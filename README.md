@@ -17,19 +17,16 @@ The repository is organized with the following directory structure:
 ```
 .
 ├── apps/
-│   └── server
+│   ├── ui
+│   └── api
 └── packages/
-    ├── client
-    ├── common
-    ├── dictionary
-    └── validation
+    └── types
 ```
 
 The modules in the monorepo are organized into two categories:
 
 - **apps/** - Standalone processes meant to be run. These are published to [ghcr.io](https://ghcr.io) as container images.
 - **packages/** - Reusable packages shared between applications and other packages. Packages are published to [NPM](https://npmjs.com).
-- **scripts** - Utility scripts for use within this repo.
 
 ## Local development
 
@@ -41,23 +38,16 @@ The modules in the monorepo are organized into two categories:
 
 ### System Dependencies
 
-- [Lectern](https://github.com/overture-stack/lectern) Dictionary Management and validation
-- [Postgres Database](https://www.postgresql.org/) For data storage
-
 ### Setup
-
-- If the setup is sufficiently simple you may choose to display it here, otherwise link to the detailed setup.md within your /docs folder
 
 ## Documentation
 
-- **[Developer Documentation](link):** Technical resources for those working with or contributing to the project, these exists within the `/docs` folder of this repository as well as our [developer docs website](link).
-
-- **[Platform Guides](link):** Targeted towards end-users and administrators looking for information on Overture platform setup, maintenance and usage.
+- [Postgres Database](https://www.postgresql.org/) For data storage
 
 ## Support & Contributions
 
-- Filing an [issue](https://github.com/overture-stack/{repoName}/issues)
-- Making a [contribution](CONTRIBUTING.md)
+- Filing an [issue](https://github.com/Pan-Canadian-Genome-Library/daco/issues)
+- Making a [contribution](https://github.com/overture-stack/.github/blob/master/CONTRIBUTING.md)
 - Connect with us on [Slack](http://slack.overture.bio)
 
 ## Related Software
