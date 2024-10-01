@@ -1,8 +1,17 @@
 {
 	"name": "pcgl-daco",
-	"version": "1.0.0",
-	"description": "",
+	"version": "0.0.1",
+	"description": "Pan Canadian Genome Library DACO",
 	"main": "index.js",
+	"type": "module",
+	"homepage": "https://github.com/Pan-Canadian-Genome-Library/daco#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Pan-Canadian-Genome-Library/daco"
+	},
+	"bugs": {
+		"url": "https://github.com/Pan-Canadian-Genome-Library/daco/issues"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
