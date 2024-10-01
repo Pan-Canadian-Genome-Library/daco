@@ -1,0 +1,7 @@
+{
+	"_type": "Revisions",
+	"createdAt": "date",
+	"createdBy": "string",
+	"version": "number",
+	"changes": "object"
+}

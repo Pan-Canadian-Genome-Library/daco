@@ -1,0 +1,86 @@
+{
+	"_type": "Application",
+	"status": "draft/review/approved/closed/revoked",
+	"applicant": {
+		"personal_information": {
+			"userId": "from auth",
+			"title": "mr/mrs/etc",
+			"first": "string",
+			"middle": "string",
+			"last": "string",
+			"suffix": "string",
+			"primary_affiliation": "string",
+			"institutional_email": "email",
+			"researcher_profile_URL": "string",
+			"position_title": "string"
+		}
+	},
+	"institution": {
+		"country": "Canada/dropdown",
+		"street_address": "string",
+		"building": "string",
+		"suite": "string",
+		"city": "string",
+		"province/state": "dropdown",
+		"zip": "string"
+	},
+
+	"institutional_representative": {
+		"applicant": "Applicant",
+		"institution": "Institution"
+	},
+
+	"collaborators": {
+		"application_ID": "id",
+		"collaborator_type": "authorized_personnel/authorized_student",
+		"title": "mr/mrs/etc",
+		"first": "string",
+		"middle": "string",
+		"last": "string",
+		"suffix": "string",
+		"primary_affiliation": "string",
+		"institutional_email": "email",
+		"researcher_profile_URL": "string",
+		"position_title": "string"
+	},
+
+	"project_information": {
+		"project_title": "string",
+		"project_website": "string",
+		"background": "text, character limit",
+		"methodology": "text, character limit",
+		"summary": "text, character limit",
+		"Relevant Publications": ["string"]
+	},
+
+	"requested_studies": {
+		"studyIds": ["id"]
+	},
+
+	"Ethics": {
+		"accepted": "boolean",
+		"ethics_letter": "file, if false"
+	},
+
+	"files": [
+		{
+			"fileId": "id",
+			"type": "string, signed PDF, Ethics Letter, Signatures, etc.",
+			"createdAt": "date",
+			"fileType": "pdf/doc/docx",
+			"data": "blob, max size, <5mb"
+		}
+	],
+
+	"data_access_agreement": {
+		"agreements": "boolean"
+	},
+
+	"appendices": {
+		"agreements": "boolean"
+	},
+
+	"signatures": "E-Signature or Manual",
+
+	"revisions": { "_type": "Revisions" }
+}
