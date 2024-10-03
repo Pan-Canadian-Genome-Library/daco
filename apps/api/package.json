@@ -1,12 +1,12 @@
 {
-	"name": "pcgl-daco-ui",
+	"name": "pcgl-daco-api",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
+	"main": "src/main.ts",
 	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build",
-		"preview": "vite preview"
+		"dev": "node ./dist/pcgl-daco-api",
+		"build": "tsc && vite build"
 	},
 	"devDependencies": {
 		"@types/express": "^5.0.0",
