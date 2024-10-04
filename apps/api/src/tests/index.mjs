@@ -17,16 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import express, { Request, Response } from 'express';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 
-const app = express();
-export const port = 3000;
+import { port } from '../../dist/pcgl-daco-api.js';
 
-app.get('/', (req: Request, res: Response) => {
-	console.log(req);
-	res.send('Hello World!');
-});
+describe('Initial Test Setup', async (t) => {
+	describe('First File', () => {
+		it('should have a Port Value of 3000', () => {
+			assert.strictEqual(port, 3000);
+		});
+	});
 
-app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
+	describe('Second File', async () => {
+		await it('Test Async Port Value', async (testContext) => {
+			console.log('Test Context', testContext);
+
+			setTimeout(() => {});
+			assert.strictEqual(port, 3000);
+		});
+	});
 });
