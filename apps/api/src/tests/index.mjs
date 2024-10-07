@@ -18,7 +18,7 @@
  */
 
 import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { beforeEach, describe, it } from 'node:test';
 
 import { port, server } from '../../dist/pcgl-daco-api.js';
 
@@ -34,10 +34,10 @@ describe('Initial Test Setup', async () => {
 // Example async beforeEach + testContext
 // Mock DB Setup etc.
 describe('Async Test Setup', async () => {
-	it('Second Test Suite', async (testContext) => {
+	it('Second Test Suite using BeforeEach', async () => {
 		let asyncData = 0;
 
-		testContext.beforeEach(async () => {
+		beforeEach(async () => {
 			const setupPromise = new Promise((resolve) => {
 				asyncData++;
 				resolve(asyncData);
@@ -46,10 +46,12 @@ describe('Async Test Setup', async () => {
 			setupPromise.then((data) => console.log('\nAsync Data', data));
 		});
 
-		await testContext.test('Example Async BeforeEach', async () => {
-			console.log('Async Data', asyncData);
-
+		await it('AsyncData does not equal 0', async () => {
 			assert.notEqual(asyncData, 0);
+		});
+
+		await it('AsyncData equals 2 (beforeEach called on every Test)', async () => {
+			assert.equal(asyncData, 2);
 		});
 	});
 });
