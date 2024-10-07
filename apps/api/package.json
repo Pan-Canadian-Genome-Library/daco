@@ -5,17 +5,21 @@
 	"type": "module",
 	"main": "src/main.ts",
 	"scripts": {
-		"dev": "node ./dist/pcgl-daco-api",
+		"dev": "nodemon --loader ts-node/esm ./src/main.mts",
 		"build": "tsc && vite build",
 		"test": "node --test --test-reporter=spec --experimental-test-coverage ./src/tests/*"
 	},
 	"devDependencies": {
+		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.7.4",
+		"nodemon": "^3.1.7",
+		"ts-node": "^10.9.2",
 		"typescript": "^5.5.3",
 		"vite": "^5.4.1"
 	},
 	"dependencies": {
+		"cors": "^2.8.5",
 		"express": "^4.21.0"
 	},
 	"engines": {

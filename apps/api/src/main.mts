@@ -17,16 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import cors from 'cors';
 import express, { Request, Response } from 'express';
+
+const demoApplication = { title: 'PCGL Project Setup' };
 
 const app = express();
 
 // Exports only to demo test suite
 export const port = 3000;
 
+app.use(cors());
+
 app.get('/', (req: Request, res: Response) => {
 	console.log(req);
 	res.send('Hello World!');
+});
+
+app.get('/applications', cors(), (req: Request, res: Response) => {
+	// TODO: fix unused req
+	console.log('Headers', req.headers);
+	res.send(demoApplication);
 });
 
 // Exports only to demo test suite
