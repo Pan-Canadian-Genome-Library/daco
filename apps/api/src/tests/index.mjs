@@ -20,7 +20,7 @@
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { port } from '../../dist/pcgl-daco-api.js';
+import { port, server } from '../../dist/pcgl-daco-api.js';
 
 describe('Initial Test Setup', async (t) => {
 	describe('First File', () => {
@@ -35,6 +35,16 @@ describe('Initial Test Setup', async (t) => {
 
 			setTimeout(() => {});
 			assert.strictEqual(port, 3000);
+		});
+	});
+
+	describe('Third File', async () => {
+		it('Demo Failure Case', async () => {
+			assert.strictEqual(port, 4000);
+		});
+
+		it('Close Server', async () => {
+			server.close();
 		});
 	});
 });

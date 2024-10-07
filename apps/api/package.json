@@ -6,7 +6,8 @@
 	"main": "src/main.ts",
 	"scripts": {
 		"dev": "node ./dist/pcgl-daco-api",
-		"build": "tsc && vite build"
+		"build": "tsc && vite build",
+		"test": "node --test --test-reporter=spec ./src/tests/*"
 	},
 	"devDependencies": {
 		"@types/express": "^5.0.0",

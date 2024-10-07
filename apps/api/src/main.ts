@@ -20,6 +20,8 @@
 import express, { Request, Response } from 'express';
 
 const app = express();
+
+// Exports only to demo test suite
 export const port = 3000;
 
 app.get('/', (req: Request, res: Response) => {
@@ -27,6 +29,7 @@ app.get('/', (req: Request, res: Response) => {
 	res.send('Hello World!');
 });
 
-app.listen(port, () => {
+// Exports only to demo test suite
+export const server = app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`);
 });
