@@ -3,7 +3,7 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
-	"main": "src/main.ts",
+	"main": "src/main.mts",
 	"scripts": {
 		"dev": "nodemon --loader ts-node/esm ./src/main.mts",
 		"build": "tsc && vite build",
@@ -19,6 +19,7 @@
 		"vite": "^5.4.1"
 	},
 	"dependencies": {
+		"pcgl-daco": "workspace:^",
 		"cors": "^2.8.5",
 		"express": "^4.21.0"
 	},

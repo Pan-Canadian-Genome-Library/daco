@@ -7,16 +7,10 @@ export default defineConfig({
 		manifest: true,
 		lib: {
 			entry: './src/main.mts',
-			name: 'pcql-daco-api',
+			name: 'pcql-daco-types',
 		},
 		rollupOptions: {
 			input: './src/main.mts',
-			external: ['express'],
-			output: {
-				globals: {
-					express: 'express',
-				},
-			},
 		},
 	},
 	plugins: [],

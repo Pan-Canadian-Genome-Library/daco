@@ -17,31 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import cors from 'cors';
-import express, { Request, Response } from 'express';
+export {
+	type Applicant,
+	type Application,
+	type Collaborator,
+	type Institution,
+	type PersonalInfo,
+	type Project,
+} from './types';
 
-// TODO: fix import
-import { demoApplication } from 'pcgl-daco/packages/types/src/main.mjs';
-
-const app = express();
-
-// Exports only to demo test suite
-export const port = 3000;
-
-app.use(cors());
-
-app.get('/', (req: Request, res: Response) => {
-	console.log(req);
-	res.send('Hello World!');
-});
-
-app.get('/applications', cors(), (req: Request, res: Response) => {
-	// TODO: fix unused req
-	console.log('Headers', req.headers);
-	res.send(demoApplication);
-});
-
-// Exports only to demo test suite
-export const server = app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
-});
+export { demoApplication } from './demoData.mts';
