@@ -32,7 +32,6 @@ function App() {
 
 		setApplication(application);
 	};
-	console.log(application);
 
 	const applicantName = application
 		? `${application.applicant.title}
