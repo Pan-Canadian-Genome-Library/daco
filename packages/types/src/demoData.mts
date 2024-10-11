@@ -23,75 +23,75 @@ export const demoApplication: Application = {
 	_type: 'Application',
 	status: 'DRAFT',
 	applicant: {
-		application_ID: '123',
+		applicationID: '123',
 		userId: 'id01',
 		title: 'Dr.',
 		first: 'Testing',
 		middle: 'Test',
 		last: 'Person',
 		suffix: '',
-		primary_affiliation: 'OICR',
-		institutional_email: 'testing@oicr.on.ca',
-		researcher_profile_URL: 'platform.icgc-argo.org',
-		position_title: 'Dr.',
+		primaryAffiliation: 'OICR',
+		institutionalEmail: 'testing@oicr.on.ca',
+		researcherProfileURL: 'platform.icgc-argo.org',
+		positionTitle: 'Dr.',
 	},
 
 	institution: {
 		country: 'Canada',
-		street_address: '661 University Ave',
+		streetAddress: '661 University Ave',
 		suite: '510',
 		city: 'Toronto',
 		province: 'ON',
-		postal_code: 'M5G 0A3',
+		postalCode: 'M5G 0A3',
 	},
 
 	institutional_representative: {
 		applicant: {
-			application_ID: '123',
+			applicationID: '123',
 			userId: 'id02',
 			title: 'Mrs.',
 			first: 'Jane',
 			middle: '',
 			last: 'Doe',
 			suffix: '',
-			primary_affiliation: 'OICR',
-			institutional_email: 'testing@oicr.on.ca',
-			researcher_profile_URL: 'platform.icgc-argo.org',
-			position_title: 'PI',
+			primaryAffiliation: 'OICR',
+			institutionalEmail: 'testing@oicr.on.ca',
+			researcherProfileURL: 'platform.icgc-argo.org',
+			positionTitle: 'PI',
 		},
 		institution: {
 			country: 'Canada',
-			street_address: '661 University Ave',
+			streetAddress: '661 University Ave',
 			suite: '510',
 			city: 'Toronto',
 			province: 'ON',
-			postal_code: 'M5G 0A3',
+			postalCode: 'M5G 0A3',
 		},
 	},
 
 	collaborators: [],
 
-	project_information: {
-		project_title: 'ICGC ARGO',
-		project_website: 'platform.icgc-argo.org',
+	projectInformation: {
+		title: 'ICGC ARGO',
+		website: 'platform.icgc-argo.org',
 		background: '',
 		methodology: '',
 		summary: '',
-		relevant_publications: 'Nature Portfolio',
+		relevantPublications: 'Nature Portfolio',
 	},
 
-	requested_studies: {
+	requestedStudies: {
 		studyIds: ['CHICHI-INTL'],
 	},
 
 	ethics: {
 		accepted: false,
-		ethics_letter: undefined,
+		ethicsLetter: undefined,
 	},
 
 	files: [],
 
-	data_access_agreement: {
+	dataAccessAgreement: {
 		agreements: false,
 	},
 

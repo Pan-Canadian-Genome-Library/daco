@@ -33,10 +33,12 @@ function App() {
 		setApplication(application);
 	};
 
-	const applicantName = application
-		? `${application.applicant.title}
-	${application.applicant.first} ${application.applicant.middle}
-	${application.applicant.last}`
+	const applicant = application?.applicant;
+
+	const applicantName = applicant
+		? `${applicant.title}
+	${applicant.first} ${applicant.middle}
+	${applicant.last}`
 		: '';
 	return (
 		<>
@@ -49,7 +51,7 @@ function App() {
 			</div>
 			{application && (
 				<div className="card">
-					<h2>{application.project_information.project_title}</h2>
+					<h2>{application.projectInformation.title}</h2>
 
 					<h3>Applicant: {applicantName}</h3>
 				</div>

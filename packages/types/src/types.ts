@@ -24,37 +24,37 @@ export type PersonalInfo = {
 	middle: string;
 	last: string;
 	suffix: string;
-	primary_affiliation: string;
-	institutional_email: string;
-	researcher_profile_URL: string;
-	position_title: string;
+	primaryAffiliation: string;
+	institutionalEmail: string;
+	researcherProfileURL: string;
+	positionTitle: string;
 };
 
 export interface Applicant extends PersonalInfo {
-	application_ID: string;
+	applicationID: string;
 }
 
 export interface Collaborator extends Applicant {
-	collaborator_type: string;
+	collaboratorType: string;
 }
 
 export type Institution = {
 	country: string;
-	street_address: string;
+	streetAddress: string;
 	building?: string;
 	suite?: string;
 	city: string;
 	province: string;
-	postal_code: string;
+	postalCode: string;
 };
 
 export type Project = {
-	project_title: string;
-	project_website: string;
+	title: string;
+	website: string;
 	background: string;
 	methodology: string;
 	summary: string;
-	relevant_publications: string;
+	relevantPublications: string;
 };
 
 export type Revisions = {
@@ -86,20 +86,20 @@ export type Application = {
 
 	collaborators: Collaborator[];
 
-	project_information: Project;
+	projectInformation: Project;
 
-	requested_studies: {
+	requestedStudies: {
 		studyIds: string[];
 	};
 
 	ethics: {
 		accepted: boolean;
-		ethics_letter?: File;
+		ethicsLetter?: File;
 	};
 
 	files: File[];
 
-	data_access_agreement: {
+	dataAccessAgreement: {
 		agreements: boolean;
 	};
 
