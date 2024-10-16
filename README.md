@@ -4,11 +4,7 @@
 
 </br>
 
-> <div>
-> <img align="left" src="ov-logo.png" height="90"/>
-> </div>
->
-> _{PCGL DACO} is part of [Overture](https://www.overture.bio/), a collection of open-source software microservices used to create platforms for researchers to organize and share genomics data._
+> \_{PCGL DACO}
 
 ## Repository Structure
 
@@ -47,5 +43,3 @@ The modules in the monorepo are organized into two categories:
 ## Support & Contributions
 
 - Filing an [issue](https://github.com/Pan-Canadian-Genome-Library/daco/issues)
-- Making a [contribution](https://github.com/overture-stack/.github/blob/master/CONTRIBUTING.md)
-- Connect with us on [Slack](http://slack.overture.bio)
