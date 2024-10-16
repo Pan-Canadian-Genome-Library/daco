@@ -7,7 +7,7 @@ export default defineConfig({
 		manifest: true,
 		lib: {
 			entry: './src/main.mts',
-			name: 'pcql-daco-types',
+			name: 'pcql-daco/data-model',
 		},
 		rollupOptions: {
 			input: './src/main.mts',

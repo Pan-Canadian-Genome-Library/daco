@@ -88,7 +88,7 @@ importers:
         specifier: ^5.4.1
         version: 5.4.8(@types/node@22.7.4)
 
-  packages/types:
+  packages/data-model:
     devDependencies:
       typescript:
         specifier: ^5.5.3

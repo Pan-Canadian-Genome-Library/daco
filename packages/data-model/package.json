@@ -1,5 +1,5 @@
 {
-	"name": "types",
+	"name": "@pcgl-daco/data-model",
 	"private": true,
 	"version": "0.0.0",
 	"main": "./src/main.mts",

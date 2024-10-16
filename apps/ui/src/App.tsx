@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type Application } from 'pcgl-daco/packages/types/src/types';
+import { type Application } from 'pcgl-daco/packages/data-model/src/types';
 import { useState } from 'react';
 import './App.css';
 
