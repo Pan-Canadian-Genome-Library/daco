@@ -28,9 +28,9 @@ The modules in the monorepo are organized into two categories:
 - **apps/** - Standalone processes meant to be run. These are published to [ghcr.io](https://ghcr.io) as container images.
 - **packages/** - Reusable packages shared between applications and other packages. Packages are published to [NPM](https://npmjs.com).
 
-## Local development
+## Local Development
 
-### Development tools
+### Development Tools
 
 - [PNPM](https://pnpm.io/) Project manager
 - [Node.js](https://nodejs.org/en) Runtime environment (v20 or higher)
@@ -49,19 +49,3 @@ The modules in the monorepo are organized into two categories:
 - Filing an [issue](https://github.com/Pan-Canadian-Genome-Library/daco/issues)
 - Making a [contribution](https://github.com/overture-stack/.github/blob/master/CONTRIBUTING.md)
 - Connect with us on [Slack](http://slack.overture.bio)
-
-## Related Software
-
-The Overture Platform includes the following Overture Components:
-
-</br>
-
-| Software                                                | Description                                                                             |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [Score](https://github.com/overture-stack/score/)       | Transfer data to and from any cloud-based storage system                                |
-| [Song](https://github.com/overture-stack/song/)         | Catalog and manage metadata associated to file data spread across cloud storage systems |
-| [Maestro](https://github.com/overture-stack/maestro/)   | Organizing your distributed data into a centralized Elasticsearch index                 |
-| [Arranger](https://github.com/overture-stack/arranger/) | A search API with reusable search UI components                                         |
-| [Stage](https://github.com/overture-stack/stage)        | A React-based front-data portal UI                                                      |
-| [Lyric](https://github.com/overture-stack/lyric)        | A data-agnostic tabular data submission system                                          |
-| [Lectern](https://github.com/overture-stack/lectern)    | A simple web browser UI that integrates Ego and Arranger                                |
