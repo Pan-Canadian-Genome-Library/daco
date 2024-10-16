@@ -20,7 +20,6 @@
 import { Application } from './types';
 
 export const demoApplication: Application = {
-	_type: 'Application',
 	status: 'DRAFT',
 	applicant: {
 		applicationID: '123',

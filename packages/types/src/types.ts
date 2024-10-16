@@ -58,7 +58,6 @@ export type Project = {
 };
 
 export type Revisions = {
-	_type: 'Revisions';
 	createdAt: Date;
 	createdBy: 'string';
 	version: number;
@@ -74,7 +73,6 @@ export enum Status {
 }
 
 export type Application = {
-	_type: 'Application';
 	status: keyof typeof Status;
 	applicant: Applicant;
 	institution: Institution;
