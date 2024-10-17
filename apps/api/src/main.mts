@@ -29,8 +29,7 @@ export const port = 3000;
 
 app.use(cors());
 
-app.get('/', (req: Request, res: Response) => {
-	console.log(req);
+app.get('/', (_req: Request, res: Response) => {
 	res.send('Hello World!');
 });
 
