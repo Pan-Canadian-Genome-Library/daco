@@ -65,8 +65,8 @@ Table application_contents {
 
   application_id bigint [not null, ref: - applications.id]
 
-	created_at timestamp [not null]
-	updated_at timestamp [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
 
   applicant_first_name varchar(255)
   applicant_middle_name varchar(255)
@@ -80,16 +80,16 @@ Table application_contents {
 
   applicant_profile_url text // no length restriciton on url, application should validate its properly formed url
 
-	institutional_rep_title varchar(255)
-	institutional_rep_first_name varchar(255)
+  institutional_rep_title varchar(255)
+  institutional_rep_first_name varchar(255)
   institutional_rep_middle_name varchar(255)
   institutional_rep_last_name varchar(255)
   institutional_rep_suffix varchar(255)
-	institutional_rep_primary_affiliation varchar(255)
-	institutional_rep_email varchar(255)
-	institutional_rep_profile_url varchar(255)
-	institutional_rep_position_title varchar(255)
-	
+  institutional_rep_primary_affiliation varchar(255)
+  institutional_rep_email varchar(255)
+  institutional_rep_profile_url varchar(255)
+  institutional_rep_position_title varchar(255)
+  
   institution_country vachar(255)
   institution_state vachar(255)
   institution_city vachar(255)
@@ -104,23 +104,23 @@ Table application_contents {
   project_summary text
   project_publication_urls text[]
 
-	//TODO: requested study information
-	requested_studies text[]
+  //TODO: requested study information
+  requested_studies text[]
 
   // TODO: need to store user agreement to terms
 
-	ethics_review_required boolean
+  ethics_review_required boolean
   ethics_letter bigint [ref: - files.id]
 
-	dac_agreement_software_updates boolean [Note: "You will keep all computer systems on which PCGL Controlled Datea reside, or which provide accesss to such data, up-to-date with respect to software patches and antivirus file definitions (if applicable)."]
-	dac_agreement_non_disclosure boolean [Note: "You will protect ICGC Controlled Data against disclosure to and use by unauthorized individuals."]
-	dac_agreement_monitor_individual_access boolean [Note: "You will monitor and control which individuals have access to ICGC controlled Data."]
-	dac_agreement_destroy_data boolean [Note: "You will securely destroy all copies of ICGC Controlled Data in accordance with the terms and conditions of the Data Access Agreement."]
-	dac_agreement_familiarize_restrictions boolean [Note: "You will familiarixe all individuals who have access to ICGC Controlled Data with the restrictions on its use."]
-	dac_agreement_provide_it_policy boolean [Note: "You agree to swiftly provide a copy of both your institutional and Research Project related IT policy documents upon request from a DACO representative."]
-	dac_agreement_notify_unauthorized_access boolean [Note: "You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized access to the ICGC Controlled Data."]
-	dac_agreement_certify_application boolean [Note: "You certify that the contents in the application are ture and correct to the best of your knowledge and belief."]
-	dac_agreement_read_and_agreed boolean [Note: "You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement."]
+  dac_agreement_software_updates boolean [Note: "You will keep all computer systems on which PCGL Controlled Datea reside, or which provide accesss to such data, up-to-date with respect to software patches and antivirus file definitions (if applicable)."]
+  dac_agreement_non_disclosure boolean [Note: "You will protect ICGC Controlled Data against disclosure to and use by unauthorized individuals."]
+  dac_agreement_monitor_individual_access boolean [Note: "You will monitor and control which individuals have access to ICGC controlled Data."]
+  dac_agreement_destroy_data boolean [Note: "You will securely destroy all copies of ICGC Controlled Data in accordance with the terms and conditions of the Data Access Agreement."]
+  dac_agreement_familiarize_restrictions boolean [Note: "You will familiarixe all individuals who have access to ICGC Controlled Data with the restrictions on its use."]
+  dac_agreement_provide_it_policy boolean [Note: "You agree to swiftly provide a copy of both your institutional and Research Project related IT policy documents upon request from a DACO representative."]
+  dac_agreement_notify_unauthorized_access boolean [Note: "You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized access to the ICGC Controlled Data."]
+  dac_agreement_certify_application boolean [Note: "You certify that the contents in the application are ture and correct to the best of your knowledge and belief."]
+  dac_agreement_read_and_agreed boolean [Note: "You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement."]
 
   signed_pdf bigint [ref: -files.id]
 }
