@@ -9,3 +9,19 @@ node_modules/
 
 # dotenv environment variable files
 .env*
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+
+# System
+.DS_Store
+
+# Dependencies, Env & Build
+node_modules
+dist
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
