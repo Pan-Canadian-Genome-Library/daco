@@ -1,24 +1,9 @@
 {
+	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"module": "ESNext",
 		"lib": ["ESNext"],
-		"skipLibCheck": true,
 		"moduleResolution": "node",
-		"esModuleInterop": true,
-		"allowImportingTsExtensions": true,
-		"allowSyntheticDefaultImports": true,
-		"isolatedModules": true,
-		"moduleDetection": "force",
-		"noEmit": true,
-		"baseUrl": ".",
-		"paths": {
-			"*": ["node_modules/*"]
-		},
-
-		"strict": true,
-		"noUnusedLocals": true,
-		"noImplicitAny": true,
-		"noUncheckedIndexedAccess": true
+		"esModuleInterop": true
 	},
-	"include": ["src"]
+	"include": ["src", "vite.config.ts"]
 }

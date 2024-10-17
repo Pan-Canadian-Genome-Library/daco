@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"lib": ["ESNext"],
+		"skipLibCheck": true,
+		"allowImportingTsExtensions": true,
+		"allowSyntheticDefaultImports": true,
+		"isolatedModules": true,
+		"moduleDetection": "force",
+		"noEmit": true,
+		"baseUrl": ".",
+		"paths": {
+			"*": ["./node_modules/*"],
+			"vite": ["./node_modules/vite"]
+		}
+	},
+
+	/* Linting */
+	"strict": true,
+	"noUnusedLocals": true,
+	"noImplicitAny": true,
+	"noUncheckedIndexedAccess": true,
+	"useDefineForClassFields": true,
+	"noFallthroughCasesInSwitch": true
+}

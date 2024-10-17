@@ -9,9 +9,6 @@ export default defineConfig({
 			entry: './src/main.mts',
 			name: 'pcql-daco/data-model',
 		},
-		rollupOptions: {
-			input: './src/main.mts',
-		},
 	},
 	plugins: [],
 });
