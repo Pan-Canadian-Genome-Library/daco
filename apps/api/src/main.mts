@@ -25,7 +25,6 @@ import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
 
 const app = express();
 
-// Exports only to demo test suite
 export const port = 3000;
 
 app.use(cors());
@@ -35,13 +34,10 @@ app.get('/', (req: Request, res: Response) => {
 	res.send('Hello World!');
 });
 
-app.get('/applications', cors(), (req: Request, res: Response) => {
-	// TODO: fix unused req
-	console.log('Headers', req.headers);
+app.get('/applications', cors(), (_req: Request, res: Response) => {
 	res.send(demoApplication);
 });
 
-// Exports only to demo test suite
 export const server = app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`);
 });

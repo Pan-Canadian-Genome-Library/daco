@@ -18,51 +18,18 @@
  */
 
 import assert from 'node:assert';
-import { beforeEach, describe, it } from 'node:test';
+import { after, describe, it } from 'node:test';
 
 import { port, server } from '../../dist/pcgl-daco-api.js';
 
-// Most basic synchronous example
 describe('Initial Test Setup', async () => {
 	describe('First File', () => {
 		it('should have a Port Value of 3000', () => {
 			assert.strictEqual(port, 3000);
 		});
 	});
-});
 
-// Example async beforeEach + testContext
-// Mock DB Setup etc.
-describe('Async Test Setup', async () => {
-	it('Second Test Suite using BeforeEach', async () => {
-		let asyncData = 0;
-
-		beforeEach(async () => {
-			const setupPromise = new Promise((resolve) => {
-				asyncData++;
-				resolve(asyncData);
-			});
-
-			setupPromise.then((data) => console.log('\nAsync Data', data));
-		});
-
-		await it('AsyncData does not equal 0', async () => {
-			assert.notEqual(asyncData, 0);
-		});
-
-		await it('AsyncData equals 2 (beforeEach called on every Test)', async () => {
-			assert.equal(asyncData, 2);
-		});
-	});
-});
-
-// Failure Example + Close Server
-describe('Third Test Suite', async () => {
-	it('Example Failure Case', async () => {
-		assert.strictEqual(port, 4000);
-	});
-
-	it('Close Server', async () => {
+	after(() => {
 		server.close();
 	});
 });
