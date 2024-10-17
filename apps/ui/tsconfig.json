@@ -1,7 +1,12 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"jsx": "react-jsx"
+	},
+	"include": ["src", "vite.config.ts"]
 }
