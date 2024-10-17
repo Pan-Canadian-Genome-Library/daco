@@ -1,23 +1,10 @@
 {
+	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"target": "ES2020",
-		"useDefineForClassFields": true,
-		"module": "ESNext",
-		"lib": ["ES2020", "DOM", "DOM.Iterable"],
-		"skipLibCheck": true,
+		"lib": ["ESNext"],
 
 		/* Bundler mode */
-		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": true,
-		"isolatedModules": true,
-		"moduleDetection": "force",
-		"noEmit": true,
-
-		/* Linting */
-		"strict": true,
-		"noUnusedLocals": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedIndexedAccess": true
+		"moduleResolution": "bundler"
 	},
-	"include": ["src"]
+	"include": ["src", "vite.config.ts"]
 }
