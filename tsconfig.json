@@ -12,14 +12,14 @@
 		"paths": {
 			"*": ["./node_modules/*"],
 			"vite": ["./node_modules/vite"]
-		}
+		},
+		"strict": true,
+		"useDefineForClassFields": true
 	},
 
 	/* Linting */
-	"strict": true,
 	"noUnusedLocals": true,
 	"noImplicitAny": true,
 	"noUncheckedIndexedAccess": true,
-	"useDefineForClassFields": true,
 	"noFallthroughCasesInSwitch": true
 }
