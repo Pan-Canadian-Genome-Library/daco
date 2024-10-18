@@ -34,11 +34,21 @@ The modules in the monorepo are organized into two categories:
 
 ### System Dependencies
 
+- This project uses Node ^20.1, Typescript ^5.5, and PNPM ^9.10, and was created using Vite 5.4.1.
+
 ### Setup
 
-## Documentation
+- Install PNPM: `npm i -g pnpm`
 
-- [Postgres Database](https://www.postgresql.org/) For data storage
+- Install dependencies: `pnpm i`
+
+- Start server:
+  `cd apps/api`
+  `pnpm run dev`
+
+- Start UI:
+  `cd apps/ui`
+  `pnpm run dev`
 
 ## Support & Contributions
 
