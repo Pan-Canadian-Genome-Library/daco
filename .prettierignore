@@ -1,0 +1,8 @@
+**/Dockerfile
+**/node_modules
+**/*.sh
+**/*.md
+**/*.min.js
+**/package-lock.json
+**/.gitignore
+**/pnpm-lock.yaml
