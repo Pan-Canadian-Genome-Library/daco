@@ -180,6 +180,12 @@ export type Files = {
 	filename: string;
 };
 
+export type EthicsData = {
+	ethicsReviewRequired: boolean;
+	ethicsLetter?: BigInt;
+	signedPdf?: BigInt;
+};
+
 export type ApplicationContents = {
 	applicant: BigInt;
 	createdAt: Date;
@@ -194,10 +200,7 @@ export type ApplicationContents = {
 	requestedStudies?: {
 		studyIds: string[]; //TODO: requested study information
 	};
-	ethics?: {
-		accepted: boolean;
-		ethicsLetter?: Files;
-	};
+	ethics?: EthicsData;
 	files?: Files[];
 	dataAccessAgreements?: Agreements[];
 	appendices?: {
@@ -206,12 +209,6 @@ export type ApplicationContents = {
 	signatures?: Files[];
 	revisions?: RevisionRequest[];
 };
-
-// TODO: need to store user agreement to terms
-// 	ethics_review_required boolean
-//   ethics_letter bigint [ref: - files.id]
-
-//   signed_pdf bigint [ref: -files.id]
 
 export type Application = {
 	id: BigInt;
