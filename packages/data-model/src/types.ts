@@ -17,12 +17,51 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Constants
+
+export enum ApplicationStates {
+	'DRAFT',
+	'INSTITUTIONAL_REP_REVIEW',
+	'DAC_REVIEW',
+	'DAC_REVISIONS_REQUESTED',
+	'REJECTED',
+	'APPROVED',
+	'CLOSED',
+	'REVOKED',
+}
+
+export enum FileTypes {
+	'SIGNED_APPLICATION',
+	'ETHICS_LETTER',
+}
+
+export enum ApplicationReviewOutcomes {
+	'APPROVED',
+	'REJECTED',
+	'REVISIONS_REQUESTED',
+}
+
+export enum ApplicationActions {
+	'CREATE',
+	'WITHDRAW',
+	'CLOSE',
+	'REQUEST_INSTITUTIONAL_REP',
+	'INSTITUTIONAL_REP_APPROVED',
+	'INSTITUTIONAL_REP_REJECTED',
+	'DAC_REVIEW_APPROVED',
+	'DAC_REVIEW_REJECTED',
+	'DAC_REVIEW_REVISIONS',
+	'REVOKE',
+}
+
+// Data Types
+
 export type PersonalInfo = {
 	userId: string;
 	title: string;
-	first: string;
-	middle: string;
-	last: string;
+	firstName: string;
+	middleName: string;
+	lastName: string;
 	suffix: string;
 	primaryAffiliation: string;
 	institutionalEmail: string;
@@ -57,124 +96,83 @@ export type Project = {
 	relevantPublications: string;
 };
 
-export type Revisions = {
+export type RevisionRequest = {
+	id: BigInt;
+	applicationId: BigInt;
 	createdAt: Date;
-	createdBy: 'string';
+	createdBy: string;
 	version: number;
 	changes: {}[];
+	comments?: string;
+	applicantApproved: Boolean;
+	applicantNotes?: string;
+	institutionRepApproved: boolean;
+	institutionRepNotes?: string;
+	collaboratorsApproved: boolean;
+	collaboratorsNotes?: string;
+	projectApproved: boolean;
+	projectNotes?: string;
+	requestedStudiesApproved: boolean;
+	requestedStudiesNotes?: string;
 };
 
-export enum Status {
-	'DRAFT',
-	'INSTITUTIONAL_REP_REVIEW',
-	'DAC_REVIEW',
-	'DAC_REVISIONS_REQUESTED',
-	'REJECTED',
-	'APPROVED',
-	'CLOSED',
-	'REVOKED',
-}
+export type Agreements = {
+	id: BigInt;
+	userId: string;
+	name: string;
+	agreementText: string;
+	agreementType: string; // enum, need to review possible agreements needed
+	agreedAt: Date;
+};
 
-export enum file_type {
-	'SIGNED_APPLICATION',
-	'ETHICS_LETTER',
-}
+export type Files = {
+	id: BigInt;
+	applicationId: BigInt;
+	type: FileTypes;
+	SubmitterUserId: BigInt;
+	submitted_at: Date;
+	content: any; // TODO: Add correct type
+	filename: string;
+};
 
-export enum application_review_outcome {
-	'APPROVED',
-	'REJECTED',
-	'REVISIONS_REQUESTED',
-}
+// Table application_actions {
+//   id bigint [pk, increment]
+//   application_id bigint [not null, ref: <> applications.id]
+//   created_at timestamp [not null]
+//   user_id varchar(100) [not null]
+//   action application_action [not null]
+//   state_before varchar(255) [not null]
+//   state_after varchar(255) [not null]
+//   revisions_request_id bigint [ref: - revision_requests.id]
+//   // TODO: may need reference to a content diff
+// }
 
-export enum application_action {
-	'CREATE',
-	'WITHDRAW',
-	'CLOSE',
-	'REQUEST_INSTITUTIONAL_REP',
-	'INSTITUTIONAL_REP_APPROVED',
-	'INSTITUTIONAL_REP_REJECTED',
-	'DAC_REVIEW_APPROVED',
-	'DAC_REVIEW_REJECTED',
-	'DAC_REVIEW_REVISIONS',
-	'REVOKE',
-}
-
-export type Application = {
-	status: keyof typeof Status;
-	applicant: Applicant;
-	institution: Institution;
-
-	institutional_representative: {
+export type ApplicationContents = {
+	applicant: BigInt;
+	createdAt: Date;
+	updatedAt: Date;
+	institution?: Institution;
+	institutional_representative?: {
 		applicant: Applicant;
 		institution: Institution;
 	};
-
-	collaborators: Collaborator[];
-
-	projectInformation: Project;
-
-	requestedStudies: {
+	collaborators?: Collaborator[];
+	projectInformation?: Project;
+	requestedStudies?: {
 		studyIds: string[];
 	};
-
-	ethics: {
+	ethics?: {
 		accepted: boolean;
-		ethicsLetter?: File;
+		ethicsLetter?: Files;
 	};
-
-	files: File[];
-
-	dataAccessAgreement: {
-		agreements: boolean;
-	};
-
-	appendices: {
+	files?: Files[];
+	dataAccessAgreements?: Agreements[];
+	appendices?: {
 		agreements: { name: string; agreement: boolean }[];
 	};
-
-	signatures: File[];
-
-	revisions: Revisions[];
+	signatures?: Files[];
+	revisions?: RevisionRequest[];
 };
-
-// Table applications {
-//   id bigint [pk, increment]
-
-//   user_id varchar(100) [not null] // User ID set to a string since we don't have details atm about how this will be communicated. This will either be email address or a unique token from the auth system
-
-//   state application_state [not null]
-
-//   created_at timestamp [not null]
-
-//   approved_at timestamp
-//   expires_at timestamp
-// }
-
-// Table application_contents {
-//   Note: '''
-//     All fields here are nullable as this allows us to store partially complete
-//     applications as the user is working through the submission form.
-
-//     Validation rules for the application content needs to be implemented in the
-//     software, not at the database level.
-//   '''
-
-//   application_id bigint [not null, ref: - applications.id]
-
-// 	created_at timestamp [not null]
-// 	updated_at timestamp [not null]
-
-//   applicant_first_name varchar(255)
-//   applicant_middle_name varchar(255)
-//   applicant_last_name varchar(255)
-//   applicant_title varchar(255)
-//   applicant_suffix varchar(255)
-//   applicant_position_title varchar(255)
-
-//   applicant_primary_affiliation varchar(500)
-//   applicant_institutional_email varchar(320) // emails addresses cannot be longer than 320
-
-//   applicant_profile_url text // no length restriciton on url, application should validate its properly formed url
 
 // 	institutional_rep_title varchar(255)
 // 	institutional_rep_first_name varchar(255)
@@ -204,10 +202,8 @@ export type Application = {
 // requested_studies text[]
 
 // TODO: need to store user agreement to terms
-
 // 	ethics_review_required boolean
 //   ethics_letter bigint [ref: - files.id]
-
 // 	dac_agreement_software_updates boolean [Note: "You will keep all computer systems on which PCGL Controlled Datea reside, or which provide accesss to such data, up-to-date with respect to software patches and antivirus file definitions (if applicable)."]
 // 	dac_agreement_non_disclosure boolean [Note: "You will protect ICGC Controlled Data against disclosure to and use by unauthorized individuals."]
 // 	dac_agreement_monitor_individual_access boolean [Note: "You will monitor and control which individuals have access to ICGC controlled Data."]
@@ -217,90 +213,15 @@ export type Application = {
 // 	dac_agreement_notify_unauthorized_access boolean [Note: "You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized access to the ICGC Controlled Data."]
 // 	dac_agreement_certify_application boolean [Note: "You certify that the contents in the application are ture and correct to the best of your knowledge and belief."]
 // 	dac_agreement_read_and_agreed boolean [Note: "You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement."]
-
 //   signed_pdf bigint [ref: -files.id]
 // }
 
-// Table application_actions {
-//   id bigint [pk, increment]
-
-//   application_id bigint [not null, ref: <> applications.id]
-
-//   created_at timestamp [not null]
-
-//   user_id varchar(100) [not null]
-
-//   action application_action [not null]
-//   state_before varchar(255) [not null]
-//   state_after varchar(255) [not null]
-
-//   revisions_request_id bigint [ref: - revision_requests.id]
-
-//   // TODO: may need reference to a content diff
-// }
-
-// Table revision_requests {
-//   id bigint [pk, increment]
-//   application_id bigint [not null, ref: <> applications.id]
-
-//   created_at timestamp [not null]
-
-//   comments text
-
-//   applicant_approved boolean [not null]
-//   applicant_notes text
-
-//   institution_rep_approved boolean [not null]
-//   institution_rep_notes text
-
-//   collaborators_approved boolean [not null]
-//   collaborators_notes text
-
-//   project_approved boolean [not null]
-//   project_notes text
-
-//   requested_studies_approved boolean [not null]
-//   requested_studies_notes text
-// }
-
-// TODO: Might need to track user agreements separate from the application content, This could model this
-// Table agreements {
-//   id bigint [not null]
-//   user_id varchar(100) [not null]
-//   name text [not null]
-//   agreement_text text [not null]
-
-//   agreement_type agreement_type [not null] // enum, need to review possible agreements needed
-//   agreed_at timestamp [not null] // with timezone, seconds precision = 0
-// }
-
-// Table collaborators {
-//   id bigint [pk, increment]
-//   application_id bigint [ref: - applications.id]
-
-//   first_name varchar(255) [not null]
-//   middle_name varchar(255)
-//   last_name varchar(255) [not null]
-//   title varchar(255)
-//   suffix varchar(255)
-//   position_title varchar(255) [not null]
-//   institutional_email varchar(320) [not null]
-//   profile_url text
-
-//   // TODO: need email? how do we connect this
-// }
-
-// Table files {
-//   id bigint [pk, increment]
-
-//   application_id bigint [not null, ref: <> applications.id]
-
-//   type file_type [not null]
-
-//   submitter_user_id varchar(100) [not null]
-//   submitted_at timestamp [not null]
-
-//   content bytea [not null]
-//   filename varchar(255)
-
-// }
+export type Application = {
+	id: BigInt;
+	userId: string;
+	state: ApplicationStates;
+	created_at: Date;
+	approved_at: Date;
+	expires_at: Date;
+	contents: ApplicationContents;
+};
