@@ -22,9 +22,7 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-	const [application, setApplication] = useState<Application | undefined>(
-		undefined
-	);
+	const [application, setApplication] = useState<Application | undefined>(undefined);
 
 	const getApplication = async () => {
 		const response = await fetch('http://localhost:3000/applications');
