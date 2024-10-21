@@ -30,7 +30,7 @@ The modules in the monorepo are organized into two categories:
 
 ### System Dependencies
 
-- This project uses Node ^20.1, Typescript ^5.5, and PNPM ^9.10, and was created using Vite 5.4.1.
+- This project uses Node ^20.9, Typescript ^5.5, and PNPM ^9.10, and was created using Vite 5.4.1.
 
 ### Setup
 
