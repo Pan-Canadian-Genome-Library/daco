@@ -1,10 +1,6 @@
 # Pan Canadian Genome Library DACO
 
-<br/>
-
-<img align="left" src="./apps/ui/public/pcgl-logo.png" height="90" display="block"/>
-
-<br/>
+> <img src="./apps/ui/public/pcgl-logo.png" height="90" />
 
 ## Repository Structure
 
