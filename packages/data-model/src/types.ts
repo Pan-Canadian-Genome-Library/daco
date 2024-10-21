@@ -54,7 +54,41 @@ export enum ApplicationActions {
 	'REVOKE',
 }
 
+export enum ApplicationAgreements {
+	'dac_agreement_software_updates',
+	'dac_agreement_non_disclosure',
+	'dac_agreement_monitor_individual_access',
+	'dac_agreement_destroy_data',
+	'dac_agreement_familiarize_restrictions',
+	'dac_agreement_provide_it_policy',
+	'dac_agreement_notify_unauthorized_access',
+	'dac_agreement_certify_application',
+	'dac_agreement_read_and_agreed',
+}
+// TODO: dedupe keys
+export const ApplicationMessages = {
+	dac_agreement_software_updates:
+		'You will keep all computer systems on which PCGL Controlled Datea reside, or which provide accesss to such data, up-to-date with respect to software patches and antivirus file definitions (if applicable).',
+	dac_agreement_non_disclosure:
+		'You will protect ICGC Controlled Data against disclosure to and use by unauthorized individuals.',
+	dac_agreement_monitor_individual_access:
+		'You will monitor and control which individuals have access to ICGC controlled Data.',
+	dac_agreement_destroy_data:
+		'You will securely destroy all copies of ICGC Controlled Data in accordance with the terms and conditions of the Data Access Agreement.',
+	dac_agreement_familiarize_restrictions:
+		'You will familiarixe all individuals who have access to ICGC Controlled Data with the restrictions on its use.',
+	dac_agreement_provide_it_policy:
+		'You agree to swiftly provide a copy of both your institutional and Research Project related IT policy documents upon request from a DACO representative.',
+	dac_agreement_notify_unauthorized_access:
+		'You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized access to the ICGC Controlled Data.',
+	dac_agreement_certify_application:
+		'You certify that the contents in the application are ture and correct to the best of your knowledge and belief.',
+	dac_agreement_read_and_agreed:
+		'You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement.',
+};
+
 // Data Types
+// TODO: Which fields are optional?
 
 export type PersonalInfo = {
 	userId: string;
@@ -83,17 +117,17 @@ export type Institution = {
 	building?: string;
 	suite?: string;
 	city: string;
-	province: string;
+	province: string; // TODO: Handle Province or State?
 	postalCode: string;
 };
 
 export type Project = {
 	title: string;
 	website: string;
-	background: string;
+	abstract: string;
 	methodology: string;
 	summary: string;
-	relevantPublications: string;
+	publicationUrls: string[];
 };
 
 export type RevisionRequest = {
@@ -102,7 +136,7 @@ export type RevisionRequest = {
 	createdAt: Date;
 	createdBy: string;
 	version: number;
-	changes: {}[];
+	changes: {}[]; // TODO: Define structure, maybe ApplicationActionData[] ?
 	comments?: string;
 	applicantApproved: Boolean;
 	applicantNotes?: string;
@@ -114,6 +148,17 @@ export type RevisionRequest = {
 	projectNotes?: string;
 	requestedStudiesApproved: boolean;
 	requestedStudiesNotes?: string;
+};
+
+export type ApplicationActionData = {
+	id: BigInt;
+	applicationId: BigInt;
+	createdAt: Date;
+	userId: string;
+	action: ApplicationActions;
+	stateBefore: ApplicationStates;
+	stateAfter: ApplicationStates;
+	revisionsRequestId: BigInt; // TODO: may need reference to a content diff
 };
 
 export type Agreements = {
@@ -135,31 +180,19 @@ export type Files = {
 	filename: string;
 };
 
-// Table application_actions {
-//   id bigint [pk, increment]
-//   application_id bigint [not null, ref: <> applications.id]
-//   created_at timestamp [not null]
-//   user_id varchar(100) [not null]
-//   action application_action [not null]
-//   state_before varchar(255) [not null]
-//   state_after varchar(255) [not null]
-//   revisions_request_id bigint [ref: - revision_requests.id]
-//   // TODO: may need reference to a content diff
-// }
-
 export type ApplicationContents = {
 	applicant: BigInt;
 	createdAt: Date;
 	updatedAt: Date;
 	institution?: Institution;
-	institutional_representative?: {
-		applicant: Applicant;
+	institutionalRepresentative?: {
+		personalInformation: PersonalInfo;
 		institution: Institution;
 	};
 	collaborators?: Collaborator[];
 	projectInformation?: Project;
 	requestedStudies?: {
-		studyIds: string[];
+		studyIds: string[]; //TODO: requested study information
 	};
 	ethics?: {
 		accepted: boolean;
@@ -174,47 +207,11 @@ export type ApplicationContents = {
 	revisions?: RevisionRequest[];
 };
 
-// 	institutional_rep_title varchar(255)
-// 	institutional_rep_first_name varchar(255)
-//   institutional_rep_middle_name varchar(255)
-//   institutional_rep_last_name varchar(255)
-//   institutional_rep_suffix varchar(255)
-// 	institutional_rep_primary_affiliation varchar(255)
-// 	institutional_rep_email varchar(255)
-// 	institutional_rep_profile_url varchar(255)
-// 	institutional_rep_position_title varchar(255)
-
-//   institution_country vachar(255)
-//   institution_state vachar(255)
-//   institution_city vachar(255)
-//   institution_street_address text
-//   institution_postal_code varchar(255) // postal codes globally may be longer, might as well not constrain it
-//   institution_building varchar(255)
-
-//   project_title text
-//   project_website text
-//   project_abstract text
-//   project_methodology text
-//   project_summary text
-//   project_publication_urls text[]
-
-//TODO: requested study information
-// requested_studies text[]
-
 // TODO: need to store user agreement to terms
 // 	ethics_review_required boolean
 //   ethics_letter bigint [ref: - files.id]
-// 	dac_agreement_software_updates boolean [Note: "You will keep all computer systems on which PCGL Controlled Datea reside, or which provide accesss to such data, up-to-date with respect to software patches and antivirus file definitions (if applicable)."]
-// 	dac_agreement_non_disclosure boolean [Note: "You will protect ICGC Controlled Data against disclosure to and use by unauthorized individuals."]
-// 	dac_agreement_monitor_individual_access boolean [Note: "You will monitor and control which individuals have access to ICGC controlled Data."]
-// 	dac_agreement_destroy_data boolean [Note: "You will securely destroy all copies of ICGC Controlled Data in accordance with the terms and conditions of the Data Access Agreement."]
-// 	dac_agreement_familiarize_restrictions boolean [Note: "You will familiarixe all individuals who have access to ICGC Controlled Data with the restrictions on its use."]
-// 	dac_agreement_provide_it_policy boolean [Note: "You agree to swiftly provide a copy of both your institutional and Research Project related IT policy documents upon request from a DACO representative."]
-// 	dac_agreement_notify_unauthorized_access boolean [Note: "You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized access to the ICGC Controlled Data."]
-// 	dac_agreement_certify_application boolean [Note: "You certify that the contents in the application are ture and correct to the best of your knowledge and belief."]
-// 	dac_agreement_read_and_agreed boolean [Note: "You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement."]
+
 //   signed_pdf bigint [ref: -files.id]
-// }
 
 export type Application = {
 	id: BigInt;
