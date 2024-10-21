@@ -80,6 +80,25 @@ export enum file_type {
 	'ETHICS_LETTER',
 }
 
+export enum application_review_outcome {
+	'APPROVED',
+	'REJECTED',
+	'REVISIONS_REQUESTED',
+}
+
+export enum application_action {
+	'CREATE',
+	'WITHDRAW',
+	'CLOSE',
+	'REQUEST_INSTITUTIONAL_REP',
+	'INSTITUTIONAL_REP_APPROVED',
+	'INSTITUTIONAL_REP_REJECTED',
+	'DAC_REVIEW_APPROVED',
+	'DAC_REVIEW_REJECTED',
+	'DAC_REVIEW_REVISIONS',
+	'REVOKE',
+}
+
 export type Application = {
 	status: keyof typeof Status;
 	applicant: Applicant;
@@ -117,25 +136,6 @@ export type Application = {
 
 	revisions: Revisions[];
 };
-
-// enum application_review_outcome {
-//   approved
-//   rejected
-//   revisions_requested
-// }
-
-// enum application_action {
-//   create
-//   withdraw
-//   close
-//   request_institutional_rep
-//   institutional_rep_approve
-//   institutional_rep_reject
-//   dac_review_approve
-//   dac_review_reject
-//   dac_review_revisions
-//   revoke
-// }
 
 // Table applications {
 //   id bigint [pk, increment]
