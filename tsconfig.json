@@ -9,9 +9,6 @@
 		"moduleDetection": "force",
 		"noEmit": true,
 		"baseUrl": ".",
-		"paths": {
-			"vite": ["./node_modules/vite"]
-		},
 		"strict": true,
 		"useDefineForClassFields": true
 	},
