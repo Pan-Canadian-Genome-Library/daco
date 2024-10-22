@@ -25,18 +25,18 @@ function App() {
 	const [application, setApplication] = useState<Application | undefined>(undefined);
 
 	const getApplication = async () => {
-		const response = await fetch('http://localhost:3000/applications');
+		const response = await fetch('http://localhost:3001/applications');
 		const application: Application = await response.json();
 
 		setApplication(application);
 	};
 
-	const applicant = application?.applicant;
+	const project = application?.contents.projectInformation;
+
+	const applicant = application?.contents.applicant;
 
 	const applicantName = applicant
-		? `${applicant.title}
-	${applicant.first} ${applicant.middle}
-	${applicant.last}`
+		? `${applicant.title} ${applicant.firstName} ${applicant.middleName} ${applicant.lastName}`
 		: '';
 	return (
 		<>
@@ -49,7 +49,7 @@ function App() {
 			</div>
 			{application && (
 				<div className="card">
-					<h2>{application.projectInformation.title}</h2>
+					<h2>{project?.title}</h2>
 
 					<h3>Applicant: {applicantName}</h3>
 				</div>

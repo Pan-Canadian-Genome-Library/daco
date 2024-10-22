@@ -103,9 +103,7 @@ export type PersonalInfo = {
 	positionTitle: string;
 };
 
-export interface Applicant extends PersonalInfo {
-	applicationID: string;
-}
+export interface Applicant extends PersonalInfo {}
 
 export interface Collaborator extends Applicant {
 	collaboratorType: string;
@@ -187,9 +185,9 @@ export type EthicsData = {
 };
 
 export type ApplicationContents = {
-	applicant: BigInt;
 	createdAt: Date;
 	updatedAt: Date;
+	applicant: Applicant;
 	institution?: Institution;
 	institutionalRepresentative?: {
 		personalInformation: PersonalInfo;
