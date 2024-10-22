@@ -20,16 +20,16 @@
 import assert from 'node:assert';
 import { after, describe, it } from 'node:test';
 
-import { port, server } from '../../dist/pcgl-daco-api.js';
+import { port } from '../main.mts';
 
 describe('Initial Test Setup', () => {
 	describe('First File', () => {
 		it('should have a Port Value of 3000', () => {
 			assert.strictEqual(port, 3000);
 		});
-	});
 
-	after(() => {
-		server.close();
+		after(() => {
+			process.exit();
+		});
 	});
 });

@@ -22,7 +22,7 @@ import express, { Request, Response } from 'express';
 // TODO: Fix Types package so we can import from main instead of specific file
 import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
 
-export const port = process.env.PORT;
+export const port = process.env.PORT || 3000;
 
 const app = express();
 
@@ -34,6 +34,6 @@ app.get('/applications', cors(), (_req: Request, res: Response) => {
 	res.send(demoApplication);
 });
 
-export const server = app.listen(port, () => {
+app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`);
 });
