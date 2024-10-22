@@ -6,7 +6,6 @@
 	"main": "src/main.mts",
 	"scripts": {
 		"dev": "npx tsx watch --env-file=.env ./src/main.mts",
-		"build": "tsc && vite build",
 		"test": "node --test --test-reporter=spec --experimental-test-coverage ./src/tests/*"
 	},
 	"devDependencies": {
@@ -14,8 +13,7 @@
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.7.4",
 		"tsx": "^4.19.1",
-		"typescript": "^5.5.3",
-		"vite": "^5.4.1"
+		"typescript": "^5.5.3"
 	},
 	"dependencies": {
 		"cors": "^2.8.5",
