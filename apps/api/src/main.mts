@@ -19,11 +19,10 @@
 
 import cors from 'cors';
 import express, { Request, Response } from 'express';
-
-export const port = process.env.PORT;
-
 // TODO: Fix Types package so we can import from main instead of specific file
 import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
+
+export const port = process.env.PORT;
 
 const app = express();
 
