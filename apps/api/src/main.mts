@@ -26,8 +26,6 @@ export const port = process.env.PORT;
 
 const app = express();
 
-app.use(cors());
-
 app.get('/', (_req: Request, res: Response) => {
 	res.send('Hello World!');
 });
