@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"lib": ["ESNext"],
+		"skipLibCheck": true,
+		"allowImportingTsExtensions": true,
+		"allowSyntheticDefaultImports": true,
+		"isolatedModules": true,
+		"moduleDetection": "force",
+		"noEmit": true,
+		"baseUrl": ".",
+		"strict": true,
+		"useDefineForClassFields": true
+	},
+
+	/* Linting */
+	"noUnusedLocals": true,
+	"noImplicitAny": true,
+	"noUncheckedIndexedAccess": true,
+	"noFallthroughCasesInSwitch": true
+}

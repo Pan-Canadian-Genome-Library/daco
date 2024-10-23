@@ -1,0 +1,30 @@
+{
+	"name": "pcgl-daco",
+	"version": "0.0.1",
+	"description": "Pan Canadian Genome Library DACO",
+	"main": "index.js",
+	"type": "module",
+	"homepage": "https://github.com/Pan-Canadian-Genome-Library/daco#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Pan-Canadian-Genome-Library/daco"
+	},
+	"bugs": {
+		"url": "https://github.com/Pan-Canadian-Genome-Library/daco/issues"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prettier": "npx prettier ./packages ./apps --write",
+		"prepare": "husky"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"husky": "^9.1.6",
+		"prettier": "^3.3.3",
+		"prettier-plugin-organize-imports": "^4.1.0",
+		"typescript": "^5.5.3",
+		"vite": "^5.4.1"
+	}
+}
