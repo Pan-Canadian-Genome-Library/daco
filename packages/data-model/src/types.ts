@@ -129,8 +129,8 @@ export type Project = {
 };
 
 export type RevisionRequest = {
-	id: BigInt;
-	applicationId: BigInt;
+	id: number; // TODO: Implement BigInt
+	applicationId: number; // TODO: Implement BigInt;
 	createdAt: Date;
 	createdBy: string;
 	version: number;
@@ -149,18 +149,19 @@ export type RevisionRequest = {
 };
 
 export type ApplicationActionData = {
-	id: BigInt;
-	applicationId: BigInt;
+	id: number; // TODO: Implement BigInt;
+	applicationId: number; // TODO: Implement BigInt;
 	createdAt: Date;
 	userId: string;
 	action: ApplicationActions;
 	stateBefore: ApplicationStates;
 	stateAfter: ApplicationStates;
-	revisionsRequestId: BigInt; // TODO: may need reference to a content diff
+	revisionsRequestId: number; // TODO: Implement BigInt
+	// TODO: may need reference to a content diff
 };
 
 export type Agreements = {
-	id: BigInt;
+	id: number; // TODO: Implement BigInt;
 	userId: string;
 	name: string;
 	agreementText: string;
@@ -169,10 +170,10 @@ export type Agreements = {
 };
 
 export type Files = {
-	id: BigInt;
-	applicationId: BigInt;
+	id: number; // TODO: Implement BigInt;
+	applicationId: number; // TODO: Implement BigInt;
 	type: FileTypes;
-	SubmitterUserId: BigInt;
+	SubmitterUserId: number; // TODO: Implement BigInt;
 	submitted_at: Date;
 	content: any; // TODO: Add correct type
 	filename: string;
@@ -180,8 +181,8 @@ export type Files = {
 
 export type EthicsData = {
 	ethicsReviewRequired: boolean;
-	ethicsLetter?: BigInt;
-	signedPdf?: BigInt;
+	ethicsLetter?: number; // TODO: Implement BigInt;
+	signedPdf?: number; // TODO: Implement BigInt;
 };
 
 export type ApplicationContents = {
@@ -209,7 +210,7 @@ export type ApplicationContents = {
 };
 
 export type Application = {
-	id: BigInt;
+	id: number; // TODO: Implement BigInt;
 	userId: string;
 	state: ApplicationStates;
 	created_at: Date;
