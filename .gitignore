@@ -9,6 +9,7 @@ node_modules/
 
 # dotenv environment variable files
 .env*
+!.env.schema
 
 # Logs
 npm-debug.log*
