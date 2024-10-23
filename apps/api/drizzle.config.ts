@@ -17,45 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { usersTable } from './schemas/users.mts';
+import { defineConfig } from 'drizzle-kit';
 
-const POSTGRES_URL = process.env.POSTGRES_URL;
-const PGDATABASE = process.env.PGDATABASE;
-
-const connectionString = `${POSTGRES_URL}${PGDATABASE}`;
-console.log('connectionString', connectionString);
-
-const db = drizzle(connectionString!);
-console.log('db', db);
-
-const result = await db.execute('select 1');
-console.log('result', result);
-
-const pool = db.$client;
-console.log('pool', pool);
-
-async function main() {
-	const user: typeof usersTable.$inferInsert = {
-		name: 'John',
-		age: 30,
-		email: 'john@example.com',
-	};
-	await db.insert(usersTable).values(user);
-	console.log('New user created!');
-	const users = await db.select().from(usersTable);
-	console.log('Getting all users from the database: ', users);
-	await db
-		.update(usersTable)
-		.set({
-			age: 31,
-		})
-		.where(eq(usersTable.email, user.email));
-	console.log('User info updated!');
-	await db.delete(usersTable).where(eq(usersTable.email, user.email));
-	console.log('User deleted!');
-
-	process.exit();
-}
-main();
+export default defineConfig({
+	out: './drizzle',
+	schema: './src/db/schemas/users.mts',
+	dialect: 'postgresql',
+	dbCredentials: {
+		url: process.env.POSTGRES_URL!,
+	},
+});
