@@ -42,7 +42,7 @@ const demoInstitute: Institution = {
 };
 
 export const demoApplication: Application = {
-	id: BigInt(1),
+	id: 1,
 	state: ApplicationStates['DRAFT'],
 	userId: 'ddemaria@oicr.on.ca',
 	created_at: new Date(),
@@ -101,7 +101,7 @@ export const demoApplication: Application = {
 
 		dataAccessAgreements: [
 			{
-				id: BigInt(123),
+				id: 123,
 				userId: 'user123',
 				name: 'Dr. Doctorson',
 				agreementText: 'I agree',
