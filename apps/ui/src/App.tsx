@@ -21,11 +21,13 @@ import { type Application } from 'pcgl-daco/packages/data-model/src/types';
 import { useState } from 'react';
 import './App.css';
 
+const APPLICATION_API_URL = import.meta.env.VITE_APPLICATION_API_URL;
+
 function App() {
 	const [application, setApplication] = useState<Application | undefined>(undefined);
 
 	const getApplication = async () => {
-		const response = await fetch('http://localhost:3001/applications');
+		const response = await fetch(`${APPLICATION_API_URL}/applications`);
 		const application: Application = await response.json();
 
 		setApplication(application);
