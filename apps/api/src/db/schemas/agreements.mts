@@ -17,7 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applications } from './applications.mts';
 // TODO: Integrate w/ TS
 // import { ApplicationAgreements } from 'pcgl-daco/packages/data-model/';
 
@@ -35,9 +37,17 @@ const agreementEnum = pgEnum('agreements', [
 
 export const agreements = pgTable('agreements', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }),
 	user_id: varchar({ length: 100 }).notNull(),
 	name: text().notNull(),
 	agreement_text: text().notNull(),
 	agreement_type: agreementEnum().notNull(),
 	agreed_at: timestamp().notNull(),
 });
+
+export const actionsRelations = relations(agreements, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [agreements.application_id],
+		references: [applications.id],
+	}),
+}));
