@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { relations } from 'drizzle-orm';
 import { bigint, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { applications } from './applications.mts';
 
 export const collaborators = pgTable('collaborators', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }), // [ref: - applications.id]
+	application_id: bigint({ mode: 'number' }),
 	first_name: varchar({ length: 255 }).notNull(),
 	middle_name: varchar({ length: 255 }),
 	last_name: varchar({ length: 255 }).notNull(),
@@ -32,3 +34,10 @@ export const collaborators = pgTable('collaborators', {
 	profile_url: text(),
 	// TODO: need email? how do we connect this
 });
+
+export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [collaborators.application_id],
+		references: [applications.id],
+	}),
+}));
