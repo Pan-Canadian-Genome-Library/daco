@@ -19,43 +19,68 @@
 
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { usersTable } from './schemas/users.mts';
+import { actionsTable } from './schemas/actions.mts';
+import { applicationsTable } from './schemas/applications.mts';
+import { collaboratorsTable } from './schemas/collaborators.mts';
+import { filesTable } from './schemas/files.mts';
+import { revisionRequestsTable } from './schemas/revisionRequests.mts';
 
 const POSTGRES_URL = process.env.POSTGRES_URL;
 const PGDATABASE = process.env.PGDATABASE;
 
 const connectionString = `${POSTGRES_URL}${PGDATABASE}`;
-console.log('connectionString', connectionString);
 
 const db = drizzle(connectionString!);
-console.log('db', db);
 
-const result = await db.execute('select 1');
-console.log('result', result);
-
-const pool = db.$client;
-console.log('pool', pool);
-
-async function main() {
-	const user: typeof usersTable.$inferInsert = {
+async function testApplications() {
+	const application: typeof applicationsTable.$inferInsert = {
 		name: 'John',
 		age: 30,
 		email: 'john@example.com',
 	};
-	await db.insert(usersTable).values(user);
-	console.log('New user created!');
-	const users = await db.select().from(usersTable);
-	console.log('Getting all users from the database: ', users);
+	await db.insert(applicationsTable).values(application);
+	console.log('New application created');
+	const users = await db.select().from(applicationsTable);
+	console.log('Getting all applications from the database: ', users);
 	await db
-		.update(usersTable)
+		.update(applicationsTable)
 		.set({
 			age: 31,
 		})
-		.where(eq(usersTable.email, user.email));
-	console.log('User info updated!');
-	await db.delete(usersTable).where(eq(usersTable.email, user.email));
-	console.log('User deleted!');
+		.where(eq(applicationsTable.email, application.email));
+	console.log('Application info updated');
+	await db.delete(applicationsTable).where(eq(applicationsTable.email, application.email));
+	console.log('Application deleted');
+}
 
+async function testActions() {
+	console.log('actions', actionsTable);
+}
+
+async function testCollaborators() {
+	console.log('collaborators', collaboratorsTable);
+}
+
+async function testFiles() {
+	console.log('files', filesTable);
+}
+
+async function testRevisions() {
+	console.log('revisions', revisionRequestsTable);
+}
+
+async function testDb() {
+	try {
+		await testActions();
+		await testApplications();
+		await testCollaborators();
+		await testFiles();
+		await testRevisions();
+	} catch (err) {
+		console.error('Error at TestDb');
+		console.error(err);
+	}
 	process.exit();
 }
-main();
+
+await testDb();

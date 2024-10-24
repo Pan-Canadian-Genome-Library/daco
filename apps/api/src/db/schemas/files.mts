@@ -19,9 +19,19 @@
 
 import { integer, pgTable, varchar } from 'drizzle-orm/pg-core';
 
-export const usersTable = pgTable('users', {
+export const filesTable = pgTable('files', {
 	id: integer().primaryKey().generatedAlwaysAsIdentity(),
 	name: varchar({ length: 255 }).notNull(),
 	age: integer().notNull(),
 	email: varchar({ length: 255 }).notNull().unique(),
 });
+
+// Table files {
+// 	id bigint [pk, increment]
+// 	application_id bigint [not null, ref: <> applications.id]
+// 	type file_type [not null]
+// 	submitter_user_id varchar(100) [not null]
+// 	submitted_at timestamp [not null]
+// 	content bytea [not null]
+// 	filename varchar(255)
+// }
