@@ -19,7 +19,7 @@
 
 import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const revisionRequestsTable = pgTable('revisionRequests', {
+export const revisionRequests = pgTable('revisionRequests', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(), // [ref: <> applications.id]
 	created_at: timestamp().notNull(),
