@@ -17,28 +17,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { integer, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const revisionRequestsTable = pgTable('revisionRequests', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	name: varchar({ length: 255 }).notNull(),
-	age: integer().notNull(),
-	email: varchar({ length: 255 }).notNull().unique(),
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }).notNull(), // [ref: <> applications.id]
+	created_at: timestamp().notNull(),
+	comments: text(),
+	applicant_notes: text(),
+	applicant_approved: boolean().notNull(),
+	institution_rep_approved: boolean().notNull(),
+	institution_rep_notes: boolean().notNull(),
+	collaborators_approved: boolean().notNull(),
+	collaborators_notes: text(),
+	project_approved: boolean().notNull(),
+	project_notes: text(),
+	requested_studies_approved: boolean().notNull(),
+	requested_studies_notes: text(),
 });
-
-// Table revision_requests {
-// 	id bigint [pk, increment]
-// 	application_id bigint [not null, ref: <> applications.id]
-// 	created_at timestamp [not null]
-// 	comments text
-// 	applicant_approved boolean [not null]
-// 	applicant_notes text
-// 	institution_rep_approved boolean [not null]
-// 	institution_rep_notes text
-// 	collaborators_approved boolean [not null]
-// 	collaborators_notes text
-// 	project_approved boolean [not null]
-// 	project_notes text
-// 	requested_studies_approved boolean [not null]
-// 	requested_studies_notes text
-// }
