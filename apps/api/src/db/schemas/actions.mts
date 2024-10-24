@@ -17,16 +17,45 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applicationsTable } from './applications.mts';
+import { revisionRequestsTable } from './revisionRequests.mts';
+// TODO: Integrate w/ TS
+// import { applicationActions } from 'pcgl-daco/packages/data-model/';
+
+const actionsEnum = pgEnum('actions', [
+	'CREATE',
+	'WITHDRAW',
+	'CLOSE',
+	'REQUEST_INSTITUTIONAL_REP',
+	'INSTITUTIONAL_REP_APPROVED',
+	'INSTITUTIONAL_REP_REJECTED',
+	'DAC_REVIEW_APPROVED',
+	'DAC_REVIEW_REJECTED',
+	'DAC_REVIEW_REVISIONS',
+	'REVOKE',
+]);
 
 export const actionsTable = pgTable('actions', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(), // [ref: <> applications.id]
+	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull(),
 	user_id: varchar({ length: 100 }).notNull(),
-	// 	action application_action [not null]
+	action: actionsEnum().notNull(),
+	revisions_request_id: bigint({ mode: 'number' }),
 	state_before: varchar({ length: 255 }).notNull(),
 	state_after: varchar({ length: 255 }).notNull(),
-	revisions_request_id: bigint({ mode: 'number' }), // [ref: - revision_requests.id]
 	// TODO: may need reference to a content diff
 });
+
+export const usersRelations = relations(actionsTable, ({ one }) => ({
+	application_id: one(applicationsTable, {
+		fields: [actionsTable.application_id],
+		references: [applicationsTable.id],
+	}),
+	revisions_request_id: one(revisionRequestsTable, {
+		fields: [actionsTable.revisions_request_id],
+		references: [revisionRequestsTable.id],
+	}),
+}));
