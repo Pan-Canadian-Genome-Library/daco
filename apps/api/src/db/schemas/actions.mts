@@ -17,23 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { integer, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const actionsTable = pgTable('actions', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	name: varchar({ length: 255 }).notNull(),
-	age: integer().notNull(),
-	email: varchar({ length: 255 }).notNull().unique(),
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }).notNull(), // [ref: <> applications.id]
+	created_at: timestamp().notNull(),
+	user_id: varchar({ length: 100 }).notNull(),
+	// 	action application_action [not null]
+	state_before: varchar({ length: 255 }).notNull(),
+	state_after: varchar({ length: 255 }).notNull(),
+	revisions_request_id: bigint({ mode: 'number' }), // [ref: - revision_requests.id]
+	// TODO: may need reference to a content diff
 });
-
-// Table application_actions {
-// 	id bigint [pk, increment]
-// 	application_id bigint [not null, ref: <> applications.id]
-// 	created_at timestamp [not null]
-// 	user_id varchar(100) [not null]
-// 	action application_action [not null]
-// 	state_before varchar(255) [not null]
-// 	state_after varchar(255) [not null]
-// 	revisions_request_id bigint [ref: - revision_requests.id]
-// 	// TODO: may need reference to a content diff
-// }
