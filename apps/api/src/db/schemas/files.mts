@@ -17,14 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applications } from './applications.mts';
+// TODO: Integrate w/ TS
+// import { FileTypes } from 'pcgl-daco/packages/data-model/';
+
+const fileEnum = pgEnum('agreements', ['SIGNED_APPLICATION', 'ETHICS_LETTER']);
 
 export const files = pgTable('files', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(), // 	ref: <> applications.id]
-	// 	type file_type [not null]
+	application_id: bigint({ mode: 'number' }).notNull(),
+	type: fileEnum().notNull(),
 	submitter_user_id: varchar({ length: 100 }).notNull(),
 	submitted_at: timestamp().notNull(),
-	// 	content bytea [not null]
+	// 	TODO: content bytes [not null]
 	filename: varchar({ length: 255 }),
 });
+
+export const collaboratorsRelations = relations(files, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [files.application_id],
+		references: [applications.id],
+	}),
+}));
