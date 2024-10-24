@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { applications } from './applications.mts';
 
 export const revisionRequests = pgTable('revisionRequests', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(), // [ref: <> applications.id]
+	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull(),
 	comments: text(),
 	applicant_notes: text(),
@@ -35,3 +37,10 @@ export const revisionRequests = pgTable('revisionRequests', {
 	requested_studies_approved: boolean().notNull(),
 	requested_studies_notes: text(),
 });
+
+export const revisionRelations = relations(revisionRequests, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [revisionRequests.application_id],
+		references: [applications.id],
+	}),
+}));
