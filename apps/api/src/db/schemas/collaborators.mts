@@ -17,25 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { integer, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { bigint, pgTable, text, varchar } from 'drizzle-orm/pg-core';
 
 export const collaboratorsTable = pgTable('collaborators', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	name: varchar({ length: 255 }).notNull(),
-	age: integer().notNull(),
-	email: varchar({ length: 255 }).notNull().unique(),
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }), // [ref: - applications.id]
+	first_name: varchar({ length: 255 }).notNull(),
+	middle_name: varchar({ length: 255 }),
+	last_name: varchar({ length: 255 }).notNull(),
+	title: varchar({ length: 255 }),
+	suffix: varchar({ length: 255 }),
+	position_title: varchar({ length: 255 }).notNull(),
+	institutional_email: varchar({ length: 320 }).notNull(),
+	profile_url: text(),
+	// TODO: need email? how do we connect this
 });
-
-// Table collaborators {
-// 	id bigint [pk, increment]
-// 	application_id bigint [ref: - applications.id]
-// 	first_name varchar(255) [not null]
-// 	middle_name varchar(255)
-// 	last_name varchar(255) [not null]
-// 	title varchar(255)
-// 	suffix varchar(255)
-// 	position_title varchar(255) [not null]
-// 	institutional_email varchar(320) [not null]
-// 	profile_url text
-// 	// TODO: need email? how do we connect this
-// }
