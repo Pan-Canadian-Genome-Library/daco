@@ -18,12 +18,19 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { bigint, customType, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { applications } from './applications.mts';
 // TODO: Integrate w/ TS
 // import { FileTypes } from 'pcgl-daco/packages/data-model/';
 
 const fileEnum = pgEnum('agreements', ['SIGNED_APPLICATION', 'ETHICS_LETTER']);
+
+// https://stackoverflow.com/questions/76399047/how-to-represent-bytea-datatype-from-pg-inside-new-drizzle-orm
+const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
+	dataType() {
+		return 'bytea';
+	},
+});
 
 export const files = pgTable('files', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
@@ -31,7 +38,7 @@ export const files = pgTable('files', {
 	type: fileEnum().notNull(),
 	submitter_user_id: varchar({ length: 100 }).notNull(),
 	submitted_at: timestamp().notNull(),
-	// 	TODO: content bytes [not null]
+	content: bytea().notNull(),
 	filename: varchar({ length: 255 }),
 });
 
