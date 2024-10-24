@@ -17,7 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applicationContents } from './applicationContents.mts';
 // TODO: Integrate w/ TS
 // import { ApplicationStates } from 'pcgl-daco/packages/data-model';
 
@@ -39,4 +41,12 @@ export const applications = pgTable('applications', {
 	created_at: timestamp().notNull(),
 	approved_at: timestamp(),
 	expires_at: timestamp(),
+	contents: bigint({ mode: 'number' }),
 });
+
+export const applicationsRelations = relations(applications, ({ one }) => ({
+	application_contents: one(applicationContents, {
+		fields: [applications.contents],
+		references: [applicationContents.id],
+	}),
+}));

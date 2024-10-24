@@ -21,17 +21,12 @@ import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { agreements } from './agreements.mts';
 import { applications } from './applications.mts';
+import { collaborators } from './collaborators.mts';
 import { files } from './files.mts';
 import { revisionRequests } from './revisionRequests.mts';
 
-// TODO: Integrate w/ TS
-// import { ApplicationStates } from 'pcgl-daco/packages/data-model';
-
-// export interface Collaborator extends Applicant {
-// 	collaboratorType: string;
-// }
-
 export const applicationContents = pgTable('application_contents', {
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull(),
 	updated_at: timestamp().notNull(),
@@ -84,6 +79,7 @@ export const applicationContentsRelations = relations(applicationContents, ({ ma
 		references: [applications.id],
 	}),
 	agreements: many(agreements),
+	collaborators: many(collaborators),
 	revisions: many(revisionRequests),
 	ethics_letter: one(files, {
 		fields: [applicationContents.ethics_letter],

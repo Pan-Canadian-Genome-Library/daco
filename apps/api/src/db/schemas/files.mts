@@ -42,7 +42,7 @@ export const files = pgTable('files', {
 	filename: varchar({ length: 255 }),
 });
 
-export const collaboratorsRelations = relations(files, ({ one }) => ({
+export const filesRelations = relations(files, ({ one }) => ({
 	application_id: one(applications, {
 		fields: [files.application_id],
 		references: [applications.id],
