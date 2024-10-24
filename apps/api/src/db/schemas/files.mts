@@ -17,21 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { integer, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const filesTable = pgTable('files', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	name: varchar({ length: 255 }).notNull(),
-	age: integer().notNull(),
-	email: varchar({ length: 255 }).notNull().unique(),
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }).notNull(), // 	ref: <> applications.id]
+	// 	type file_type [not null]
+	submitter_user_id: varchar({ length: 100 }).notNull(),
+	submitted_at: timestamp().notNull(),
+	// 	content bytea [not null]
+	filename: varchar({ length: 255 }),
 });
-
-// Table files {
-// 	id bigint [pk, increment]
-// 	application_id bigint [not null, ref: <> applications.id]
-// 	type file_type [not null]
-// 	submitter_user_id varchar(100) [not null]
-// 	submitted_at timestamp [not null]
-// 	content bytea [not null]
-// 	filename varchar(255)
-// }
