@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { actionsTable } from './schemas/actions.mts';
 import { applicationsTable } from './schemas/applications.mts';
@@ -32,25 +31,10 @@ const connectionString = `${POSTGRES_URL}${PGDATABASE}`;
 
 const db = drizzle(connectionString!);
 
+console.log('Db', db);
+
 async function testApplications() {
-	const application: typeof applicationsTable.$inferInsert = {
-		name: 'John',
-		age: 30,
-		email: 'john@example.com',
-	};
-	await db.insert(applicationsTable).values(application);
-	console.log('New application created');
-	const users = await db.select().from(applicationsTable);
-	console.log('Getting all applications from the database: ', users);
-	await db
-		.update(applicationsTable)
-		.set({
-			age: 31,
-		})
-		.where(eq(applicationsTable.email, application.email));
-	console.log('Application info updated');
-	await db.delete(applicationsTable).where(eq(applicationsTable.email, application.email));
-	console.log('Application deleted');
+	console.log('applications', applicationsTable);
 }
 
 async function testActions() {
