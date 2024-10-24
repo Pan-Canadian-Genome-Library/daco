@@ -49,7 +49,7 @@ export const actions = pgTable('actions', {
 	// TODO: may need reference to a content diff
 });
 
-export const usersRelations = relations(actions, ({ one }) => ({
+export const actionsRelations = relations(actions, ({ one }) => ({
 	application_id: one(applications, {
 		fields: [actions.application_id],
 		references: [applications.id],
