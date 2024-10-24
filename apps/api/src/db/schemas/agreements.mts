@@ -17,13 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// // TODO: Might need to track user agreements separate from the application content, This could model this
-// // Table agreements {
-// //   id bigint [not null]
-// //   user_id varchar(100) [not null]
-// //   name text [not null]
-// //   agreement_text text [not null]
+import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+// TODO: Integrate w/ TS
+// import { ApplicationAgreements } from 'pcgl-daco/packages/data-model/';
 
-// //   agreement_type agreement_type [not null] // enum, need to review possible agreements needed
-// //   agreed_at timestamp [not null] // with timezone, seconds precision = 0
-// // }
+const agreementEnum = pgEnum('agreements', [
+	'dac_agreement_software_updates',
+	'dac_agreement_non_disclosure',
+	'dac_agreement_monitor_individual_access',
+	'dac_agreement_destroy_data',
+	'dac_agreement_familiarize_restrictions',
+	'dac_agreement_provide_it_policy',
+	'dac_agreement_notify_unauthorized_access',
+	'dac_agreement_certify_application',
+	'dac_agreement_read_and_agreed',
+]);
+
+export const agreements = pgTable('agreements', {
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	user_id: varchar({ length: 100 }).notNull(),
+	name: text().notNull(),
+	agreement_text: text().notNull(),
+	agreement_type: agreementEnum().notNull(),
+	agreed_at: timestamp().notNull(),
+});
