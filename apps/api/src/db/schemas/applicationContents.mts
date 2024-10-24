@@ -17,69 +17,80 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Table application_contents {
-// 	Note: '''
-// 		All fields here are nullable as this allows us to store partially complete
-// 		applications as the user is working through the submission form.
+import { relations } from 'drizzle-orm';
+import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { agreements } from './agreements.mts';
+import { applications } from './applications.mts';
+import { files } from './files.mts';
+import { revisionRequests } from './revisionRequests.mts';
 
-// 		Validation rules for the application content needs to be implemented in the
-// 		software, not at the database level.
-// 	'''
+// TODO: Integrate w/ TS
+// import { ApplicationStates } from 'pcgl-daco/packages/data-model';
 
-// 	application_id bigint [not null, ref: - applications.id]
-// 	created_at timestamp [not null]
-// 	updated_at timestamp [not null]
-
-// 	applicant_first_name varchar(255)
-// 	applicant_middle_name varchar(255)
-// 	applicant_last_name varchar(255)
-// 	applicant_title varchar(255)
-// 	applicant_suffix varchar(255)
-// 	applicant_position_title varchar(255)
-// 	applicant_primary_affiliation varchar(500)
-// 	applicant_institutional_email varchar(320) // emails addresses cannot be longer than 320
-// 	applicant_profile_url text // no length restriciton on url, application should validate its properly formed url
-
-// 	institutional_rep_title varchar(255)
-// 	institutional_rep_first_name varchar(255)
-// 	institutional_rep_middle_name varchar(255)
-// 	institutional_rep_last_name varchar(255)
-// 	institutional_rep_suffix varchar(255)
-// 	institutional_rep_primary_affiliation varchar(255)
-// 	institutional_rep_email varchar(255)
-// 	institutional_rep_profile_url varchar(255)
-// 	institutional_rep_position_title varchar(255)
-// 	institution_country vachar(255)
-// 	institution_state vachar(255)
-// 	institution_city vachar(255)
-// 	institution_street_address text
-// 	institution_postal_code varchar(255) // postal codes globally may be longer, might as well not constrain it
-// 	institution_building varchar(255)
-
-// 	project_title text
-// 	project_website text
-// 	project_abstract text
-// 	project_methodology text
-// 	project_summary text
-// 	project_publication_urls text[]
-
-// 	//TODO: requested study information
-// 	requested_studies text[]
-
-// 	// TODO: need to store user agreement to terms
-
-// 	ethics_review_required boolean
-// 	ethics_letter bigint [ref: - files.id]
-
-// 	dac_agreement_software_updates boolean [Note: "You will keep all computer systems on which PCGL Controlled Datea reside, or which provide accesss to such data, up-to-date with respect to software patches and antivirus file definitions (if applicable)."]
-// 	dac_agreement_non_disclosure boolean [Note: "You will protect ICGC Controlled Data against disclosure to and use by unauthorized individuals."]
-// 	dac_agreement_monitor_individual_access boolean [Note: "You will monitor and control which individuals have access to ICGC controlled Data."]
-// 	dac_agreement_destroy_data boolean [Note: "You will securely destroy all copies of ICGC Controlled Data in accordance with the terms and conditions of the Data Access Agreement."]
-// 	dac_agreement_familiarize_restrictions boolean [Note: "You will familiarixe all individuals who have access to ICGC Controlled Data with the restrictions on its use."]
-// 	dac_agreement_provide_it_policy boolean [Note: "You agree to swiftly provide a copy of both your institutional and Research Project related IT policy documents upon request from a DACO representative."]
-// 	dac_agreement_notify_unauthorized_access boolean [Note: "You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized access to the ICGC Controlled Data."]
-// 	dac_agreement_certify_application boolean [Note: "You certify that the contents in the application are ture and correct to the best of your knowledge and belief."]
-// 	dac_agreement_read_and_agreed boolean [Note: "You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement."]
-
-// 	signed_pdf bigint [ref: -files.id]
+// export interface Collaborator extends Applicant {
+// 	collaboratorType: string;
 // }
+
+export const applicationContents = pgTable('application_contents', {
+	application_id: bigint({ mode: 'number' }).notNull(),
+	created_at: timestamp().notNull(),
+	updated_at: timestamp().notNull(),
+	// Applicant
+	applicant_first_name: varchar({ length: 255 }),
+	applicant_middle_name: varchar({ length: 255 }),
+	applicant_last_name: varchar({ length: 255 }),
+	applicant_title: varchar({ length: 255 }),
+	applicant_suffix: varchar({ length: 255 }),
+	applicant_position_title: varchar({ length: 255 }),
+	applicant_primary_affiliation: varchar({ length: 500 }),
+	applicant_institutional_email: varchar({ length: 320 }),
+	applicant_profile_url: text(),
+	// Institutional Rep
+	institutional_rep_title: varchar({ length: 255 }),
+	institutional_rep_first_name: varchar({ length: 255 }),
+	institutional_rep_middle_name: varchar({ length: 255 }),
+	institutional_rep_last_name: varchar({ length: 255 }),
+	institutional_rep_suffix: varchar({ length: 255 }),
+	institutional_rep_primary_affiliation: varchar({ length: 255 }),
+	institutional_rep_email: varchar({ length: 255 }),
+	institutional_rep_profile_url: varchar({ length: 255 }),
+	institutional_rep_position_title: varchar({ length: 255 }),
+	// Institution
+	institution_country: varchar({ length: 255 }),
+	institution_state: varchar({ length: 255 }),
+	institution_city: varchar({ length: 255 }),
+	institution_street_address: text(),
+	institution_postal_code: varchar({ length: 255 }),
+	institution_building: varchar({ length: 255 }),
+	// Project
+	project_title: text(),
+	project_website: text(),
+	project_abstract: text(),
+	project_methodology: text(),
+	project_summary: text(),
+	project_publication_urls: text().array(),
+	// Studies
+	// TODO: requested study information
+	requested_studies: text().array(),
+	// Agreements & Ethics
+	ethics_review_required: boolean(),
+	ethics_letter: bigint({ mode: 'number' }),
+	signed_pdf: bigint({ mode: 'number' }),
+});
+
+export const applicationContentsRelations = relations(applicationContents, ({ many, one }) => ({
+	application_id: one(applications, {
+		fields: [applicationContents.application_id],
+		references: [applications.id],
+	}),
+	agreements: many(agreements),
+	revisions: many(revisionRequests),
+	ethics_letter: one(files, {
+		fields: [applicationContents.ethics_letter],
+		references: [files.id],
+	}),
+	signed_pdf: one(files, {
+		fields: [applicationContents.signed_pdf],
+		references: [files.id],
+	}),
+}));

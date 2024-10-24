@@ -20,6 +20,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { actions } from './schemas/actions.mts';
 import { agreements } from './schemas/agreements.mts';
+import { applicationContents } from './schemas/applicationContents.mts';
 import { applications } from './schemas/applications.mts';
 import { collaborators } from './schemas/collaborators.mts';
 import { files } from './schemas/files.mts';
@@ -46,6 +47,10 @@ async function testApplications() {
 	console.log('applications', applications);
 }
 
+async function testApplicationContents() {
+	console.log('application contents', applicationContents);
+}
+
 async function testCollaborators() {
 	console.log('collaborators', collaborators);
 }
@@ -63,6 +68,7 @@ async function testDb() {
 		await testActions();
 		await testAgreements();
 		await testApplications();
+		await testApplicationContents();
 		await testCollaborators();
 		await testFiles();
 		await testRevisions();

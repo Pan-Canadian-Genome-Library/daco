@@ -19,6 +19,7 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { actions } from './actions.mts';
 import { applications } from './applications.mts';
 
 export const revisionRequests = pgTable('revisionRequests', {
@@ -38,9 +39,10 @@ export const revisionRequests = pgTable('revisionRequests', {
 	requested_studies_notes: text(),
 });
 
-export const revisionRelations = relations(revisionRequests, ({ one }) => ({
+export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
 	application_id: one(applications, {
 		fields: [revisionRequests.application_id],
 		references: [applications.id],
 	}),
+	actions: many(actions),
 }));
