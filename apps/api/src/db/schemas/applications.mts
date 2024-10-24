@@ -32,7 +32,7 @@ const statesEnum = pgEnum('applicationStates', [
 	'REVOKED',
 ]);
 
-export const applicationsTable = pgTable('applications', {
+export const applications = pgTable('applications', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	user_id: varchar({ length: 100 }).notNull(),
 	state: statesEnum().notNull(),

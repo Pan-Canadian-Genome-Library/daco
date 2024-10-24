@@ -18,11 +18,12 @@
  */
 
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { actionsTable } from './schemas/actions.mts';
-import { applicationsTable } from './schemas/applications.mts';
-import { collaboratorsTable } from './schemas/collaborators.mts';
-import { filesTable } from './schemas/files.mts';
-import { revisionRequestsTable } from './schemas/revisionRequests.mts';
+import { actions } from './schemas/actions.mts';
+import { agreements } from './schemas/agreements.mts';
+import { applications } from './schemas/applications.mts';
+import { collaborators } from './schemas/collaborators.mts';
+import { files } from './schemas/files.mts';
+import { revisionRequests } from './schemas/revisionRequests.mts';
 
 const POSTGRES_URL = process.env.POSTGRES_URL;
 const PGDATABASE = process.env.PGDATABASE;
@@ -33,29 +34,34 @@ const db = drizzle(connectionString!);
 
 console.log('Db', db);
 
-async function testApplications() {
-	console.log('applications', applicationsTable);
+async function testActions() {
+	console.log('actions', actions);
 }
 
-async function testActions() {
-	console.log('actions', actionsTable);
+async function testAgreements() {
+	console.log('agreements', agreements);
+}
+
+async function testApplications() {
+	console.log('applications', applications);
 }
 
 async function testCollaborators() {
-	console.log('collaborators', collaboratorsTable);
+	console.log('collaborators', collaborators);
 }
 
 async function testFiles() {
-	console.log('files', filesTable);
+	console.log('files', files);
 }
 
 async function testRevisions() {
-	console.log('revisions', revisionRequestsTable);
+	console.log('revisions', revisionRequests);
 }
 
 async function testDb() {
 	try {
 		await testActions();
+		await testAgreements();
 		await testApplications();
 		await testCollaborators();
 		await testFiles();

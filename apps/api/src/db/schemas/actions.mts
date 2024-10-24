@@ -19,8 +19,8 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applicationsTable } from './applications.mts';
-import { revisionRequestsTable } from './revisionRequests.mts';
+import { applications } from './applications.mts';
+import { revisionRequests } from './revisionRequests.mts';
 // TODO: Integrate w/ TS
 // import { applicationActions } from 'pcgl-daco/packages/data-model/';
 
@@ -37,7 +37,7 @@ const actionsEnum = pgEnum('actions', [
 	'REVOKE',
 ]);
 
-export const actionsTable = pgTable('actions', {
+export const actions = pgTable('actions', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull(),
@@ -49,13 +49,13 @@ export const actionsTable = pgTable('actions', {
 	// TODO: may need reference to a content diff
 });
 
-export const usersRelations = relations(actionsTable, ({ one }) => ({
-	application_id: one(applicationsTable, {
-		fields: [actionsTable.application_id],
-		references: [applicationsTable.id],
+export const usersRelations = relations(actions, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [actions.application_id],
+		references: [applications.id],
 	}),
-	revisions_request_id: one(revisionRequestsTable, {
-		fields: [actionsTable.revisions_request_id],
-		references: [revisionRequestsTable.id],
+	revisions_request_id: one(revisionRequests, {
+		fields: [actions.revisions_request_id],
+		references: [revisionRequests.id],
 	}),
 }));

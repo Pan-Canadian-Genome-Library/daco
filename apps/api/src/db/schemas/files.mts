@@ -19,7 +19,7 @@
 
 import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
-export const filesTable = pgTable('files', {
+export const files = pgTable('files', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(), // 	ref: <> applications.id]
 	// 	type file_type [not null]
