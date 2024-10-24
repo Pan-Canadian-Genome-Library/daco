@@ -17,23 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { integer, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { bigint, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const applicationsTable = pgTable('applications', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	name: varchar({ length: 255 }).notNull(),
-	age: integer().notNull(),
-	email: varchar({ length: 255 }).notNull().unique(),
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	user_id: varchar({ length: 100 }).notNull(), // User ID set to a string since we don't have details atm about how this will be communicated. This will either be email address or a unique token from the auth system
+	state: text().notNull(), // application_state enum
+	created_at: timestamp().notNull(),
+	approved_at: timestamp(),
+	expires_at: timestamp(),
 });
-
-// Table applications {
-// 	id bigint [pk, increment]
-// 	user_id varchar(100) [not null] // User ID set to a string since we don't have details atm about how this will be communicated. This will either be email address or a unique token from the auth system
-// 	state application_state [not null]
-// 	created_at timestamp [not null]
-// 	approved_at timestamp
-// 	expires_at timestamp
-// }
 
 // Table application_contents {
 // 	Note: '''
