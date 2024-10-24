@@ -17,26 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-// TODO: Integrate w/ TS
-// import { ApplicationStates } from 'pcgl-daco/packages/data-model';
+// // TODO: Might need to track user agreements separate from the application content, This could model this
+// // Table agreements {
+// //   id bigint [not null]
+// //   user_id varchar(100) [not null]
+// //   name text [not null]
+// //   agreement_text text [not null]
 
-const statesEnum = pgEnum('applicationStates', [
-	'DRAFT',
-	'INSTITUTIONAL_REP_REVIEW',
-	'DAC_REVIEW',
-	'DAC_REVISIONS_REQUESTED',
-	'REJECTED',
-	'APPROVED',
-	'CLOSED',
-	'REVOKED',
-]);
-
-export const applicationsTable = pgTable('applications', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	user_id: varchar({ length: 100 }).notNull(),
-	state: statesEnum().notNull(),
-	created_at: timestamp().notNull(),
-	approved_at: timestamp(),
-	expires_at: timestamp(),
-});
+// //   agreement_type agreement_type [not null] // enum, need to review possible agreements needed
+// //   agreed_at timestamp [not null] // with timezone, seconds precision = 0
+// // }
