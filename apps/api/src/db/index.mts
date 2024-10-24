@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { actions } from './schemas/actions.mts';
 import { agreements } from './schemas/agreements.mts';
 import { applicationContents } from './schemas/applicationContents.mts';
@@ -25,15 +24,6 @@ import { applications } from './schemas/applications.mts';
 import { collaborators } from './schemas/collaborators.mts';
 import { files } from './schemas/files.mts';
 import { revisionRequests } from './schemas/revisionRequests.mts';
-
-const POSTGRES_URL = process.env.POSTGRES_URL;
-const PGDATABASE = process.env.PGDATABASE;
-
-const connectionString = `${POSTGRES_URL}${PGDATABASE}`;
-
-const db = drizzle(connectionString!);
-
-console.log('Db', db);
 
 async function testActions() {
 	console.log('actions', actions);

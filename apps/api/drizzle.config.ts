@@ -19,11 +19,16 @@
 
 import { defineConfig } from 'drizzle-kit';
 
+const POSTGRES_URL = process.env.POSTGRES_URL;
+const PGDATABASE = process.env.PGDATABASE;
+
+const connectionString = `${POSTGRES_URL}${PGDATABASE}`;
+
 export default defineConfig({
 	out: './drizzle',
-	schema: './src/db/schemas/users.mts',
+	schema: './src/db/schemas/',
 	dialect: 'postgresql',
 	dbCredentials: {
-		url: process.env.POSTGRES_URL!,
+		url: connectionString!,
 	},
 });
