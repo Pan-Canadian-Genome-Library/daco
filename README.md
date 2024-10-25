@@ -1,6 +1,12 @@
 # Pan Canadian Genome Library Data Access Compliance Office
 
-> <img src="./apps/ui/public/pcgl-logo.png" height="90" />
+<div>
+<img src="./apps/ui/public/pcgl-logo.png" height="90" align="right" />
+</div>
+
+Canada boasts world-leading expertise in genomics, including developing data-sharing policies and tools. However, we lack a national strategy to aggregate, store and share Canadian data equitably, securely and sustainably. At the same time, the size and complexity of human genomics datasets and their associated clinical data are growing rapidly.
+
+The Pan-Canadian Genome Library (PCGL) is a large collaborative effort to unify Canada's genome sequencing efforts. The PCGL is an open-source and open-science initiative, building upon Canadian-made foundational components and datasets, and utilizing international standards such as GA4GH to unify Canada’s human genome sequencing efforts.
 
 ## Repository Structure
 
