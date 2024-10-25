@@ -18,36 +18,44 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applications } from './applications.mts';
+import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applications } from './applications.ts';
+import { revisionRequests } from './revisionRequests.ts';
 // TODO: Integrate w/ TS
-// import { ApplicationAgreements } from 'pcgl-daco/packages/data-model/';
+// import { applicationActions } from 'pcgl-daco/packages/data-model/';
 
-const agreementEnum = pgEnum('agreements', [
-	'dac_agreement_software_updates',
-	'dac_agreement_non_disclosure',
-	'dac_agreement_monitor_individual_access',
-	'dac_agreement_destroy_data',
-	'dac_agreement_familiarize_restrictions',
-	'dac_agreement_provide_it_policy',
-	'dac_agreement_notify_unauthorized_access',
-	'dac_agreement_certify_application',
-	'dac_agreement_read_and_agreed',
+const actionsEnum = pgEnum('actions', [
+	'CREATE',
+	'WITHDRAW',
+	'CLOSE',
+	'REQUEST_INSTITUTIONAL_REP',
+	'INSTITUTIONAL_REP_APPROVED',
+	'INSTITUTIONAL_REP_REJECTED',
+	'DAC_REVIEW_APPROVED',
+	'DAC_REVIEW_REJECTED',
+	'DAC_REVIEW_REVISIONS',
+	'REVOKE',
 ]);
 
-export const agreements = pgTable('agreements', {
+export const actions = pgTable('actions', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }),
+	application_id: bigint({ mode: 'number' }).notNull(),
+	created_at: timestamp().notNull(),
 	user_id: varchar({ length: 100 }).notNull(),
-	name: text().notNull(),
-	agreement_text: text().notNull(),
-	agreement_type: agreementEnum().notNull(),
-	agreed_at: timestamp().notNull(),
+	action: actionsEnum().notNull(),
+	revisions_request_id: bigint({ mode: 'number' }),
+	state_before: varchar({ length: 255 }).notNull(),
+	state_after: varchar({ length: 255 }).notNull(),
+	// TODO: may need reference to a content diff
 });
 
-export const actionsRelations = relations(agreements, ({ one }) => ({
+export const actionsRelations = relations(actions, ({ one }) => ({
 	application_id: one(applications, {
-		fields: [agreements.application_id],
+		fields: [actions.application_id],
 		references: [applications.id],
+	}),
+	revisions_request_id: one(revisionRequests, {
+		fields: [actions.revisions_request_id],
+		references: [revisionRequests.id],
 	}),
 }));

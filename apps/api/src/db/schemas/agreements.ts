@@ -18,35 +18,36 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applicationContents } from './applicationContents.mts';
+import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applications } from './applications.ts';
 // TODO: Integrate w/ TS
-// import { ApplicationStates } from 'pcgl-daco/packages/data-model';
+// import { ApplicationAgreements } from 'pcgl-daco/packages/data-model/';
 
-const statesEnum = pgEnum('applicationStates', [
-	'DRAFT',
-	'INSTITUTIONAL_REP_REVIEW',
-	'DAC_REVIEW',
-	'DAC_REVISIONS_REQUESTED',
-	'REJECTED',
-	'APPROVED',
-	'CLOSED',
-	'REVOKED',
+const agreementEnum = pgEnum('agreements', [
+	'dac_agreement_software_updates',
+	'dac_agreement_non_disclosure',
+	'dac_agreement_monitor_individual_access',
+	'dac_agreement_destroy_data',
+	'dac_agreement_familiarize_restrictions',
+	'dac_agreement_provide_it_policy',
+	'dac_agreement_notify_unauthorized_access',
+	'dac_agreement_certify_application',
+	'dac_agreement_read_and_agreed',
 ]);
 
-export const applications = pgTable('applications', {
+export const agreements = pgTable('agreements', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }),
 	user_id: varchar({ length: 100 }).notNull(),
-	state: statesEnum().notNull(),
-	created_at: timestamp().notNull(),
-	approved_at: timestamp(),
-	expires_at: timestamp(),
-	contents: bigint({ mode: 'number' }),
+	name: text().notNull(),
+	agreement_text: text().notNull(),
+	agreement_type: agreementEnum().notNull(),
+	agreed_at: timestamp().notNull(),
 });
 
-export const applicationsRelations = relations(applications, ({ one }) => ({
-	application_contents: one(applicationContents, {
-		fields: [applications.contents],
-		references: [applicationContents.id],
+export const actionsRelations = relations(agreements, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [agreements.application_id],
+		references: [applications.id],
 	}),
 }));

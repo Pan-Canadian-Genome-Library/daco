@@ -17,19 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import assert from 'node:assert';
-import { after, describe, it } from 'node:test';
+import { relations } from 'drizzle-orm';
+import { bigint, customType, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applications } from './applications.ts';
+// TODO: Integrate w/ TS
+// import { FileTypes } from 'pcgl-daco/packages/data-model/';
 
-import { port } from '../main.mts';
+const fileEnum = pgEnum('agreements', ['SIGNED_APPLICATION', 'ETHICS_LETTER']);
 
-describe('Initial Test Setup', () => {
-	describe('First File', () => {
-		it('should have a Port Value of 3000', () => {
-			assert.strictEqual(port, 3000);
-		});
-
-		after(() => {
-			process.exit();
-		});
-	});
+// https://stackoverflow.com/questions/76399047/how-to-represent-bytea-datatype-from-pg-inside-new-drizzle-orm
+const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
+	dataType() {
+		return 'bytea';
+	},
 });
+
+export const files = pgTable('files', {
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }).notNull(),
+	type: fileEnum().notNull(),
+	submitter_user_id: varchar({ length: 100 }).notNull(),
+	submitted_at: timestamp().notNull(),
+	content: bytea().notNull(),
+	filename: varchar({ length: 255 }),
+});
+
+export const filesRelations = relations(files, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [files.application_id],
+		references: [applications.id],
+	}),
+}));

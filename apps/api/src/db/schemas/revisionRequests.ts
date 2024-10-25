@@ -18,33 +18,31 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, customType, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applications } from './applications.mts';
-// TODO: Integrate w/ TS
-// import { FileTypes } from 'pcgl-daco/packages/data-model/';
+import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { actions } from './actions.ts';
+import { applications } from './applications.ts';
 
-const fileEnum = pgEnum('agreements', ['SIGNED_APPLICATION', 'ETHICS_LETTER']);
-
-// https://stackoverflow.com/questions/76399047/how-to-represent-bytea-datatype-from-pg-inside-new-drizzle-orm
-const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
-	dataType() {
-		return 'bytea';
-	},
-});
-
-export const files = pgTable('files', {
+export const revisionRequests = pgTable('revisionRequests', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
-	type: fileEnum().notNull(),
-	submitter_user_id: varchar({ length: 100 }).notNull(),
-	submitted_at: timestamp().notNull(),
-	content: bytea().notNull(),
-	filename: varchar({ length: 255 }),
+	created_at: timestamp().notNull(),
+	comments: text(),
+	applicant_notes: text(),
+	applicant_approved: boolean().notNull(),
+	institution_rep_approved: boolean().notNull(),
+	institution_rep_notes: boolean().notNull(),
+	collaborators_approved: boolean().notNull(),
+	collaborators_notes: text(),
+	project_approved: boolean().notNull(),
+	project_notes: text(),
+	requested_studies_approved: boolean().notNull(),
+	requested_studies_notes: text(),
 });
 
-export const filesRelations = relations(files, ({ one }) => ({
+export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
 	application_id: one(applications, {
-		fields: [files.application_id],
+		fields: [revisionRequests.application_id],
 		references: [applications.id],
 	}),
+	actions: many(actions),
 }));
