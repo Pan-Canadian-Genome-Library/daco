@@ -25,43 +25,43 @@ import { collaborators } from './schemas/collaborators.ts';
 import { files } from './schemas/files.ts';
 import { revisionRequests } from './schemas/revisionRequests.ts';
 
-async function testActions() {
+function testActions() {
 	console.log('actions', actions);
 }
 
-async function testAgreements() {
+function testAgreements() {
 	console.log('agreements', agreements);
 }
 
-async function testApplications() {
+function testApplications() {
 	console.log('applications', applications);
 }
 
-async function testApplicationContents() {
+function testApplicationContents() {
 	console.log('application contents', applicationContents);
 }
 
-async function testCollaborators() {
+function testCollaborators() {
 	console.log('collaborators', collaborators);
 }
 
-async function testFiles() {
+function testFiles() {
 	console.log('files', files);
 }
 
-async function testRevisions() {
+function testRevisions() {
 	console.log('revisions', revisionRequests);
 }
 
 async function testDb() {
 	try {
-		await testActions();
-		await testAgreements();
-		await testApplications();
-		await testApplicationContents();
-		await testCollaborators();
-		await testFiles();
-		await testRevisions();
+		testActions();
+		testAgreements();
+		testApplications();
+		testApplicationContents();
+		testCollaborators();
+		testFiles();
+		testRevisions();
 	} catch (err) {
 		console.error('Error at TestDb');
 		console.error(err);
