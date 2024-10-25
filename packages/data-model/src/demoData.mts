@@ -17,88 +17,105 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Application } from './types';
+import { Applicant, Application, ApplicationStates, Institution } from './types';
+
+const demoUser: Applicant = {
+	userId: 'id01',
+	title: 'Dr.',
+	firstName: 'Testing',
+	middleName: 'Test',
+	lastName: 'Person',
+	suffix: '',
+	primaryAffiliation: 'OICR',
+	institutionalEmail: 'testing@oicr.on.ca',
+	researcherProfileURL: 'platform.icgc-argo.org',
+	positionTitle: 'Dr.',
+};
+
+const demoInstitute: Institution = {
+	country: 'Canada',
+	streetAddress: '661 University Ave',
+	suite: '510',
+	city: 'Toronto',
+	province: 'ON',
+	postalCode: 'M5G 0A3',
+};
 
 export const demoApplication: Application = {
-	status: 'DRAFT',
-	applicant: {
-		applicationID: '123',
-		userId: 'id01',
-		title: 'Dr.',
-		first: 'Testing',
-		middle: 'Test',
-		last: 'Person',
-		suffix: '',
-		primaryAffiliation: 'OICR',
-		institutionalEmail: 'testing@oicr.on.ca',
-		researcherProfileURL: 'platform.icgc-argo.org',
-		positionTitle: 'Dr.',
-	},
+	id: 1,
+	state: ApplicationStates['DRAFT'],
+	userId: 'ddemaria@oicr.on.ca',
+	created_at: new Date(),
+	approved_at: new Date(),
+	expires_at: new Date(),
+	contents: {
+		applicant: demoUser,
+		createdAt: new Date(),
+		updatedAt: new Date(),
 
-	institution: {
-		country: 'Canada',
-		streetAddress: '661 University Ave',
-		suite: '510',
-		city: 'Toronto',
-		province: 'ON',
-		postalCode: 'M5G 0A3',
-	},
-
-	institutional_representative: {
-		applicant: {
-			applicationID: '123',
-			userId: 'id02',
-			title: 'Mrs.',
-			first: 'Jane',
-			middle: '',
-			last: 'Doe',
-			suffix: '',
-			primaryAffiliation: 'OICR',
-			institutionalEmail: 'testing@oicr.on.ca',
-			researcherProfileURL: 'platform.icgc-argo.org',
-			positionTitle: 'PI',
+		institution: demoInstitute,
+		institutionalRepresentative: {
+			personalInformation: {
+				userId: 'id02',
+				title: 'Mrs.',
+				firstName: 'Jane',
+				middleName: '',
+				lastName: 'Doe',
+				suffix: '',
+				primaryAffiliation: 'OICR',
+				institutionalEmail: 'testing@oicr.on.ca',
+				researcherProfileURL: 'platform.icgc-argo.org',
+				positionTitle: 'PI',
+			},
+			institution: {
+				country: 'Canada',
+				streetAddress: '661 University Ave',
+				suite: '510',
+				city: 'Toronto',
+				province: 'ON',
+				postalCode: 'M5G 0A3',
+			},
 		},
-		institution: {
-			country: 'Canada',
-			streetAddress: '661 University Ave',
-			suite: '510',
-			city: 'Toronto',
-			province: 'ON',
-			postalCode: 'M5G 0A3',
+
+		collaborators: [],
+
+		projectInformation: {
+			title: 'ICGC ARGO',
+			website: 'platform.icgc-argo.org',
+			abstract: '',
+			methodology: '',
+			summary: '',
+			publicationUrls: ['Nature Portfolio'],
 		},
+
+		requestedStudies: {
+			studyIds: ['CHICHI-INTL'],
+		},
+
+		ethics: {
+			ethicsReviewRequired: false,
+			ethicsLetter: undefined,
+		},
+
+		files: [],
+
+		dataAccessAgreements: [
+			{
+				id: 123,
+				userId: 'user123',
+				name: 'Dr. Doctorson',
+				agreementText: 'I agree',
+				agreementType: '',
+				agreedAt: new Date(),
+			},
+		],
+
+		appendices: {
+			agreements: [{ name: 'NDA', agreement: false }],
+		},
+
+		signatures: [],
+
+		revisions: [],
 	},
-
-	collaborators: [],
-
-	projectInformation: {
-		title: 'ICGC ARGO',
-		website: 'platform.icgc-argo.org',
-		background: '',
-		methodology: '',
-		summary: '',
-		relevantPublications: 'Nature Portfolio',
-	},
-
-	requestedStudies: {
-		studyIds: ['CHICHI-INTL'],
-	},
-
-	ethics: {
-		accepted: false,
-		ethicsLetter: undefined,
-	},
-
-	files: [],
-
-	dataAccessAgreement: {
-		agreements: false,
-	},
-
-	appendices: {
-		agreements: [{ name: 'NDA', agreement: false }],
-	},
-
-	signatures: [],
-
-	revisions: [],
 };

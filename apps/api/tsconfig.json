@@ -2,8 +2,9 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"lib": ["ESNext"],
-		"moduleResolution": "node",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"esModuleInterop": true
 	},
-	"include": ["src"]
+	"include": ["src", "./drizzle.config.ts"]
 }
