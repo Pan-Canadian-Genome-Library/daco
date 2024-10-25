@@ -19,43 +19,34 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applications } from './applications.mts';
-import { revisionRequests } from './revisionRequests.mts';
+import { applicationContents } from './applicationContents.ts';
 // TODO: Integrate w/ TS
-// import { applicationActions } from 'pcgl-daco/packages/data-model/';
+// import { ApplicationStates } from 'pcgl-daco/packages/data-model';
 
-const actionsEnum = pgEnum('actions', [
-	'CREATE',
-	'WITHDRAW',
-	'CLOSE',
-	'REQUEST_INSTITUTIONAL_REP',
-	'INSTITUTIONAL_REP_APPROVED',
-	'INSTITUTIONAL_REP_REJECTED',
-	'DAC_REVIEW_APPROVED',
-	'DAC_REVIEW_REJECTED',
-	'DAC_REVIEW_REVISIONS',
-	'REVOKE',
+const statesEnum = pgEnum('applicationStates', [
+	'DRAFT',
+	'INSTITUTIONAL_REP_REVIEW',
+	'DAC_REVIEW',
+	'DAC_REVISIONS_REQUESTED',
+	'REJECTED',
+	'APPROVED',
+	'CLOSED',
+	'REVOKED',
 ]);
 
-export const actions = pgTable('actions', {
+export const applications = pgTable('applications', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull(),
 	user_id: varchar({ length: 100 }).notNull(),
-	action: actionsEnum().notNull(),
-	revisions_request_id: bigint({ mode: 'number' }),
-	state_before: varchar({ length: 255 }).notNull(),
-	state_after: varchar({ length: 255 }).notNull(),
-	// TODO: may need reference to a content diff
+	state: statesEnum().notNull(),
+	created_at: timestamp().notNull(),
+	approved_at: timestamp(),
+	expires_at: timestamp(),
+	contents: bigint({ mode: 'number' }),
 });
 
-export const actionsRelations = relations(actions, ({ one }) => ({
-	application_id: one(applications, {
-		fields: [actions.application_id],
-		references: [applications.id],
-	}),
-	revisions_request_id: one(revisionRequests, {
-		fields: [actions.revisions_request_id],
-		references: [revisionRequests.id],
+export const applicationsRelations = relations(applications, ({ one }) => ({
+	application_contents: one(applicationContents, {
+		fields: [applications.contents],
+		references: [applicationContents.id],
 	}),
 }));

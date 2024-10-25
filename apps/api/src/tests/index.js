@@ -17,32 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { actions } from './actions.mts';
-import { applications } from './applications.mts';
+import assert from 'node:assert';
+import { after, describe, it } from 'node:test';
 
-export const revisionRequests = pgTable('revisionRequests', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull(),
-	comments: text(),
-	applicant_notes: text(),
-	applicant_approved: boolean().notNull(),
-	institution_rep_approved: boolean().notNull(),
-	institution_rep_notes: boolean().notNull(),
-	collaborators_approved: boolean().notNull(),
-	collaborators_notes: text(),
-	project_approved: boolean().notNull(),
-	project_notes: text(),
-	requested_studies_approved: boolean().notNull(),
-	requested_studies_notes: text(),
+import { port } from '../main.ts';
+
+describe('Initial Test Setup', () => {
+	describe('First File', () => {
+		it('should have a Port Value of 3000', () => {
+			assert.strictEqual(port, 3000);
+		});
+
+		after(() => {
+			process.exit();
+		});
+	});
 });
-
-export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
-	application_id: one(applications, {
-		fields: [revisionRequests.application_id],
-		references: [applications.id],
-	}),
-	actions: many(actions),
-}));

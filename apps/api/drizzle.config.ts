@@ -19,10 +19,13 @@
 
 import { defineConfig } from 'drizzle-kit';
 
-const POSTGRES_URL = process.env.POSTGRES_URL;
 const PGDATABASE = process.env.PGDATABASE;
+const PGUSER = process.env.PGUSER;
+const PGPASSWORD = process.env.PGPASSWORD;
+const PGHOST = process.env.PGHOST;
 
-const connectionString = `${POSTGRES_URL}${PGDATABASE}`;
+// PG Connection String: postgres://postgres:mypassword@localhost:5432/postgres
+const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}`;
 
 export default defineConfig({
 	out: './drizzle',

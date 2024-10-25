@@ -17,13 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { actions } from './schemas/actions.mts';
-import { agreements } from './schemas/agreements.mts';
-import { applicationContents } from './schemas/applicationContents.mts';
-import { applications } from './schemas/applications.mts';
-import { collaborators } from './schemas/collaborators.mts';
-import { files } from './schemas/files.mts';
-import { revisionRequests } from './schemas/revisionRequests.mts';
+import { actions } from './schemas/actions.ts';
+import { agreements } from './schemas/agreements.ts';
+import { applicationContents } from './schemas/applicationContents.ts';
+import { applications } from './schemas/applications.ts';
+import { collaborators } from './schemas/collaborators.ts';
+import { files } from './schemas/files.ts';
+import { revisionRequests } from './schemas/revisionRequests.ts';
 
 async function testActions() {
 	console.log('actions', actions);
