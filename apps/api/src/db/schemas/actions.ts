@@ -40,7 +40,7 @@ const actionsEnum = pgEnum('actions', [
 export const actions = pgTable('actions', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull(),
+	created_at: timestamp().notNull().defaultNow(),
 	user_id: varchar({ length: 100 }).notNull(),
 	action: actionsEnum().notNull(),
 	revisions_request_id: bigint({ mode: 'number' }),

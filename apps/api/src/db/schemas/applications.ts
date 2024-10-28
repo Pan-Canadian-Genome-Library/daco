@@ -38,7 +38,7 @@ export const applications = pgTable('applications', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	user_id: varchar({ length: 100 }).notNull(),
 	state: statesEnum().notNull(),
-	created_at: timestamp().notNull(),
+	created_at: timestamp().notNull().defaultNow(),
 	approved_at: timestamp(),
 	expires_at: timestamp(),
 	contents: bigint({ mode: 'number' }),

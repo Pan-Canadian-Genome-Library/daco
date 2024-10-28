@@ -28,7 +28,7 @@ import { revisionRequests } from './revisionRequests.ts';
 export const applicationContents = pgTable('application_contents', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull(),
+	created_at: timestamp().notNull().defaultNow(),
 	updated_at: timestamp().notNull(),
 	// Applicant
 	applicant_first_name: varchar({ length: 255 }),

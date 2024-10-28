@@ -25,7 +25,7 @@ import { applications } from './applications.ts';
 export const revisionRequests = pgTable('revisionRequests', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull(),
+	created_at: timestamp().notNull().defaultNow(),
 	comments: text(),
 	applicant_notes: text(),
 	applicant_approved: boolean().notNull(),
