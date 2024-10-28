@@ -30,7 +30,7 @@ export const revisionRequests = pgTable('revisionRequests', {
 	applicant_notes: text(),
 	applicant_approved: boolean().notNull(),
 	institution_rep_approved: boolean().notNull(),
-	institution_rep_notes: boolean().notNull(),
+	institution_rep_notes: text(),
 	collaborators_approved: boolean().notNull(),
 	collaborators_notes: text(),
 	project_approved: boolean().notNull(),
