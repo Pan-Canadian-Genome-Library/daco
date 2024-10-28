@@ -17,19 +17,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import assert from 'node:assert';
-import { after, describe, it } from 'node:test';
+import { relations } from 'drizzle-orm';
+import { bigint, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { applications } from './applications.ts';
 
-import { port } from '../main.mts';
-
-describe('Initial Test Setup', () => {
-	describe('First File', () => {
-		it('should have a Port Value of 3000', () => {
-			assert.strictEqual(port, 3000);
-		});
-
-		after(() => {
-			process.exit();
-		});
-	});
+export const collaborators = pgTable('collaborators', {
+	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' }),
+	first_name: varchar({ length: 255 }).notNull(),
+	middle_name: varchar({ length: 255 }),
+	last_name: varchar({ length: 255 }).notNull(),
+	title: varchar({ length: 255 }),
+	suffix: varchar({ length: 255 }),
+	position_title: varchar({ length: 255 }).notNull(),
+	institutional_email: varchar({ length: 320 }).notNull(),
+	profile_url: text(),
+	collaborator_type: text(),
+	// TODO: need email? how do we connect this
 });
+
+export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [collaborators.application_id],
+		references: [applications.id],
+	}),
+}));
