@@ -22,4 +22,8 @@ It provides an Express API for accessing a Postgres database using Drizzle ORM.
 
 ### Unit Testing
 
-- Unit tests are built with the Node Test Runner and are triggered using `pnpm run test`
+- Unit tests are built using the [Node Test Runner](https://nodejs.org/api/test.html) and are triggered using `pnpm run test`
+
+### Database
+
+- This application implements a Postgres database using the following [data model](../../docs/model/README.md)
