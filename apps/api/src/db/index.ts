@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { drizzle } from 'drizzle-orm/node-postgres';
+
 import { actions } from './schemas/actions.ts';
 import { agreements } from './schemas/agreements.ts';
 import { applicationContents } from './schemas/applicationContents.ts';
@@ -24,6 +26,8 @@ import { applications } from './schemas/applications.ts';
 import { collaborators } from './schemas/collaborators.ts';
 import { files } from './schemas/files.ts';
 import { revisionRequests } from './schemas/revisionRequests.ts';
+
+import { connectionString } from '../../drizzle.config.ts';
 
 function testActions() {
 	console.log('actions', actions);
@@ -55,6 +59,11 @@ function testRevisions() {
 
 async function testDb() {
 	try {
+		const db = drizzle(connectionString);
+
+		console.log('Connected to Postgres Db');
+		console.log(db);
+
 		testActions();
 		testAgreements();
 		testApplications();
