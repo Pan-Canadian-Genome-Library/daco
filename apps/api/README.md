@@ -1,7 +1,25 @@
 # PCGL DACO API
 
-Server Application for the Pan Canadian Genome Library Data Access Compliance Office
+Nodes.js API for the Pan Canadian Genome Library Data Access Compliance Office.
+
+This app uses features in Node ^20.9, in combination with TSX for TypeScript support.
+
+It provides an Express API for accessing a Postgres database using Drizzle ORM.
 
 ## Local Development
 
 - Follow the [Setup steps in project Readme](../../README.md)
+
+### Environment Variables
+
+| Name                                             | Description                                                                                                                     | Type     | Required | Default                                                                                                                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PORT`                                           | Port number this service will listen to.                                                                                        | `number` | Optional | `3000`                                                                                                                                                         |
+| `PG_USER`                                       | Postgres Database User name.      | `string` | Optional | `production`                                                                                                                                                   |
+| `PG_PASSWORD` | Postgres Database password.                                             | `string` | Required | `mypassword`                                                                                                                          |
+| `PG_HOST`                                | URL for the Postgres DB service. application                                                                                             | `string` | Required | `localhost:5432`                                                                                                                                        |
+| `PG_DATABASE`                              | Postgres Database name. application                                                                                           | `string` | Required | `postgres`                                                                                                                                        |
+
+### Unit Testing
+
+- Unit tests are built with the Node Test Runner and are triggered using `pnpm run test`

@@ -46,11 +46,13 @@ The modules in the monorepo are organized into two categories:
 
 - Start server:
   `cd apps/api`
+  `touch .env`
   `pnpm run dev`
   The server is now listening for requests at `http://localhost:3000`
 
 - Start UI:
   `cd apps/ui`
+  `touch .env`
   `pnpm run dev`
   Visit `http://localhost:5173/` in the browser to get started
 
