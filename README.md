@@ -48,9 +48,7 @@ The modules in the monorepo are organized into two categories:
   
   `cd apps/api`
   
-  `touch .env`
-
-  Add `.env` values
+  `cp .env.schema .env`
 
   `pnpm run dev`
   
@@ -60,9 +58,7 @@ The modules in the monorepo are organized into two categories:
 
   `cd apps/ui`
 
-  `touch .env`
-
-  Add `.env` values
+  `cp .env.schema .env`
 
   `pnpm run dev`
 
