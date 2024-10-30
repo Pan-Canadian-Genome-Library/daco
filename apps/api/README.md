@@ -1,6 +1,6 @@
 # PCGL DACO API
 
-Nodes.js API for the Pan Canadian Genome Library Data Access Compliance Office.
+Node.js Express API for the Pan-Canadian Genome Library's Data Access Compliance Office.
 
 This app uses features in Node ^20.9, in combination with TSX for TypeScript support.
 
