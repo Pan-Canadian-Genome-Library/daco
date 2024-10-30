@@ -21,7 +21,7 @@ import { type Application } from 'pcgl-daco/packages/data-model/src/types';
 import { useState } from 'react';
 import './App.css';
 
-const APPLICATION_API_URL = import.meta.env.VITE_APPLICATION_API_URL || 'http://localhost:3000';
+const APPLICATION_API_URL = import.meta.env.VITE_APPLICATION_API_URL;
 
 function App() {
 	const [application, setApplication] = useState<Application | undefined>(undefined);
