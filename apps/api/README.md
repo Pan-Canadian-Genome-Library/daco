@@ -2,9 +2,7 @@
 
 Node.js Express API for the Pan-Canadian Genome Library's Data Access Compliance Office.
 
-This app uses features in Node ^20.9, in combination with TSX for TypeScript support.
-
-It provides an Express API for accessing a Postgres database using Drizzle ORM.
+This app uses features from Node ^20.9, in combination with TSX for TypeScript support, and it provides access to a Postgres database using Drizzle ORM.
 
 ## Local Development
 
