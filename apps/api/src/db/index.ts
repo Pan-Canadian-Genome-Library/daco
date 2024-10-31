@@ -30,30 +30,114 @@ import { revisionRequests } from './schemas/revisionRequests.ts';
 import { connectionString } from '../../drizzle.config.ts';
 
 function testActions() {
-	console.log('actions', actions);
+	const testAction: typeof actions.$inferInsert = {
+		application_id: 1,
+		user_id: 'testUser@oicr.on.ca',
+		action: 'CREATE',
+		state_before: 'none',
+		state_after: 'tbd',
+	};
+
+	console.log('testAction', testAction);
 }
 
 function testAgreements() {
-	console.log('agreements', agreements);
+	const testAgreements: typeof agreements.$inferInsert = {
+		application_id: 1,
+		name: 'Test Agreement',
+		agreement_text: 'Testing Agreement',
+		agreement_type: 'dac_agreement_non_disclosure',
+		user_id: 'testUser@oicr.on.ca',
+		agreed_at: new Date(),
+	};
+
+	console.log('testAgreements', testAgreements);
 }
 
 function testApplications() {
-	console.log('applications', applications);
+	const testApplications: typeof applications.$inferInsert = {
+		user_id: 'testUser@oicr.on.ca',
+		state: 'DRAFT',
+	};
+	console.log('testApplications', testApplications);
 }
 
 function testApplicationContents() {
-	console.log('application contents', applicationContents);
+	const testApplicationContents: typeof applicationContents.$inferInsert = {
+		application_id: 1,
+		updated_at: new Date(),
+		// Applicant
+		applicant_first_name: 'Test',
+		applicant_middle_name: '',
+		applicant_last_name: 'Testerson',
+		applicant_title: 'Dr.',
+		applicant_suffix: 'Sr.',
+		applicant_position_title: 'PHD',
+		applicant_primary_affiliation: 'UHN',
+		applicant_institutional_email: 'testAccount@oicr.on.ca',
+		applicant_profile_url: '',
+		// Institutional Rep
+		institutional_rep_title: '',
+		institutional_rep_first_name: '',
+		institutional_rep_middle_name: '',
+		institutional_rep_last_name: '',
+		institutional_rep_suffix: '',
+		institutional_rep_primary_affiliation: '',
+		institutional_rep_email: '',
+		institutional_rep_profile_url: '',
+		institutional_rep_position_title: '',
+		// Institution
+		institution_country: '',
+		institution_state: '',
+		institution_city: '',
+		institution_street_address: '',
+		institution_postal_code: '',
+		institution_building: '',
+		// Project
+		project_title: '',
+		project_website: '',
+		project_abstract: '',
+		project_methodology: '',
+		project_summary: '',
+		project_publication_urls: [],
+		// Studies
+		requested_studies: [],
+		// Agreements & Ethics
+		ethics_review_required: false,
+	};
+	console.log('application contents', testApplicationContents);
 }
 
 function testCollaborators() {
+	const testAction: typeof actions.$inferInsert = {
+		application_id: 1,
+		user_id: 'testUser@oicr.on.ca',
+		action: 'CREATE',
+		state_before: 'none',
+		state_after: 'tbd',
+	};
 	console.log('collaborators', collaborators);
 }
 
 function testFiles() {
+	const testAction: typeof actions.$inferInsert = {
+		application_id: 1,
+		user_id: 'testUser@oicr.on.ca',
+		action: 'CREATE',
+		state_before: 'none',
+		state_after: 'tbd',
+	};
 	console.log('files', files);
 }
 
 function testRevisions() {
+	const testAction: typeof actions.$inferInsert = {
+		application_id: 1,
+		user_id: 'testUser@oicr.on.ca',
+		action: 'CREATE',
+		state_before: 'none',
+		state_after: 'tbd',
+	};
 	console.log('revisions', revisionRequests);
 }
 
@@ -62,7 +146,6 @@ async function testDb() {
 		const db = drizzle(connectionString);
 
 		console.log('Connected to Postgres Db');
-		console.log(db);
 
 		testActions();
 		testAgreements();
