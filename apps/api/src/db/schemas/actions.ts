@@ -46,8 +46,8 @@ export const actions = pgTable('actions', {
 	revisions_request_id: bigint({ mode: 'number' }),
 	state_before: varchar({ length: 255 }).notNull(),
 	state_after: varchar({ length: 255 }).notNull(),
-	// TODO: may need reference to a content diff
 });
+// TODO: may need reference to a content diff
 
 export const actionsRelations = relations(actions, ({ one }) => ({
 	application_id: one(applications, {

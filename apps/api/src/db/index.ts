@@ -17,7 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { eq } from 'drizzle-orm';
+import { drizzle, NodePgClient, NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { actions } from './schemas/actions.ts';
 import { agreements } from './schemas/agreements.ts';
@@ -29,7 +30,11 @@ import { revisionRequests } from './schemas/revisionRequests.ts';
 
 import { connectionString } from '../../drizzle.config.ts';
 
-function testActions() {
+type Database = NodePgDatabase<Record<string, never>> & {
+	$client: NodePgClient;
+};
+
+async function testActions(db: Database) {
 	const testAction: typeof actions.$inferInsert = {
 		application_id: 1,
 		user_id: 'testUser@oicr.on.ca',
@@ -38,10 +43,16 @@ function testActions() {
 		state_after: 'tbd',
 	};
 
-	console.log('testAction', testAction);
+	await db.insert(actions).values(testAction);
+
+	const allActions = await db.select().from(actions);
+	console.log('Getting all actions from the database: ', allActions);
+
+	await db.delete(actions).where(eq(actions.application_id, testAction.application_id));
+	console.log('Action deleted');
 }
 
-function testAgreements() {
+async function testAgreements(db: Database) {
 	const testAgreements: typeof agreements.$inferInsert = {
 		application_id: 1,
 		name: 'Test Agreement',
@@ -51,22 +62,34 @@ function testAgreements() {
 		agreed_at: new Date(),
 	};
 
-	console.log('testAgreements', testAgreements);
+	await db.insert(agreements).values(testAgreements);
+
+	const allAgreements = await db.select().from(agreements);
+	console.log('Getting all agreements from the database: ', allAgreements);
+
+	await db.delete(agreements).where(eq(agreements.name, testAgreements.name));
+	console.log('Agreement deleted');
 }
 
-function testApplications() {
+async function testApplications(db: Database) {
 	const testApplications: typeof applications.$inferInsert = {
 		user_id: 'testUser@oicr.on.ca',
 		state: 'DRAFT',
 	};
-	console.log('testApplications', testApplications);
+
+	await db.insert(applications).values(testApplications);
+
+	const allApplications = await db.select().from(applications);
+	console.log('Getting all applications from the database: ', allApplications);
+
+	await db.delete(applications).where(eq(applications.user_id, testApplications.user_id));
+	console.log('Application deleted');
 }
 
-function testApplicationContents() {
+async function testApplicationContents(db: Database) {
 	const testApplicationContents: typeof applicationContents.$inferInsert = {
 		application_id: 1,
 		updated_at: new Date(),
-		// Applicant
 		applicant_first_name: 'Test',
 		applicant_middle_name: '',
 		applicant_last_name: 'Testerson',
@@ -76,69 +99,72 @@ function testApplicationContents() {
 		applicant_primary_affiliation: 'UHN',
 		applicant_institutional_email: 'testAccount@oicr.on.ca',
 		applicant_profile_url: '',
-		// Institutional Rep
-		institutional_rep_title: '',
-		institutional_rep_first_name: '',
-		institutional_rep_middle_name: '',
-		institutional_rep_last_name: '',
-		institutional_rep_suffix: '',
-		institutional_rep_primary_affiliation: '',
-		institutional_rep_email: '',
-		institutional_rep_profile_url: '',
-		institutional_rep_position_title: '',
-		// Institution
-		institution_country: '',
-		institution_state: '',
-		institution_city: '',
-		institution_street_address: '',
-		institution_postal_code: '',
-		institution_building: '',
-		// Project
-		project_title: '',
-		project_website: '',
-		project_abstract: '',
-		project_methodology: '',
-		project_summary: '',
-		project_publication_urls: [],
-		// Studies
-		requested_studies: [],
-		// Agreements & Ethics
-		ethics_review_required: false,
 	};
-	console.log('application contents', testApplicationContents);
+
+	await db.insert(applicationContents).values(testApplicationContents);
+
+	const allApplicationContents = await db.select().from(applicationContents);
+	console.log('Getting all actions from the database: ', allApplicationContents);
+
+	await db
+		.delete(applicationContents)
+		.where(eq(applicationContents.application_id, testApplicationContents.application_id));
+	console.log('Application contents deleted');
 }
 
-function testCollaborators() {
-	const testAction: typeof actions.$inferInsert = {
+async function testCollaborators(db: Database) {
+	const testCollaborators: typeof collaborators.$inferInsert = {
 		application_id: 1,
-		user_id: 'testUser@oicr.on.ca',
-		action: 'CREATE',
-		state_before: 'none',
-		state_after: 'tbd',
+		first_name: 'Thomas',
+		last_name: 'Testing',
+		position_title: 'Teacher',
+		institutional_email: 'ttesting@oicr.on.ca',
 	};
-	console.log('collaborators', collaborators);
+
+	await db.insert(collaborators).values(testCollaborators);
+
+	const allCollaborators = await db.select().from(collaborators);
+	console.log('Getting all collaborators from the database: ', allCollaborators);
+
+	await db.delete(collaborators).where(eq(collaborators.first_name, testCollaborators.first_name));
+	console.log('Collaborator deleted');
 }
 
-function testFiles() {
-	const testAction: typeof actions.$inferInsert = {
+async function testFiles(db: Database) {
+	const testFiles: typeof files.$inferInsert = {
 		application_id: 1,
-		user_id: 'testUser@oicr.on.ca',
-		action: 'CREATE',
-		state_before: 'none',
-		state_after: 'tbd',
+		type: 'SIGNED_APPLICATION',
+		submitter_user_id: '001',
+		submitted_at: new Date(),
+		content: Buffer.alloc(123),
 	};
-	console.log('files', files);
+
+	await db.insert(files).values(testFiles);
+
+	const allFiles = await db.select().from(files);
+	console.log('Getting all files from the database: ', allFiles);
+
+	await db.delete(files).where(eq(files.submitter_user_id, testFiles.submitter_user_id));
+	console.log('File deleted');
 }
 
-function testRevisions() {
-	const testAction: typeof actions.$inferInsert = {
+async function testRevisions(db: Database) {
+	const testRevisions: typeof revisionRequests.$inferInsert = {
 		application_id: 1,
-		user_id: 'testUser@oicr.on.ca',
-		action: 'CREATE',
-		state_before: 'none',
-		state_after: 'tbd',
+		applicant_approved: false,
+		institution_rep_approved: true,
+		collaborators_approved: true,
+		project_approved: false,
+		requested_studies_approved: true,
 	};
-	console.log('revisions', revisionRequests);
+
+	await db.insert(revisionRequests).values(testRevisions);
+
+	const allRevisions = await db.select().from(revisionRequests);
+	console.log('Getting all revisions from the database: ', allRevisions);
+
+	await db.delete(revisionRequests).where(eq(revisionRequests.application_id, testRevisions.application_id));
+	console.log('Revision deleted');
 }
 
 async function testDb() {
@@ -147,13 +173,13 @@ async function testDb() {
 
 		console.log('Connected to Postgres Db');
 
-		testActions();
-		testAgreements();
-		testApplications();
-		testApplicationContents();
-		testCollaborators();
-		testFiles();
-		testRevisions();
+		await testActions(db);
+		await testAgreements(db);
+		await testApplications(db);
+		await testApplicationContents(db);
+		await testCollaborators(db);
+		await testFiles(db);
+		await testRevisions(db);
 	} catch (err) {
 		console.error('Error at TestDb');
 		console.error(err);

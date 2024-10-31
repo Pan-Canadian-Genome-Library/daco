@@ -6,6 +6,4 @@ services:
     volumes:
       - ~/apps/postgres:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=hiddensecret
-      - POSTGRES_USER=pcgl
-      - POSTGRES_DATABASE=daco
+      POSTGRES_PASSWORD: hiddensecret

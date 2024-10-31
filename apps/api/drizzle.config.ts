@@ -29,7 +29,7 @@ export const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}
 
 export default defineConfig({
 	out: './drizzle',
-	schema: './src/db/schemas/',
+	schema: './src/db/schemas/*',
 	dialect: 'postgresql',
 	dbCredentials: {
 		url: connectionString!,
