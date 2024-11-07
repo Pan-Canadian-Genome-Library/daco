@@ -1,4 +1,4 @@
-# PCGC DACO Data Model
+# PCGL DACO Data Model
 
 ![Data Model](data-model.png)
 
