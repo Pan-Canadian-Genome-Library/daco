@@ -24,4 +24,4 @@ This app uses features from Node ^20.9, in combination with TSX for TypeScript s
 
 ### Database
 
-- This application implements a Postgres database using the following [data model](../../docs/model/README.md)
+- This application implements a Postgres database based on the following [data model](../../docs/model/README.md) and managed by [Drizzle ORM](https://orm.drizzle.team/docs/overview)
