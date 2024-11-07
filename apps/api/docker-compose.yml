@@ -6,4 +6,4 @@ services:
     volumes:
       - ~/apps/postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: hiddensecret
+      POSTGRES_PASSWORD: mypassword
