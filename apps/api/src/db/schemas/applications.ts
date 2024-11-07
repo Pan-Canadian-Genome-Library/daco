@@ -23,7 +23,7 @@ import { applicationContents } from './applicationContents.ts';
 // TODO: Integrate w/ TS
 // import { ApplicationStates } from 'pcgl-daco/packages/data-model';
 
-const statesEnum = pgEnum('applicationStates', [
+export const statesEnum = pgEnum('application_states', [
 	'DRAFT',
 	'INSTITUTIONAL_REP_REVIEW',
 	'DAC_REVIEW',

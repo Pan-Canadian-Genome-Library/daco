@@ -23,7 +23,7 @@ import { applications } from './applications.ts';
 // TODO: Integrate w/ TS
 // import { FileTypes } from 'pcgl-daco/packages/data-model/';
 
-const fileTypesEnum = pgEnum('fileTypes', ['SIGNED_APPLICATION', 'ETHICS_LETTER']);
+export const fileTypesEnum = pgEnum('file_types', ['SIGNED_APPLICATION', 'ETHICS_LETTER']);
 
 // https://stackoverflow.com/questions/76399047/how-to-represent-bytea-datatype-from-pg-inside-new-drizzle-orm
 const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
