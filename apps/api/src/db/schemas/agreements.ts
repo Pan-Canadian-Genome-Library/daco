@@ -45,7 +45,7 @@ export const agreements = pgTable('agreements', {
 	agreed_at: timestamp().notNull(),
 });
 
-export const actionsRelations = relations(agreements, ({ one }) => ({
+export const agreementsRelations = relations(agreements, ({ one }) => ({
 	application_id: one(applications, {
 		fields: [agreements.application_id],
 		references: [applications.id],

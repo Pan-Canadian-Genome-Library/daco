@@ -19,8 +19,11 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { agreements } from './agreements.ts';
 import { applications } from './applications.ts';
+import { collaborators } from './collaborators.ts';
 import { files } from './files.ts';
+import { revisionRequests } from './revisionRequests.ts';
 
 export const applicationContents = pgTable('application_contents', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
@@ -75,9 +78,9 @@ export const applicationContentsRelations = relations(applicationContents, ({ ma
 		fields: [applicationContents.application_id],
 		references: [applications.id],
 	}),
-	// agreements: many(agreements),
-	// collaborators: many(collaborators),
-	// revisions: many(revisionRequests),
+	agreements: many(agreements),
+	collaborators: many(collaborators),
+	revisions: many(revisionRequests),
 	ethics_letter: one(files, {
 		fields: [applicationContents.ethics_letter],
 		references: [files.id],
