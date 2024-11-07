@@ -1,6 +1,10 @@
 # Pan Canadian Genome Library Data Access Compliance Office
 
-> <img src="./apps/ui/public/pcgl-logo.png" height="90" />
+<img src="./apps/ui/public/pcgl-logo.png" height="90" align="right" />
+
+Canada boasts world-leading expertise in genomics, including developing data-sharing policies and tools. However, we lack a national strategy to aggregate, store and share Canadian data equitably, securely and sustainably. At the same time, the size and complexity of human genomics datasets and their associated clinical data are growing rapidly.
+
+The Pan-Canadian Genome Library (PCGL) is a large collaborative effort to unify Canada's genome sequencing efforts. The PCGL is an open-source and open-science initiative, building upon Canadian-made foundational components and datasets, and utilizing international standards such as GA4GH to unify Canada’s human genome sequencing efforts.
 
 ## Repository Structure
 
@@ -39,13 +43,23 @@ The modules in the monorepo are organized into two categories:
 - Install dependencies: `pnpm i`
 
 - Start server:
+  
   `cd apps/api`
+  
+  `cp .env.schema .env`
+
   `pnpm run dev`
+  
   The server is now listening for requests at `http://localhost:3000`
 
 - Start UI:
+
   `cd apps/ui`
+
+  `cp .env.schema .env`
+
   `pnpm run dev`
+
   Visit `http://localhost:5173/` in the browser to get started
 
 ## Support & Contributions

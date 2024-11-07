@@ -21,6 +21,7 @@ pnpm-debug.log*
 # Dependencies, Env & Build
 node_modules
 dist
+.vite
 *.local
 
 # Editor directories and files
