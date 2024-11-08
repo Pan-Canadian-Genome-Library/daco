@@ -17,45 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type Application } from 'pcgl-daco/packages/data-model/src/types';
-import { useState } from 'react';
-import './App.css';
-
-const APPLICATION_API_URL = import.meta.env.VITE_APPLICATION_API_URL;
-
 function App() {
-	const [application, setApplication] = useState<Application | undefined>(undefined);
-
-	const getApplication = async () => {
-		const response = await fetch(`${APPLICATION_API_URL}/applications`);
-		const application: Application = await response.json();
-
-		setApplication(application);
-	};
-
-	const project = application?.contents.projectInformation;
-
-	const applicant = application?.contents.applicant;
-
-	const applicantName = applicant
-		? `${applicant.title} ${applicant.firstName} ${applicant.middleName} ${applicant.lastName}`
-		: '';
 	return (
 		<>
-			<div>
-				<img src={'./pcgl-logo.png'} className="logo" alt="PCGL Logo" />
-			</div>
-			<h1>Pan Canadian Genomic Library DACO</h1>
-			<div className="card">
-				<button onClick={() => getApplication()}>Start an Application</button>
-			</div>
-			{application && (
-				<div className="card">
-					<h2>{project?.title}</h2>
-
-					<h3>Applicant: {applicantName}</h3>
-				</div>
-			)}
+			<div>Daco Homepage</div>
 		</>
 	);
 }
