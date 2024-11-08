@@ -48,7 +48,7 @@ The modules in the monorepo are organized into two categories:
 
   Create .env file: `cp .env.schema .env`
 
-  Start Postgres DB: `docker compose -f ./docker-compose.yml up --detach`
+  Start Postgres DB: `docker compose up --detach`
   
   `pnpm run dev`
   
