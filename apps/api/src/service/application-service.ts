@@ -17,29 +17,45 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { connectionString } from '../../drizzle.config.ts';
+import { and, eq } from 'drizzle-orm';
 import { applications } from '../db/schemas/applications.ts';
+import { db } from '../main.ts';
 
-const db = drizzle(connectionString);
+type statesEnumValues =
+	| 'DRAFT'
+	| 'INSTITUTIONAL_REP_REVIEW'
+	| 'DAC_REVIEW'
+	| 'DAC_REVISIONS_REQUESTED'
+	| 'REJECTED'
+	| 'APPROVED'
+	| 'CLOSED'
+	| 'REVOKED';
 
 export const applicationService = {
-	createApplication: async () => {
-		const testApplications: typeof applications.$inferInsert = {
-			user_id: 'testUser@oicr.on.ca',
+	createApplication: async ({ user_id }: { user_id: string }) => {
+		const newApplication: typeof applications.$inferInsert = {
+			user_id,
 			state: 'DRAFT',
 		};
 
-		await db.insert(applications).values(testApplications);
+		await db.insert(applications).values(newApplication);
 	},
-	getApplicationById: async () => {
-		const application = await db.select().from(applications);
+	getApplicationById: async ({ id }: { id: number }) => {
+		const application = await db.select().from(applications).where(eq(applications.id, id));
 
 		return application;
 	},
-	listApplications: async () => {
-		const allApplications = await db.select().from(applications);
-
+	listApplications: async ({ user_id, state }: { user_id?: number; state?: statesEnumValues }) => {
+		const allApplications = await db
+			.select()
+			.from(applications)
+			.where(
+				and(
+					user_id ? eq(applications.user_id, String(user_id)) : undefined,
+					state ? eq(applications.state, state) : undefined,
+				),
+			);
+		// orderBy
 		return allApplications;
 	},
 };
