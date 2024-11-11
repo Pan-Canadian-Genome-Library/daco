@@ -17,23 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
-import { Home } from './pages/Home';
-import ThemeProvider from './providers/ThemeProvider';
+import { ConfigProvider, ThemeConfig } from 'antd';
 
-const AppStyle: React.CSSProperties = {
-	minHeight: '100vh',
+const psglTheme: ThemeConfig = {
+	token: {
+		colorPrimary: '#C41D7F',
+		colorBgContainer: '#FFF0F6',
+		colorFillSecondary: '#520339',
+		colorWarning: '#FADB14',
+		colorSuccess: '#73D13D',
+	},
 };
 
-function App() {
-	return (
-		<ThemeProvider>
-			<Flex style={AppStyle}>
-				{/* TODO: add router and add Home component to it remix or react-router-dom */}
-				<Home />
-			</Flex>
-		</ThemeProvider>
-	);
-}
+const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
+	return <ConfigProvider theme={psglTheme}>{children}</ConfigProvider>;
+};
 
-export default App;
+export default ThemeProvider;
