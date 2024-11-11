@@ -29,9 +29,15 @@ export const applicationService = {
 			state: ApplicationStates.DRAFT,
 		};
 
-		const newRecord = await db.insert(applications).values(newApplication).returning();
-
-		return newRecord;
+		try {
+			const newRecord = await db.insert(applications).values(newApplication).returning();
+			console.log(`Application created with user_id: ${user_id}`);
+			return newRecord;
+		} catch (err) {
+			console.error(`Error at createApplication with user_id: ${user_id}`);
+			console.error(err);
+			return null;
+		}
 	},
 	getApplicationById: async ({ id }: { id: number }) => {
 		const application = await db.select().from(applications).where(eq(applications.id, id));

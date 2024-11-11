@@ -32,6 +32,8 @@ describe('Postgres Database', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
 
+	const user_id = 'testUser@oicr.on.ca';
+
 	before(async () => {
 		container = await new PostgreSqlContainer().start();
 		const connectionString = container.getConnectionUri();
@@ -45,18 +47,17 @@ describe('Postgres Database', () => {
 	});
 
 	describe('Applications', () => {
-		it('should create & delete', async () => {
-			const user_id = 'testUser@oicr.on.ca';
-
+		it('should create applications with status DRAFT and submitted user_id', async () => {
 			const applicationRecords = await applicationService.createApplication({ user_id });
 
+			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords[0].user_id, user_id);
 			assert.strictEqual(applicationRecords[0].state, ApplicationStates.DRAFT);
+		});
 
-			console.log('Application created', applicationRecords);
-
+		it('should delete applications with a given user_id', async () => {
 			const deletedRecords = await applicationService.deleteApplication({ user_id });
-			console.log('Application deleted', deletedRecords);
+			console.log('Application deleted');
 
 			assert.strictEqual(deletedRecords.length, 1);
 		});

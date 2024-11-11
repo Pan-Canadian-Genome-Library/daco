@@ -18,9 +18,9 @@
  */
 
 import cors from 'cors';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import express, { Request, Response } from 'express';
 // TODO: Fix Types package so we can import from main instead of specific file
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
 import { connectionString } from '../drizzle.config.ts';
 
