@@ -16,39 +16,24 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { Layout } from 'antd';
 
-const { Header, Content, Footer } = Layout;
+import { Flex } from 'antd';
+import { HomePage } from '.';
+import ThemeProvider from '../components/providers/ThemeProvider';
 
-const headerStyle: React.CSSProperties = {
-	textAlign: 'center',
-	backgroundColor: '#FFFFFF',
+const AppStyle: React.CSSProperties = {
+	minHeight: '100vh',
 };
 
-const contentStyle: React.CSSProperties = {
-	display: 'flex',
-	justifyContent: 'center',
-	alignItems: 'center',
-	textAlign: 'center',
-	backgroundColor: '#FFF0F6',
-};
-
-const footerStyle: React.CSSProperties = {
-	textAlign: 'center',
-	color: '#FFFFFF',
-	backgroundColor: '#520339',
-};
-
-const layoutStyle = {
-	overflow: 'hidden',
-};
-
-export const HomePage = () => {
+function App() {
 	return (
-		<Layout style={layoutStyle}>
-			<Header style={headerStyle}>PCGL Header</Header>
-			<Content style={contentStyle}>PCGL Hero Content</Content>
-			<Footer style={footerStyle}>PCGL Footer</Footer>
-		</Layout>
+		<ThemeProvider>
+			<Flex style={AppStyle}>
+				{/* TODO: add router and add Home component to it remix or react-router-dom */}
+				<HomePage />
+			</Flex>
+		</ThemeProvider>
 	);
-};
+}
+
+export default App;
