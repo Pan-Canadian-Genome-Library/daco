@@ -45,9 +45,11 @@ The modules in the monorepo are organized into two categories:
 - Start server:
   
   `cd apps/api`
-  
-  `cp .env.schema .env`
 
+  Create .env file: `cp .env.schema .env`
+
+  Start Postgres DB: `docker compose up --detach`
+  
   `pnpm run dev`
   
   The server is now listening for requests at `http://localhost:3000`

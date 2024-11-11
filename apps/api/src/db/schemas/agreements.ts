@@ -23,7 +23,7 @@ import { applications } from './applications.ts';
 // TODO: Integrate w/ TS
 // import { ApplicationAgreements } from 'pcgl-daco/packages/data-model/';
 
-const agreementEnum = pgEnum('agreements', [
+export const agreementEnum = pgEnum('agreement_types', [
 	'dac_agreement_software_updates',
 	'dac_agreement_non_disclosure',
 	'dac_agreement_monitor_individual_access',
@@ -45,7 +45,7 @@ export const agreements = pgTable('agreements', {
 	agreed_at: timestamp().notNull(),
 });
 
-export const actionsRelations = relations(agreements, ({ one }) => ({
+export const agreementRelations = relations(agreements, ({ one }) => ({
 	application_id: one(applications, {
 		fields: [agreements.application_id],
 		references: [applications.id],
