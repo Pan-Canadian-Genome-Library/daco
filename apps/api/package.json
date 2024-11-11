@@ -9,6 +9,7 @@
 		"test": "npx tsx --env-file=.env.test --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*"
 	},
 	"devDependencies": {
+		"@testcontainers/postgresql": "^10.14.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.7.4",

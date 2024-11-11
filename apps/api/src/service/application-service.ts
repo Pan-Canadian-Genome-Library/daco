@@ -18,7 +18,7 @@
  */
 
 import { and, asc, eq } from 'drizzle-orm';
-import { ApplicationStates } from 'pcgl-daco/packages/data-model';
+import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { applications } from '../db/schemas/applications.ts';
 import { db } from '../main.ts';
 
@@ -29,7 +29,9 @@ export const applicationService = {
 			state: ApplicationStates.DRAFT,
 		};
 
-		await db.insert(applications).values(newApplication);
+		const newRecord = await db.insert(applications).values(newApplication).returning();
+
+		return newRecord;
 	},
 	getApplicationById: async ({ id }: { id: number }) => {
 		const application = await db.select().from(applications).where(eq(applications.id, id));
@@ -49,5 +51,10 @@ export const applicationService = {
 			.orderBy(asc(applications.created_at));
 
 		return allApplications;
+	},
+	deleteApplication: async ({ user_id }: { user_id: string }) => {
+		const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
+
+		return deletedRecords;
 	},
 };
