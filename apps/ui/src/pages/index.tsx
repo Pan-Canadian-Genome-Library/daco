@@ -16,48 +16,39 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { Layout } from 'antd';
 
-import { type Application } from 'pcgl-daco/packages/data-model/src/types';
-import { useState } from 'react';
-import './App.css';
+const { Header, Content, Footer } = Layout;
 
-const APPLICATION_API_URL = import.meta.env.VITE_APPLICATION_API_URL;
+const headerStyle: React.CSSProperties = {
+	textAlign: 'center',
+	backgroundColor: '#FFFFFF',
+};
 
-function App() {
-	const [application, setApplication] = useState<Application | undefined>(undefined);
+const contentStyle: React.CSSProperties = {
+	display: 'flex',
+	justifyContent: 'center',
+	alignItems: 'center',
+	textAlign: 'center',
+	backgroundColor: '#FFF0F6',
+};
 
-	const getApplication = async () => {
-		const response = await fetch(`${APPLICATION_API_URL}/applications`);
-		const application: Application = await response.json();
+const footerStyle: React.CSSProperties = {
+	textAlign: 'center',
+	color: '#FFFFFF',
+	backgroundColor: '#520339',
+};
 
-		setApplication(application);
-	};
+const layoutStyle = {
+	overflow: 'hidden',
+};
 
-	const project = application?.contents.projectInformation;
-
-	const applicant = application?.contents.applicant;
-
-	const applicantName = applicant
-		? `${applicant.title} ${applicant.firstName} ${applicant.middleName} ${applicant.lastName}`
-		: '';
+export const HomePage = () => {
 	return (
-		<>
-			<div>
-				<img src={'./pcgl-logo.png'} className="logo" alt="PCGL Logo" />
-			</div>
-			<h1>Pan Canadian Genomic Library DACO</h1>
-			<div className="card">
-				<button onClick={() => getApplication()}>Start an Application</button>
-			</div>
-			{application && (
-				<div className="card">
-					<h2>{project?.title}</h2>
-
-					<h3>Applicant: {applicantName}</h3>
-				</div>
-			)}
-		</>
+		<Layout style={layoutStyle}>
+			<Header style={headerStyle}>PCGL Header</Header>
+			<Content style={contentStyle}>PCGL Hero Content</Content>
+			<Footer style={footerStyle}>PCGL Footer</Footer>
+		</Layout>
 	);
-}
-
-export default App;
+};
