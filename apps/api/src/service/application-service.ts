@@ -40,23 +40,35 @@ export const applicationService = {
 		}
 	},
 	getApplicationById: async ({ id }: { id: number }) => {
-		const application = await db.select().from(applications).where(eq(applications.id, id));
+		try {
+			const application = await db.select().from(applications).where(eq(applications.id, id));
 
-		return application;
+			return application;
+		} catch (err) {
+			console.error(`Error at getApplicationById with id: ${id}`);
+			console.error(err);
+			return null;
+		}
 	},
-	listApplications: async ({ user_id, state }: { user_id?: number; state?: ApplicationStates }) => {
-		const allApplications = await db
-			.select()
-			.from(applications)
-			.where(
-				and(
-					user_id ? eq(applications.user_id, String(user_id)) : undefined,
-					state ? eq(applications.state, state) : undefined,
-				),
-			)
-			.orderBy(asc(applications.created_at));
+	listApplications: async ({ user_id, state }: { user_id?: string; state?: ApplicationStates }) => {
+		try {
+			const allApplications = await db
+				.select()
+				.from(applications)
+				.where(
+					and(
+						user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						state ? eq(applications.state, state) : undefined,
+					),
+				)
+				.orderBy(asc(applications.created_at));
 
-		return allApplications;
+			return allApplications;
+		} catch (err) {
+			console.error(`Error at listApplications with user_id: ${user_id} state: ${state}`);
+			console.error(err);
+			return null;
+		}
 	},
 	deleteApplication: async ({ user_id }: { user_id: string }) => {
 		try {
