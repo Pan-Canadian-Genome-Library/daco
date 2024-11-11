@@ -19,7 +19,7 @@
 
 import { ConfigProvider, ThemeConfig } from 'antd';
 
-const psglTheme: ThemeConfig = {
+const pcglTheme: ThemeConfig = {
 	token: {
 		colorPrimary: '#C41D7F',
 		colorBgContainer: '#FFF0F6',
@@ -30,7 +30,7 @@ const psglTheme: ThemeConfig = {
 };
 
 const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
-	return <ConfigProvider theme={psglTheme}>{children}</ConfigProvider>;
+	return <ConfigProvider theme={pcglTheme}>{children}</ConfigProvider>;
 };
 
 export default ThemeProvider;
