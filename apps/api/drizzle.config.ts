@@ -25,11 +25,11 @@ const PG_PASSWORD = process.env.PG_PASSWORD;
 const PG_HOST = process.env.PG_HOST;
 
 // PG Connection String: postgres://postgres:mypassword@localhost:5432/postgres
-const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
+export const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
 
 export default defineConfig({
 	out: './drizzle',
-	schema: './src/db/schemas/',
+	schema: './src/db/schemas/*',
 	dialect: 'postgresql',
 	dbCredentials: {
 		url: connectionString!,
