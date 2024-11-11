@@ -18,7 +18,7 @@
  */
 
 import { Flex } from 'antd';
-import ThemeProvider from '../providers/ThemeProvider';
+import ThemeProvider from '../components/providers/ThemeProvider';
 import { HomePage } from './HomePage';
 
 const AppStyle: React.CSSProperties = {
