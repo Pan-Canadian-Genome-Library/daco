@@ -59,8 +59,15 @@ export const applicationService = {
 		return allApplications;
 	},
 	deleteApplication: async ({ user_id }: { user_id: string }) => {
-		const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
+		try {
+			const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
+			console.log(`Application deleted with user_id: ${user_id}`);
 
-		return deletedRecords;
+			return deletedRecords;
+		} catch (err) {
+			console.error(`Error at createApplication with user_id: ${user_id}`);
+			console.error(err);
+			return null;
+		}
 	},
 };

@@ -57,8 +57,8 @@ describe('Postgres Database', () => {
 
 		it('should delete applications with a given user_id', async () => {
 			const deletedRecords = await applicationService.deleteApplication({ user_id });
-			console.log('Application deleted');
 
+			assert.ok(Array.isArray(deletedRecords));
 			assert.strictEqual(deletedRecords.length, 1);
 		});
 	});
