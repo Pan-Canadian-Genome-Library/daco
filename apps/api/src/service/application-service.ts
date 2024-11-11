@@ -18,24 +18,15 @@
  */
 
 import { and, eq } from 'drizzle-orm';
+import { ApplicationStates } from 'pcgl-daco/packages/data-model';
 import { applications } from '../db/schemas/applications.ts';
 import { db } from '../main.ts';
-
-type statesEnumValues =
-	| 'DRAFT'
-	| 'INSTITUTIONAL_REP_REVIEW'
-	| 'DAC_REVIEW'
-	| 'DAC_REVISIONS_REQUESTED'
-	| 'REJECTED'
-	| 'APPROVED'
-	| 'CLOSED'
-	| 'REVOKED';
 
 export const applicationService = {
 	createApplication: async ({ user_id }: { user_id: string }) => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
-			state: 'DRAFT',
+			state: ApplicationStates.DRAFT,
 		};
 
 		await db.insert(applications).values(newApplication);
@@ -45,7 +36,7 @@ export const applicationService = {
 
 		return application;
 	},
-	listApplications: async ({ user_id, state }: { user_id?: number; state?: statesEnumValues }) => {
+	listApplications: async ({ user_id, state }: { user_id?: number; state?: ApplicationStates }) => {
 		const allApplications = await db
 			.select()
 			.from(applications)
