@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { ApplicationStates } from 'pcgl-daco/packages/data-model';
 import { applications } from '../db/schemas/applications.ts';
 import { db } from '../main.ts';
@@ -45,8 +45,9 @@ export const applicationService = {
 					user_id ? eq(applications.user_id, String(user_id)) : undefined,
 					state ? eq(applications.state, state) : undefined,
 				),
-			);
-		// orderBy
+			)
+			.orderBy(asc(applications.created_at));
+
 		return allApplications;
 	},
 };
