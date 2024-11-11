@@ -18,8 +18,8 @@
  */
 
 import { Flex } from 'antd';
-import { Home } from './pages/Home';
-import ThemeProvider from './providers/ThemeProvider';
+import ThemeProvider from '../providers/ThemeProvider';
+import { HomePage } from './HomePage';
 
 const AppStyle: React.CSSProperties = {
 	minHeight: '100vh',
@@ -30,7 +30,7 @@ function App() {
 		<ThemeProvider>
 			<Flex style={AppStyle}>
 				{/* TODO: add router and add Home component to it remix or react-router-dom */}
-				<Home />
+				<HomePage />
 			</Flex>
 		</ThemeProvider>
 	);

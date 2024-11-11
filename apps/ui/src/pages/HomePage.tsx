@@ -43,7 +43,7 @@ const layoutStyle = {
 	overflow: 'hidden',
 };
 
-export const Home = () => {
+export const HomePage = () => {
 	return (
 		<Layout style={layoutStyle}>
 			<Header style={headerStyle}>PCGL Header</Header>
