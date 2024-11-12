@@ -19,6 +19,7 @@
 
 import { and, asc, eq } from 'drizzle-orm';
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
+import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
 import { db } from '../main.ts';
 
@@ -30,9 +31,26 @@ export const applicationService = {
 		};
 
 		try {
-			const newRecord = await db.insert(applications).values(newApplication).returning();
+			const newApplicationRecord = await db.insert(applications).values(newApplication).returning();
+			const { id } = newApplicationRecord[0];
+
+			const newAppContents: typeof applicationContents.$inferInsert = {
+				application_id: id,
+				created_at: new Date(),
+				updated_at: new Date(),
+			};
+			const newAppContentsRecord = await db.insert(applicationContents).values(newAppContents).returning();
+			const { id: contentsId } = newAppContentsRecord[0];
+
+			const updatedRecord = await db
+				.update(applications)
+				.set({ contents: contentsId })
+				.where(eq(applications.id, id))
+				.returning();
+
 			console.log(`Application created with user_id: ${user_id}`);
-			return newRecord;
+
+			return updatedRecord;
 		} catch (err) {
 			console.error(`Error at createApplication with user_id: ${user_id}`);
 			console.error(err);
@@ -43,6 +61,7 @@ export const applicationService = {
 		try {
 			const application = await db.select().from(applications).where(eq(applications.id, id));
 
+			// includes application-content
 			return application;
 		} catch (err) {
 			console.error(`Error at getApplicationById with id: ${id}`);
@@ -51,9 +70,19 @@ export const applicationService = {
 		}
 	},
 	listApplications: async ({ user_id, state }: { user_id?: string; state?: ApplicationStates }) => {
+		// can be sorted:
+		// by created date, asc or desc
+		// by updated date, asc or desc
+		// by state
 		try {
 			const allApplications = await db
-				.select()
+				.select({
+					id: applications.id,
+					user_id: applications.user_id,
+					state: applications.state,
+					createdAt: applications.created_at,
+					updatedAt: applications.created_at,
+				})
 				.from(applications)
 				.where(
 					and(
