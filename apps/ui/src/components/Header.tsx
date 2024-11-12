@@ -1,3 +1,4 @@
+import PCGL from '@assets/pcgl-logo-full.png';
 import { Button, ConfigProvider, Flex, Image, Layout, Typography } from 'antd';
 import { pcglHeaderTheme } from './providers/ThemeProvider';
 const { Link } = Typography;
@@ -22,7 +23,7 @@ const HeaderComponent = () => {
 					<Flex flex={1}>
 						<Flex justify="space-around" align="center" gap={40}>
 							<Link target="_blank">
-								<Image style={imageStyle} src="../../public/pcgl-logo-full.png" preview={false} />
+								<Image style={imageStyle} src={PCGL} preview={false} />
 							</Link>
 							<Link style={linkStyle} target="_blank">
 								Policies & Guidelines
