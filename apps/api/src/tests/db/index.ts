@@ -20,9 +20,13 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
 import { actions } from '../../db/schemas/actions.ts';
 import { agreements } from '../../db/schemas/agreements.ts';
@@ -30,6 +34,9 @@ import { applicationContents } from '../../db/schemas/applicationContents.ts';
 import { collaborators } from '../../db/schemas/collaborators.ts';
 import { files } from '../../db/schemas/files.ts';
 import { revisionRequests } from '../../db/schemas/revisionRequests.ts';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 type PostgresDb = ReturnType<typeof drizzle>;
 
@@ -40,9 +47,16 @@ describe('Postgres Database', () => {
 	const user_id = 'testUser@oicr.on.ca';
 
 	before(async () => {
+		const migrationsFolder = __dirname + '/../../../drizzle';
 		container = await new PostgreSqlContainer().start();
 		const connectionString = container.getConnectionUri();
 		db = drizzle(connectionString);
+		try {
+			await migrate(db, { migrationsFolder });
+		} catch (err) {
+			console.log('Test migration error');
+			console.log(err);
+		}
 	});
 
 	describe('Connection', () => {
@@ -55,7 +69,7 @@ describe('Postgres Database', () => {
 		it('should create & delete', async () => {
 			const testAction: typeof actions.$inferInsert = {
 				application_id: 1,
-				user_id: 'testUser@oicr.on.ca',
+				user_id,
 				action: 'CREATE',
 				state_before: 'none',
 				state_after: 'tbd',
@@ -85,7 +99,7 @@ describe('Postgres Database', () => {
 				name: 'Test Agreement',
 				agreement_text: 'Testing Agreement',
 				agreement_type: 'dac_agreement_non_disclosure',
-				user_id: 'testUser@oicr.on.ca',
+				user_id,
 				agreed_at: new Date(),
 			};
 
