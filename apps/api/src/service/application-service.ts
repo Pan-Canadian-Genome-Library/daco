@@ -42,15 +42,21 @@ export const applicationService = {
 			const newAppContentsRecord = await db.insert(applicationContents).values(newAppContents).returning();
 			const { id: contentsId } = newAppContentsRecord[0];
 
-			const updatedRecord = await db
-				.update(applications)
-				.set({ contents: contentsId })
-				.where(eq(applications.id, id))
-				.returning();
-
+			await db.update(applications).set({ contents: contentsId }).where(eq(applications.id, id));
 			console.log(`Application created with user_id: ${user_id}`);
 
-			return updatedRecord;
+			const applicationRecord = await db
+				.select()
+				.from(applications)
+				.where(eq(applications.id, id))
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+
+			const application = {
+				...applicationRecord[0].applications,
+				contents: applicationRecord[0].application_contents,
+			};
+
+			return application;
 		} catch (err) {
 			console.error(`Error at createApplication with user_id: ${user_id}`);
 			console.error(err);
@@ -59,9 +65,17 @@ export const applicationService = {
 	},
 	getApplicationById: async ({ id }: { id: number }) => {
 		try {
-			const application = await db.select().from(applications).where(eq(applications.id, id));
+			const applicationRecord = await db
+				.select()
+				.from(applications)
+				.where(eq(applications.id, id))
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
-			// includes application-content
+			const application = {
+				...applicationRecord[0].applications,
+				contents: applicationRecord[0].application_contents,
+			};
+
 			return application;
 		} catch (err) {
 			console.error(`Error at getApplicationById with id: ${id}`);

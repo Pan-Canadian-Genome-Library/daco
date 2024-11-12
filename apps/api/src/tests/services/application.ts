@@ -38,6 +38,7 @@ describe('Postgres Database', () => {
 		container = await new PostgreSqlContainer().start();
 		const connectionString = container.getConnectionUri();
 		db = drizzle(connectionString);
+		// create file with seed data for postgres to test read actions
 	});
 
 	describe('Connection', () => {
@@ -48,14 +49,14 @@ describe('Postgres Database', () => {
 
 	describe('Applications', () => {
 		it('should create applications with status DRAFT and submitted user_id', async () => {
-			const applicationRecords = await applicationService.createApplication({ user_id });
+			const application = await applicationService.createApplication({ user_id });
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.strictEqual(applicationRecords[0].user_id, user_id);
-			assert.strictEqual(applicationRecords[0].state, ApplicationStates.DRAFT);
+			assert.notEqual(application, null);
+			assert.strictEqual(application?.user_id, user_id);
+			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
 		});
 
-		it('should get applications requested by id', async () => {
+		it('should get applications requested by id, with application_contents', async () => {
 			const applicationRecords = await applicationService.listApplications({ user_id });
 
 			assert.ok(Array.isArray(applicationRecords));
@@ -64,8 +65,9 @@ describe('Postgres Database', () => {
 
 			const requestedApplication = await applicationService.getApplicationById({ id });
 
-			assert.ok(Array.isArray(requestedApplication));
-			assert.strictEqual(requestedApplication[0].id, id);
+			assert.notEqual(requestedApplication, null);
+			assert.strictEqual(requestedApplication?.id, id);
+			assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
 		});
 
 		it('should list applications filtered by user_id', async () => {
