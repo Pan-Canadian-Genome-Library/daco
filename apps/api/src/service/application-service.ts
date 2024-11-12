@@ -42,21 +42,15 @@ export const applicationService = {
 			const newAppContentsRecord = await db.insert(applicationContents).values(newAppContents).returning();
 			const { id: contentsId } = newAppContentsRecord[0];
 
-			await db.update(applications).set({ contents: contentsId }).where(eq(applications.id, id));
+			const application = await db
+				.update(applications)
+				.set({ contents: contentsId })
+				.where(eq(applications.id, id))
+				.returning();
+
 			console.log(`Application created with user_id: ${user_id}`);
 
-			const applicationRecord = await db
-				.select()
-				.from(applications)
-				.where(eq(applications.id, id))
-				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
-
-			const application = {
-				...applicationRecord[0].applications,
-				contents: applicationRecord[0].application_contents,
-			};
-
-			return application;
+			return application[0];
 		} catch (err) {
 			console.error(`Error at createApplication with user_id: ${user_id}`);
 			console.error(err);
