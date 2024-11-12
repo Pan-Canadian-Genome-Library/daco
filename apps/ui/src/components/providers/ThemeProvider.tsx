@@ -19,16 +19,33 @@
 
 import { ConfigProvider, ThemeConfig } from 'antd';
 
+// General Theme Configurations
 const pcglTheme: ThemeConfig = {
 	token: {
+		fontFamily:
+			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 		colorPrimary: '#C41D7F',
 		colorBgContainer: '#FFF0F6',
 		colorFillSecondary: '#520339',
 		colorWarning: '#FADB14',
 		colorSuccess: '#73D13D',
+		colorLink: '#C41D7F',
 	},
 };
-
+// Header Theme Configurations
+export const pcglHeaderTheme: ThemeConfig = {
+	...pcglTheme,
+	token: {
+		colorLink: '#000000',
+		colorLinkHover: 'rgba(0,0,0,0.5)',
+		colorBgContainer: '#FFFFFF',
+	},
+	components: {
+		Layout: {
+			headerBg: '#FFFFFF',
+		},
+	},
+};
 const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
 	return <ConfigProvider theme={pcglTheme}>{children}</ConfigProvider>;
 };
