@@ -29,6 +29,18 @@ const pcglTheme: ThemeConfig = {
 	},
 };
 
+export const pcglFooterTheme: ThemeConfig = {
+	components: {
+		Layout: {
+			footerBg: '#520339',
+		},
+		Typography: {
+			colorText: '#FFFFFF',
+			colorLink: '#FFD6E7',
+			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
+		},
+	},
+};
 const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
 	return <ConfigProvider theme={pcglTheme}>{children}</ConfigProvider>;
 };
