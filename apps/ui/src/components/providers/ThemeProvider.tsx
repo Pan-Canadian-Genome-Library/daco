@@ -32,6 +32,7 @@ const pcglTheme: ThemeConfig = {
 		colorLink: '#C41D7F',
 	},
 };
+
 // Header Theme Configurations
 export const pcglHeaderTheme: ThemeConfig = {
 	...pcglTheme,
@@ -46,6 +47,7 @@ export const pcglHeaderTheme: ThemeConfig = {
 		},
 	},
 };
+
 const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
 	return <ConfigProvider theme={pcglTheme}>{children}</ConfigProvider>;
 };

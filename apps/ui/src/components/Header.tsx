@@ -1,6 +1,9 @@
-import PCGL from '@assets/pcgl-logo-full.png';
 import { Button, ConfigProvider, Flex, Image, Layout, Typography } from 'antd';
+
+import PCGL from '@assets/pcgl-logo-full.png';
+
 import { pcglHeaderTheme } from './providers/ThemeProvider';
+
 const { Link } = Typography;
 const { Header } = Layout;
 
