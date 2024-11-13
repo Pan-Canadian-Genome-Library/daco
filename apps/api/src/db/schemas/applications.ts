@@ -23,7 +23,7 @@ import { applicationContents } from './applicationContents.ts';
 // TODO: Integrate w/ TS
 // import { ApplicationStates } from 'pcgl-daco/packages/data-model';
 
-const statesEnum = pgEnum('applicationStates', [
+export const applicationStatesEnum = pgEnum('application_states', [
 	'DRAFT',
 	'INSTITUTIONAL_REP_REVIEW',
 	'DAC_REVIEW',
@@ -37,7 +37,7 @@ const statesEnum = pgEnum('applicationStates', [
 export const applications = pgTable('applications', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	user_id: varchar({ length: 100 }).notNull(),
-	state: statesEnum().notNull(),
+	state: applicationStatesEnum().notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 	approved_at: timestamp(),
 	expires_at: timestamp(),

@@ -24,7 +24,7 @@ import { revisionRequests } from './revisionRequests.ts';
 // TODO: Integrate w/ TS
 // import { applicationActions } from 'pcgl-daco/packages/data-model/';
 
-const actionsEnum = pgEnum('actions', [
+export const actionTypesEnum = pgEnum('action_types', [
 	'CREATE',
 	'WITHDRAW',
 	'CLOSE',
@@ -42,12 +42,12 @@ export const actions = pgTable('actions', {
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 	user_id: varchar({ length: 100 }).notNull(),
-	action: actionsEnum().notNull(),
+	action: actionTypesEnum().notNull(),
 	revisions_request_id: bigint({ mode: 'number' }),
 	state_before: varchar({ length: 255 }).notNull(),
 	state_after: varchar({ length: 255 }).notNull(),
-	// TODO: may need reference to a content diff
 });
+// TODO: may need reference to a content diff
 
 export const actionsRelations = relations(actions, ({ one }) => ({
 	application_id: one(applications, {
