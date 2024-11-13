@@ -18,13 +18,9 @@
  */
 import { Layout } from 'antd';
 import FooterComponent from '../components/Footer';
+import HeaderComponent from '../components/Header';
 
-const { Header, Content } = Layout;
-
-const headerStyle: React.CSSProperties = {
-	textAlign: 'center',
-	backgroundColor: '#FFFFFF',
-};
+const { Content } = Layout;
 
 const contentStyle: React.CSSProperties = {
 	display: 'flex',
@@ -34,14 +30,10 @@ const contentStyle: React.CSSProperties = {
 	backgroundColor: '#FFF0F6',
 };
 
-const layoutStyle = {
-	overflow: 'hidden',
-};
-
 export const HomePage = () => {
 	return (
-		<Layout style={layoutStyle}>
-			<Header style={headerStyle}>PCGL Header</Header>
+		<Layout>
+			<HeaderComponent />
 			<Content style={contentStyle}>PCGL Hero Content</Content>
 			<FooterComponent />
 		</Layout>
