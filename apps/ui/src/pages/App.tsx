@@ -16,10 +16,10 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 import { Flex } from 'antd';
-import { HomePage } from '.';
-import ThemeProvider from '../components/providers/ThemeProvider';
+
+import ThemeProvider from '@/components/providers/ThemeProvider';
+import { HomePage } from '@/pages/index';
 
 const AppStyle: React.CSSProperties = {
 	minHeight: '100vh',

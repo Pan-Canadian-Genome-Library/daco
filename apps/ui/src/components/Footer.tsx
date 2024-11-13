@@ -1,5 +1,7 @@
 import { ConfigProvider, Flex, Layout, Typography } from 'antd';
-import { pcglFooterTheme } from './providers/ThemeProvider';
+
+import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
+
 const { Footer } = Layout;
 const { Text, Link } = Typography;
 
@@ -7,6 +9,7 @@ const linkStyle: React.CSSProperties = {
 	textAlign: 'center',
 	textWrap: 'nowrap',
 };
+
 const textStyle: React.CSSProperties = {
 	textAlign: 'center',
 };

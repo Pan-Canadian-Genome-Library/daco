@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { Layout } from 'antd';
-import FooterComponent from '../components/Footer';
-import HeaderComponent from '../components/Header';
+
+import FooterComponent from '@/components/Footer';
+import HeaderComponent from '@/components/Header';
 
 const { Content } = Layout;
 
