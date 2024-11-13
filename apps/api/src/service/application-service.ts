@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
@@ -77,11 +77,36 @@ export const applicationService = {
 			return null;
 		}
 	},
-	listApplications: async ({ user_id, state }: { user_id?: string; state?: ApplicationStates }) => {
-		// can be sorted:
-		// by created date, asc or desc
-		// by updated date, asc or desc
-		// by state
+	listApplications: async ({
+		user_id,
+		state,
+		sort = '',
+	}: {
+		user_id?: string;
+		state?: ApplicationStates;
+		sort?: string;
+	}) => {
+		const isDescending = sort?.charAt(0) === '-';
+		const sortValue = isDescending ? sort.substring(1) : sort;
+		const sortFunction = isDescending ? desc : asc;
+
+		let sortKey;
+
+		switch (sortValue) {
+			case 'updated_at':
+				sortKey = applications.updated_at;
+				break;
+			case 'state':
+				sortKey = applications.state;
+				break;
+			case 'created_at':
+			default:
+				sortKey = applications.created_at;
+				break;
+		}
+
+		const sortQuery = sortFunction(sortKey);
+
 		try {
 			const allApplications = await db
 				.select({
@@ -89,7 +114,7 @@ export const applicationService = {
 					user_id: applications.user_id,
 					state: applications.state,
 					createdAt: applications.created_at,
-					updatedAt: applications.created_at,
+					updatedAt: applications.updated_at,
 				})
 				.from(applications)
 				.where(
@@ -98,7 +123,7 @@ export const applicationService = {
 						state ? eq(applications.state, state) : undefined,
 					),
 				)
-				.orderBy(asc(applications.created_at));
+				.orderBy(sortQuery);
 
 			return allApplications;
 		} catch (err) {

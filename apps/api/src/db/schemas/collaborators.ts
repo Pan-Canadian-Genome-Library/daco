@@ -19,7 +19,7 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgTable, text, varchar } from 'drizzle-orm/pg-core';
-import { applications } from './applications.ts';
+import { applicationContents } from './applicationContents.ts';
 
 export const collaborators = pgTable('collaborators', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
@@ -37,8 +37,8 @@ export const collaborators = pgTable('collaborators', {
 });
 
 export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
-	application_id: one(applications, {
+	application_id: one(applicationContents, {
 		fields: [collaborators.application_id],
-		references: [applications.id],
+		references: [applicationContents.application_id],
 	}),
 }));

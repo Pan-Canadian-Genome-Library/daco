@@ -40,6 +40,7 @@ export const applications = pgTable('applications', {
 	state: applicationStatesEnum().notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 	approved_at: timestamp(),
+	updated_at: timestamp(),
 	expires_at: timestamp(),
 	contents: bigint({ mode: 'number' }),
 });

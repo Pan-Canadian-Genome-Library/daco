@@ -20,7 +20,7 @@
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { actions } from './actions.ts';
-import { applications } from './applications.ts';
+import { applicationContents } from './applicationContents.ts';
 
 export const revisionRequests = pgTable('revision_requests', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
@@ -40,9 +40,9 @@ export const revisionRequests = pgTable('revision_requests', {
 });
 
 export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
-	application_id: one(applications, {
+	application_id: one(applicationContents, {
 		fields: [revisionRequests.application_id],
-		references: [applications.id],
+		references: [applicationContents.id],
 	}),
 	actions: many(actions),
 }));
