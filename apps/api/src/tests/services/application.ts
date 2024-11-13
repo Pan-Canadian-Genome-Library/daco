@@ -76,7 +76,7 @@ describe('Postgres Database', () => {
 			await applicationService.createApplication({ user_id });
 			await applicationService.createApplication({ user_id });
 
-			const applicationRecords = await applicationService.listApplications({ user_id, sort: 'state' });
+			const applicationRecords = await applicationService.listApplications({ user_id });
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
@@ -89,9 +89,52 @@ describe('Postgres Database', () => {
 			assert.strictEqual(applicationRecords.length, 3);
 		});
 
-		it('should allow sorting records', async () => {
-			const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
+		it('should allow sorting records by created_at', async () => {
+			const applicationRecords = await applicationService.listApplications({ sort: 'created_at' });
 
+			assert.ok(Array.isArray(applicationRecords));
+			assert.strictEqual(applicationRecords.length, 3);
+
+			const date1 = applicationRecords[0].createdAt.valueOf();
+			const date2 = applicationRecords[1].createdAt.valueOf();
+			const date3 = applicationRecords[2].createdAt.valueOf();
+
+			assert.ok(date1 < date2);
+			assert.ok(date2 < date3);
+		});
+
+		it('should allow sorting records by updated_at', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
+
+			assert.ok(Array.isArray(applicationRecords));
+			assert.strictEqual(applicationRecords.length, 3);
+
+			const { id: zeroRecordId } = applicationRecords[0];
+			const { id: firstRecordId } = applicationRecords[1];
+			const { id: secondRecordId } = applicationRecords[2];
+
+			// State is tested in following test so first record remains in 'Draft'
+			await applicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
+			await applicationService.findOneAndUpdate({ id: firstRecordId, update: { state: ApplicationStates.APPROVED } });
+			await applicationService.findOneAndUpdate({ id: secondRecordId, update: { state: ApplicationStates.REJECTED } });
+
+			const updatedRecords = await applicationService.listApplications({ user_id });
+
+			assert.ok(Array.isArray(updatedRecords));
+			assert.strictEqual(updatedRecords.length, 3);
+
+			const date1 = updatedRecords[0].updatedAt?.valueOf();
+			const date2 = updatedRecords[1].updatedAt?.valueOf();
+			const date3 = updatedRecords[2].updatedAt?.valueOf();
+
+			assert.ok(date1 && date2 && date1 < date2);
+			assert.ok(date2 && date3 && date2 < date3);
+		});
+
+		it('should allow sorting records by state', async () => {
+			const applicationRecords = await applicationService.listApplications({ sort: 'state' });
+			console.log('state');
+			console.log(applicationRecords);
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
 		});

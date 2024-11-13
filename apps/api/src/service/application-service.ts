@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
@@ -53,6 +53,21 @@ export const applicationService = {
 			return application[0];
 		} catch (err) {
 			console.error(`Error at createApplication with user_id: ${user_id}`);
+			console.error(err);
+			return null;
+		}
+	},
+	findOneAndUpdate: async ({ id, update }: { id: number; update: any }) => {
+		try {
+			const application = await db
+				.update(applications)
+				.set({ ...update, updated_at: sql`NOW()` })
+				.where(eq(applications.id, id))
+				.returning();
+
+			return application;
+		} catch (err) {
+			console.error(`Error at findOneAndUpdate with id: ${id}`);
 			console.error(err);
 			return null;
 		}
