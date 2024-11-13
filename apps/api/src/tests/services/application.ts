@@ -38,7 +38,9 @@ describe('Postgres Database', () => {
 		container = await new PostgreSqlContainer().start();
 		const connectionString = container.getConnectionUri();
 		db = drizzle(connectionString);
-		// create file with seed data for postgres to test read actions
+		// TODO: create file with seed data for postgres to test read actions
+		// Not yet supported in Drizzle Kit:
+		// https://orm.drizzle.team/docs/kit-seed-data
 	});
 
 	describe('Connection', () => {
@@ -77,28 +79,28 @@ describe('Postgres Database', () => {
 			const applicationRecords = await applicationService.listApplications({ user_id, sort: 'state' });
 
 			assert.ok(Array.isArray(applicationRecords));
-			// assert.strictEqual(applicationRecords.length, 1);
+			assert.strictEqual(applicationRecords.length, 3);
 		});
 
 		it('should list applications filtered by state', async () => {
 			const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
 
 			assert.ok(Array.isArray(applicationRecords));
-			// assert.strictEqual(applicationRecords.length, 1);
+			assert.strictEqual(applicationRecords.length, 3);
 		});
 
-		it('should allow sorting record', async () => {
+		it('should allow sorting records', async () => {
 			const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
 
 			assert.ok(Array.isArray(applicationRecords));
-			// assert.strictEqual(applicationRecords.length, 1);
+			assert.strictEqual(applicationRecords.length, 3);
 		});
 
 		it('should delete applications with a given user_id', async () => {
 			const deletedRecords = await applicationService.deleteApplication({ user_id });
 
 			assert.ok(Array.isArray(deletedRecords));
-			// assert.strictEqual(deletedRecords.length, 1);
+			assert.strictEqual(deletedRecords.length, 3);
 		});
 	});
 
