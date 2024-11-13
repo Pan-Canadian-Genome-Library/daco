@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { Layout } from 'antd';
+import FooterComponent from '../components/Footer';
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content } = Layout;
 
 const headerStyle: React.CSSProperties = {
 	textAlign: 'center',
@@ -33,12 +34,6 @@ const contentStyle: React.CSSProperties = {
 	backgroundColor: '#FFF0F6',
 };
 
-const footerStyle: React.CSSProperties = {
-	textAlign: 'center',
-	color: '#FFFFFF',
-	backgroundColor: '#520339',
-};
-
 const layoutStyle = {
 	overflow: 'hidden',
 };
@@ -48,7 +43,7 @@ export const HomePage = () => {
 		<Layout style={layoutStyle}>
 			<Header style={headerStyle}>PCGL Header</Header>
 			<Content style={contentStyle}>PCGL Hero Content</Content>
-			<Footer style={footerStyle}>PCGL Footer</Footer>
+			<FooterComponent />
 		</Layout>
 	);
 };
