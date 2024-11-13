@@ -1,8 +1,7 @@
 import { ConfigProvider, Flex, Image, Layout, Typography } from 'antd';
 
-import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
-
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
+import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -62,7 +61,6 @@ const FooterComponent = () => {
 					</Flex>
 				</Flex>
 			</Footer>
-			;
 		</ConfigProvider>
 	);
 };

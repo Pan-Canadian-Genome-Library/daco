@@ -48,6 +48,7 @@ export const pcglHeaderTheme: ThemeConfig = {
 	},
 };
 
+// Footer Theme Configurations
 export const pcglFooterTheme: ThemeConfig = {
 	components: {
 		Layout: {
@@ -60,6 +61,7 @@ export const pcglFooterTheme: ThemeConfig = {
 		},
 	},
 };
+
 const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
 	return <ConfigProvider theme={pcglTheme}>{children}</ConfigProvider>;
 };
