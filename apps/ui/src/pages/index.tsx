@@ -17,9 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { Layout } from 'antd';
-import HeaderComponent from '../components/Header';
 
-const { Content, Footer } = Layout;
+import FooterComponent from '@/components/Footer';
+import HeaderComponent from '@/components/Header';
+
+const { Content } = Layout;
 
 const contentStyle: React.CSSProperties = {
 	display: 'flex',
@@ -29,18 +31,12 @@ const contentStyle: React.CSSProperties = {
 	backgroundColor: '#FFF0F6',
 };
 
-const footerStyle: React.CSSProperties = {
-	textAlign: 'center',
-	color: '#FFFFFF',
-	backgroundColor: '#520339',
-};
-
 export const HomePage = () => {
 	return (
 		<Layout>
 			<HeaderComponent />
 			<Content style={contentStyle}>PCGL Hero Content</Content>
-			<Footer style={footerStyle}>PCGL Footer</Footer>
+			<FooterComponent />
 		</Layout>
 	);
 };

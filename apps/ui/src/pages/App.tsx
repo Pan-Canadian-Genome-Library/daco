@@ -18,8 +18,9 @@
  */
 
 import { Flex } from 'antd';
-import { HomePage } from '.';
-import ThemeProvider from '../components/providers/ThemeProvider';
+
+import ThemeProvider from '@/components/providers/ThemeProvider';
+import { HomePage } from '@/pages/index';
 
 const AppStyle: React.CSSProperties = {
 	minHeight: '100vh',
