@@ -30,7 +30,7 @@ import { collaborators } from '../../db/schemas/collaborators.ts';
 import { files } from '../../db/schemas/files.ts';
 import { revisionRequests } from '../../db/schemas/revisionRequests.ts';
 
-import { initMigration, startDb, type PostgresDb } from '../../main.ts';
+import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
 
 describe('Postgres Database', () => {
 	let db: PostgresDb;

@@ -23,7 +23,7 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { initMigration, startDb } from '../../main.ts';
+import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
 import service from '../../service/application-service.ts';
 
 const PG_DATABASE = process.env.PG_DATABASE || 'testUser';
@@ -31,7 +31,7 @@ const PG_USER = process.env.PG_USER || 'testPassword';
 const PG_PASSWORD = process.env.PG_PASSWORD || 'postgres';
 
 describe('Application Service', () => {
-	let db: any;
+	let db: PostgresDb;
 	let applicationService: ReturnType<typeof service>;
 	let container: StartedPostgreSqlContainer;
 

@@ -20,7 +20,7 @@
 import assert from 'node:assert';
 import { after, describe, it } from 'node:test';
 
-import { port } from '../main.ts';
+import { port } from '../server.ts';
 
 describe('Initial Test Setup', () => {
 	describe('First File', () => {
