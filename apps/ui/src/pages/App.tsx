@@ -17,13 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { HomePage } from '.';
-import ThemeProvider from '../components/providers/ThemeProvider';
+import { Flex } from 'antd';
+
+import ThemeProvider from '@/components/providers/ThemeProvider';
+import { HomePage } from '@/pages/index';
+
 function App() {
 	return (
 		<ThemeProvider>
-			{/* TODO: add router and add Home component to it remix or react-router-dom */}
-			<HomePage />
+			<Flex>
+				{/* TODO: add router and add Home component to it remix or react-router-dom */}
+				<HomePage />
+			</Flex>
 		</ThemeProvider>
 	);
 }

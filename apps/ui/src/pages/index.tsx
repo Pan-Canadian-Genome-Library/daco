@@ -24,17 +24,13 @@ const { Content, Footer } = Layout;
 const { Title, Paragraph } = Typography;
 const { useToken } = theme;
 
-const footerStyle: React.CSSProperties = {
-	textAlign: 'center',
-	color: '#FFFFFF',
-	backgroundColor: '#520339',
-};
-
 const heroStyle: React.CSSProperties = {
 	width: '90%',
 	marginInline: 'auto',
 	minHeight: 400,
 };
+
+import FooterComponent from '@/components/Footer';
 
 export const HomePage = () => {
 	const { token } = useToken();
@@ -63,7 +59,8 @@ export const HomePage = () => {
 				</Flex>
 				<Flex style={{ ...heroStyle, height: '100%' }}>Temporary</Flex>
 			</Content>
-			<Footer style={footerStyle}>PCGL Footer</Footer>
+
+			<FooterComponent />
 		</Layout>
 	);
 };
