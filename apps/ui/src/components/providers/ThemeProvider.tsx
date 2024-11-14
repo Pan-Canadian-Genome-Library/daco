@@ -30,6 +30,15 @@ const pcglTheme: ThemeConfig = {
 		colorWarning: '#FADB14',
 		colorSuccess: '#73D13D',
 		colorLink: '#C41D7F',
+		colorTextSecondary: '#ffffff',
+	},
+	components: {
+		Button: {
+			fontWeight: 700,
+		},
+		Typography: {
+			fontSize: 18,
+		},
 	},
 };
 

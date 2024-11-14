@@ -16,18 +16,13 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { Layout } from 'antd';
+
+import { Button, Col, Flex, Layout, Typography, theme } from 'antd';
 import HeaderComponent from '../components/Header';
 
 const { Content, Footer } = Layout;
-
-const contentStyle: React.CSSProperties = {
-	display: 'flex',
-	justifyContent: 'center',
-	alignItems: 'center',
-	textAlign: 'center',
-	backgroundColor: '#FFF0F6',
-};
+const { Title, Paragraph } = Typography;
+const { useToken } = theme;
 
 const footerStyle: React.CSSProperties = {
 	textAlign: 'center',
@@ -35,11 +30,39 @@ const footerStyle: React.CSSProperties = {
 	backgroundColor: '#520339',
 };
 
+const heroStyle: React.CSSProperties = {
+	width: '90%',
+	marginInline: 'auto',
+	minHeight: 400,
+};
+
 export const HomePage = () => {
+	const { token } = useToken();
+
 	return (
 		<Layout>
 			<HeaderComponent />
-			<Content style={contentStyle}>PCGL Hero Content</Content>
+			<Content>
+				<Flex className="hero-background-image" justify="center">
+					<Flex align="center" style={heroStyle}>
+						<Col span={12}>
+							<Flex vertical>
+								<Title style={{ color: token.colorTextSecondary }}> Apply for Access to Controlled Data</Title>
+								<Paragraph style={{ color: token.colorTextSecondary }}>
+									The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers and
+									commercial teams for access to PCGL Controlled Data.
+								</Paragraph>
+								<Col span={6}>
+									<Button type="link" color="primary" variant="solid">
+										Get Started
+									</Button>
+								</Col>
+							</Flex>
+						</Col>
+					</Flex>
+				</Flex>
+				<Flex style={{ ...heroStyle, height: '100%' }}>Temporary</Flex>
+			</Content>
 			<Footer style={footerStyle}>PCGL Footer</Footer>
 		</Layout>
 	);
