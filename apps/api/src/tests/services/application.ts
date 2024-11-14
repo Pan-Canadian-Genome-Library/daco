@@ -118,7 +118,7 @@ describe('Application Service', () => {
 		const { id: firstRecordId } = applicationRecords[1];
 		const { id: secondRecordId } = applicationRecords[2];
 
-		// State is tested in following test so first record remains in 'Draft'
+		// State values are used in the next test so first record remains in 'Draft', this is just populating `updatedAt`
 		await applicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
 		await applicationService.findOneAndUpdate({ id: firstRecordId, update: { state: ApplicationStates.APPROVED } });
 		await applicationService.findOneAndUpdate({ id: secondRecordId, update: { state: ApplicationStates.REJECTED } });
@@ -150,11 +150,42 @@ describe('Application Service', () => {
 		assert.ok(rejectedRecordIndex < approvedRecordIndex);
 	});
 
+	it('should allow record pagination', async () => {
+		const applicationRecords = await applicationService.listApplications({ sort: 'state' });
+
+		assert.ok(Array.isArray(applicationRecords));
+		assert.strictEqual(applicationRecords.length, 3);
+
+		// Bring total # of records to 20
+		// TODO: Seed test DB
+		for (let i = 0; i < 17; i++) {
+			await applicationService.createApplication({ user_id });
+		}
+
+		const paginatedRecords = await applicationService.listApplications({ user_id, page: 1, pageSize: 10 });
+
+		// Test that only 10 were returned
+		assert.ok(Array.isArray(paginatedRecords));
+		assert.strictEqual(paginatedRecords.length, 10);
+
+		const allRecords = await applicationService.listApplications({ user_id });
+
+		assert.ok(Array.isArray(allRecords));
+
+		const lastPaginatedIndex = paginatedRecords.length - 1;
+		const middleIndex = allRecords.length - 10;
+		const lastIndex = allRecords.length - 1;
+
+		// Test that pagination returned 'page 2' of the results
+		assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);
+		assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
+	});
+
 	it('should delete applications with a given user_id', async () => {
 		const deletedRecords = await applicationService.deleteApplication({ user_id });
 
 		assert.ok(Array.isArray(deletedRecords));
-		assert.strictEqual(deletedRecords.length, 3);
+		assert.strictEqual(deletedRecords.length, 20);
 	});
 
 	after(async () => {

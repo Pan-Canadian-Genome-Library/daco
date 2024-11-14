@@ -96,10 +96,14 @@ const applicationService = (db: PostgresDb) => ({
 		user_id,
 		state,
 		sort = '',
+		page = 0,
+		pageSize = 20,
 	}: {
 		user_id?: string;
 		state?: ApplicationStates;
 		sort?: string;
+		page?: number;
+		pageSize?: number;
 	}) => {
 		const isDescending = sort?.charAt(0) === '-';
 		const sortValue = isDescending ? sort.substring(1) : sort;
@@ -138,7 +142,9 @@ const applicationService = (db: PostgresDb) => ({
 						state ? eq(applications.state, state) : undefined,
 					),
 				)
-				.orderBy(sortQuery);
+				.orderBy(sortQuery)
+				.offset(page * pageSize)
+				.limit(pageSize);
 
 			return allApplications;
 		} catch (err) {
