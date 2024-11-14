@@ -22,9 +22,6 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 import { actions } from '../../db/schemas/actions.ts';
 import { agreements } from '../../db/schemas/agreements.ts';
@@ -33,11 +30,7 @@ import { collaborators } from '../../db/schemas/collaborators.ts';
 import { files } from '../../db/schemas/files.ts';
 import { revisionRequests } from '../../db/schemas/revisionRequests.ts';
 
-import { startDb, type PostgresDb } from '../../main.ts';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const migrationsFolder = __dirname + '/../../../drizzle';
+import { initMigration, startDb, type PostgresDb } from '../../main.ts';
 
 describe('Postgres Database', () => {
 	let db: PostgresDb;
@@ -50,12 +43,7 @@ describe('Postgres Database', () => {
 		const connectionString = container.getConnectionUri();
 		db = startDb(connectionString);
 
-		try {
-			await migrate(db, { migrationsFolder });
-		} catch (err) {
-			console.log('Error Migrating on Database startup');
-			console.log(err);
-		}
+		await initMigration(db);
 	});
 
 	describe('Connection', () => {

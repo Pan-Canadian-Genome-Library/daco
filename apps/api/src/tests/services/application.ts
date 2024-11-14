@@ -20,23 +20,15 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { startDb } from '../../main.ts';
+import { initMigration, startDb } from '../../main.ts';
 import service from '../../service/application-service.ts';
 
 const PG_DATABASE = process.env.PG_DATABASE || 'testUser';
 const PG_USER = process.env.PG_USER || 'testPassword';
 const PG_PASSWORD = process.env.PG_PASSWORD || 'postgres';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const migrationsFolder = __dirname + '/../../../drizzle';
 
 describe('Application Service', () => {
 	let db: any;
@@ -55,12 +47,7 @@ describe('Application Service', () => {
 		const connectionString = container.getConnectionUri();
 		db = startDb(connectionString);
 
-		try {
-			await migrate(db, { migrationsFolder });
-		} catch (err) {
-			console.log('Error Migrating on Database startup');
-			console.log(err);
-		}
+		await initMigration(db);
 
 		applicationService = service(db);
 		// TODO: create file with seed data for postgres to test read actions

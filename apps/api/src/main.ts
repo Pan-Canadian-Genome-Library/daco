@@ -19,9 +19,17 @@
 
 import cors from 'cors';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import express, { Request, Response } from 'express';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
 // TODO: Fix Types package so we can import from main instead of specific file
 import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const migrationsFolder = __dirname + '/../drizzle';
 
 export const port = process.env.PORT || 3000;
 
@@ -30,6 +38,15 @@ export type PostgresDb = ReturnType<typeof drizzle>;
 export const startDb = (connectionString: string): PostgresDb => {
 	const db = drizzle(connectionString);
 	return db;
+};
+
+export const initMigration = async (db: PostgresDb) => {
+	try {
+		await migrate(db, { migrationsFolder });
+	} catch (err) {
+		console.log('Error Migrating on Database startup');
+		console.log(err);
+	}
 };
 
 const app = express();
