@@ -22,11 +22,15 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import express, { Request, Response } from 'express';
 // TODO: Fix Types package so we can import from main instead of specific file
 import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
-import { connectionString } from '../drizzle.config.ts';
 
 export const port = process.env.PORT || 3000;
 
-export const db = drizzle(connectionString);
+export type PostgresDb = ReturnType<typeof drizzle>;
+
+export const startDb = (connectionString: string): PostgresDb => {
+	const db = drizzle(connectionString);
+	return db;
+};
 
 const app = express();
 

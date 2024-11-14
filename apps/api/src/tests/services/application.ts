@@ -20,137 +20,154 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { drizzle } from 'drizzle-orm/node-postgres';
 
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { applicationService } from '../../service/application-service.ts';
+import { startDb } from '../../main.ts';
+import service from '../../service/application-service.ts';
 
-type PostgresDb = ReturnType<typeof drizzle>;
+const PG_DATABASE = process.env.PG_DATABASE || 'testUser';
+const PG_USER = process.env.PG_USER || 'testPassword';
+const PG_PASSWORD = process.env.PG_PASSWORD || 'postgres';
 
-describe('Postgres Database', () => {
-	let db: PostgresDb;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const migrationsFolder = __dirname + '/../../../drizzle';
+
+describe('Application Service', () => {
+	let db: any;
+	let applicationService: ReturnType<typeof service>;
 	let container: StartedPostgreSqlContainer;
 
 	const user_id = 'testUser@oicr.on.ca';
 
 	before(async () => {
-		container = await new PostgreSqlContainer().start();
+		container = await new PostgreSqlContainer()
+			.withUsername(PG_USER)
+			.withPassword(PG_PASSWORD)
+			.withDatabase(PG_DATABASE)
+			.start();
+
 		const connectionString = container.getConnectionUri();
-		db = drizzle(connectionString);
+		db = startDb(connectionString);
+
+		try {
+			await migrate(db, { migrationsFolder });
+		} catch (err) {
+			console.log('Error Migrating on Database startup');
+			console.log(err);
+		}
+
+		applicationService = service(db);
 		// TODO: create file with seed data for postgres to test read actions
 		// Not yet supported in Drizzle Kit:
 		// https://orm.drizzle.team/docs/kit-seed-data
 	});
 
-	describe('Connection', () => {
-		it('should connect successfully', () => {
-			assert.notEqual(db, undefined);
-		});
+	it('should create applications with status DRAFT and submitted user_id', async () => {
+		const application = await applicationService.createApplication({ user_id });
+
+		assert.notEqual(application, null);
+		assert.strictEqual(application?.user_id, user_id);
+		assert.strictEqual(application?.state, ApplicationStates.DRAFT);
 	});
 
-	describe('Applications', () => {
-		it('should create applications with status DRAFT and submitted user_id', async () => {
-			const application = await applicationService.createApplication({ user_id });
+	it('should get applications requested by id, with application_contents', async () => {
+		const applicationRecords = await applicationService.listApplications({ user_id });
 
-			assert.notEqual(application, null);
-			assert.strictEqual(application?.user_id, user_id);
-			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
-		});
+		assert.ok(Array.isArray(applicationRecords));
 
-		it('should get applications requested by id, with application_contents', async () => {
-			const applicationRecords = await applicationService.listApplications({ user_id });
+		const { id } = applicationRecords[0];
 
-			assert.ok(Array.isArray(applicationRecords));
+		const requestedApplication = await applicationService.getApplicationById({ id });
 
-			const { id } = applicationRecords[0];
+		assert.notEqual(requestedApplication, null);
+		assert.strictEqual(requestedApplication?.id, id);
+		assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
+	});
 
-			const requestedApplication = await applicationService.getApplicationById({ id });
+	it('should list applications filtered by user_id', async () => {
+		await applicationService.createApplication({ user_id });
+		await applicationService.createApplication({ user_id });
 
-			assert.notEqual(requestedApplication, null);
-			assert.strictEqual(requestedApplication?.id, id);
-			assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
-		});
+		const applicationRecords = await applicationService.listApplications({ user_id });
 
-		it('should list applications filtered by user_id', async () => {
-			await applicationService.createApplication({ user_id });
-			await applicationService.createApplication({ user_id });
+		assert.ok(Array.isArray(applicationRecords));
+		assert.strictEqual(applicationRecords.length, 3);
+	});
 
-			const applicationRecords = await applicationService.listApplications({ user_id });
+	it('should list applications filtered by state', async () => {
+		const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.strictEqual(applicationRecords.length, 3);
-		});
+		assert.ok(Array.isArray(applicationRecords));
+		assert.strictEqual(applicationRecords.length, 3);
+	});
 
-		it('should list applications filtered by state', async () => {
-			const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
+	it('should allow sorting records by created_at', async () => {
+		const applicationRecords = await applicationService.listApplications({ sort: 'created_at' });
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.strictEqual(applicationRecords.length, 3);
-		});
+		assert.ok(Array.isArray(applicationRecords));
+		assert.strictEqual(applicationRecords.length, 3);
 
-		it('should allow sorting records by created_at', async () => {
-			const applicationRecords = await applicationService.listApplications({ sort: 'created_at' });
+		const date1 = applicationRecords[0].createdAt.valueOf();
+		const date2 = applicationRecords[1].createdAt.valueOf();
+		const date3 = applicationRecords[2].createdAt.valueOf();
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.strictEqual(applicationRecords.length, 3);
+		assert.ok(date1 < date2);
+		assert.ok(date2 < date3);
+	});
 
-			const date1 = applicationRecords[0].createdAt.valueOf();
-			const date2 = applicationRecords[1].createdAt.valueOf();
-			const date3 = applicationRecords[2].createdAt.valueOf();
+	it('should allow sorting records by updated_at', async () => {
+		const applicationRecords = await applicationService.listApplications({ user_id });
 
-			assert.ok(date1 < date2);
-			assert.ok(date2 < date3);
-		});
+		assert.ok(Array.isArray(applicationRecords));
+		assert.strictEqual(applicationRecords.length, 3);
 
-		it('should allow sorting records by updated_at', async () => {
-			const applicationRecords = await applicationService.listApplications({ user_id });
+		const { id: zeroRecordId } = applicationRecords[0];
+		const { id: firstRecordId } = applicationRecords[1];
+		const { id: secondRecordId } = applicationRecords[2];
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.strictEqual(applicationRecords.length, 3);
+		// State is tested in following test so first record remains in 'Draft'
+		await applicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
+		await applicationService.findOneAndUpdate({ id: firstRecordId, update: { state: ApplicationStates.APPROVED } });
+		await applicationService.findOneAndUpdate({ id: secondRecordId, update: { state: ApplicationStates.REJECTED } });
 
-			const { id: zeroRecordId } = applicationRecords[0];
-			const { id: firstRecordId } = applicationRecords[1];
-			const { id: secondRecordId } = applicationRecords[2];
+		const updatedRecords = await applicationService.listApplications({ user_id });
 
-			// State is tested in following test so first record remains in 'Draft'
-			await applicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
-			await applicationService.findOneAndUpdate({ id: firstRecordId, update: { state: ApplicationStates.APPROVED } });
-			await applicationService.findOneAndUpdate({ id: secondRecordId, update: { state: ApplicationStates.REJECTED } });
+		assert.ok(Array.isArray(updatedRecords));
+		assert.strictEqual(updatedRecords.length, 3);
 
-			const updatedRecords = await applicationService.listApplications({ user_id });
+		const date1 = updatedRecords[0].updatedAt?.valueOf();
+		const date2 = updatedRecords[1].updatedAt?.valueOf();
+		const date3 = updatedRecords[2].updatedAt?.valueOf();
 
-			assert.ok(Array.isArray(updatedRecords));
-			assert.strictEqual(updatedRecords.length, 3);
+		assert.ok(date1 && date2 && date1 < date2);
+		assert.ok(date2 && date3 && date2 < date3);
+	});
 
-			const date1 = updatedRecords[0].updatedAt?.valueOf();
-			const date2 = updatedRecords[1].updatedAt?.valueOf();
-			const date3 = updatedRecords[2].updatedAt?.valueOf();
+	it('should allow sorting records by state', async () => {
+		const applicationRecords = await applicationService.listApplications({ sort: 'state' });
 
-			assert.ok(date1 && date2 && date1 < date2);
-			assert.ok(date2 && date3 && date2 < date3);
-		});
+		assert.ok(Array.isArray(applicationRecords));
+		assert.strictEqual(applicationRecords.length, 3);
 
-		it('should allow sorting records by state', async () => {
-			const applicationRecords = await applicationService.listApplications({ sort: 'state' });
+		const draftRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.DRAFT);
+		const rejectedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.REJECTED);
+		const approvedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.APPROVED);
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.strictEqual(applicationRecords.length, 3);
+		assert.ok(draftRecordIndex < rejectedRecordIndex);
+		assert.ok(rejectedRecordIndex < approvedRecordIndex);
+	});
 
-			const draftRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.DRAFT);
-			const rejectedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.REJECTED);
-			const approvedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.APPROVED);
+	it('should delete applications with a given user_id', async () => {
+		const deletedRecords = await applicationService.deleteApplication({ user_id });
 
-			assert.ok(draftRecordIndex < rejectedRecordIndex);
-			assert.ok(rejectedRecordIndex < approvedRecordIndex);
-		});
-
-		it('should delete applications with a given user_id', async () => {
-			const deletedRecords = await applicationService.deleteApplication({ user_id });
-
-			assert.ok(Array.isArray(deletedRecords));
-			assert.strictEqual(deletedRecords.length, 3);
-		});
+		assert.ok(Array.isArray(deletedRecords));
+		assert.strictEqual(deletedRecords.length, 3);
 	});
 
 	after(async () => {

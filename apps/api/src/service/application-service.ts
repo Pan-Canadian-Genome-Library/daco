@@ -21,9 +21,9 @@ import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
-import { db } from '../main.ts';
+import { type PostgresDb } from '../main.ts';
 
-export const applicationService = {
+const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
@@ -159,4 +159,6 @@ export const applicationService = {
 			return null;
 		}
 	},
-};
+});
+
+export default applicationService;

@@ -20,13 +20,11 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 import { actions } from '../../db/schemas/actions.ts';
 import { agreements } from '../../db/schemas/agreements.ts';
@@ -35,10 +33,11 @@ import { collaborators } from '../../db/schemas/collaborators.ts';
 import { files } from '../../db/schemas/files.ts';
 import { revisionRequests } from '../../db/schemas/revisionRequests.ts';
 
+import { startDb, type PostgresDb } from '../../main.ts';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-type PostgresDb = ReturnType<typeof drizzle>;
+const migrationsFolder = __dirname + '/../../../drizzle';
 
 describe('Postgres Database', () => {
 	let db: PostgresDb;
@@ -47,14 +46,14 @@ describe('Postgres Database', () => {
 	const user_id = 'testUser@oicr.on.ca';
 
 	before(async () => {
-		const migrationsFolder = __dirname + '/../../../drizzle';
 		container = await new PostgreSqlContainer().start();
 		const connectionString = container.getConnectionUri();
-		db = drizzle(connectionString);
+		db = startDb(connectionString);
+
 		try {
 			await migrate(db, { migrationsFolder });
 		} catch (err) {
-			console.log('Test migration error');
+			console.log('Error Migrating on Database startup');
 			console.log(err);
 		}
 	});
