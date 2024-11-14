@@ -133,10 +133,16 @@ describe('Postgres Database', () => {
 
 		it('should allow sorting records by state', async () => {
 			const applicationRecords = await applicationService.listApplications({ sort: 'state' });
-			console.log('state');
-			console.log(applicationRecords);
+
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
+
+			const draftRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.DRAFT);
+			const rejectedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.REJECTED);
+			const approvedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.APPROVED);
+
+			assert.ok(draftRecordIndex < rejectedRecordIndex);
+			assert.ok(rejectedRecordIndex < approvedRecordIndex);
 		});
 
 		it('should delete applications with a given user_id', async () => {
