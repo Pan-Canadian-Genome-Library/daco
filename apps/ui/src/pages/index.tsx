@@ -17,17 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Col, Flex, Layout, Typography, theme } from 'antd';
+import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
+import { Avatar, Button, Col, Flex, Layout, Typography, theme } from 'antd';
 import HeaderComponent from '../components/Header';
 
-const { Content, Footer } = Layout;
-const { Title, Paragraph } = Typography;
+const { Content } = Layout;
+const { Title, Paragraph, Link, Text } = Typography;
 const { useToken } = theme;
 
 const heroStyle: React.CSSProperties = {
-	width: '90%',
+	width: '80%',
 	marginInline: 'auto',
 	minHeight: 400,
+	paddingBottom: 50,
+	paddingTop: 50,
 };
 
 import FooterComponent from '@/components/Footer';
@@ -57,9 +60,68 @@ export const HomePage = () => {
 						</Col>
 					</Flex>
 				</Flex>
-				<Flex style={{ ...heroStyle, height: '100%' }}>Temporary</Flex>
+				<Flex align="center" style={{ ...heroStyle }}>
+					<Flex gap={20}>
+						<Col span={12}>
+							<Flex vertical gap={10}>
+								<Title level={2}>Overview</Title>
+								<Paragraph>
+									Authorization for access to Pan-Canadian Genome Library controlled data is study based and is reviewed
+									for compliance with PCGL Policies and Guidelines. The PCGL DACO is the overarching authority to ensure
+									that data from the PCGL will only be used by qualified individuals for public health objectives.
+								</Paragraph>
+								<Paragraph>
+									Before starting your application, learn more about Data Access and Use Policies and review our 
+									<Link underline> frequently asked questions</Link>.
+								</Paragraph>
+							</Flex>
+						</Col>
+						<Col span={12}>
+							<Flex vertical gap={20}>
+								<Title level={2}>The Application Process is Simple</Title>
+								<Flex align="center" gap={10}>
+									<Flex justify="center" align="center">
+										<Avatar
+											style={{ backgroundColor: '#C0DCF3', color: 'rgba(0,0,0,0.5)' }}
+											size={60}
+											icon={<FileOutlined />}
+										/>
+									</Flex>
+									<Text>
+										Log in and start an application. Carefully complete all required sections and review all policies
+										and agreements.
+									</Text>
+								</Flex>
+								<Flex align="center" gap={10}>
+									<Flex justify="center" align="center">
+										<Avatar
+											style={{ backgroundColor: '#FDD6CB', color: 'rgba(0,0,0,0.5)' }}
+											size={60}
+											icon={<SignatureOutlined />}
+										/>
+									</Flex>
+									<Text>
+										When completed, obtain the required signatures and submit the signed application for review.
+									</Text>
+								</Flex>
+								<Flex align="center" gap={10}>
+									<Flex justify="center" align="center">
+										<Avatar
+											style={{ backgroundColor: '#D3F7F0', color: 'rgba(0,0,0,0.5)' }}
+											size={60}
+											icon={<AuditOutlined />}
+										/>
+									</Flex>
+									<Text>
+										The PCGL DACO will review the application and approved project teams will be granted access to PCGL
+										Controlled Data.
+									</Text>
+								</Flex>
+							</Flex>
+						</Col>
+					</Flex>
+				</Flex>
 			</Content>
-
 			<FooterComponent />
 		</Layout>
 	);

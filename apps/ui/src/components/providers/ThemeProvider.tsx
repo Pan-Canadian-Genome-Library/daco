@@ -37,7 +37,7 @@ const pcglTheme: ThemeConfig = {
 			fontWeight: 700,
 		},
 		Typography: {
-			fontSize: 18,
+			fontSize: 16,
 		},
 	},
 };
