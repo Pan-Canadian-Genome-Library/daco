@@ -20,7 +20,6 @@
 import { Button, ConfigProvider, Flex, Image, Layout, Typography } from 'antd';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
-
 import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
 
 const { Link } = Typography;

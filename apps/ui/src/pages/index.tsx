@@ -19,7 +19,9 @@
 
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, Flex, Layout, Typography, theme } from 'antd';
-import HeaderComponent from '../components/Header';
+
+import FooterComponent from '@/components/Footer';
+import HeaderComponent from '@/components/Header';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -32,8 +34,6 @@ const heroStyle: React.CSSProperties = {
 	paddingBottom: 50,
 	paddingTop: 50,
 };
-
-import FooterComponent from '@/components/Footer';
 
 export const HomePage = () => {
 	const { token } = useToken();
