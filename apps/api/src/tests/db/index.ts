@@ -23,14 +23,13 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
 
+import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
 import { actions } from '../../db/schemas/actions.ts';
 import { agreements } from '../../db/schemas/agreements.ts';
 import { applicationContents } from '../../db/schemas/applicationContents.ts';
 import { collaborators } from '../../db/schemas/collaborators.ts';
 import { files } from '../../db/schemas/files.ts';
 import { revisionRequests } from '../../db/schemas/revisionRequests.ts';
-
-import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
 
 describe('Postgres Database', () => {
 	let db: PostgresDb;
