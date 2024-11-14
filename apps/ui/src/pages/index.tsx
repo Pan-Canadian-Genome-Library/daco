@@ -40,7 +40,7 @@ export const HomePage = () => {
 	const { token } = useToken();
 
 	return (
-		<Layout>
+		<Layout style={{ minHeight: '100vh' }}>
 			<HeaderComponent />
 			<Content>
 				<Flex className="hero-background-image" justify="center">
