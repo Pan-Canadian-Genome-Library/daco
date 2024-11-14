@@ -172,6 +172,6 @@ describe('Application Service', () => {
 
 	after(async () => {
 		await container.stop();
-		process.exit();
+		process.exit(0);
 	});
 });

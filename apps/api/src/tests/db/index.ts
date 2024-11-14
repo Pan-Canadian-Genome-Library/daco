@@ -233,6 +233,6 @@ describe('Postgres Database', () => {
 
 	after(async () => {
 		await container.stop();
-		process.exit();
+		process.exit(0);
 	});
 });
