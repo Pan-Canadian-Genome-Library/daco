@@ -24,6 +24,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
+import { applications } from '../../db/schemas/applications.ts';
 import service from '../../service/application-service.ts';
 
 const PG_DATABASE = process.env.PG_DATABASE || 'testUser';
@@ -158,8 +159,9 @@ describe('Application Service', () => {
 
 		// Bring total # of records to 20
 		// TODO: Seed test DB
+		const userRecord = { user_id, state: ApplicationStates.DRAFT };
 		for (let i = 0; i < 17; i++) {
-			await applicationService.createApplication({ user_id });
+			await db.insert(applications).values(userRecord);
 		}
 
 		const paginatedRecords = await applicationService.listApplications({ user_id, page: 1, pageSize: 10 });

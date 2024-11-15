@@ -48,8 +48,6 @@ const applicationService = (db: PostgresDb) => ({
 				.where(eq(applications.id, id))
 				.returning();
 
-			console.log(`Application created with user_id: ${user_id}`);
-
 			return application[0];
 		} catch (err) {
 			console.error(`Error at createApplication with user_id: ${user_id}`);
@@ -156,7 +154,6 @@ const applicationService = (db: PostgresDb) => ({
 	deleteApplication: async ({ user_id }: { user_id: string }) => {
 		try {
 			const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
-			console.log(`Application deleted with user_id: ${user_id}`);
 
 			return deletedRecords;
 		} catch (err) {
