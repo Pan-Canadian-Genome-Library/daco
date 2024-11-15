@@ -17,32 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { actions } from './actions.ts';
-import { applicationContents } from './applicationContents.ts';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-export const revisionRequests = pgTable('revision_requests', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	comments: text(),
-	applicant_notes: text(),
-	applicant_approved: boolean().notNull(),
-	institution_rep_approved: boolean().notNull(),
-	institution_rep_notes: text(),
-	collaborators_approved: boolean().notNull(),
-	collaborators_notes: text(),
-	project_approved: boolean().notNull(),
-	project_notes: text(),
-	requested_studies_approved: boolean().notNull(),
-	requested_studies_notes: text(),
-});
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const migrationsFolder = __dirname + '/../../drizzle';
 
-export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
-	application_id: one(applicationContents, {
-		fields: [revisionRequests.application_id],
-		references: [applicationContents.id],
-	}),
-	actions: many(actions),
-}));
+export type PostgresDb = ReturnType<typeof drizzle>;
+
+export const startDb = (connectionString: string): PostgresDb => {
+	try {
+		const db = drizzle(connectionString);
+		return db;
+	} catch (err) {
+		console.log('Error on Database startup');
+		console.log(err);
+		throw err;
+	}
+};
+
+export const initMigration = async (db: PostgresDb) => {
+	try {
+		await migrate(db, { migrationsFolder });
+	} catch (err) {
+		console.log('Error Migrating on Database startup');
+		console.log(err);
+		throw err;
+	}
+};

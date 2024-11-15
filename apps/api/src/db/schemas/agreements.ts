@@ -19,7 +19,7 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applications } from './applications.ts';
+import { applicationContents } from './applicationContents.ts';
 // TODO: Integrate w/ TS
 // import { ApplicationAgreements } from 'pcgl-daco/packages/data-model/';
 
@@ -46,8 +46,8 @@ export const agreements = pgTable('agreements', {
 });
 
 export const agreementRelations = relations(agreements, ({ one }) => ({
-	application_id: one(applications, {
+	application_id: one(applicationContents, {
 		fields: [agreements.application_id],
-		references: [applications.id],
+		references: [applicationContents.application_id],
 	}),
 }));

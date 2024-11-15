@@ -17,32 +17,31 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { actions } from './actions.ts';
-import { applicationContents } from './applicationContents.ts';
+import cors from 'cors';
+import express, { Request, Response } from 'express';
+// TODO: Fix Types package so we can import from main instead of specific file
+import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
+import { startDb, type PostgresDb } from './db/index.ts';
 
-export const revisionRequests = pgTable('revision_requests', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	comments: text(),
-	applicant_notes: text(),
-	applicant_approved: boolean().notNull(),
-	institution_rep_approved: boolean().notNull(),
-	institution_rep_notes: text(),
-	collaborators_approved: boolean().notNull(),
-	collaborators_notes: text(),
-	project_approved: boolean().notNull(),
-	project_notes: text(),
-	requested_studies_approved: boolean().notNull(),
-	requested_studies_notes: text(),
-});
+export const port = process.env.PORT || 3000;
 
-export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
-	application_id: one(applicationContents, {
-		fields: [revisionRequests.application_id],
-		references: [applicationContents.id],
-	}),
-	actions: many(actions),
-}));
+const startServer = async (connectionString: string) => {
+	// TODO: Implement with service and routes
+	const _db: PostgresDb = startDb(connectionString);
+
+	const app = express();
+
+	app.get('/', (_req: Request, res: Response) => {
+		res.send('Hello World!');
+	});
+
+	app.get('/applications', cors(), (_req: Request, res: Response) => {
+		res.send(demoApplication);
+	});
+
+	app.listen(port, () => {
+		console.log(`Example app listening on port ${port}`);
+	});
+};
+
+export default startServer;
