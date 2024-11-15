@@ -55,7 +55,7 @@ export const HomePage = () => {
 					</Col>
 				</Flex>
 			</Flex>
-			<Flex align="center" style={{ ...heroStyle }}>
+			<Flex align="center" style={heroStyle}>
 				<Flex gap={20}>
 					<Col span={12}>
 						<Flex vertical gap={10}>
@@ -66,8 +66,8 @@ export const HomePage = () => {
 								that data from the PCGL will only be used by qualified individuals for public health objectives.
 							</Paragraph>
 							<Paragraph>
-								Before starting your application, learn more about Data Access and Use Policies and review our 
-								<Link underline> frequently asked questions</Link>.
+								Before starting your application, learn more about Data Access and Use Policies and review our
+								<Link underline> frequently asked questions</Link>.
 							</Paragraph>
 						</Flex>
 					</Col>
