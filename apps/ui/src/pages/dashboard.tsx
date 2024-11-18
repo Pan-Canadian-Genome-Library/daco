@@ -20,11 +20,17 @@
 import { Flex } from 'antd';
 
 import ApplicationStatusBar from '@/components/ApplicationStatusBar';
+import ContentWrapper from '@/components/layouts/ContentWrapper';
 
 const DashboardPage = () => {
 	return (
-		<Flex>
+		<Flex style={{ height: '100%' }} vertical>
 			<ApplicationStatusBar />
+			<Flex flex={1} align="center" justify="center">
+				<ContentWrapper>
+					<>Test</>
+				</ContentWrapper>
+			</Flex>
 		</Flex>
 	);
 };

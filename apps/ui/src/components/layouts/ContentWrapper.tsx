@@ -17,25 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, theme } from 'antd';
-import ContentWrapper from './ContentWrapper';
+import { Flex } from 'antd';
 
-const { useToken } = theme;
-
-const StatusBannerWrapperStyles: React.CSSProperties = {
-	paddingInline: '50px',
-	width: '100%',
-	minHeight: 300,
+// @description: Purpose of this wrapper is to endure all elements on the page is sized consistently and properly across pages and elements
+export const contentWrapperStyles: React.CSSProperties = {
+	marginInline: 'auto',
+	width: '90%',
 };
 
-const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => {
-	const { token } = useToken();
-
-	return (
-		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorFillAlter }}>
-			<ContentWrapper>{children}</ContentWrapper>
-		</Flex>
-	);
+const ContentWrapper = ({ children }: { children: React.ReactElement }) => {
+	return <Flex style={contentWrapperStyles}>{children}</Flex>;
 };
 
-export default StatusBannerWrapper;
+export default ContentWrapper;
