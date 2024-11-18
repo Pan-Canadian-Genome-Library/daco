@@ -69,8 +69,27 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
-	editApplication: async () => {
-		// Validate application state allows updates
+	editApplication: async ({ id, update }: { id: number; update: any }) => {
+		try {
+			// Validate application state allows updates
+			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+			if (!applicationRecord.length) {
+				throw new Error('Application Not Found');
+			}
+
+			const { state } = applicationRecord[0];
+			const isAllowedState =
+				state === ApplicationStates.DRAFT ||
+				state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
+				state === ApplicationStates.DAC_REVIEW;
+			if (isAllowedState) {
+				// this.findOneAndUpdate(id, update);
+			}
+		} catch (err) {
+			console.error(`Error at editApplication with id: ${id}`);
+			console.error(err);
+			return null;
+		}
 	},
 	findOneAndUpdate: async ({ id, update }: { id: number; update: any }) => {
 		try {
