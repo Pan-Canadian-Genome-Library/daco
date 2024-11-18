@@ -17,16 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
+import { Flex, theme } from 'antd';
 
-import ApplicationStatusBar from '@/components/ApplicationStatusBar';
+const { useToken } = theme;
 
-const DashboardPage = () => {
-	return (
-		<Flex>
-			<ApplicationStatusBar />
-		</Flex>
-	);
+const StatusBannerWrapperStyles: React.CSSProperties = {
+	paddingInline: '50px',
+	width: '100%',
+	minHeight: 300,
 };
 
-export default DashboardPage;
+const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => {
+	const { token } = useToken();
+
+	return <Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorFillAlter }}>{children}</Flex>;
+};
+
+export default StatusBannerWrapper;

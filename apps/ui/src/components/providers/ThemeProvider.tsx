@@ -24,13 +24,24 @@ const pcglTheme: ThemeConfig = {
 	token: {
 		fontFamily:
 			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+
 		colorPrimary: '#C41D7F',
-		colorBgContainer: '#FFF0F6',
+		colorFillAlter: '#FFFFFF',
 		colorFillSecondary: '#520339',
-		colorWarning: '#FADB14',
-		colorSuccess: '#73D13D',
+		colorBgContainer: '#FFF0F6',
+
+		// States
+		colorSuccess: '#52C41A',
+		colorWarning: '#FAAD14',
+		colorError: '#FF4D4F',
+
+		// Link styles
 		colorLink: '#C41D7F',
+
+		// Text Styles
 		colorTextSecondary: '#ffffff',
+
+		colorIcon: '#C41D7F',
 	},
 	components: {
 		Button: {
