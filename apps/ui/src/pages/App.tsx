@@ -18,11 +18,20 @@
  */
 
 import { Flex, Layout } from 'antd';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import FooterComponent from '@/components/Footer';
 import HeaderComponent from '@/components/Header';
 import ThemeProvider from '@/components/providers/ThemeProvider';
+
 import { HomePage } from '@/pages/index';
+
+export const router = createBrowserRouter([
+	{
+		path: '/',
+		element: <HomePage />,
+	},
+]);
 
 function App() {
 	return (
@@ -30,8 +39,7 @@ function App() {
 			<Flex>
 				<Layout style={{ minHeight: '100vh' }}>
 					<HeaderComponent />
-					{/* TODO: add router and add Home component to it remix or react-router-dom */}
-					<HomePage />
+					<RouterProvider router={router} />
 					<FooterComponent />
 				</Layout>
 			</Flex>
