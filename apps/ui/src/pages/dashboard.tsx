@@ -17,39 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Flex } from 'antd';
 
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
+const DashboardPage = () => {
+	return <Flex>dashboard</Flex>;
+};
 
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
-
-export const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <HomePage />,
-	},
-	{
-		path: '/dashboard',
-		element: <DashboardPage />,
-	},
-]);
-
-function App() {
-	return (
-		<ThemeProvider>
-			<Flex>
-				<Layout style={{ minHeight: '100vh' }}>
-					<HeaderComponent />
-					<RouterProvider router={router} />
-					<FooterComponent />
-				</Layout>
-			</Flex>
-		</ThemeProvider>
-	);
-}
-
-export default App;
+export default DashboardPage;

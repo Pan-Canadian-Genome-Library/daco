@@ -32,7 +32,7 @@ const heroStyle: React.CSSProperties = {
 	paddingTop: 50,
 };
 
-export const HomePage = () => {
+const HomePage = () => {
 	const { token } = useToken();
 
 	return (
@@ -119,3 +119,5 @@ export const HomePage = () => {
 		</Content>
 	);
 };
+
+export default HomePage;
