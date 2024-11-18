@@ -57,6 +57,21 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
+	deleteApplication: async ({ user_id }: { user_id: string }) => {
+		try {
+			const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
+			console.log(`Application deleted with user_id: ${user_id}`);
+
+			return deletedRecords;
+		} catch (err) {
+			console.error(`Error at createApplication with user_id: ${user_id}`);
+			console.error(err);
+			return null;
+		}
+	},
+	editApplication: async () => {
+		// Validate application state allows updates
+	},
 	findOneAndUpdate: async ({ id, update }: { id: number; update: any }) => {
 		try {
 			const application = await db
@@ -149,18 +164,6 @@ const applicationService = (db: PostgresDb) => ({
 			return allApplications;
 		} catch (err) {
 			console.error(`Error at listApplications with user_id: ${user_id} state: ${state}`);
-			console.error(err);
-			return null;
-		}
-	},
-	deleteApplication: async ({ user_id }: { user_id: string }) => {
-		try {
-			const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
-			console.log(`Application deleted with user_id: ${user_id}`);
-
-			return deletedRecords;
-		} catch (err) {
-			console.error(`Error at createApplication with user_id: ${user_id}`);
 			console.error(err);
 			return null;
 		}
