@@ -78,12 +78,23 @@ const applicationService = (db: PostgresDb) => ({
 			}
 
 			const { state } = applicationRecord[0];
-			const isAllowedState =
-				state === ApplicationStates.DRAFT ||
-				state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
-				state === ApplicationStates.DAC_REVIEW;
-			if (isAllowedState) {
-				// this.findOneAndUpdate(id, update);
+			const isDraftState = state === ApplicationStates.DRAFT;
+			// Edits to Applications under review will revert state to 'DRAFT'
+			const isReviewState =
+				state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
+
+			if (isDraftState || isReviewState) {
+				try {
+					const application = await db
+						.update(applications)
+						.set({ ...update, updated_at: sql`NOW()`, ...(isReviewState && { state: ApplicationStates.DRAFT }) })
+						.where(eq(applications.id, id))
+						.returning();
+
+					return application;
+				} catch (err) {
+					throw err;
+				}
 			}
 		} catch (err) {
 			console.error(`Error at editApplication with id: ${id}`);
