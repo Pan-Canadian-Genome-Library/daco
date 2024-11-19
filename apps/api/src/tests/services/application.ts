@@ -181,6 +181,40 @@ describe('Application Service', () => {
 		assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
 	});
 
+	it('should allow editing applications with status DRAFT and submitted user_id', async () => {
+		const applicationRecords = await applicationService.listApplications({ user_id });
+
+		assert.ok(Array.isArray(applicationRecords));
+
+		const { id } = applicationRecords[0];
+
+		const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+
+		const editedApplication = await applicationService.editApplication({ id, update });
+
+		assert.ok(Array.isArray(editedApplication));
+		assert.strictEqual(editedApplication[0].state, update.state);
+	});
+
+	it('should allow editing applications with status DAC_REVIEW', async () => {
+		const applicationRecords = await applicationService.listApplications({ user_id });
+
+		assert.ok(Array.isArray(applicationRecords));
+
+		const { id, state } = applicationRecords[0];
+
+		assert.strictEqual(state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+
+		// Needs Contents
+		// const update = { content: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+
+		// const application = await applicationService.editApplication({ id, update });
+
+		// assert.notEqual(application, null);
+		// assert.strictEqual(application?.user_id, user_id);
+		// assert.strictEqual(application?.state, ApplicationStates.DRAFT);
+	});
+
 	it('should delete applications with a given user_id', async () => {
 		const deletedRecords = await applicationService.deleteApplication({ user_id });
 
