@@ -111,6 +111,9 @@ const applicationService = (db: PostgresDb) => ({
 				} catch (err) {
 					throw err;
 				}
+			} else {
+				const error = new Error(`Cannot update application with state ${state}`);
+				throw error;
 			}
 		} catch (err) {
 			console.error(`Error at editApplication with id: ${id}`);

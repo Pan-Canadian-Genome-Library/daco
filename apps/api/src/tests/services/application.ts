@@ -221,6 +221,27 @@ describe('Application Service', () => {
 		assert.strictEqual(editedApplication?.contents.applicant_last_name, contentUpdate.applicant_last_name);
 	});
 
+	it('should not allow editing applications with non-draft/review states', async () => {
+		const applicationRecords = await applicationService.listApplications({ user_id });
+
+		assert.ok(Array.isArray(applicationRecords));
+
+		const { id, state } = applicationRecords[0];
+
+		assert.strictEqual(state, ApplicationStates.DRAFT);
+
+		const stateUpdate = { state: ApplicationStates.DAC_REVISIONS_REQUESTED };
+		const reviewRecord = await applicationService.findOneAndUpdate({ id, update: stateUpdate });
+
+		assert.ok(Array.isArray(reviewRecord));
+		assert.strictEqual(reviewRecord[0].state, ApplicationStates.DAC_REVISIONS_REQUESTED);
+
+		const contentUpdate = { applicant_title: 'Dr.' };
+		const editedApplication = await applicationService.editApplication({ id, update: contentUpdate });
+
+		assert.ok(!editedApplication);
+	});
+
 	it('should delete applications with a given user_id', async () => {
 		const deletedRecords = await applicationService.deleteApplication({ user_id });
 
