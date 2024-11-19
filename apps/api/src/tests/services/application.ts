@@ -58,7 +58,7 @@ describe('Application Service', () => {
 	it('should create applications with status DRAFT and submitted user_id', async () => {
 		const application = await applicationService.createApplication({ user_id });
 
-		assert.notEqual(application, null);
+		assert.ok(!!application);
 		assert.strictEqual(application?.user_id, user_id);
 		assert.strictEqual(application?.state, ApplicationStates.DRAFT);
 	});
@@ -72,7 +72,7 @@ describe('Application Service', () => {
 
 		const requestedApplication = await applicationService.getApplicationById({ id });
 
-		assert.notEqual(requestedApplication, null);
+		assert.ok(!!requestedApplication);
 		assert.strictEqual(requestedApplication?.id, id);
 		assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
 	});
@@ -192,8 +192,7 @@ describe('Application Service', () => {
 
 		const editedApplication = await applicationService.editApplication({ id, update });
 
-		assert.notStrictEqual(editedApplication, null);
-		assert.notStrictEqual(editedApplication, undefined);
+		assert.ok(!!editedApplication);
 		assert.strictEqual(editedApplication?.state, ApplicationStates.DRAFT);
 		assert.strictEqual(editedApplication?.contents.applicant_first_name, update.applicant_first_name);
 	});
@@ -213,7 +212,7 @@ describe('Application Service', () => {
 		const contentUpdate = { applicant_last_name: 'User' };
 		const editedApplication = await applicationService.editApplication({ id, update: contentUpdate });
 
-		assert.notEqual(editedApplication, null);
+		assert.ok(!!editedApplication);
 		assert.strictEqual(editedApplication?.id, id);
 		assert.strictEqual(editedApplication?.state, ApplicationStates.DRAFT);
 		assert.strictEqual(editedApplication?.contents.applicant_last_name, contentUpdate.applicant_last_name);
