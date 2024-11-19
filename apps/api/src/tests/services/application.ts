@@ -221,7 +221,7 @@ describe('Application Service', () => {
 		assert.strictEqual(editedApplication?.contents.applicant_last_name, contentUpdate.applicant_last_name);
 	});
 
-	it('should not allow editing applications with non-draft/review states', async () => {
+	it('should error and return null when application state is not draft or review', async () => {
 		const applicationRecords = await applicationService.listApplications({ user_id });
 
 		assert.ok(Array.isArray(applicationRecords));
