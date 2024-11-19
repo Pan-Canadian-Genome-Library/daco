@@ -83,11 +83,29 @@ const applicationService = (db: PostgresDb) => ({
 			const isReviewState =
 				state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 
-			const updates = { ...update, updated_at: sql`NOW()`, ...(isReviewState && { state: ApplicationStates.DRAFT }) };
-
 			if (isDraftState || isReviewState) {
 				try {
-					const application = await db.update(applications).set(updates).where(eq(applications.id, id)).returning();
+					const contents = { ...update, updated_at: sql`NOW()` };
+					const editedContents = await db
+						.update(applicationContents)
+						.set(contents)
+						.where(eq(applicationContents.application_id, id))
+						.returning();
+
+					const applicationUpdates = {
+						updated_at: sql`NOW()`,
+						...(isReviewState && { state: ApplicationStates.DRAFT }),
+					};
+					const editedApplication = await db
+						.update(applications)
+						.set(applicationUpdates)
+						.where(eq(applications.id, id))
+						.returning();
+
+					const application = {
+						...editedApplication[0],
+						contents: editedContents[0],
+					};
 
 					return application;
 				} catch (err) {

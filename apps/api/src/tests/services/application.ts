@@ -188,12 +188,14 @@ describe('Application Service', () => {
 
 		const { id } = applicationRecords[0];
 
-		const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+		const update = { applicant_first_name: 'Test' };
 
 		const editedApplication = await applicationService.editApplication({ id, update });
 
-		assert.ok(Array.isArray(editedApplication));
-		assert.strictEqual(editedApplication[0].state, update.state);
+		assert.notStrictEqual(editedApplication, null);
+		assert.notStrictEqual(editedApplication, undefined);
+		assert.strictEqual(editedApplication?.state, ApplicationStates.DRAFT);
+		assert.strictEqual(editedApplication?.contents.applicant_first_name, update.applicant_first_name);
 	});
 
 	it('should allow editing applications with status DAC_REVIEW', async () => {
@@ -203,16 +205,18 @@ describe('Application Service', () => {
 
 		const { id, state } = applicationRecords[0];
 
-		assert.strictEqual(state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+		assert.strictEqual(state, ApplicationStates.DRAFT);
 
-		// Needs Contents
-		// const update = { content: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+		const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+		await applicationService.findOneAndUpdate({ id, update: stateUpdate });
 
-		// const application = await applicationService.editApplication({ id, update });
+		const contentUpdate = { applicant_last_name: 'User' };
+		const editedApplication = await applicationService.editApplication({ id, update: contentUpdate });
 
-		// assert.notEqual(application, null);
-		// assert.strictEqual(application?.user_id, user_id);
-		// assert.strictEqual(application?.state, ApplicationStates.DRAFT);
+		assert.notEqual(editedApplication, null);
+		assert.strictEqual(editedApplication?.id, id);
+		assert.strictEqual(editedApplication?.state, ApplicationStates.DRAFT);
+		assert.strictEqual(editedApplication?.contents.applicant_last_name, contentUpdate.applicant_last_name);
 	});
 
 	it('should delete applications with a given user_id', async () => {
