@@ -17,20 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
-import { HomePage } from '.';
-import ThemeProvider from '../components/providers/ThemeProvider';
+import { Flex, Layout } from 'antd';
 
-const AppStyle: React.CSSProperties = {
-	minHeight: '100vh',
-};
+import FooterComponent from '@/components/Footer';
+import HeaderComponent from '@/components/Header';
+import ThemeProvider from '@/components/providers/ThemeProvider';
+import { HomePage } from '@/pages/index';
 
 function App() {
 	return (
 		<ThemeProvider>
-			<Flex style={AppStyle}>
-				{/* TODO: add router and add Home component to it remix or react-router-dom */}
-				<HomePage />
+			<Flex>
+				<Layout style={{ minHeight: '100vh' }}>
+					<HeaderComponent />
+					{/* TODO: add router and add Home component to it remix or react-router-dom */}
+					<HomePage />
+					<FooterComponent />
+				</Layout>
 			</Flex>
 		</ThemeProvider>
 	);

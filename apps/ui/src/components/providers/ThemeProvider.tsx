@@ -19,13 +19,55 @@
 
 import { ConfigProvider, ThemeConfig } from 'antd';
 
+// General Theme Configurations
 const pcglTheme: ThemeConfig = {
 	token: {
+		fontFamily:
+			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 		colorPrimary: '#C41D7F',
 		colorBgContainer: '#FFF0F6',
 		colorFillSecondary: '#520339',
 		colorWarning: '#FADB14',
 		colorSuccess: '#73D13D',
+		colorLink: '#C41D7F',
+		colorTextSecondary: '#ffffff',
+	},
+	components: {
+		Button: {
+			fontWeight: 700,
+		},
+		Typography: {
+			fontSize: 16,
+		},
+	},
+};
+
+// Header Theme Configurations
+export const pcglHeaderTheme: ThemeConfig = {
+	...pcglTheme,
+	token: {
+		colorLink: '#000000',
+		colorLinkHover: 'rgba(0,0,0,0.5)',
+		colorBgContainer: '#FFFFFF',
+	},
+	components: {
+		Layout: {
+			headerBg: '#FFFFFF',
+		},
+	},
+};
+
+// Footer Theme Configurations
+export const pcglFooterTheme: ThemeConfig = {
+	components: {
+		Layout: {
+			footerBg: '#520339',
+		},
+		Typography: {
+			colorText: '#FFFFFF',
+			colorLink: '#FFD6E7',
+			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
+		},
 	},
 };
 

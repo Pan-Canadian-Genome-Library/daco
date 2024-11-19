@@ -10,3 +10,10 @@ body {
 	box-sizing: border-box;
 	margin: 0;
 }
+
+.hero-background-image {
+	background-image: url(./assets/pcgl-hero-banner.png);
+	background-position: center;
+	background-size: cover;
+	justify-content: center;
+}
