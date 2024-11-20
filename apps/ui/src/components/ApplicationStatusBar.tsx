@@ -18,7 +18,7 @@
  */
 
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
-import { Col, Flex, Typography, theme } from 'antd';
+import { Col, Flex, Row, Typography, theme } from 'antd';
 
 import StatusBarWrapper from '@/components/layouts/StatusBarWrapper';
 
@@ -35,7 +35,7 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 
 	return (
 		<StatusBarWrapper>
-			<>
+			<Row style={{ width: '100%' }}>
 				<Col span={12}>
 					<Flex style={{ height: '100%' }} vertical justify="center">
 						<Title>My Applications</Title>
@@ -74,7 +74,7 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 						</Flex>
 					</Flex>
 				</Col>
-			</>
+			</Row>
 		</StatusBarWrapper>
 	);
 };
