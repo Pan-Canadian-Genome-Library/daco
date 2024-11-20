@@ -55,7 +55,7 @@ EXAMPLE END -->
   - Label is added for the type of work done in this PR (`feature`, `fix`, `chore`, `documentation`)
 - [ ] **Local Testing**
   - Successfully built all packages locally
-  - Succesffully run all test suites, all unit and integration tests pass
+  - Successfully ran all test suites, all unit and integration tests pass
 - [ ] **Updated Tests**
   - Unit and integration tests have been added that describe the bug that was fixed or the features that were added
 - [ ] Documentation
