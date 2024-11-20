@@ -43,12 +43,22 @@ pnpm i
 ```
 EXAMPLE END -->
 
-## PR Readiness Checklist
+## Readiness Checklist
 
-- [ ] I have performed a self review of code and manual testing of changes
-- [ ] Title is properly formatted: `#{TicketNumber}: Description of Changes`
-- [ ] Labels added to PR for service name (`api`, `ui`, etc...), type (`feature`, `chore`, `documentation`, etc...)
-- [ ] Unit and integration tests have been updated to capture new features or bug behaviour
-- [ ] The code successfully builds locally and passes all test suites
-- [ ] All new environment variables added to `.env.schema` files and documented in the README
-- [ ] All changes to server HTTP endpoints have open-api documentation
+- [ ] **Self Review**
+  - I have performed a self review of code
+  - I have run the application locally and manually tested the feature
+- [ ] **Title Format**
+  - The PR title is properly formatted to match the pattern: `#{TicketNumber}: Description of Changes`
+- [ ] **Labels Added**
+  - Label is added for each package/app that is modified (`api`, `ui`, `data-model`, etc.)
+  - Label is added for the type of work done in this PR (`feature`, `fix`, `chore`, `documentation`)
+- [ ] **Local Testing**
+  - Successfully built all packages locally
+  - Succesffully run all test suites, all unit and integration tests pass
+- [ ] **Updated Tests**
+  - Unit and integration tests have been added that describe the bug that was fixed or the features that were added
+- [ ] Documentation
+  - All new environment variables added to `.env.schema` file and documented in the README
+  - All changes to server HTTP endpoints have open-api documentation
+  - All new functions exported from their module have TSDoc comment documentation
