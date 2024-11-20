@@ -17,27 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
-import { RouterProvider } from 'react-router-dom';
+import { Flex } from 'antd';
 
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
+// @description: Purpose of this wrapper is to endure all elements on the page is sized consistently and properly across pages and elements
+export const contentWrapperStyles: React.CSSProperties = {
+	marginInline: 'auto',
+	width: '90%',
+};
 
-import router from '@/pages/routes';
+const ContentWrapper = ({ children }: { children: React.ReactElement }) => {
+	return <Flex style={contentWrapperStyles}>{children}</Flex>;
+};
 
-function App() {
-	return (
-		<ThemeProvider>
-			<Flex>
-				<Layout style={{ minHeight: '100vh' }}>
-					<HeaderComponent />
-					<RouterProvider router={router} />
-					<FooterComponent />
-				</Layout>
-			</Flex>
-		</ThemeProvider>
-	);
-}
-
-export default App;
+export default ContentWrapper;

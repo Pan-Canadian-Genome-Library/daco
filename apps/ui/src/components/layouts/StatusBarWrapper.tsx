@@ -17,27 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
-import { RouterProvider } from 'react-router-dom';
+import { Flex, theme } from 'antd';
+import ContentWrapper from './ContentWrapper';
 
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
+const { useToken } = theme;
 
-import router from '@/pages/routes';
+const StatusBannerWrapperStyles: React.CSSProperties = {
+	paddingInline: '50px',
+	width: '100%',
+	minHeight: 300,
+};
 
-function App() {
+const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => {
+	const { token } = useToken();
+
 	return (
-		<ThemeProvider>
-			<Flex>
-				<Layout style={{ minHeight: '100vh' }}>
-					<HeaderComponent />
-					<RouterProvider router={router} />
-					<FooterComponent />
-				</Layout>
-			</Flex>
-		</ThemeProvider>
+		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorWhite }}>
+			<ContentWrapper>{children}</ContentWrapper>
+		</Flex>
 	);
-}
+};
 
-export default App;
+export default StatusBannerWrapper;

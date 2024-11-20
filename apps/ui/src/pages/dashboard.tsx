@@ -17,27 +17,31 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
-import { RouterProvider } from 'react-router-dom';
+import { Col, Flex, Layout } from 'antd';
 
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
+import ApplicationStatusBar from '@/components/ApplicationStatusBar';
+import ContentWrapper from '@/components/layouts/ContentWrapper';
+import NewApplicationCard from '@/components/NewApplicationCard';
 
-import router from '@/pages/routes';
+const { Content } = Layout;
 
-function App() {
+const DashboardPage = () => {
 	return (
-		<ThemeProvider>
-			<Flex>
-				<Layout style={{ minHeight: '100vh' }}>
-					<HeaderComponent />
-					<RouterProvider router={router} />
-					<FooterComponent />
-				</Layout>
+		<Content>
+			<Flex style={{ height: '100%' }} vertical>
+				<ApplicationStatusBar />
+				<Flex flex={1} align="center" justify="center">
+					<ContentWrapper>
+						<Flex style={{ width: '100%' }} justify="center" align="center">
+							<Col span={12}>
+								<NewApplicationCard />
+							</Col>
+						</Flex>
+					</ContentWrapper>
+				</Flex>
 			</Flex>
-		</ThemeProvider>
+		</Content>
 	);
-}
+};
 
-export default App;
+export default DashboardPage;
