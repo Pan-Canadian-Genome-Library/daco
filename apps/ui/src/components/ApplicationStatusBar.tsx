@@ -26,11 +26,11 @@ const { Text, Title } = Typography;
 const { useToken } = theme;
 
 // TODO: properly type and verify incoming data once API service is completed
-interface ApplicationStatusBarType {
-	expires_at?: string;
-}
+type ApplicationStatusBarProps = {
+	expiresAt?: string;
+};
 
-const ApplicationStatusBar = ({ expires_at }: ApplicationStatusBarType) => {
+const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 	const { token } = useToken();
 
 	return (
@@ -57,12 +57,12 @@ const ApplicationStatusBar = ({ expires_at }: ApplicationStatusBarType) => {
 							align="center"
 							gap={20}
 						>
-							{expires_at ? (
+							{expiresAt ? (
 								<>
 									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
 									<Flex vertical>
 										<Text strong>You have access to PCGL Controlled Data</Text>
-										<Text>Expires: {expires_at}</Text>
+										<Text>Expires: {expiresAt}</Text>
 									</Flex>
 								</>
 							) : (
