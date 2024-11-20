@@ -21,14 +21,10 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 // TODO: Fix Types package so we can import from main instead of specific file
 import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
-import { connectToDb } from './db/index.ts';
 
 export const port = process.env.PORT || 3000;
 
-const startServer = async (connectionString: string) => {
-	// TODO: Implement with service and routes
-	connectToDb(connectionString);
-
+const startServer = async () => {
 	const app = express();
 
 	app.get('/', (_req: Request, res: Response) => {

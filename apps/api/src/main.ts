@@ -18,6 +18,8 @@
  */
 
 import { connectionString } from '../drizzle.config.ts';
+import { connectToDb } from './db/index.ts';
 import startServer from './server.ts';
 
-startServer(connectionString);
+connectToDb(connectionString);
+startServer();
