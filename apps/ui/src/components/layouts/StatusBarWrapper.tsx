@@ -32,7 +32,7 @@ const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => 
 	const { token } = useToken();
 
 	return (
-		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorFillAlter }}>
+		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorWhite }}>
 			<ContentWrapper>{children}</ContentWrapper>
 		</Flex>
 	);
