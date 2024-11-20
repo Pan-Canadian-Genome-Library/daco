@@ -1,6 +1,6 @@
 // TODO: test data, subject to change
 
-interface ApplicationtType {
+export interface ApplicationtType {
 	applicationName: string;
 	applicationStatus: ApplicationStatus;
 	createdAt: Date;
