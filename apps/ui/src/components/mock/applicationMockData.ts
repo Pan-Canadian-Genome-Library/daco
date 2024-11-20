@@ -1,8 +1,8 @@
 // TODO: test data, subject to change
 
-interface ProjectType {
-	projectName: string;
-	projectStatus: ApplicationStatus;
+interface ApplicationtType {
+	applicationName: string;
+	applicationStatus: ApplicationStatus;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -20,34 +20,34 @@ enum ApplicationStatus {
 	Revoked = 'Revoked',
 }
 
-export const projects: ProjectType[] = [
+export const applications: ApplicationtType[] = [
 	{
-		projectName: 'PCGL-123',
-		projectStatus: ApplicationStatus.Draft,
+		applicationName: 'PCGL-123',
+		applicationStatus: ApplicationStatus.Draft,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 	},
 	{
-		projectName: 'PCGL-151',
-		projectStatus: ApplicationStatus.DACRevision,
+		applicationName: 'PCGL-151',
+		applicationStatus: ApplicationStatus.DACRevision,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 	},
 	{
-		projectName: 'PCGL-111',
-		projectStatus: ApplicationStatus.Approved,
+		applicationName: 'PCGL-111',
+		applicationStatus: ApplicationStatus.Approved,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 	},
 	{
-		projectName: 'PCGL-231',
-		projectStatus: ApplicationStatus.Rejected,
+		applicationName: 'PCGL-231',
+		applicationStatus: ApplicationStatus.Rejected,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 	},
 	{
-		projectName: 'PCGL-554',
-		projectStatus: ApplicationStatus.Closed,
+		applicationName: 'PCGL-554',
+		applicationStatus: ApplicationStatus.Closed,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 	},
