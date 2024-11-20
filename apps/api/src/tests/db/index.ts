@@ -23,7 +23,7 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
 
-import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
+import { connectToDb, initMigration, type PostgresDb } from '../../db/index.ts';
 import { actions } from '../../db/schemas/actions.ts';
 import { agreements } from '../../db/schemas/agreements.ts';
 import { applicationContents } from '../../db/schemas/applicationContents.ts';
@@ -40,7 +40,7 @@ describe('Postgres Database', () => {
 	before(async () => {
 		container = await new PostgreSqlContainer().start();
 		const connectionString = container.getConnectionUri();
-		db = startDb(connectionString);
+		db = connectToDb(connectionString);
 
 		await initMigration(db);
 	});

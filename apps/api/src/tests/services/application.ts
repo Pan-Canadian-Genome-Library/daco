@@ -23,7 +23,7 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
+import { connectToDb, initMigration, type PostgresDb } from '../../db/index.ts';
 import { applications } from '../../db/schemas/applications.ts';
 import service from '../../service/application-service.ts';
 
@@ -46,7 +46,7 @@ describe('Application Service', () => {
 			.start();
 
 		const connectionString = container.getConnectionUri();
-		db = startDb(connectionString);
+		db = connectToDb(connectionString);
 
 		await initMigration(db);
 

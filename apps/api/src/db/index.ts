@@ -28,7 +28,7 @@ const migrationsFolder = __dirname + '/../../drizzle';
 
 export type PostgresDb = ReturnType<typeof drizzle>;
 
-export const startDb = (connectionString: string): PostgresDb => {
+export const connectToDb = (connectionString: string): PostgresDb => {
 	try {
 		const db = drizzle(connectionString);
 		return db;
