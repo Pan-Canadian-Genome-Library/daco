@@ -21,6 +21,7 @@ import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import { eq } from 'drizzle-orm';
 
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { connectToDb, initMigration, type PostgresDb } from '../../db/index.ts';
@@ -183,14 +184,8 @@ describe('Application Service', () => {
 		assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
 	});
 
-	it('should delete applications with a given user_id', async () => {
-		const deletedRecords = await applicationService.deleteApplication({ user_id });
-
-		assert.ok(Array.isArray(deletedRecords));
-		assert.strictEqual(deletedRecords.length, 20);
-	});
-
 	after(async () => {
+		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});

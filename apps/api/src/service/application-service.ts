@@ -151,17 +151,6 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
-	deleteApplication: async ({ user_id }: { user_id: string }) => {
-		try {
-			const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
-
-			return deletedRecords;
-		} catch (err) {
-			console.error(`Error at createApplication with user_id: ${user_id}`);
-			console.error(err);
-			return null;
-		}
-	},
 });
 
 export default applicationService;
