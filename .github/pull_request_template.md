@@ -1,6 +1,8 @@
 <!-- PR Title Should match format:
 #{TicketNumber}: Description of Changes
 
+if no ticket number, use `chore:`, `fix:`, `feat:` etc.
+
 Example:
 #123: Add pagination to List Applications endpoint
 -->
@@ -43,10 +45,10 @@ EXAMPLE END -->
 
 ## PR Readiness Checklist
 
-- [ ] PR Title is properly formatted
+- [ ] I have performed a self review of code and manual testing of changes
+- [ ] Title is properly formatted: `#{TicketNumber}: Description of Changes`
 - [ ] Labels added to PR for service name (`api`, `ui`, etc...), type (`feature`, `chore`, `documentation`, etc...)
-- [ ] I have performed a self review of code and manual testing of feature
-- [ ] The code succesffully builds locally and passes all test suites
-- [ ] Unit and Integration tests have been updated to capture new features or bug behaviour
+- [ ] Unit and integration tests have been updated to capture new features or bug behaviour
+- [ ] The code successfully builds locally and passes all test suites
 - [ ] All new environment variables added to `.env.schema` files and documented in the README
-- [ ] All changes to server endpoints have open-api documentation
+- [ ] All changes to server HTTP endpoints have open-api documentation
