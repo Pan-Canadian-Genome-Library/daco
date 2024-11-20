@@ -17,31 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout } from 'antd';
+import { Button, Card, Flex, theme, Typography } from 'antd';
 
-import ApplicationStatusBar from '@/components/ApplicationStatusBar';
-import ContentWrapper from '@/components/layouts/ContentWrapper';
-import NewApplicationCard from '@/components/NewApplicationCard';
+const { Title } = Typography;
+const { useToken } = theme;
 
-const { Content } = Layout;
+const NewApplicationCard = () => {
+	const { token } = useToken();
 
-const DashboardPage = () => {
 	return (
-		<Content>
-			<Flex style={{ height: '100%' }} vertical>
-				<ApplicationStatusBar />
-				<Flex flex={1} align="center" justify="center">
-					<ContentWrapper>
-						<Flex style={{ width: '100%' }} justify="center" align="center">
-							<Col span={12}>
-								<NewApplicationCard />
-							</Col>
-						</Flex>
-					</ContentWrapper>
-				</Flex>
+		<Card style={{ backgroundColor: token.colorFillAlter, minHeight: 200 }}>
+			<Flex justify="center" align="center" vertical gap="middle">
+				<Title level={3}>Start A New Application</Title>
+				<Button color="default" variant="outlined">
+					Get Started
+				</Button>
 			</Flex>
-		</Content>
+		</Card>
 	);
 };
 
-export default DashboardPage;
+export default NewApplicationCard;

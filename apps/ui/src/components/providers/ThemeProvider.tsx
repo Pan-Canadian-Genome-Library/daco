@@ -46,6 +46,8 @@ const pcglTheme: ThemeConfig = {
 	components: {
 		Button: {
 			fontWeight: 700,
+			defaultColor: '#000000',
+			defaultBg: '#ffffff',
 		},
 		Typography: {
 			fontSize: 16,
