@@ -31,24 +31,27 @@ const applicationService = (db: PostgresDb) => ({
 		};
 
 		try {
-			const newApplicationRecord = await db.insert(applications).values(newApplication).returning();
-			const { id } = newApplicationRecord[0];
+			const application = await db.transaction(async (transaction) => {
+				const newApplicationRecord = await transaction.insert(applications).values(newApplication).returning();
+				const { id } = newApplicationRecord[0];
 
-			const newAppContents: typeof applicationContents.$inferInsert = {
-				application_id: id,
-				created_at: new Date(),
-				updated_at: new Date(),
-			};
-			const newAppContentsRecord = await db.insert(applicationContents).values(newAppContents).returning();
-			const { id: contentsId } = newAppContentsRecord[0];
+				const newAppContents: typeof applicationContents.$inferInsert = {
+					application_id: id,
+					created_at: new Date(),
+					updated_at: new Date(),
+				};
+				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
+				const { id: contentsId } = newAppContentsRecord[0];
 
-			const application = await db
-				.update(applications)
-				.set({ contents: contentsId })
-				.where(eq(applications.id, id))
-				.returning();
+				const application = await transaction
+					.update(applications)
+					.set({ contents: contentsId })
+					.where(eq(applications.id, id))
+					.returning();
 
-			return application[0];
+				return application[0];
+			});
+			return application;
 		} catch (err) {
 			console.error(`Error at createApplication with user_id: ${user_id}`);
 			console.error(err);
