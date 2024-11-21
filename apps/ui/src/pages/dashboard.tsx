@@ -19,9 +19,9 @@
 
 import { Col, Flex, Layout, Row } from 'antd';
 
-import ApplicationCard from '@/components/ApplicationCard';
 import ApplicationStatusBar from '@/components/ApplicationStatusBar';
-import NewApplicationCard from '@/components/NewApplicationCard';
+import ApplicationCard from '@/components/cards/ApplicationCard';
+import NewApplicationCard from '@/components/cards/NewApplicationCard';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import { applications } from '@/components/mock/applicationMockData';
 
