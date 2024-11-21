@@ -25,8 +25,17 @@ export const contentWrapperStyles: React.CSSProperties = {
 	width: '90%',
 };
 
-const ContentWrapper = ({ children }: { children: React.ReactElement }) => {
-	return <Flex style={contentWrapperStyles}>{children}</Flex>;
+type ContentWrapperProps = {
+	style?: React.CSSProperties;
+	children: React.ReactElement;
+};
+
+const ContentWrapper = ({ style, children }: ContentWrapperProps) => {
+	return (
+		<Flex style={{ ...contentWrapperStyles, ...style }} flex={1} justify="center">
+			{children}
+		</Flex>
+	);
 };
 
 export default ContentWrapper;
