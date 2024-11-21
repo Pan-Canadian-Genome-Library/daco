@@ -48,8 +48,9 @@ EXAMPLE END -->
 - [ ] **Self Review**
   - I have performed a self review of code
   - I have run the application locally and manually tested the feature
-- [ ] **Title Format**
+- [ ] **PR Format**
   - The PR title is properly formatted to match the pattern: `#{TicketNumber}: Description of Changes`
+  - Links are included to all relevant tickets
 - [ ] **Labels Added**
   - Label is added for each package/app that is modified (`api`, `ui`, `data-model`, etc.)
   - Label is added for the type of work done in this PR (`feature`, `fix`, `chore`, `documentation`)
