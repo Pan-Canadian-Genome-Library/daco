@@ -32,30 +32,28 @@ const DashboardPage = () => {
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
 				<ApplicationStatusBar />
-				<Flex flex={1} align="center" justify="center">
-					<ContentWrapper>
-						<Flex style={{ width: '100%' }} justify="center" align="center">
-							{applications.length > 0 ? (
-								<Row style={{ width: '100%' }} gutter={[48, 48]}>
-									<Col span={12}>
-										<NewApplicationCard />
-									</Col>
-									{applications.map((applicationItem) => {
-										return (
-											<Col key={applicationItem.applicationName} span={12}>
-												<ApplicationCard {...applicationItem} />
-											</Col>
-										);
-									})}
-								</Row>
-							) : (
+				<ContentWrapper style={{ padding: 40 }}>
+					<Row style={{ width: '100%' }} gutter={[48, 48]} align={'middle'} justify={'center'}>
+						{applications.length > 0 ? (
+							<>
 								<Col span={12}>
 									<NewApplicationCard />
 								</Col>
-							)}
-						</Flex>
-					</ContentWrapper>
-				</Flex>
+								{applications.map((applicationItem) => {
+									return (
+										<Col key={applicationItem.applicationName} span={12}>
+											<ApplicationCard {...applicationItem} />
+										</Col>
+									);
+								})}
+							</>
+						) : (
+							<Col span={12}>
+								<NewApplicationCard />
+							</Col>
+						)}
+					</Row>
+				</ContentWrapper>
 			</Flex>
 		</Content>
 	);
