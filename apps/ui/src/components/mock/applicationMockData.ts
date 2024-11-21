@@ -7,7 +7,7 @@ export interface ApplicationtType {
 	updatedAt: Date;
 }
 
-enum ApplicationStatus {
+export enum ApplicationStatus {
 	Draft = 'Draft',
 	RepReview = 'Rep Review',
 	DACReview = 'DAC Review',
