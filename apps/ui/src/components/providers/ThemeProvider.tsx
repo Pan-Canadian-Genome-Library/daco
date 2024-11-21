@@ -19,22 +19,55 @@
 
 import { ConfigProvider, ThemeConfig } from 'antd';
 
+const pcglColors = {
+	// Main Colors
+	primary: '#C41D7F',
+	secondary: '#520339',
+	tertiary: '#FFF0F6',
+	quaternary: '#FFD6E7',
+
+	errorPrimary: '#FF4D4F',
+	errorSecondary: '#FFCCC7',
+
+	warningPrimary: '#FAAD14',
+	warningSecondary: '#FFFFB8',
+
+	successPrimary: '#52C41A',
+	successSecondary: '#D9F7BE',
+
+	white: '#FFFFFF',
+	black: '#000000',
+};
+
 // General Theme Configurations
 const pcglTheme: ThemeConfig = {
 	token: {
 		fontFamily:
 			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
-		colorPrimary: '#C41D7F',
-		colorBgContainer: '#FFF0F6',
-		colorFillSecondary: '#520339',
-		colorWarning: '#FADB14',
-		colorSuccess: '#73D13D',
-		colorLink: '#C41D7F',
-		colorTextSecondary: '#ffffff',
+
+		colorPrimary: pcglColors.primary,
+		colorFillAlter: pcglColors.white,
+		colorFillSecondary: pcglColors.secondary,
+		colorBgContainer: pcglColors.tertiary,
+
+		// States
+		colorSuccess: pcglColors.successPrimary,
+		colorWarning: pcglColors.warningPrimary,
+		colorError: pcglColors.errorPrimary,
+
+		// Link styles
+		colorLink: pcglColors.primary,
+
+		// Text Styles
+		colorTextSecondary: pcglColors.white,
+
+		colorIcon: pcglColors.primary,
 	},
 	components: {
 		Button: {
 			fontWeight: 700,
+			defaultColor: pcglColors.black,
+			defaultBg: pcglColors.white,
 		},
 		Typography: {
 			fontSize: 16,
@@ -46,13 +79,13 @@ const pcglTheme: ThemeConfig = {
 export const pcglHeaderTheme: ThemeConfig = {
 	...pcglTheme,
 	token: {
-		colorLink: '#000000',
+		colorLink: pcglColors.black,
 		colorLinkHover: 'rgba(0,0,0,0.5)',
-		colorBgContainer: '#FFFFFF',
+		colorBgContainer: pcglColors.white,
 	},
 	components: {
 		Layout: {
-			headerBg: '#FFFFFF',
+			headerBg: pcglColors.white,
 		},
 	},
 };
@@ -61,11 +94,11 @@ export const pcglHeaderTheme: ThemeConfig = {
 export const pcglFooterTheme: ThemeConfig = {
 	components: {
 		Layout: {
-			footerBg: '#520339',
+			footerBg: pcglColors.secondary,
 		},
 		Typography: {
-			colorText: '#FFFFFF',
-			colorLink: '#FFD6E7',
+			colorText: pcglColors.white,
+			colorLink: pcglColors.quaternary,
 			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
 		},
 	},

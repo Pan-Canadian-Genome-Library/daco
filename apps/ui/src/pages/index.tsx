@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, Flex, Layout, Typography, theme } from 'antd';
 
@@ -25,14 +26,13 @@ const { Title, Paragraph, Link, Text } = Typography;
 const { useToken } = theme;
 
 const heroStyle: React.CSSProperties = {
-	width: '80%',
-	marginInline: 'auto',
+	...contentWrapperStyles,
 	minHeight: 400,
 	paddingBottom: 50,
 	paddingTop: 50,
 };
 
-export const HomePage = () => {
+const HomePage = () => {
 	const { token } = useToken();
 
 	return (
@@ -119,3 +119,5 @@ export const HomePage = () => {
 		</Content>
 	);
 };
+
+export default HomePage;

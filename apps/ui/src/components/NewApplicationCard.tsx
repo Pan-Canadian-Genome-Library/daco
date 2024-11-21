@@ -17,27 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
-import { RouterProvider } from 'react-router-dom';
+import { Button, Card, Flex, theme, Typography } from 'antd';
 
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
+const { Title } = Typography;
+const { useToken } = theme;
 
-import router from '@/pages/routes';
+const NewApplicationCard = () => {
+	const { token } = useToken();
 
-function App() {
 	return (
-		<ThemeProvider>
-			<Flex>
-				<Layout style={{ minHeight: '100vh' }}>
-					<HeaderComponent />
-					<RouterProvider router={router} />
-					<FooterComponent />
-				</Layout>
+		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }}>
+			<Flex justify="center" align="center" vertical gap="middle">
+				<Title level={3}>Start A New Application</Title>
+				<Button color="default" variant="outlined">
+					Get Started
+				</Button>
 			</Flex>
-		</ThemeProvider>
+		</Card>
 	);
-}
+};
 
-export default App;
+export default NewApplicationCard;
