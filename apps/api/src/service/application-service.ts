@@ -17,28 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { type PostgresDb } from '../db/index.ts';
 import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
-
-type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
-type ApplicationsColumnName = keyof typeof applications.$inferSelect;
-type OrderBy<Key extends string> = {
-	direction: 'asc' | 'desc';
-	column: Key;
-};
-
-const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
-			)
-		: [asc(applications.created_at)];
-
-	return orderByArguments;
-};
+import { ApplicationsColumnName, ApplicationUpdates, OrderBy } from './types.ts';
+import { sortQuery } from './utils.ts';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
