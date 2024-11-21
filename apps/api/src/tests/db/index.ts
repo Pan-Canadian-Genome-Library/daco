@@ -31,6 +31,8 @@ import { collaborators } from '../../db/schemas/collaborators.ts';
 import { files } from '../../db/schemas/files.ts';
 import { revisionRequests } from '../../db/schemas/revisionRequests.ts';
 
+import { PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.ts';
+
 describe('Postgres Database', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
@@ -38,8 +40,14 @@ describe('Postgres Database', () => {
 	const user_id = 'testUser@oicr.on.ca';
 
 	before(async () => {
-		container = await new PostgreSqlContainer().start();
+		container = await new PostgreSqlContainer()
+			.withUsername(PG_USER)
+			.withPassword(PG_PASSWORD)
+			.withDatabase(PG_DATABASE)
+			.start();
+
 		const connectionString = container.getConnectionUri();
+
 		db = connectToDb(connectionString);
 
 		await initMigration(db);

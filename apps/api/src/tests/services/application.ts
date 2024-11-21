@@ -28,9 +28,7 @@ import { connectToDb, initMigration, type PostgresDb } from '../../db/index.ts';
 import { applications } from '../../db/schemas/applications.ts';
 import service from '../../service/application-service.ts';
 
-const PG_DATABASE = process.env.PG_DATABASE || 'testUser';
-const PG_USER = process.env.PG_USER || 'testPassword';
-const PG_PASSWORD = process.env.PG_PASSWORD || 'postgres';
+import { PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.ts';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
