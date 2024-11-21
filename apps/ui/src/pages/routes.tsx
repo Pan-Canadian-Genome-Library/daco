@@ -17,25 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, theme } from 'antd';
-import ContentWrapper from './ContentWrapper';
+import { createBrowserRouter } from 'react-router-dom';
 
-const { useToken } = theme;
+import DashboardPage from '@/pages/dashboard';
+import HomePage from '@/pages/index';
 
-const StatusBannerWrapperStyles: React.CSSProperties = {
-	paddingInline: '50px',
-	width: '100%',
-	minHeight: 300,
-};
+const router = createBrowserRouter([
+	{
+		path: '/',
+		element: <HomePage />,
+	},
+	{
+		path: '/dashboard',
+		element: <DashboardPage />,
+	},
+]);
 
-const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => {
-	const { token } = useToken();
-
-	return (
-		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorWhite }}>
-			<ContentWrapper>{children}</ContentWrapper>
-		</Flex>
-	);
-};
-
-export default StatusBannerWrapper;
+export default router;

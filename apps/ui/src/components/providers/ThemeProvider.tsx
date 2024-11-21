@@ -19,35 +19,55 @@
 
 import { ConfigProvider, ThemeConfig } from 'antd';
 
+const pcglColors = {
+	// Main Colors
+	primary: '#C41D7F',
+	secondary: '#520339',
+	tertiary: '#FFF0F6',
+	quaternary: '#FFD6E7',
+
+	errorPrimary: '#FF4D4F',
+	errorSecondary: '#FFCCC7',
+
+	warningPrimary: '#FAAD14',
+	warningSecondary: '#FFFFB8',
+
+	successPrimary: '#52C41A',
+	successSecondary: '#D9F7BE',
+
+	white: '#FFFFFF',
+	black: '#000000',
+};
+
 // General Theme Configurations
 const pcglTheme: ThemeConfig = {
 	token: {
 		fontFamily:
 			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 
-		colorPrimary: '#C41D7F',
-		colorFillAlter: '#FFFFFF',
-		colorFillSecondary: '#520339',
-		colorBgContainer: '#FFF0F6',
+		colorPrimary: pcglColors.primary,
+		colorFillAlter: pcglColors.white,
+		colorFillSecondary: pcglColors.secondary,
+		colorBgContainer: pcglColors.tertiary,
 
 		// States
-		colorSuccess: '#52C41A',
-		colorWarning: '#FAAD14',
-		colorError: '#FF4D4F',
+		colorSuccess: pcglColors.successPrimary,
+		colorWarning: pcglColors.warningPrimary,
+		colorError: pcglColors.errorPrimary,
 
 		// Link styles
-		colorLink: '#C41D7F',
+		colorLink: pcglColors.primary,
 
 		// Text Styles
-		colorTextSecondary: '#ffffff',
+		colorTextSecondary: pcglColors.white,
 
-		colorIcon: '#C41D7F',
+		colorIcon: pcglColors.primary,
 	},
 	components: {
 		Button: {
 			fontWeight: 700,
-			defaultColor: '#000000',
-			defaultBg: '#ffffff',
+			defaultColor: pcglColors.black,
+			defaultBg: pcglColors.white,
 		},
 		Typography: {
 			fontSize: 16,
@@ -59,13 +79,13 @@ const pcglTheme: ThemeConfig = {
 export const pcglHeaderTheme: ThemeConfig = {
 	...pcglTheme,
 	token: {
-		colorLink: '#000000',
+		colorLink: pcglColors.black,
 		colorLinkHover: 'rgba(0,0,0,0.5)',
-		colorBgContainer: '#FFFFFF',
+		colorBgContainer: pcglColors.white,
 	},
 	components: {
 		Layout: {
-			headerBg: '#FFFFFF',
+			headerBg: pcglColors.white,
 		},
 	},
 };
@@ -74,11 +94,11 @@ export const pcglHeaderTheme: ThemeConfig = {
 export const pcglFooterTheme: ThemeConfig = {
 	components: {
 		Layout: {
-			footerBg: '#520339',
+			footerBg: pcglColors.secondary,
 		},
 		Typography: {
-			colorText: '#FFFFFF',
-			colorLink: '#FFD6E7',
+			colorText: pcglColors.white,
+			colorLink: pcglColors.quaternary,
 			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
 		},
 	},

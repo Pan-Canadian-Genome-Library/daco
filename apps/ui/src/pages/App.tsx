@@ -18,25 +18,13 @@
  */
 
 import { Flex, Layout } from 'antd';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 
 import FooterComponent from '@/components/Footer';
 import HeaderComponent from '@/components/Header';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
-
-export const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <HomePage />,
-	},
-	{
-		path: '/dashboard',
-		element: <DashboardPage />,
-	},
-]);
+import router from '@/pages/routes';
 
 function App() {
 	return (

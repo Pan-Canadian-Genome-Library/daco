@@ -18,7 +18,7 @@
  */
 
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
-import { Col, Flex, Typography, theme } from 'antd';
+import { Col, Flex, Row, Typography, theme } from 'antd';
 
 import StatusBarWrapper from '@/components/layouts/StatusBarWrapper';
 
@@ -26,16 +26,16 @@ const { Text, Title } = Typography;
 const { useToken } = theme;
 
 // TODO: properly type and verify incoming data once API service is completed
-interface ApplicationStatusBarType {
-	expireDate?: string;
-}
+type ApplicationStatusBarProps = {
+	expiresAt?: string;
+};
 
-const ApplicationStatusBar = ({ expireDate }: ApplicationStatusBarType) => {
+const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 	const { token } = useToken();
 
 	return (
 		<StatusBarWrapper>
-			<>
+			<Row style={{ width: '100%' }}>
 				<Col span={12}>
 					<Flex style={{ height: '100%' }} vertical justify="center">
 						<Title>My Applications</Title>
@@ -57,12 +57,12 @@ const ApplicationStatusBar = ({ expireDate }: ApplicationStatusBarType) => {
 							align="center"
 							gap={20}
 						>
-							{expireDate ? (
+							{expiresAt ? (
 								<>
 									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
 									<Flex vertical>
 										<Text strong>You have access to PCGL Controlled Data</Text>
-										<Text>Expires: {expireDate}</Text>
+										<Text>Expires: {expiresAt}</Text>
 									</Flex>
 								</>
 							) : (
@@ -74,7 +74,7 @@ const ApplicationStatusBar = ({ expireDate }: ApplicationStatusBarType) => {
 						</Flex>
 					</Flex>
 				</Col>
-			</>
+			</Row>
 		</StatusBarWrapper>
 	);
 };
