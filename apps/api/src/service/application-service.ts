@@ -23,6 +23,8 @@ import { type PostgresDb } from '../db/index.ts';
 import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
 
+type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
 		const newApplication: typeof applications.$inferInsert = {
@@ -58,7 +60,7 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
-	findOneAndUpdate: async ({ id, update }: { id: number; update: any }) => {
+	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
 		try {
 			const application = await db
 				.update(applications)
