@@ -17,6 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+import { type PostgresDb } from '../db/index.ts';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export const PG_DATABASE = 'testUser';
 export const PG_USER = 'testPassword';
 export const PG_PASSWORD = 'postgres';
+
+const migrationsFolder = __dirname + '/../../drizzle';
+
+export const initTestMigration = async (db: PostgresDb) => {
+	try {
+		await migrate(db, { migrationsFolder });
+	} catch (err) {
+		console.log('Error Migrating on Database startup');
+		console.log(err);
+		throw err;
+	}
+};

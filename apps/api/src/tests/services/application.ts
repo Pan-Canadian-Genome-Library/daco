@@ -24,11 +24,11 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { eq } from 'drizzle-orm';
 
 import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { connectToDb, initMigration, type PostgresDb } from '../../db/index.ts';
+import { connectToDb, type PostgresDb } from '../../db/index.ts';
 import { applications } from '../../db/schemas/applications.ts';
 import service from '../../service/application-service.ts';
 
-import { PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.ts';
+import { initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.ts';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
@@ -47,7 +47,7 @@ describe('Application Service', () => {
 		const connectionString = container.getConnectionUri();
 		db = connectToDb(connectionString);
 
-		await initMigration(db);
+		await initTestMigration(db);
 
 		applicationService = service(db);
 		// TODO: create file with seed data for postgres to test read actions
