@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout } from 'antd';
+import { Col, Flex, Layout, Row } from 'antd';
 
+import ApplicationCard from '@/components/ApplicationCard';
 import ApplicationStatusBar from '@/components/ApplicationStatusBar';
-import ContentWrapper from '@/components/layouts/ContentWrapper';
 import NewApplicationCard from '@/components/NewApplicationCard';
+import ContentWrapper from '@/components/layouts/ContentWrapper';
+import { applications } from '@/components/mock/applicationMockData';
 
 const { Content } = Layout;
 
@@ -33,9 +35,24 @@ const DashboardPage = () => {
 				<Flex flex={1} align="center" justify="center">
 					<ContentWrapper>
 						<Flex style={{ width: '100%' }} justify="center" align="center">
-							<Col span={12}>
-								<NewApplicationCard />
-							</Col>
+							{applications.length > 0 ? (
+								<Row style={{ width: '100%' }} gutter={[48, 48]}>
+									<Col span={12}>
+										<NewApplicationCard />
+									</Col>
+									{applications.map((applicationItem) => {
+										return (
+											<Col span={12}>
+												<ApplicationCard {...applicationItem} />
+											</Col>
+										);
+									})}
+								</Row>
+							) : (
+								<Col span={12}>
+									<NewApplicationCard />
+								</Col>
+							)}
 						</Flex>
 					</ContentWrapper>
 				</Flex>
