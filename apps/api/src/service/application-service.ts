@@ -24,6 +24,21 @@ import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
 
 type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+type ApplicationsColumnName = keyof typeof applications.$inferSelect;
+type OrderBy<Key extends string> = {
+	direction: 'asc' | 'desc';
+	column: Key;
+};
+
+const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
+	const orderByArguments = sort
+		? sort.map((sortBy) =>
+				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
+			)
+		: [asc(applications.created_at)];
+
+	return orderByArguments;
+};
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -98,37 +113,16 @@ const applicationService = (db: PostgresDb) => ({
 	listApplications: async ({
 		user_id,
 		state,
-		sort = '',
+		sort = [],
 		page = 0,
 		pageSize = 20,
 	}: {
 		user_id?: string;
 		state?: ApplicationStates;
-		sort?: string;
+		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
 	}) => {
-		const isDescending = sort?.charAt(0) === '-';
-		const sortValue = isDescending ? sort.substring(1) : sort;
-		const sortFunction = isDescending ? desc : asc;
-
-		let sortKey;
-
-		switch (sortValue) {
-			case 'updated_at':
-				sortKey = applications.updated_at;
-				break;
-			case 'state':
-				sortKey = applications.state;
-				break;
-			case 'created_at':
-			default:
-				sortKey = applications.created_at;
-				break;
-		}
-
-		const sortQuery = sortFunction(sortKey);
-
 		try {
 			const allApplications = await db
 				.select({
@@ -145,7 +139,7 @@ const applicationService = (db: PostgresDb) => ({
 						state ? eq(applications.state, state) : undefined,
 					),
 				)
-				.orderBy(sortQuery)
+				.orderBy(...sortQuery(sort))
 				.offset(page * pageSize)
 				.limit(pageSize);
 

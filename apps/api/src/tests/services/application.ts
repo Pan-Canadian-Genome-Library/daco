@@ -117,7 +117,14 @@ describe('Application Service', () => {
 		});
 
 		it('should allow sorting records by created_at', async () => {
-			const applicationRecords = await applicationService.listApplications({ sort: 'created_at' });
+			const applicationRecords = await applicationService.listApplications({
+				sort: [
+					{
+						direction: 'asc',
+						column: 'created_at',
+					},
+				],
+			});
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
@@ -159,7 +166,14 @@ describe('Application Service', () => {
 		});
 
 		it('should allow sorting records by state', async () => {
-			const applicationRecords = await applicationService.listApplications({ sort: 'state' });
+			const applicationRecords = await applicationService.listApplications({
+				sort: [
+					{
+						direction: 'asc',
+						column: 'state',
+					},
+				],
+			});
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
@@ -173,7 +187,14 @@ describe('Application Service', () => {
 		});
 
 		it('should allow record pagination', async () => {
-			const applicationRecords = await applicationService.listApplications({ sort: 'state' });
+			const applicationRecords = await applicationService.listApplications({
+				sort: [
+					{
+						direction: 'asc',
+						column: 'state',
+					},
+				],
+			});
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
