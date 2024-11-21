@@ -22,7 +22,7 @@ import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { type PostgresDb } from '../db/index.ts';
 import { applicationContents } from '../db/schemas/applicationContents.ts';
 import { applications } from '../db/schemas/applications.ts';
-import { ApplicationsColumnName, ApplicationUpdates, OrderBy } from './types.ts';
+import { type ApplicationsColumnName, type ApplicationUpdates, type OrderBy } from './types.ts';
 import { sortQuery } from './utils.ts';
 
 const applicationService = (db: PostgresDb) => ({
