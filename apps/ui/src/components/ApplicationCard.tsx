@@ -17,19 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Card, Flex, theme, Typography } from 'antd';
+import { Button, Card, Flex, theme, Typography } from 'antd';
 
 import { ApplicationtType } from '@/components/mock/applicationMockData';
 
 const { Title } = Typography;
 const { useToken } = theme;
 
-const ApplicationCard = ({ applicationName }: ApplicationtType) => {
+const ApplicationCard = ({ applicationName, applicationStatus }: ApplicationtType) => {
 	const { token } = useToken();
 
 	return (
 		<Card style={{ backgroundColor: token.colorFillAlter, minHeight: 200 }}>
 			<Flex vertical gap="middle">
+				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
+					<Flex align="center">
+						<Flex style={{ padding: 10, minWidth: 200 }} align="center" justify="center">
+							{applicationStatus}
+						</Flex>
+						Action required
+					</Flex>
+					<Flex flex={1} justify="flex-end" align="center">
+						<Button>Edit</Button>
+					</Flex>
+				</Flex>
 				<Title level={3}>Application: {applicationName}</Title>
 			</Flex>
 		</Card>
