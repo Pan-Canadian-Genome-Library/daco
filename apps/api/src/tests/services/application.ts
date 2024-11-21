@@ -57,26 +57,45 @@ describe('Application Service', () => {
 		// https://orm.drizzle.team/docs/kit-seed-data
 	});
 
-	it('should create applications with status DRAFT and submitted user_id', async () => {
-		const application = await applicationService.createApplication({ user_id });
+	describe('Create Applications', () => {
+		it('should create applications with status DRAFT and submitted user_id', async () => {
+			const application = await applicationService.createApplication({ user_id });
 
-		assert.notEqual(application, null);
-		assert.strictEqual(application?.user_id, user_id);
-		assert.strictEqual(application?.state, ApplicationStates.DRAFT);
+			assert.notEqual(application, null);
+			assert.strictEqual(application?.user_id, user_id);
+			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
+		});
 	});
 
-	it('should get applications requested by id, with application_contents', async () => {
-		const applicationRecords = await applicationService.listApplications({ user_id });
+	describe('Get Applications', () => {
+		it('should get applications requested by id, with application_contents', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
 
-		assert.ok(Array.isArray(applicationRecords));
+			assert.ok(Array.isArray(applicationRecords));
 
-		const { id } = applicationRecords[0];
+			const { id } = applicationRecords[0];
 
-		const requestedApplication = await applicationService.getApplicationById({ id });
+			const requestedApplication = await applicationService.getApplicationById({ id });
 
-		assert.notEqual(requestedApplication, null);
-		assert.strictEqual(requestedApplication?.id, id);
-		assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
+			assert.notEqual(requestedApplication, null);
+			assert.strictEqual(requestedApplication?.id, id);
+			assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
+		});
+	});
+
+	describe('FindOneAndUpdate Application', () => {
+		it('should populate updated_at field', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
+			assert.ok(Array.isArray(applicationRecords));
+
+			const { id } = applicationRecords[0];
+			await applicationService.findOneAndUpdate({ id, update: {} });
+
+			const updatedApplication = await applicationService.getApplicationById({ id });
+
+			assert.notEqual(updatedApplication, null);
+			assert.ok(!!updatedApplication?.updated_at);
+		});
 	});
 
 	describe('List Applications', () => {
