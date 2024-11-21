@@ -19,7 +19,7 @@
 
 import { Flex } from 'antd';
 
-// @description: Purpose of this wrapper is to endure all elements on the page is sized consistently and properly across pages and elements
+// @description: Purpose of this wrapper is to ensure all elements on the page is sized consistently and properly across pages and elements
 export const contentWrapperStyles: React.CSSProperties = {
 	marginInline: 'auto',
 	width: '90%',
