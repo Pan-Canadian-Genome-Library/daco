@@ -89,7 +89,7 @@ const FooterComponent = () => {
 							))}
 						</Flex>
 						<Text style={textStyle}>
-							© 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
+							© 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
 						</Text>
 						<Flex gap={20} justify="center" align="center">
 							{policiesConditionsLinks.map((itemLink) => (
