@@ -105,6 +105,9 @@ describe('Application Service', () => {
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
+			assert.strictEqual(applicationRecords[0].user_id, user_id);
+			assert.strictEqual(applicationRecords[1].user_id, user_id);
+			assert.strictEqual(applicationRecords[2].user_id, user_id);
 		});
 
 		it('should filter by state', async () => {
@@ -112,6 +115,9 @@ describe('Application Service', () => {
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.strictEqual(applicationRecords.length, 3);
+			assert.strictEqual(applicationRecords[0].state, ApplicationStates.DRAFT);
+			assert.strictEqual(applicationRecords[1].state, ApplicationStates.DRAFT);
+			assert.strictEqual(applicationRecords[2].state, ApplicationStates.DRAFT);
 		});
 
 		it('should allow sorting records by created_at', async () => {
