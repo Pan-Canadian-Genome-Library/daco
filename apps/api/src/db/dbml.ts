@@ -17,18 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { pgGenerate } from 'drizzle-dbml-generator'; // Using Postgres for this example
+import * as schema from '../../drizzle/schema.ts';
 
-export type PostgresDb = ReturnType<typeof drizzle>;
+const out = './src/db/schema.dbml';
+const relational = true;
 
-export const connectToDb = (connectionString: string): PostgresDb => {
-	try {
-		const db = drizzle(connectionString);
+pgGenerate({ schema, out, relational });
 
-		return db;
-	} catch (err) {
-		console.log('Error on Database startup');
-		console.log(err);
-		throw err;
-	}
-};
+console.log(`Schema DBML Generated at ${out}`);
