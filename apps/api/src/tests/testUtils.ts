@@ -17,19 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { eq } from 'drizzle-orm';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { dirname } from 'path';
+import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { fileURLToPath } from 'url';
 
 import { type PostgresDb } from '../db/index.ts';
+import { applicationContents } from '../db/schemas/applicationContents.ts';
+import { applications } from '../db/schemas/applications.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
+export const testUserId = 'testUser@oicr.on.ca';
 export const PG_DATABASE = 'testUser';
 export const PG_USER = 'testPassword';
 export const PG_PASSWORD = 'postgres';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const migrationsFolder = __dirname + '/../../drizzle';
 
 export const initTestMigration = async (db: PostgresDb) => {
@@ -39,5 +43,41 @@ export const initTestMigration = async (db: PostgresDb) => {
 		console.log('Error Migrating on Database startup');
 		console.log(err);
 		throw err;
+	}
+};
+
+export const addInitialDonors = async (db: PostgresDb) => {
+	const newApplication: typeof applications.$inferInsert = {
+		user_id: testUserId,
+		state: ApplicationStates.DRAFT,
+	};
+
+	// Create 3 Initial Applications w/ Contents
+	for (let i = 0; i < 3; i++) {
+		const newRecord = await db.insert(applications).values(newApplication).returning();
+
+		const { id } = newRecord[0];
+
+		const newAppContents: typeof applicationContents.$inferInsert = {
+			application_id: id,
+			created_at: new Date(),
+			updated_at: new Date(),
+		};
+		const newAppContentsRecord = await db.insert(applicationContents).values(newAppContents).returning();
+		const { id: contentsId } = newAppContentsRecord[0];
+
+		await db.update(applications).set({ contents: contentsId }).where(eq(applications.id, id));
+	}
+};
+
+export const addPaginationDonors = async (db: PostgresDb) => {
+	const newApplication: typeof applications.$inferInsert = {
+		user_id: testUserId,
+		state: ApplicationStates.DRAFT,
+	};
+
+	// Create additional 20 Applications to test paginated results
+	for (let i = 0; i < 20; i++) {
+		await db.insert(applications).values(newApplication);
 	}
 };
