@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createMachine } from 'xstate';
+import { createActor, createMachine } from 'xstate';
 import { ApplicationStates } from '../../../packages/data-model/src/types.ts';
 
 const {
@@ -71,3 +71,5 @@ export const applicationStateMachine = createMachine({
 		},
 	},
 });
+
+export const applicationStateActor = createActor(applicationStateMachine);
