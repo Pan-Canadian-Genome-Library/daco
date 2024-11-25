@@ -17,37 +17,57 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applicationContents } from './applicationContents.ts';
-// TODO: Integrate w/ TS
-// import { ApplicationStates } from 'pcgl-daco/packages/data-model';
+import { createMachine } from 'xstate';
+import { ApplicationStates } from '../../../packages/data-model/src/types.ts';
 
-export const applicationStatesEnum = pgEnum('application_states', [
-	'DRAFT',
-	'INSTITUTIONAL_REP_REVIEW',
-	'REP_REVISION',
-	'DAC_REVIEW',
-	'DAC_REVISIONS_REQUESTED',
-	'REJECTED',
-	'APPROVED',
-	'CLOSED',
-	'REVOKED',
-]);
+const {
+	DRAFT,
+	INSTITUTIONAL_REP_REVIEW,
+	REP_REVISION,
+	DAC_REVIEW,
+	DAC_REVISIONS_REQUESTED,
+	REJECTED,
+	APPROVED,
+	CLOSED,
+	REVOKED,
+} = ApplicationStates;
 
-export const applications = pgTable('applications', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	user_id: varchar({ length: 100 }).notNull(),
-	state: applicationStatesEnum().notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	approved_at: timestamp(),
-	expires_at: timestamp(),
-	contents: bigint({ mode: 'number' }),
+export const applicationStateMachine = createMachine({
+	id: 'applicationState',
+	initial: 'DRAFT',
+	states: {
+		DRAFT: {
+			on: { submit: 'INSTITUTIONAL_REP_REVIEW', close: 'CLOSED' },
+		},
+		INSTITUTIONAL_REP_REVIEW: {
+			on: { close: 'CLOSED', edit: 'DRAFT', revision_request: 'REP_REVISION', submit: 'DAC_REVIEW' },
+		},
+		REP_REVISION: {
+			on: { submit: 'INSTITUTIONAL_REP_REVIEW' },
+		},
+		DAC_REVIEW: {
+			on: {
+				approve: 'APPROVED',
+				close: 'CLOSED',
+				edit: 'DRAFT',
+				revision_request: 'DAC_REVISIONS_REQUESTED',
+				reject: 'REJECTED',
+			},
+		},
+		DAC_REVISIONS_REQUESTED: {
+			on: { submit: 'DAC_REVIEW' },
+		},
+		REJECTED: {
+			on: {},
+		},
+		APPROVED: {
+			on: { revoked: 'REVOKED' },
+		},
+		CLOSED: {
+			on: {},
+		},
+		REVOKED: {
+			on: {},
+		},
+	},
 });
-
-export const applicationsRelations = relations(applications, ({ one }) => ({
-	application_contents: one(applicationContents, {
-		fields: [applications.contents],
-		references: [applicationContents.id],
-	}),
-}));

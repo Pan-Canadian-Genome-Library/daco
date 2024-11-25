@@ -21,6 +21,7 @@ import assert from 'node:assert';
 import { after, describe, it } from 'node:test';
 
 import { port } from '../main.ts';
+import { applicationStateMachine } from '../states.ts';
 
 describe('Initial Test Setup', () => {
 	describe('First File', () => {
@@ -31,5 +32,9 @@ describe('Initial Test Setup', () => {
 		after(() => {
 			process.exit();
 		});
+	});
+
+	describe('State Machine', () => {
+		console.log(applicationStateMachine);
 	});
 });

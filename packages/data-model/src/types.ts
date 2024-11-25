@@ -22,6 +22,7 @@
 export enum ApplicationStates {
 	'DRAFT',
 	'INSTITUTIONAL_REP_REVIEW',
+	'REP_REVISION',
 	'DAC_REVIEW',
 	'DAC_REVISIONS_REQUESTED',
 	'REJECTED',

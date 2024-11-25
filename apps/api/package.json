@@ -22,7 +22,8 @@
 		"drizzle-orm": "^0.35.3",
 		"express": "^4.21.0",
 		"pcgl-daco": "workspace:^",
-		"pg": "^8.13.0"
+		"pg": "^8.13.0",
+		"xstate": "^5.19.0"
 	},
 	"engines": {
 		"node": "^20.9.0"
