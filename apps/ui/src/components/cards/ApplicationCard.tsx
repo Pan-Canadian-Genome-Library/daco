@@ -21,12 +21,13 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Card, Flex, theme, Typography } from 'antd';
 
 import { ApplicationtType } from '@/components/mock/applicationMockData';
+import { formatDate } from '@/global/utils';
 import useApplicationStatusHook from '@/hooks/useApplicationStatusHook';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
 
-const ApplicationCard = ({ userId, status }: ApplicationtType) => {
+const ApplicationCard = ({ userId, status, createdAt, expiresAt }: ApplicationtType) => {
 	const { showEdit, color, showActionRequired } = useApplicationStatusHook(status);
 	const { token } = useToken();
 
@@ -53,7 +54,12 @@ const ApplicationCard = ({ userId, status }: ApplicationtType) => {
 						{showEdit ? <Button>Edit</Button> : null}
 					</Flex>
 				</Flex>
-				<Title level={3}>Application: {userId}</Title>
+				<Title style={{ margin: 0 }} level={3}>
+					Application: {userId}
+				</Title>
+				<Text>
+					Created: {formatDate(createdAt)} | Expires: {formatDate(expiresAt)}
+				</Text>
 			</Flex>
 		</Card>
 	);
