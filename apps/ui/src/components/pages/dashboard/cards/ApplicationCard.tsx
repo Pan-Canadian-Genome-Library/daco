@@ -21,7 +21,9 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Card, Flex, theme, Typography } from 'antd';
 
 import { ApplicationtType } from '@/components/mock/applicationMockData';
-import { formatDate, getApplicationStatusProperties } from '@/global/utils';
+import { getApplicationStatusProperties } from '@/components/pages/dashboard/getApplicationStateProps';
+import { formatDate } from '@/global/utils';
+
 const { Title, Text } = Typography;
 const { useToken } = theme;
 

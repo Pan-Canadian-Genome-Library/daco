@@ -19,11 +19,11 @@
 
 import { Col, Flex, Layout, Row } from 'antd';
 
-import ApplicationStatusBar from '@/components/ApplicationStatusBar';
-import ApplicationCard from '@/components/cards/ApplicationCard';
-import NewApplicationCard from '@/components/cards/NewApplicationCard';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import { applications } from '@/components/mock/applicationMockData';
+import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatusBar';
+import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
+import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 
 const { Content } = Layout;
 
