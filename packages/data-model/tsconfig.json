@@ -1,10 +1,4 @@
 {
-	"extends": "../../tsconfig.json",
-	"compilerOptions": {
-		"lib": ["ESNext"],
-
-		/* Bundler mode */
-		"moduleResolution": "bundler"
-	},
-	"include": ["src", "vite.config.ts"]
+	"extends": "../../tsconfig.base.json",
+	"include": ["src"]
 }

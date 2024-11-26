@@ -19,8 +19,9 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { actions } from './actions.ts';
-import { applications } from './applications.ts';
+
+import { actions } from './actions.js';
+import { applications } from './applications.js';
 
 export const revisionRequests = pgTable('revision_requests', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),

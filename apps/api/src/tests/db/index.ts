@@ -23,15 +23,15 @@ import { after, describe, it } from 'node:test';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
-import { actions } from '../../db/schemas/actions.ts';
-import { agreements } from '../../db/schemas/agreements.ts';
-import { applicationContents } from '../../db/schemas/applicationContents.ts';
-import { applications } from '../../db/schemas/applications.ts';
-import { collaborators } from '../../db/schemas/collaborators.ts';
-import { files } from '../../db/schemas/files.ts';
-import { revisionRequests } from '../../db/schemas/revisionRequests.ts';
+import { actions } from '../../db/schemas/actions.js';
+import { agreements } from '../../db/schemas/agreements.js';
+import { applicationContents } from '../../db/schemas/applicationContents.js';
+import { applications } from '../../db/schemas/applications.js';
+import { collaborators } from '../../db/schemas/collaborators.js';
+import { files } from '../../db/schemas/files.js';
+import { revisionRequests } from '../../db/schemas/revisionRequests.js';
 
-import { connectionString } from '../../../drizzle.config.ts';
+import { connectionString } from '../../../drizzle.config.js';
 
 type PostgresDb = ReturnType<typeof drizzle>;
 

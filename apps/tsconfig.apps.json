@@ -1,0 +1,9 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		// Apps are never imported into other modules so they do not need TS declarations of source maps
+		"declaration": false,
+		"declarationMap": false,
+		"sourceMap": false
+	}
+}

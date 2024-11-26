@@ -1,11 +1,13 @@
 {
-	"extends": "../../tsconfig.json",
+	"extends": "../tsconfig.apps.json",
 	"compilerOptions": {
 		"target": "ESNext",
 		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"noEmit": true,
 
 		/* Bundler mode */
-		"moduleResolution": "bundler",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
 		"jsx": "react-jsx",
 		"baseUrl": ".",
 		"paths": {
