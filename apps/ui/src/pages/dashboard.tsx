@@ -41,7 +41,7 @@ const DashboardPage = () => {
 								</Col>
 								{applications.map((applicationItem) => {
 									return (
-										<Col key={applicationItem.applicationName} span={12}>
+										<Col key={applicationItem.id} span={12}>
 											<ApplicationCard {...applicationItem} />
 										</Col>
 									);
