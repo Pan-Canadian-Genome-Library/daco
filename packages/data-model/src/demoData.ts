@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Applicant, Application, ApplicationStates, Institution } from './types';
+import { Applicant, Application, ApplicationStates, Institution } from './types.js';
 
 const demoUser: Applicant = {
 	userId: 'id01',

@@ -19,11 +19,11 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { agreements } from './agreements.ts';
-import { applications } from './applications.ts';
-import { collaborators } from './collaborators.ts';
-import { files } from './files.ts';
-import { revisionRequests } from './revisionRequests.ts';
+import { agreements } from './agreements.js';
+import { applications } from './applications.js';
+import { collaborators } from './collaborators.js';
+import { files } from './files.js';
+import { revisionRequests } from './revisionRequests.js';
 
 export const applicationContents = pgTable('application_contents', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
