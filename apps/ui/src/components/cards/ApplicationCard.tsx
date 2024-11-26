@@ -17,31 +17,43 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Card, Flex, theme, Typography } from 'antd';
 
 import { ApplicationtType } from '@/components/mock/applicationMockData';
+import useApplicationStatusHook from '@/hooks/useApplicationStatusHook';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { useToken } = theme;
 
-const ApplicationCard = ({ applicationName, applicationStatus }: ApplicationtType) => {
+const ApplicationCard = ({ userId, status }: ApplicationtType) => {
+	const { showEdit, color, showActionRequired } = useApplicationStatusHook(status);
 	const { token } = useToken();
 
 	return (
-		<Card style={{ backgroundColor: token.colorFillAlter, minHeight: 200 }}>
+		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }}>
 			<Flex vertical gap="middle">
 				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
-					<Flex align="center">
-						<Flex style={{ padding: 10, minWidth: 200 }} align="center" justify="center">
-							{applicationStatus}
+					<Flex align="center" gap="middle">
+						<Flex
+							style={{ backgroundColor: color, padding: 10, minWidth: 200, borderRadius: token.borderRadius }}
+							align="center"
+							justify="center"
+						>
+							<Text strong>{status}</Text>
 						</Flex>
-						Action required
+						{showActionRequired ? (
+							<Flex align="center" gap={'small'}>
+								<ExclamationCircleFilled style={{ color: token.colorPrimary, fontSize: 20 }} />
+								<Text strong>Action Required</Text>
+							</Flex>
+						) : null}
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
-						<Button>Edit</Button>
+						{showEdit ? <Button>Edit</Button> : null}
 					</Flex>
 				</Flex>
-				<Title level={3}>Application: {applicationName}</Title>
+				<Title level={3}>Application: {userId}</Title>
 			</Flex>
 		</Card>
 	);
