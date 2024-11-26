@@ -33,15 +33,15 @@ const DashboardPage = () => {
 			<Flex style={{ height: '100%' }} vertical>
 				<ApplicationStatusBar />
 				<ContentWrapper style={{ padding: 40 }}>
-					<Row style={{ width: '100%' }} gutter={[48, 48]} align={'middle'} justify={'center'}>
+					<Row gutter={[48, 48]} align={'middle'} justify={'center'}>
 						{applications.length > 0 ? (
 							<>
-								<Col span={12}>
+								<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 									<NewApplicationCard />
 								</Col>
 								{applications.map((applicationItem) => {
 									return (
-										<Col key={applicationItem.id} span={12}>
+										<Col key={applicationItem.id} xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 											<ApplicationCard {...applicationItem} />
 										</Col>
 									);
