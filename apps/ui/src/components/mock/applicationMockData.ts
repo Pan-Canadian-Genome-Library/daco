@@ -1,10 +1,12 @@
 // TODO: test data, subject to change
 
 export interface ApplicationtType {
-	applicationName: string;
-	applicationStatus: ApplicationStatus;
+	id: string;
+	userId: string;
+	status: ApplicationStatus;
 	createdAt: Date;
-	updatedAt: Date;
+	approvedAt: Date;
+	expiresAt: Date;
 }
 
 export enum ApplicationStatus {
@@ -22,33 +24,43 @@ export enum ApplicationStatus {
 
 export const applications: ApplicationtType[] = [
 	{
-		applicationName: 'PCGL-123',
-		applicationStatus: ApplicationStatus.Draft,
+		id: '23124',
+		userId: 'PCGL-123',
+		status: ApplicationStatus.Draft,
 		createdAt: new Date(),
-		updatedAt: new Date(),
+		approvedAt: new Date(),
+		expiresAt: new Date(),
 	},
 	{
-		applicationName: 'PCGL-151',
-		applicationStatus: ApplicationStatus.DACRevision,
+		id: '543451',
+		userId: 'PCGL-151',
+		status: ApplicationStatus.DACRevision,
 		createdAt: new Date(),
-		updatedAt: new Date(),
+		approvedAt: new Date(),
+		expiresAt: new Date(),
 	},
 	{
-		applicationName: 'PCGL-111',
-		applicationStatus: ApplicationStatus.Approved,
+		id: '986412',
+		userId: 'PCGL-111',
+		status: ApplicationStatus.Approved,
 		createdAt: new Date(),
-		updatedAt: new Date(),
+		approvedAt: new Date(),
+		expiresAt: new Date(),
 	},
 	{
-		applicationName: 'PCGL-231',
-		applicationStatus: ApplicationStatus.Rejected,
+		id: '821312',
+		userId: 'PCGL-231',
+		status: ApplicationStatus.Rejected,
 		createdAt: new Date(),
-		updatedAt: new Date(),
+		approvedAt: new Date(),
+		expiresAt: new Date(),
 	},
 	{
-		applicationName: 'PCGL-554',
-		applicationStatus: ApplicationStatus.Closed,
+		id: '543453',
+		userId: 'PCGL-554',
+		status: ApplicationStatus.Closed,
 		createdAt: new Date(),
-		updatedAt: new Date(),
+		approvedAt: new Date(),
+		expiresAt: new Date(),
 	},
 ];
