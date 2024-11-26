@@ -30,7 +30,7 @@ const ApplicationCard = ({ userId, status, createdAt, expiresAt }: ApplicationtT
 	const { token } = useToken();
 
 	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }}>
+		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
 			<Flex vertical gap="middle">
 				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
 					<Flex align="center" gap="middle">
