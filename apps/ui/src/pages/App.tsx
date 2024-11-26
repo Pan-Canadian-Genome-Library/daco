@@ -18,7 +18,7 @@
  */
 
 import { Flex, Layout } from 'antd';
-import { RouterProvider } from 'react-router-dom';
+import { RouterProvider } from 'react-router';
 
 import FooterComponent from '@/components/Footer';
 import HeaderComponent from '@/components/Header';
