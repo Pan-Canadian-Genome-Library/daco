@@ -19,10 +19,9 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applications } from './applications.ts';
-import { revisionRequests } from './revisionRequests.ts';
-// TODO: Integrate w/ TS
-// import { applicationActions } from 'pcgl-daco/packages/data-model/';
+
+import { applications } from './applications.js';
+import { revisionRequests } from './revisionRequests.js';
 
 export const actionTypesEnum = pgEnum('action_types', [
 	'CREATE',

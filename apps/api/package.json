@@ -3,11 +3,11 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
-	"main": "src/main.ts",
 	"scripts": {
-		"dev": "npx tsx watch --env-file=.env ./src/main.ts",
+		"build": "rimraf ./dist && tsc",
+		"dev": "tsx watch --env-file=.env ./src/main.ts",
 		"test": "npx tsx --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*",
-		"generate-dbml": "npx tsx ./src/db/dbml.ts"
+		"start:prod": "node ./dist/src/main.js"
 	},
 	"devDependencies": {
 		"@testcontainers/postgresql": "^10.14.0",
@@ -24,7 +24,7 @@
 		"cors": "^2.8.5",
 		"drizzle-orm": "^0.35.3",
 		"express": "^4.21.0",
-		"pcgl-daco": "workspace:^",
+		"@pcgl-daco/data-model": "workspace:^",
 		"pg": "^8.13.0"
 	},
 	"engines": {

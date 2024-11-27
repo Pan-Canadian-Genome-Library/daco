@@ -42,6 +42,8 @@ The modules in the monorepo are organized into two categories:
 
 - Install dependencies: `pnpm i`
 
+- Build all packages and apps: `pnpm -w build:all`
+
 - Start server:
   
   `cd apps/api`
