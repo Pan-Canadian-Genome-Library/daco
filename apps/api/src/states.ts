@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { createActor, createMachine } from 'xstate';
-import { ApplicationStates } from '../../../packages/data-model/src/types.ts';
 
 const {
 	DRAFT,
@@ -34,39 +34,39 @@ const {
 
 export const applicationStateMachine = createMachine({
 	id: 'applicationState',
-	initial: 'DRAFT',
+	initial: DRAFT,
 	states: {
-		DRAFT: {
-			on: { submit: 'INSTITUTIONAL_REP_REVIEW', close: 'CLOSED' },
+		[DRAFT]: {
+			on: { submit: INSTITUTIONAL_REP_REVIEW, close: CLOSED },
 		},
-		INSTITUTIONAL_REP_REVIEW: {
-			on: { close: 'CLOSED', edit: 'DRAFT', revision_request: 'REP_REVISION', submit: 'DAC_REVIEW' },
+		[INSTITUTIONAL_REP_REVIEW]: {
+			on: { close: CLOSED, edit: DRAFT, revision_request: REP_REVISION, submit: DAC_REVIEW },
 		},
-		REP_REVISION: {
-			on: { submit: 'INSTITUTIONAL_REP_REVIEW' },
+		[REP_REVISION]: {
+			on: { submit: INSTITUTIONAL_REP_REVIEW },
 		},
-		DAC_REVIEW: {
+		[DAC_REVIEW]: {
 			on: {
-				approve: 'APPROVED',
-				close: 'CLOSED',
-				edit: 'DRAFT',
-				revision_request: 'DAC_REVISIONS_REQUESTED',
-				reject: 'REJECTED',
+				approve: APPROVED,
+				close: CLOSED,
+				edit: DRAFT,
+				revision_request: DAC_REVISIONS_REQUESTED,
+				reject: REJECTED,
 			},
 		},
-		DAC_REVISIONS_REQUESTED: {
-			on: { submit: 'DAC_REVIEW' },
+		[DAC_REVISIONS_REQUESTED]: {
+			on: { submit: DAC_REVIEW },
 		},
-		REJECTED: {
+		[REJECTED]: {
 			on: {},
 		},
-		APPROVED: {
-			on: { revoked: 'REVOKED' },
+		[APPROVED]: {
+			on: { revoked: REVOKED },
 		},
-		CLOSED: {
+		[CLOSED]: {
 			on: {},
 		},
-		REVOKED: {
+		[REVOKED]: {
 			on: {},
 		},
 	},

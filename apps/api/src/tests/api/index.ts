@@ -20,17 +20,20 @@
 import assert from 'node:assert';
 import { before, describe, it } from 'node:test';
 
+import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { StateValue } from 'xstate';
 import { applicationStateActor } from '../../states.ts';
+
+const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
+	ApplicationStates;
 
 describe('State Machine', () => {
 	describe('Application State', () => {
 		let counter = 0;
-		let value: string | StateValue = 'DRAFT';
+		let value: string | StateValue = DRAFT;
 
 		before(() => {
 			applicationStateActor.subscribe((snapshot) => {
-				console.log(counter, snapshot.value);
 				counter++;
 				value = snapshot.value;
 			});
@@ -38,48 +41,53 @@ describe('State Machine', () => {
 
 		it('should initialize with state DRAFT', () => {
 			applicationStateActor.start();
-			assert.strictEqual(value, 'DRAFT');
+			assert.strictEqual(value, DRAFT);
 		});
 
 		it('should change from DRAFT to INSTITUTIONAL_REP_REVIEW on submit', () => {
 			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, 'INSTITUTIONAL_REP_REVIEW');
+			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', () => {
 			applicationStateActor.send({ type: 'edit' });
-			assert.strictEqual(value, 'DRAFT');
+			assert.strictEqual(value, DRAFT);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to REP_REVISION on revision_request', () => {
 			applicationStateActor.send({ type: 'submit' });
 			applicationStateActor.send({ type: 'revision_request' });
-			assert.strictEqual(value, 'REP_REVISION');
+			assert.strictEqual(value, REP_REVISION);
 		});
 
 		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', () => {
 			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, 'INSTITUTIONAL_REP_REVIEW');
+			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on submit', () => {
 			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, 'DAC_REVIEW');
+			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', () => {
 			applicationStateActor.send({ type: 'revision_request' });
-			assert.strictEqual(value, 'DAC_REVISIONS_REQUESTED');
+			assert.strictEqual(value, DAC_REVISIONS_REQUESTED);
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', () => {
 			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, 'DAC_REVIEW');
+			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', () => {
 			applicationStateActor.send({ type: 'approve' });
-			assert.strictEqual(value, 'APPROVED');
+			assert.strictEqual(value, APPROVED);
+		});
+
+		it('should change from DAC_REVIEW to APPROVED on approval', () => {
+			applicationStateActor.send({ type: 'edit' });
+			assert.ok(DRAFT);
 		});
 	});
 });
