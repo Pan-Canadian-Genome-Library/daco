@@ -1,5 +1,5 @@
 {
-	"id": "e4398e05-1ede-4105-93b4-69970e577e92",
+	"id": "3664b66f-cca1-4b88-a166-1af0e3ac6a52",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -435,6 +435,12 @@
 				},
 				"approved_at": {
 					"name": "approved_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"updated_at": {
+					"name": "updated_at",
 					"type": "timestamp",
 					"primaryKey": false,
 					"notNull": false

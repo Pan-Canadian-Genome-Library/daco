@@ -17,23 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import cors from 'cors';
-import express, { Request, Response } from 'express';
+import { connectionString } from '../drizzle.config.js';
+import { connectToDb } from './db/index.js';
+import startServer from './server.js';
 
-import { demoApplication } from '@pcgl-daco/data-model';
-
-export const port = process.env.PORT || 3000;
-
-const app = express();
-
-app.get('/', (_req: Request, res: Response) => {
-	res.send('Hello World!');
-});
-
-app.get('/applications', cors(), (_req: Request, res: Response) => {
-	res.send(demoApplication);
-});
-
-app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`);
-});
+connectToDb(connectionString);
+startServer();

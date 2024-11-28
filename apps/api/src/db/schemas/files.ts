@@ -37,6 +37,7 @@ export const files = pgTable('files', {
 	type: fileTypesEnum().notNull(),
 	submitter_user_id: varchar({ length: 100 }).notNull(),
 	submitted_at: timestamp().notNull(),
+	// TODO: This is producing an error between drizzle-kit and generate-DBML
 	content: bytea().notNull(),
 	filename: varchar({ length: 255 }),
 });
