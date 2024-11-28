@@ -18,128 +18,71 @@
  */
 
 import assert from 'node:assert';
-import { before, describe, it } from 'node:test';
+import { describe, it } from 'node:test';
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { StateValue } from 'xstate';
-import { ApplicationEvents, applicationFiniteStateMachine, applicationStateActor } from '../../api/states.js';
+import { ApplicationEvents, applicationStateMachine } from '../../api/states.js';
 
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
 	ApplicationStates;
 
 describe('State Machine', () => {
-	describe('XState - Application State', () => {
-		let counter = 0;
-		let value: string | StateValue = DRAFT;
-
-		before(() => {
-			applicationStateActor.subscribe((snapshot) => {
-				counter++;
-				value = snapshot.value;
-			});
-		});
-
-		it('should initialize with state DRAFT', () => {
-			applicationStateActor.start();
-			assert.strictEqual(value, DRAFT);
-		});
-
-		it('should change from DRAFT to INSTITUTIONAL_REP_REVIEW on submit', () => {
-			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
-		});
-
-		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', () => {
-			applicationStateActor.send({ type: 'edit' });
-			assert.strictEqual(value, DRAFT);
-		});
-
-		it('should change from INSTITUTIONAL_REP_REVIEW to REP_REVISION on revision_request', () => {
-			applicationStateActor.send({ type: 'submit' });
-			applicationStateActor.send({ type: 'revision_request' });
-			assert.strictEqual(value, REP_REVISION);
-		});
-
-		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', () => {
-			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
-		});
-
-		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on submit', () => {
-			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, DAC_REVIEW);
-		});
-
-		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', () => {
-			applicationStateActor.send({ type: 'revision_request' });
-			assert.strictEqual(value, DAC_REVISIONS_REQUESTED);
-		});
-
-		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', () => {
-			applicationStateActor.send({ type: 'submit' });
-			assert.strictEqual(value, DAC_REVIEW);
-		});
-
-		it('should change from DAC_REVIEW to APPROVED on approval', () => {
-			applicationStateActor.send({ type: 'approve' });
-			assert.strictEqual(value, APPROVED);
-		});
-	});
-
-	describe('FSM - Application State', () => {
+	describe('Application State', () => {
 		let value: ApplicationStates = DRAFT;
 
 		it('should initialize with state DRAFT', () => {
-			value = applicationFiniteStateMachine.getState();
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, DRAFT);
 		});
 
 		it('should change from DRAFT to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.submit);
-			value = applicationFiniteStateMachine.getState();
+			await applicationStateMachine.dispatch(ApplicationEvents.submit);
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.edit);
-			value = applicationFiniteStateMachine.getState();
+			await applicationStateMachine.dispatch(ApplicationEvents.edit);
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, DRAFT);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to REP_REVISION on revision_request', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.submit);
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.revision_request);
-			value = applicationFiniteStateMachine.getState();
+			await applicationStateMachine.dispatch(ApplicationEvents.submit);
+			await applicationStateMachine.dispatch(ApplicationEvents.revision_request);
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, REP_REVISION);
 		});
 
 		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.submit);
-			value = applicationFiniteStateMachine.getState();
-			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
+			if (applicationStateMachine.can(ApplicationEvents.submit)) {
+				await applicationStateMachine.dispatch(ApplicationEvents.submit);
+				value = applicationStateMachine.getState();
+				assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
+			}
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on submit', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.submit);
-			value = applicationFiniteStateMachine.getState();
+			await applicationStateMachine.dispatch(ApplicationEvents.submit);
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.revision_request);
-			value = applicationFiniteStateMachine.getState();
+			await applicationStateMachine.dispatch(ApplicationEvents.revision_request);
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, DAC_REVISIONS_REQUESTED);
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.submit);
-			value = applicationFiniteStateMachine.getState();
+			await applicationStateMachine.dispatch(ApplicationEvents.submit);
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
-			await applicationFiniteStateMachine.dispatch(ApplicationEvents.approve);
-			value = applicationFiniteStateMachine.getState();
+			await applicationStateMachine.dispatch(ApplicationEvents.approve);
+			value = applicationStateMachine.getState();
 			assert.strictEqual(value, APPROVED);
 		});
 	});

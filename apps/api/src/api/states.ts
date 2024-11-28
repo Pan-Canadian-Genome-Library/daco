@@ -18,8 +18,6 @@
  */
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { createActor, createMachine } from 'xstate';
-
 import { StateMachine, t as transition } from 'typescript-fsm';
 
 const {
@@ -33,52 +31,6 @@ const {
 	CLOSED,
 	REVOKED,
 } = ApplicationStates;
-
-// XState
-
-export const applicationStateMachine = createMachine({
-	id: 'applicationState',
-	initial: DRAFT,
-	states: {
-		[DRAFT]: {
-			on: { submit: INSTITUTIONAL_REP_REVIEW, close: CLOSED },
-		},
-		[INSTITUTIONAL_REP_REVIEW]: {
-			on: { close: CLOSED, edit: DRAFT, revision_request: REP_REVISION, submit: DAC_REVIEW },
-		},
-		[REP_REVISION]: {
-			on: { submit: INSTITUTIONAL_REP_REVIEW },
-		},
-		[DAC_REVIEW]: {
-			on: {
-				approve: APPROVED,
-				close: CLOSED,
-				edit: DRAFT,
-				revision_request: DAC_REVISIONS_REQUESTED,
-				reject: REJECTED,
-			},
-		},
-		[DAC_REVISIONS_REQUESTED]: {
-			on: { submit: DAC_REVIEW },
-		},
-		[REJECTED]: {
-			on: {},
-		},
-		[APPROVED]: {
-			on: { revoked: REVOKED },
-		},
-		[CLOSED]: {
-			on: {},
-		},
-		[REVOKED]: {
-			on: {},
-		},
-	},
-});
-
-export const applicationStateActor = createActor(applicationStateMachine);
-
-// FSM
 
 export enum ApplicationEvents {
 	submit = 'submit',
@@ -144,4 +96,4 @@ const transitions = [
 ];
 
 // TODO: Rename
-export const applicationFiniteStateMachine = new StateMachine<ApplicationStates, ApplicationEvents>(DRAFT, transitions);
+export const applicationStateMachine = new StateMachine<ApplicationStates, ApplicationEvents>(DRAFT, transitions);
