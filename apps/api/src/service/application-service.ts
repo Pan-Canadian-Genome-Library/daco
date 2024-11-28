@@ -18,10 +18,12 @@
  */
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '../db/index.js';
 import { applicationContents } from '../db/schemas/applicationContents.js';
 import { applications } from '../db/schemas/applications.js';
+import { type ApplicationsColumnName, type ApplicationUpdates, type OrderBy } from './types.js';
+import { sortQuery } from './utils.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -31,38 +33,31 @@ const applicationService = (db: PostgresDb) => ({
 		};
 
 		try {
-			const newApplicationRecord = await db.insert(applications).values(newApplication).returning();
-			const { id } = newApplicationRecord[0];
+			const application = await db.transaction(async (transaction) => {
+				const newApplicationRecord = await transaction.insert(applications).values(newApplication).returning();
+				if (!newApplicationRecord[0]) throw new Error('Application record is undefined');
 
-			const newAppContents: typeof applicationContents.$inferInsert = {
-				application_id: id,
-				created_at: new Date(),
-				updated_at: new Date(),
-			};
-			const newAppContentsRecord = await db.insert(applicationContents).values(newAppContents).returning();
-			const { id: contentsId } = newAppContentsRecord[0];
+				const { id } = newApplicationRecord[0];
 
-			const application = await db
-				.update(applications)
-				.set({ contents: contentsId })
-				.where(eq(applications.id, id))
-				.returning();
+				const newAppContents: typeof applicationContents.$inferInsert = {
+					application_id: id,
+					created_at: new Date(),
+					updated_at: new Date(),
+				};
+				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
+				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
-			console.log(`Application created with user_id: ${user_id}`);
+				const { id: contentsId } = newAppContentsRecord[0];
 
-			return application[0];
-		} catch (err) {
-			console.error(`Error at createApplication with user_id: ${user_id}`);
-			console.error(err);
-			return null;
-		}
-	},
-	deleteApplication: async ({ user_id }: { user_id: string }) => {
-		try {
-			const deletedRecords = await db.delete(applications).where(eq(applications.user_id, user_id)).returning();
-			console.log(`Application deleted with user_id: ${user_id}`);
+				const application = await transaction
+					.update(applications)
+					.set({ contents: contentsId })
+					.where(eq(applications.id, id))
+					.returning();
 
-			return deletedRecords;
+				return application[0];
+			});
+			return application;
 		} catch (err) {
 			console.error(`Error at createApplication with user_id: ${user_id}`);
 			console.error(err);
@@ -73,7 +68,7 @@ const applicationService = (db: PostgresDb) => ({
 		try {
 			// Validate application state allows updates
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
-			if (!applicationRecord.length) {
+			if (!applicationRecord[0]) {
 				throw new Error('Application Not Found');
 			}
 
@@ -121,7 +116,7 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
-	findOneAndUpdate: async ({ id, update }: { id: number; update: any }) => {
+	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
 		try {
 			const application = await db
 				.update(applications)
@@ -143,6 +138,7 @@ const applicationService = (db: PostgresDb) => ({
 				.from(applications)
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			const application = {
 				...applicationRecord[0].applications,
@@ -159,37 +155,16 @@ const applicationService = (db: PostgresDb) => ({
 	listApplications: async ({
 		user_id,
 		state,
-		sort = '',
+		sort = [],
 		page = 0,
 		pageSize = 20,
 	}: {
 		user_id?: string;
 		state?: ApplicationStates;
-		sort?: string;
+		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
 	}) => {
-		const isDescending = sort?.charAt(0) === '-';
-		const sortValue = isDescending ? sort.substring(1) : sort;
-		const sortFunction = isDescending ? desc : asc;
-
-		let sortKey;
-
-		switch (sortValue) {
-			case 'updated_at':
-				sortKey = applications.updated_at;
-				break;
-			case 'state':
-				sortKey = applications.state;
-				break;
-			case 'created_at':
-			default:
-				sortKey = applications.created_at;
-				break;
-		}
-
-		const sortQuery = sortFunction(sortKey);
-
 		try {
 			const allApplications = await db
 				.select({
@@ -206,7 +181,7 @@ const applicationService = (db: PostgresDb) => ({
 						state ? eq(applications.state, state) : undefined,
 					),
 				)
-				.orderBy(sortQuery)
+				.orderBy(...sortQuery(sort))
 				.offset(page * pageSize)
 				.limit(pageSize);
 

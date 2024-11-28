@@ -18,32 +18,16 @@
  */
 
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const migrationsFolder = __dirname + '/../../drizzle';
 
 export type PostgresDb = ReturnType<typeof drizzle>;
 
-export const startDb = (connectionString: string): PostgresDb => {
+export const connectToDb = (connectionString: string): PostgresDb => {
 	try {
 		const db = drizzle(connectionString);
+
 		return db;
 	} catch (err) {
 		console.log('Error on Database startup');
-		console.log(err);
-		throw err;
-	}
-};
-
-export const initMigration = async (db: PostgresDb) => {
-	try {
-		await migrate(db, { migrationsFolder });
-	} catch (err) {
-		console.log('Error Migrating on Database startup');
 		console.log(err);
 		throw err;
 	}

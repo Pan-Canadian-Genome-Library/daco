@@ -1,0 +1,153 @@
+enum action_types {
+  CREATE
+  WITHDRAW
+  CLOSE
+  REQUEST_INSTITUTIONAL_REP
+  INSTITUTIONAL_REP_APPROVED
+  INSTITUTIONAL_REP_REJECTED
+  DAC_REVIEW_APPROVED
+  DAC_REVIEW_REJECTED
+  DAC_REVIEW_REVISIONS
+  REVOKE
+}
+
+enum agreement_types {
+  dac_agreement_software_updates
+  dac_agreement_non_disclosure
+  dac_agreement_monitor_individual_access
+  dac_agreement_destroy_data
+  dac_agreement_familiarize_restrictions
+  dac_agreement_provide_it_policy
+  dac_agreement_notify_unauthorized_access
+  dac_agreement_certify_application
+  dac_agreement_read_and_agreed
+}
+
+enum application_states {
+  DRAFT
+  INSTITUTIONAL_REP_REVIEW
+  DAC_REVIEW
+  DAC_REVISIONS_REQUESTED
+  REJECTED
+  APPROVED
+  CLOSED
+  REVOKED
+}
+
+enum file_types {
+  SIGNED_APPLICATION
+  ETHICS_LETTER
+}
+
+table actions {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  created_at timestamp [not null, default: `now()`]
+  user_id varchar(100) [not null]
+  action action_types [not null]
+  revisions_request_id bigint
+  state_before varchar(255) [not null]
+  state_after varchar(255) [not null]
+}
+
+table agreements {
+  id bigint [pk, not null]
+  application_id bigint
+  user_id varchar(100) [not null]
+  name text [not null]
+  agreement_text text [not null]
+  agreement_type agreement_types [not null]
+  agreed_at timestamp [not null]
+}
+
+table application_contents {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null]
+  applicant_first_name varchar(255)
+  applicant_middle_name varchar(255)
+  applicant_last_name varchar(255)
+  applicant_title varchar(255)
+  applicant_suffix varchar(255)
+  applicant_position_title varchar(255)
+  applicant_primary_affiliation varchar(500)
+  applicant_institutional_email varchar(320)
+  applicant_profile_url text
+  institutional_rep_title varchar(255)
+  institutional_rep_first_name varchar(255)
+  institutional_rep_middle_name varchar(255)
+  institutional_rep_last_name varchar(255)
+  institutional_rep_suffix varchar(255)
+  institutional_rep_primary_affiliation varchar(255)
+  institutional_rep_email varchar(255)
+  institutional_rep_profile_url varchar(255)
+  institutional_rep_position_title varchar(255)
+  institution_country varchar(255)
+  institution_state varchar(255)
+  institution_city varchar(255)
+  institution_street_address text
+  institution_postal_code varchar(255)
+  institution_building varchar(255)
+  project_title text
+  project_website text
+  project_abstract text
+  project_methodology text
+  project_summary text
+  project_publication_urls text[]
+  requested_studies text[]
+  ethics_review_required boolean
+  ethics_letter bigint
+  signed_pdf bigint
+}
+
+table applications {
+  id bigint [pk, not null]
+  user_id varchar(100) [not null]
+  state application_states [not null]
+  created_at timestamp [not null, default: `now()`]
+  approved_at timestamp
+  expires_at timestamp
+  contents bigint
+  updated_at timestamp
+}
+
+table collaborators {
+  id bigint [pk, not null]
+  application_id bigint
+  first_name varchar(255) [not null]
+  middle_name varchar(255)
+  last_name varchar(255) [not null]
+  title varchar(255)
+  suffix varchar(255)
+  position_title varchar(255) [not null]
+  institutional_email varchar(320) [not null]
+  profile_url text
+  collaborator_type text
+}
+
+table files {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  type file_types [not null]
+  submitter_user_id varchar(100) [not null]
+  submitted_at timestamp [not null]
+  filename varchar(255)
+}
+
+table revision_requests {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  created_at timestamp [not null, default: `now()`]
+  comments text
+  applicant_notes text
+  applicant_approved boolean [not null]
+  institution_rep_approved boolean [not null]
+  institution_rep_notes text
+  collaborators_approved boolean [not null]
+  collaborators_notes text
+  project_approved boolean [not null]
+  project_notes text
+  requested_studies_approved boolean [not null]
+  requested_studies_notes text
+}

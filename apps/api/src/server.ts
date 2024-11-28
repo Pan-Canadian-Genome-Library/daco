@@ -23,7 +23,7 @@ import express, { Request, Response } from 'express';
 
 export const port = process.env.PORT || 3000;
 
-const startServer = async (connectionString: string) => {
+const startServer = async () => {
 	const app = express();
 
 	app.get('/', (_req: Request, res: Response) => {

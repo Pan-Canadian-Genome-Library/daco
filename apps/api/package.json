@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "rimraf ./dist && tsc",
 		"dev": "tsx watch --env-file=.env ./src/main.ts",
-		"test": "tsx --env-file=.env.test --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*",
+		"test": "npx tsx --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*",
 		"start:prod": "node ./dist/src/main.js"
 	},
 	"devDependencies": {
@@ -15,6 +15,7 @@
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.7.4",
 		"@types/pg": "^8.11.10",
+		"drizzle-dbml-generator": "^0.9.0",
 		"drizzle-kit": "^0.26.2",
 		"tsx": "^4.19.1",
 		"typescript": "^5.5.3"

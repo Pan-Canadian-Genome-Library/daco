@@ -23,13 +23,15 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
 
-import { initMigration, startDb, type PostgresDb } from '../../db/index.js';
+import { connectToDb, type PostgresDb } from '../../db/index.js';
 import { actions } from '../../db/schemas/actions.js';
 import { agreements } from '../../db/schemas/agreements.js';
 import { applicationContents } from '../../db/schemas/applicationContents.js';
 import { collaborators } from '../../db/schemas/collaborators.js';
 import { files } from '../../db/schemas/files.js';
 import { revisionRequests } from '../../db/schemas/revisionRequests.js';
+
+import { initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
 describe('Postgres Database', () => {
 	let db: PostgresDb;
@@ -38,11 +40,17 @@ describe('Postgres Database', () => {
 	const user_id = 'testUser@oicr.on.ca';
 
 	before(async () => {
-		container = await new PostgreSqlContainer().start();
-		const connectionString = container.getConnectionUri();
-		db = startDb(connectionString);
+		container = await new PostgreSqlContainer()
+			.withUsername(PG_USER)
+			.withPassword(PG_PASSWORD)
+			.withDatabase(PG_DATABASE)
+			.start();
 
-		await initMigration(db);
+		const connectionString = container.getConnectionUri();
+
+		db = connectToDb(connectionString);
+
+		await initTestMigration(db);
 	});
 
 	describe('Connection', () => {
@@ -64,7 +72,6 @@ describe('Postgres Database', () => {
 			await db.insert(actions).values(testAction);
 
 			const allActions = await db.select().from(actions);
-			console.log('Getting all actions from the database');
 
 			assert.strictEqual(allActions.length, 1);
 
@@ -72,7 +79,6 @@ describe('Postgres Database', () => {
 				.delete(actions)
 				.where(eq(actions.application_id, testAction.application_id))
 				.returning();
-			console.log('Action deleted');
 
 			assert.strictEqual(deletedRecord.length, 1);
 		});
@@ -92,12 +98,10 @@ describe('Postgres Database', () => {
 			await db.insert(agreements).values(testAgreements);
 
 			const allAgreements = await db.select().from(agreements);
-			console.log('Getting all agreements from the database');
 
 			assert.strictEqual(allAgreements.length, 1);
 
 			const deletedRecord = await db.delete(agreements).where(eq(agreements.name, testAgreements.name)).returning();
-			console.log('Agreement deleted');
 
 			assert.strictEqual(deletedRecord.length, 1);
 		});
@@ -122,7 +126,6 @@ describe('Postgres Database', () => {
 			await db.insert(applicationContents).values(testApplicationContents);
 
 			const allApplicationContents = await db.select().from(applicationContents);
-			console.log('Getting all application contents from the database');
 
 			assert.strictEqual(allApplicationContents.length, 1);
 
@@ -130,7 +133,6 @@ describe('Postgres Database', () => {
 				.delete(applicationContents)
 				.where(eq(applicationContents.application_id, testApplicationContents.application_id))
 				.returning();
-			console.log('Application contents deleted');
 
 			assert.strictEqual(deletedRecord.length, 1);
 		});
@@ -149,7 +151,6 @@ describe('Postgres Database', () => {
 			await db.insert(collaborators).values(testCollaborators);
 
 			const allCollaborators = await db.select().from(collaborators);
-			console.log('Getting all collaborators from the database');
 
 			assert.strictEqual(allCollaborators.length, 1);
 
@@ -157,7 +158,6 @@ describe('Postgres Database', () => {
 				.delete(collaborators)
 				.where(eq(collaborators.first_name, testCollaborators.first_name))
 				.returning();
-			console.log('Collaborator deleted');
 
 			assert.strictEqual(deletedRecord.length, 1);
 		});
@@ -176,7 +176,6 @@ describe('Postgres Database', () => {
 			await db.insert(files).values(testFiles);
 
 			const allFiles = await db.select().from(files);
-			console.log('Getting all files from the database');
 
 			assert.strictEqual(allFiles.length, 1);
 
@@ -184,7 +183,6 @@ describe('Postgres Database', () => {
 				.delete(files)
 				.where(eq(files.submitter_user_id, testFiles.submitter_user_id))
 				.returning();
-			console.log('File deleted');
 
 			assert.strictEqual(deletedRecord.length, 1);
 		});
@@ -204,7 +202,6 @@ describe('Postgres Database', () => {
 			await db.insert(revisionRequests).values(testRevisions);
 
 			const allRevisions = await db.select().from(revisionRequests);
-			console.log('Getting all revisions from the database');
 
 			assert.strictEqual(allRevisions.length, 1);
 
@@ -212,7 +209,6 @@ describe('Postgres Database', () => {
 				.delete(revisionRequests)
 				.where(eq(revisionRequests.application_id, testRevisions.application_id))
 				.returning();
-			console.log('Revision deleted');
 
 			assert.strictEqual(deletedRecord.length, 1);
 		});

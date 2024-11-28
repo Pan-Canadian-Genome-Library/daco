@@ -1,3 +1,5 @@
+name: pcgl-daco-database
+
 services:
   postgres:
     image: postgres:15-alpine

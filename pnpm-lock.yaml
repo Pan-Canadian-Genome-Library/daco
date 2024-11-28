@@ -60,6 +60,9 @@ importers:
       '@types/pg':
         specifier: ^8.11.10
         version: 8.11.10
+      drizzle-dbml-generator:
+        specifier: ^0.9.0
+        version: 0.9.0(drizzle-orm@0.35.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1))
       drizzle-kit:
         specifier: ^0.26.2
         version: 0.26.2
@@ -1528,6 +1531,11 @@ packages:
   dockerode@3.3.5:
     resolution: {integrity: sha512-/0YNa3ZDNeLr/tSckmD69+Gq+qVNhvKfAHNeZJBnp7EOP6RGKV8ORrJHkUn20So5wU+xxT7+1n5u8PjHbfjbSA==}
     engines: {node: '>= 8.0'}
+
+  drizzle-dbml-generator@0.9.0:
+    resolution: {integrity: sha512-R/INfHUJNtxUkanSng8suh6er3snYKzMLFCeshqMMtGbrzo1+ulOY6qyrWXkY1d5jLuFwydySUD6bIZSyr0aSg==}
+    peerDependencies:
+      drizzle-orm: '>=0.32.0'
 
   drizzle-kit@0.26.2:
     resolution: {integrity: sha512-cMq8omEKywjIy5KcqUo6LvEFxkl8/zYHsgYjFVXjmPWWtuW4blcz+YW9+oIhoaALgs2ebRjzXwsJgN9i6P49Dw==}
@@ -4249,6 +4257,10 @@ snapshots:
       tar-fs: 2.0.1
     transitivePeerDependencies:
       - supports-color
+
+  drizzle-dbml-generator@0.9.0(drizzle-orm@0.35.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)):
+    dependencies:
+      drizzle-orm: 0.35.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)
 
   drizzle-kit@0.26.2:
     dependencies:

@@ -17,9 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { connectionString } from '../drizzle.config.js';
-import { connectToDb } from './db/index.js';
-import startServer from './server.js';
+import { asc, desc } from 'drizzle-orm';
+import { applications } from '../db/schemas/applications.js';
+import { type ApplicationsColumnName, type OrderBy } from './types.js';
 
-connectToDb(connectionString);
-startServer();
+export const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
+	const orderByArguments = sort
+		? sort.map((sortBy) =>
+				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
+			)
+		: [asc(applications.created_at)];
+
+	return orderByArguments;
+};

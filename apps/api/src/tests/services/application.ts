@@ -21,21 +21,27 @@ import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import { eq } from 'drizzle-orm';
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { initMigration, startDb, type PostgresDb } from '../../db/index.js';
+import { connectToDb, type PostgresDb } from '../../db/index.js';
+import { applications } from '../../db/schemas/applications.js';
 import service from '../../service/application-service.js';
 
-const PG_DATABASE = process.env.PG_DATABASE || 'testUser';
-const PG_USER = process.env.PG_USER || 'testPassword';
-const PG_PASSWORD = process.env.PG_PASSWORD || 'postgres';
+import {
+	addInitialApplications,
+	addPaginationDonors,
+	initTestMigration,
+	PG_DATABASE,
+	PG_PASSWORD,
+	PG_USER,
+	testUserId as user_id,
+} from '../testUtils.js';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
 	let applicationService: ReturnType<typeof service>;
 	let container: StartedPostgreSqlContainer;
-
-	const user_id = 'testUser@oicr.on.ca';
 
 	before(async () => {
 		container = await new PostgreSqlContainer()
@@ -45,211 +51,190 @@ describe('Application Service', () => {
 			.start();
 
 		const connectionString = container.getConnectionUri();
-		db = startDb(connectionString);
+		db = connectToDb(connectionString);
 
-		await initMigration(db);
+		await initTestMigration(db);
+		await addInitialApplications(db);
 
 		applicationService = service(db);
-		// TODO: create file with seed data for postgres to test read actions
-		// Not yet supported in Drizzle Kit:
-		// https://orm.drizzle.team/docs/kit-seed-data
 	});
 
-	it('should create applications with status DRAFT and submitted user_id', async () => {
-		const application = await applicationService.createApplication({ user_id });
+	describe('Create Applications', () => {
+		it('should create applications with status DRAFT and submitted user_id', async () => {
+			const application = await applicationService.createApplication({ user_id });
 
-		assert.ok(!!application);
-		assert.strictEqual(application?.user_id, user_id);
-		assert.strictEqual(application?.state, ApplicationStates.DRAFT);
+			assert.notEqual(application, null);
+			assert.strictEqual(application?.user_id, user_id);
+			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
+		});
 	});
 
-	it('should get applications requested by id, with application_contents', async () => {
-		const applicationRecords = await applicationService.listApplications({ user_id });
+	describe('Get Applications', () => {
+		it('should get applications requested by id, with application_contents', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
 
-		assert.ok(Array.isArray(applicationRecords));
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
 
-		const { id } = applicationRecords[0];
+			const { id } = applicationRecords[0];
 
-		const requestedApplication = await applicationService.getApplicationById({ id });
+			const requestedApplication = await applicationService.getApplicationById({ id });
 
-		assert.ok(!!requestedApplication);
-		assert.strictEqual(requestedApplication?.id, id);
-		assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
+			assert.notEqual(requestedApplication, null);
+			assert.strictEqual(requestedApplication?.id, id);
+			assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
+		});
 	});
 
-	it('should list applications filtered by user_id', async () => {
-		await applicationService.createApplication({ user_id });
-		await applicationService.createApplication({ user_id });
+	describe('FindOneAndUpdate Application', () => {
+		it('should populate updated_at field', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
 
-		const applicationRecords = await applicationService.listApplications({ user_id });
+			const { id } = applicationRecords[0];
+			await applicationService.findOneAndUpdate({ id, update: {} });
 
-		assert.ok(Array.isArray(applicationRecords));
-		assert.strictEqual(applicationRecords.length, 3);
+			const updatedApplication = await applicationService.getApplicationById({ id });
+
+			assert.notEqual(updatedApplication, null);
+			assert.ok(!!updatedApplication?.updated_at);
+		});
 	});
 
-	it('should list applications filtered by state', async () => {
-		const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
+	describe('List Applications', () => {
+		it('should filter by user_id', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
 
-		assert.ok(Array.isArray(applicationRecords));
-		assert.strictEqual(applicationRecords.length, 3);
-	});
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
 
-	it('should allow sorting records by created_at', async () => {
-		const applicationRecords = await applicationService.listApplications({ sort: 'created_at' });
+			assert.strictEqual(applicationRecords[0].user_id, user_id);
+			assert.strictEqual(applicationRecords[1].user_id, user_id);
+			assert.strictEqual(applicationRecords[2].user_id, user_id);
+		});
 
-		assert.ok(Array.isArray(applicationRecords));
-		assert.strictEqual(applicationRecords.length, 3);
+		it('should filter by state', async () => {
+			const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
 
-		const date1 = applicationRecords[0].createdAt.valueOf();
-		const date2 = applicationRecords[1].createdAt.valueOf();
-		const date3 = applicationRecords[2].createdAt.valueOf();
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
 
-		assert.ok(date1 < date2);
-		assert.ok(date2 < date3);
-	});
+			assert.strictEqual(applicationRecords[0].state, ApplicationStates.DRAFT);
+			assert.strictEqual(applicationRecords[1].state, ApplicationStates.DRAFT);
+			assert.strictEqual(applicationRecords[2].state, ApplicationStates.DRAFT);
+		});
 
-	it('should allow sorting records by updated_at', async () => {
-		const applicationRecords = await applicationService.listApplications({ user_id });
+		it('should allow sorting records by created_at', async () => {
+			const applicationRecords = await applicationService.listApplications({
+				sort: [
+					{
+						direction: 'asc',
+						column: 'created_at',
+					},
+				],
+			});
 
-		assert.ok(Array.isArray(applicationRecords));
-		assert.strictEqual(applicationRecords.length, 3);
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
 
-		const { id: zeroRecordId } = applicationRecords[0];
-		const { id: firstRecordId } = applicationRecords[1];
-		const { id: secondRecordId } = applicationRecords[2];
+			const date1 = applicationRecords[0].createdAt.valueOf();
+			const date2 = applicationRecords[1].createdAt.valueOf();
+			const date3 = applicationRecords[2].createdAt.valueOf();
 
-		// State values are used in the next test so first record remains in 'Draft', this is just populating `updatedAt`
-		await applicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
-		await applicationService.findOneAndUpdate({ id: firstRecordId, update: { state: ApplicationStates.APPROVED } });
-		await applicationService.findOneAndUpdate({ id: secondRecordId, update: { state: ApplicationStates.REJECTED } });
+			assert.ok(date1 < date2);
+			assert.ok(date2 < date3);
+		});
 
-		const updatedRecords = await applicationService.listApplications({ user_id });
+		it('should allow sorting records by updated_at', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
 
-		assert.ok(Array.isArray(updatedRecords));
-		assert.strictEqual(updatedRecords.length, 3);
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
 
-		const date1 = updatedRecords[0].updatedAt?.valueOf();
-		const date2 = updatedRecords[1].updatedAt?.valueOf();
-		const date3 = updatedRecords[2].updatedAt?.valueOf();
+			const { id: zeroRecordId } = applicationRecords[0];
+			const { id: firstRecordId } = applicationRecords[1];
+			const { id: secondRecordId } = applicationRecords[2];
 
-		assert.ok(date1 && date2 && date1 < date2);
-		assert.ok(date2 && date3 && date2 < date3);
-	});
+			// State values are used in the next test so first record remains in 'Draft', this is just populating `updatedAt`
+			await applicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
+			await applicationService.findOneAndUpdate({ id: firstRecordId, update: { state: ApplicationStates.APPROVED } });
+			await applicationService.findOneAndUpdate({ id: secondRecordId, update: { state: ApplicationStates.REJECTED } });
 
-	it('should allow sorting records by state', async () => {
-		const applicationRecords = await applicationService.listApplications({ sort: 'state' });
+			const updatedRecords = await applicationService.listApplications({ user_id });
 
-		assert.ok(Array.isArray(applicationRecords));
-		assert.strictEqual(applicationRecords.length, 3);
+			assert.ok(Array.isArray(updatedRecords));
+			assert.ok(updatedRecords[0]);
+			assert.ok(updatedRecords[1]);
+			assert.ok(updatedRecords[2]);
 
-		const draftRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.DRAFT);
-		const rejectedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.REJECTED);
-		const approvedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.APPROVED);
+			const date1 = updatedRecords[0].updatedAt?.valueOf();
+			const date2 = updatedRecords[1].updatedAt?.valueOf();
+			const date3 = updatedRecords[2].updatedAt?.valueOf();
 
-		assert.ok(draftRecordIndex < rejectedRecordIndex);
-		assert.ok(rejectedRecordIndex < approvedRecordIndex);
-	});
+			assert.ok(date1 && date2 && date1 < date2);
+			assert.ok(date2 && date3 && date2 < date3);
+		});
 
-	it('should allow record pagination', async () => {
-		const applicationRecords = await applicationService.listApplications({ sort: 'state' });
+		it('should allow sorting records by state', async () => {
+			const applicationRecords = await applicationService.listApplications({
+				sort: [
+					{
+						direction: 'asc',
+						column: 'state',
+					},
+				],
+			});
 
-		assert.ok(Array.isArray(applicationRecords));
-		assert.strictEqual(applicationRecords.length, 3);
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords.length >= 3);
 
-		// Bring total # of records to 20
-		// TODO: Seed test DB
-		for (let i = 0; i < 17; i++) {
-			await applicationService.createApplication({ user_id });
-		}
+			const draftRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.DRAFT);
+			const rejectedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.REJECTED);
+			const approvedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.APPROVED);
 
-		const paginatedRecords = await applicationService.listApplications({ user_id, page: 1, pageSize: 10 });
+			assert.ok(draftRecordIndex < rejectedRecordIndex);
+			assert.ok(rejectedRecordIndex < approvedRecordIndex);
+		});
 
-		// Test that only 10 were returned
-		assert.ok(Array.isArray(paginatedRecords));
-		assert.strictEqual(paginatedRecords.length, 10);
+		it('should allow record pagination', async () => {
+			await addPaginationDonors(db);
 
-		const allRecords = await applicationService.listApplications({ user_id });
+			const paginatedRecords = await applicationService.listApplications({ user_id, page: 1, pageSize: 10 });
 
-		assert.ok(Array.isArray(allRecords));
+			// Test that only 10 were returned
+			assert.ok(Array.isArray(paginatedRecords));
+			assert.strictEqual(paginatedRecords.length, 10);
 
-		const lastPaginatedIndex = paginatedRecords.length - 1;
-		const middleIndex = allRecords.length - 10;
-		const lastIndex = allRecords.length - 1;
+			const allRecords = await applicationService.listApplications({ user_id });
 
-		// Test that pagination returned 'page 2' of the results
-		assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);
-		assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
-	});
+			assert.ok(Array.isArray(allRecords));
 
-	it('should allow editing applications with status DRAFT and submitted user_id', async () => {
-		const applicationRecords = await applicationService.listApplications({ user_id });
+			const lastPaginatedIndex = paginatedRecords.length - 1;
+			const middleIndex = allRecords.length - 10;
+			const lastIndex = allRecords.length - 1;
 
-		assert.ok(Array.isArray(applicationRecords));
+			assert.ok(paginatedRecords[0]);
+			assert.ok(paginatedRecords[lastPaginatedIndex]);
+			assert.ok(allRecords[middleIndex]);
+			assert.ok(allRecords[lastIndex]);
 
-		const { id } = applicationRecords[0];
-
-		const update = { applicant_first_name: 'Test' };
-
-		const editedApplication = await applicationService.editApplication({ id, update });
-
-		assert.ok(!!editedApplication);
-		assert.strictEqual(editedApplication?.state, ApplicationStates.DRAFT);
-		assert.strictEqual(editedApplication?.contents.applicant_first_name, update.applicant_first_name);
-	});
-
-	it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
-		const applicationRecords = await applicationService.listApplications({ user_id });
-
-		assert.ok(Array.isArray(applicationRecords));
-
-		const { id, state } = applicationRecords[0];
-
-		assert.strictEqual(state, ApplicationStates.DRAFT);
-
-		const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-		const reviewRecord = await applicationService.findOneAndUpdate({ id, update: stateUpdate });
-
-		assert.ok(Array.isArray(reviewRecord));
-		assert.strictEqual(reviewRecord[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
-
-		const contentUpdate = { applicant_last_name: 'User' };
-		const editedApplication = await applicationService.editApplication({ id, update: contentUpdate });
-
-		assert.ok(!!editedApplication);
-		assert.strictEqual(editedApplication?.id, id);
-		assert.strictEqual(editedApplication?.state, ApplicationStates.DRAFT);
-		assert.strictEqual(editedApplication?.contents.applicant_last_name, contentUpdate.applicant_last_name);
-	});
-
-	it('should error and return null when application state is not draft or review', async () => {
-		const applicationRecords = await applicationService.listApplications({ user_id });
-
-		assert.ok(Array.isArray(applicationRecords));
-
-		const { id, state } = applicationRecords[0];
-
-		assert.strictEqual(state, ApplicationStates.DRAFT);
-
-		const stateUpdate = { state: ApplicationStates.DAC_REVISIONS_REQUESTED };
-		const reviewRecord = await applicationService.findOneAndUpdate({ id, update: stateUpdate });
-
-		assert.ok(Array.isArray(reviewRecord));
-		assert.strictEqual(reviewRecord[0].state, ApplicationStates.DAC_REVISIONS_REQUESTED);
-
-		const contentUpdate = { applicant_title: 'Dr.' };
-		const editedApplication = await applicationService.editApplication({ id, update: contentUpdate });
-
-		assert.ok(!editedApplication);
-	});
-
-	it('should delete applications with a given user_id', async () => {
-		const deletedRecords = await applicationService.deleteApplication({ user_id });
-
-		assert.ok(Array.isArray(deletedRecords));
-		assert.strictEqual(deletedRecords.length, 20);
+			// Test that pagination returned 'page 2' of the results
+			assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);
+			assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
+		});
 	});
 
 	after(async () => {
+		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});

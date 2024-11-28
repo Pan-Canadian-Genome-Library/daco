@@ -19,7 +19,6 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-
 import { applicationContents } from './applicationContents.js';
 
 export const agreementEnum = pgEnum('agreement_types', [
