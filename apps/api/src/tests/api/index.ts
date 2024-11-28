@@ -22,13 +22,13 @@ import { before, describe, it } from 'node:test';
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { StateValue } from 'xstate';
-import { applicationStateActor } from '../../states.js';
+import { applicationStateActor } from '../../api/states.js';
 
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
 	ApplicationStates;
 
 describe('State Machine', () => {
-	describe('Application State', () => {
+	describe('XState - Application State', () => {
 		let counter = 0;
 		let value: string | StateValue = DRAFT;
 
