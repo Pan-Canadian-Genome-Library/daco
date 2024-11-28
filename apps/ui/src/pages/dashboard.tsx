@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout } from 'antd';
+import { Col, Flex, Layout, Row } from 'antd';
 
-import ApplicationStatusBar from '@/components/ApplicationStatusBar';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
-import NewApplicationCard from '@/components/NewApplicationCard';
+import { applications } from '@/components/mock/applicationMockData';
+import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatusBar';
+import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
+import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 
 const { Content } = Layout;
 
@@ -30,15 +32,28 @@ const DashboardPage = () => {
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
 				<ApplicationStatusBar />
-				<Flex flex={1} align="center" justify="center">
-					<ContentWrapper>
-						<Flex style={{ width: '100%' }} justify="center" align="center">
+				<ContentWrapper style={{ padding: 40 }}>
+					<Row gutter={[48, 48]} align={'middle'} justify={'center'}>
+						{applications.length > 0 ? (
+							<>
+								<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+									<NewApplicationCard />
+								</Col>
+								{applications.map((applicationItem) => {
+									return (
+										<Col key={applicationItem.id} xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+											<ApplicationCard {...applicationItem} />
+										</Col>
+									);
+								})}
+							</>
+						) : (
 							<Col span={12}>
 								<NewApplicationCard />
 							</Col>
-						</Flex>
-					</ContentWrapper>
-				</Flex>
+						)}
+					</Row>
+				</ContentWrapper>
 			</Flex>
 		</Content>
 	);

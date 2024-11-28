@@ -19,7 +19,7 @@
 
 import { ConfigProvider, ThemeConfig } from 'antd';
 
-const pcglColors = {
+export const pcglColors = {
 	// Main Colors
 	primary: '#C41D7F',
 	secondary: '#520339',
@@ -29,7 +29,7 @@ const pcglColors = {
 	errorPrimary: '#FF4D4F',
 	errorSecondary: '#FFCCC7',
 
-	warningPrimary: '#FAAD14',
+	warningPrimary: '#FADB14',
 	warningSecondary: '#FFFFB8',
 
 	successPrimary: '#52C41A',
@@ -37,6 +37,7 @@ const pcglColors = {
 
 	white: '#FFFFFF',
 	black: '#000000',
+	grey: '#D9D9D9',
 };
 
 // General Theme Configurations
