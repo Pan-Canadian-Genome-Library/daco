@@ -24,9 +24,9 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { eq } from 'drizzle-orm';
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { connectToDb, type PostgresDb } from '../../db/index.js';
-import { applications } from '../../db/schemas/applications.js';
-import service from '../../service/application-service.js';
+import { connectToDb, type PostgresDb } from '../../src/db/index.js';
+import { applications } from '../../src/db/schemas/applications.js';
+import service from '../../src/service/application-service.js';
 
 import {
 	addInitialApplications,

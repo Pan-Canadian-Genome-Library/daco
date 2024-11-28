@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "rimraf ./dist && tsc",
 		"dev": "tsx watch --env-file=.env ./src/main.ts",
-		"test": "npx tsx --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*",
+		"test": "npx tsx --test --test-reporter=spec --experimental-test-coverage ./tests/**/*",
 		"start:prod": "node ./dist/src/main.js"
 	},
 	"devDependencies": {
