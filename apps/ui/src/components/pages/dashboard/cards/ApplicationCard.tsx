@@ -33,7 +33,7 @@ type ApplicationCardProps = {
 };
 
 const ApplicationCard = (props: ApplicationCardProps) => {
-	const { id, userId, status, createdAt, expiresAt } = props.application;
+	const { id, status, createdAt, expiresAt } = props.application;
 	const { showEdit, color, showActionRequired } = getApplicationStatusProperties(status);
 	const { token } = useToken();
 
@@ -61,7 +61,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 					</Flex>
 				</Flex>
 				<Title style={{ margin: 0 }} level={3}>
-					Application: {userId}
+					Application: PCGL-{id}
 				</Title>
 				<Text>
 					Created: {formatDate(createdAt)} | Expires: {formatDate(expiresAt)}
