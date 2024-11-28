@@ -17,27 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
-import { RouterProvider } from 'react-router';
+export const formatDate = (date: Date): string => {
+	const monthNames = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December',
+	];
 
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
+	const day = date.getDate().toString().padStart(2, '0');
+	const month = monthNames[date.getMonth()].substring(0, 3);
+	const year = date.getFullYear();
 
-import router from '@/pages/routes';
-
-function App() {
-	return (
-		<ThemeProvider>
-			<Flex>
-				<Layout style={{ minHeight: '100vh' }}>
-					<HeaderComponent />
-					<RouterProvider router={router} />
-					<FooterComponent />
-				</Layout>
-			</Flex>
-		</ThemeProvider>
-	);
-}
-
-export default App;
+	return `${month} ${day}, ${year}`;
+};

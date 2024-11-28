@@ -19,14 +19,23 @@
 
 import { Flex } from 'antd';
 
-// @description: Purpose of this wrapper is to endure all elements on the page is sized consistently and properly across pages and elements
+// @description: Purpose of this wrapper is to ensure all elements on the page is sized consistently and properly across pages and elements
 export const contentWrapperStyles: React.CSSProperties = {
 	marginInline: 'auto',
 	width: '90%',
 };
 
-const ContentWrapper = ({ children }: { children: React.ReactElement }) => {
-	return <Flex style={contentWrapperStyles}>{children}</Flex>;
+type ContentWrapperProps = {
+	style?: React.CSSProperties;
+	children: React.ReactElement;
+};
+
+const ContentWrapper = ({ style, children }: ContentWrapperProps) => {
+	return (
+		<Flex style={{ ...contentWrapperStyles, ...style }} flex={1} justify="center">
+			{children}
+		</Flex>
+	);
 };
 
 export default ContentWrapper;
