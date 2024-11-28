@@ -17,19 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import assert from 'node:assert';
-import { after, describe, it } from 'node:test';
+export {
+	type Applicant,
+	type Application,
+	type Collaborator,
+	type Institution,
+	type PersonalInfo,
+	type Project,
+} from './types.js';
 
-import { port } from '../server.ts';
-
-describe('Initial Test Setup', () => {
-	describe('First File', () => {
-		it('should have a Port Value of 3000', () => {
-			assert.strictEqual(port, 3000);
-		});
-
-		after(() => {
-			process.exit();
-		});
-	});
-});
+export { demoApplication } from './demoData.js';

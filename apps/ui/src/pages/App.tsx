@@ -18,11 +18,13 @@
  */
 
 import { Flex, Layout } from 'antd';
+import { RouterProvider } from 'react-router';
 
 import FooterComponent from '@/components/Footer';
 import HeaderComponent from '@/components/Header';
 import ThemeProvider from '@/components/providers/ThemeProvider';
-import { HomePage } from '@/pages/index';
+
+import router from '@/pages/routes';
 
 function App() {
 	return (
@@ -30,8 +32,7 @@ function App() {
 			<Flex>
 				<Layout style={{ minHeight: '100vh' }}>
 					<HeaderComponent />
-					{/* TODO: add router and add Home component to it remix or react-router-dom */}
-					<HomePage />
+					<RouterProvider router={router} />
 					<FooterComponent />
 				</Layout>
 			</Flex>

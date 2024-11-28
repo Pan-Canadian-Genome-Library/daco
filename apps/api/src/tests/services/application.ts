@@ -22,9 +22,9 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { initMigration, startDb, type PostgresDb } from '../../db/index.ts';
-import service from '../../service/application-service.ts';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { initMigration, startDb, type PostgresDb } from '../../db/index.js';
+import service from '../../service/application-service.js';
 
 const PG_DATABASE = process.env.PG_DATABASE || 'testUser';
 const PG_USER = process.env.PG_USER || 'testPassword';

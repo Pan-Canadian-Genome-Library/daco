@@ -17,32 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { actions } from './actions.js';
-import { applicationContents } from './applicationContents.js';
+import { Button, Card, Flex, theme, Typography } from 'antd';
 
-export const revisionRequests = pgTable('revision_requests', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	comments: text(),
-	applicant_notes: text(),
-	applicant_approved: boolean().notNull(),
-	institution_rep_approved: boolean().notNull(),
-	institution_rep_notes: text(),
-	collaborators_approved: boolean().notNull(),
-	collaborators_notes: text(),
-	project_approved: boolean().notNull(),
-	project_notes: text(),
-	requested_studies_approved: boolean().notNull(),
-	requested_studies_notes: text(),
-});
+const { Title } = Typography;
+const { useToken } = theme;
 
-export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
-	application_id: one(applicationContents, {
-		fields: [revisionRequests.application_id],
-		references: [applicationContents.id],
-	}),
-	actions: many(actions),
-}));
+const NewApplicationCard = () => {
+	const { token } = useToken();
+
+	return (
+		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
+			<Flex justify="center" align="center" vertical gap="middle">
+				<Title level={3}>Start A New Application</Title>
+				<Button color="default" variant="outlined">
+					Get Started
+				</Button>
+			</Flex>
+		</Card>
+	);
+};
+
+export default NewApplicationCard;

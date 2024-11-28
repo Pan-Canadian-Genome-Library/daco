@@ -17,18 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { demoApplication } from '@pcgl-daco/data-model/src/main.js';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
-// TODO: Fix Types package so we can import from main instead of specific file
-import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
-import { startDb, type PostgresDb } from './db/index.ts';
 
 export const port = process.env.PORT || 3000;
 
 const startServer = async (connectionString: string) => {
-	// TODO: Implement with service and routes
-	const _db: PostgresDb = startDb(connectionString);
-
 	const app = express();
 
 	app.get('/', (_req: Request, res: Response) => {

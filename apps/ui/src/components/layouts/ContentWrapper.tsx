@@ -17,32 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { actions } from './actions.js';
-import { applicationContents } from './applicationContents.js';
+import { Flex } from 'antd';
 
-export const revisionRequests = pgTable('revision_requests', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	comments: text(),
-	applicant_notes: text(),
-	applicant_approved: boolean().notNull(),
-	institution_rep_approved: boolean().notNull(),
-	institution_rep_notes: text(),
-	collaborators_approved: boolean().notNull(),
-	collaborators_notes: text(),
-	project_approved: boolean().notNull(),
-	project_notes: text(),
-	requested_studies_approved: boolean().notNull(),
-	requested_studies_notes: text(),
-});
+// @description: Purpose of this wrapper is to ensure all elements on the page is sized consistently and properly across pages and elements
+export const contentWrapperStyles: React.CSSProperties = {
+	marginInline: 'auto',
+	width: '90%',
+};
 
-export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
-	application_id: one(applicationContents, {
-		fields: [revisionRequests.application_id],
-		references: [applicationContents.id],
-	}),
-	actions: many(actions),
-}));
+type ContentWrapperProps = {
+	style?: React.CSSProperties;
+	children: React.ReactElement;
+};
+
+const ContentWrapper = ({ style, children }: ContentWrapperProps) => {
+	return (
+		<Flex style={{ ...contentWrapperStyles, ...style }} flex={1} justify="center">
+			{children}
+		</Flex>
+	);
+};
+
+export default ContentWrapper;

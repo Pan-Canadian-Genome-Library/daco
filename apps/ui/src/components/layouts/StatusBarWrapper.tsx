@@ -17,13 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export {
-	type Applicant,
-	type Application,
-	type Collaborator,
-	type Institution,
-	type PersonalInfo,
-	type Project,
-} from './types';
+import { Flex, theme } from 'antd';
+import ContentWrapper from './ContentWrapper';
 
-export { demoApplication } from './demoData.mts';
+const { useToken } = theme;
+
+const StatusBannerWrapperStyles: React.CSSProperties = {
+	paddingInline: '50px',
+	width: '100%',
+	minHeight: 300,
+};
+
+const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => {
+	const { token } = useToken();
+
+	return (
+		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorWhite }}>
+			<ContentWrapper>{children}</ContentWrapper>
+		</Flex>
+	);
+};
+
+export default StatusBannerWrapper;
