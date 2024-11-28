@@ -27,7 +27,13 @@ import { formatDate } from '@/global/utils';
 const { Title, Text } = Typography;
 const { useToken } = theme;
 
-const ApplicationCard = ({ userId, status, createdAt, expiresAt }: ApplicationtType) => {
+type ApplicationCardProps = {
+	openEdit: (id: string) => void;
+	application: ApplicationtType;
+};
+
+const ApplicationCard = (props: ApplicationCardProps) => {
+	const { id, userId, status, createdAt, expiresAt } = props.application;
 	const { showEdit, color, showActionRequired } = getApplicationStatusProperties(status);
 	const { token } = useToken();
 
@@ -51,7 +57,7 @@ const ApplicationCard = ({ userId, status, createdAt, expiresAt }: ApplicationtT
 						) : null}
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
-						{showEdit ? <Button>Edit</Button> : null}
+						{showEdit ? <Button onClick={() => props.openEdit(id)}>Edit</Button> : null}
 					</Flex>
 				</Flex>
 				<Title style={{ margin: 0 }} level={3}>
