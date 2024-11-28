@@ -80,7 +80,7 @@ export const applicationStateActor = createActor(applicationStateMachine);
 
 // FSM
 
-enum ApplicationEvents {
+export enum ApplicationEvents {
 	submit = 'submit',
 	close = 'close',
 	edit = 'edit',
@@ -143,4 +143,5 @@ const transitions = [
 	approvalRevokedTransition,
 ];
 
+// TODO: Rename
 export const applicationFiniteStateMachine = new StateMachine<ApplicationStates, ApplicationEvents>(DRAFT, transitions);
