@@ -20,7 +20,7 @@
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ApplicationEvents, applicationStateMachine } from '../../api/states.js';
 
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
@@ -28,7 +28,7 @@ const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS
 
 describe('State Machine', () => {
 	describe('Application State', () => {
-		let value: ApplicationStates = DRAFT;
+		let value: ApplicationStateValues = DRAFT;
 
 		it('should initialize with state DRAFT', () => {
 			value = applicationStateMachine.getState();

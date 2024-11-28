@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { StateMachine, t as transition } from 'typescript-fsm';
 
 const {
@@ -96,4 +96,4 @@ const transitions = [
 ];
 
 // TODO: Rename
-export const applicationStateMachine = new StateMachine<ApplicationStates, ApplicationEvents>(DRAFT, transitions);
+export const applicationStateMachine = new StateMachine<ApplicationStateValues, ApplicationEvents>(DRAFT, transitions);
