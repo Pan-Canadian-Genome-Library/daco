@@ -38,7 +38,7 @@ const DashboardPage = () => {
 		setOpenModal(true);
 	};
 
-	// TODO: logic to change status from current to draft then redirect user
+	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleOk = () => {
 		setOpenModal(false);
 	};
