@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { createActor, createMachine } from 'xstate';
 
 const {

@@ -24,6 +24,6 @@ export {
 	type Institution,
 	type PersonalInfo,
 	type Project,
-} from './types';
+} from './types.js';
 
-export { demoApplication } from './demoData.mts';
+export { demoApplication } from './demoData.js';

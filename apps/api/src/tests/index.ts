@@ -17,35 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applicationContents } from './applicationContents.js';
+import assert from 'node:assert';
+import { after, describe, it } from 'node:test';
 
-export const applicationStatesEnum = pgEnum('application_states', [
-	'DRAFT',
-	'INSTITUTIONAL_REP_REVIEW',
-	'REP_REVISION',
-	'DAC_REVIEW',
-	'DAC_REVISIONS_REQUESTED',
-	'REJECTED',
-	'APPROVED',
-	'CLOSED',
-	'REVOKED',
-]);
+import { port } from '../main.js';
 
-export const applications = pgTable('applications', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	user_id: varchar({ length: 100 }).notNull(),
-	state: applicationStatesEnum().notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	approved_at: timestamp(),
-	expires_at: timestamp(),
-	contents: bigint({ mode: 'number' }),
+describe('Initial Test Setup', () => {
+	describe('First File', () => {
+		it('should have a Port Value of 3000', () => {
+			assert.strictEqual(port, 3000);
+		});
+
+		after(() => {
+			process.exit();
+		});
+	});
 });
-
-export const applicationsRelations = relations(applications, ({ one }) => ({
-	application_contents: one(applicationContents, {
-		fields: [applications.contents],
-		references: [applicationContents.id],
-	}),
-}));

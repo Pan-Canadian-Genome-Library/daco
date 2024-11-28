@@ -20,9 +20,9 @@
 import assert from 'node:assert';
 import { before, describe, it } from 'node:test';
 
-import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { StateValue } from 'xstate';
-import { applicationStateActor } from '../../states.ts';
+import { applicationStateActor } from '../../states.js';
 
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
 	ApplicationStates;

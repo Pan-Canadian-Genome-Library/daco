@@ -1,0 +1,20 @@
+# Deny All
+*
+
+# Allow select paths
+!apps/*
+!packages/*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!tsconfig.base.json
+!tsconfig.json
+
+# Ignore hidden files from sub-directories
+**/.*
+
+# Ignore test folders
+**/test/
+
+# Ignore nested node_modules
+**/node_modules/
