@@ -17,13 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { and, eq, sql } from 'drizzle-orm';
-import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { type PostgresDb } from '../db/index.ts';
-import { applicationContents } from '../db/schemas/applicationContents.ts';
-import { applications } from '../db/schemas/applications.ts';
-import { type ApplicationsColumnName, type ApplicationUpdates, type OrderBy } from './types.ts';
-import { sortQuery } from './utils.ts';
+import { type PostgresDb } from '../db/index.js';
+import { applicationContents } from '../db/schemas/applicationContents.js';
+import { applications } from '../db/schemas/applications.js';
+import { type ApplicationsColumnName, type ApplicationUpdates, type OrderBy } from './types.js';
+import { sortQuery } from './utils.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -35,6 +35,8 @@ const applicationService = (db: PostgresDb) => ({
 		try {
 			const application = await db.transaction(async (transaction) => {
 				const newApplicationRecord = await transaction.insert(applications).values(newApplication).returning();
+				if (!newApplicationRecord[0]) throw new Error('Application record is undefined');
+
 				const { id } = newApplicationRecord[0];
 
 				const newAppContents: typeof applicationContents.$inferInsert = {
@@ -43,6 +45,8 @@ const applicationService = (db: PostgresDb) => ({
 					updated_at: new Date(),
 				};
 				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
+				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
+
 				const { id: contentsId } = newAppContentsRecord[0];
 
 				const application = await transaction
@@ -82,6 +86,7 @@ const applicationService = (db: PostgresDb) => ({
 				.from(applications)
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			const application = {
 				...applicationRecord[0].applications,

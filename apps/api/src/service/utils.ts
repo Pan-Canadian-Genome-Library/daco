@@ -18,8 +18,8 @@
  */
 
 import { asc, desc } from 'drizzle-orm';
-import { applications } from '../db/schemas/applications.ts';
-import { type ApplicationsColumnName, type OrderBy } from './types.ts';
+import { applications } from '../db/schemas/applications.js';
+import { type ApplicationsColumnName, type OrderBy } from './types.js';
 
 export const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
 	const orderByArguments = sort

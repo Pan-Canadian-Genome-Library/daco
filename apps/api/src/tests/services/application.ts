@@ -23,20 +23,20 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
 
-import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
-import { connectToDb, type PostgresDb } from '../../db/index.ts';
-import { applications } from '../../db/schemas/applications.ts';
-import service from '../../service/application-service.ts';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { connectToDb, type PostgresDb } from '../../db/index.js';
+import { applications } from '../../db/schemas/applications.js';
+import service from '../../service/application-service.js';
 
 import {
-	addInitialDonors,
+	addInitialApplications,
 	addPaginationDonors,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../testUtils.ts';
+} from '../testUtils.js';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
@@ -54,7 +54,7 @@ describe('Application Service', () => {
 		db = connectToDb(connectionString);
 
 		await initTestMigration(db);
-		await addInitialDonors(db);
+		await addInitialApplications(db);
 
 		applicationService = service(db);
 	});
@@ -74,6 +74,7 @@ describe('Application Service', () => {
 			const applicationRecords = await applicationService.listApplications({ user_id });
 
 			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
 
 			const { id } = applicationRecords[0];
 
@@ -89,6 +90,7 @@ describe('Application Service', () => {
 		it('should populate updated_at field', async () => {
 			const applicationRecords = await applicationService.listApplications({ user_id });
 			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
 
 			const { id } = applicationRecords[0];
 			await applicationService.findOneAndUpdate({ id, update: {} });
@@ -105,7 +107,10 @@ describe('Application Service', () => {
 			const applicationRecords = await applicationService.listApplications({ user_id });
 
 			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords.length >= 3);
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
+
 			assert.strictEqual(applicationRecords[0].user_id, user_id);
 			assert.strictEqual(applicationRecords[1].user_id, user_id);
 			assert.strictEqual(applicationRecords[2].user_id, user_id);
@@ -115,7 +120,10 @@ describe('Application Service', () => {
 			const applicationRecords = await applicationService.listApplications({ state: ApplicationStates.DRAFT });
 
 			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords.length >= 3);
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
+
 			assert.strictEqual(applicationRecords[0].state, ApplicationStates.DRAFT);
 			assert.strictEqual(applicationRecords[1].state, ApplicationStates.DRAFT);
 			assert.strictEqual(applicationRecords[2].state, ApplicationStates.DRAFT);
@@ -132,7 +140,9 @@ describe('Application Service', () => {
 			});
 
 			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords.length >= 3);
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
 
 			const date1 = applicationRecords[0].createdAt.valueOf();
 			const date2 = applicationRecords[1].createdAt.valueOf();
@@ -146,7 +156,9 @@ describe('Application Service', () => {
 			const applicationRecords = await applicationService.listApplications({ user_id });
 
 			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords.length >= 3);
+			assert.ok(applicationRecords[0]);
+			assert.ok(applicationRecords[1]);
+			assert.ok(applicationRecords[2]);
 
 			const { id: zeroRecordId } = applicationRecords[0];
 			const { id: firstRecordId } = applicationRecords[1];
@@ -160,7 +172,9 @@ describe('Application Service', () => {
 			const updatedRecords = await applicationService.listApplications({ user_id });
 
 			assert.ok(Array.isArray(updatedRecords));
-			assert.ok(applicationRecords.length >= 3);
+			assert.ok(updatedRecords[0]);
+			assert.ok(updatedRecords[1]);
+			assert.ok(updatedRecords[2]);
 
 			const date1 = updatedRecords[0].updatedAt?.valueOf();
 			const date2 = updatedRecords[1].updatedAt?.valueOf();
@@ -207,6 +221,11 @@ describe('Application Service', () => {
 			const lastPaginatedIndex = paginatedRecords.length - 1;
 			const middleIndex = allRecords.length - 10;
 			const lastIndex = allRecords.length - 1;
+
+			assert.ok(paginatedRecords[0]);
+			assert.ok(paginatedRecords[lastPaginatedIndex]);
+			assert.ok(allRecords[middleIndex]);
+			assert.ok(allRecords[lastIndex]);
 
 			// Test that pagination returned 'page 2' of the results
 			assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);

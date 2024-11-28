@@ -17,15 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { eq } from 'drizzle-orm';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { dirname } from 'path';
-import { ApplicationStates } from 'pcgl-daco/packages/data-model/src/types.ts';
 import { fileURLToPath } from 'url';
 
-import { type PostgresDb } from '../db/index.ts';
-import { applicationContents } from '../db/schemas/applicationContents.ts';
-import { applications } from '../db/schemas/applications.ts';
+import { type PostgresDb } from '../db/index.js';
+import { applicationContents } from '../db/schemas/applicationContents.js';
+import { applications } from '../db/schemas/applications.js';
 
 export const testUserId = 'testUser@oicr.on.ca';
 export const PG_DATABASE = 'testUser';
@@ -46,7 +46,7 @@ export const initTestMigration = async (db: PostgresDb) => {
 	}
 };
 
-export const addInitialDonors = async (db: PostgresDb) => {
+export const addInitialApplications = async (db: PostgresDb) => {
 	const newApplication: typeof applications.$inferInsert = {
 		user_id: testUserId,
 		state: ApplicationStates.DRAFT,
@@ -55,6 +55,7 @@ export const addInitialDonors = async (db: PostgresDb) => {
 	// Create 3 Initial Applications w/ Contents
 	for (let i = 0; i < 3; i++) {
 		const newRecord = await db.insert(applications).values(newApplication).returning();
+		if (!newRecord[0]) throw new Error('Error creating test application records');
 
 		const { id } = newRecord[0];
 
@@ -64,6 +65,8 @@ export const addInitialDonors = async (db: PostgresDb) => {
 			updated_at: new Date(),
 		};
 		const newAppContentsRecord = await db.insert(applicationContents).values(newAppContents).returning();
+		if (!newAppContentsRecord[0]) throw new Error('Error creating test application content records');
+
 		const { id: contentsId } = newAppContentsRecord[0];
 
 		await db.update(applications).set({ contents: contentsId }).where(eq(applications.id, id));

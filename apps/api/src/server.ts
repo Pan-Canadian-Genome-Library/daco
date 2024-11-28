@@ -17,10 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { demoApplication } from '@pcgl-daco/data-model/src/main.js';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
-// TODO: Fix Types package so we can import from main instead of specific file
-import { demoApplication } from 'pcgl-daco/packages/data-model/src/main.mts';
 
 export const port = process.env.PORT || 3000;
 

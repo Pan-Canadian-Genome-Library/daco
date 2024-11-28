@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { applications } from '../db/schemas/applications.ts';
+import { applications } from '../db/schemas/applications.js';
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
