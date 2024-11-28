@@ -20,6 +20,8 @@
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { createActor, createMachine } from 'xstate';
 
+import { StateMachine, t as transition } from 'typescript-fsm';
+
 const {
 	DRAFT,
 	INSTITUTIONAL_REP_REVIEW,
@@ -31,6 +33,8 @@ const {
 	CLOSED,
 	REVOKED,
 } = ApplicationStates;
+
+// XState
 
 export const applicationStateMachine = createMachine({
 	id: 'applicationState',
@@ -73,3 +77,70 @@ export const applicationStateMachine = createMachine({
 });
 
 export const applicationStateActor = createActor(applicationStateMachine);
+
+// FSM
+
+enum ApplicationEvents {
+	submit = 'submit',
+	close = 'close',
+	edit = 'edit',
+	revision_request = 'revision_request',
+	approve = 'approve',
+	reject = 'reject',
+	revoked = 'revoked',
+}
+
+const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationEvents;
+
+const transitionHandler = () => {};
+
+const draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, transitionHandler);
+const draftEditTransition = transition(DRAFT, edit, DRAFT, transitionHandler);
+const draftCloseTransition = transition(DRAFT, close, CLOSED, transitionHandler);
+
+const repReviewCloseTransition = transition(INSTITUTIONAL_REP_REVIEW, close, CLOSED, transitionHandler);
+const repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, DRAFT, transitionHandler);
+const repReviewRevisionTransition = transition(
+	INSTITUTIONAL_REP_REVIEW,
+	revision_request,
+	REP_REVISION,
+	transitionHandler,
+);
+const repReviewSubmitTransition = transition(INSTITUTIONAL_REP_REVIEW, submit, DAC_REVIEW, transitionHandler);
+
+const repRevisionSubmitTransition = transition(REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW, transitionHandler);
+
+const dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, transitionHandler);
+const dacReviewCloseTransition = transition(DAC_REVIEW, close, CLOSED, transitionHandler);
+const dacReviewEditTransition = transition(DAC_REVIEW, edit, DRAFT, transitionHandler);
+const dacReviewRevisionTransition = transition(
+	DAC_REVIEW,
+	revision_request,
+	DAC_REVISIONS_REQUESTED,
+	transitionHandler,
+);
+const dacReviewRejectTransition = transition(DAC_REVIEW, reject, REJECTED, transitionHandler);
+
+const dacRevisionSubmitTransition = transition(DAC_REVISIONS_REQUESTED, submit, DAC_REVIEW, transitionHandler);
+
+const approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, transitionHandler);
+
+const transitions = [
+	draftSubmitTransition,
+	draftEditTransition,
+	draftCloseTransition,
+	repReviewCloseTransition,
+	repReviewEditTransition,
+	repReviewRevisionTransition,
+	repReviewSubmitTransition,
+	repRevisionSubmitTransition,
+	dacReviewApproveTransition,
+	dacReviewCloseTransition,
+	dacReviewEditTransition,
+	dacReviewRevisionTransition,
+	dacReviewRejectTransition,
+	dacRevisionSubmitTransition,
+	approvalRevokedTransition,
+];
+
+export const applicationFiniteStateMachine = new StateMachine<ApplicationStates, ApplicationEvents>(DRAFT, transitions);
