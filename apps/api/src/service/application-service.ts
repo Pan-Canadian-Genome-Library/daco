@@ -66,50 +66,29 @@ const applicationService = (db: PostgresDb) => ({
 	},
 	editApplication: async ({ id, update }: { id: number; update: any }) => {
 		try {
-			// Validate application state allows updates
-			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
-			if (!applicationRecord[0]) {
-				throw new Error('Application Not Found');
-			}
+			const contents = { ...update, updated_at: sql`NOW()` };
+			const editedContents = await db
+				.update(applicationContents)
+				.set(contents)
+				.where(eq(applicationContents.application_id, id))
+				.returning();
 
-			const { state } = applicationRecord[0];
-			const isDraftState = state === ApplicationStates.DRAFT;
-			// Edits to Applications under review will revert state to 'DRAFT'
-			const isReviewState =
-				state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
+			const applicationUpdates = {
+				updated_at: sql`NOW()`,
+				state: ApplicationStates.DRAFT,
+			};
+			const editedApplication = await db
+				.update(applications)
+				.set(applicationUpdates)
+				.where(eq(applications.id, id))
+				.returning();
 
-			if (isDraftState || isReviewState) {
-				try {
-					const contents = { ...update, updated_at: sql`NOW()` };
-					const editedContents = await db
-						.update(applicationContents)
-						.set(contents)
-						.where(eq(applicationContents.application_id, id))
-						.returning();
+			const application = {
+				...editedApplication[0],
+				contents: editedContents[0],
+			};
 
-					const applicationUpdates = {
-						updated_at: sql`NOW()`,
-						...(isReviewState && { state: ApplicationStates.DRAFT }),
-					};
-					const editedApplication = await db
-						.update(applications)
-						.set(applicationUpdates)
-						.where(eq(applications.id, id))
-						.returning();
-
-					const application = {
-						...editedApplication[0],
-						contents: editedContents[0],
-					};
-
-					return application;
-				} catch (err) {
-					throw err;
-				}
-			} else {
-				const error = new Error(`Cannot update application with state ${state}`);
-				throw error;
-			}
+			return application;
 		} catch (err) {
 			console.error(`Error at editApplication with id: ${id}`);
 			console.error(err);

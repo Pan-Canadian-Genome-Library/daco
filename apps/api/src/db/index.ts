@@ -21,9 +21,14 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 
 export type PostgresDb = ReturnType<typeof drizzle>;
 
+let pgDatabase: PostgresDb;
+
+export const getDbInstance = () => pgDatabase;
+
 export const connectToDb = (connectionString: string): PostgresDb => {
 	try {
 		const db = drizzle(connectionString);
+		pgDatabase = db;
 
 		return db;
 	} catch (err) {

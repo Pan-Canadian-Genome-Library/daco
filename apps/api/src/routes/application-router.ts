@@ -17,30 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { demoApplication } from '@pcgl-daco/data-model/src/main.js';
-import cors from 'cors';
-import express, { Request, Response } from 'express';
+import express from 'express';
+import { editApplication } from '../api/application-api.js';
 
-import applicationRouter from './routes/application-router.js';
+const applicationRouter = express.Router();
 
-export const port = process.env.PORT || 3000;
+applicationRouter.post('/application/edit/', (req, res) => {
+	editApplication({ id: 0, update: {} });
 
-const startServer = async () => {
-	const app = express();
+	res.send('Birds home page');
+});
 
-	app.get('/', (_req: Request, res: Response) => {
-		res.send('Hello World!');
-	});
-
-	app.use(applicationRouter);
-
-	app.get('/demo-application', cors(), (_req: Request, res: Response) => {
-		res.send(demoApplication);
-	});
-
-	app.listen(port, () => {
-		console.log(`Example app listening on port ${port}`);
-	});
-};
-
-export default startServer;
+export default applicationRouter;
