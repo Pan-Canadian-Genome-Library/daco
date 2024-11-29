@@ -23,16 +23,16 @@ import express, { Request, Response } from 'express';
 
 import applicationRouter from './routes/application-router.js';
 
-export const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 const startServer = async () => {
 	const app = express();
 
+	app.use(applicationRouter);
+
 	app.get('/', (_req: Request, res: Response) => {
 		res.send('Hello World!');
 	});
-
-	app.use(applicationRouter);
 
 	app.get('/demo-application', cors(), (_req: Request, res: Response) => {
 		res.send(demoApplication);

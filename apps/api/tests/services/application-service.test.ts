@@ -281,28 +281,6 @@ describe('Application Service', () => {
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicant_last_name);
 		});
-
-		// TODO: Move test to API
-		it.skip('should error and return null when application state is not draft or review', async () => {
-			const applicationRecords = await applicationService.listApplications({ user_id });
-
-			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
-
-			const { id, state } = applicationRecords[0];
-
-			assert.strictEqual(state, ApplicationStates.DRAFT);
-
-			const stateUpdate = { state: ApplicationStates.DAC_REVISIONS_REQUESTED };
-			const reviewRecord = await applicationService.findOneAndUpdate({ id, update: stateUpdate });
-
-			assert.ok(Array.isArray(reviewRecord) && reviewRecord[0]);
-			assert.strictEqual(reviewRecord[0].state, ApplicationStates.DAC_REVISIONS_REQUESTED);
-
-			const contentUpdate = { applicant_title: 'Dr.' };
-			const editedApplication = await applicationService.editApplication({ id, update: contentUpdate });
-
-			assert.ok(!editedApplication);
-		});
 	});
 
 	after(async () => {

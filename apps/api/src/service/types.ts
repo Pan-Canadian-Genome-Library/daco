@@ -17,9 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { applicationContents } from '../db/schemas/applicationContents.js';
 import { applications } from '../db/schemas/applications.js';
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+
+export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 

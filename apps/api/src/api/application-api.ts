@@ -19,11 +19,11 @@
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import applicationService from '../service/application-service.js';
-import { type ApplicationUpdates } from '../service/types.js';
+import { type ApplicationContentUpdates } from '../service/types.js';
 
 import { getDbInstance } from '../db/index.js';
 
-export const editApplication = async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
+export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
 	const service = applicationService(database);
 
@@ -44,7 +44,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		const updatedRecord = service.editApplication({ id, update });
 		return updatedRecord;
 	} else {
-		const error = new Error(`Cannot update application with state ${state}`);
-		throw error;
+		console.error(`Cannot update application with state ${state}`);
+		return null;
 	}
 };

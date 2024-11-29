@@ -22,7 +22,12 @@ import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '../db/index.js';
 import { applicationContents } from '../db/schemas/applicationContents.js';
 import { applications } from '../db/schemas/applications.js';
-import { type ApplicationsColumnName, type ApplicationUpdates, type OrderBy } from './types.js';
+import {
+	type ApplicationContentUpdates,
+	type ApplicationsColumnName,
+	type ApplicationUpdates,
+	type OrderBy,
+} from './types.js';
 import { sortQuery } from './utils.js';
 
 const applicationService = (db: PostgresDb) => ({
@@ -64,7 +69,7 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
-	editApplication: async ({ id, update }: { id: number; update: any }) => {
+	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 		try {
 			const contents = { ...update, updated_at: sql`NOW()` };
 			const editedContents = await db
