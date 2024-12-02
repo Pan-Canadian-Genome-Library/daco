@@ -17,12 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import bodyParser from 'body-parser';
 import express from 'express';
 import { editApplication } from '../api/application-api.js';
 
 const applicationRouter = express.Router();
+const jsonParser = bodyParser.json();
 
-applicationRouter.post('/application/edit/', async (req, res) => {
+applicationRouter.post('/application/edit/', jsonParser, async (req, res) => {
 	// TODO: Add Auth & Zod validation
 	const data = req.body;
 	const { id, update } = data;
