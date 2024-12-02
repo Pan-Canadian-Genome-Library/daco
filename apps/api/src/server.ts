@@ -17,8 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { demoApplication } from '@pcgl-daco/data-model/src/main.js';
-import cors from 'cors';
 import express, { Request, Response } from 'express';
 
 import applicationRouter from './routes/application-router.js';
@@ -32,10 +30,6 @@ const startServer = async () => {
 
 	app.get('/', (_req: Request, res: Response) => {
 		res.send('Hello World!');
-	});
-
-	app.get('/demo-application', cors(), (_req: Request, res: Response) => {
-		res.send(demoApplication);
 	});
 
 	app.listen(port, () => {
