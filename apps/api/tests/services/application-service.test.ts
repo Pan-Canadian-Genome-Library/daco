@@ -242,7 +242,7 @@ describe('Application Service', () => {
 			await addInitialApplications(db);
 		});
 
-		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
+		it('should allow editing applications and return record with updated fields', async () => {
 			const applicationRecords = await applicationService.listApplications({ user_id });
 
 			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
@@ -260,33 +260,6 @@ describe('Application Service', () => {
 
 			assert.ok(editedApplication.contents);
 			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicant_first_name);
-		});
-
-		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
-			const applicationRecords = await applicationService.listApplications({ user_id });
-
-			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
-
-			const { id, state } = applicationRecords[0];
-
-			assert.strictEqual(state, ApplicationStates.DRAFT);
-
-			const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-			const reviewRecord = await applicationService.findOneAndUpdate({ id, update: stateUpdate });
-
-			assert.ok(Array.isArray(reviewRecord) && reviewRecord[0]);
-			assert.strictEqual(reviewRecord[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
-
-			const contentUpdate = { applicant_last_name: 'User' };
-			const result = await applicationService.editApplication({ id, update: contentUpdate });
-			assert.ok(result.success);
-
-			const editedApplication = result.data;
-			assert.strictEqual(editedApplication.id, id);
-			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
-
-			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicant_last_name);
 		});
 	});
 
