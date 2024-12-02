@@ -32,7 +32,7 @@ export enum Status {
 export type ComponentStatus = {
 	status: Status;
 	statusText?: 'OK' | 'N/A' | 'ERROR';
-	info?: any;
+	info?: { err: unknown };
 };
 
 const health: AppHealth = {
