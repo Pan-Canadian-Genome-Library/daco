@@ -19,6 +19,9 @@
 
 import { applicationContents } from '../db/schemas/applicationContents.js';
 import { applications } from '../db/schemas/applications.js';
+import applicationService from './application-service.js';
+
+export type ApplicationService = ReturnType<typeof applicationService>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
