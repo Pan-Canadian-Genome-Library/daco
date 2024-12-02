@@ -23,6 +23,13 @@ import applicationService from '../service/application-service.js';
 import { type ApplicationContentUpdates, type ApplicationService } from '../service/types.js';
 import { failure } from '../utils/results.js';
 
+/**
+ * Validates if a given Application state allows edits, then updates the record
+ * Updated records are returned in state 'DRAFT'
+ * @param id - Application ID
+ * @param update - Application Contents details to update
+ * @returns Success with Application data / Failure with Error
+ */
 export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
 	const service: ApplicationService = applicationService(database);
@@ -34,9 +41,6 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 	}
 
 	const applicationRecord = result.data;
-
-	// Validate Application state will allow updates
-	// Edits to Applications under review will revert state to 'DRAFT'
 	const { state } = applicationRecord;
 
 	// TODO: Replace w/ state machine https://github.com/Pan-Canadian-Genome-Library/daco/issues/58
