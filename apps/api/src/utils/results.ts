@@ -17,22 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import express from 'express';
-import { editApplication } from '../api/application-api.js';
+// types
+export type Success<T> = { success: true; data: T };
+export type Failure = { success: false; message: string; errors?: any };
+export type Result<T> = Success<T> | Failure;
+export type AsyncResult<T> = Promise<Result<T>>;
 
-const applicationRouter = express.Router();
-
-applicationRouter.post('/application/edit/', async (req, res) => {
-	// TODO: Add Auth & Zod validation
-	const data = req.body;
-	const { id, update } = data;
-	const result = await editApplication({ id, update });
-
-	if (result.success) {
-		res.send(result.data);
-	} else {
-		res.status(500).send({ message: result.message, errors: result.errors });
-	}
+// helpers
+export const success = <T>(data: T): Success<T> => ({ success: true, data });
+export const failure = (message: string, errors?: any): Failure => ({
+	success: false,
+	message,
+	errors,
 });
-
-export default applicationRouter;

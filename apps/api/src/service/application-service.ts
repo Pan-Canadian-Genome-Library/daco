@@ -22,6 +22,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '../db/index.js';
 import { applicationContents } from '../db/schemas/applicationContents.js';
 import { applications } from '../db/schemas/applications.js';
+import { failure, success } from '../utils/results.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
@@ -29,8 +30,6 @@ import {
 	type OrderBy,
 } from './types.js';
 import { sortQuery } from './utils.js';
-
-export type ApplicationService = ReturnType<typeof applicationService>;
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -95,11 +94,12 @@ const applicationService = (db: PostgresDb) => ({
 				contents: editedContents[0],
 			};
 
-			return application;
+			return success(application);
 		} catch (err) {
-			console.error(`Error at editApplication with id: ${id}`);
+			const message = `Error at editApplication with id: ${id}`;
+			console.error(message);
 			console.error(err);
-			return null;
+			return failure(message, err);
 		}
 	},
 	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
@@ -124,6 +124,7 @@ const applicationService = (db: PostgresDb) => ({
 				.from(applications)
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			const application = {
@@ -135,6 +136,7 @@ const applicationService = (db: PostgresDb) => ({
 		} catch (err) {
 			console.error(`Error at getApplicationById with id: ${id}`);
 			console.error(err);
+
 			return null;
 		}
 	},

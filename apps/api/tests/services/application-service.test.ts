@@ -251,10 +251,14 @@ describe('Application Service', () => {
 
 			const update = { applicant_first_name: 'Test' };
 
-			const editedApplication = await applicationService.editApplication({ id, update });
+			const result = await applicationService.editApplication({ id, update });
 
-			assert.ok(editedApplication && editedApplication.contents);
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
 			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicant_first_name);
 		});
 
@@ -274,11 +278,14 @@ describe('Application Service', () => {
 			assert.strictEqual(reviewRecord[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
 			const contentUpdate = { applicant_last_name: 'User' };
-			const editedApplication = await applicationService.editApplication({ id, update: contentUpdate });
+			const result = await applicationService.editApplication({ id, update: contentUpdate });
+			assert.ok(result.success);
 
-			assert.ok(editedApplication && editedApplication.contents);
+			const editedApplication = result.data;
 			assert.strictEqual(editedApplication.id, id);
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
 			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicant_last_name);
 		});
 	});

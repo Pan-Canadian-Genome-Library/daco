@@ -66,9 +66,9 @@ describe('Application API', () => {
 			await applicationService.findOneAndUpdate({ id, update: stateUpdate });
 
 			const contentUpdate = { applicant_title: 'Dr.' };
-			const editedApplication = await editApplication({ id, update: contentUpdate });
+			const result = await editApplication({ id, update: contentUpdate });
 
-			assert.ok(!editedApplication);
+			assert.ok(!result.success);
 		});
 
 		after(() => {});

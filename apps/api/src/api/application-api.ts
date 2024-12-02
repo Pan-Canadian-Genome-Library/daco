@@ -18,10 +18,10 @@
  */
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { getDbInstance } from '../db/index.js';
 import applicationService from '../service/application-service.js';
 import { type ApplicationContentUpdates, type ApplicationService } from '../service/types.js';
-
-import { getDbInstance } from '../db/index.js';
+import { failure } from '../utils/results.js';
 
 export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
@@ -30,7 +30,9 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 	const applicationRecord = await service.getApplicationById({ id });
 
 	if (!applicationRecord) {
-		throw new Error('Application Not Found');
+		const message = `Application Not Found with ${id}`;
+		console.error(message);
+		return failure(message);
 	}
 
 	// Validate Application state will allow updates
@@ -44,15 +46,11 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		state === ApplicationStates.DAC_REVIEW;
 
 	if (isEditState) {
-		const updatedRecord = service.editApplication({ id, update });
-		if (updatedRecord) {
-			return updatedRecord;
-		} else {
-			console.error(`Error updating application`);
-			return null;
-		}
+		const result = await service.editApplication({ id, update });
+		return result;
 	} else {
-		console.error(`Cannot update application with state ${state}`);
-		return null;
+		const message = `Cannot update application with state ${state}`;
+		console.error(message);
+		return failure(message);
 	}
 };
