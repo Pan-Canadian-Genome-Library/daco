@@ -78,9 +78,11 @@ describe('Application Service', () => {
 
 			const { id } = applicationRecords[0];
 
-			const requestedApplication = await applicationService.getApplicationById({ id });
+			const result = await applicationService.getApplicationById({ id });
 
-			assert.notEqual(requestedApplication, null);
+			assert.ok(result.success);
+
+			const requestedApplication = result.data;
 			assert.strictEqual(requestedApplication?.id, id);
 			assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
 		});
@@ -95,9 +97,12 @@ describe('Application Service', () => {
 			const { id } = applicationRecords[0];
 			await applicationService.findOneAndUpdate({ id, update: {} });
 
-			const updatedApplication = await applicationService.getApplicationById({ id });
+			const result = await applicationService.getApplicationById({ id });
 
-			assert.notEqual(updatedApplication, null);
+			assert.ok(result.success);
+
+			const updatedApplication = result.data;
+
 			assert.ok(!!updatedApplication?.updated_at);
 		});
 	});

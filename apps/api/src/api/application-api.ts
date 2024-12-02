@@ -27,13 +27,13 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 	const database = getDbInstance();
 	const service: ApplicationService = applicationService(database);
 
-	const applicationRecord = await service.getApplicationById({ id });
+	const result = await service.getApplicationById({ id });
 
-	if (!applicationRecord) {
-		const message = `Application Not Found with ${id}`;
-		console.error(message);
-		return failure(message);
+	if (!result.success) {
+		return result;
 	}
+
+	const applicationRecord = result.data;
 
 	// Validate Application state will allow updates
 	// Edits to Applications under review will revert state to 'DRAFT'

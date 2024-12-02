@@ -132,12 +132,13 @@ const applicationService = (db: PostgresDb) => ({
 				contents: applicationRecord[0].application_contents,
 			};
 
-			return application;
+			return success(application);
 		} catch (err) {
-			console.error(`Error at getApplicationById with id: ${id}`);
+			const message = `Error at getApplicationById with id: ${id}`;
+			console.error(message);
 			console.error(err);
 
-			return null;
+			return failure(message, err);
 		}
 	},
 	listApplications: async ({
