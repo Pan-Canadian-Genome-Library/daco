@@ -23,7 +23,7 @@ export type PostgresDb = ReturnType<typeof drizzle>;
 
 let pgDatabase: PostgresDb;
 
-export const getDbInstance = () => pgDatabase;
+export const getDbInstance = (): PostgresDb => pgDatabase;
 
 export const connectToDb = (connectionString: string): PostgresDb => {
 	try {
