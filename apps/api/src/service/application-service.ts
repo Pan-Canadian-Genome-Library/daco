@@ -30,6 +30,8 @@ import {
 } from './types.js';
 import { sortQuery } from './utils.js';
 
+export type ApplicationService = ReturnType<typeof applicationService>;
+
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
 		const newApplication: typeof applications.$inferInsert = {

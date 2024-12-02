@@ -22,10 +22,16 @@ import { editApplication } from '../api/application-api.js';
 
 const applicationRouter = express.Router();
 
-applicationRouter.post('/application/edit/', (req, res) => {
-	editApplication({ id: 0, update: {} });
+applicationRouter.post('/application/edit/', async (req, res) => {
+	const data = req.body;
+	const { id, update } = data;
+	const record = await editApplication({ id, update });
 
-	res.send('Birds home page');
+	if (record) {
+		res.send(record);
+	} else {
+		res.status(500).send({ error: `Error updating application with id ${id}` });
+	}
 });
 
 export default applicationRouter;

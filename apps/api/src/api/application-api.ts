@@ -18,14 +18,14 @@
  */
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import applicationService from '../service/application-service.js';
+import applicationService, { ApplicationService } from '../service/application-service.js';
 import { type ApplicationContentUpdates } from '../service/types.js';
 
 import { getDbInstance } from '../db/index.js';
 
 export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
-	const service = applicationService(database);
+	const service: ApplicationService = applicationService(database);
 
 	const applicationRecord = await service.getApplicationById({ id });
 
@@ -36,6 +36,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 	// Validate Application state will allow updates
 	// Edits to Applications under review will revert state to 'DRAFT'
 	const { state } = applicationRecord;
+
 	// TODO: Replace w/ state machine https://github.com/Pan-Canadian-Genome-Library/daco/issues/58
 	const isEditState =
 		state === ApplicationStates.DRAFT ||
