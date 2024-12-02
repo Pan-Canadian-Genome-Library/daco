@@ -23,6 +23,7 @@ import { editApplication } from '../api/application-api.js';
 const applicationRouter = express.Router();
 
 applicationRouter.post('/application/edit/', async (req, res) => {
+	// TODO: Add Auth, Zod, & success/failure types
 	const data = req.body;
 	const { id, update } = data;
 	const record = await editApplication({ id, update });
