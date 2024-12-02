@@ -40,8 +40,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		return result;
 	}
 
-	const applicationRecord = result.data;
-	const { state } = applicationRecord;
+	const { state } = result.data;
 
 	// TODO: Replace w/ state machine https://github.com/Pan-Canadian-Genome-Library/daco/issues/58
 	const isEditState =
