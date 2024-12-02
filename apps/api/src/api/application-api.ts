@@ -33,14 +33,16 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		throw new Error('Application Not Found');
 	}
 
-	// TODO: Replace w/ state machine https://github.com/Pan-Canadian-Genome-Library/daco/issues/58
-	// Validate application state allows updates
+	// Validate Application state will allow updates
 	// Edits to Applications under review will revert state to 'DRAFT'
 	const { state } = applicationRecord;
-	const isDraftState = state === ApplicationStates.DRAFT;
-	const isReviewState = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
+	// TODO: Replace w/ state machine https://github.com/Pan-Canadian-Genome-Library/daco/issues/58
+	const isEditState =
+		state === ApplicationStates.DRAFT ||
+		state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
+		state === ApplicationStates.DAC_REVIEW;
 
-	if (isDraftState || isReviewState) {
+	if (isEditState) {
 		const updatedRecord = service.editApplication({ id, update });
 		return updatedRecord;
 	} else {
