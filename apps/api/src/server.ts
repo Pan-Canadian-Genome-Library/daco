@@ -49,11 +49,13 @@ const startServer = async () => {
 			version: `PCGL-V1`,
 			health,
 		};
-		if (health.all.status == Status.OK) {
-			res.send(resBody);
+
+		if (health.all.status != Status.OK) {
+			res.status(500).send(resBody);
 			return;
 		}
-		res.send(resBody);
+
+		res.status(200).send(resBody);
 	});
 
 	app.get('/applications', cors(), (_req: Request, res: Response) => {
