@@ -17,19 +17,38 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import assert from 'node:assert';
-import { after, describe, it } from 'node:test';
+import { after, before, describe } from 'node:test';
 
-import { port } from '../server.js';
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 
-describe('Initial Test Setup', () => {
-	describe('First File', () => {
-		it('should have a Port Value of 3000', () => {
-			assert.strictEqual(port, 3000);
-		});
+import service from '../../src/service/application-service.js';
 
-		after(() => {
-			process.exit();
-		});
+import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
+
+describe('Application API', () => {
+	let db: PostgresDb;
+	let applicationService: ReturnType<typeof service>;
+	let container: StartedPostgreSqlContainer;
+
+	before(async () => {
+		container = await new PostgreSqlContainer()
+			.withUsername(PG_USER)
+			.withPassword(PG_PASSWORD)
+			.withDatabase(PG_DATABASE)
+			.start();
+
+		const connectionString = container.getConnectionUri();
+		db = connectToDb(connectionString);
+
+		await initTestMigration(db);
+		await addInitialApplications(db);
+
+		applicationService = service(db);
+	});
+
+	after(async () => {
+		await container.stop();
+		process.exit(0);
 	});
 });

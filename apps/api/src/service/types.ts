@@ -23,6 +23,8 @@ export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 
+export type ApplicationSelectParams = { [column in ApplicationsColumnName]?: (typeof applications)[column] };
+
 export type OrderBy<Key extends string> = {
 	direction: 'asc' | 'desc';
 	column: Key;

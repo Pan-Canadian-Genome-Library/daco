@@ -21,7 +21,7 @@ import assert from 'node:assert';
 import { describe, it } from 'node:test';
 
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationEvents, applicationStateMachine } from '../../api/states.js';
+import { ApplicationEvents, applicationStateMachine } from '../../src/api/states.js';
 
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
 	ApplicationStates;

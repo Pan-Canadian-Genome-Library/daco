@@ -24,9 +24,9 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { eq } from 'drizzle-orm';
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { connectToDb, type PostgresDb } from '../../db/index.js';
-import { applications } from '../../db/schemas/applications.js';
-import service from '../../service/application-service.js';
+import { connectToDb, type PostgresDb } from '../../src/db/index.js';
+import { applications } from '../../src/db/schemas/applications.js';
+import service from '../../src/service/application-service.js';
 
 import {
 	addInitialApplications,
@@ -78,7 +78,7 @@ describe('Application Service', () => {
 
 			const { id } = applicationRecords[0];
 
-			const requestedApplication = await applicationService.getApplicationById({ id });
+			const requestedApplication = await applicationService.getApplicationWithContents({ id });
 
 			assert.notEqual(requestedApplication, null);
 			assert.strictEqual(requestedApplication?.id, id);
@@ -95,7 +95,7 @@ describe('Application Service', () => {
 			const { id } = applicationRecords[0];
 			await applicationService.findOneAndUpdate({ id, update: {} });
 
-			const updatedApplication = await applicationService.getApplicationById({ id });
+			const updatedApplication = await applicationService.getApplicationWithContents({ id });
 
 			assert.notEqual(updatedApplication, null);
 			assert.ok(!!updatedApplication?.updated_at);

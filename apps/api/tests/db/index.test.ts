@@ -23,13 +23,13 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { eq } from 'drizzle-orm';
 
-import { connectToDb, type PostgresDb } from '../../db/index.js';
-import { actions } from '../../db/schemas/actions.js';
-import { agreements } from '../../db/schemas/agreements.js';
-import { applicationContents } from '../../db/schemas/applicationContents.js';
-import { collaborators } from '../../db/schemas/collaborators.js';
-import { files } from '../../db/schemas/files.js';
-import { revisionRequests } from '../../db/schemas/revisionRequests.js';
+import { connectToDb, type PostgresDb } from '../../src/db/index.js';
+import { actions } from '../../src/db/schemas/actions.js';
+import { agreements } from '../../src/db/schemas/agreements.js';
+import { applicationContents } from '../../src/db/schemas/applicationContents.js';
+import { collaborators } from '../../src/db/schemas/collaborators.js';
+import { files } from '../../src/db/schemas/files.js';
+import { revisionRequests } from '../../src/db/schemas/revisionRequests.js';
 
 import { initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
@@ -80,7 +80,7 @@ describe('Postgres Database', () => {
 				.where(eq(actions.application_id, testAction.application_id))
 				.returning();
 
-			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
+			assert.strictEqual(deletedRecord.length, 1);
 		});
 	});
 
@@ -103,7 +103,7 @@ describe('Postgres Database', () => {
 
 			const deletedRecord = await db.delete(agreements).where(eq(agreements.name, testAgreements.name)).returning();
 
-			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
+			assert.strictEqual(deletedRecord.length, 1);
 		});
 	});
 
@@ -127,14 +127,14 @@ describe('Postgres Database', () => {
 
 			const allApplicationContents = await db.select().from(applicationContents);
 
-			assert.ok(Array.isArray(allApplicationContents));
+			assert.strictEqual(allApplicationContents.length, 1);
 
 			const deletedRecord = await db
 				.delete(applicationContents)
 				.where(eq(applicationContents.application_id, testApplicationContents.application_id))
 				.returning();
 
-			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
+			assert.strictEqual(deletedRecord.length, 1);
 		});
 	});
 
@@ -159,7 +159,7 @@ describe('Postgres Database', () => {
 				.where(eq(collaborators.first_name, testCollaborators.first_name))
 				.returning();
 
-			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
+			assert.strictEqual(deletedRecord.length, 1);
 		});
 	});
 
@@ -184,7 +184,7 @@ describe('Postgres Database', () => {
 				.where(eq(files.submitter_user_id, testFiles.submitter_user_id))
 				.returning();
 
-			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
+			assert.strictEqual(deletedRecord.length, 1);
 		});
 	});
 
@@ -210,7 +210,7 @@ describe('Postgres Database', () => {
 				.where(eq(revisionRequests.application_id, testRevisions.application_id))
 				.returning();
 
-			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
+			assert.strictEqual(deletedRecord.length, 1);
 		});
 	});
 
