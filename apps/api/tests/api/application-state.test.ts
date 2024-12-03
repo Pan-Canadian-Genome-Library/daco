@@ -17,17 +17,37 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { after, before, describe, it } from 'node:test';
 
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationEvents, applicationStateMachine } from '../../src/api/states.js';
+import { ApplicationEvents, applicationStateMachine, createApplicationManager } from '../../src/api/states.js';
+import { connectToDb, type PostgresDb } from '../../src/db/index.js';
+import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
 	ApplicationStates;
 
 describe('State Machine', () => {
-	describe('Application State', () => {
+	let db: PostgresDb;
+	let container: StartedPostgreSqlContainer;
+
+	before(async () => {
+		container = await new PostgreSqlContainer()
+			.withUsername(PG_USER)
+			.withPassword(PG_PASSWORD)
+			.withDatabase(PG_DATABASE)
+			.start();
+
+		const connectionString = container.getConnectionUri();
+		db = connectToDb(connectionString);
+
+		await initTestMigration(db);
+		await addInitialApplications(db);
+	});
+
+	describe('Application State Machine', () => {
 		let value: ApplicationStateValues = DRAFT;
 
 		it('should initialize with state DRAFT', () => {
@@ -85,5 +105,18 @@ describe('State Machine', () => {
 			value = applicationStateMachine.getState();
 			assert.strictEqual(value, APPROVED);
 		});
+	});
+
+	describe('Application Manager', () => {
+		it('create Application Manager classes', async () => {
+			const manager = await createApplicationManager({ id: 1 });
+			console.log(manager);
+			assert.ok(manager);
+		});
+	});
+
+	after(async () => {
+		await container.stop();
+		process.exit(0);
 	});
 });

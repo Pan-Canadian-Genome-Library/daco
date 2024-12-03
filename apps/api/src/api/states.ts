@@ -19,6 +19,9 @@
 
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { StateMachine, t as transition } from 'typescript-fsm';
+import { getDbInstance } from '../db/index.js';
+import { applications } from '../db/schemas/applications.js';
+import applicationService from '../service/application-service.js';
 
 const {
 	DRAFT,
@@ -44,6 +47,7 @@ export enum ApplicationEvents {
 
 const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationEvents;
 
+// TODO: Replace with actual methods
 const transitionHandler = () => {};
 
 const draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, transitionHandler);
@@ -97,3 +101,62 @@ const transitions = [
 
 // TODO: Rename
 export const applicationStateMachine = new StateMachine<ApplicationStateValues, ApplicationEvents>(DRAFT, transitions);
+
+export const createApplicationManager = async ({ id }: { id: number }) => {
+	const database = getDbInstance();
+	const service: ReturnType<typeof applicationService> = applicationService(database);
+
+	const selectFields = { id: applications.id, state: applications.state };
+	const dbRecord = await service.getApplicationById({ id, selectFields });
+
+	console.log(dbRecord);
+	return dbRecord;
+};
+
+// class Application extends StateMachine<ApplicationStateValues, ApplicationEvents> {
+// private readonly _id: number;
+// private readonly _key: number;
+
+// constructor(application: ApplicationDBRecord) {
+// this._id = application.id;
+// this.addTransitions(transitions);
+
+// fetch application from db to get initial state
+// this._key = application.state; // state read from db
+// }
+
+// async submit(applicationRecord) {
+// 	if(this.can('submit')) {
+// 		const validationResult = validateContent();
+// 		if(validationResult.success) {
+// 			this.dispatch('submit');
+// 		} else {
+// 			return errorStuff
+// 		}
+// };
+// }
+
+// const submit = () => {
+// if(state.can('submit')) {
+// 	const validationResult = validateContent();
+// 	if(validationResult.success) {
+// 		state.dispatch('submit');
+// 	} else {
+// 		return errorStuff
+// 	}
+// };
+// }
+
+// export submitDraft(application: ApplicationDBRecord): {success: true} | {success: false; error: something} => {
+// 	//1. initialize state machine
+// 	const stateMachine = new StateMachine(applciation.state, transitions);
+// 	if(stateMachine.can('submit')) {
+// 		if(validationResult.success) {
+// 			stateMachine.dispatch('submit');
+// 			const validationResult = validateContent();
+// 		} else {
+// 			return errorStuff
+// 		}
+// }
+
+// result is either success, or the reason i cant submit it.
