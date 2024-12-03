@@ -47,13 +47,15 @@ export enum ApplicationStateEvents {
 
 const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
 
-// TODO: Replace with actual methods
+// TODO: Replace with individual methods
 const transitionHandler = () => {};
 
+// Draft
 const draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, transitionHandler);
 const draftEditTransition = transition(DRAFT, edit, DRAFT, transitionHandler);
 const draftCloseTransition = transition(DRAFT, close, CLOSED, transitionHandler);
 
+// Rep Review
 const repReviewCloseTransition = transition(INSTITUTIONAL_REP_REVIEW, close, CLOSED, transitionHandler);
 const repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, DRAFT, transitionHandler);
 const repReviewRevisionTransition = transition(
@@ -64,8 +66,10 @@ const repReviewRevisionTransition = transition(
 );
 const repReviewSubmitTransition = transition(INSTITUTIONAL_REP_REVIEW, submit, DAC_REVIEW, transitionHandler);
 
+// Rep Revision
 const repRevisionSubmitTransition = transition(REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW, transitionHandler);
 
+// DAC Review
 const dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, transitionHandler);
 const dacReviewCloseTransition = transition(DAC_REVIEW, close, CLOSED, transitionHandler);
 const dacReviewEditTransition = transition(DAC_REVIEW, edit, DRAFT, transitionHandler);
@@ -77,10 +81,14 @@ const dacReviewRevisionTransition = transition(
 );
 const dacReviewRejectTransition = transition(DAC_REVIEW, reject, REJECTED, transitionHandler);
 
+// DAC Revision
 const dacRevisionSubmitTransition = transition(DAC_REVISIONS_REQUESTED, submit, DAC_REVIEW, transitionHandler);
 
+// Approval
 const approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, transitionHandler);
 
+// All Transitions
+// TODO: Add Connect Handlers to Class
 const applicationTransitions = [
 	draftSubmitTransition,
 	draftEditTransition,
@@ -99,6 +107,7 @@ const applicationTransitions = [
 	approvalRevokedTransition,
 ];
 
+// TODO: Move to API
 export const createApplicationStateManager = async ({ id }: { id: number }) => {
 	const database = getDbInstance();
 	const service: ReturnType<typeof applicationService> = applicationService(database);
@@ -123,6 +132,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	constructor(application: typeof applications.$inferSelect) {
 		const { id, state } = application;
+		// TODO: Build Transitions for Class
 		super(state, applicationTransitions);
 		this._id = id;
 		this._state = state;
@@ -147,7 +157,14 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			} else {
 				return { success: false, data: `Cannot submit application with state ${this._state}` };
 			}
+		} else {
+			return { success: false, data: `Cannot submit application with state ${this._state}` };
 		}
+	}
+
+	private async _onSubmit() {
+		// this.logger.log(`${this._id} onOpen...`);
+		// return this.dispatch(Events.openComplete);
 	}
 }
 

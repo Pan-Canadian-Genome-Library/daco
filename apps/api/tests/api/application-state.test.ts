@@ -116,6 +116,15 @@ describe('State Machine', () => {
 			value = manager.getState();
 			assert.strictEqual(value, APPROVED);
 		});
+
+		it('should not allow submission post approval', async () => {
+			const result = await manager.submit();
+
+			const errorMessage = `Cannot submit application with state DRAFT`;
+
+			assert.strictEqual(result?.success, false);
+			assert.strictEqual(result?.data, errorMessage);
+		});
 	});
 
 	after(async () => {
