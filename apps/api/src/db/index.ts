@@ -29,9 +29,13 @@ export const connectToDb = (connectionString: string): PostgresDb => {
 		setStatus('db', { status: Status.OK });
 		return db;
 	} catch (err) {
-		console.log('Error on Database startup');
-		console.log(err);
-		setStatus('db', { status: Status.ERROR, info: { err } });
+		console.log('Error on Database startup: \n', err);
+
+		if (err instanceof Error) {
+			setStatus('db', { status: Status.ERROR, info: { err: err.message } });
+		} else {
+			setStatus('db', { status: Status.ERROR, info: { err: String(err) } });
+		}
 		throw err;
 	}
 };
