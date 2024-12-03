@@ -33,7 +33,7 @@ applicationRouter.post('/application/edit/', jsonParser, async (req, res) => {
 	if (result.success) {
 		res.send(result.data);
 	} else {
-		res.status(500).send({ message: result.message, errors: result.errors });
+		res.status(500).send({ message: result.message, errors: String(result.errors) });
 	}
 });
 
