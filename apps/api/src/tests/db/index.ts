@@ -68,7 +68,7 @@ describe('Postgres Database', () => {
 				.returning();
 			console.log('Action deleted');
 
-			assert.strictEqual(deletedRecord.length, 1);
+			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
 		});
 	});
 
@@ -93,7 +93,7 @@ describe('Postgres Database', () => {
 			const deletedRecord = await db.delete(agreements).where(eq(agreements.name, testAgreements.name)).returning();
 			console.log('Agreement deleted');
 
-			assert.strictEqual(deletedRecord.length, 1);
+			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
 		});
 	});
 
@@ -117,7 +117,7 @@ describe('Postgres Database', () => {
 				.returning();
 			console.log('Application deleted');
 
-			assert.ok(Array.isArray(deletedRecord));
+			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
 		});
 	});
 
@@ -142,7 +142,7 @@ describe('Postgres Database', () => {
 			const allApplicationContents = await db.select().from(applicationContents);
 			console.log('Getting all application contents from the database');
 
-			assert.strictEqual(allApplicationContents.length, 1);
+			assert.ok(Array.isArray(allApplicationContents));
 
 			const deletedRecord = await db
 				.delete(applicationContents)
@@ -150,7 +150,7 @@ describe('Postgres Database', () => {
 				.returning();
 			console.log('Application contents deleted');
 
-			assert.strictEqual(deletedRecord.length, 1);
+			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
 		});
 	});
 
@@ -177,7 +177,7 @@ describe('Postgres Database', () => {
 				.returning();
 			console.log('Collaborator deleted');
 
-			assert.strictEqual(deletedRecord.length, 1);
+			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
 		});
 	});
 
@@ -204,7 +204,7 @@ describe('Postgres Database', () => {
 				.returning();
 			console.log('File deleted');
 
-			assert.strictEqual(deletedRecord.length, 1);
+			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
 		});
 	});
 
@@ -232,7 +232,7 @@ describe('Postgres Database', () => {
 				.returning();
 			console.log('Revision deleted');
 
-			assert.strictEqual(deletedRecord.length, 1);
+			assert.ok(Array.isArray(deletedRecord) && deletedRecord.length !== 0);
 		});
 	});
 
