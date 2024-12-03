@@ -22,7 +22,11 @@ import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationEvents, ApplicationManager, createApplicationManager } from '../../src/api/states.js';
+import {
+	ApplicationStateEvents,
+	ApplicationStateManager,
+	createApplicationStateManager,
+} from '../../src/api/states.js';
 import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
@@ -32,7 +36,7 @@ const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS
 describe('State Machine', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
-	let manager: ApplicationManager;
+	let manager: ApplicationStateManager;
 
 	before(async () => {
 		container = await new PostgreSqlContainer()
@@ -48,16 +52,14 @@ describe('State Machine', () => {
 		await addInitialApplications(db);
 	});
 
-	describe('Application Manager', () => {
-		it('create Application Manager classes', async () => {
-			manager = await createApplicationManager({ id: 1 });
+	describe('Application State Manager', () => {
+		let value: ApplicationStateValues = DRAFT;
+
+		it('create Application State Manager classes', async () => {
+			manager = await createApplicationStateManager({ id: 1 });
 
 			assert.ok(manager);
 		});
-	});
-
-	describe('Application State Machine', () => {
-		let value: ApplicationStateValues = DRAFT;
 
 		it('should initialize with state DRAFT', () => {
 			value = manager.getState();
@@ -65,52 +67,52 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DRAFT to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			await manager.dispatch(ApplicationEvents.submit);
+			await manager.dispatch(ApplicationStateEvents.submit);
 			value = manager.getState();
 			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', async () => {
-			await manager.dispatch(ApplicationEvents.edit);
+			await manager.dispatch(ApplicationStateEvents.edit);
 			value = manager.getState();
 			assert.strictEqual(value, DRAFT);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to REP_REVISION on revision_request', async () => {
-			await manager.dispatch(ApplicationEvents.submit);
-			await manager.dispatch(ApplicationEvents.revision_request);
+			await manager.dispatch(ApplicationStateEvents.submit);
+			await manager.dispatch(ApplicationStateEvents.revision_request);
 			value = manager.getState();
 			assert.strictEqual(value, REP_REVISION);
 		});
 
 		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			if (manager.can(ApplicationEvents.submit)) {
-				await manager.dispatch(ApplicationEvents.submit);
+			if (manager.can(ApplicationStateEvents.submit)) {
+				await manager.dispatch(ApplicationStateEvents.submit);
 				value = manager.getState();
 				assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 			}
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on submit', async () => {
-			await manager.dispatch(ApplicationEvents.submit);
+			await manager.dispatch(ApplicationStateEvents.submit);
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
-			await manager.dispatch(ApplicationEvents.revision_request);
+			await manager.dispatch(ApplicationStateEvents.revision_request);
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVISIONS_REQUESTED);
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', async () => {
-			await manager.dispatch(ApplicationEvents.submit);
+			await manager.dispatch(ApplicationStateEvents.submit);
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
-			await manager.dispatch(ApplicationEvents.approve);
+			await manager.dispatch(ApplicationStateEvents.approve);
 			value = manager.getState();
 			assert.strictEqual(value, APPROVED);
 		});

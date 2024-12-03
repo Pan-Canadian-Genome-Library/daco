@@ -35,7 +35,7 @@ const {
 	REVOKED,
 } = ApplicationStates;
 
-export enum ApplicationEvents {
+export enum ApplicationStateEvents {
 	submit = 'submit',
 	close = 'close',
 	edit = 'edit',
@@ -45,7 +45,7 @@ export enum ApplicationEvents {
 	revoked = 'revoked',
 }
 
-const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationEvents;
+const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
 
 // TODO: Replace with actual methods
 const transitionHandler = () => {};
@@ -99,50 +99,57 @@ const applicationTransitions = [
 	approvalRevokedTransition,
 ];
 
-export const createApplicationManager = async ({ id }: { id: number }) => {
+export const createApplicationStateManager = async ({ id }: { id: number }) => {
 	const database = getDbInstance();
 	const service: ReturnType<typeof applicationService> = applicationService(database);
 
 	const dbRecord = await service.getApplicationById({ id });
 	if (!dbRecord) throw new Error();
 
-	const appStateManager = new ApplicationManager(dbRecord);
+	const appStateManager = new ApplicationStateManager(dbRecord);
 
 	return appStateManager;
 };
 
-export class ApplicationManager extends StateMachine<ApplicationStateValues, ApplicationEvents> {
+// TODO: Add Validation
+const validateContent = (application: typeof applications.$inferSelect) => {
+	return { success: true, data: application };
+};
+
+export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
 	private readonly _state: ApplicationStateValues;
+	private readonly _application: typeof applications.$inferSelect;
 
 	constructor(application: typeof applications.$inferSelect) {
 		const { id, state } = application;
 		super(state, applicationTransitions);
 		this._id = id;
 		this._state = state;
+		this._application = application;
 	}
 
-	// async submit(applicationRecord) {
-	// 	if(this.can('submit')) {
-	// 		const validationResult = validateContent();
-	// 		if(validationResult.success) {
-	// 			this.dispatch('submit');
-	// 		} else {
-	// 			return errorStuff
-	// 		}
-	// };
-}
+	get id() {
+		return this._id;
+	}
 
-// const submit = () => {
-// if(state.can('submit')) {
-// 	const validationResult = validateContent();
-// 	if(validationResult.success) {
-// 		state.dispatch('submit');
-// 	} else {
-// 		return errorStuff
-// 	}
-// };
-// }
+	get state() {
+		return this._state;
+	}
+
+	async submit() {
+		if (this.can(submit)) {
+			// TODO: Add Validation
+			const validationResult = validateContent(this._application);
+			if (validationResult.success) {
+				this.dispatch(submit);
+				return validationResult;
+			} else {
+				return { success: false, data: `Cannot submit application with state ${this._state}` };
+			}
+		}
+	}
+}
 
 // export submitDraft(application: ApplicationDBRecord): {success: true} | {success: false; error: something} => {
 // 	//1. initialize state machine
