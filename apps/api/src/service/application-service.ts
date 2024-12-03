@@ -22,12 +22,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '../db/index.js';
 import { applicationContents } from '../db/schemas/applicationContents.js';
 import { applications } from '../db/schemas/applications.js';
-import {
-	type ApplicationsColumnName,
-	type ApplicationSelectParams,
-	type ApplicationUpdates,
-	type OrderBy,
-} from './types.js';
+import { type ApplicationsColumnName, type ApplicationUpdates, type OrderBy } from './types.js';
 import { sortQuery } from './utils.js';
 
 const applicationService = (db: PostgresDb) => ({
@@ -84,9 +79,9 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
-	getApplicationById: async ({ id, selectFields = {} }: { id: number; selectFields?: ApplicationSelectParams }) => {
+	getApplicationById: async ({ id }: { id: number }) => {
 		try {
-			const applicationRecord = await db.select(selectFields).from(applications).where(eq(applications.id, id));
+			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			return applicationRecord[0];

@@ -81,7 +81,7 @@ const dacRevisionSubmitTransition = transition(DAC_REVISIONS_REQUESTED, submit, 
 
 const approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, transitionHandler);
 
-const transitions = [
+const applicationTransitions = [
 	draftSubmitTransition,
 	draftEditTransition,
 	draftCloseTransition,
@@ -99,42 +99,39 @@ const transitions = [
 	approvalRevokedTransition,
 ];
 
-// TODO: Rename
-export const applicationStateMachine = new StateMachine<ApplicationStateValues, ApplicationEvents>(DRAFT, transitions);
-
 export const createApplicationManager = async ({ id }: { id: number }) => {
 	const database = getDbInstance();
 	const service: ReturnType<typeof applicationService> = applicationService(database);
 
-	const selectFields = { id: applications.id, state: applications.state };
-	const dbRecord = await service.getApplicationById({ id, selectFields });
+	const dbRecord = await service.getApplicationById({ id });
+	if (!dbRecord) throw new Error();
 
-	console.log(dbRecord);
-	return dbRecord;
+	const appStateManager = new ApplicationManager(dbRecord);
+
+	return appStateManager;
 };
 
-// class Application extends StateMachine<ApplicationStateValues, ApplicationEvents> {
-// private readonly _id: number;
-// private readonly _key: number;
+export class ApplicationManager extends StateMachine<ApplicationStateValues, ApplicationEvents> {
+	private readonly _id: number;
+	private readonly _state: ApplicationStateValues;
 
-// constructor(application: ApplicationDBRecord) {
-// this._id = application.id;
-// this.addTransitions(transitions);
+	constructor(application: typeof applications.$inferSelect) {
+		const { id, state } = application;
+		super(state, applicationTransitions);
+		this._id = id;
+		this._state = state;
+	}
 
-// fetch application from db to get initial state
-// this._key = application.state; // state read from db
-// }
-
-// async submit(applicationRecord) {
-// 	if(this.can('submit')) {
-// 		const validationResult = validateContent();
-// 		if(validationResult.success) {
-// 			this.dispatch('submit');
-// 		} else {
-// 			return errorStuff
-// 		}
-// };
-// }
+	// async submit(applicationRecord) {
+	// 	if(this.can('submit')) {
+	// 		const validationResult = validateContent();
+	// 		if(validationResult.success) {
+	// 			this.dispatch('submit');
+	// 		} else {
+	// 			return errorStuff
+	// 		}
+	// };
+}
 
 // const submit = () => {
 // if(state.can('submit')) {
