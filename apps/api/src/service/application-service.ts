@@ -40,9 +40,11 @@ const applicationService = (db: PostgresDb) => ({
 
 		try {
 			const application = await db.transaction(async (transaction) => {
+				// Create Application
 				const newApplicationRecord = await transaction.insert(applications).values(newApplication).returning();
 				if (!newApplicationRecord[0]) throw new Error('Application record is undefined');
 
+				// Create associated ApplicationContents
 				const { id } = newApplicationRecord[0];
 
 				const newAppContents: typeof applicationContents.$inferInsert = {
@@ -53,6 +55,7 @@ const applicationService = (db: PostgresDb) => ({
 				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
+				// Join records
 				const { id: contentsId } = newAppContentsRecord[0];
 
 				const application = await transaction
@@ -72,27 +75,32 @@ const applicationService = (db: PostgresDb) => ({
 	},
 	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 		try {
-			const contents = { ...update, updated_at: sql`NOW()` };
-			const editedContents = await db
-				.update(applicationContents)
-				.set(contents)
-				.where(eq(applicationContents.application_id, id))
-				.returning();
+			const application = await db.transaction(async (transaction) => {
+				// Update Application Contents
+				const contents = { ...update, updated_at: sql`NOW()` };
+				const editedContents = await transaction
+					.update(applicationContents)
+					.set(contents)
+					.where(eq(applicationContents.application_id, id))
+					.returning();
 
-			const applicationUpdates = {
-				updated_at: sql`NOW()`,
-				state: ApplicationStates.DRAFT,
-			};
-			const editedApplication = await db
-				.update(applications)
-				.set(applicationUpdates)
-				.where(eq(applications.id, id))
-				.returning();
+				// Update Related Application
+				const applicationUpdates = {
+					updated_at: sql`NOW()`,
+					state: ApplicationStates.DRAFT,
+				};
+				const editedApplication = await transaction
+					.update(applications)
+					.set(applicationUpdates)
+					.where(eq(applications.id, id))
+					.returning();
 
-			const application = {
-				...editedApplication[0],
-				contents: editedContents[0],
-			};
+				// Returns merged record
+				return {
+					...editedApplication[0],
+					contents: editedContents[0],
+				};
+			});
 
 			return success(application);
 		} catch (err) {
