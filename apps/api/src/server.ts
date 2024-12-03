@@ -16,7 +16,6 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 import { demoApplication } from '@pcgl-daco/data-model/src/main.js';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
@@ -27,6 +26,7 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from './app-health.js';
 
+const { npm_package_version } = process.env;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -44,9 +44,8 @@ const startServer = async () => {
 	app.get('/health', (_req: Request, res: Response) => {
 		const health = getHealth();
 
-		// TODO: implement proper versioning logic when in place
 		const resBody = {
-			version: `PCGL-V1`,
+			version: `PCGL-${npm_package_version}`,
 			health,
 		};
 
