@@ -18,6 +18,16 @@
  */
 
 import express, { Request, Response } from 'express';
+import path, { dirname } from 'path';
+import * as swaggerUi from 'swagger-ui-express';
+import { fileURLToPath } from 'url';
+import yaml from 'yamljs';
+
+import { getHealth, Status } from './app-health.js';
+
+const { npm_package_version } = process.env;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 import applicationRouter from './routes/application-router.js';
 
@@ -28,8 +38,26 @@ const startServer = async () => {
 
 	app.use(applicationRouter);
 
+	app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))));
+
 	app.get('/', (_req: Request, res: Response) => {
 		res.send('Hello World!');
+	});
+
+	app.get('/health', (_req: Request, res: Response) => {
+		const health = getHealth();
+
+		const resBody = {
+			version: `PCGL-${npm_package_version}`,
+			health,
+		};
+
+		if (health.all.status != Status.OK) {
+			res.status(500).send(resBody);
+			return;
+		}
+
+		res.status(200).send(resBody);
 	});
 
 	app.listen(port, () => {

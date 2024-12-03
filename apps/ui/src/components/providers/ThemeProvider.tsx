@@ -73,6 +73,10 @@ const pcglTheme: ThemeConfig = {
 		Typography: {
 			fontSize: 16,
 		},
+		Modal: {
+			titleFontSize: 24,
+			titleLineHeight: 2,
+		},
 	},
 };
 

@@ -18,6 +18,7 @@
  */
 
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { setStatus, Status } from '../app-health.js';
 
 export type PostgresDb = ReturnType<typeof drizzle>;
 
@@ -33,10 +34,16 @@ export const connectToDb = (connectionString: string): PostgresDb => {
 		const db = drizzle(connectionString);
 		pgDatabase = db;
 
+		setStatus('db', { status: Status.OK });
 		return db;
 	} catch (err) {
-		console.log('Error on Database startup');
-		console.log(err);
+		console.log('Error on Database startup: \n', err);
+
+		if (err instanceof Error) {
+			setStatus('db', { status: Status.ERROR, info: { err: err.message } });
+		} else {
+			setStatus('db', { status: Status.ERROR, info: { err: String(err) } });
+		}
 		throw err;
 	}
 };
