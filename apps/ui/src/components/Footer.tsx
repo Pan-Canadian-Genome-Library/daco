@@ -83,17 +83,17 @@ const FooterComponent = () => {
 					<Flex flex={1} vertical justify="center" align="center" gap={10} wrap>
 						<Flex gap={20} justify="center" align="center" wrap>
 							{pcglLinks.map((itemLink) => (
-								<Link style={linkStyle} underline target="_blank">
+								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
 									{itemLink.name}
 								</Link>
 							))}
 						</Flex>
 						<Text style={textStyle}>
-							© 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
+							© 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
 						</Text>
 						<Flex gap={20} justify="center" align="center">
 							{policiesConditionsLinks.map((itemLink) => (
-								<Link style={linkStyle} underline target="_blank">
+								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
 									{itemLink.name}
 								</Link>
 							))}

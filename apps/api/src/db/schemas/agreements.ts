@@ -19,8 +19,7 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-
-import { applications } from './applications.js';
+import { applicationContents } from './applicationContents.js';
 
 export const agreementEnum = pgEnum('agreement_types', [
 	'dac_agreement_software_updates',
@@ -45,8 +44,8 @@ export const agreements = pgTable('agreements', {
 });
 
 export const agreementRelations = relations(agreements, ({ one }) => ({
-	application_id: one(applications, {
+	application_id: one(applicationContents, {
 		fields: [agreements.application_id],
-		references: [applications.id],
+		references: [applicationContents.application_id],
 	}),
 }));

@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS "applications" (
 	"state" "application_states" NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"approved_at" timestamp,
+	"updated_at" timestamp,
 	"expires_at" timestamp,
 	"contents" bigint
 );

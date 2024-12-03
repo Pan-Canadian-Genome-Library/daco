@@ -17,24 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Card, Flex, theme, Typography } from 'antd';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { setStatus, Status } from '../app-health.js';
 
-const { Title } = Typography;
-const { useToken } = theme;
+export type PostgresDb = ReturnType<typeof drizzle>;
 
-const NewApplicationCard = () => {
-	const { token } = useToken();
+export const connectToDb = (connectionString: string): PostgresDb => {
+	try {
+		const db = drizzle(connectionString);
 
-	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }}>
-			<Flex justify="center" align="center" vertical gap="middle">
-				<Title level={3}>Start A New Application</Title>
-				<Button color="default" variant="outlined">
-					Get Started
-				</Button>
-			</Flex>
-		</Card>
-	);
+		setStatus('db', { status: Status.OK });
+		return db;
+	} catch (err) {
+		console.log('Error on Database startup: \n', err);
+
+		if (err instanceof Error) {
+			setStatus('db', { status: Status.ERROR, info: { err: err.message } });
+		} else {
+			setStatus('db', { status: Status.ERROR, info: { err: String(err) } });
+		}
+		throw err;
+	}
 };
-
-export default NewApplicationCard;

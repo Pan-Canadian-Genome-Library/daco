@@ -6,14 +6,18 @@
 	"scripts": {
 		"build": "rimraf ./dist && tsc",
 		"dev": "tsx watch --env-file=.env ./src/main.ts",
-		"test": "tsx --env-file=.env.test --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*",
+		"test": "npx tsx --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*",
 		"start:prod": "node ./dist/src/main.js"
 	},
 	"devDependencies": {
+		"@testcontainers/postgresql": "^10.14.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.7.4",
 		"@types/pg": "^8.11.10",
+		"@types/swagger-ui-express": "^4.1.7",
+		"@types/yamljs": "^0.2.34",
+		"drizzle-dbml-generator": "^0.9.0",
 		"drizzle-kit": "^0.26.2",
 		"tsx": "^4.19.1",
 		"typescript": "^5.5.3"
@@ -25,7 +29,9 @@
 		"express": "^4.21.0",
 		"pg": "^8.13.0",
 		"typescript-fsm": "^1.4.5",
-		"xstate": "^5.19.0"
+		"xstate": "^5.19.0",
+		"swagger-ui-express": "^5.0.1",
+		"yamljs": "^0.3.0"
 	},
 	"engines": {
 		"node": "^20.9.0"

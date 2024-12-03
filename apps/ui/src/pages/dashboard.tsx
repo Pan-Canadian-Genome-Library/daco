@@ -17,29 +17,75 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout } from 'antd';
+import { Col, Flex, Layout, Modal, Row, Typography } from 'antd';
+import { useState } from 'react';
 
-import ApplicationStatusBar from '@/components/ApplicationStatusBar';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
-import NewApplicationCard from '@/components/NewApplicationCard';
+import { applications } from '@/components/mock/applicationMockData';
+import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatusBar';
+import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
+import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 
 const { Content } = Layout;
+const { Text } = Typography;
 
 const DashboardPage = () => {
+	const [openModal, setOpenModal] = useState(false);
+	const [modalAppId, setModalAppId] = useState('');
+
+	const showEditApplicationModal = (id: string) => {
+		setModalAppId(id);
+		setOpenModal(true);
+	};
+
+	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
+	const handleOk = () => {
+		setOpenModal(false);
+	};
+
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
 				<ApplicationStatusBar />
-				<Flex flex={1} align="center" justify="center">
-					<ContentWrapper>
-						<Flex style={{ width: '100%' }} justify="center" align="center">
+				<ContentWrapper style={{ padding: 40 }}>
+					<Row gutter={[48, 48]} align={'middle'} justify={'center'}>
+						{applications.length > 0 ? (
+							<>
+								<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+									<NewApplicationCard />
+								</Col>
+								{applications.map((applicationItem) => {
+									return (
+										<Col key={applicationItem.id} xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+											<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />
+										</Col>
+									);
+								})}
+							</>
+						) : (
 							<Col span={12}>
 								<NewApplicationCard />
 							</Col>
-						</Flex>
-					</ContentWrapper>
-				</Flex>
+						)}
+					</Row>
+				</ContentWrapper>
 			</Flex>
+			<Modal
+				title={`Are you sure you want to edit Applications: PCGL-${modalAppId}?`}
+				okText={'Edit Application'}
+				width={'100%'}
+				style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+				open={openModal}
+				onOk={handleOk}
+				onCancel={() => setOpenModal(false)}
+			>
+				<Flex style={{ height: '100%', marginTop: 20 }}>
+					<Text>
+						If so, the application will move back into Draft status and you will need to resubmit the application for
+						review.
+					</Text>
+				</Flex>
+			</Modal>
 		</Content>
 	);
 };

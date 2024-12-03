@@ -17,32 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { actions } from './actions.js';
-import { applicationContents } from './applicationContents.js';
+import { pgGenerate } from 'drizzle-dbml-generator'; // Using Postgres for this example
+import * as schema from '../../drizzle/schema.js';
 
-export const revisionRequests = pgTable('revision_requests', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	comments: text(),
-	applicant_notes: text(),
-	applicant_approved: boolean().notNull(),
-	institution_rep_approved: boolean().notNull(),
-	institution_rep_notes: text(),
-	collaborators_approved: boolean().notNull(),
-	collaborators_notes: text(),
-	project_approved: boolean().notNull(),
-	project_notes: text(),
-	requested_studies_approved: boolean().notNull(),
-	requested_studies_notes: text(),
-});
+const out = './src/db/schema.dbml';
+const relational = true;
 
-export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
-	application_id: one(applicationContents, {
-		fields: [revisionRequests.application_id],
-		references: [applicationContents.id],
-	}),
-	actions: many(actions),
-}));
+pgGenerate({ schema, out, relational });
+
+console.log(`Schema DBML Generated at ${out}`);
