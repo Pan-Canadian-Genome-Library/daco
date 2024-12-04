@@ -33,6 +33,7 @@ applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
 	if (result.success) {
 		res.send(result.data);
 	} else {
+		// TODO: System Error Handling
 		if (result.errors === 'Error: Application record not found') {
 			res.status(404);
 		} else {
