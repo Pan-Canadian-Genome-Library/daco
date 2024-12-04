@@ -47,64 +47,67 @@ export enum ApplicationStateEvents {
 
 const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
 
+// TODO: Remove
+type mockResult = { success: boolean; data: typeof applications.$inferSelect | string };
+
 // TODO: Replace with individual methods
-const transitionHandler = () => {};
+type ApplicationTransitionCallback = () => Promise<mockResult>;
+
+type TransitionValues = [
+	ApplicationStateValues,
+	ApplicationStateEvents,
+	ApplicationStateValues,
+	ApplicationTransitionCallback?,
+];
+
+const getTransitionHandler = (values: TransitionValues) => {
+	return transition(...values);
+};
 
 // Draft
-const draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, transitionHandler);
-const draftEditTransition = transition(DRAFT, edit, DRAFT, transitionHandler);
-const draftCloseTransition = transition(DRAFT, close, CLOSED, transitionHandler);
+const draftSubmitTransitionValues: TransitionValues = [DRAFT, submit, INSTITUTIONAL_REP_REVIEW];
+const draftEditTransitionValues: TransitionValues = [DRAFT, edit, DRAFT];
+const draftCloseTransitionValues: TransitionValues = [DRAFT, close, CLOSED];
 
 // Rep Review
-const repReviewCloseTransition = transition(INSTITUTIONAL_REP_REVIEW, close, CLOSED, transitionHandler);
-const repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, DRAFT, transitionHandler);
-const repReviewRevisionTransition = transition(
-	INSTITUTIONAL_REP_REVIEW,
-	revision_request,
-	REP_REVISION,
-	transitionHandler,
-);
-const repReviewSubmitTransition = transition(INSTITUTIONAL_REP_REVIEW, submit, DAC_REVIEW, transitionHandler);
+const repReviewCloseTransitionValues: TransitionValues = [INSTITUTIONAL_REP_REVIEW, close, CLOSED];
+const repReviewEditTransitionValues: TransitionValues = [INSTITUTIONAL_REP_REVIEW, edit, DRAFT];
+const repReviewRevisionTransitionValues: TransitionValues = [INSTITUTIONAL_REP_REVIEW, revision_request, REP_REVISION];
+const repReviewSubmitTransitionValues: TransitionValues = [INSTITUTIONAL_REP_REVIEW, submit, DAC_REVIEW];
 
 // Rep Revision
-const repRevisionSubmitTransition = transition(REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW, transitionHandler);
+const repRevisionSubmitTransitionValues: TransitionValues = [REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW];
 
 // DAC Review
-const dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, transitionHandler);
-const dacReviewCloseTransition = transition(DAC_REVIEW, close, CLOSED, transitionHandler);
-const dacReviewEditTransition = transition(DAC_REVIEW, edit, DRAFT, transitionHandler);
-const dacReviewRevisionTransition = transition(
-	DAC_REVIEW,
-	revision_request,
-	DAC_REVISIONS_REQUESTED,
-	transitionHandler,
-);
-const dacReviewRejectTransition = transition(DAC_REVIEW, reject, REJECTED, transitionHandler);
+const dacReviewApproveTransitionValues: TransitionValues = [DAC_REVIEW, approve, APPROVED];
+const dacReviewCloseTransitionValues: TransitionValues = [DAC_REVIEW, close, CLOSED];
+const dacReviewEditTransitionValues: TransitionValues = [DAC_REVIEW, edit, DRAFT];
+const dacReviewRevisionTransitionValues: TransitionValues = [DAC_REVIEW, revision_request, DAC_REVISIONS_REQUESTED];
+const dacReviewRejectTransitionValues: TransitionValues = [DAC_REVIEW, reject, REJECTED];
 
 // DAC Revision
-const dacRevisionSubmitTransition = transition(DAC_REVISIONS_REQUESTED, submit, DAC_REVIEW, transitionHandler);
+const dacRevisionSubmitTransitionValues: TransitionValues = [DAC_REVISIONS_REQUESTED, submit, DAC_REVIEW];
 
 // Approval
-const approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, transitionHandler);
+const approvalRevokedTransitionValues: TransitionValues = [APPROVED, revoked, REVOKED];
 
 // All Transitions
-// TODO: Add Connect Handlers to Class
-const applicationTransitions = [
-	draftSubmitTransition,
-	draftEditTransition,
-	draftCloseTransition,
-	repReviewCloseTransition,
-	repReviewEditTransition,
-	repReviewRevisionTransition,
-	repReviewSubmitTransition,
-	repRevisionSubmitTransition,
-	dacReviewApproveTransition,
-	dacReviewCloseTransition,
-	dacReviewEditTransition,
-	dacReviewRevisionTransition,
-	dacReviewRejectTransition,
-	dacRevisionSubmitTransition,
-	approvalRevokedTransition,
+const applicationTransitionValues: TransitionValues[] = [
+	draftSubmitTransitionValues,
+	draftEditTransitionValues,
+	draftCloseTransitionValues,
+	repReviewCloseTransitionValues,
+	repReviewEditTransitionValues,
+	repReviewRevisionTransitionValues,
+	repReviewSubmitTransitionValues,
+	repRevisionSubmitTransitionValues,
+	dacReviewApproveTransitionValues,
+	dacReviewCloseTransitionValues,
+	dacReviewEditTransitionValues,
+	dacReviewRevisionTransitionValues,
+	dacReviewRejectTransitionValues,
+	dacRevisionSubmitTransitionValues,
+	approvalRevokedTransitionValues,
 ];
 
 // TODO: Move to API
@@ -121,36 +124,20 @@ export const createApplicationStateManager = async ({ id }: { id: number }) => {
 };
 
 // TODO: Add Validation
-const validateContent = (application: typeof applications.$inferSelect) => {
+const validateContent = async (application: typeof applications.$inferSelect): Promise<mockResult> => {
 	return { success: true, data: application };
 };
 
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
-	private readonly _state: ApplicationStateValues;
 	private readonly _application: typeof applications.$inferSelect;
+	private _state: ApplicationStateValues;
 
-	constructor(application: typeof applications.$inferSelect) {
-		const { id, state } = application;
-		// TODO: Build Transitions for Class
-		super(state, applicationTransitions);
-		this._id = id;
-		this._state = state;
-		this._application = application;
-	}
-
-	get id() {
-		return this._id;
-	}
-
-	get state() {
-		return this._state;
-	}
-
-	async submit() {
+	// TODO: Add methods for all actions: submit, close, edit, revision_request, approve, reject, revoked
+	private async _onSubmit() {
 		if (this.can(submit)) {
 			// TODO: Add Validation
-			const validationResult = validateContent(this._application);
+			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
 				this.dispatch(submit);
 				return validationResult;
@@ -162,22 +149,25 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onSubmit() {
-		// this.logger.log(`${this._id} onOpen...`);
-		// return this.dispatch(Events.openComplete);
+	constructor(application: typeof applications.$inferSelect) {
+		const { id, state } = application;
+		super(state);
+		this._id = id;
+		this._state = state;
+		this._application = application;
+
+		const applicationTransitions = applicationTransitionValues.map((values) => {
+			values.push(this._onSubmit);
+			return getTransitionHandler(values);
+		});
+		this.addTransitions(applicationTransitions);
+	}
+
+	get id() {
+		return this._id;
+	}
+
+	get state() {
+		return this._state;
 	}
 }
-
-// export submitDraft(application: ApplicationDBRecord): {success: true} | {success: false; error: something} => {
-// 	//1. initialize state machine
-// 	const stateMachine = new StateMachine(applciation.state, transitions);
-// 	if(stateMachine.can('submit')) {
-// 		if(validationResult.success) {
-// 			stateMachine.dispatch('submit');
-// 			const validationResult = validateContent();
-// 		} else {
-// 			return errorStuff
-// 		}
-// }
-
-// result is either success, or the reason i cant submit it.
