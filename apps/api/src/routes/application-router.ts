@@ -24,7 +24,7 @@ import { editApplication } from '../api/application-api.js';
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
 
-applicationRouter.post('/application/edit/', jsonParser, async (req, res) => {
+applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
 	// TODO: Add Auth & Zod validation
 	const data = req.body;
 	const { id, update } = data;
@@ -33,7 +33,13 @@ applicationRouter.post('/application/edit/', jsonParser, async (req, res) => {
 	if (result.success) {
 		res.send(result.data);
 	} else {
-		res.status(500).send({ message: result.message, errors: String(result.errors) });
+		if (result.errors === 'Error: Application record not found') {
+			res.status(404);
+		} else {
+			res.status(500);
+		}
+
+		res.send({ message: result.message, errors: String(result.errors) });
 	}
 });
 

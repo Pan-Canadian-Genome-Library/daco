@@ -133,7 +133,7 @@ const applicationService = (db: PostgresDb) => ({
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
-			if (!applicationRecord[0]) throw new Error('Application record is undefined');
+			if (!applicationRecord[0]) throw new Error('Application record not found');
 
 			const application = {
 				...applicationRecord[0].applications,
