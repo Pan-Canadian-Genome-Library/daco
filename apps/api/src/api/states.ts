@@ -119,7 +119,6 @@ export const createApplicationStateManager = async ({ id }: { id: number }) => {
 	}
 
 	const dbRecord = result.data;
-
 	const appStateManager = new ApplicationStateManager(dbRecord);
 
 	return success(appStateManager);
@@ -143,7 +142,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
-				this.dispatch(submit);
 				return validationResult;
 			} else {
 				return failure(`Cannot submit application with state ${this._state}`);
