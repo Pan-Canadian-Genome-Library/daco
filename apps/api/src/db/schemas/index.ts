@@ -17,21 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { defineConfig } from 'drizzle-kit';
-
-const PG_DATABASE = process.env.PG_DATABASE;
-const PG_USER = process.env.PG_USER;
-const PG_PASSWORD = process.env.PG_PASSWORD;
-const PG_HOST = process.env.PG_HOST;
-
-// PG Connection String: postgres://postgres:mypassword@localhost:5432/postgres
-export const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
-
-export default defineConfig({
-	out: './drizzle',
-	schema: './dist/src/db/schemas/*',
-	dialect: 'postgresql',
-	dbCredentials: {
-		url: connectionString!,
-	},
-});
+export * from './actions.js';
+export * from './agreements.js';
+export * from './applicationContents.js';
+export * from './applications.js';
+export * from './collaborators.js';
+export * from './files.js';
+export * from './revisionRequests.js';

@@ -78,9 +78,11 @@ describe('Application Service', () => {
 
 			const { id } = applicationRecords[0];
 
-			const requestedApplication = await applicationService.getApplicationWithContents({ id });
+			const result = await applicationService.getApplicationWithContents({ id });
 
-			assert.notEqual(requestedApplication, null);
+			assert.ok(result.success);
+
+			const requestedApplication = result.data;
 			assert.strictEqual(requestedApplication?.id, id);
 			assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
 		});
@@ -95,9 +97,12 @@ describe('Application Service', () => {
 			const { id } = applicationRecords[0];
 			await applicationService.findOneAndUpdate({ id, update: {} });
 
-			const updatedApplication = await applicationService.getApplicationWithContents({ id });
+			const result = await applicationService.getApplicationById({ id });
 
-			assert.notEqual(updatedApplication, null);
+			assert.ok(result.success);
+
+			const updatedApplication = result.data;
+
 			assert.ok(!!updatedApplication?.updated_at);
 		});
 	});
@@ -230,6 +235,36 @@ describe('Application Service', () => {
 			// Test that pagination returned 'page 2' of the results
 			assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);
 			assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
+		});
+
+		after(async () => {
+			await db.delete(applications).where(eq(applications.user_id, user_id));
+		});
+	});
+
+	describe('Edit Applications', () => {
+		before(async () => {
+			await addInitialApplications(db);
+		});
+
+		it('should allow editing applications and return record with updated fields', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
+
+			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
+
+			const { id } = applicationRecords[0];
+
+			const update = { applicant_first_name: 'Test' };
+
+			const result = await applicationService.editApplication({ id, update });
+
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicant_first_name);
 		});
 	});
 

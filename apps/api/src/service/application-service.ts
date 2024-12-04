@@ -22,7 +22,13 @@ import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '../db/index.js';
 import { applicationContents } from '../db/schemas/applicationContents.js';
 import { applications } from '../db/schemas/applications.js';
-import { type ApplicationsColumnName, type ApplicationUpdates, type OrderBy } from './types.js';
+import { failure, success } from '../utils/results.js';
+import {
+	type ApplicationContentUpdates,
+	type ApplicationsColumnName,
+	type ApplicationUpdates,
+	type OrderBy,
+} from './types.js';
 import { sortQuery } from './utils.js';
 
 const applicationService = (db: PostgresDb) => ({
@@ -34,9 +40,11 @@ const applicationService = (db: PostgresDb) => ({
 
 		try {
 			const application = await db.transaction(async (transaction) => {
+				// Create Application
 				const newApplicationRecord = await transaction.insert(applications).values(newApplication).returning();
 				if (!newApplicationRecord[0]) throw new Error('Application record is undefined');
 
+				// Create associated ApplicationContents
 				const { id } = newApplicationRecord[0];
 
 				const newAppContents: typeof applicationContents.$inferInsert = {
@@ -47,6 +55,7 @@ const applicationService = (db: PostgresDb) => ({
 				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
+				// Join records
 				const { id: contentsId } = newAppContentsRecord[0];
 
 				const application = await transaction
@@ -64,6 +73,43 @@ const applicationService = (db: PostgresDb) => ({
 			return null;
 		}
 	},
+	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
+		try {
+			const application = await db.transaction(async (transaction) => {
+				// Update Application Contents
+				const contents = { ...update, updated_at: sql`NOW()` };
+				const editedContents = await transaction
+					.update(applicationContents)
+					.set(contents)
+					.where(eq(applicationContents.application_id, id))
+					.returning();
+
+				// Update Related Application
+				const applicationUpdates = {
+					updated_at: sql`NOW()`,
+					state: ApplicationStates.DRAFT,
+				};
+				const editedApplication = await transaction
+					.update(applications)
+					.set(applicationUpdates)
+					.where(eq(applications.id, id))
+					.returning();
+
+				// Returns merged record
+				return {
+					...editedApplication[0],
+					contents: editedContents[0],
+				};
+			});
+
+			return success(application);
+		} catch (err) {
+			const message = `Error at editApplication with id: ${id}`;
+			console.error(message);
+			console.error(err);
+			return failure(message, err);
+		}
+	},
 	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
 		try {
 			const application = await db
@@ -74,9 +120,10 @@ const applicationService = (db: PostgresDb) => ({
 
 			return application;
 		} catch (err) {
-			console.error(`Error at findOneAndUpdate with id: ${id}`);
+			const message = `Error at findOneAndUpdate with id: ${id}`;
+			console.error(message);
 			console.error(err);
-			return null;
+			return failure(message, err);
 		}
 	},
 	getApplicationById: async ({ id }: { id: number }) => {
@@ -84,11 +131,12 @@ const applicationService = (db: PostgresDb) => ({
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
-			return applicationRecord[0];
+			return success(applicationRecord[0]);
 		} catch (err) {
-			console.error(`Error at getApplicationById with id: ${id}`);
+			const message = `Error at getApplicationById with id: ${id}`;
+			console.error(message);
 			console.error(err);
-			return null;
+			return failure(message, err);
 		}
 	},
 	getApplicationWithContents: async ({ id }: { id: number }) => {
@@ -98,18 +146,21 @@ const applicationService = (db: PostgresDb) => ({
 				.from(applications)
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
-			if (!applicationRecord[0]) throw new Error('Application record is undefined');
+
+			if (!applicationRecord[0]) throw new Error('Application record not found');
 
 			const application = {
 				...applicationRecord[0].applications,
 				contents: applicationRecord[0].application_contents,
 			};
 
-			return application;
+			return success(application);
 		} catch (err) {
-			console.error(`Error at getApplicationWithContents with id: ${id}`);
+			const message = `Error at getApplicationById with id: ${id}`;
+			console.error(message);
 			console.error(err);
-			return null;
+
+			return failure(message, err);
 		}
 	},
 	listApplications: async ({

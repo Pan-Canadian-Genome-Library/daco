@@ -17,21 +17,31 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { defineConfig } from 'drizzle-kit';
+import bodyParser from 'body-parser';
+import express from 'express';
+import { editApplication } from '../api/application-api.js';
 
-const PG_DATABASE = process.env.PG_DATABASE;
-const PG_USER = process.env.PG_USER;
-const PG_PASSWORD = process.env.PG_PASSWORD;
-const PG_HOST = process.env.PG_HOST;
+const applicationRouter = express.Router();
+const jsonParser = bodyParser.json();
 
-// PG Connection String: postgres://postgres:mypassword@localhost:5432/postgres
-export const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
+applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
+	// TODO: Add Auth & Zod validation
+	const data = req.body;
+	const { id, update } = data;
+	const result = await editApplication({ id, update });
 
-export default defineConfig({
-	out: './drizzle',
-	schema: './dist/src/db/schemas/*',
-	dialect: 'postgresql',
-	dbCredentials: {
-		url: connectionString!,
-	},
+	if (result.success) {
+		res.send(result.data);
+	} else {
+		// TODO: System Error Handling
+		if (result.errors === 'Error: Application record not found') {
+			res.status(404);
+		} else {
+			res.status(500);
+		}
+
+		res.send({ message: result.message, errors: String(result.errors) });
+	}
 });
+
+export default applicationRouter;

@@ -17,21 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { defineConfig } from 'drizzle-kit';
+// types
+export type Success<T> = { success: true; data: T };
+export type Failure = { success: false; message: string; errors?: any };
+export type Result<T> = Success<T> | Failure;
+export type AsyncResult<T> = Promise<Result<T>>;
 
-const PG_DATABASE = process.env.PG_DATABASE;
-const PG_USER = process.env.PG_USER;
-const PG_PASSWORD = process.env.PG_PASSWORD;
-const PG_HOST = process.env.PG_HOST;
-
-// PG Connection String: postgres://postgres:mypassword@localhost:5432/postgres
-export const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
-
-export default defineConfig({
-	out: './drizzle',
-	schema: './dist/src/db/schemas/*',
-	dialect: 'postgresql',
-	dbCredentials: {
-		url: connectionString!,
-	},
+// helpers
+export const success = <T>(data: T): Success<T> => ({ success: true, data });
+export const failure = (message: string, errors?: any): Failure => ({
+	success: false,
+	message,
+	errors,
 });

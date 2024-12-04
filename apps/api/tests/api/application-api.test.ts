@@ -20,11 +20,23 @@
 import { after, before, describe } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import assert from 'node:assert';
+import { it } from 'node:test';
+
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { editApplication } from '../../src/api/application-api.js';
 import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 
 import service from '../../src/service/application-service.js';
 
-import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
+import {
+	addInitialApplications,
+	initTestMigration,
+	PG_DATABASE,
+	PG_PASSWORD,
+	PG_USER,
+	testUserId as user_id,
+} from '../testUtils.js';
 
 describe('Application API', () => {
 	let db: PostgresDb;
@@ -50,5 +62,67 @@ describe('Application API', () => {
 	after(async () => {
 		await container.stop();
 		process.exit(0);
+	});
+
+	describe('Edit Application', () => {
+		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
+
+			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
+
+			const { id } = applicationRecords[0];
+
+			const update = { applicant_first_name: 'Test' };
+
+			const result = await editApplication({ id, update });
+
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicant_first_name);
+		});
+
+		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
+
+			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
+
+			const { id, state } = applicationRecords[0];
+
+			assert.strictEqual(state, ApplicationStates.DRAFT);
+
+			const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+			const reviewRecord = await applicationService.findOneAndUpdate({ id, update: stateUpdate });
+
+			assert.ok(Array.isArray(reviewRecord) && reviewRecord[0]);
+			assert.strictEqual(reviewRecord[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+
+			const contentUpdate = { applicant_last_name: 'User' };
+			const result = await editApplication({ id, update: contentUpdate });
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.id, id);
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicant_last_name);
+		});
+
+		it('should error and return null when application state is not draft or review', async () => {
+			const applicationRecords = await applicationService.listApplications({ user_id });
+			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
+			const { id } = applicationRecords[0];
+			const stateUpdate = { state: ApplicationStates.CLOSED };
+			await applicationService.findOneAndUpdate({ id, update: stateUpdate });
+
+			const contentUpdate = { applicant_title: 'Dr.' };
+			const result = await editApplication({ id, update: contentUpdate });
+
+			assert.ok(!result.success);
+		});
 	});
 });
