@@ -107,9 +107,9 @@ table applications {
   state application_states [not null]
   created_at timestamp [not null, default: `now()`]
   approved_at timestamp
+  updated_at timestamp
   expires_at timestamp
   contents bigint
-  updated_at timestamp
 }
 
 table collaborators {
@@ -132,6 +132,7 @@ table files {
   type file_types [not null]
   submitter_user_id varchar(100) [not null]
   submitted_at timestamp [not null]
+  content bytea [not null]
   filename varchar(255)
 }
 
@@ -151,3 +152,19 @@ table revision_requests {
   requested_studies_approved boolean [not null]
   requested_studies_notes text
 }
+
+ref: actions.application_id - applications.id
+
+ref: actions.revisions_request_id > revision_requests.id
+
+ref: agreements.application_id > application_contents.application_id
+
+ref: applications.contents - application_contents.id
+
+ref: application_contents.signed_pdf - files.id
+
+ref: collaborators.application_id > application_contents.application_id
+
+ref: files.application_id - applications.id
+
+ref: revision_requests.application_id > application_contents.id

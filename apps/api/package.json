@@ -6,7 +6,8 @@
 	"scripts": {
 		"build": "rimraf ./dist && tsc",
 		"dev": "tsx watch --env-file=.env ./src/main.ts",
-		"test": "npx tsx --test --test-reporter=spec --experimental-test-coverage ./src/tests/**/*",
+		"dbml": "tsx ./src/db/dbml.ts",
+		"test": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/**/*.test.ts",
 		"start:prod": "node ./dist/src/main.js"
 	},
 	"devDependencies": {
@@ -24,6 +25,8 @@
 	},
 	"dependencies": {
 		"@pcgl-daco/data-model": "workspace:^",
+		"@types/body-parser": "^1.19.5",
+		"body-parser": "^1.20.3",
 		"cors": "^2.8.5",
 		"drizzle-orm": "^0.35.3",
 		"express": "^4.21.0",

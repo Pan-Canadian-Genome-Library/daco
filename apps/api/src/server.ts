@@ -17,8 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { demoApplication } from '@pcgl-daco/data-model/src/main.js';
-import cors from 'cors';
 import express, { Request, Response } from 'express';
 import path, { dirname } from 'path';
 import * as swaggerUi from 'swagger-ui-express';
@@ -31,10 +29,14 @@ const { npm_package_version } = process.env;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const port = process.env.PORT || 3000;
+import applicationRouter from './routes/application-router.js';
+
+const port = process.env.PORT || 3000;
 
 const startServer = async () => {
 	const app = express();
+
+	app.use(applicationRouter);
 
 	app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))));
 
@@ -56,10 +58,6 @@ const startServer = async () => {
 		}
 
 		res.status(200).send(resBody);
-	});
-
-	app.get('/applications', cors(), (_req: Request, res: Response) => {
-		res.send(demoApplication);
 	});
 
 	app.listen(port, () => {

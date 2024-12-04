@@ -22,9 +22,17 @@ import { setStatus, Status } from '../app-health.js';
 
 export type PostgresDb = ReturnType<typeof drizzle>;
 
+let pgDatabase: PostgresDb;
+
+export const getDbInstance = (): PostgresDb => {
+	if (!pgDatabase) throw new Error('Not connected to Postgres database');
+	return pgDatabase;
+};
+
 export const connectToDb = (connectionString: string): PostgresDb => {
 	try {
 		const db = drizzle(connectionString);
+		pgDatabase = db;
 
 		setStatus('db', { status: Status.OK });
 		return db;

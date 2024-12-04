@@ -17,7 +17,7 @@
 
 openapi: 3.0.0
 info:
-  title: PCGL
+  title: PCGL DACO API
   version: 1.0.0
 paths:
   /health:
@@ -34,3 +34,152 @@ paths:
             application/json:
               schema:
                 type: object
+
+  /application/edit:
+    post:
+      tags:
+        - Applications
+      summary: Edit application details
+      requestBody:
+        description: Changes made to an Application record
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationUpdates'
+      responses:
+        '500':
+          description: 'Error editing application'
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'Error editing application - Application not found'
+          content:
+            application/json:
+              schema:
+                type: object
+        '200':
+          description: 'Application updated'
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  schemas:
+    ApplicationUpdates:
+      type: object
+      required:
+        - id
+        - update
+      properties:
+        id:
+          type: number
+          description: The id of the Application
+        update:
+          description: Changes made to the application
+          type: object
+          $ref: '#/components/schemas/ApplicationContents'
+
+    ApplicationContents:
+      type: object
+      properties:
+        applicant_first_name:
+          type: string
+          description: Applicant's first name
+        applicant_middle_name:
+          type: string
+          description: Applicant's middle name
+        applicant_last_name:
+          type: string
+          description: Applicant's last name
+        applicant_title:
+          type: string
+          description: Applicant's formal title
+        applicant_suffix:
+          type: string
+          description: Applicant's formal suffix
+        applicant_position_title:
+          type: string
+          description: Applicant's professional title
+        applicant_primary_affiliation:
+          type: string
+          description: Applicant's institution
+        applicant_institutional_email:
+          type: string
+          description: Applicant's email
+        applicant_profile_url:
+          type: string
+          description: Applicant's profile URL
+        # Institutional Rep
+        institutional_rep_title:
+          type: string
+          description: Institutional representative's professional title
+        institutional_rep_first_name:
+          type: string
+          description: Institutional representative's first name
+        institutional_rep_middle_name:
+          type: string
+          description: Institutional representative's middle name
+        institutional_rep_last_name:
+          type: string
+          description: Institutional representative's last name
+        institutional_rep_suffix:
+          type: string
+          description: Institutional representative's formal suffix
+        institutional_rep_primary_affiliation:
+          type: string
+          description: Institutional representative's affiliation
+        institutional_rep_email:
+          type: string
+          description: Institutional representative's email
+        institutional_rep_profile_url:
+          type: string
+          description: Institutional representative's profile URL
+        institutional_rep_position_title:
+          type: string
+          description: Institutional representative's professional title
+        # Institution
+        institution_country:
+          type: string
+          description: Address of Institution - Country
+        institution_state:
+          type: string
+          description: Address of Institution - State
+        institution_city:
+          type: string
+          description: Address of Institution - City
+        institution_street_address:
+          type: string
+          description: Address of Institution - street name and number
+        institution_postal_code:
+          type: string
+          description: Address of Institution - postal code
+        institution_building:
+          type: string
+          description: Address of Institution - specific building name if required
+        # Project
+        project_title:
+          type: string
+          description: Name of project
+        project_website:
+          type: string
+          description: URL of project website
+        project_abstract:
+          type: string
+          description: Brief description of project
+        project_methodology:
+          type: string
+          description: Description of scientific approach used in the project
+        project_summary:
+          type: string
+          description: In depth text summary of project
+        project_publication_urls:
+          type: array
+          description: URLs of publications related to the project
+        # Studies
+        requested_studies:
+          type: array
+          description: List of studies
