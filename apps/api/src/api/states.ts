@@ -22,6 +22,7 @@ import { StateMachine, t as transition } from 'typescript-fsm';
 import { getDbInstance } from '../db/index.js';
 import { applications } from '../db/schemas/applications.js';
 import applicationService from '../service/application-service.js';
+import { AsyncResult, failure, success } from '../utils/results.js';
 
 const {
 	DRAFT,
@@ -47,11 +48,8 @@ export enum ApplicationStateEvents {
 
 const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
 
-// TODO: Remove
-type mockResult = { success: boolean; data: typeof applications.$inferSelect | string };
-
 // TODO: Replace with individual methods
-type ApplicationTransitionCallback = () => Promise<mockResult>;
+type ApplicationTransitionCallback = () => AsyncResult<typeof applications.$inferSelect>;
 
 type TransitionValues = [
 	ApplicationStateValues,
@@ -115,17 +113,23 @@ export const createApplicationStateManager = async ({ id }: { id: number }) => {
 	const database = getDbInstance();
 	const service: ReturnType<typeof applicationService> = applicationService(database);
 
-	const dbRecord = await service.getApplicationById({ id });
-	if (!dbRecord) throw new Error();
+	const result = await service.getApplicationById({ id });
+	if (!result.success) {
+		return result;
+	}
+
+	const dbRecord = result.data;
 
 	const appStateManager = new ApplicationStateManager(dbRecord);
 
-	return appStateManager;
+	return success(appStateManager);
 };
 
 // TODO: Add Validation
-const validateContent = async (application: typeof applications.$inferSelect): Promise<mockResult> => {
-	return { success: true, data: application };
+const validateContent = async (
+	application: typeof applications.$inferSelect,
+): AsyncResult<typeof applications.$inferSelect> => {
+	return success(application);
 };
 
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
@@ -142,10 +146,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 				this.dispatch(submit);
 				return validationResult;
 			} else {
-				return { success: false, data: `Cannot submit application with state ${this._state}` };
+				return failure(`Cannot submit application with state ${this._state}`);
 			}
 		} else {
-			return { success: false, data: `Cannot submit application with state ${this._state}` };
+			return failure(`Cannot submit application with state ${this._state}`);
 		}
 	}
 

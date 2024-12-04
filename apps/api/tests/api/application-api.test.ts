@@ -59,11 +59,6 @@ describe('Application API', () => {
 		applicationService = service(db);
 	});
 
-	after(async () => {
-		await container.stop();
-		process.exit(0);
-	});
-
 	describe('Edit Application', () => {
 		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
 			const applicationRecords = await applicationService.listApplications({ user_id });
@@ -123,6 +118,11 @@ describe('Application API', () => {
 			const result = await editApplication({ id, update: contentUpdate });
 
 			assert.ok(!result.success);
+		});
+
+		after(async () => {
+			await container.stop();
+			process.exit(0);
 		});
 	});
 });
