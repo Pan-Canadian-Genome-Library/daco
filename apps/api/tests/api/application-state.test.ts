@@ -71,7 +71,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DRAFT to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			await manager.dispatch(submit);
+			await manager.submitDraft();
 			value = manager.getState();
 			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 		});
@@ -90,15 +90,13 @@ describe('State Machine', () => {
 		});
 
 		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			if (manager.can(submit)) {
-				await manager.dispatch(submit);
-				value = manager.getState();
-				assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
-			}
+			await manager.submitRepRevision();
+			value = manager.getState();
+			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on submit', async () => {
-			await manager.dispatch(submit);
+			await manager.submitRepReview();
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});
@@ -110,7 +108,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', async () => {
-			await manager.dispatch(submit);
+			await manager.submitDacRevision();
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});

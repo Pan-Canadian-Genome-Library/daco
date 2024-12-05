@@ -56,7 +56,7 @@ const validateContent = async (
 };
 
 // TODO: Replace with individual methods
-type ApplicationTransitionCallback = () => AsyncResult<typeof applications.$inferSelect | string>;
+type ApplicationTransitionCallback = () => AsyncResult<string | void>;
 
 type ApplicationTransitions = ITransition<
 	ApplicationStateValues,
@@ -126,27 +126,12 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	];
 
 	// Handler Methods
-	async onDraftSubmit() {
-		return this._onSubmit();
-	}
-
-	async onRepReviewSubmit() {
-		return this._onSubmit();
-	}
-
-	async onRepRevisionSubmit() {
-		return this._onSubmit();
-	}
-
-	async onDacRevisionSubmit() {
-		return this._onSubmit();
-	}
-
-	private async _onSubmit() {
+	async submitDraft() {
 		if (this.can(submit)) {
 			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
+				await this.dispatch(submit);
 				return validationResult;
 			} else {
 				return failure(`Cannot submit application with state ${this.getState()}`);
@@ -154,6 +139,22 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return failure(`Cannot submit application with state ${this.getState()}`);
 		}
+	}
+
+	async submitRepReview() {
+		return this.submitDraft();
+	}
+
+	async submitRepRevision() {
+		return this.submitDraft();
+	}
+
+	async submitDacRevision() {
+		return this.submitDraft();
+	}
+
+	private async _onSubmit() {
+		return success('post dispatch on submit');
 	}
 
 	async onDraftEdit() {
