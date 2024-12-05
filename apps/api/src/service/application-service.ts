@@ -182,11 +182,12 @@ const applicationService = (db: PostgresDb) => ({
 				.offset(page * pageSize)
 				.limit(pageSize);
 
-			return allApplications;
+			return success(allApplications);
 		} catch (err) {
-			console.error(`Error at listApplications with user_id: ${user_id} state: ${state}`);
+			const message = `Error at listApplications with user_id: ${user_id} state: ${state}`;
+			console.error(message);
 			console.error(err);
-			return null;
+			return failure(message, err);
 		}
 	},
 });

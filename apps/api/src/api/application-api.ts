@@ -57,3 +57,21 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		return failure(message);
 	}
 };
+
+/**
+ *
+ * @param userId - user ID
+ * @returns Success with list of Applications / Failure with Error
+ */
+export const getAllApplications = async ({ userId }: { userId: string }) => {
+	const database = getDbInstance();
+	const service: ApplicationService = applicationService(database);
+
+	const result = await service.listApplications({ user_id: userId });
+
+	if (!result.success) {
+		return result;
+	}
+
+	return result;
+};

@@ -19,7 +19,7 @@
 
 import bodyParser from 'body-parser';
 import express from 'express';
-import { editApplication } from '../api/application-api.js';
+import { editApplication, getAllApplications } from '../api/application-api.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -41,6 +41,19 @@ applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
 		}
 
 		res.send({ message: result.message, errors: String(result.errors) });
+	}
+});
+
+// TODO: once authorization is logic is in, retrieve the users ID via session/jwt
+applicationRouter.get('/application', async (req, res) => {
+	const userId = '2';
+
+	const result = await getAllApplications({ userId });
+
+	if (result.success) {
+		res.send(result.data);
+	} else {
+		res.status(500).send({ message: result.message, errors: result.errors });
 	}
 });
 
