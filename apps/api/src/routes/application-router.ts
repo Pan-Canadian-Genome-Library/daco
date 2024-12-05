@@ -18,10 +18,10 @@
  */
 
 import bodyParser from 'body-parser';
-import express from 'express';
+import express, { Request } from 'express';
 
 import { editApplication, getAllApplications } from '@/api/application-api.js';
-import { ApplicationListRequest } from '@/routes/types.js';
+import { ApplicationListRequest } from './types.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -46,12 +46,11 @@ applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
 	}
 });
 
-// TODO: once authorization is logic is in, retrieve the users ID via session/jwt
-//       - also validate queryParam options using zod
-//       - remove casting once request validation pattern is in place
-applicationRouter.get('/application', async (req, res) => {
-	const userId = '1';
-	const { state, sort, page, pageSize } = req.query as ApplicationListRequest;
+// TODO: - verify if user can access applications
+//       - validate queryParam options using zod
+// .     - remove current req.query typing solution once validation/dto flow is confirmed
+applicationRouter.get('/application', async (req: Request<{}, {}, {}, ApplicationListRequest>, res) => {
+	const { userId, state, sort, page, pageSize } = req.query;
 
 	const result = await getAllApplications({ userId, state, sort, page, pageSize });
 
