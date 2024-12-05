@@ -65,10 +65,6 @@ type TransitionValues = [
 	ApplicationTransitionCallback?,
 ];
 
-const getTransitionHandler = (values: TransitionValues) => {
-	return transition(...values);
-};
-
 // Draft
 const draftSubmitTransitionValues: TransitionValues = [DRAFT, submit, INSTITUTIONAL_REP_REVIEW];
 const draftEditTransitionValues: TransitionValues = [DRAFT, edit, DRAFT];
@@ -115,10 +111,14 @@ const applicationTransitionValues: TransitionValues[] = [
 	approvalRevokedTransitionValues,
 ];
 
+const getTransitionHandler = (values: TransitionValues) => {
+	return transition(...values);
+};
+
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
 	private readonly _application: typeof applications.$inferSelect;
-	private _state: ApplicationStateValues;
+	private readonly _initState: ApplicationStateValues;
 
 	// TODO: Add methods for all actions: submit, close, edit, revision_request, approve, reject, revoked
 	private async _onSubmit() {
@@ -128,10 +128,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			if (validationResult.success) {
 				return validationResult;
 			} else {
-				return failure(`Cannot submit application with state ${this._state}`);
+				return failure(`Cannot submit application with state ${this.getState()}`);
 			}
 		} else {
-			return failure(`Cannot submit application with state ${this._state}`);
+			return failure(`Cannot submit application with state ${this.getState()}`);
 		}
 	}
 
@@ -139,7 +139,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		const { id, state } = application;
 		super(state);
 		this._id = id;
-		this._state = state;
+		this._initState = state;
 		this._application = application;
 
 		const applicationTransitions = applicationTransitionValues.map((values) => {
@@ -155,7 +155,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	get state() {
-		return this._state;
+		return this.getState();
 	}
 }
 
