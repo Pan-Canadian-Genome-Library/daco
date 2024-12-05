@@ -125,10 +125,25 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.approvalRevokedTransition,
 	];
 
-	// TODO: Add methods for all actions: submit, close, edit, revision_request, approve, reject, revoked
+	// Handler Methods
+	async onDraftSubmit() {
+		return this._onSubmit();
+	}
+
+	async onRepReviewSubmit() {
+		return this._onSubmit();
+	}
+
+	async onRepRevisionSubmit() {
+		return this._onSubmit();
+	}
+
+	async onDacRevisionSubmit() {
+		return this._onSubmit();
+	}
+
 	private async _onSubmit() {
 		if (this.can(submit)) {
-			console.log('on submit');
 			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
@@ -141,55 +156,93 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
+	async onDraftEdit() {
+		return this._onEdit();
+	}
+
+	async onRepReviewEdit() {
+		return this._onEdit();
+	}
+
+	async onDacReviewEdit() {
+		return this._onEdit();
+	}
+
 	private async _onEdit() {
 		if (this.can(edit)) {
-			console.log('on edit');
-			return success('edit');
+			return success(edit);
 		} else {
 			return failure(`Cannot edit application with state ${this.getState()}`);
 		}
 	}
 
+	async onRepReviewRevision() {
+		return this._onRevision();
+	}
+
+	async onDacReviewRevision() {
+		return this._onRevision();
+	}
+
 	private async _onRevision() {
 		if (this.can(revision_request)) {
-			console.log('on revision');
-			return success('revision');
+			return success(revision_request);
 		} else {
 			return failure(`Cannot revise application with state ${this.getState()}`);
 		}
 	}
 
+	async onDraftClose() {
+		return this._onClose();
+	}
+
+	async onRepReviewClose() {
+		return this._onClose();
+	}
+
+	async onDacReviewClose() {
+		return this._onClose();
+	}
+
 	private async _onClose() {
 		if (this.can(close)) {
-			console.log('on close');
-			return success('close');
+			return success(close);
 		} else {
 			return failure(`Cannot close application with state ${this.getState()}`);
 		}
 	}
 
+	async onDacReviewApprove() {
+		return this._onApproved();
+	}
+
 	private async _onApproved() {
 		if (this.can(approve)) {
-			console.log('on approved');
-			return success('approved');
+			return success(approve);
 		} else {
 			return failure(`Cannot approve application with state ${this.getState()}`);
 		}
 	}
 
+	async onDacReviewReject() {
+		return this._onReject();
+	}
+
 	private async _onReject() {
 		if (this.can(reject)) {
-			console.log('on reject');
-			return success('reject');
+			return success(reject);
 		} else {
 			return failure(`Cannot reject application with state ${this.getState()}`);
 		}
 	}
 
+	async onApprovalRevoked() {
+		return this._onRevoked();
+	}
+
 	private async _onRevoked() {
 		if (this.can(revoked)) {
-			console.log('on revoked');
-			return success('revoked');
+			return success(revoked);
 		} else {
 			return failure(`Cannot revoke application with state ${this.getState()}`);
 		}
@@ -212,15 +265,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	get state() {
 		return this.getState();
 	}
-
-	submitDraft(props: {}) {
-		//if can submit
-		// try {
-		// this.dispatch(ApplicationStateEvents.submit);
-		// } catch (e) {
-		// }
-		// else return error
-	}
 }
 
 export const createApplicationStateManager = async ({ id }: { id: number }) => {
@@ -237,5 +281,3 @@ export const createApplicationStateManager = async ({ id }: { id: number }) => {
 
 	return success(appStateManager);
 };
-
-// application.submitDraft({});
