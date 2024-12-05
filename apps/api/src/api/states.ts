@@ -56,7 +56,7 @@ const validateContent = async (
 };
 
 // TODO: Replace with individual methods
-type ApplicationTransitionCallback = () => AsyncResult<typeof applications.$inferSelect>;
+type ApplicationTransitionCallback = () => AsyncResult<typeof applications.$inferSelect | string>;
 
 type ApplicationTransitions = ITransition<
 	ApplicationStateValues,
@@ -71,17 +71,17 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Draft
 	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
-	private draftEditTransition = transition(DRAFT, edit, DRAFT, this._onSubmit);
-	private draftCloseTransition = transition(DRAFT, close, CLOSED, this._onSubmit);
+	private draftEditTransition = transition(DRAFT, edit, DRAFT, this._onEdit);
+	private draftCloseTransition = transition(DRAFT, close, CLOSED, this._onClose);
 
 	// Rep Review
-	private repReviewCloseTransition = transition(INSTITUTIONAL_REP_REVIEW, close, CLOSED, this._onSubmit);
-	private repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, DRAFT, this._onSubmit);
+	private repReviewCloseTransition = transition(INSTITUTIONAL_REP_REVIEW, close, CLOSED, this._onClose);
+	private repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, DRAFT, this._onEdit);
 	private repReviewRevisionTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
 		revision_request,
 		REP_REVISION,
-		this._onSubmit,
+		this._onRevision,
 	);
 	private repReviewSubmitTransition = transition(INSTITUTIONAL_REP_REVIEW, submit, DAC_REVIEW, this._onSubmit);
 
@@ -89,22 +89,22 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	private repRevisionSubmitTransition = transition(REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
 
 	// DAC Review
-	private dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, this._onSubmit);
-	private dacReviewCloseTransition = transition(DAC_REVIEW, close, CLOSED, this._onSubmit);
-	private dacReviewEditTransition = transition(DAC_REVIEW, edit, DRAFT, this._onSubmit);
+	private dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, this._onApproved);
+	private dacReviewCloseTransition = transition(DAC_REVIEW, close, CLOSED, this._onClose);
+	private dacReviewEditTransition = transition(DAC_REVIEW, edit, DRAFT, this._onEdit);
 	private dacReviewRevisionTransition = transition(
 		DAC_REVIEW,
 		revision_request,
 		DAC_REVISIONS_REQUESTED,
-		this._onSubmit,
+		this._onRevision,
 	);
-	private dacReviewRejectTransition = transition(DAC_REVIEW, reject, REJECTED, this._onSubmit);
+	private dacReviewRejectTransition = transition(DAC_REVIEW, reject, REJECTED, this._onReject);
 
 	// DAC Revision
 	private dacRevisionSubmitTransition = transition(DAC_REVISIONS_REQUESTED, submit, DAC_REVIEW, this._onSubmit);
 
 	// Approval
-	private approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, this._onSubmit);
+	private approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, this._onRevoked);
 
 	// All Transitions
 	private applicationTransitions: ApplicationTransitions[] = [
@@ -127,8 +127,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// TODO: Add methods for all actions: submit, close, edit, revision_request, approve, reject, revoked
 	private async _onSubmit() {
-		// throw new Error('i messed up');
 		if (this.can(submit)) {
+			console.log('on submit');
 			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
@@ -138,6 +138,60 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			}
 		} else {
 			return failure(`Cannot submit application with state ${this.getState()}`);
+		}
+	}
+
+	private async _onEdit() {
+		if (this.can(edit)) {
+			console.log('on edit');
+			return success('edit');
+		} else {
+			return failure(`Cannot edit application with state ${this.getState()}`);
+		}
+	}
+
+	private async _onRevision() {
+		if (this.can(revision_request)) {
+			console.log('on revision');
+			return success('revision');
+		} else {
+			return failure(`Cannot revise application with state ${this.getState()}`);
+		}
+	}
+
+	private async _onClose() {
+		if (this.can(close)) {
+			console.log('on close');
+			return success('close');
+		} else {
+			return failure(`Cannot close application with state ${this.getState()}`);
+		}
+	}
+
+	private async _onApproved() {
+		if (this.can(approve)) {
+			console.log('on approved');
+			return success('approved');
+		} else {
+			return failure(`Cannot approve application with state ${this.getState()}`);
+		}
+	}
+
+	private async _onReject() {
+		if (this.can(reject)) {
+			console.log('on reject');
+			return success('reject');
+		} else {
+			return failure(`Cannot reject application with state ${this.getState()}`);
+		}
+	}
+
+	private async _onRevoked() {
+		if (this.can(revoked)) {
+			console.log('on revoked');
+			return success('revoked');
+		} else {
+			return failure(`Cannot revoke application with state ${this.getState()}`);
 		}
 	}
 

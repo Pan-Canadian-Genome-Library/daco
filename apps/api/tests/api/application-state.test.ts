@@ -33,6 +33,8 @@ import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
 	ApplicationStates;
 
+const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
+
 describe('State Machine', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
@@ -69,52 +71,52 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DRAFT to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			await manager.dispatch(ApplicationStateEvents.submit);
+			await manager.dispatch(submit);
 			value = manager.getState();
 			assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', async () => {
-			await manager.dispatch(ApplicationStateEvents.edit);
+			await manager.dispatch(edit);
 			value = manager.getState();
 			assert.strictEqual(value, DRAFT);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to REP_REVISION on revision_request', async () => {
-			await manager.dispatch(ApplicationStateEvents.submit);
-			await manager.dispatch(ApplicationStateEvents.revision_request);
+			await manager.dispatch(submit);
+			await manager.dispatch(revision_request);
 			value = manager.getState();
 			assert.strictEqual(value, REP_REVISION);
 		});
 
 		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			if (manager.can(ApplicationStateEvents.submit)) {
-				await manager.dispatch(ApplicationStateEvents.submit);
+			if (manager.can(submit)) {
+				await manager.dispatch(submit);
 				value = manager.getState();
 				assert.strictEqual(value, INSTITUTIONAL_REP_REVIEW);
 			}
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on submit', async () => {
-			await manager.dispatch(ApplicationStateEvents.submit);
+			await manager.dispatch(submit);
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
-			await manager.dispatch(ApplicationStateEvents.revision_request);
+			await manager.dispatch(revision_request);
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVISIONS_REQUESTED);
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', async () => {
-			await manager.dispatch(ApplicationStateEvents.submit);
+			await manager.dispatch(submit);
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
-			await manager.dispatch(ApplicationStateEvents.approve);
+			await manager.dispatch(approve);
 			value = manager.getState();
 			assert.strictEqual(value, APPROVED);
 		});
