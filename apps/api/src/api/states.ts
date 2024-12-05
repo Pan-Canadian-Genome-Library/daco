@@ -48,6 +48,13 @@ export enum ApplicationStateEvents {
 
 const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
 
+// TODO: Add Validation
+const validateContent = async (
+	application: typeof applications.$inferSelect,
+): AsyncResult<typeof applications.$inferSelect> => {
+	return success(application);
+};
+
 // TODO: Replace with individual methods
 type ApplicationTransitionCallback = () => AsyncResult<typeof applications.$inferSelect>;
 
@@ -108,29 +115,6 @@ const applicationTransitionValues: TransitionValues[] = [
 	approvalRevokedTransitionValues,
 ];
 
-// TODO: Move to API
-export const createApplicationStateManager = async ({ id }: { id: number }) => {
-	const database = getDbInstance();
-	const service: ReturnType<typeof applicationService> = applicationService(database);
-
-	const result = await service.getApplicationById({ id });
-	if (!result.success) {
-		return result;
-	}
-
-	const dbRecord = result.data;
-	const appStateManager = new ApplicationStateManager(dbRecord);
-
-	return success(appStateManager);
-};
-
-// TODO: Add Validation
-const validateContent = async (
-	application: typeof applications.$inferSelect,
-): AsyncResult<typeof applications.$inferSelect> => {
-	return success(application);
-};
-
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
 	private readonly _application: typeof applications.$inferSelect;
@@ -162,6 +146,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			values.push(this._onSubmit);
 			return getTransitionHandler(values);
 		});
+
 		this.addTransitions(applicationTransitions);
 	}
 
@@ -173,3 +158,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		return this._state;
 	}
 }
+
+export const createApplicationStateManager = async ({ id }: { id: number }) => {
+	const database = getDbInstance();
+	const service: ReturnType<typeof applicationService> = applicationService(database);
+
+	const result = await service.getApplicationById({ id });
+	if (!result.success) {
+		return result;
+	}
+
+	const dbRecord = result.data;
+	const appStateManager = new ApplicationStateManager(dbRecord);
+
+	return success(appStateManager);
+};
