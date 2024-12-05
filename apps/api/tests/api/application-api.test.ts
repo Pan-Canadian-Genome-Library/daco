@@ -20,12 +20,12 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { editApplication } from '../../src/api/application-api.js';
-import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 
-import service from '../../src/service/application-service.js';
+import { editApplication } from '@/api/application-api.js';
+import { connectToDb, type PostgresDb } from '@/db/index.js';
+import service from '@/service/application-service.js';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
 	addInitialApplications,

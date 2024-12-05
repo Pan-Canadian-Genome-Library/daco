@@ -17,19 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { and, eq, sql } from 'drizzle-orm';
-import { type PostgresDb } from '../db/index.js';
-import { applicationContents } from '../db/schemas/applicationContents.js';
-import { applications } from '../db/schemas/applications.js';
-import { failure, success } from '../utils/results.js';
+
+import { type PostgresDb } from '@/db/index.js';
+import { applicationContents } from '@/db/schemas/applicationContents.js';
+import { applications } from '@/db/schemas/applications.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
 	type OrderBy,
-} from './types.js';
-import { sortQuery } from './utils.js';
+} from '@/service/types.js';
+import { sortQuery } from '@/service/utils.js';
+import { failure, success } from '@/utils/results.js';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {

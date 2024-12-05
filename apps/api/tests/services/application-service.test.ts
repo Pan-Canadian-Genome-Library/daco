@@ -17,16 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { eq } from 'drizzle-orm';
 
+import { connectToDb, type PostgresDb } from '@/db/index.js';
+import { applications } from '@/db/schemas/applications.js';
+import service from '@/service/application-service.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { connectToDb, type PostgresDb } from '../../src/db/index.js';
-import { applications } from '../../src/db/schemas/applications.js';
-import service from '../../src/service/application-service.js';
 
 import {
 	addInitialApplications,

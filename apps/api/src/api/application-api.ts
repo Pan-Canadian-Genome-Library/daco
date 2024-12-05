@@ -18,10 +18,11 @@
  */
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { getDbInstance } from '../db/index.js';
-import applicationService from '../service/application-service.js';
-import { type ApplicationContentUpdates, type ApplicationService } from '../service/types.js';
-import { failure } from '../utils/results.js';
+
+import { getDbInstance } from '@/db/index.js';
+import applicationService from '@/service/application-service.js';
+import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
+import { failure } from '@/utils/results.js';
 
 /**
  * Validates if a given Application state allows edits, then updates the record
