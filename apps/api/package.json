@@ -32,7 +32,6 @@
 		"express": "^4.21.0",
 		"pg": "^8.13.0",
 		"typescript-fsm": "^1.4.5",
-		"xstate": "^5.19.0",
 		"swagger-ui-express": "^5.0.1",
 		"yamljs": "^0.3.0"
 	},
