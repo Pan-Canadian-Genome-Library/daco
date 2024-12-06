@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '../db/index.js';
 import { applicationContents } from '../db/schemas/applicationContents.js';
@@ -120,12 +120,26 @@ const applicationService = (db: PostgresDb) => ({
 
 			return application;
 		} catch (err) {
-			console.error(`Error at findOneAndUpdate with id: ${id}`);
+			const message = `Error at findOneAndUpdate with id: ${id}`;
+			console.error(message);
 			console.error(err);
-			return null;
+			return failure(message, err);
 		}
 	},
 	getApplicationById: async ({ id }: { id: number }) => {
+		try {
+			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
+
+			return success(applicationRecord[0]);
+		} catch (err) {
+			const message = `Error at getApplicationById with id: ${id}`;
+			console.error(message);
+			console.error(err);
+			return failure(message, err);
+		}
+	},
+	getApplicationWithContents: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db
 				.select()
@@ -157,7 +171,7 @@ const applicationService = (db: PostgresDb) => ({
 		pageSize = 20,
 	}: {
 		user_id?: string;
-		state?: ApplicationStates;
+		state?: ApplicationStateValues;
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;

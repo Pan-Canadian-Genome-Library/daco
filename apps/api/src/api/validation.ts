@@ -17,36 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applicationContents } from './applicationContents.js';
+import { applications } from '../db/schemas/applications.js';
+import { AsyncResult, success } from '../utils/results.js';
 
-export const applicationStatesEnum = pgEnum('application_states', [
-	'DRAFT',
-	'INSTITUTIONAL_REP_REVIEW',
-	'REP_REVISION',
-	'DAC_REVIEW',
-	'DAC_REVISIONS_REQUESTED',
-	'REJECTED',
-	'APPROVED',
-	'CLOSED',
-	'REVOKED',
-]);
-
-export const applications = pgTable('applications', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	user_id: varchar({ length: 100 }).notNull(),
-	state: applicationStatesEnum().notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	approved_at: timestamp(),
-	updated_at: timestamp(),
-	expires_at: timestamp(),
-	contents: bigint({ mode: 'number' }),
-});
-
-export const applicationsRelations = relations(applications, ({ one }) => ({
-	application_contents: one(applicationContents, {
-		fields: [applications.contents],
-		references: [applicationContents.id],
-	}),
-}));
+// TODO: Add Validation
+export const validateContent = async (
+	application: typeof applications.$inferSelect,
+): AsyncResult<typeof applications.$inferSelect> => {
+	return success(application);
+};

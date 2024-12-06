@@ -20,8 +20,9 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { editApplication } from '../../src/api/application-api.js';
 import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 
@@ -118,6 +119,9 @@ describe('Application API', () => {
 			assert.ok(!result.success);
 		});
 
-		after(() => {});
+		after(async () => {
+			await container.stop();
+			process.exit(0);
+		});
 	});
 });
