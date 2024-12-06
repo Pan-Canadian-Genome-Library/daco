@@ -17,11 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { after, before, describe } from 'node:test';
+import assert from 'node:assert';
+import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import assert from 'node:assert';
-import { it } from 'node:test';
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { editApplication } from '../../src/api/application-api.js';
