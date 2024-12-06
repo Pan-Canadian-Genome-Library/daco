@@ -240,21 +240,21 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// All Transitions
 	private applicationTransitions: ApplicationTransitions[] = [
-		this.draftSubmitTransition,
-		this.draftEditTransition,
-		this.draftCloseTransition,
-		this.repReviewCloseTransition,
-		this.repReviewEditTransition,
-		this.repReviewRevisionTransition,
-		this.repReviewSubmitTransition,
-		this.repRevisionSubmitTransition,
+		this.approvalRevokedTransition,
 		this.dacReviewApproveTransition,
 		this.dacReviewCloseTransition,
 		this.dacReviewEditTransition,
 		this.dacReviewRevisionTransition,
 		this.dacReviewRejectTransition,
 		this.dacRevisionSubmitTransition,
-		this.approvalRevokedTransition,
+		this.draftCloseTransition,
+		this.draftEditTransition,
+		this.draftSubmitTransition,
+		this.repReviewCloseTransition,
+		this.repReviewEditTransition,
+		this.repReviewRevisionTransition,
+		this.repReviewSubmitTransition,
+		this.repRevisionSubmitTransition,
 	];
 
 	constructor(application: typeof applications.$inferSelect) {
