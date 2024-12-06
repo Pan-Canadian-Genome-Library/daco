@@ -188,14 +188,14 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async reviseDacReview() {
-		return this._onRevision();
+		return this.reviseRepReview();
 	}
 
 	private async _onRevision() {
 		return success('post dispatch on revision');
 	}
 
-	async onDraftClose() {
+	async closeDraft() {
 		if (this.can(close)) {
 			await this.dispatch(close);
 			return success(close);
@@ -204,19 +204,19 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async onRepReviewClose() {
-		return this.onDraftClose();
+	async closeRepReview() {
+		return this.closeDraft();
 	}
 
-	async onDacReviewClose() {
-		return this.onDraftClose();
+	async closeDacReview() {
+		return this.closeDraft();
 	}
 
 	private async _onClose() {
 		return success('post dispatch on close');
 	}
 
-	async onDacReviewApprove() {
+	async approveDacReview() {
 		if (this.can(approve)) {
 			await this.dispatch(approve);
 			return success(approve);
@@ -229,7 +229,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		return success('post dispatch on close');
 	}
 
-	async onDacReviewReject() {
+	async rejectDacReview() {
 		if (this.can(reject)) {
 			await this.dispatch(reject);
 			return success(reject);
@@ -242,7 +242,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		return success('post dispatch on reject');
 	}
 
-	async onApprovalRevoked() {
+	async revokeApproval() {
 		if (this.can(revoked)) {
 			await this.dispatch(revoked);
 			return success(revoked);

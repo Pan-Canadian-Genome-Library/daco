@@ -22,18 +22,12 @@ import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import {
-	ApplicationStateEvents,
-	ApplicationStateManager,
-	createApplicationStateManager,
-} from '../../src/api/states.js';
+import { ApplicationStateManager, createApplicationStateManager } from '../../src/api/states.js';
 import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
 const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
 	ApplicationStates;
-
-const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
 
 describe('State Machine', () => {
 	let db: PostgresDb;
@@ -102,7 +96,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
-			await manager.dispatch(revision_request);
+			await manager.reviseDacReview();
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVISIONS_REQUESTED);
 		});
@@ -114,7 +108,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
-			await manager.dispatch(approve);
+			await manager.approveDacReview();
 			value = manager.getState();
 			assert.strictEqual(value, APPROVED);
 		});
