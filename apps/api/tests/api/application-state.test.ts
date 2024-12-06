@@ -77,14 +77,14 @@ describe('State Machine', () => {
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', async () => {
-			await manager.dispatch(edit);
+			await manager.editRepReview();
 			value = manager.getState();
 			assert.strictEqual(value, DRAFT);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to REP_REVISION on revision_request', async () => {
-			await manager.dispatch(submit);
-			await manager.dispatch(revision_request);
+			await manager.submitDraft();
+			await manager.reviseRepReview();
 			value = manager.getState();
 			assert.strictEqual(value, REP_REVISION);
 		});

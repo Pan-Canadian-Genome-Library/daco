@@ -157,96 +157,102 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		return success('post dispatch on submit');
 	}
 
-	async onDraftEdit() {
-		return this._onEdit();
-	}
-
-	async onRepReviewEdit() {
-		return this._onEdit();
-	}
-
-	async onDacReviewEdit() {
-		return this._onEdit();
-	}
-
-	private async _onEdit() {
+	async editDraft() {
 		if (this.can(edit)) {
+			await this.dispatch(edit);
 			return success(edit);
 		} else {
 			return failure(`Cannot edit application with state ${this.getState()}`);
 		}
 	}
 
-	async onRepReviewRevision() {
-		return this._onRevision();
+	async editRepReview() {
+		return this.editDraft();
 	}
 
-	async onDacReviewRevision() {
-		return this._onRevision();
+	async editDacReview() {
+		return this.editDraft();
 	}
 
-	private async _onRevision() {
+	private async _onEdit() {
+		return success('post dispatch on edit');
+	}
+
+	async reviseRepReview() {
 		if (this.can(revision_request)) {
+			await this.dispatch(revision_request);
 			return success(revision_request);
 		} else {
 			return failure(`Cannot revise application with state ${this.getState()}`);
 		}
 	}
 
+	async reviseDacReview() {
+		return this._onRevision();
+	}
+
+	private async _onRevision() {
+		return success('post dispatch on revision');
+	}
+
 	async onDraftClose() {
-		return this._onClose();
-	}
-
-	async onRepReviewClose() {
-		return this._onClose();
-	}
-
-	async onDacReviewClose() {
-		return this._onClose();
-	}
-
-	private async _onClose() {
 		if (this.can(close)) {
+			await this.dispatch(close);
 			return success(close);
 		} else {
 			return failure(`Cannot close application with state ${this.getState()}`);
 		}
 	}
 
-	async onDacReviewApprove() {
-		return this._onApproved();
+	async onRepReviewClose() {
+		return this.onDraftClose();
 	}
 
-	private async _onApproved() {
+	async onDacReviewClose() {
+		return this.onDraftClose();
+	}
+
+	private async _onClose() {
+		return success('post dispatch on close');
+	}
+
+	async onDacReviewApprove() {
 		if (this.can(approve)) {
+			await this.dispatch(approve);
 			return success(approve);
 		} else {
 			return failure(`Cannot approve application with state ${this.getState()}`);
 		}
 	}
 
-	async onDacReviewReject() {
-		return this._onReject();
+	private async _onApproved() {
+		return success('post dispatch on close');
 	}
 
-	private async _onReject() {
+	async onDacReviewReject() {
 		if (this.can(reject)) {
+			await this.dispatch(reject);
 			return success(reject);
 		} else {
 			return failure(`Cannot reject application with state ${this.getState()}`);
 		}
 	}
 
-	async onApprovalRevoked() {
-		return this._onRevoked();
+	private async _onReject() {
+		return success('post dispatch on reject');
 	}
 
-	private async _onRevoked() {
+	async onApprovalRevoked() {
 		if (this.can(revoked)) {
+			await this.dispatch(revoked);
 			return success(revoked);
 		} else {
 			return failure(`Cannot revoke application with state ${this.getState()}`);
 		}
+	}
+
+	private async _onRevoked() {
+		return success('post dispatch on revoked');
 	}
 
 	constructor(application: typeof applications.$inferSelect) {
