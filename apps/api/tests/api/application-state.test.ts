@@ -26,8 +26,17 @@ import { ApplicationStateManager, createApplicationStateManager } from '../../sr
 import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
-const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED, REVOKED } =
-	ApplicationStates;
+const {
+	APPROVED,
+	CLOSED,
+	DAC_REVIEW,
+	DAC_REVISIONS_REQUESTED,
+	DRAFT,
+	INSTITUTIONAL_REP_REVIEW,
+	REJECTED,
+	REP_REVISION,
+	REVOKED,
+} = ApplicationStates;
 
 describe('State Machine', () => {
 	let db: PostgresDb;
@@ -105,6 +114,40 @@ describe('State Machine', () => {
 			await manager.submitDacRevision();
 			value = manager.getState();
 			assert.strictEqual(value, DAC_REVIEW);
+		});
+
+		it('should change from DAC_REVIEW to REJECTED on rejected', async () => {
+			const result = await createApplicationStateManager({ id: 2 });
+			assert.ok(result.success);
+
+			const dacReviewManager = result.data;
+			await dacReviewManager.submitDraft();
+			await dacReviewManager.submitRepReview();
+
+			value = dacReviewManager.getState();
+			assert.strictEqual(value, DAC_REVIEW);
+
+			await dacReviewManager.rejectDacReview();
+
+			value = dacReviewManager.getState();
+			assert.strictEqual(value, REJECTED);
+		});
+
+		it('should change from DAC_REVIEW to CLOSED on close', async () => {
+			const result = await createApplicationStateManager({ id: 3 });
+			assert.ok(result.success);
+
+			const dacReviewManager = result.data;
+			await dacReviewManager.submitDraft();
+			await dacReviewManager.submitRepReview();
+
+			value = dacReviewManager.getState();
+			assert.strictEqual(value, DAC_REVIEW);
+
+			await dacReviewManager.closeDacReview();
+
+			value = dacReviewManager.getState();
+			assert.strictEqual(value, CLOSED);
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
