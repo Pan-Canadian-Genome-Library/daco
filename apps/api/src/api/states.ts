@@ -235,7 +235,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// DAC Revision
 	private dacRevisionSubmitTransition = transition(DAC_REVISIONS_REQUESTED, submit, DAC_REVIEW, this._onSubmit);
 
-	// Approval
+	// Revoke Approval
 	private approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, this._onRevoked);
 
 	// All Transitions

@@ -26,7 +26,7 @@ import { ApplicationStateManager, createApplicationStateManager } from '../../sr
 import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
-const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED } =
+const { DRAFT, INSTITUTIONAL_REP_REVIEW, REP_REVISION, DAC_REVIEW, DAC_REVISIONS_REQUESTED, APPROVED, REVOKED } =
 	ApplicationStates;
 
 describe('State Machine', () => {
@@ -113,11 +113,10 @@ describe('State Machine', () => {
 			assert.strictEqual(value, APPROVED);
 		});
 
-		it('should not allow submission post approval', async () => {
-			// const result = await manager.dispatch(ApplicationStateEvents.submit);
-			// const errorMessage = `Cannot submit application with state DRAFT`;
-			// assert.strictEqual(result?.success, false);
-			// assert.strictEqual(result?.data, errorMessage);
+		it('should change from APPROVED to REVOKED on revoked', async () => {
+			await manager.revokeApproval();
+			value = manager.getState();
+			assert.strictEqual(value, REVOKED);
 		});
 	});
 
