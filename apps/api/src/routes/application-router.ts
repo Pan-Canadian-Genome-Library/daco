@@ -21,7 +21,6 @@ import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
 import { editApplication, getAllApplications } from '@/api/application-api.js';
-import { ApplicationListRequest } from './types.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -46,13 +45,33 @@ applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
 	}
 });
 
-// TODO: - verify if user can access applications
+// TODO: - Refactor endpoint logic once validation/dto flow is in place
+//       - verify if user can access applications
 //       - validate queryParam options using zod
-// .     - remove current req.query typing solution once validation/dto flow is confirmed
-applicationRouter.get('/application', async (req: Request<{}, {}, {}, ApplicationListRequest>, res) => {
-	const { userId, state, sort, page, pageSize } = req.query;
+applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res) => {
+	const { userId, state, page, pageSize } = req.query;
 
-	const result = await getAllApplications({ userId, state, sort, page, pageSize });
+	//  Temporary userId check until validation/dto flow is confirmed
+	//  - reflect changes in swagger once refactored
+	if (!userId) {
+		res.status(400).send({ message: 'User Id is required' });
+		return;
+	}
+
+	// Check if sort exists and parse it if true
+	let sort = [];
+
+	if (req.query.sort) {
+		sort = JSON.parse(req.query.sort);
+	}
+
+	const result = await getAllApplications({
+		userId,
+		state,
+		sort,
+		page: parseInt(page),
+		pageSize: parseInt(pageSize),
+	});
 
 	if (result.success) {
 		res.status(200).send(result.data);
