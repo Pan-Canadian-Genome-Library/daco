@@ -23,13 +23,12 @@ import * as swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from 'url';
 import yaml from 'yamljs';
 
-import { getHealth, Status } from './app-health.js';
+import { getHealth, Status } from '@/app-health.js';
+import applicationRouter from '@/routes/application-router.js';
 
 const { npm_package_version } = process.env;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-import applicationRouter from './routes/application-router.js';
 
 const port = process.env.PORT || 3000;
 

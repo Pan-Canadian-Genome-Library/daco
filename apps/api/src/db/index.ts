@@ -18,7 +18,8 @@
  */
 
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { setStatus, Status } from '../app-health.js';
+
+import { setStatus, Status } from '@/app-health.js';
 
 export type PostgresDb = ReturnType<typeof drizzle>;
 

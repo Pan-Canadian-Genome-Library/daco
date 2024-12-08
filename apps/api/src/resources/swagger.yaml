@@ -66,6 +66,57 @@ paths:
             application/json:
               schema:
                 type: object
+  /applications:
+    get:
+      tags:
+        - Applications
+      summary: Get All Users Applications
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          description: Retrieve application items belonging to userId
+          required: true
+        - in: query
+          name: state
+          schema:
+            type: string
+          description: Retrieve specific application items in a certain State
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: Sort application items
+        - in: query
+          name: page
+          schema:
+            type: string
+          description: Retrieve specific page of application items
+        - in: query
+          name: pageSize
+          schema:
+            type: string
+          description: Max number of application items per page
+      responses:
+        '500':
+          description: 'Cannot return applications list'
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'Error retrieving applications - Please provide user ID'
+          content:
+            application/json:
+              schema:
+                type: object
+        '200':
+          description: 'Application retrieved'
+          content:
+            application/json:
+              schema:
+                type: object
 
 components:
   schemas:

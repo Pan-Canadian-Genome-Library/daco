@@ -17,19 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { eq } from 'drizzle-orm';
 
-import { connectToDb, type PostgresDb } from '../../src/db/index.js';
-import { actions } from '../../src/db/schemas/actions.js';
-import { agreements } from '../../src/db/schemas/agreements.js';
-import { applicationContents } from '../../src/db/schemas/applicationContents.js';
-import { collaborators } from '../../src/db/schemas/collaborators.js';
-import { files } from '../../src/db/schemas/files.js';
-import { revisionRequests } from '../../src/db/schemas/revisionRequests.js';
+import { connectToDb, type PostgresDb } from '@/db/index.js';
+import { actions } from '@/db/schemas/actions.js';
+import { agreements } from '@/db/schemas/agreements.js';
+import { applicationContents } from '@/db/schemas/applicationContents.js';
+import { collaborators } from '@/db/schemas/collaborators.js';
+import { files } from '@/db/schemas/files.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 
 import { initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
