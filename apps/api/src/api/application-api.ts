@@ -67,6 +67,10 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 /**
  *
  * @param userId - user ID
+ * @param state - application state
+ * @param sort - sorting options
+ * @param page - page offset
+ * @param pageSize - page limit
  * @returns Success with list of Applications / Failure with Error
  */
 export const getAllApplications = async ({
