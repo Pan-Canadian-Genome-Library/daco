@@ -18,8 +18,9 @@
  */
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { Breakpoints, useMinWidth } from '@/global/hooks/useMinWidth';
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col, Flex, Layout, Typography, theme } from 'antd';
+import { Avatar, Button, Col, Flex, Layout, Row, Typography, theme } from 'antd';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -34,12 +35,13 @@ const heroStyle: React.CSSProperties = {
 
 const HomePage = () => {
 	const { token } = useToken();
+	const minWidth = useMinWidth();
 
 	return (
 		<Content>
-			<Flex className="hero-background-image" justify="center">
-				<Flex align="center" style={heroStyle}>
-					<Col span={12}>
+			<Row className="hero-background-image" align="middle">
+				<Row align="middle" style={{ ...heroStyle, width: '90%' }}>
+					<Col span={24} lg={12}>
 						<Flex vertical>
 							<Title style={{ color: token.colorTextSecondary }}> Apply for Access to Controlled Data</Title>
 							<Paragraph style={{ color: token.colorTextSecondary }}>
@@ -53,69 +55,65 @@ const HomePage = () => {
 							</Col>
 						</Flex>
 					</Col>
-				</Flex>
-			</Flex>
-			<Flex align="center" style={heroStyle}>
-				<Flex gap={20}>
-					<Col span={12}>
-						<Flex vertical gap={10}>
-							<Title level={2}>Overview</Title>
-							<Paragraph>
-								Authorization for access to Pan-Canadian Genome Library controlled data is study based and is reviewed
-								for compliance with PCGL Policies and Guidelines. The PCGL DACO is the overarching authority to ensure
-								that data from the PCGL will only be used by qualified individuals for public health objectives.
-							</Paragraph>
-							<Paragraph>
-								Before starting your application, learn more about Data Access and Use Policies and review our
-								<Link underline> frequently asked questions</Link>.
-							</Paragraph>
+				</Row>
+			</Row>
+			<Row style={{ ...heroStyle, width: minWidth <= Breakpoints.LG ? '95%' : '90%' }} align={'top'} gutter={32}>
+				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+					<Flex vertical gap={'middle'}>
+						<Title level={2}>Overview</Title>
+						<Paragraph>
+							Authorization for access to Pan-Canadian Genome Library controlled data is study based and is reviewed for
+							compliance with PCGL Policies and Guidelines. The PCGL DACO is the overarching authority to ensure that
+							data from the PCGL will only be used by qualified individuals for public health objectives.
+						</Paragraph>
+						<Paragraph>
+							Before starting your application, learn more about Data Access and Use Policies and review our
+							<Link underline> frequently asked questions</Link>.
+						</Paragraph>
+					</Flex>
+				</Col>
+				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+					<Flex vertical gap={'large'}>
+						<Title level={2}>The Application Process is Simple</Title>
+						<Flex align="center" gap={'middle'}>
+							<Flex justify="center" align="center">
+								<Avatar
+									style={{ backgroundColor: '#C0DCF3', color: 'rgba(0,0,0,0.5)' }}
+									size={60}
+									icon={<FileOutlined />}
+								/>
+							</Flex>
+							<Text>
+								Log in and start an application. Carefully complete all required sections and review all policies and
+								agreements.
+							</Text>
 						</Flex>
-					</Col>
-					<Col span={12}>
-						<Flex vertical gap={20}>
-							<Title level={2}>The Application Process is Simple</Title>
-							<Flex align="center" gap={10}>
-								<Flex justify="center" align="center">
-									<Avatar
-										style={{ backgroundColor: '#C0DCF3', color: 'rgba(0,0,0,0.5)' }}
-										size={60}
-										icon={<FileOutlined />}
-									/>
-								</Flex>
-								<Text>
-									Log in and start an application. Carefully complete all required sections and review all policies and
-									agreements.
-								</Text>
+						<Flex align="center" gap={'middle'}>
+							<Flex justify="center" align="center">
+								<Avatar
+									style={{ backgroundColor: '#FDD6CB', color: 'rgba(0,0,0,0.5)' }}
+									size={60}
+									icon={<SignatureOutlined />}
+								/>
 							</Flex>
-							<Flex align="center" gap={10}>
-								<Flex justify="center" align="center">
-									<Avatar
-										style={{ backgroundColor: '#FDD6CB', color: 'rgba(0,0,0,0.5)' }}
-										size={60}
-										icon={<SignatureOutlined />}
-									/>
-								</Flex>
-								<Text>
-									When completed, obtain the required signatures and submit the signed application for review.
-								</Text>
-							</Flex>
-							<Flex align="center" gap={10}>
-								<Flex justify="center" align="center">
-									<Avatar
-										style={{ backgroundColor: '#D3F7F0', color: 'rgba(0,0,0,0.5)' }}
-										size={60}
-										icon={<AuditOutlined />}
-									/>
-								</Flex>
-								<Text>
-									The PCGL DACO will review the application and approved project teams will be granted access to PCGL
-									Controlled Data.
-								</Text>
-							</Flex>
+							<Text>When completed, obtain the required signatures and submit the signed application for review.</Text>
 						</Flex>
-					</Col>
-				</Flex>
-			</Flex>
+						<Flex align="center" gap={'middle'}>
+							<Flex justify="center" align="center">
+								<Avatar
+									style={{ backgroundColor: '#D3F7F0', color: 'rgba(0,0,0,0.5)' }}
+									size={60}
+									icon={<AuditOutlined />}
+								/>
+							</Flex>
+							<Text>
+								The PCGL DACO will review the application and approved project teams will be granted access to PCGL
+								Controlled Data.
+							</Text>
+						</Flex>
+					</Flex>
+				</Col>
+			</Row>
 		</Content>
 	);
 };
