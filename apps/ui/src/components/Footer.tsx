@@ -21,6 +21,7 @@ import { ConfigProvider, Flex, Image, Layout, Typography } from 'antd';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
 import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
+import { Breakpoints, useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -63,35 +64,60 @@ const policiesConditionsLinks: LinkType[] = [
 	},
 ];
 
-const linkStyle: React.CSSProperties = {
-	textAlign: 'center',
-	textWrap: 'nowrap',
-};
-
-const textStyle: React.CSSProperties = {
-	textAlign: 'center',
-};
-
 const FooterComponent = () => {
+	const minWidth = useMinWidth();
+
+	const linkStyle: React.CSSProperties = {
+		textAlign: 'center',
+		textWrap: 'nowrap',
+		fontSize: minWidth <= Breakpoints.LG ? '.75rem' : '1rem',
+	};
+
+	const textStyle: React.CSSProperties = {
+		textAlign: minWidth <= Breakpoints.LG ? 'start' : 'center',
+		fontSize: minWidth <= Breakpoints.LG ? '.75rem' : '1rem',
+		alignSelf: 'center',
+	};
+
+	const footerStyle: React.CSSProperties = {
+		display: 'flex',
+		flexDirection: minWidth <= Breakpoints.LG ? 'column' : 'row',
+		justifyItems: 'center',
+		alignItems: 'center',
+		gap: minWidth <= Breakpoints.LG ? '2rem' : '0',
+	};
+
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
-			<Footer>
-				<Flex justify="center" align="center">
-					<Link target="_blank">
-						<Image width={200} src={PCGLFOOTER} preview={false} />
-					</Link>
-					<Flex flex={1} vertical justify="center" align="center" gap={10} wrap>
-						<Flex gap={20} justify="center" align="center" wrap>
+			<Footer style={footerStyle}>
+				<Link target="_blank" style={{ margin: minWidth <= Breakpoints.LG ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
+					<Image width={200} src={PCGLFOOTER} preview={false} />
+				</Link>
+				<Flex flex={1} vertical gap={20}>
+					<Flex
+						gap={10}
+						vertical={minWidth <= Breakpoints.LG ? false : true}
+						justify={minWidth <= Breakpoints.LG ? 'space-between' : 'center'}
+						align={minWidth <= Breakpoints.LG ? 'flex-start' : 'center'}
+					>
+						<Flex
+							gap={20}
+							justify="center"
+							align={minWidth <= Breakpoints.LG ? 'start' : 'center'}
+							vertical={minWidth <= Breakpoints.LG ? true : false}
+						>
 							{pcglLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
 									{itemLink.name}
 								</Link>
 							))}
 						</Flex>
-						<Text style={textStyle}>
-							© 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
-						</Text>
-						<Flex gap={20} justify="center" align="center">
+						<Flex
+							gap={20}
+							justify="center"
+							align={minWidth <= Breakpoints.LG ? 'start' : 'center'}
+							vertical={minWidth <= Breakpoints.LG ? true : false}
+						>
 							{policiesConditionsLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
 									{itemLink.name}
@@ -99,6 +125,9 @@ const FooterComponent = () => {
 							))}
 						</Flex>
 					</Flex>
+					<Text style={textStyle}>
+						&copy; 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
+					</Text>
 				</Flex>
 			</Footer>
 		</ConfigProvider>
