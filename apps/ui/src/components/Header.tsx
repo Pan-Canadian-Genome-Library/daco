@@ -186,7 +186,13 @@ const HeaderComponent = () => {
 						placement={minWidth <= Breakpoints.SM ? 'top' : 'left'}
 						width={minWidth <= Breakpoints.SM ? '100%' : '40%'}
 					>
-						<Flex style={{ margin: '4rem .5rem 0 .25rem'}} vertical justify="top" align="flex-start" gap={token.paddingXL}>
+						<Flex
+							style={{ margin: '4rem .5rem 0 .25rem' }}
+							vertical
+							justify="top"
+							align="flex-start"
+							gap={token.paddingXL}
+						>
 							<>{displayMenuLinks(menuLinks, 'both')}</>
 						</Flex>
 					</Drawer>

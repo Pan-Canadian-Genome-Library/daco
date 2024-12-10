@@ -95,7 +95,7 @@ const FooterComponent = () => {
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
 				<Link target="_blank" style={{ margin: minWidth <= Breakpoints.XL ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
-					<Image width={200} src={PCGLFOOTER} preview={false} />
+					<Image width={200} src={PCGLFOOTER} preview={false} alt="Pan-Canadian Genome Library / Librairie Pancanadienne de Génomique" />
 				</Link>
 				<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={24}>
 					<Flex
