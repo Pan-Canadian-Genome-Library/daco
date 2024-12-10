@@ -20,18 +20,6 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Breakpoints for common device sizes, based off of breakpoints provided by Bootstrap 4.0, which are used by Ant Design components.
- * @see(@link https://getbootstrap.com/docs/4.0/layout/overview/#responsive-breakpoints)
- * @see(@link https://ant.design/components/grid#design-token)
- */
-export const Breakpoints = {
-	XL: 1200,
-	LG: 992,
-	MD: 768,
-	SM: 576,
-};
-
-/**
  * Gets the current width of the screen as a number.
  * @returns Current width of the screen.
  */

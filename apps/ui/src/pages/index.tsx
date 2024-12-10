@@ -17,11 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { Breakpoints, useMinWidth } from '@/global/hooks/useMinWidth';
-import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
 import { useState } from 'react';
+
+import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
+import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
+
+import { useMinWidth } from '@/global/hooks/useMinWidth';
+
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -39,7 +42,7 @@ const HomePage = () => {
 	const minWidth = useMinWidth();
 	const [openModal, setOpenModal] = useState(false);
 
-	const isResponsiveMode = minWidth <= Breakpoints.LG;
+	const isResponsiveMode = minWidth <= token.screenLG;
 
 	// TODO: Handle the transition over to the the login page
 	const handleLoginButton = () => {
@@ -134,7 +137,7 @@ const HomePage = () => {
 				style={{
 					top: '20%',
 					maxWidth: '800px',
-					paddingInline: minWidth <= Breakpoints.SM || minWidth >= Breakpoints.XL ? token.padding : token.paddingXL,
+					paddingInline: minWidth <= token.screenSM || minWidth >= token.screenXL ? token.padding : token.paddingXL,
 				}}
 				open={openModal}
 				onOk={handleLoginButton}

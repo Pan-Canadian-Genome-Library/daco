@@ -21,8 +21,8 @@ import { ConfigProvider, Flex, Image, Layout, Typography, theme } from 'antd';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
 import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
-import { Breakpoints, useMinWidth } from '@/global/hooks/useMinWidth';
-import { contentWrapperStyles } from './layouts/ContentWrapper';
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -73,28 +73,28 @@ const FooterComponent = () => {
 	const linkStyle: React.CSSProperties = {
 		textAlign: 'center',
 		textWrap: 'nowrap',
-		fontSize: minWidth <= Breakpoints.LG ? token.fontSize : token.fontSizeLG,
+		fontSize: minWidth <= token.screenLG ? token.fontSize : token.fontSizeLG,
 	};
 
 	const textStyle: React.CSSProperties = {
-		textAlign: minWidth <= Breakpoints.XL ? 'start' : 'center',
-		fontSize: minWidth <= Breakpoints.LG ? token.fontSize : token.fontSizeLG,
+		textAlign: minWidth <= token.screenXL ? 'start' : 'center',
+		fontSize: minWidth <= token.screenLG ? token.fontSize : token.fontSizeLG,
 		alignSelf: 'center',
 	};
 
 	const footerStyle: React.CSSProperties = {
 		display: 'flex',
-		flexDirection: minWidth <= Breakpoints.XL ? 'column' : 'row',
+		flexDirection: minWidth <= token.screenXL ? 'column' : 'row',
 		justifyItems: 'center',
 		alignItems: 'center',
-		padding: minWidth <= Breakpoints.LG ? `2rem 1.75rem` : token.Layout?.footerPadding,
-		gap: minWidth <= Breakpoints.XL ? token.paddingXL : '0rem',
+		padding: minWidth <= token.screenLG ? `2rem 1.75rem` : token.Layout?.footerPadding,
+		gap: minWidth <= token.screenXL ? token.paddingXL : '0rem',
 	};
 
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
-				<Link target="_blank" style={{ margin: minWidth <= Breakpoints.XL ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
+				<Link target="_blank" style={{ margin: minWidth <= token.screenXL ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
 					<Image
 						width={200}
 						src={PCGLFOOTER}
@@ -106,15 +106,15 @@ const FooterComponent = () => {
 					<Flex
 						gap={token.padding}
 						style={{ width: '100%' }}
-						vertical={minWidth <= Breakpoints.XL ? false : true}
-						justify={minWidth <= Breakpoints.XL ? 'space-between' : 'center'}
-						align={minWidth <= Breakpoints.XL ? 'flex-start' : 'center'}
+						vertical={minWidth <= token.screenXL ? false : true}
+						justify={minWidth <= token.screenXL ? 'space-between' : 'center'}
+						align={minWidth <= token.screenXL ? 'flex-start' : 'center'}
 					>
 						<Flex
 							gap={token.paddingLG}
 							justify="center"
-							align={minWidth <= Breakpoints.XL ? 'start' : 'center'}
-							vertical={minWidth <= Breakpoints.XL ? true : false}
+							align={minWidth <= token.screenXL ? 'start' : 'center'}
+							vertical={minWidth <= token.screenXL ? true : false}
 						>
 							{pcglLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
@@ -125,8 +125,8 @@ const FooterComponent = () => {
 						<Flex
 							gap={token.paddingLG}
 							justify="center"
-							align={minWidth <= Breakpoints.XL ? 'start' : 'center'}
-							vertical={minWidth <= Breakpoints.XL ? true : false}
+							align={minWidth <= token.screenXL ? 'start' : 'center'}
+							vertical={minWidth <= token.screenXL ? true : false}
 						>
 							{policiesConditionsLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">

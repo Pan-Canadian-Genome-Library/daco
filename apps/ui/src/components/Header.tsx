@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import React, { useState } from 'react';
+
 import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
+import { CloseOutlined, MenuOutlined } from '@ant-design/icons';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
-import { Breakpoints, useMinWidth } from '@/global/hooks/useMinWidth';
-import { CloseOutlined, MenuOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Link } = Typography;
 const { Header } = Layout;
@@ -45,9 +46,9 @@ const linkStyle: React.CSSProperties = {
 
 const HeaderComponent = () => {
 	const minWidth = useMinWidth();
-	const isResponsiveMode = minWidth <= Breakpoints.XL;
-
 	const { token } = useToken();
+	
+	const isResponsiveMode = minWidth <= token.screenXL;
 
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
 
@@ -57,18 +58,18 @@ const HeaderComponent = () => {
 
 	/**
 	 * Default action when a button in the menu is clicked, used particularly for the mobile menu which should close after click.
-	 * @param buttonAction The function for the action needed to be preformed.
+	 * @param buttonAction The function for the action needed to be performed.
 	 */
 	const onMenuButtonClick = (buttonAction?: VoidFunction) => {
 		if (!buttonAction) {
 			return;
 		}
+		
 		if (isResponsiveMode) {
 			setResponsiveMenuOpen(false);
-			buttonAction();
-		} else {
-			buttonAction();
 		}
+		
+		buttonAction();	
 	};
 
 	const onLoginClick = () => {
@@ -117,7 +118,7 @@ const HeaderComponent = () => {
 			.map((ml, key) =>
 				ml.isButton ? (
 					<Button
-						key={`mi-${key}`}
+						key={`menuLink-${key}`}
 						{...(ml.buttonProps ?? null)}
 						style={{ ...menuButtonStyle, ...ml.buttonProps?.style }}
 						onClick={() => onMenuButtonClick(ml.onClickAction)}
@@ -125,7 +126,7 @@ const HeaderComponent = () => {
 						{ml.name}
 					</Button>
 				) : (
-					<Link style={linkStyle} target="_blank" href={ml.href ?? '#'} key={`mi-${key}`}>
+					<Link key={`menuLink-${key}`} style={linkStyle} target="_blank" href={ml.href ?? '#'}>
 						{ml.name}
 					</Link>
 				),
@@ -187,8 +188,8 @@ const HeaderComponent = () => {
 						title={null}
 						onClose={() => setResponsiveMenuOpen(false)}
 						closeIcon={null}
-						placement={minWidth < Breakpoints.MD ? 'top' : 'left'}
-						width={minWidth < Breakpoints.MD ? '100%' : '40%'}
+						placement={minWidth < token.screenMD ? 'top' : 'left'}
+						width={minWidth < token.screenMD ? '100%' : '40%'}
 					>
 						<Flex style={{ margin: '4rem 0 0 0' }} vertical justify="top" align="flex-start" gap={token.paddingXL}>
 							<>{displayMenuLinks(menuLinks, 'both')}</>
