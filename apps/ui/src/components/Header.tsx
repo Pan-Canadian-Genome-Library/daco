@@ -185,9 +185,10 @@ const HeaderComponent = () => {
 						height={'100%'}
 						open={responsiveMenuOpen}
 						title={null}
+						onClose={() => setResponsiveMenuOpen(false)}
 						closeIcon={null}
-						placement={minWidth <= Breakpoints.SM ? 'top' : 'left'}
-						width={minWidth <= Breakpoints.SM ? '100%' : '40%'}
+						placement={minWidth < Breakpoints.MD ? 'top' : 'left'}
+						width={minWidth < Breakpoints.MD ? '100%' : '40%'}
 					>
 						<Flex style={{ margin: '4rem 0 0 0' }} vertical justify="top" align="flex-start" gap={token.paddingXL}>
 							<>{displayMenuLinks(menuLinks, 'both')}</>
