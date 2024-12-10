@@ -45,7 +45,7 @@ const linkStyle: React.CSSProperties = {
 
 const HeaderComponent = () => {
 	const minWidth = useMinWidth();
-	const isResponsiveMode = minWidth <= Breakpoints.LG;
+	const isResponsiveMode = minWidth <= Breakpoints.XL;
 
 	const { token } = useToken();
 
@@ -114,9 +114,10 @@ const HeaderComponent = () => {
 	const displayMenuLinks = (menuLinks: MenuLinkType[], position: 'left' | 'right' | 'both'): JSX.Element[] => {
 		return menuLinks
 			.filter((ml) => (position !== 'both' ? ml.position === position : ml.position))
-			.map((ml) =>
+			.map((ml, key) =>
 				ml.isButton ? (
 					<Button
+						key={`mi-${key}`}
 						{...(ml.buttonProps ?? null)}
 						style={{ ...menuButtonStyle, ...ml.buttonProps?.style }}
 						onClick={() => onMenuButtonClick(ml.onClickAction)}
@@ -124,7 +125,7 @@ const HeaderComponent = () => {
 						{ml.name}
 					</Button>
 				) : (
-					<Link style={linkStyle} target="_blank" href={ml.href ?? '#'}>
+					<Link style={linkStyle} target="_blank" href={ml.href ?? '#'} key={`mi-${key}`}>
 						{ml.name}
 					</Link>
 				),
