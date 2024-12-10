@@ -166,12 +166,12 @@ const HeaderComponent = () => {
 						{!isResponsiveMode ? (
 							<>{displayMenuLinks(menuLinks, 'right')}</>
 						) : !responsiveMenuOpen ? (
-							<Button type="text" aria-description="Open Menu" onClick={() => setResponsiveMenuOpen(true)}>
-								<MenuOutlined />
+							<Button type="text" aria-label="Open Menu" onClick={() => setResponsiveMenuOpen(true)}>
+								<MenuOutlined aria-hidden />
 							</Button>
 						) : (
-							<Button type="text" aria-description="Close Menu" onClick={() => setResponsiveMenuOpen(false)}>
-								<CloseOutlined />
+							<Button type="text" aria-label="Close Menu" onClick={() => setResponsiveMenuOpen(false)}>
+								<CloseOutlined aria-hidden />
 							</Button>
 						)}
 					</Flex>
