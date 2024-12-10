@@ -22,6 +22,7 @@ import { ConfigProvider, Flex, Image, Layout, Typography } from 'antd';
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
 import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
 import { Breakpoints, useMinWidth } from '@/global/hooks/useMinWidth';
+import { contentWrapperStyles } from './layouts/ContentWrapper';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -70,41 +71,42 @@ const FooterComponent = () => {
 	const linkStyle: React.CSSProperties = {
 		textAlign: 'center',
 		textWrap: 'nowrap',
-		fontSize: minWidth <= Breakpoints.LG ? '.75rem' : '1rem',
+		fontSize: minWidth <= Breakpoints.LG ? '.90rem' : '1rem',
 	};
 
 	const textStyle: React.CSSProperties = {
-		textAlign: minWidth <= Breakpoints.LG ? 'start' : 'center',
-		fontSize: minWidth <= Breakpoints.LG ? '.75rem' : '1rem',
+		textAlign: minWidth <= Breakpoints.XL ? 'start' : 'center',
+		fontSize: minWidth <= Breakpoints.LG ? '.90rem' : '1rem',
 		alignSelf: 'center',
 	};
 
 	const footerStyle: React.CSSProperties = {
 		display: 'flex',
-		flexDirection: minWidth <= Breakpoints.LG ? 'column' : 'row',
+		flexDirection: minWidth <= Breakpoints.XL ? 'column' : 'row',
 		justifyItems: 'center',
 		alignItems: 'center',
-		gap: minWidth <= Breakpoints.LG ? '2rem' : '0',
+		gap: minWidth <= Breakpoints.XL ? '2rem' : '0',
 	};
 
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
-				<Link target="_blank" style={{ margin: minWidth <= Breakpoints.LG ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
+				<Link target="_blank" style={{ margin: minWidth <= Breakpoints.XL ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
 					<Image width={200} src={PCGLFOOTER} preview={false} />
 				</Link>
-				<Flex flex={1} vertical gap={20}>
+				<Flex style={{...contentWrapperStyles, width: '100%'}} flex={1} vertical gap={20}>
 					<Flex
 						gap={10}
-						vertical={minWidth <= Breakpoints.LG ? false : true}
-						justify={minWidth <= Breakpoints.LG ? 'space-between' : 'center'}
-						align={minWidth <= Breakpoints.LG ? 'flex-start' : 'center'}
+						style={{width: '100%'}}
+						vertical={minWidth <= Breakpoints.XL ? false : true}
+						justify={minWidth <= Breakpoints.XL ? 'space-between' : 'center'}
+						align={minWidth <= Breakpoints.XL ? 'flex-start' : 'center'}
 					>
 						<Flex
 							gap={20}
 							justify="center"
-							align={minWidth <= Breakpoints.LG ? 'start' : 'center'}
-							vertical={minWidth <= Breakpoints.LG ? true : false}
+							align={minWidth <= Breakpoints.XL ? 'start' : 'center'}
+							vertical={minWidth <= Breakpoints.XL ? true : false}
 						>
 							{pcglLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
@@ -115,8 +117,8 @@ const FooterComponent = () => {
 						<Flex
 							gap={20}
 							justify="center"
-							align={minWidth <= Breakpoints.LG ? 'start' : 'center'}
-							vertical={minWidth <= Breakpoints.LG ? true : false}
+							align={minWidth <= Breakpoints.XL ? 'start' : 'center'}
+							vertical={minWidth <= Breakpoints.XL ? true : false}
 						>
 							{policiesConditionsLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
