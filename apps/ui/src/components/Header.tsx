@@ -156,8 +156,8 @@ const HeaderComponent = () => {
 				>
 					<Flex flex={1}>
 						<Flex justify="space-around" align="center" gap={40}>
-							<Link target="_blank">
-								<Image width={200} src={PCGL} preview={false} />
+							<Link href="/">
+								<Image width={200} src={PCGL} preview={false} alt="PCGL DACO Home" />
 							</Link>
 							{!isResponsiveMode ? <>{displayMenuLinks(menuLinks, 'left')}</> : null}
 						</Flex>
