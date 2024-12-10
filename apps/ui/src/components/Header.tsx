@@ -135,7 +135,7 @@ const HeaderComponent = () => {
 		<ConfigProvider theme={pcglHeaderTheme}>
 			<Header
 				style={{
-					padding: isResponsiveMode ? '0' : '0 50px',
+					padding: isResponsiveMode ? '0' : token.Layout?.headerPadding,
 					zIndex: 1000,
 					backgroundColor: token.colorWhite,
 				}}
@@ -143,7 +143,7 @@ const HeaderComponent = () => {
 				<Flex
 					role="menu"
 					style={{
-						padding: isResponsiveMode ? '0 1rem 0 1rem' : '0',
+						padding: isResponsiveMode ? '.5rem 1rem .5rem 1.25rem' : '0',
 						height: '100%',
 						width: '100%',
 						zIndex: 1000,
@@ -186,7 +186,7 @@ const HeaderComponent = () => {
 						placement={minWidth <= Breakpoints.SM ? 'top' : 'left'}
 						width={minWidth <= Breakpoints.SM ? '100%' : '40%'}
 					>
-						<Flex style={{ margin: '4rem 0 0 0' }} vertical justify="top" align="start" gap={'2rem'}>
+						<Flex style={{ margin: '4rem .5rem 0 .25rem'}} vertical justify="top" align="flex-start" gap={token.paddingXL}>
 							<>{displayMenuLinks(menuLinks, 'both')}</>
 						</Flex>
 					</Drawer>
