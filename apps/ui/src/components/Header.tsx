@@ -19,8 +19,8 @@
 
 import React, { useState } from 'react';
 
-import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
 import { CloseOutlined, MenuOutlined } from '@ant-design/icons';
+import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
@@ -47,7 +47,7 @@ const linkStyle: React.CSSProperties = {
 const HeaderComponent = () => {
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	
+
 	const isResponsiveMode = minWidth <= token.screenXL;
 
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -64,12 +64,12 @@ const HeaderComponent = () => {
 		if (!buttonAction) {
 			return;
 		}
-		
+
 		if (isResponsiveMode) {
 			setResponsiveMenuOpen(false);
 		}
-		
-		buttonAction();	
+
+		buttonAction();
 	};
 
 	const onLoginClick = () => {

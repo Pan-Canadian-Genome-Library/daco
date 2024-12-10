@@ -19,8 +19,8 @@
 
 import { useState } from 'react';
 
-import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
+import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
 
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 

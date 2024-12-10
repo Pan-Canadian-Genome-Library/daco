@@ -20,8 +20,8 @@
 import { ConfigProvider, Flex, Image, Layout, Typography, theme } from 'antd';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
-import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Footer } = Layout;
