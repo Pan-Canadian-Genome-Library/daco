@@ -20,7 +20,8 @@
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { Breakpoints, useMinWidth } from '@/global/hooks/useMinWidth';
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col, Flex, Layout, Row, Typography, theme } from 'antd';
+import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
+import { useState } from 'react';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -36,8 +37,15 @@ const heroStyle: React.CSSProperties = {
 const HomePage = () => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
+	const [openModal, setOpenModal] = useState(false);
+
 	const isResponsiveMode = minWidth <= Breakpoints.LG;
 
+	// TODO: Handle the transition over to the the login page
+	const handleLoginButton = () => {
+		console.info('Login clicked.');
+		setOpenModal(false);
+	};
 	return (
 		<Content>
 			<Row className="hero-background-image" align="middle">
@@ -54,7 +62,7 @@ const HomePage = () => {
 								commercial teams for access to PCGL Controlled Data.
 							</Paragraph>
 							<Col span={6}>
-								<Button type="link" color="primary" variant="solid">
+								<Button type="link" color="primary" variant="solid" onClick={() => setOpenModal(true)}>
 									Get Started
 								</Button>
 							</Col>
@@ -119,6 +127,26 @@ const HomePage = () => {
 					</Flex>
 				</Col>
 			</Row>
+			<Modal
+				title={`Apply for Access`}
+				okText={'Login'}
+				width={'100%'}
+				style={{
+					top: '20%',
+					maxWidth: '800px',
+					paddingInline: minWidth <= Breakpoints.SM || minWidth >= Breakpoints.XL ? token.padding : token.paddingXL,
+				}}
+				open={openModal}
+				onOk={handleLoginButton}
+				onCancel={() => setOpenModal(false)}
+			>
+				<Flex>
+					<Text>
+						For authorization, we require a valid institutional email address. This will be the email address you will
+						use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access.
+					</Text>
+				</Flex>
+			</Modal>
 		</Content>
 	);
 };
