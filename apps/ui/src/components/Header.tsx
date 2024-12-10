@@ -73,7 +73,7 @@ const HeaderComponent = () => {
 	};
 
 	const onLoginClick = () => {
-		console.info('Login Clicked. Not implemented yet.');
+		// TODO: Handle the transition over to the the login page
 	};
 
 	const menuLinks: MenuLinkType[] = [

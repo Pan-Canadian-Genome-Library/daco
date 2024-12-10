@@ -46,9 +46,9 @@ const HomePage = () => {
 
 	// TODO: Handle the transition over to the the login page
 	const handleLoginButton = () => {
-		console.info('Login clicked.');
 		setOpenModal(false);
 	};
+
 	return (
 		<Content>
 			<Row className="hero-background-image" align="middle">
