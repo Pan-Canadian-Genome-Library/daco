@@ -24,7 +24,7 @@ import { editApplication } from '../api/application-api.js';
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
 
-applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
+applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
 	// TODO: Add Auth & Zod validation
 	const data = req.body;
 	const { id, update } = data;
