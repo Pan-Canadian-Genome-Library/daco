@@ -94,10 +94,10 @@ const FooterComponent = () => {
 				<Link target="_blank" style={{ margin: minWidth <= Breakpoints.XL ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
 					<Image width={200} src={PCGLFOOTER} preview={false} />
 				</Link>
-				<Flex style={{...contentWrapperStyles, width: '100%'}} flex={1} vertical gap={20}>
+				<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={20}>
 					<Flex
 						gap={10}
-						style={{width: '100%'}}
+						style={{ width: '100%' }}
 						vertical={minWidth <= Breakpoints.XL ? false : true}
 						justify={minWidth <= Breakpoints.XL ? 'space-between' : 'center'}
 						align={minWidth <= Breakpoints.XL ? 'flex-start' : 'center'}

@@ -166,11 +166,11 @@ const HeaderComponent = () => {
 						{!isResponsiveMode ? (
 							<>{displayMenuLinks(menuLinks, 'right')}</>
 						) : !responsiveMenuOpen ? (
-							<Button type="text" onClick={() => setResponsiveMenuOpen(true)}>
+							<Button type="text" aria-description="Open Menu" onClick={() => setResponsiveMenuOpen(true)}>
 								<MenuOutlined />
 							</Button>
 						) : (
-							<Button type="text" onClick={() => setResponsiveMenuOpen(false)}>
+							<Button type="text" aria-description="Close Menu" onClick={() => setResponsiveMenuOpen(false)}>
 								<CloseOutlined />
 							</Button>
 						)}
