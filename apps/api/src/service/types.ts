@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { applicationContents } from '../db/schemas/applicationContents.js';
-import { applications } from '../db/schemas/applications.js';
-import applicationService from './application-service.js';
+import { applicationContents } from '@/db/schemas/applicationContents.js';
+import { applications } from '@/db/schemas/applications.js';
+import applicationService from '@/service/application-service.js';
 
 export type ApplicationService = ReturnType<typeof applicationService>;
 

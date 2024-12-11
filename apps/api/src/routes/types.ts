@@ -17,17 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { asc, desc } from 'drizzle-orm';
+import { ApplicationsColumnName, OrderBy } from '@/service/types.js';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-import { applications } from '@/db/schemas/applications.js';
-import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
-
-export const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
-			)
-		: [asc(applications.created_at)];
-
-	return orderByArguments;
+export type ApplicationListRequest = {
+	userId: string;
+	state?: ApplicationStates;
+	sort?: Array<OrderBy<ApplicationsColumnName>>;
+	page?: number;
+	pageSize?: number;
 };

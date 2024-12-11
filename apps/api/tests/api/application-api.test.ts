@@ -20,12 +20,12 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { editApplication } from '../../src/api/application-api.js';
-import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 
-import service from '../../src/service/application-service.js';
+import { editApplication } from '@/api/application-api.js';
+import { connectToDb, type PostgresDb } from '@/db/index.js';
+import service from '@/service/application-service.js';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
 	addInitialApplications,
@@ -59,11 +59,12 @@ describe('Application API', () => {
 
 	describe('Edit Application', () => {
 		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
-			const applicationRecords = await applicationService.listApplications({ user_id });
+			const applicationRecordsResult = await applicationService.listApplications({ user_id });
 
-			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
 
-			const { id } = applicationRecords[0];
+			const { id } = applicationRecordsResult.data[0];
 
 			const update = { applicant_first_name: 'Test' };
 
@@ -79,11 +80,12 @@ describe('Application API', () => {
 		});
 
 		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
-			const applicationRecords = await applicationService.listApplications({ user_id });
+			const applicationRecordsResult = await applicationService.listApplications({ user_id });
 
-			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
 
-			const { id, state } = applicationRecords[0];
+			const { id, state } = applicationRecordsResult.data[0];
 
 			assert.strictEqual(state, ApplicationStates.DRAFT);
 
@@ -106,9 +108,12 @@ describe('Application API', () => {
 		});
 
 		it('should error and return null when application state is not draft or review', async () => {
-			const applicationRecords = await applicationService.listApplications({ user_id });
-			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
-			const { id } = applicationRecords[0];
+			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			const { id } = applicationRecordsResult.data[0];
+
 			const stateUpdate = { state: ApplicationStates.CLOSED };
 			await applicationService.findOneAndUpdate({ id, update: stateUpdate });
 
