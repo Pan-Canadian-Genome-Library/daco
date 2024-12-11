@@ -49,7 +49,7 @@ applicationRouter.post('/application/edit', jsonParser, async (req, res) => {
 //       - verify if user can access applications
 //       - validate queryParam options using zod
 applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res) => {
-	const { userId, state, page, pageSize } = req.query;
+	const { userId, state, sort: sortQuery, page, pageSize } = req.query;
 
 	//  Temporary userId check until validation/dto flow is confirmed
 	//  - reflect changes in swagger once refactored
@@ -59,11 +59,7 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 	}
 
 	// Check if sort exists and parse it if true
-	let sort = [];
-
-	if (req.query.sort) {
-		sort = JSON.parse(req.query.sort);
-	}
+	const sort = !!sortQuery ? JSON.parse(sortQuery) : [];
 
 	const result = await getAllApplications({
 		userId,
