@@ -58,7 +58,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 							<Text strong>{status}</Text>
 						</Flex>
 						{showActionRequired ? (
-							<Flex align={'center'} gap={'small'} style={{ order: isLowResDevice ? 1 : 'initial' }}>
+							<Flex align={'center'} gap={'small'}>
 								<ExclamationCircleFilled style={{ color: token.colorPrimary, fontSize: 20 }} />
 								<Text strong>Action Required</Text>
 							</Flex>
