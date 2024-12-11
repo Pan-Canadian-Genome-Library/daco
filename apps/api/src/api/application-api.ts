@@ -91,11 +91,5 @@ export const getAllApplications = async ({
 
 	const result = await service.listApplications({ user_id: userId, state, sort, page, pageSize });
 
-	if (!result.success) {
-		const message = `Cannot return applications list`;
-		console.error(message);
-		return failure(message);
-	}
-
 	return result;
 };
