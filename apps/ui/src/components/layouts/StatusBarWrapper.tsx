@@ -22,14 +22,14 @@ import ContentWrapper from './ContentWrapper';
 
 const { useToken } = theme;
 
-const StatusBannerWrapperStyles: React.CSSProperties = {
-	paddingInline: '50px',
-	width: '100%',
-	minHeight: 300,
-};
-
 const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => {
 	const { token } = useToken();
+
+	const StatusBannerWrapperStyles: React.CSSProperties = {
+		padding: `${token.paddingLG}px 52px`,
+		width: '100%',
+		minHeight: 300,
+	};
 
 	return (
 		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorWhite }}>
