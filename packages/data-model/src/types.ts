@@ -19,16 +19,18 @@
 
 // Constants
 
-export enum ApplicationStates {
-	DRAFT = 'DRAFT',
-	INSTITUTIONAL_REP_REVIEW = 'INSTITUTIONAL_REP_REVIEW',
-	DAC_REVIEW = 'DAC_REVIEW',
-	DAC_REVISIONS_REQUESTED = 'DAC_REVISIONS_REQUESTED',
-	REJECTED = 'REJECTED',
-	APPROVED = 'APPROVED',
-	CLOSED = 'CLOSED',
-	REVOKED = 'REVOKED',
-}
+export const ApplicationStates = {
+	DRAFT: 'DRAFT',
+	INSTITUTIONAL_REP_REVIEW: 'INSTITUTIONAL_REP_REVIEW',
+	DAC_REVIEW: 'DAC_REVIEW',
+	DAC_REVISIONS_REQUESTED: 'DAC_REVISIONS_REQUESTED',
+	REJECTED: 'REJECTED',
+	APPROVED: 'APPROVED',
+	CLOSED: 'CLOSED',
+	REVOKED: 'REVOKED',
+} as const;
+
+export type ApplicationStateValues = (typeof ApplicationStates)[keyof typeof ApplicationStates];
 
 export enum FileTypes {
 	'SIGNED_APPLICATION',
@@ -41,18 +43,20 @@ export enum ApplicationReviewOutcomes {
 	'REVISIONS_REQUESTED',
 }
 
-export enum ApplicationActions {
-	'CREATE',
-	'WITHDRAW',
-	'CLOSE',
-	'REQUEST_INSTITUTIONAL_REP',
-	'INSTITUTIONAL_REP_APPROVED',
-	'INSTITUTIONAL_REP_REJECTED',
-	'DAC_REVIEW_APPROVED',
-	'DAC_REVIEW_REJECTED',
-	'DAC_REVIEW_REVISIONS',
-	'REVOKE',
-}
+export const ApplicationActions = {
+	CREATE: 'CREATE',
+	WITHDRAW: 'WITHDRAW',
+	CLOSE: 'CLOSE',
+	REQUEST_INSTITUTIONAL_REP: 'REQUEST_INSTITUTIONAL_REP',
+	INSTITUTIONAL_REP_APPROVED: 'INSTITUTIONAL_REP_APPROVED',
+	INSTITUTIONAL_REP_REJECTED: 'INSTITUTIONAL_REP_REJECTED',
+	DAC_REVIEW_APPROVED: 'DAC_REVIEW_APPROVED',
+	DAC_REVIEW_REJECTED: 'DAC_REVIEW_REJECTED',
+	DAC_REVIEW_REVISIONS: 'DAC_REVIEW_REVISIONS',
+	REVOKE: 'REVOKE',
+} as const;
+
+export type ActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
 
 export enum ApplicationAgreements {
 	'dac_agreement_software_updates',
