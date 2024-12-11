@@ -30,13 +30,19 @@ const { Link } = Typography;
 const { Header } = Layout;
 const { useToken } = theme;
 
-interface MenuLinkType {
+interface MenuItem {
 	name: string;
-	isButton?: boolean;
-	buttonProps?: ButtonProps;
-	onClickAction?: VoidFunction;
-	href?: string;
 	position: 'left' | 'right';
+}
+
+interface MenuButton extends MenuItem {
+	buttonProps?: ButtonProps;
+	onClickAction: VoidFunction;
+}
+
+interface MenuLink extends MenuItem {
+	href: string;
+	target?: '_self' | '_blank' | '_parent' | '_top';
 }
 
 const linkStyle: React.CSSProperties = {
@@ -60,15 +66,10 @@ const HeaderComponent = () => {
 	 * Default action when a button in the menu is clicked, used particularly for the mobile menu which should close after click.
 	 * @param buttonAction The function for the action needed to be performed.
 	 */
-	const onMenuButtonClick = (buttonAction?: VoidFunction) => {
-		if (!buttonAction) {
-			return;
-		}
-
+	const onMenuButtonClick = (buttonAction: VoidFunction) => {
 		if (isResponsiveMode) {
 			setResponsiveMenuOpen(false);
 		}
-
 		buttonAction();
 	};
 
@@ -76,7 +77,7 @@ const HeaderComponent = () => {
 		// TODO: Handle the transition over to the the login page
 	};
 
-	const menuLinks: MenuLinkType[] = [
+	const menuItems: (MenuLink | MenuButton)[] = [
 		{
 			name: 'Policies & Guidelines',
 			href: '#',
@@ -99,7 +100,6 @@ const HeaderComponent = () => {
 		},
 		{
 			name: 'Login',
-			isButton: true,
 			onClickAction: onLoginClick,
 			buttonProps: { color: 'primary', variant: 'solid' },
 			position: 'right',
@@ -108,29 +108,41 @@ const HeaderComponent = () => {
 
 	/**
 	 * Generates the links to display in the mobile and desktop menus.
-	 * @param menuLinks An array containing the list of links for the menu
+	 * @param menuItems An array containing the list of links for the menu
 	 * @param position The 'side' of links you want in the menu, left (next to the logo) or right (away from the logo on the other side of the screen)
 	 * @returns JSX Element array containing the link elements.
 	 */
-	const displayMenuLinks = (menuLinks: MenuLinkType[], position: 'left' | 'right' | 'both'): JSX.Element[] => {
-		return menuLinks
-			.filter((ml) => (position !== 'both' ? ml.position === position : ml.position))
-			.map((ml, key) =>
-				ml.isButton ? (
-					<Button
-						key={`menuLink-${key}`}
-						{...(ml.buttonProps ?? null)}
-						style={{ ...menuButtonStyle, ...ml.buttonProps?.style }}
-						onClick={() => onMenuButtonClick(ml.onClickAction)}
-					>
-						{ml.name}
-					</Button>
-				) : (
-					<Link key={`menuLink-${key}`} style={linkStyle} target="_blank" href={ml.href ?? '#'}>
-						{ml.name}
-					</Link>
-				),
-			);
+	const displayMenuItems = (
+		menuItems: (MenuLink | MenuButton)[],
+		position: 'left' | 'right' | 'both',
+	): JSX.Element[] => {
+		return menuItems
+			.filter((menuItem) => (position !== 'both' ? menuItem.position === position : menuItem.position))
+			.map((menuItem, key) => {
+				if ('onClickAction' in menuItem) {
+					return (
+						<Button
+							key={`menuItem-${key}`}
+							{...(menuItem.buttonProps ?? null)}
+							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
+							onClick={() => onMenuButtonClick(menuItem.onClickAction)}
+						>
+							{menuItem.name}
+						</Button>
+					);
+				} else {
+					return (
+						<Link
+							key={`menuItem-${key}`}
+							style={linkStyle}
+							target={menuItem.target ?? '_blank'}
+							href={menuItem.href ?? '#'}
+						>
+							{menuItem.name}
+						</Link>
+					);
+				}
+			});
 	};
 
 	return (
@@ -163,12 +175,12 @@ const HeaderComponent = () => {
 							<Link href="/">
 								<Image width={200} src={PCGL} preview={false} alt="PCGL DACO Home" />
 							</Link>
-							{!isResponsiveMode ? <>{displayMenuLinks(menuLinks, 'left')}</> : null}
+							{!isResponsiveMode ? <>{displayMenuItems(menuItems, 'left')}</> : null}
 						</Flex>
 					</Flex>
 					<Flex justify="flex-end" align="center" gap={20}>
 						{!isResponsiveMode ? (
-							<>{displayMenuLinks(menuLinks, 'right')}</>
+							<>{displayMenuItems(menuItems, 'right')}</>
 						) : !responsiveMenuOpen ? (
 							<Button type="text" aria-label="Open Menu" onClick={() => setResponsiveMenuOpen(true)}>
 								<MenuOutlined aria-hidden />
@@ -192,7 +204,7 @@ const HeaderComponent = () => {
 						width={minWidth < token.screenMD ? '100%' : '40%'}
 					>
 						<Flex style={{ margin: '4rem 0 0 0' }} vertical justify="top" align="flex-start" gap={token.paddingXL}>
-							<>{displayMenuLinks(menuLinks, 'both')}</>
+							<>{displayMenuItems(menuItems, 'both')}</>
 						</Flex>
 					</Drawer>
 				) : null}
