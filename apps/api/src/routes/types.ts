@@ -20,7 +20,6 @@
 import { ApplicationsColumnName, OrderBy } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-// TODO: remove this once request validation pattern is in place
 export type ApplicationListRequest = {
 	userId: string;
 	state?: ApplicationStates;

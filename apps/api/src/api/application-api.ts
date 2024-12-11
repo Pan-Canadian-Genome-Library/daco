@@ -20,13 +20,9 @@
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
+import { ApplicationListRequest } from '@/routes/types.js';
 import applicationService from '@/service/application-service.js';
-import {
-	ApplicationsColumnName,
-	OrderBy,
-	type ApplicationContentUpdates,
-	type ApplicationService,
-} from '@/service/types.js';
+import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 
 /**
@@ -73,19 +69,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
  * @param pageSize - page limit
  * @returns Success with list of Applications / Failure with Error
  */
-export const getAllApplications = async ({
-	userId,
-	state,
-	sort,
-	page,
-	pageSize,
-}: {
-	userId: string;
-	state?: ApplicationStates;
-	sort?: Array<OrderBy<ApplicationsColumnName>>;
-	page?: number;
-	pageSize?: number;
-}) => {
+export const getAllApplications = async ({ userId, state, sort, page, pageSize }: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const service: ApplicationService = applicationService(database);
 
