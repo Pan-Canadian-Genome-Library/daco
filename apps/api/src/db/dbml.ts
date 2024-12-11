@@ -18,7 +18,8 @@
  */
 
 import { pgGenerate } from 'drizzle-dbml-generator'; // Using Postgres for this example
-import * as schema from './schemas/index.js';
+
+import * as schema from '@/db/schemas/index.js';
 
 const out = './src/db/schema.dbml';
 const relational = true;

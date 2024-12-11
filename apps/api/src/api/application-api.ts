@@ -18,10 +18,12 @@
  */
 
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { getDbInstance } from '../db/index.js';
-import applicationService from '../service/application-service.js';
-import { type ApplicationContentUpdates, type ApplicationService } from '../service/types.js';
-import { failure } from '../utils/results.js';
+
+import { getDbInstance } from '@/db/index.js';
+import { ApplicationListRequest } from '@/routes/types.js';
+import applicationService from '@/service/application-service.js';
+import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
+import { failure } from '@/utils/results.js';
 
 /**
  * Validates if a given Application state allows edits, then updates the record
@@ -56,4 +58,22 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		console.error(message);
 		return failure(message);
 	}
+};
+
+/**
+ *
+ * @param userId - user ID
+ * @param state - application state
+ * @param sort - sorting options
+ * @param page - page offset
+ * @param pageSize - page limit
+ * @returns Success with list of Applications / Failure with Error
+ */
+export const getAllApplications = async ({ userId, state, sort, page, pageSize }: ApplicationListRequest) => {
+	const database = getDbInstance();
+	const service: ApplicationService = applicationService(database);
+
+	const result = await service.listApplications({ user_id: userId, state, sort, page, pageSize });
+
+	return result;
 };
