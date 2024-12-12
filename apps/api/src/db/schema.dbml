@@ -153,7 +153,7 @@ table revision_requests {
   requested_studies_notes text
 }
 
-ref: actions.application_id - applications.id
+ref: actions.application_id > applications.id
 
 ref: actions.revisions_request_id > revision_requests.id
 

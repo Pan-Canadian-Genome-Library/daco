@@ -19,7 +19,7 @@
 		"@types/swagger-ui-express": "^4.1.7",
 		"@types/yamljs": "^0.2.34",
 		"drizzle-dbml-generator": "^0.9.0",
-		"drizzle-kit": "^0.26.2",
+		"drizzle-kit": "^0.30.0",
 		"tsx": "^4.19.1",
 		"typescript": "^5.5.3"
 	},
@@ -28,7 +28,7 @@
 		"@types/body-parser": "^1.19.5",
 		"body-parser": "^1.20.3",
 		"cors": "^2.8.5",
-		"drizzle-orm": "^0.35.3",
+		"drizzle-orm": "^0.38.1",
 		"express": "^4.21.0",
 		"pg": "^8.13.0",
 		"swagger-ui-express": "^5.0.1",
