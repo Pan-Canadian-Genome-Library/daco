@@ -30,7 +30,7 @@ import {
 } from '@/service/types.js';
 import { sortQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -121,12 +121,26 @@ const applicationService = (db: PostgresDb) => ({
 
 			return application;
 		} catch (err) {
-			console.error(`Error at findOneAndUpdate with id: ${id}`);
+			const message = `Error at findOneAndUpdate with id: ${id}`;
+			console.error(message);
 			console.error(err);
-			return null;
+			return failure(message, err);
 		}
 	},
 	getApplicationById: async ({ id }: { id: number }) => {
+		try {
+			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
+
+			return success(applicationRecord[0]);
+		} catch (err) {
+			const message = `Error at getApplicationById with id: ${id}`;
+			console.error(message);
+			console.error(err);
+			return failure(message, err);
+		}
+	},
+	getApplicationWithContents: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db
 				.select()
@@ -158,7 +172,7 @@ const applicationService = (db: PostgresDb) => ({
 		pageSize = 20,
 	}: {
 		user_id?: string;
-		state?: ApplicationStates;
+		state?: ApplicationStateValues;
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
