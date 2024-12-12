@@ -21,6 +21,7 @@ import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
 import { Col, Flex, Row, Typography, theme } from 'antd';
 
 import StatusBarWrapper from '@/components/layouts/StatusBarWrapper';
+import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { formatDate } from '@/global/utils';
 
 const { Text, Title } = Typography;
@@ -33,12 +34,14 @@ type ApplicationStatusBarProps = {
 
 const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 	const { token } = useToken();
+	const minWidth = useMinWidth();
+	const isLowResDevice = minWidth <= token.screenLG;
 
 	return (
 		<StatusBarWrapper>
-			<Row style={{ width: '100%' }}>
+			<Row style={{ width: '100%' }} gutter={token.sizeXXL} wrap>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-					<Flex style={{ height: '100%' }} vertical justify="center">
+					<Flex style={{ height: '100%' }} vertical justify="center" align="start">
 						<Title>My Applications</Title>
 						<Text>
 							This is where you can manage your Applications for Access to PCGL Controlled Data. Access will be granted
@@ -47,12 +50,13 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 					</Flex>
 				</Col>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-					<Flex style={{ height: '100%' }} justify="center" align="center">
+					<Flex style={{ height: '100%' }} justify={isLowResDevice ? 'center' : 'end'} align="center">
 						<Flex
 							style={{
 								padding: token.paddingLG,
 								backgroundColor: token.colorBgContainer,
 								borderRadius: token.borderRadius,
+								margin: isLowResDevice ? `${token.paddingMD}px 0` : 'none',
 							}}
 							justify="center"
 							align="center"
