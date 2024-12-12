@@ -17,25 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Layout } from 'antd';
-import { RouterProvider } from 'react-router';
+import { useEffect, useState } from 'react';
 
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
+/**
+ * Gets the current width of the screen as a number.
+ * @returns Current width of the screen.
+ */
+export const useMinWidth = (): number => {
+	const [minWidth, setMinWidth] = useState(window.innerWidth);
+	useEffect(() => {
+		const handleWidthChange = () => {
+			setMinWidth(window.innerWidth);
+		};
+		window.addEventListener('resize', handleWidthChange);
 
-import router from '@/pages/routes';
+		return () => {
+			//Remember to clean up after ourselves.
+			window.removeEventListener('resize', handleWidthChange);
+		};
+	}, []);
 
-function App() {
-	return (
-		<ThemeProvider>
-			<Layout style={{ minHeight: '100%' }}>
-				<HeaderComponent />
-				<RouterProvider router={router} />
-				<FooterComponent />
-			</Layout>
-		</ThemeProvider>
-	);
-}
-
-export default App;
+	return minWidth;
+};
