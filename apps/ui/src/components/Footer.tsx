@@ -17,13 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ConfigProvider, Flex, Image, Layout, Typography } from 'antd';
+import { ConfigProvider, Flex, Image, Layout, Typography, theme } from 'antd';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
+import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
+const { useToken } = theme;
 
 interface LinkType {
 	name: string;
@@ -63,35 +66,68 @@ const policiesConditionsLinks: LinkType[] = [
 	},
 ];
 
-const linkStyle: React.CSSProperties = {
-	textAlign: 'center',
-	textWrap: 'nowrap',
-};
-
-const textStyle: React.CSSProperties = {
-	textAlign: 'center',
-};
-
 const FooterComponent = () => {
+	const minWidth = useMinWidth();
+	const { token } = useToken();
+
+	const linkStyle: React.CSSProperties = {
+		textAlign: 'center',
+		textWrap: 'nowrap',
+		fontSize: minWidth <= token.screenLG ? token.fontSize : token.fontSizeLG,
+	};
+
+	const textStyle: React.CSSProperties = {
+		textAlign: minWidth <= token.screenXL ? 'start' : 'center',
+		fontSize: minWidth <= token.screenLG ? token.fontSize : token.fontSizeLG,
+		alignSelf: 'center',
+	};
+
+	const footerStyle: React.CSSProperties = {
+		display: 'flex',
+		flexDirection: minWidth <= token.screenXL ? 'column' : 'row',
+		justifyItems: 'center',
+		alignItems: 'center',
+		padding: minWidth <= token.screenLG ? `2rem 1.75rem` : token.Layout?.footerPadding,
+		gap: minWidth <= token.screenXL ? token.paddingXL : '0rem',
+	};
+
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
-			<Footer>
-				<Flex justify="center" align="center">
-					<Link target="_blank">
-						<Image width={200} src={PCGLFOOTER} preview={false} />
-					</Link>
-					<Flex flex={1} vertical justify="center" align="center" gap={10} wrap>
-						<Flex gap={20} justify="center" align="center" wrap>
+			<Footer style={footerStyle}>
+				<Link target="_blank" style={{ margin: minWidth <= token.screenXL ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
+					<Image
+						width={200}
+						src={PCGLFOOTER}
+						preview={false}
+						alt="Pan-Canadian Genome Library / Librairie Pancanadienne de Génomique"
+					/>
+				</Link>
+				<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={token.paddingMD}>
+					<Flex
+						gap={token.paddingMD}
+						style={{ width: '100%' }}
+						vertical={minWidth <= token.screenXL ? false : true}
+						justify={minWidth <= token.screenXL ? 'space-between' : 'center'}
+						align={minWidth <= token.screenXL ? 'flex-start' : 'center'}
+					>
+						<Flex
+							gap={token.paddingMD}
+							justify="center"
+							align={minWidth <= token.screenXL ? 'start' : 'center'}
+							vertical={minWidth <= token.screenXL ? true : false}
+						>
 							{pcglLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
 									{itemLink.name}
 								</Link>
 							))}
 						</Flex>
-						<Text style={textStyle}>
-							© 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
-						</Text>
-						<Flex gap={20} justify="center" align="center">
+						<Flex
+							gap={token.paddingMD}
+							justify="center"
+							align={minWidth <= token.screenXL ? 'start' : 'center'}
+							vertical={minWidth <= token.screenXL ? true : false}
+						>
 							{policiesConditionsLinks.map((itemLink) => (
 								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
 									{itemLink.name}
@@ -99,6 +135,10 @@ const FooterComponent = () => {
 							))}
 						</Flex>
 					</Flex>
+					<Text style={textStyle}>
+						&copy; {new Date().getFullYear()} PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API
+						v1.0
+					</Text>
 				</Flex>
 			</Footer>
 		</ConfigProvider>
