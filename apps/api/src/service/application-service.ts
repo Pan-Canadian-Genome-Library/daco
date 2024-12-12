@@ -30,7 +30,7 @@ import {
 } from '@/service/types.js';
 import { sortQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -158,7 +158,7 @@ const applicationService = (db: PostgresDb) => ({
 		pageSize = 20,
 	}: {
 		user_id?: string;
-		state?: ApplicationStates;
+		state?: ApplicationStateValues;
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;

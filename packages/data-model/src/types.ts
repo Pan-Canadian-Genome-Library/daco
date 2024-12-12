@@ -157,9 +157,9 @@ export type ApplicationActionData = {
 	applicationId: number; // TODO: Implement BigInt;
 	createdAt: Date;
 	userId: string;
-	action: ApplicationActions;
-	stateBefore: ApplicationStates;
-	stateAfter: ApplicationStates;
+	action: ActionValues;
+	stateBefore: ApplicationStateValues;
+	stateAfter: ApplicationStateValues;
 	revisionsRequestId: number; // TODO: Implement BigInt
 	// TODO: may need reference to a content diff
 };
@@ -216,7 +216,7 @@ export type ApplicationContents = {
 export type Application = {
 	id: number; // TODO: Implement BigInt;
 	userId: string;
-	state: ApplicationStates;
+	state: ApplicationStateValues;
 	created_at: Date;
 	approved_at: Date;
 	expires_at: Date;
