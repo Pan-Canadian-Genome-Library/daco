@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
+import { Layout } from 'antd';
 import { RouterProvider } from 'react-router';
 
 import FooterComponent from '@/components/Footer';
@@ -29,13 +29,11 @@ import router from '@/pages/routes';
 function App() {
 	return (
 		<ThemeProvider>
-			<Flex>
-				<Layout style={{ minHeight: '100vh' }}>
-					<HeaderComponent />
-					<RouterProvider router={router} />
-					<FooterComponent />
-				</Layout>
-			</Flex>
+			<Layout style={{ minHeight: '100%' }}>
+				<HeaderComponent />
+				<RouterProvider router={router} />
+				<FooterComponent />
+			</Layout>
 		</ThemeProvider>
 	);
 }

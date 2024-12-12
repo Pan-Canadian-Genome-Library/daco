@@ -17,19 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { and, eq, sql } from 'drizzle-orm';
-import { type PostgresDb } from '../db/index.js';
-import { applicationContents } from '../db/schemas/applicationContents.js';
-import { applications } from '../db/schemas/applications.js';
-import { failure, success } from '../utils/results.js';
+
+import { type PostgresDb } from '@/db/index.js';
+import { applicationContents } from '@/db/schemas/applicationContents.js';
+import { applications } from '@/db/schemas/applications.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
 	type OrderBy,
-} from './types.js';
-import { sortQuery } from './utils.js';
+} from '@/service/types.js';
+import { sortQuery } from '@/service/utils.js';
+import { failure, success } from '@/utils/results.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -196,11 +197,12 @@ const applicationService = (db: PostgresDb) => ({
 				.offset(page * pageSize)
 				.limit(pageSize);
 
-			return allApplications;
+			return success(allApplications);
 		} catch (err) {
-			console.error(`Error at listApplications with user_id: ${user_id} state: ${state}`);
+			const message = `Error at listApplications with user_id: ${user_id} state: ${state}`;
+			console.error(message);
 			console.error(err);
-			return null;
+			return failure(message, err);
 		}
 	},
 });

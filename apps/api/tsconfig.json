@@ -4,7 +4,10 @@
 		"lib": ["ESNext"],
 		"target": "ESNext",
 		"module": "NodeNext",
-		"moduleResolution": "NodeNext"
+		"moduleResolution": "NodeNext",
+		"paths": {
+			"@/*": ["./src/*"]
+		}
 	},
 	"include": ["src", "./drizzle.config.ts", "tests"]
 }

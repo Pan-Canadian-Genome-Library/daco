@@ -17,17 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { asc, desc } from 'drizzle-orm';
+import { useEffect, useState } from 'react';
 
-import { applications } from '@/db/schemas/applications.js';
-import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
+/**
+ * Gets the current width of the screen as a number.
+ * @returns Current width of the screen.
+ */
+export const useMinWidth = (): number => {
+	const [minWidth, setMinWidth] = useState(window.innerWidth);
+	useEffect(() => {
+		const handleWidthChange = () => {
+			setMinWidth(window.innerWidth);
+		};
+		window.addEventListener('resize', handleWidthChange);
 
-export const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
-			)
-		: [asc(applications.created_at)];
+		return () => {
+			//Remember to clean up after ourselves.
+			window.removeEventListener('resize', handleWidthChange);
+		};
+	}, []);
 
-	return orderByArguments;
+	return minWidth;
 };
