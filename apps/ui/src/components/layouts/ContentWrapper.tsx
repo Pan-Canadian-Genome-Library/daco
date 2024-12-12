@@ -23,6 +23,7 @@ import { Flex } from 'antd';
 export const contentWrapperStyles: React.CSSProperties = {
 	marginInline: 'auto',
 	width: '90%',
+	maxWidth: '1440px' /* Limit max sizes on large displays to enhance readability  */,
 };
 
 type ContentWrapperProps = {
