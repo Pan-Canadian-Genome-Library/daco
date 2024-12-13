@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { editApplication } from '@/api/application-api.js';
+import { editApplication, getApplicationById } from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import service from '@/service/application-service.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -121,6 +121,49 @@ describe('Application API', () => {
 			const result = await editApplication({ id, update: contentUpdate });
 
 			assert.ok(!result.success);
+		});
+
+		after(() => {});
+	});
+
+	describe('Get Application by ID', () => {
+		it('should successfully be able to find an application with an ID', async () => {
+			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+
+			const { id } = applicationRecordsResult.data[0];
+
+			const result = await getApplicationById({ applicationId: id });
+
+			assert.ok(result.success);
+
+			const application = result.data;
+
+			assert.strictEqual(application.id, id);
+
+			assert.ok(application.contents);
+		});
+
+		it('should error with a not found error, not being able to find a non-existant application ID', async () => {
+			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+
+			const last_id = applicationRecordsResult.data[applicationRecordsResult.data.length - 1];
+
+			assert.ok(last_id?.id);
+
+			const result = await getApplicationById({ applicationId: last_id.id + 1 });
+
+			assert.ok(!result.success);
+
+			const error_message = String(result.errors);
+
+			assert.strictEqual(error_message, 'Error: Application record not found');
 		});
 
 		after(() => {});
