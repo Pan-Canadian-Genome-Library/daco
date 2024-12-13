@@ -25,6 +25,7 @@ import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { Trans, useTranslation } from 'react-i18next';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -38,6 +39,7 @@ const heroStyle: React.CSSProperties = {
 };
 
 const HomePage = () => {
+	const { t } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const [openModal, setOpenModal] = useState(false);
@@ -59,14 +61,11 @@ const HomePage = () => {
 						style={{ padding: !isResponsiveMode ? `0 ${token.padding}px` : `0 ${token.paddingXXS}px` }}
 					>
 						<Flex vertical>
-							<Title style={{ color: token.colorTextSecondary }}> Apply for Access to Controlled Data</Title>
-							<Paragraph style={{ color: token.colorTextSecondary }}>
-								The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers and
-								commercial teams for access to PCGL Controlled Data.
-							</Paragraph>
+							<Title style={{ color: token.colorTextSecondary }}> {t('homepage.title')}</Title>
+							<Paragraph style={{ color: token.colorTextSecondary }}>{t('homepage.introduction')}</Paragraph>
 							<Col span={6}>
 								<Button type="link" color="primary" variant="solid" onClick={() => setOpenModal(true)}>
-									Get Started
+									{t('homepage.getStarted')}
 								</Button>
 							</Col>
 						</Flex>
@@ -76,21 +75,21 @@ const HomePage = () => {
 			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} align={'top'} gutter={token.paddingXL}>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'middle'}>
-						<Title level={2}>Overview</Title>
+						<Title level={2}>{t('homepage.overviewTitle')}</Title>
+						<Paragraph>{t('homepage.authorizationText')}</Paragraph>
 						<Paragraph>
-							Authorization for access to Pan-Canadian Genome Library controlled data is study based and is reviewed for
-							compliance with PCGL Policies and Guidelines. The PCGL DACO is the overarching authority to ensure that
-							data from the PCGL will only be used by qualified individuals for public health objectives.
-						</Paragraph>
-						<Paragraph>
-							Before starting your application, learn more about Data Access and Use Policies and review our
-							<Link underline> frequently asked questions</Link>.
+							<Trans
+								i18nKey={'homepage.dataAccessInfo'}
+								components={{
+									link1: <Link href="#" underline />,
+								}}
+							/>
 						</Paragraph>
 					</Flex>
 				</Col>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'large'}>
-						<Title level={2}>The Application Process is Simple</Title>
+						<Title level={2}>{t('homepage.processTitle')}</Title>
 						<Flex align="center" gap={'middle'}>
 							<Flex justify="center" align="center">
 								<Avatar
@@ -99,10 +98,7 @@ const HomePage = () => {
 									icon={<FileOutlined />}
 								/>
 							</Flex>
-							<Text>
-								Log in and start an application. Carefully complete all required sections and review all policies and
-								agreements.
-							</Text>
+							<Text>{t('homepage.description1')}</Text>
 						</Flex>
 						<Flex align="center" gap={'middle'}>
 							<Flex justify="center" align="center">
@@ -112,7 +108,7 @@ const HomePage = () => {
 									icon={<SignatureOutlined />}
 								/>
 							</Flex>
-							<Text>When completed, obtain the required signatures and submit the signed application for review.</Text>
+							<Text>{t('homepage.description2')}</Text>
 						</Flex>
 						<Flex align="center" gap={'middle'}>
 							<Flex justify="center" align="center">
@@ -122,10 +118,7 @@ const HomePage = () => {
 									icon={<AuditOutlined />}
 								/>
 							</Flex>
-							<Text>
-								The PCGL DACO will review the application and approved project teams will be granted access to PCGL
-								Controlled Data.
-							</Text>
+							<Text>{t('homepage.description3')}</Text>
 						</Flex>
 					</Flex>
 				</Col>
