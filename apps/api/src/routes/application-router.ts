@@ -35,7 +35,7 @@ applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
 		res.send(result.data);
 	} else {
 		// TODO: System Error Handling
-		if (result.errors === 'Error: Application record not found') {
+		if (String(result.errors) === 'Error: Application record not found') {
 			res.status(404);
 		} else {
 			res.status(500);
@@ -72,7 +72,7 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 	if (result.success) {
 		res.status(200).send(result.data);
 	} else {
-		res.status(500).send({ message: result.message, errors: result.errors });
+		res.status(500).send({ message: result.message, errors: String(result.errors) });
 	}
 });
 
