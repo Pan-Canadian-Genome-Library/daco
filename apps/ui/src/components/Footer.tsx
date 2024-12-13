@@ -102,16 +102,16 @@ const FooterComponent = () => {
 						alt="Pan-Canadian Genome Library / Librairie Pancanadienne de Génomique"
 					/>
 				</Link>
-				<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={24}>
+				<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={token.paddingMD}>
 					<Flex
-						gap={token.padding}
+						gap={token.paddingMD}
 						style={{ width: '100%' }}
 						vertical={minWidth <= token.screenXL ? false : true}
 						justify={minWidth <= token.screenXL ? 'space-between' : 'center'}
 						align={minWidth <= token.screenXL ? 'flex-start' : 'center'}
 					>
 						<Flex
-							gap={token.paddingLG}
+							gap={token.paddingMD}
 							justify="center"
 							align={minWidth <= token.screenXL ? 'start' : 'center'}
 							vertical={minWidth <= token.screenXL ? true : false}
@@ -123,7 +123,7 @@ const FooterComponent = () => {
 							))}
 						</Flex>
 						<Flex
-							gap={token.paddingLG}
+							gap={token.paddingMD}
 							justify="center"
 							align={minWidth <= token.screenXL ? 'start' : 'center'}
 							vertical={minWidth <= token.screenXL ? true : false}
@@ -136,7 +136,8 @@ const FooterComponent = () => {
 						</Flex>
 					</Flex>
 					<Text style={textStyle}>
-						&copy; 2026 PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API v1.0
+						&copy; {new Date().getFullYear()} PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API
+						v1.0
 					</Text>
 				</Flex>
 			</Footer>
