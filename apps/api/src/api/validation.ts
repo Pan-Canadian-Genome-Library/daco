@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { applications } from '../db/schemas/applications.js';
-import { AsyncResult, success } from '../utils/results.js';
+import { applications } from '@/db/schemas/applications.js';
+import { AsyncResult, success } from '@/utils/results.js';
 
 // TODO: Add Validation
 export const validateContent = async (

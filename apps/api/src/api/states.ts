@@ -17,11 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getDbInstance } from '@/db/index.js';
+import { applications } from '@/db/schemas/applications.js';
+import applicationService from '@/service/application-service.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
-import { getDbInstance } from '../db/index.js';
-import { applications } from '../db/schemas/applications.js';
-import applicationService from '../service/application-service.js';
 import { AsyncResult, failure, success } from '../utils/results.js';
 import { validateContent } from './validation.js';
 

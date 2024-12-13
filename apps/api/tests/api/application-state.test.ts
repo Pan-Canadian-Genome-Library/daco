@@ -21,9 +21,9 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
+import { ApplicationStateManager, createApplicationStateManager } from '@/api/states.js';
+import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationStateManager, createApplicationStateManager } from '../../src/api/states.js';
-import { connectToDb, type PostgresDb } from '../../src/db/index.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
 const {
