@@ -21,13 +21,15 @@ import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import applicationService from '@/service/application-service.js';
 
-export type ApplicationService = ReturnType<typeof applicationService>;
-
-export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 
 export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
 
-export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
+export type ApplicationData = typeof applications.$inferSelect;
+
+export type ApplicationService = ReturnType<typeof applicationService>;
+
+export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
 export type OrderBy<Key extends string> = {
 	direction: 'asc' | 'desc';

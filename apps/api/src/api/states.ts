@@ -18,8 +18,8 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
-import { applications } from '@/db/schemas/applications.js';
 import applicationService from '@/service/application-service.js';
+import { ApplicationData } from '@/service/types.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
 import { AsyncResult, failure, success } from '../utils/results.js';
@@ -60,7 +60,7 @@ type ApplicationTransitions = ITransition<
 
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
-	private readonly _application: typeof applications.$inferSelect;
+	private readonly _application: ApplicationData;
 	private readonly _initState: ApplicationStateValues;
 
 	// Handler Methods
@@ -257,7 +257,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.repRevisionSubmitTransition,
 	];
 
-	constructor(application: typeof applications.$inferSelect) {
+	constructor(application: ApplicationData) {
 		const { id, state } = application;
 		super(state);
 		this._id = id;
