@@ -17,14 +17,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './i18n/translations';
-import './index.css';
-import App from './pages/App';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<App />
-	</StrictMode>,
-);
+import enLink from './locale/en/enLinks.json';
+import enLang from './locale/en/translations.json';
+import frLink from './locale/fr/frLinks.json';
+import frLang from './locale/fr/translations.json';
+
+// TODO: French language is generated using online tools, replace with correct translations.
+const resources = {
+	en: {
+		translation: { ...enLang, ...enLink },
+	},
+	fr: {
+		translation: { ...frLang, ...frLink },
+	},
+};
+
+i18n.use(initReactI18next).init({
+	resources,
+	lng: 'en',
+	fallbackLng: 'fr',
+});
+
+export default i18n;
