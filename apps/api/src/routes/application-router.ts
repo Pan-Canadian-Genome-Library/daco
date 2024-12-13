@@ -77,11 +77,11 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 });
 
 /**
- * TODO: 
+ * TODO:
  * 	- Currently no validation is done to ensure that the current logged in user can access the specified application. This should be done and refactored.
  * 	- Validate request params using Zod.
  * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
-*/
+ */
 applicationRouter.get(
 	'/applications/:applicationId',
 	async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {

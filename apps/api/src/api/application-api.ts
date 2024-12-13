@@ -80,14 +80,14 @@ export const getAllApplications = async ({ userId, state, sort, page, pageSize }
 
 /**
  * Gets an application by a corresponding application ID
- * @param applicationId - The ID of the application within the database. 
+ * @param applicationId - The ID of the application within the database.
  * @returns Success with the details of the application / Failure with Error.
  */
-export const getApplicationById = async ({applicationId}: {applicationId: number}) => {
+export const getApplicationById = async ({ applicationId }: { applicationId: number }) => {
 	const database = getDbInstance();
 	const service: ApplicationService = applicationService(database);
 
-	const result = await service.getApplicationById({id: applicationId});
+	const result = await service.getApplicationById({ id: applicationId });
 
 	return result;
-}
+};
