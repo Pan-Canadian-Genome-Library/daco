@@ -60,7 +60,7 @@ type ApplicationTransitions = ITransition<
 
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
-	private readonly _application: ApplicationData;
+	private _application: ApplicationData;
 	private readonly _initState: ApplicationStateValues;
 
 	// Handler Methods
