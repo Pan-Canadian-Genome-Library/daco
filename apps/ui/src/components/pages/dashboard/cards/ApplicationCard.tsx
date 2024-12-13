@@ -22,6 +22,7 @@ import { Button, Card, Flex, theme, Typography } from 'antd';
 
 import { ApplicationtType } from '@/components/mock/applicationMockData';
 import { getApplicationStatusProperties } from '@/components/pages/dashboard/getApplicationStateProps';
+import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { formatDate } from '@/global/utils';
 
 const { Title, Text } = Typography;
@@ -36,21 +37,28 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const { id, status, createdAt, expiresAt } = props.application;
 	const { showEdit, color, showActionRequired } = getApplicationStatusProperties(status);
 	const { token } = useToken();
+	const minWidth = useMinWidth();
+	const isLowResDevice = minWidth <= token.screenLGMax;
 
 	return (
 		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
 			<Flex vertical gap="middle">
 				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
-					<Flex align="center" gap="middle">
+					<Flex align={isLowResDevice ? 'start' : 'center'} vertical={isLowResDevice} gap="middle">
 						<Flex
-							style={{ backgroundColor: color, padding: 10, minWidth: 200, borderRadius: token.borderRadius }}
-							align="center"
+							style={{
+								backgroundColor: color,
+								padding: 10,
+								minWidth: minWidth <= token.screenLG ? 100 : 200,
+								borderRadius: token.borderRadius,
+							}}
+							align="left"
 							justify="center"
 						>
 							<Text strong>{status}</Text>
 						</Flex>
 						{showActionRequired ? (
-							<Flex align="center" gap={'small'}>
+							<Flex align={'center'} gap={'small'}>
 								<ExclamationCircleFilled style={{ color: token.colorPrimary, fontSize: 20 }} />
 								<Text strong>Action Required</Text>
 							</Flex>
