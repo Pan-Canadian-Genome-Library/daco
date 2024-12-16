@@ -35,37 +35,6 @@ paths:
               schema:
                 type: object
 
-  /applications/edit:
-    post:
-      tags:
-        - Applications
-      summary: Edit application details
-      requestBody:
-        description: Changes made to an Application record
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApplicationUpdates'
-      responses:
-        '500':
-          description: 'Error editing application'
-          content:
-            application/json:
-              schema:
-                type: object
-        '400':
-          description: 'Error editing application - Application not found'
-          content:
-            application/json:
-              schema:
-                type: object
-        '200':
-          description: 'Application updated'
-          content:
-            application/json:
-              schema:
-                type: object
   /applications:
     get:
       tags:
@@ -104,13 +73,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error retrieving applications - Please provide user ID'
-          content:
-            application/json:
-              schema:
-                type: object
         '200':
           description: 'Application retrieved'
           content:
@@ -135,19 +100,43 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ServerErrors'
         '404':
           description: 'Error retrieving application by ID - Application not found.'
-          content:
-            application/json:
-              schema:
-                type: object
         '200':
           description: 'Application retrieved'
           content:
             application/json:
               schema:
                 type: object
+  /applications/edit:
+    post:
+      tags:
+        - Applications
+      summary: Edit application details
+      requestBody:
+        description: Changes made to an Application record
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationUpdates'
+      responses:
+        '500':
+          description: 'Error editing application'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error editing application - Application not found'
+        '200':
+          description: 'Application updated'
+          content:
+            application/json:
+              schema:
+                type: object
+
 components:
   schemas:
     ApplicationUpdates:
@@ -264,3 +253,25 @@ components:
         requested_studies:
           type: array
           description: List of studies
+
+  responses:
+    ClientErrors:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: General description of error with parameters and context
+
+    ServerErrors:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: General description of error with parameters and context
+        errors:
+          description: Detailed error data thrown by code failure
+          type: string
