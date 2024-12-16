@@ -119,6 +119,39 @@ paths:
               schema:
                 type: object
 
+  /applications/create:
+    post:
+      tags:
+        - Applications
+      summary: Create a new application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreation'
+      responses:
+        '500':
+          description: 'Error creating application'
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'Error crating application - No User ID specified.'
+          content:
+            application/json:
+              schema:
+                type: object
+        '201':
+          description: 'Application created'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Application'
+
   /applications/edit:
     post:
       tags:
@@ -150,8 +183,55 @@ paths:
             application/json:
               schema:
                 type: object
+
 components:
   schemas:
+    Application:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        user_id:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [DRAFT, INSTITUTIONAL_REP_REVIEW, DAC_REVIEW, DAC_REVISIONS_REQUESTED, REJECTED, APPROVED, CLOSED, REVOKED]
+          description: The current state that the application is in.
+        created_at:
+          type: string
+          format: date-time
+          description: When the application was created
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+        contents:
+          type: number
+          description: A ID referring to the entry with the application contents.
+
+    ApplicationCreation:
+      type: object
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: string
+          description: The user ID belonging to the currently signed in user.
+
     ApplicationUpdates:
       type: object
       required:
