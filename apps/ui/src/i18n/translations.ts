@@ -24,7 +24,7 @@ import enLang from './locale/en/enTranslations.json';
 import frLang from './locale/fr/frTranslations.json';
 
 // TODO: French language is generated using online tools, replace with correct translations.
-const resources = {
+export const resources = {
 	en: {
 		translation: { ...enLang },
 	},

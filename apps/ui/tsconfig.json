@@ -15,7 +15,8 @@
 			"@/components/*": ["./src/components/*"],
 			"@/pages/*": ["./src/pages/*"],
 			"@/hooks/*": ["./src/hooks/*"],
-			"@/global/*": ["./src/global/*"]
+			"@/global/*": ["./src/global/*"],
+			"@/*": ["./src/*"]
 		}
 	},
 	"include": ["src", "vite.config.ts"]

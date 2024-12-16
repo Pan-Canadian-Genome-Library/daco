@@ -21,12 +21,16 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router';
 
+import { resources } from '@/i18n/translations';
+
 const LanguageLayout = () => {
 	const { lang } = useParams();
 	const { i18n } = useTranslation();
 
 	useEffect(() => {
-		if (lang) {
+		const languages = Object.keys(resources);
+
+		if (!lang || languages.includes(lang)) {
 			i18n.changeLanguage(lang);
 			return;
 		}
