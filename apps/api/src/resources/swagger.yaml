@@ -76,6 +76,10 @@ paths:
                 $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error retrieving applications - Please provide user ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'Applications retrieved'
           content:
@@ -105,6 +109,10 @@ paths:
                 $ref: '#/components/responses/ServerErrors'
         '404':
           description: 'Error retrieving application by ID - Application not found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'Application retrieved'
           content:
@@ -132,6 +140,10 @@ paths:
                 $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error editing application - Application not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'Application updated'
           content:
