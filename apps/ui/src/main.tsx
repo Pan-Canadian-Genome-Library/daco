@@ -17,14 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
 import './i18n/translations';
 import './index.css';
-import App from './pages/App';
+
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
+
+import ThemeProvider from '@/components/providers/ThemeProvider';
+import App from '@/pages/App';
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<App />
+		<ThemeProvider>
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
+		</ThemeProvider>
 	</StrictMode>,
 );

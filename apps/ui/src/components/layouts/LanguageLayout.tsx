@@ -17,21 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Route, Routes } from 'react-router';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useParams } from 'react-router';
 
-import LanguageLayout from '@/components/layouts/LanguageLayout';
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
+const LanguageLayout = () => {
+	const { lang } = useParams();
+	const { i18n } = useTranslation();
 
-const PCGLRoutes = () => {
+	useEffect(() => {
+		if (lang) {
+			i18n.changeLanguage(lang);
+			return;
+		}
+	}, [lang, i18n]);
+
 	return (
-		<Routes>
-			<Route path=":lang?" element={<LanguageLayout />}>
-				<Route index element={<HomePage />} />
-				<Route path="dashboard" element={<DashboardPage />} />
-			</Route>
-		</Routes>
+		<>
+			<Outlet />
+		</>
 	);
 };
 
-export default PCGLRoutes;
+export default LanguageLayout;

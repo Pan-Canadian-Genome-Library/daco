@@ -18,23 +18,18 @@
  */
 
 import { Layout } from 'antd';
-import { RouterProvider } from 'react-router';
 
 import FooterComponent from '@/components/Footer';
 import HeaderComponent from '@/components/Header';
-import ThemeProvider from '@/components/providers/ThemeProvider';
-
-import router from '@/pages/routes';
+import PCGLRoutes from '@/pages/routes';
 
 function App() {
 	return (
-		<ThemeProvider>
-			<Layout style={{ minHeight: '100%' }}>
-				<HeaderComponent />
-				<RouterProvider router={router} />
-				<FooterComponent />
-			</Layout>
-		</ThemeProvider>
+		<Layout style={{ minHeight: '100%' }}>
+			<HeaderComponent />
+			<PCGLRoutes />
+			<FooterComponent />
+		</Layout>
 	);
 }
 
