@@ -65,7 +65,7 @@ const HomePage = () => {
 							<Paragraph style={{ color: token.colorTextSecondary }}>{t('homepage.introduction')}</Paragraph>
 							<Col span={6}>
 								<Button type="link" color="primary" variant="solid" onClick={() => setOpenModal(true)}>
-									{t('homepage.getStarted')}
+									{t('button.getStarted')}
 								</Button>
 							</Col>
 						</Flex>

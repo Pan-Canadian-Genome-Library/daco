@@ -2,7 +2,6 @@
 	"homepage": {
 		"title": "Demander l'accès aux Données Contrôlées",
 		"introduction": "Le Bureau de la Conformité aux Accès aux Données (BCAD) gère les demandes d'accès aux Données Contrôlées du Pan-Canadian Genome Library (PCGL) provenant de scientifiques, chercheurs et équipes commerciales.",
-		"getStarted": "Commencer",
 		"overviewTitle": "Aperçu",
 		"authorizationText": "L'autorisation d'accès aux données contrôlées du Pan-Canadian Genome Library est basée sur les études et est examinée pour sa conformité aux Politiques et Directives du PCGL. Le BCAD assure que seules les personnes qualifiées auront accès aux données du PCGL pour des objectifs de santé publique.",
 		"dataAccessInfo": "Avant de commencer votre demande, consultez les Politiques d'Accès et d'Utilisation des Données et examinez <link1>notre page de questions fréquentes</link1>.",
@@ -11,23 +10,45 @@
 		"description2": "Une fois terminé, obtenez une demande. Remplissez soigneusement toutes les sections obligatoires et examinez toutes les politiques et accords.",
 		"description3": "Connectez-vous et commencez une demande. Remplissez soigneusement toutes les sections obligatoires et examinez toutes les politiques et accords."
 	},
+	"dashboard": {
+		"title": "Mes Applications",
+		"description": "C'est ici que vous pouvez gérer vos demandes d'accès aux données contrôlées par le PCGL. L'accès sera accordé à partir de la date d'approbation par le PCGL DACO.",
+		"hasAccess": "Vous avez accès aux données contrôlées par le PCGL",
+		"noAccess": "Vous n'avez pas accès aux données contrôlées par le PCGL",
+		"startNewApp": "Commencer une nouvelle demande"
+	},
 	"status": {
 		"404": "Désolé, nous n'avons pas trouvé ce que vous cherchiez !"
 	},
 	"modal": {
-		"authorization": "Pour l'autorisation, nous exigeons une adresse e-mail institutionnelle valide. Cette adresse sera celle que vous utiliserez pour vous connecter à PCGL DACO et sera associée à l'accès contrôlé aux données de PCGL."
+		"authorization": "Pour l'autorisation, nous exigeons une adresse e-mail institutionnelle valide. Cette adresse sera celle que vous utiliserez pour vous connecter à PCGL DACO et sera associée à l'accès contrôlé aux données de PCGL.",
+		"editTitle": "Êtes-vous sûr de vouloir modifier les demandes : PCGL-{{id}}",
+		"editDescription": "Dans ce cas, la demande reviendra au statut de brouillon et vous devrez soumettre à nouveau la demande pour examen."
+	},
+	"alert": {
+		"sizeWarning": "Ce site web peut ne pas être compatible avec votre appareil.",
+		"sizeDescription": "Veuillez visiter ce site web en utilisant un appareil avec un écran plus large pour une expérience optimale et un accès à toutes les fonctionnalités."
 	},
 	"links": {
 		"policies": "Politiques et Règles",
 		"helpGuides": "Guides d'Aide",
 		"controlledDataUsers": "Utilisateurs de Données Contrôlées",
 		"apply": "Demander un Accès",
-		"login": "Connexion",
 		"privacy": "Politique de confidentialité",
 		"termsConditions": "Conditions d'utilisation",
 		"publicationPolicy": "Politique de publication",
 		"contact": "Contactez-nous",
 		"pcglWebsite": "PCGL Website",
 		"dataPlatform": "Plateforme de données"
+	},
+	"button": {
+		"getStarted": "Commencer",
+		"login": "Connexion",
+		"editApplication": "Modifier la demande",
+		"cancel": "Annuler"
+	},
+	"label": {
+		"created": "Créé",
+		"expires": "Expire"
 	}
 }

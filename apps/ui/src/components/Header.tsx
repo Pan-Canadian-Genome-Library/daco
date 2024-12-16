@@ -101,7 +101,7 @@ const HeaderComponent = () => {
 			position: 'right',
 		},
 		{
-			name: t('links.login'),
+			name: t('button.login'),
 			onClickAction: onLoginClick,
 			buttonProps: { color: 'primary', variant: 'solid' },
 			position: 'right',
