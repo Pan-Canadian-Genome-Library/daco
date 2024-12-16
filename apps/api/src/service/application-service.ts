@@ -67,11 +67,14 @@ const applicationService = (db: PostgresDb) => ({
 
 				return application[0];
 			});
-			return application;
+			return success(application);
 		} catch (err) {
-			console.error(`Error at createApplication with user_id: ${user_id}`);
+			const message = `Error at createApplication with user_id: ${user_id}`;
+
+			console.error(message);
 			console.error(err);
-			return null;
+
+			return failure(message, err);
 		}
 	},
 	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
