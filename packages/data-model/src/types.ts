@@ -22,6 +22,7 @@
 export const ApplicationStates = {
 	DRAFT: 'DRAFT',
 	INSTITUTIONAL_REP_REVIEW: 'INSTITUTIONAL_REP_REVIEW',
+	REP_REVISION: 'REP_REVISION',
 	DAC_REVIEW: 'DAC_REVIEW',
 	DAC_REVISIONS_REQUESTED: 'DAC_REVISIONS_REQUESTED',
 	REJECTED: 'REJECTED',
@@ -32,10 +33,12 @@ export const ApplicationStates = {
 
 export type ApplicationStateValues = (typeof ApplicationStates)[keyof typeof ApplicationStates];
 
-export enum FileTypes {
-	'SIGNED_APPLICATION',
-	'ETHICS_LETTER',
-}
+export const FileTypes = {
+	SIGNED_APPLICATION: 'SIGNED_APPLICATION',
+	ETHICS_LETTER: 'ETHICS_LETTER',
+} as const;
+
+export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
 export enum ApplicationReviewOutcomes {
 	'APPROVED',
@@ -176,7 +179,7 @@ export type Agreements = {
 export type Files = {
 	id: number; // TODO: Implement BigInt;
 	applicationId: number; // TODO: Implement BigInt;
-	type: FileTypes;
+	type: FileType;
 	SubmitterUserId: number; // TODO: Implement BigInt;
 	submitted_at: Date;
 	content: any; // TODO: Add correct type

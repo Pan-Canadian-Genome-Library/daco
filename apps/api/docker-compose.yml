@@ -6,6 +6,11 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - daco-api-db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: mypassword
+
+volumes:
+  daco-api-db:
+    name: daco-api-db
+    driver: local

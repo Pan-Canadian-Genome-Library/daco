@@ -23,9 +23,9 @@ import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-import { type PostgresDb } from '../src/db/index.js';
-import { applicationContents } from '../src/db/schemas/applicationContents.js';
-import { applications } from '../src/db/schemas/applications.js';
+import { type PostgresDb } from '@/db/index.js';
+import { applicationContents } from '@/db/schemas/applicationContents.js';
+import { applications } from '@/db/schemas/applications.js';
 
 export const testUserId = 'testUser@oicr.on.ca';
 export const testApplicationId = 1;

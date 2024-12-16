@@ -17,25 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const formatDate = (date: Date): string => {
-	const monthNames = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December',
-	];
+import { ApplicationData } from '@/service/types.js';
+import { AsyncResult, success } from '@/utils/results.js';
 
-	const day = date.getDate().toString().padStart(2, '0');
-	const month = monthNames[date.getMonth()]?.substring(0, 3);
-	const year = date.getFullYear();
-
-	return `${month} ${day}, ${year}`;
+// TODO: Add Validation
+export const validateContent = async (application: ApplicationData): AsyncResult<ApplicationData> => {
+	return success(application);
 };
