@@ -30,7 +30,7 @@ const LanguageLayout = () => {
 	useEffect(() => {
 		const languages = Object.keys(resources);
 
-		if (!lang || languages.includes(lang)) {
+		if (lang && languages.includes(lang)) {
 			i18n.changeLanguage(lang);
 			return;
 		}
