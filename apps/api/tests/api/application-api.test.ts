@@ -124,7 +124,10 @@ describe('Application API', () => {
 			assert.ok(!result.success);
 		});
 
-		after(() => {});
+		after(async () => {
+			await container.stop();
+			process.exit(0);
+		});
 	});
 
 	describe('Get Application by ID', () => {
