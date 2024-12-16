@@ -16,20 +16,20 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { Route, Routes } from 'react-router';
 
-import { Layout } from 'antd';
-
-import FooterComponent from '@/components/Footer';
-import HeaderComponent from '@/components/Header';
-import PCGLRoutes from '@/pages/routes';
+import LanguageLayout from '@/components/layouts/LanguageLayout';
+import DashboardPage from '@/pages/dashboard';
+import HomePage from '@/pages/index';
 
 function App() {
 	return (
-		<Layout style={{ minHeight: '100%' }}>
-			<HeaderComponent />
-			<PCGLRoutes />
-			<FooterComponent />
-		</Layout>
+		<Routes>
+			<Route path=":lang?" element={<LanguageLayout />}>
+				<Route index element={<HomePage />} />
+				<Route path="dashboard" element={<DashboardPage />} />
+			</Route>
+		</Routes>
 	);
 }
 

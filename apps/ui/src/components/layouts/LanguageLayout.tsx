@@ -17,10 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { Layout } from 'antd';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router';
 
+import HeaderComponent from '@/components//Header';
+import FooterComponent from '@/components/Footer';
 import { resources } from '@/i18n/translations';
 
 const LanguageLayout = () => {
@@ -37,9 +40,11 @@ const LanguageLayout = () => {
 	}, [lang, i18n]);
 
 	return (
-		<>
+		<Layout style={{ minHeight: '100%' }}>
+			<HeaderComponent />
 			<Outlet />
-		</>
+			<FooterComponent />
+		</Layout>
 	);
 };
 
