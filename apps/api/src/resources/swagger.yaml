@@ -110,7 +110,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Applications'
   /applications/edit:
     post:
       tags:
@@ -122,7 +122,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationUpdates'
+              $ref: '#/components/requests/ApplicationUpdates'
       responses:
         '500':
           description: 'Error editing application'
@@ -137,12 +137,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/ApplicationRecord'
 
 components:
   schemas:
     Applications:
       type: object
+      description: Base Application information
       required:
         - id
         - user_id
@@ -159,29 +160,25 @@ components:
         state:
           description: The current status of the application
           type: string
+        approved_at:
+          description: Date application was approved
+          type: string
         createdAt:
           description: Date application first created
+          type: string
+        expires_at:
+          description: Date application will expire
           type: string
         updatedAt:
           description: Date application last updated
           type: string
-
-    ApplicationUpdates:
-      type: object
-      required:
-        - id
-        - update
-      properties:
-        id:
+        contents:
+          description: ID of associated ApplicationContents record
           type: number
-          description: The id of the Application
-        update:
-          description: Changes made to the application
-          type: object
-          $ref: '#/components/schemas/ApplicationContents'
 
     ApplicationContents:
       type: object
+      description: Complete Application details
       properties:
         applicant_first_name:
           type: string
@@ -280,6 +277,30 @@ components:
         requested_studies:
           type: array
           description: List of studies
+
+    ApplicationRecord:
+      type: object
+      description: Merged Application & ApplicationContents record
+      $ref: '#/components/schemas/Applications'
+      properties:
+        contents:
+          type: object
+          $ref: '#/components/schemas/ApplicationContents'
+
+  requests:
+    ApplicationUpdates:
+      type: object
+      required:
+        - id
+        - update
+      properties:
+        id:
+          type: number
+          description: The id of the Application
+        update:
+          description: Changes to make to the application
+          type: object
+          $ref: '#/components/schemas/ApplicationContents'
 
   responses:
     ClientErrors:
