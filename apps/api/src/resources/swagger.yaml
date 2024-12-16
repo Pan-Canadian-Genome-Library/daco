@@ -35,37 +35,6 @@ paths:
               schema:
                 type: object
 
-  /applications/edit:
-    post:
-      tags:
-        - Applications
-      summary: Edit application details
-      requestBody:
-        description: Changes made to an Application record
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApplicationUpdates'
-      responses:
-        '500':
-          description: 'Error editing application'
-          content:
-            application/json:
-              schema:
-                type: object
-        '400':
-          description: 'Error editing application - Application not found'
-          content:
-            application/json:
-              schema:
-                type: object
-        '200':
-          description: 'Application updated'
-          content:
-            application/json:
-              schema:
-                type: object
   /applications:
     get:
       tags:
@@ -117,6 +86,7 @@ paths:
             application/json:
               schema:
                 type: object
+
   /applications/{applicationId}:
     get:
       tags:
@@ -144,6 +114,38 @@ paths:
                 type: object
         '200':
           description: 'Application retrieved'
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /applications/edit:
+    post:
+      tags:
+        - Applications
+      summary: Edit application details
+      requestBody:
+        description: Changes made to an Application record
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationUpdates'
+      responses:
+        '500':
+          description: 'Error editing application'
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'Error editing application - Application not found'
+          content:
+            application/json:
+              schema:
+                type: object
+        '200':
+          description: 'Application updated'
           content:
             application/json:
               schema:
