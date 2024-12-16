@@ -18,10 +18,16 @@
 		"authorization": "Pour l'autorisation, nous exigeons une adresse e-mail institutionnelle valide. Cette adresse sera celle que vous utiliserez pour vous connecter à PCGL DACO et sera associée à l'accès contrôlé aux données de PCGL."
 	},
 	"links": {
-		"Policies": "Politiques et Règles",
-		"HelpGuides": "Guides d'Aide",
-		"ControlledDataUsers": "Utilisateurs de Données Contrôlées",
-		"Apply": "Demander un Accès",
-		"Login": "Connexion"
+		"policies": "Politiques et Règles",
+		"helpGuides": "Guides d'Aide",
+		"controlledDataUsers": "Utilisateurs de Données Contrôlées",
+		"apply": "Demander un Accès",
+		"login": "Connexion",
+		"privacy": "Politique de confidentialité",
+		"termsConditions": "Conditions d'utilisation",
+		"publicationPolicy": "Politique de publication",
+		"contact": "Contactez-nous",
+		"pcglWebsite": "PCGL Website",
+		"dataPlatform": "Plateforme de données"
 	}
 }
