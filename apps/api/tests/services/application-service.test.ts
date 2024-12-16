@@ -61,7 +61,11 @@ describe('Application Service', () => {
 
 	describe('Create Applications', () => {
 		it('should create applications with status DRAFT and submitted user_id', async () => {
-			const application = await applicationService.createApplication({ user_id });
+			const applicationResult = await applicationService.createApplication({ user_id });
+
+			assert.ok(applicationResult.success && applicationResult.data);
+
+			const application = applicationResult.data;
 
 			assert.notEqual(application, null);
 			assert.strictEqual(application?.user_id, user_id);
