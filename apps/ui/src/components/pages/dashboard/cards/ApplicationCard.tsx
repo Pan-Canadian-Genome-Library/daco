@@ -24,7 +24,6 @@ import { useTranslation } from 'react-i18next';
 import { ApplicationtType } from '@/components/mock/applicationMockData';
 import { getApplicationStatusProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { formatDate } from '@/global/utils';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -41,6 +40,24 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLGMax;
+
+	const formateDate = (createdAt: Date, expiresAt: Date) => {
+		const createdDate = t('date.intlDateTime', {
+			val: new Date(createdAt),
+			formatParams: {
+				val: { year: 'numeric', month: 'long', day: 'numeric' },
+			},
+		});
+
+		const expiresDate = t('date.intlDateTime', {
+			val: new Date(expiresAt),
+			formatParams: {
+				val: { year: 'numeric', month: 'long', day: 'numeric' },
+			},
+		});
+
+		return `${t('label.created')}: ${createdDate} | ${t('label.expires')}: ${expiresDate}`;
+	};
 
 	return (
 		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
@@ -73,9 +90,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 				<Title style={{ margin: 0 }} level={3}>
 					Application: PCGL-{id}
 				</Title>
-				<Text>
-					{t('label.created')}: {formatDate(createdAt)} | {t('label.expires')}: {formatDate(expiresAt)}
-				</Text>
+				<Text>{formateDate(createdAt, expiresAt)}</Text>
 			</Flex>
 		</Card>
 	);

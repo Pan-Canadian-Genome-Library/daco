@@ -23,7 +23,6 @@ import { useTranslation } from 'react-i18next';
 
 import StatusBarWrapper from '@/components/layouts/StatusBarWrapper';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { formatDate } from '@/global/utils';
 
 const { Text, Title } = Typography;
 const { useToken } = theme;
@@ -61,12 +60,20 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 							align="center"
 							gap={20}
 						>
-							{expiresAt ? (
+							{!expiresAt ? (
 								<>
 									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
 									<Flex vertical>
 										<Text strong>{t('dashboard.hasAccess')}</Text>
-										<Text>Expires: {formatDate(expiresAt)}</Text>
+										<Text>
+											{t('label.expires')}:
+											{t('date.intlDateTime', {
+												val: new Date(),
+												formatParams: {
+													val: { year: 'numeric', month: 'long', day: 'numeric' },
+												},
+											})}
+										</Text>
 									</Flex>
 								</>
 							) : (

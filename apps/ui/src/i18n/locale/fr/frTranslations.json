@@ -52,5 +52,8 @@
 	"label": {
 		"created": "Créé",
 		"expires": "Expire"
+	},
+	"date": {
+		"intlDateTime": "{{val, datetime}}"
 	}
 }
