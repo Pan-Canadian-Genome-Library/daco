@@ -117,7 +117,37 @@ paths:
             application/json:
               schema:
                 type: object
-
+  /applications/{applicationId}:
+    get:
+      tags:
+        - Applications
+      summary: Gets a application for a specified application ID.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: string
+          description: Retrieve a specific application with the specified application ID.
+          required: true
+      responses:
+        '500':
+          description: 'Cannot retrieve application by ID'
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: 'Error retrieving application by ID - Application not found.'
+          content:
+            application/json:
+              schema:
+                type: object
+        '200':
+          description: 'Application retrieved'
+          content:
+            application/json:
+              schema:
+                type: object
 components:
   schemas:
     ApplicationUpdates:

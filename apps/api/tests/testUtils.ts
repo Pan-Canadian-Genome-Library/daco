@@ -31,6 +31,7 @@ export const testUserId = 'testUser@oicr.on.ca';
 export const PG_DATABASE = 'testUser';
 export const PG_USER = 'testPassword';
 export const PG_PASSWORD = 'postgres';
+export const testApplicationId = 1;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
