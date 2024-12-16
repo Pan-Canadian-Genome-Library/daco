@@ -139,7 +139,7 @@ paths:
               schema:
                 type: object
         '400':
-          description: 'Error crating application - No User ID specified.'
+          description: 'Error creating application - No User ID specified.'
           content:
             application/json:
               schema:

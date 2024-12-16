@@ -41,7 +41,7 @@ applicationRouter.post(
 		 * Reflect changes in swagger once refactored.
 		 **/
 		if (!userId) {
-			response.send(400).send({ message: 'User ID is required.' });
+			response.status(400).send({ message: 'User ID is required.' });
 			return;
 		}
 
