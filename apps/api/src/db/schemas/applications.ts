@@ -24,6 +24,7 @@ import { applicationContents } from './applicationContents.js';
 export const applicationStatesEnum = pgEnum('application_states', [
 	'DRAFT',
 	'INSTITUTIONAL_REP_REVIEW',
+	'REP_REVISION',
 	'DAC_REVIEW',
 	'DAC_REVISIONS_REQUESTED',
 	'REJECTED',

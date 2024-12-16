@@ -53,6 +53,9 @@ importers:
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@4.21.0)
+      typescript-fsm:
+        specifier: ^1.4.5
+        version: 1.4.5
       yamljs:
         specifier: ^0.3.0
         version: 0.3.0
@@ -2951,6 +2954,9 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  typescript-fsm@1.4.5:
+    resolution: {integrity: sha512-NsFpTyPjgpU0Ci5LAnRYO29LkopdqEvAC3rCivde55hjWB3nvACLh66G5qLKj0hwKsvahftLd7gxZeZt6UiplA==}
 
   typescript@5.6.2:
     resolution: {integrity: sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==}
@@ -5864,6 +5870,8 @@ snapshots:
     transitivePeerDependencies:
       - eslint
       - supports-color
+
+  typescript-fsm@1.4.5: {}
 
   typescript@5.6.2: {}
 

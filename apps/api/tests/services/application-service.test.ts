@@ -82,7 +82,7 @@ describe('Application Service', () => {
 
 			const { id } = applicationRecords[0];
 
-			const result = await applicationService.getApplicationById({ id });
+			const result = await applicationService.getApplicationWithContents({ id });
 
 			assert.ok(result.success);
 
