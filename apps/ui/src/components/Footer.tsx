@@ -18,6 +18,7 @@
  */
 
 import { ConfigProvider, Flex, Image, Layout, Typography, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
@@ -33,42 +34,43 @@ interface LinkType {
 	href?: string;
 }
 
-const pcglLinks: LinkType[] = [
-	{
-		name: 'Contact Us',
-	},
-	{
-		name: 'Policies & Guidelines',
-	},
-	{
-		name: 'Help Guides',
-	},
-	{
-		name: 'Controlled Data Users',
-	},
-	{
-		name: 'PCGL Website',
-	},
-	{
-		name: 'Data Platform',
-	},
-];
-
-const policiesConditionsLinks: LinkType[] = [
-	{
-		name: 'Privacy Policy',
-	},
-	{
-		name: 'Terms & Conditions',
-	},
-	{
-		name: 'Publication Policy',
-	},
-];
-
 const FooterComponent = () => {
+	const { t } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
+
+	const pcglLinks: LinkType[] = [
+		{
+			name: t('links.contact'),
+		},
+		{
+			name: t('links.policies'),
+		},
+		{
+			name: t('links.helpGuides'),
+		},
+		{
+			name: t('links.controlledDataUsers'),
+		},
+		{
+			name: t('links.pcglWebsite'),
+		},
+		{
+			name: t('links.dataPlatform'),
+		},
+	];
+
+	const policiesConditionsLinks: LinkType[] = [
+		{
+			name: t('links.privacy'),
+		},
+		{
+			name: t('links.termsConditions'),
+		},
+		{
+			name: t('links.publicationPolicy'),
+		},
+	];
 
 	const linkStyle: React.CSSProperties = {
 		textAlign: 'center',

@@ -21,6 +21,7 @@ import React, { useState } from 'react';
 
 import { CloseOutlined, MenuOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
@@ -51,6 +52,7 @@ const linkStyle: React.CSSProperties = {
 };
 
 const HeaderComponent = () => {
+	const { t } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 
@@ -79,27 +81,27 @@ const HeaderComponent = () => {
 
 	const menuItems: (MenuLink | MenuButton)[] = [
 		{
-			name: 'Policies & Guidelines',
+			name: t('links.policies'),
 			href: '#',
 			position: 'left',
 		},
 		{
-			name: 'Help Guides',
+			name: t('links.helpGuides'),
 			href: '#',
 			position: 'left',
 		},
 		{
-			name: 'Controlled Data Users',
+			name: t('links.controlledDataUsers'),
 			href: '#',
 			position: 'left',
 		},
 		{
-			name: 'Apply For Access',
+			name: t('links.apply'),
 			href: '#',
 			position: 'right',
 		},
 		{
-			name: 'Login',
+			name: t('links.login'),
 			onClickAction: onLoginClick,
 			buttonProps: { color: 'primary', variant: 'solid' },
 			position: 'right',
