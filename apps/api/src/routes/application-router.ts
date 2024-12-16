@@ -48,7 +48,7 @@ applicationRouter.post(
 		const result = await createApplication({ user_id: userId });
 
 		if (result.success) {
-			response.status(200).send(result.data);
+			response.status(201).send(result.data);
 		} else {
 			response.status(500).send({ message: result.message, errors: String(result.errors) });
 		}
