@@ -17,21 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { applicationContents } from '@/db/schemas/applicationContents.js';
-import { applications } from '@/db/schemas/applications.js';
-import applicationService from '@/service/application-service.js';
+import { ApplicationData } from '@/service/types.js';
+import { AsyncResult, success } from '@/utils/results.js';
 
-export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
-
-export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
-
-export type ApplicationData = typeof applications.$inferSelect;
-
-export type ApplicationService = ReturnType<typeof applicationService>;
-
-export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
-
-export type OrderBy<Key extends string> = {
-	direction: 'asc' | 'desc';
-	column: Key;
+// TODO: Add Validation
+export const validateContent = async (application: ApplicationData): AsyncResult<ApplicationData> => {
+	return success(application);
 };
