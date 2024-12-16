@@ -44,13 +44,19 @@ The modules in the monorepo are organized into two categories:
 
 - Build all packages and apps: `pnpm -w build:all`
 
-- Start server:
+- Start API:
   
   `cd apps/api`
 
   Create .env file: `cp .env.schema .env`
 
-  Start Postgres DB: `docker compose up --detach`
+  Start Postgres DB: 
+  
+  `docker compose up --detach`
+
+  `pnpm drizzle-kit migrate`
+
+  Start Server: 
   
   `pnpm run dev`
   

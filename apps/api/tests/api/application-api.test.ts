@@ -33,6 +33,7 @@ import {
 	PG_DATABASE,
 	PG_PASSWORD,
 	PG_USER,
+	testApplicationId,
 	testUserId as user_id,
 } from '../testUtils.js';
 
@@ -128,20 +129,13 @@ describe('Application API', () => {
 
 	describe('Get Application by ID', () => {
 		it('should successfully be able to find an application with an ID', async () => {
-			const applicationRecordsResult = await applicationService.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
-
-			const { id } = applicationRecordsResult.data[0];
-
-			const result = await getApplicationById({ applicationId: id });
+			const result = await getApplicationById({ applicationId: testApplicationId });
 
 			assert.ok(result.success);
 
 			const application = result.data;
 
-			assert.strictEqual(application.id, id);
+			assert.strictEqual(application.id, testApplicationId);
 
 			assert.ok(application.contents);
 		});
@@ -165,7 +159,5 @@ describe('Application API', () => {
 
 			assert.strictEqual(error_message, 'Error: Application record not found');
 		});
-
-		after(() => {});
 	});
 });
