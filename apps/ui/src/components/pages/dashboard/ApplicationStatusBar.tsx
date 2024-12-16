@@ -19,6 +19,7 @@
 
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
 import { Col, Flex, Row, Typography, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import StatusBarWrapper from '@/components/layouts/StatusBarWrapper';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
@@ -33,6 +34,7 @@ type ApplicationStatusBarProps = {
 };
 
 const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
+	const { t } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
@@ -42,11 +44,8 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 			<Row style={{ width: '100%' }} gutter={token.sizeXXL} wrap>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex style={{ height: '100%' }} vertical justify="center" align="start">
-						<Title>My Applications</Title>
-						<Text>
-							This is where you can manage your Applications for Access to PCGL Controlled Data. Access will be granted
-							starting from the date of approval by the PCGL DACO.
-						</Text>
+						<Title>{t('dashboard.title')}</Title>
+						<Text>{t('dashboard.description')}</Text>
 					</Flex>
 				</Col>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -66,14 +65,14 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 								<>
 									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
 									<Flex vertical>
-										<Text strong>You have access to PCGL Controlled Data</Text>
+										<Text strong>{t('dashboard.hasAccess')}</Text>
 										<Text>Expires: {formatDate(expiresAt)}</Text>
 									</Flex>
 								</>
 							) : (
 								<Flex align="center" gap={10}>
 									<CloseCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
-									<Text strong>You do not have access to PCGL Controlled Data</Text>
+									<Text strong>{t('dashboard.noAccess')}</Text>
 								</Flex>
 							)}
 						</Flex>

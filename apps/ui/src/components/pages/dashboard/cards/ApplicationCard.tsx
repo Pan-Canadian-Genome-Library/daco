@@ -19,6 +19,7 @@
 
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Card, Flex, theme, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import { ApplicationtType } from '@/components/mock/applicationMockData';
 import { getApplicationStatusProperties } from '@/components/pages/dashboard/getApplicationStateProps';
@@ -34,6 +35,7 @@ type ApplicationCardProps = {
 };
 
 const ApplicationCard = (props: ApplicationCardProps) => {
+	const { t } = useTranslation();
 	const { id, status, createdAt, expiresAt } = props.application;
 	const { showEdit, color, showActionRequired } = getApplicationStatusProperties(status);
 	const { token } = useToken();
@@ -60,19 +62,19 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 						{showActionRequired ? (
 							<Flex align={'center'} gap={'small'}>
 								<ExclamationCircleFilled style={{ color: token.colorPrimary, fontSize: 20 }} />
-								<Text strong>Action Required</Text>
+								<Text strong>{t('alert.actionRequired')}</Text>
 							</Flex>
 						) : null}
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
-						{showEdit ? <Button onClick={() => props.openEdit(id)}>Edit</Button> : null}
+						{showEdit ? <Button onClick={() => props.openEdit(id)}>{t('button.edit')}</Button> : null}
 					</Flex>
 				</Flex>
 				<Title style={{ margin: 0 }} level={3}>
 					Application: PCGL-{id}
 				</Title>
 				<Text>
-					Created: {formatDate(createdAt)} | Expires: {formatDate(expiresAt)}
+					{t('label.created')}: {formatDate(createdAt)} | {t('label.expires')}: {formatDate(expiresAt)}
 				</Text>
 			</Flex>
 		</Card>

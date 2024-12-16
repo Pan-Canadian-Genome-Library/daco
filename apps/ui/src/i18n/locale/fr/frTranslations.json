@@ -27,7 +27,8 @@
 	},
 	"alert": {
 		"sizeWarning": "Ce site web peut ne pas être compatible avec votre appareil.",
-		"sizeDescription": "Veuillez visiter ce site web en utilisant un appareil avec un écran plus large pour une expérience optimale et un accès à toutes les fonctionnalités."
+		"sizeDescription": "Veuillez visiter ce site web en utilisant un appareil avec un écran plus large pour une expérience optimale et un accès à toutes les fonctionnalités.",
+		"actionRequired": "Action requise"
 	},
 	"links": {
 		"policies": "Politiques et Règles",
@@ -45,7 +46,8 @@
 		"getStarted": "Commencer",
 		"login": "Connexion",
 		"editApplication": "Modifier la demande",
-		"cancel": "Annuler"
+		"cancel": "Annuler",
+		"edit": "Modifier"
 	},
 	"label": {
 		"created": "Créé",

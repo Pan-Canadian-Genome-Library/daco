@@ -18,19 +18,21 @@
  */
 
 import { Button, Card, Flex, theme, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 const { useToken } = theme;
 
 const NewApplicationCard = () => {
+	const { t } = useTranslation();
 	const { token } = useToken();
 
 	return (
 		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
 			<Flex justify="center" align="center" vertical gap="middle">
-				<Title level={3}>Start A New Application</Title>
+				<Title level={3}>{t('dashboard.startNewApp')}</Title>
 				<Button color="default" variant="outlined">
-					Get Started
+					{t('button.getStarted')}
 				</Button>
 			</Flex>
 		</Card>

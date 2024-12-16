@@ -27,7 +27,8 @@
 	},
 	"alert": {
 		"sizeWarning": "This website may not be supported by your device.",
-		"sizeDescription": "Please visit this website using a device with a wider screen for optimal experience and access to all features."
+		"sizeDescription": "Please visit this website using a device with a wider screen for optimal experience and access to all features.",
+		"actionRequired": "Action Required"
 	},
 	"links": {
 		"policies": "Policies & Guidelines",
@@ -45,7 +46,8 @@
 		"getStarted": "Get Started",
 		"login": "Login",
 		"editApplication": "Edit Application",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"Edit": "Edit"
 	},
 	"label": {
 		"created": "Created",
