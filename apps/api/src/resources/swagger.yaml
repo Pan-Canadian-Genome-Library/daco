@@ -77,11 +77,13 @@ paths:
         '400':
           description: 'Error retrieving applications - Please provide user ID'
         '200':
-          description: 'Application retrieved'
+          description: 'Applications retrieved'
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  $ref: '#/components/schemas/Applications'
   /applications/{applicationId}:
     get:
       tags:
@@ -139,6 +141,31 @@ paths:
 
 components:
   schemas:
+    Applications:
+      type: object
+      required:
+        - id
+        - user_id
+        - state
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: number
+          description: The id of the Application
+        user_id:
+          description: The user_id associated with this application
+          type: string
+        state:
+          description: The current status of the application
+          type: string
+        createdAt:
+          description: Date application first created
+          type: string
+        updatedAt:
+          description: Date application last updated
+          type: string
+
     ApplicationUpdates:
       type: object
       required:
