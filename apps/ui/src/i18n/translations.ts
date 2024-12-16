@@ -21,9 +21,9 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import enLink from './locale/en/enLinks.json';
-import enLang from './locale/en/translations.json';
+import enLang from './locale/en/enTranslations.json';
 import frLink from './locale/fr/frLinks.json';
-import frLang from './locale/fr/translations.json';
+import frLang from './locale/fr/frTranslations.json';
 
 // TODO: French language is generated using online tools, replace with correct translations.
 const resources = {

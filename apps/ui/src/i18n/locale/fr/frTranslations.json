@@ -13,5 +13,8 @@
 	},
 	"status": {
 		"404": "Désolé, nous n'avons pas trouvé ce que vous cherchiez !"
+	},
+	"modal": {
+		"authorization": "Pour l'autorisation, nous exigeons une adresse e-mail institutionnelle valide. Cette adresse sera celle que vous utiliserez pour vous connecter à PCGL DACO et sera associée à l'accès contrôlé aux données de PCGL."
 	}
 }

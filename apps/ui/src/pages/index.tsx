@@ -137,10 +137,7 @@ const HomePage = () => {
 				onCancel={() => setOpenModal(false)}
 			>
 				<Flex>
-					<Text>
-						For authorization, we require a valid institutional email address. This will be the email address you will
-						use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access.
-					</Text>
+					<Text>{t('modal.authorization')}</Text>
 				</Flex>
 			</Modal>
 		</Content>
