@@ -20,7 +20,7 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { editApplication, getAllApplications } from '@/api/application-api.js';
+import { editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -35,7 +35,7 @@ applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
 		res.send(result.data);
 	} else {
 		// TODO: System Error Handling
-		if (result.errors === 'Error: Application record not found') {
+		if (String(result.errors) === 'Error: Application record not found') {
 			res.status(404);
 		} else {
 			res.status(500);
@@ -72,8 +72,37 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 	if (result.success) {
 		res.status(200).send(result.data);
 	} else {
-		res.status(500).send({ message: result.message, errors: result.errors });
+		res.status(500).send({ message: result.message, errors: String(result.errors) });
 	}
 });
+
+/**
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can access the specified application. This should be done and refactored.
+ * 	- Validate request params using Zod.
+ * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
+ */
+applicationRouter.get(
+	'/applications/:applicationId',
+	async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {
+		const { applicationId } = request.params;
+
+		const result = await getApplicationById({ applicationId });
+
+		if (result.success) {
+			response.status(200).send(result.data);
+		} else {
+			const resultErrors = String(result.errors);
+
+			if (resultErrors === 'Error: Application record not found') {
+				response.status(404);
+			} else {
+				response.status(500);
+			}
+
+			response.send({ message: result.message, errors: resultErrors });
+		}
+	},
+);
 
 export default applicationRouter;
