@@ -26,6 +26,20 @@ import { type ApplicationContentUpdates, type ApplicationService } from '@/servi
 import { failure } from '@/utils/results.js';
 
 /**
+ * Creates a new application and returns the created data.
+ * @param user_id - The ID of the user requesting the creation of the application.
+ * @returns Success with Application data / Failure with Error.
+ */
+export const createApplication = async ({ user_id }: { user_id: string }) => {
+	const database = getDbInstance();
+	const service: ApplicationService = applicationService(database);
+
+	const result = await service.createApplication({ user_id });
+
+	return result;
+};
+
+/**
  * Validates if a given Application state allows edits, then updates the record
  * Updated records are returned in state 'DRAFT'
  * @param id - Application ID

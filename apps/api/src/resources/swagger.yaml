@@ -87,7 +87,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Applications'
+                  $ref: '#/components/schemas/Application'
   /applications/{applicationId}:
     get:
       tags:
@@ -118,7 +118,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Applications'
+                $ref: '#/components/schemas/Application'
+
+  /applications/create:
+    post:
+      tags:
+        - Applications
+      summary: Create a new application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/ApplicationCreation'
+      responses:
+        '500':
+          description: 'Error creating application'
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'Error creating application - No User ID specified.'
+          content:
+            application/json:
+              schema:
+                type: object
+        '201':
+          description: 'Application created'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Application'
+
   /applications/edit:
     post:
       tags:
@@ -153,40 +187,42 @@ paths:
 
 components:
   schemas:
-    Applications:
+    Application:
       type: object
-      description: Base Application information
-      required:
-        - id
-        - user_id
-        - state
-        - createdAt
-        - updatedAt
       properties:
         id:
           type: number
-          description: The id of the Application
+          description: The unique ID of the application in the database.
         user_id:
-          description: The user_id associated with this application
           type: string
+          description: The user ID associated with the application.
         state:
-          description: The current status of the application
           type: string
+          enum:
+            [DRAFT, INSTITUTIONAL_REP_REVIEW, DAC_REVIEW, DAC_REVISIONS_REQUESTED, REJECTED, APPROVED, CLOSED, REVOKED]
+          description: The current state that the application is in.
+        created_at:
+          type: string
+          format: date-time
+          description: When the application was created
         approved_at:
-          description: Date application was approved
           type: string
-        createdAt:
-          description: Date application first created
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updated_at:
           type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
         expires_at:
-          description: Date application will expire
           type: string
-        updatedAt:
-          description: Date application last updated
-          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
         contents:
-          description: ID of associated ApplicationContents record
           type: number
+          description: A ID referring to the entry with the application contents.
 
     ApplicationContents:
       type: object
@@ -300,6 +336,15 @@ components:
           $ref: '#/components/schemas/ApplicationContents'
 
   requests:
+    ApplicationCreation:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          description: The user ID belonging to the currently signed in user.
+
     ApplicationUpdates:
       type: object
       required:
