@@ -77,8 +77,10 @@ const applicationService = (db: PostgresDb) => ({
 			return success(application);
 		} catch (err) {
 			const message = `Error at createApplication with user_id: ${user_id}`;
+
 			console.error(message);
 			console.error(err);
+
 			return failure(message, err);
 		}
 	},

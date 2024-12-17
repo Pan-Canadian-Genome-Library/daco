@@ -20,10 +20,40 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
+import { createApplication, editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
+
+/**
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ * 	- Validate request params using Zod.
+ */
+applicationRouter.post(
+	'/applications/create',
+	jsonParser,
+	async (request: Request<{}, {}, { userId: string }, any>, response) => {
+		const { userId } = request.body;
+
+		/**
+		 * TODO: Temporary userId check until validation/dto flow is confirmed.
+		 * Reflect changes in swagger once refactored.
+		 **/
+		if (!userId) {
+			response.status(400).send({ message: 'User ID is required.' });
+			return;
+		}
+
+		const result = await createApplication({ user_id: userId });
+
+		if (result.success) {
+			response.status(201).send(result.data);
+		} else {
+			response.status(500).send({ message: result.message, errors: String(result.errors) });
+		}
+	},
+);
 
 applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
 	// TODO: Add Auth & Zod validation

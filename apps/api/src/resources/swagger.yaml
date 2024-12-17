@@ -34,6 +34,18 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  version:
+                    type: string
+                  health:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        statusText:
+                          type: string
 
   /applications:
     get:
@@ -73,19 +85,21 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error retrieving applications - Please provide user ID'
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ClientErrors'
         '200':
-          description: 'Application retrieved'
+          description: 'Applications retrieved'
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  $ref: '#/components/schemas/Applications'
   /applications/{applicationId}:
     get:
       tags:
@@ -104,19 +118,53 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ServerErrors'
         '404':
           description: 'Error retrieving application by ID - Application not found.'
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'Application retrieved'
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Applications'
+
+  /applications/create:
+    post:
+      tags:
+        - Applications
+      summary: Create a new application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/ApplicationCreation'
+      responses:
+        '500':
+          description: 'Error creating application'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error creating application - No User ID specified.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '201':
+          description: 'Application created'
+          content:
+            application/json:
+              schema:
                 type: object
+                $ref: '#/components/schemas/Applications'
+
   /applications/edit:
     post:
       tags:
@@ -128,44 +176,69 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationUpdates'
+              $ref: '#/components/requests/ApplicationUpdates'
       responses:
         '500':
           description: 'Error editing application'
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error editing application - Application not found'
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'Application updated'
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/ApplicationRecord'
+
 components:
   schemas:
-    ApplicationUpdates:
+    Applications:
       type: object
-      required:
-        - id
-        - update
       properties:
         id:
           type: number
-          description: The id of the Application
-        update:
-          description: Changes made to the application
-          type: object
-          $ref: '#/components/schemas/ApplicationContents'
+          description: The unique ID of the application in the database.
+        user_id:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [DRAFT, INSTITUTIONAL_REP_REVIEW, DAC_REVIEW, DAC_REVISIONS_REQUESTED, REJECTED, APPROVED, CLOSED, REVOKED]
+          description: The current state that the application is in.
+        created_at:
+          type: string
+          format: date-time
+          description: When the application was created
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+        contents:
+          type: number
+          description: A ID referring to the entry with the application contents.
 
     ApplicationContents:
       type: object
+      description: Complete Application details
       properties:
         applicant_first_name:
           type: string
@@ -264,3 +337,58 @@ components:
         requested_studies:
           type: array
           description: List of studies
+
+    ApplicationRecord:
+      type: object
+      description: Merged Application & ApplicationContents record
+      $ref: '#/components/schemas/Applications'
+      properties:
+        contents:
+          type: object
+          $ref: '#/components/schemas/ApplicationContents'
+
+  requests:
+    ApplicationCreation:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          description: The user ID belonging to the currently signed in user.
+
+    ApplicationUpdates:
+      type: object
+      required:
+        - id
+        - update
+      properties:
+        id:
+          type: number
+          description: The id of the Application
+        update:
+          description: Changes to make to the application
+          type: object
+          $ref: '#/components/schemas/ApplicationContents'
+
+  responses:
+    ClientErrors:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: General description of error with parameters and context
+
+    ServerErrors:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: General description of error with parameters and context
+        errors:
+          description: Detailed error data thrown by code failure
+          type: string
