@@ -20,7 +20,7 @@
 import { Layout } from 'antd';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useParams } from 'react-router';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
 
 import HeaderComponent from '@/components//Header';
 import FooterComponent from '@/components/Footer';
@@ -29,15 +29,27 @@ import { resources } from '@/i18n/translations';
 const LanguageLayout = () => {
 	const { lang } = useParams();
 	const { i18n } = useTranslation();
+	const { pathname } = useLocation();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const languages = Object.keys(resources);
 
-		if (lang && languages.includes(lang)) {
-			i18n.changeLanguage(lang);
+		// Continue as default language
+		if (!lang) {
 			return;
 		}
-	}, [lang, i18n]);
+
+		// If the language is identified, continue as default but remove the param
+		if (!languages.includes(lang)) {
+			const cleanedUrl = pathname.replace(`${lang}/`, '');
+
+			navigate(cleanedUrl);
+			return;
+		}
+
+		i18n.changeLanguage(lang);
+	}, [lang, i18n, navigate, pathname]);
 
 	return (
 		<Layout style={{ minHeight: '100%' }}>
