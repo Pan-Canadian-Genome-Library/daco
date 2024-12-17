@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { editApplication, getApplicationById } from '@/api/application-api.js';
+import { createApplication, editApplication, getApplicationById } from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import service from '@/service/application-service.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -161,6 +161,19 @@ describe('Application API', () => {
 			const error_message = String(result.errors);
 
 			assert.strictEqual(error_message, 'Error: Application record not found');
+		});
+	});
+	describe('Create a new application', () => {
+		it('should successfully be able to create a new application with the provided user_id', async () => {
+			const result = await createApplication({ user_id });
+
+			assert.ok(result.success && result.data);
+
+			const application = result.data;
+
+			assert.strictEqual(application.user_id, user_id);
+
+			assert.ok(application.contents);
 		});
 	});
 });
