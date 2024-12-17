@@ -40,7 +40,7 @@ const LanguageLayout = () => {
 			return;
 		}
 
-		// If the language is identified, continue as default but remove the param
+		// If the language is not identified, continue as default but remove the param
 		if (!languages.includes(lang)) {
 			const cleanedUrl = pathname.replace(`${lang}/`, '');
 
