@@ -34,6 +34,18 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  version:
+                    type: string
+                  health:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        statusText:
+                          type: string
 
   /applications:
     get:
@@ -87,7 +99,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Application'
+                  $ref: '#/components/schemas/Applications'
   /applications/{applicationId}:
     get:
       tags:
@@ -118,7 +130,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Application'
+                $ref: '#/components/schemas/Applications'
 
   /applications/create:
     post:
@@ -138,20 +150,20 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error creating application - No User ID specified.'
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/ClientErrors'
         '201':
           description: 'Application created'
           content:
             application/json:
               schema:
                 type: object
-                $ref: '#/components/schemas/Application'
+                $ref: '#/components/schemas/Applications'
 
   /applications/edit:
     post:
@@ -187,7 +199,7 @@ paths:
 
 components:
   schemas:
-    Application:
+    Applications:
       type: object
       properties:
         id:
