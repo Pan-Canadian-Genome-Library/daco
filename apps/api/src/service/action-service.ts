@@ -29,6 +29,7 @@ import {
 import { ApplicationData } from './types.js';
 
 const actionService = (db: PostgresDb) => {
+	// Actions are only additive, a new action is created on transition from one state to the next
 	const addActionRecord = async (
 		application: ApplicationData,
 		action: ActionValues,
