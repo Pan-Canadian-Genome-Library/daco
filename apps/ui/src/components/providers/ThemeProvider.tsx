@@ -109,6 +109,16 @@ export const pcglFooterTheme: ThemeConfig = {
 	},
 };
 
+export const pcglSkeltonTheme: ThemeConfig = {
+	token: {
+		fontFamily:
+			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+
+		colorPrimary: pcglColors.tertiary,
+		colorFillSecondary: '#f5f5f5',
+	},
+};
+
 const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
 	return <ConfigProvider theme={pcglTheme}>{children}</ConfigProvider>;
 };
