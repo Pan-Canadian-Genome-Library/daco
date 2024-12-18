@@ -26,7 +26,7 @@ import { useMinWidth } from '@/global/hooks/useMinWidth';
 const { Text, Title } = Typography;
 const { useToken } = theme;
 
-const AppViewerStatusBar = () => {
+const AppViewerHeader = () => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -81,4 +81,4 @@ const AppViewerStatusBar = () => {
 	);
 };
 
-export default AppViewerStatusBar;
+export default AppViewerHeader;

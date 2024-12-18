@@ -1,4 +1,4 @@
-import AppViewerStatusBar from '@/components/pages/application/AppViewerStatusBar';
+import AppViewerHeader from '@/components/pages/application/AppViewerHeader';
 import { Flex, Layout } from 'antd';
 
 const { Content } = Layout;
@@ -7,7 +7,7 @@ const ApplicationViewer = () => {
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<AppViewerStatusBar />
+				<AppViewerHeader />
 			</Flex>
 		</Content>
 	);
