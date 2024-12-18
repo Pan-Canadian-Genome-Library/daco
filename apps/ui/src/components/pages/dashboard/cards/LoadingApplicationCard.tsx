@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pcglSkeltonTheme } from '@/components/providers/ThemeProvider';
+import { pcglSkeletonTheme } from '@/components/providers/ThemeProvider';
 import { Card, ConfigProvider, Flex, Skeleton, theme } from 'antd';
 
 const { useToken } = theme;
@@ -26,7 +26,7 @@ const LoadingApplicationCard = () => {
 	const { token } = useToken();
 
 	return (
-		<ConfigProvider theme={pcglSkeltonTheme}>
+		<ConfigProvider theme={pcglSkeletonTheme}>
 			<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }}>
 				<Flex justify="center" align="center" vertical gap="middle">
 					<Skeleton title active />

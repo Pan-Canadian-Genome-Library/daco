@@ -109,7 +109,7 @@ export const pcglFooterTheme: ThemeConfig = {
 	},
 };
 
-export const pcglSkeltonTheme: ThemeConfig = {
+export const pcglSkeletonTheme: ThemeConfig = {
 	token: {
 		fontFamily:
 			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
