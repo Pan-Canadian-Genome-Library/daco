@@ -21,10 +21,7 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Card, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import {
-	getApplicationStateProperties,
-	getFriendlyStateName,
-} from '@/components/pages/dashboard/getApplicationStateProps';
+import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application } from '@/global/types';
 
@@ -52,12 +49,14 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 			},
 		});
 
-		const expiresDate = translate('date.intlDateTime', {
-			val: new Date(expiresAt),
-			formatParams: {
-				val: { year: 'numeric', month: 'long', day: 'numeric' },
-			},
-		});
+		const expiresDate = expiresAt
+			? translate('date.intlDateTime', {
+					val: new Date(expiresAt),
+					formatParams: {
+						val: { year: 'numeric', month: 'long', day: 'numeric' },
+					},
+				})
+			: translate('generic.notApplicable');
 
 		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
 	};
@@ -77,7 +76,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 							align="left"
 							justify="center"
 						>
-							<Text strong>{getFriendlyStateName(state)}</Text>
+							<Text strong>{translate(`application.states.${state}`)}</Text>
 						</Flex>
 						{showActionRequired ? (
 							<Flex align={'center'} gap={'small'}>
