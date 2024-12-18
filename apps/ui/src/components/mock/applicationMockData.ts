@@ -1,32 +1,14 @@
 // TODO: test data, subject to change
 
-export interface ApplicationtType {
-	id: string;
-	userId: string;
-	status: ApplicationStatus;
-	createdAt: Date;
-	approvedAt: Date;
-	expiresAt: Date;
-}
+import { Application, ApplicationState } from '@/global/types';
 
-export enum ApplicationStatus {
-	Draft = 'Draft',
-	RepReview = 'Rep Review',
-	DACReview = 'DAC Review',
-	RepRevision = 'Rep Revision',
-	DACRevision = 'DAC Revision',
-	Approved = 'Approved',
-	Rejected = 'Rejected',
-	Closed = 'Closed',
-	Sign = 'Sign & Submit',
-	Revoked = 'Revoked',
-}
+export const mockUserID = 'testUser@oicr.on.ca';
 
-export const applications: ApplicationtType[] = [
+export const applications: Application[] = [
 	{
 		id: '123',
 		userId: 'user-123',
-		status: ApplicationStatus.Draft,
+		state: ApplicationState.DRAFT,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -34,7 +16,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '436',
 		userId: 'user-151',
-		status: ApplicationStatus.DACRevision,
+		state: ApplicationState.DAC_REVIEW,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -42,7 +24,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '7685',
 		userId: 'user-111',
-		status: ApplicationStatus.Approved,
+		state: ApplicationState.APPROVED,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -50,7 +32,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '143',
 		userId: 'user-231',
-		status: ApplicationStatus.Rejected,
+		state: ApplicationState.REJECTED,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -58,7 +40,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '543453',
 		userId: 'user-554',
-		status: ApplicationStatus.Closed,
+		state: ApplicationState.CLOSED,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
