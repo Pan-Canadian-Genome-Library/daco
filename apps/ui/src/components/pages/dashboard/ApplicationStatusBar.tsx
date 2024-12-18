@@ -38,6 +38,17 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
 
+	const formatDate = (expiresAt: Date) => {
+		const expiresDate = t('date.intlDateTime', {
+			val: new Date(expiresAt),
+			formatParams: {
+				val: { year: 'numeric', month: 'long', day: 'numeric' },
+			},
+		});
+
+		return `${t('label.expires')}: ${expiresDate}`;
+	};
+
 	return (
 		<StatusBarWrapper>
 			<Row style={{ width: '100%' }} gutter={token.sizeXXL} wrap>
@@ -60,20 +71,12 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 							align="center"
 							gap={20}
 						>
-							{!expiresAt ? (
+							{expiresAt ? (
 								<>
 									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
 									<Flex vertical>
 										<Text strong>{t('dashboard.hasAccess')}</Text>
-										<Text>
-											{t('label.expires')}:
-											{t('date.intlDateTime', {
-												val: new Date(),
-												formatParams: {
-													val: { year: 'numeric', month: 'long', day: 'numeric' },
-												},
-											})}
-										</Text>
+										<Text>{formatDate(expiresAt)}</Text>
 									</Flex>
 								</>
 							) : (
