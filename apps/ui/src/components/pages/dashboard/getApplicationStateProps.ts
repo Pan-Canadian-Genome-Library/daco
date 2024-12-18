@@ -18,7 +18,7 @@
  */
 
 import { pcglColors } from '@/components/providers/ThemeProvider';
-import { ApplicationState } from '@/global/types';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 type ApplicationCardProps = {
 	showEdit: boolean;
@@ -26,77 +26,77 @@ type ApplicationCardProps = {
 	color: string;
 };
 
-export const getFriendlyStateName = (applicationState: ApplicationState): string => {
+export const getFriendlyStateName = (applicationState: ApplicationStateValues): string => {
 	switch (applicationState) {
-		case ApplicationState.DRAFT:
+		case ApplicationStates.DRAFT:
 			return 'Draft';
-		case ApplicationState.INSTITUTIONAL_REP_REVIEW:
+		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
 			return 'Rep Review';
-		case ApplicationState.DAC_REVIEW:
+		case ApplicationStates.DAC_REVIEW:
 			return 'DAC Review';
-		case ApplicationState.REP_REVISION:
+		case ApplicationStates.REP_REVISION:
 			return 'Rep Revisions';
-		case ApplicationState.DAC_REVISIONS_REQUESTED:
+		case ApplicationStates.DAC_REVISIONS_REQUESTED:
 			return 'DAC Revisions';
-		case ApplicationState.REJECTED:
+		case ApplicationStates.REJECTED:
 			return 'Rejected';
-		case ApplicationState.REVOKED:
+		case ApplicationStates.REVOKED:
 			return 'Revoked';
-		case ApplicationState.APPROVED:
+		case ApplicationStates.APPROVED:
 			return 'Approved';
-		case ApplicationState.CLOSED:
+		case ApplicationStates.CLOSED:
 			return 'Closed';
 		default:
 			return 'Unknown';
 	}
 };
-export const getApplicationStateProperties = (applicationState: ApplicationState): ApplicationCardProps => {
+export const getApplicationStateProperties = (applicationState: ApplicationStateValues): ApplicationCardProps => {
 	let showEdit = false;
 	let showActionRequired = false;
 	let color = pcglColors.white;
 
 	switch (applicationState) {
-		case ApplicationState.DRAFT:
+		case ApplicationStates.DRAFT:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = false;
 			break;
-		case ApplicationState.INSTITUTIONAL_REP_REVIEW:
+		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = false;
 			break;
-		case ApplicationState.DAC_REVIEW:
+		case ApplicationStates.DAC_REVIEW:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = false;
 			break;
-		case ApplicationState.REP_REVISION:
-			showEdit = true;
-			color = pcglColors.warningPrimary;
-			showActionRequired = true;
-			break;
-		case ApplicationState.DAC_REVISIONS_REQUESTED:
+		case ApplicationStates.REP_REVISION:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = true;
 			break;
-		case ApplicationState.REJECTED:
+		case ApplicationStates.DAC_REVISIONS_REQUESTED:
+			showEdit = true;
+			color = pcglColors.warningPrimary;
+			showActionRequired = true;
+			break;
+		case ApplicationStates.REJECTED:
 			showEdit = false;
 			color = pcglColors.errorSecondary;
 			showActionRequired = false;
 			break;
-		case ApplicationState.REVOKED:
+		case ApplicationStates.REVOKED:
 			showEdit = false;
 			color = pcglColors.errorSecondary;
 			showActionRequired = false;
 			break;
-		case ApplicationState.APPROVED:
+		case ApplicationStates.APPROVED:
 			showEdit = false;
 			color = pcglColors.successSecondary;
 			showActionRequired = false;
 			break;
-		case ApplicationState.CLOSED:
+		case ApplicationStates.CLOSED:
 			showEdit = false;
 			color = pcglColors.grey;
 			showActionRequired = false;
