@@ -18,11 +18,11 @@
  */
 
 import { ApplicationsColumnName, OrderBy } from '@/service/types.js';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
 export type ApplicationListRequest = {
 	userId: string;
-	state?: ApplicationStates;
+	state?: ApplicationStateValues;
 	sort?: Array<OrderBy<ApplicationsColumnName>>;
 	page?: number;
 	pageSize?: number;

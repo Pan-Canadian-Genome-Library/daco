@@ -61,7 +61,7 @@ type ApplicationTransitions = ITransition<
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
 	private _application: ApplicationData;
-	private readonly _initState: ApplicationStateValues;
+	public readonly initState: ApplicationStateValues;
 
 	// Handler Methods
 	// Submit
@@ -261,8 +261,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		const { id, state } = application;
 		super(state);
 		this._id = id;
-		this._initState = state;
 		this._application = application;
+		this.initState = state;
 
 		this.addTransitions(this.applicationTransitions);
 	}
