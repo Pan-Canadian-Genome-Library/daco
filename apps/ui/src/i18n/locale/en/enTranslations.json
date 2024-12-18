@@ -51,7 +51,9 @@
 	},
 	"label": {
 		"created": "Created",
-		"expires": "Expires"
+		"expires": "Expires",
+		"updated": "Updated",
+		"updatedExtended": "Last Updated"
 	},
 	"date": {
 		"intlDateTime": "{{val, datetime}}"

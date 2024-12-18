@@ -21,6 +21,7 @@ import { Route, Routes } from 'react-router';
 import PageLayout from '@/components/layouts/PageLayout';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
+import ApplicationViewer from './application';
 
 function App() {
 	return (
@@ -28,6 +29,7 @@ function App() {
 			<Route element={<PageLayout />}>
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
+				<Route path="application/:id" element={<ApplicationViewer />} />
 			</Route>
 		</Routes>
 	);
