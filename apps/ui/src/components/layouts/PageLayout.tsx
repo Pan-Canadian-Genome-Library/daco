@@ -18,39 +18,12 @@
  */
 
 import { Layout } from 'antd';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
+import { Outlet } from 'react-router';
 
 import HeaderComponent from '@/components//Header';
 import FooterComponent from '@/components/Footer';
-import { resources } from '@/i18n/translations';
 
-const LanguageLayout = () => {
-	const { lang } = useParams();
-	const { i18n } = useTranslation();
-	const { pathname } = useLocation();
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		const languages = Object.keys(resources);
-
-		// Continue as default language
-		if (!lang) {
-			return;
-		}
-
-		// If the language is not identified, continue as default but remove the param
-		if (!languages.includes(lang)) {
-			const cleanedUrl = pathname.replace(`${lang}/`, '');
-
-			navigate(cleanedUrl);
-			return;
-		}
-
-		i18n.changeLanguage(lang);
-	}, [lang, i18n, navigate, pathname]);
-
+const PageLayout = () => {
 	return (
 		<Layout style={{ minHeight: '100%' }}>
 			<HeaderComponent />
@@ -60,4 +33,4 @@ const LanguageLayout = () => {
 	);
 };
 
-export default LanguageLayout;
+export default PageLayout;

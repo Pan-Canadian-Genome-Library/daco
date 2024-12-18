@@ -18,14 +18,14 @@
  */
 import { Route, Routes } from 'react-router';
 
-import LanguageLayout from '@/components/layouts/LanguageLayout';
+import PageLayout from '@/components/layouts/PageLayout';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 
 function App() {
 	return (
 		<Routes>
-			<Route path=":lang?" element={<LanguageLayout />}>
+			<Route element={<PageLayout />}>
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
 			</Route>
