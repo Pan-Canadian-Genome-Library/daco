@@ -26,30 +26,6 @@ type ApplicationCardProps = {
 	color: string;
 };
 
-export const getFriendlyStateName = (applicationState: ApplicationStateValues): string => {
-	switch (applicationState) {
-		case ApplicationStates.DRAFT:
-			return 'Draft';
-		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-			return 'Rep Review';
-		case ApplicationStates.DAC_REVIEW:
-			return 'DAC Review';
-		case ApplicationStates.REP_REVISION:
-			return 'Rep Revisions';
-		case ApplicationStates.DAC_REVISIONS_REQUESTED:
-			return 'DAC Revisions';
-		case ApplicationStates.REJECTED:
-			return 'Rejected';
-		case ApplicationStates.REVOKED:
-			return 'Revoked';
-		case ApplicationStates.APPROVED:
-			return 'Approved';
-		case ApplicationStates.CLOSED:
-			return 'Closed';
-		default:
-			return 'Unknown';
-	}
-};
 export const getApplicationStateProperties = (applicationState: ApplicationStateValues): ApplicationCardProps => {
 	let showEdit = false;
 	let showActionRequired = false;
