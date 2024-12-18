@@ -41,7 +41,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
-	const formateDate = (createdAt: Date, expiresAt: Date) => {
+	const formatDate = (createdAt: Date, expiresAt: Date) => {
 		const createdDate = t('date.intlDateTime', {
 			val: new Date(createdAt),
 			formatParams: {
@@ -90,7 +90,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 				<Title style={{ margin: 0 }} level={3}>
 					Application: PCGL-{id}
 				</Title>
-				<Text>{formateDate(createdAt, expiresAt)}</Text>
+				<Text>{formatDate(createdAt, expiresAt)}</Text>
 			</Flex>
 		</Card>
 	);
