@@ -25,6 +25,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { actions } from '@/db/schemas/actions.js';
+import { applications } from '@/db/schemas/applications.js';
 import service from '@/service/action-service.js';
 import appService from '@/service/application-service.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -62,8 +63,8 @@ describe('Action Service', () => {
 		applicationService = appService(db);
 	});
 
-	describe('Create Actions', () => {
-		it('should create actions', async () => {
+	describe('All Actions', () => {
+		it('should perform CREATE actions with before state DRAFT and after state DRAFT', async () => {
 			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
@@ -80,10 +81,173 @@ describe('Action Service', () => {
 			assert.strictEqual(actionResult.state_before, ApplicationStates.DRAFT);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.DRAFT);
 		});
+
+		it('should perform WITHDRAW actions with after state DRAFT', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.withdrawAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.WITHDRAW);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.DRAFT);
+		});
+
+		it('should perform CLOSE actions with after state CLOSED', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.closeAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.CLOSE);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.CLOSED);
+		});
+
+		it('should perform REQUEST_INSTITUTIONAL_REP actions with after state REP_REVISION', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.requestRepAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.REQUEST_INSTITUTIONAL_REP);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.REP_REVISION);
+		});
+
+		it('should perform INSTITUTIONAL_REP_APPROVED actions with after state DAC_REVIEW', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.repApprovedAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_APPROVED);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.DAC_REVIEW);
+		});
+
+		it('should perform INSTITUTIONAL_REP_REJECTED actions with after state REJECTED', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.repRejectedAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REJECTED);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.DRAFT);
+		});
+
+		it('should perform DAC_REVIEW_APPROVED actions with after state APPROVED', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.dacApprovedAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.DAC_REVIEW_APPROVED);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.APPROVED);
+		});
+
+		it('should perform DAC_REVIEW_REJECTED actions with after state REJECTED', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.dacRejectedAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.DAC_REVIEW_REJECTED);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.REJECTED);
+		});
+
+		it('should perform DAC_REVIEW_REVISIONS actions with after state DAC_REVISIONS_REQUESTED', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.dacRevisionAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.DAC_REVIEW_REVISIONS);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.DAC_REVIEW);
+		});
+
+		it('should perform REVOKE actions with after state REVOKED', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.revokeAction(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.REVOKE);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.REVOKED);
+		});
 	});
 
 	after(async () => {
 		await db.delete(actions).where(eq(actions.user_id, user_id));
+		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});
