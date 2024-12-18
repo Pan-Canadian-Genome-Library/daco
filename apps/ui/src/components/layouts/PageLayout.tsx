@@ -17,20 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createBrowserRouter } from 'react-router';
+import { Layout } from 'antd';
+import { Outlet } from 'react-router';
 
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
+import HeaderComponent from '@/components//Header';
+import FooterComponent from '@/components/Footer';
 
-const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <HomePage />,
-	},
-	{
-		path: '/dashboard',
-		element: <DashboardPage />,
-	},
-]);
+const PageLayout = () => {
+	return (
+		<Layout style={{ minHeight: '100%' }}>
+			<HeaderComponent />
+			<Outlet />
+			<FooterComponent />
+		</Layout>
+	);
+};
 
-export default router;
+export default PageLayout;
