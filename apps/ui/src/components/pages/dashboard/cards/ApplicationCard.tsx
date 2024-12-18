@@ -20,7 +20,10 @@
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Card, Flex, theme, Typography } from 'antd';
 
-import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
+import {
+	getApplicationStateProperties,
+	getFriendlyStateName,
+} from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application } from '@/global/types';
 import { formatDate } from '@/global/utils';
@@ -55,7 +58,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 							align="left"
 							justify="center"
 						>
-							<Text strong>{state}</Text>
+							<Text strong>{getFriendlyStateName(state)}</Text>
 						</Flex>
 						{showActionRequired ? (
 							<Flex align={'center'} gap={'small'}>
