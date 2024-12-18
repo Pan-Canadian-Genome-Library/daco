@@ -72,57 +72,57 @@ const actionService = (db: PostgresDb) => {
 			return result;
 		},
 		closeAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
+			const action = ApplicationActions.CLOSE;
+			const state_after = ApplicationStates.CLOSED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
 		requestRepAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
+			const action = ApplicationActions.REQUEST_INSTITUTIONAL_REP;
+			const state_after = ApplicationStates.REP_REVISION;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
 		repApprovedAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
+			const action = ApplicationActions.INSTITUTIONAL_REP_APPROVED;
+			const state_after = ApplicationStates.DAC_REVIEW;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
 		repRejectedAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
+			const action = ApplicationActions.INSTITUTIONAL_REP_REJECTED;
 			const state_after = ApplicationStates.DRAFT;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
 		dacApprovedAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
+			const action = ApplicationActions.DAC_REVIEW_APPROVED;
+			const state_after = ApplicationStates.APPROVED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
 		dacRejectedAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
+			const action = ApplicationActions.DAC_REVIEW_REJECTED;
+			const state_after = ApplicationStates.REJECTED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
 		dacRevisionAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
+			const action = ApplicationActions.DAC_REVIEW_REVISIONS;
+			const state_after = ApplicationStates.DAC_REVIEW;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
 		revokeAction: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
+			const action = ApplicationActions.REVOKE;
+			const state_after = ApplicationStates.REVOKED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
