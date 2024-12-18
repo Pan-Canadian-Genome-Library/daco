@@ -26,6 +26,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { actions } from '@/db/schemas/actions.js';
 import service from '@/service/action-service.js';
+import appService from '@/service/application-service.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -41,6 +42,7 @@ import {
 describe('Action Service', () => {
 	let db: PostgresDb;
 	let actionService: ReturnType<typeof service>;
+	let applicationService: ReturnType<typeof appService>;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -57,11 +59,16 @@ describe('Action Service', () => {
 		await addInitialApplications(db);
 
 		actionService = service(db);
+		applicationService = appService(db);
 	});
 
 	describe('Create Actions', () => {
 		it('should create actions', async () => {
-			const result = await actionService.createAction({ user_id, application_id });
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.createAction(testApplication);
 
 			assert.ok(result.success && result.data);
 
