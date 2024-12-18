@@ -20,9 +20,9 @@
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Button, Card, Flex, theme, Typography } from 'antd';
 
-import { ApplicationtType } from '@/components/mock/applicationMockData';
-import { getApplicationStatusProperties } from '@/components/pages/dashboard/getApplicationStateProps';
+import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { Application } from '@/global/types';
 import { formatDate } from '@/global/utils';
 
 const { Title, Text } = Typography;
@@ -30,12 +30,12 @@ const { useToken } = theme;
 
 type ApplicationCardProps = {
 	openEdit: (id: string) => void;
-	application: ApplicationtType;
+	application: Application;
 };
 
 const ApplicationCard = (props: ApplicationCardProps) => {
-	const { id, status, createdAt, expiresAt } = props.application;
-	const { showEdit, color, showActionRequired } = getApplicationStatusProperties(status);
+	const { id, state, createdAt, expiresAt } = props.application;
+	const { showEdit, color, showActionRequired } = getApplicationStateProperties(state);
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLGMax;
@@ -55,7 +55,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 							align="left"
 							justify="center"
 						>
-							<Text strong>{status}</Text>
+							<Text strong>{state}</Text>
 						</Flex>
 						{showActionRequired ? (
 							<Flex align={'center'} gap={'small'}>
@@ -72,7 +72,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 					Application: PCGL-{id}
 				</Title>
 				<Text>
-					Created: {formatDate(createdAt)} | Expires: {formatDate(expiresAt)}
+					Created: {formatDate(new Date(createdAt))} | Expires: {expiresAt ? formatDate(new Date(expiresAt)) : 'N/A'}
 				</Text>
 			</Flex>
 		</Card>

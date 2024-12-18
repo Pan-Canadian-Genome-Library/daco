@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStatus } from '@/components/mock/applicationMockData';
 import { pcglColors } from '@/components/providers/ThemeProvider';
+import { ApplicationState } from '@/global/types';
 
 type ApplicationCardProps = {
 	showEdit: boolean;
@@ -26,53 +26,53 @@ type ApplicationCardProps = {
 	color: string;
 };
 
-export const getApplicationStatusProperties = (applicationStatus: ApplicationStatus): ApplicationCardProps => {
+export const getApplicationStateProperties = (applicationState: ApplicationState): ApplicationCardProps => {
 	let showEdit = false;
 	let showActionRequired = false;
 	let color = pcglColors.white;
 
-	switch (applicationStatus) {
-		case ApplicationStatus.Draft:
+	switch (applicationState) {
+		case ApplicationState.DRAFT:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = false;
 			break;
-		case ApplicationStatus.RepReview:
+		case ApplicationState.INSTITUTIONAL_REP_REVIEW:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = false;
 			break;
-		case ApplicationStatus.DACReview:
+		case ApplicationState.DAC_REVIEW:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = false;
 			break;
-		case ApplicationStatus.RepRevision:
-			showEdit = true;
-			color = pcglColors.warningPrimary;
-			showActionRequired = true;
-			break;
-		case ApplicationStatus.DACRevision:
+		case ApplicationState.REP_REVISION:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = true;
 			break;
-		case ApplicationStatus.Rejected:
+		case ApplicationState.DAC_REVISIONS_REQUESTED:
+			showEdit = true;
+			color = pcglColors.warningPrimary;
+			showActionRequired = true;
+			break;
+		case ApplicationState.REJECTED:
 			showEdit = false;
 			color = pcglColors.errorSecondary;
 			showActionRequired = false;
 			break;
-		case ApplicationStatus.Revoked:
+		case ApplicationState.REVOKED:
 			showEdit = false;
 			color = pcglColors.errorSecondary;
 			showActionRequired = false;
 			break;
-		case ApplicationStatus.Approved:
+		case ApplicationState.APPROVED:
 			showEdit = false;
 			color = pcglColors.successSecondary;
 			showActionRequired = false;
 			break;
-		case ApplicationStatus.Closed:
+		case ApplicationState.CLOSED:
 			showEdit = false;
 			color = pcglColors.grey;
 			showActionRequired = false;

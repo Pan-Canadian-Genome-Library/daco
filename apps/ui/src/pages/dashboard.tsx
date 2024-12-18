@@ -17,22 +17,31 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Alert, Col, Flex, Layout, Modal, Row, Typography } from 'antd';
-import { useState } from 'react';
+import { Alert, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
+import { useEffect, useState } from 'react';
 
-import ContentWrapper from '@/components/layouts/ContentWrapper';
-import { applications } from '@/components/mock/applicationMockData';
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { mockUserID } from '@/components/mock/applicationMockData';
 import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatusBar';
 import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
+import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
+import { fetch } from '@/global/FetchClient';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { Application, ServerError } from '@/global/types';
 
 const { Content } = Layout;
 const { Text } = Typography;
 
 const DashboardPage = () => {
+	const { useToken } = theme;
 	const [openModal, setOpenModal] = useState(false);
 	const [modalAppId, setModalAppId] = useState('');
+
+	const [applicationData, setApplicationData] = useState<Array<Application> | undefined>(undefined);
+	const [error, setError] = useState<ServerError | undefined>(undefined);
+
+	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
 
@@ -46,8 +55,46 @@ const DashboardPage = () => {
 		setOpenModal(false);
 	};
 
+	useEffect(() => {
+		async function getApplicationData() {
+			const result = await fetch(`/applications?userId=${mockUserID}`);
+			if (result.ok) {
+				return await result.json();
+			} else {
+				const serverError: ServerError = await result.json();
+
+				setError({
+					message: serverError.message,
+					errors: serverError.errors ?? result.statusText,
+				});
+
+				return [];
+			}
+		}
+		const data = getApplicationData();
+
+		data
+			.then((data: Application[]) => setApplicationData(data))
+			.catch((error: TypeError) => {
+				setError({
+					message: 'Unable to talk to API',
+					errors: `Failed to get applications, please check your internet connection. - ${error.message}`,
+				});
+				setApplicationData([]);
+			});
+	}, []);
+
 	return (
 		<>
+			{error ? (
+				// TODO: Temporary, until we get guidance on how to display error states.
+				<Alert
+					message={error.errors ? error.message : 'An Error Occurred.'}
+					description={error.errors ?? error.message}
+					showIcon
+					type="error"
+				/>
+			) : null}
 			{showDeviceRestriction ? (
 				<Alert
 					message="This website may not be supported by your device."
@@ -60,28 +107,53 @@ const DashboardPage = () => {
 			<Content>
 				<Flex style={{ height: '100%' }} vertical>
 					<ApplicationStatusBar />
-					<ContentWrapper style={{ padding: 40 }}>
-						<Row gutter={[48, 48]} align={'middle'} justify={'center'}>
-							{applications.length > 0 ? (
+					<div
+						style={{
+							...contentWrapperStyles,
+							width: showDeviceRestriction ? '100%' : '90%',
+							padding: showDeviceRestriction ? token.paddingSM : token.paddingXL,
+						}}
+					>
+						<Row
+							gutter={[
+								showDeviceRestriction ? token.size : token.sizeXL,
+								showDeviceRestriction ? token.size : token.sizeXL,
+							]}
+							align={'middle'}
+							justify={'center'}
+							wrap
+						>
+							{applicationData === undefined ? (
 								<>
-									<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+									<Col span={showDeviceRestriction ? 24 : 12}>
 										<NewApplicationCard />
 									</Col>
-									{applications.map((applicationItem) => {
+									<Col span={showDeviceRestriction ? 24 : 12}>
+										<LoadingApplicationCard />
+									</Col>
+									<Col span={showDeviceRestriction ? 24 : 12}>
+										<LoadingApplicationCard />
+									</Col>
+									<Col span={showDeviceRestriction ? 24 : 12}>
+										<LoadingApplicationCard />
+									</Col>
+								</>
+							) : (
+								<>
+									<Col xs={24} md={24} lg={12}>
+										<NewApplicationCard />
+									</Col>
+									{applicationData.map((applicationItem) => {
 										return (
-											<Col key={applicationItem.id} xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+											<Col key={applicationItem.id} xs={24} md={24} lg={12}>
 												<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />
 											</Col>
 										);
 									})}
 								</>
-							) : (
-								<Col span={12}>
-									<NewApplicationCard />
-								</Col>
 							)}
 						</Row>
-					</ContentWrapper>
+					</div>
 				</Flex>
 				<Modal
 					title={`Are you sure you want to edit Applications: PCGL-${modalAppId}?`}
