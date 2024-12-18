@@ -17,35 +17,117 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { type PostgresDb } from '../db/index.js';
-import { actions } from '../db/schemas/actions.js';
-import { failure, success } from '../utils/results.js';
+import { type PostgresDb } from '@/db/index.js';
+import { actions } from '@/db/schemas/actions.js';
+import { failure, success } from '@/utils/results.js';
+import {
+	ActionValues,
+	ApplicationActions,
+	ApplicationStates,
+	ApplicationStateValues,
+} from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationData } from './types.js';
 
-const actionService = (db: PostgresDb) => ({
-	createAction: async ({ application_id, user_id }: { application_id: number; user_id: string }) => {
-		const action = ApplicationActions.CREATE;
+const actionService = (db: PostgresDb) => {
+	const addActionRecord = async (
+		application: ApplicationData,
+		action: ActionValues,
+		state_after: ApplicationStateValues,
+	) => {
+		const { id: application_id, user_id, state: state_before } = application;
 		const newAction: typeof actions.$inferInsert = {
 			application_id,
 			user_id,
 			action,
-			state_before: ApplicationStates.DRAFT,
-			state_after: ApplicationStates.DRAFT,
+			state_before,
+			state_after,
 		};
 
 		try {
-			// Create Action
 			const newActionRecord = await db.insert(actions).values(newAction).returning();
 			if (!newActionRecord[0]) throw new Error('Application record is undefined');
 
 			return success(newActionRecord[0]);
 		} catch (err) {
-			const message = `Error at createAction with user_id: ${user_id}`;
+			const message = `Error creating action with user_id: ${user_id} & application_id: ${application_id}`;
 			console.error(message);
 			console.error(err);
 			return failure(message, err);
 		}
-	},
-});
+	};
+
+	return {
+		createAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.CREATE;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		withdrawAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		closeAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		requestRepAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		repApprovedAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		repRejectedAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		dacApprovedAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		dacRejectedAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		dacRevisionAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		revokeAction: async (application: ApplicationData) => {
+			const action = ApplicationActions.WITHDRAW;
+			const state_after = ApplicationStates.DRAFT;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+	};
+};
 
 export default actionService;
