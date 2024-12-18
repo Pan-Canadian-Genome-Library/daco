@@ -52,7 +52,7 @@ const linkStyle: React.CSSProperties = {
 };
 
 const HeaderComponent = () => {
-	const { t } = useTranslation();
+	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 
@@ -81,27 +81,27 @@ const HeaderComponent = () => {
 
 	const menuItems: (MenuLink | MenuButton)[] = [
 		{
-			name: t('links.policies'),
+			name: translate('links.policies'),
 			href: '#',
 			position: 'left',
 		},
 		{
-			name: t('links.helpGuides'),
+			name: translate('links.helpGuides'),
 			href: '#',
 			position: 'left',
 		},
 		{
-			name: t('links.controlledDataUsers'),
+			name: translate('links.controlledDataUsers'),
 			href: '#',
 			position: 'left',
 		},
 		{
-			name: t('links.apply'),
+			name: translate('links.apply'),
 			href: '#',
 			position: 'right',
 		},
 		{
-			name: t('button.login'),
+			name: translate('button.login'),
 			onClickAction: onLoginClick,
 			buttonProps: { color: 'primary', variant: 'solid' },
 			position: 'right',

@@ -32,7 +32,7 @@ const { Content } = Layout;
 const { Text } = Typography;
 
 const DashboardPage = () => {
-	const { t } = useTranslation();
+	const { t: translate } = useTranslation();
 	const [openModal, setOpenModal] = useState(false);
 	const [modalAppId, setModalAppId] = useState('');
 	const minWidth = useMinWidth();
@@ -52,8 +52,8 @@ const DashboardPage = () => {
 		<>
 			{showDeviceRestriction ? (
 				<Alert
-					message={t('alert.sizeWarning')}
-					description={t('alert.sizeDescription')}
+					message={translate('alert.sizeWarning')}
+					description={translate('alert.sizeDescription')}
 					type="error"
 					style={{ width: '100%' }}
 					showIcon
@@ -86,9 +86,9 @@ const DashboardPage = () => {
 					</ContentWrapper>
 				</Flex>
 				<Modal
-					title={t('modal.editTitle', { id: modalAppId })}
-					okText={t('button.editApplication')}
-					cancelText={t('button.cancel')}
+					title={translate('modal.editTitle', { id: modalAppId })}
+					okText={translate('button.editApplication')}
+					cancelText={translate('button.cancel')}
 					width={'100%'}
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 					open={openModal}
@@ -96,7 +96,7 @@ const DashboardPage = () => {
 					onCancel={() => setOpenModal(false)}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{t('modal.editDescription')}</Text>
+						<Text>{translate('modal.editDescription')}</Text>
 					</Flex>
 				</Modal>
 			</Content>

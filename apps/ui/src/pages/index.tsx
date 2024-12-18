@@ -39,7 +39,7 @@ const heroStyle: React.CSSProperties = {
 };
 
 const HomePage = () => {
-	const { t } = useTranslation();
+	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const [openModal, setOpenModal] = useState(false);
@@ -61,11 +61,11 @@ const HomePage = () => {
 						style={{ padding: !isResponsiveMode ? `0 ${token.padding}px` : `0 ${token.paddingXXS}px` }}
 					>
 						<Flex vertical>
-							<Title style={{ color: token.colorTextSecondary }}> {t('homepage.title')}</Title>
-							<Paragraph style={{ color: token.colorTextSecondary }}>{t('homepage.introduction')}</Paragraph>
+							<Title style={{ color: token.colorTextSecondary }}> {translate('homepage.title')}</Title>
+							<Paragraph style={{ color: token.colorTextSecondary }}>{translate('homepage.introduction')}</Paragraph>
 							<Col span={6}>
 								<Button type="link" color="primary" variant="solid" onClick={() => setOpenModal(true)}>
-									{t('button.getStarted')}
+									{translate('button.getStarted')}
 								</Button>
 							</Col>
 						</Flex>
@@ -75,8 +75,8 @@ const HomePage = () => {
 			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} align={'top'} gutter={token.paddingXL}>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'middle'}>
-						<Title level={2}>{t('homepage.overviewTitle')}</Title>
-						<Paragraph>{t('homepage.authorizationText')}</Paragraph>
+						<Title level={2}>{translate('homepage.overviewTitle')}</Title>
+						<Paragraph>{translate('homepage.authorizationText')}</Paragraph>
 						<Paragraph>
 							<Trans
 								i18nKey={'homepage.dataAccessInfo'}
@@ -89,7 +89,7 @@ const HomePage = () => {
 				</Col>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'large'}>
-						<Title level={2}>{t('homepage.processTitle')}</Title>
+						<Title level={2}>{translate('homepage.processTitle')}</Title>
 						<Flex align="center" gap={'middle'}>
 							<Flex justify="center" align="center">
 								<Avatar
@@ -98,7 +98,7 @@ const HomePage = () => {
 									icon={<FileOutlined />}
 								/>
 							</Flex>
-							<Text>{t('homepage.description1')}</Text>
+							<Text>{translate('homepage.description1')}</Text>
 						</Flex>
 						<Flex align="center" gap={'middle'}>
 							<Flex justify="center" align="center">
@@ -108,7 +108,7 @@ const HomePage = () => {
 									icon={<SignatureOutlined />}
 								/>
 							</Flex>
-							<Text>{t('homepage.description2')}</Text>
+							<Text>{translate('homepage.description2')}</Text>
 						</Flex>
 						<Flex align="center" gap={'middle'}>
 							<Flex justify="center" align="center">
@@ -118,7 +118,7 @@ const HomePage = () => {
 									icon={<AuditOutlined />}
 								/>
 							</Flex>
-							<Text>{t('homepage.description3')}</Text>
+							<Text>{translate('homepage.description3')}</Text>
 						</Flex>
 					</Flex>
 				</Col>
@@ -137,7 +137,7 @@ const HomePage = () => {
 				onCancel={() => setOpenModal(false)}
 			>
 				<Flex>
-					<Text>{t('modal.authorization')}</Text>
+					<Text>{translate('modal.authorization')}</Text>
 				</Flex>
 			</Modal>
 		</Content>

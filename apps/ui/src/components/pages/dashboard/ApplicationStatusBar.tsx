@@ -33,20 +33,20 @@ type ApplicationStatusBarProps = {
 };
 
 const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
-	const { t } = useTranslation();
+	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
 
 	const formatDate = (expiresAt: Date) => {
-		const expiresDate = t('date.intlDateTime', {
+		const expiresDate = translate('date.intlDateTime', {
 			val: new Date(expiresAt),
 			formatParams: {
 				val: { year: 'numeric', month: 'long', day: 'numeric' },
 			},
 		});
 
-		return `${t('label.expires')}: ${expiresDate}`;
+		return `${translate('label.expires')}: ${expiresDate}`;
 	};
 
 	return (
@@ -54,8 +54,8 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 			<Row style={{ width: '100%' }} gutter={token.sizeXXL} wrap>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex style={{ height: '100%' }} vertical justify="center" align="start">
-						<Title>{t('dashboard.title')}</Title>
-						<Text>{t('dashboard.description')}</Text>
+						<Title>{translate('dashboard.title')}</Title>
+						<Text>{translate('dashboard.description')}</Text>
 					</Flex>
 				</Col>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -75,14 +75,14 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 								<>
 									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
 									<Flex vertical>
-										<Text strong>{t('dashboard.hasAccess')}</Text>
+										<Text strong>{translate('dashboard.hasAccess')}</Text>
 										<Text>{formatDate(expiresAt)}</Text>
 									</Flex>
 								</>
 							) : (
 								<Flex align="center" gap={10}>
 									<CloseCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
-									<Text strong>{t('dashboard.noAccess')}</Text>
+									<Text strong>{translate('dashboard.noAccess')}</Text>
 								</Flex>
 							)}
 						</Flex>

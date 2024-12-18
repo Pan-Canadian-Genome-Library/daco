@@ -34,7 +34,7 @@ type ApplicationCardProps = {
 };
 
 const ApplicationCard = (props: ApplicationCardProps) => {
-	const { t } = useTranslation();
+	const { t: translate } = useTranslation();
 	const { id, status, createdAt, expiresAt } = props.application;
 	const { showEdit, color, showActionRequired } = getApplicationStatusProperties(status);
 	const { token } = useToken();
@@ -42,21 +42,21 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
 	const formatDate = (createdAt: Date, expiresAt: Date) => {
-		const createdDate = t('date.intlDateTime', {
+		const createdDate = translate('date.intlDateTime', {
 			val: new Date(createdAt),
 			formatParams: {
 				val: { year: 'numeric', month: 'long', day: 'numeric' },
 			},
 		});
 
-		const expiresDate = t('date.intlDateTime', {
+		const expiresDate = translate('date.intlDateTime', {
 			val: new Date(expiresAt),
 			formatParams: {
 				val: { year: 'numeric', month: 'long', day: 'numeric' },
 			},
 		});
 
-		return `${t('label.created')}: ${createdDate} | ${t('label.expires')}: ${expiresDate}`;
+		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
 	};
 
 	return (
@@ -79,12 +79,12 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 						{showActionRequired ? (
 							<Flex align={'center'} gap={'small'}>
 								<ExclamationCircleFilled style={{ color: token.colorPrimary, fontSize: 20 }} />
-								<Text strong>{t('alert.actionRequired')}</Text>
+								<Text strong>{translate('alert.actionRequired')}</Text>
 							</Flex>
 						) : null}
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
-						{showEdit ? <Button onClick={() => props.openEdit(id)}>{t('button.edit')}</Button> : null}
+						{showEdit ? <Button onClick={() => props.openEdit(id)}>{translate('button.edit')}</Button> : null}
 					</Flex>
 				</Flex>
 				<Title style={{ margin: 0 }} level={3}>

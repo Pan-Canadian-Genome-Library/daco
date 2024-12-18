@@ -35,40 +35,40 @@ interface LinkType {
 }
 
 const FooterComponent = () => {
-	const { t } = useTranslation();
+	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 
 	const pcglLinks: LinkType[] = [
 		{
-			name: t('links.contact'),
+			name: translate('links.contact'),
 		},
 		{
-			name: t('links.policies'),
+			name: translate('links.policies'),
 		},
 		{
-			name: t('links.helpGuides'),
+			name: translate('links.helpGuides'),
 		},
 		{
-			name: t('links.controlledDataUsers'),
+			name: translate('links.controlledDataUsers'),
 		},
 		{
-			name: t('links.pcglWebsite'),
+			name: translate('links.pcglWebsite'),
 		},
 		{
-			name: t('links.dataPlatform'),
+			name: translate('links.dataPlatform'),
 		},
 	];
 
 	const policiesConditionsLinks: LinkType[] = [
 		{
-			name: t('links.privacy'),
+			name: translate('links.privacy'),
 		},
 		{
-			name: t('links.termsConditions'),
+			name: translate('links.termsConditions'),
 		},
 		{
-			name: t('links.publicationPolicy'),
+			name: translate('links.publicationPolicy'),
 		},
 	];
 

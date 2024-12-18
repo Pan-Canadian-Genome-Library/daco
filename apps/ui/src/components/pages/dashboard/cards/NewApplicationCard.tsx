@@ -24,15 +24,15 @@ const { Title } = Typography;
 const { useToken } = theme;
 
 const NewApplicationCard = () => {
-	const { t } = useTranslation();
+	const { t: translate } = useTranslation();
 	const { token } = useToken();
 
 	return (
 		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
 			<Flex justify="center" align="center" vertical gap="middle">
-				<Title level={3}>{t('dashboard.startNewApp')}</Title>
+				<Title level={3}>{translate('dashboard.startNewApp')}</Title>
 				<Button color="default" variant="outlined">
-					{t('button.getStarted')}
+					{translate('button.getStarted')}
 				</Button>
 			</Flex>
 		</Card>
