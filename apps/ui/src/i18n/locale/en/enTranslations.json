@@ -47,7 +47,7 @@
 		"login": "Login",
 		"editApplication": "Edit Application",
 		"cancel": "Cancel",
-		"Edit": "Edit"
+		"edit": "Edit"
 	},
 	"label": {
 		"created": "Created",
@@ -55,5 +55,22 @@
 	},
 	"date": {
 		"intlDateTime": "{{val, datetime}}"
+	},
+	"application": {
+		"states": {
+			"DRAFT": "Draft",
+			"INSTITUTIONAL_REP_REVIEW": "Rep Review",
+			"DAC_REVIEW": "DAC Review",
+			"REP_REVISION": "Rep Revisions",
+			"DAC_REVISIONS_REQUESTED": "DAC Revisions",
+			"REJECTED": "Rejected",
+			"REVOKED": "Revoked",
+			"APPROVED": "Approved",
+			"CLOSED": "Closed"
+		}
+	},
+
+	"generic": {
+		"notApplicable": "N/A"
 	}
 }

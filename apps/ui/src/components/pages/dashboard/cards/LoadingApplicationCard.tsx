@@ -17,18 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { pcglSkeletonTheme } from '@/components/providers/ThemeProvider';
+import { Card, ConfigProvider, Flex, Skeleton, theme } from 'antd';
 
-export interface Application {
-	id: string;
-	userId: string;
-	state: ApplicationStateValues;
-	createdAt: Date;
-	approvedAt: Date;
-	expiresAt: Date;
-}
+const { useToken } = theme;
 
-export interface ServerError {
-	message: string;
-	errors?: string;
-}
+const LoadingApplicationCard = () => {
+	const { token } = useToken();
+
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }}>
+				<Flex justify="center" align="center" vertical gap="middle">
+					<Skeleton title active />
+				</Flex>
+			</Card>
+		</ConfigProvider>
+	);
+};
+
+export default LoadingApplicationCard;
