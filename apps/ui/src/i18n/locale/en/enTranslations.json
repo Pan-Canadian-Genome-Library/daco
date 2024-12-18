@@ -1,0 +1,59 @@
+{
+	"homepage": {
+		"title": "Apply for Access to Controlled Data",
+		"introduction": "The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers and commercial teams for access to PCGL Controlled Data.",
+		"overviewTitle": "Overview",
+		"authorizationText": "Authorization for access to Pan-Canadian Genome Library controlled data is study based and is reviewed for compliance with PCGL Policies and Guidelines. The PCGL DACO is the overarching authority to ensure that data from the PCGL will only be used by qualified individuals for public health objectives.",
+		"dataAccessInfo": "Before starting your application, learn more about Data Access and Use Policies and review our <link1>frequently asked questions</link1>.",
+		"processTitle": "The Application Process is Simple",
+		"description1": "Log in and start an application. Carefully complete all required sections and review all policies and agreements.",
+		"description2": "When completed, obtain the required signatures and submit the signed application for review.",
+		"description3": "The PCGL DACO will review the application and approved project teams will be granted access to PCGL Controlled Data."
+	},
+	"dashboard": {
+		"title": "My Applications",
+		"description": "This is where you can manage your Applications for Access to PCGL Controlled Data. Access will be granted starting from the date of approval by the PCGL DACO.",
+		"hasAccess": "You have access to PCGL Controlled Data",
+		"noAccess": "You do not have access to PCGL Controlled Data",
+		"startNewApp": "Start A New Application"
+	},
+	"status": {
+		"404": "Oops, didnt find what you were looking for!"
+	},
+	"modal": {
+		"authorization": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access.",
+		"editTitle": "Are you sure you want to edit Applications: PCGL-{{id}}",
+		"editDescription": "If so, the application will move back into Draft status and you will need to resubmit the application for review."
+	},
+	"alert": {
+		"sizeWarning": "This website may not be supported by your device.",
+		"sizeDescription": "Please visit this website using a device with a wider screen for optimal experience and access to all features.",
+		"actionRequired": "Action Required"
+	},
+	"links": {
+		"policies": "Policies & Guidelines",
+		"helpGuides": "Help Guides",
+		"controlledDataUsers": "Controlled Data Users",
+		"apply": "Apply For Access",
+		"privacy": "Privacy Policy",
+		"termsConditions": "Terms & Conditions",
+		"publicationPolicy": "Publication Policy",
+		"contact": "Contact Us",
+		"pcglWebsite": "PCGL Website",
+		"dataPlatform": "Data Platform"
+	},
+	"button": {
+		"getStarted": "Get Started",
+		"login": "Login",
+		"editApplication": "Edit Application",
+		"cancel": "Cancel",
+		"Edit": "Edit"
+	},
+	"label": {
+		"created": "Created",
+		"expires": "Expires"
+	},
+	"date": {
+		"intlDateTime": "{{val, datetime}}"
+	}
+}

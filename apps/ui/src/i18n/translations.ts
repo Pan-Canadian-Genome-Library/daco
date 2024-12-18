@@ -17,25 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const formatDate = (date: Date): string => {
-	const monthNames = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December',
-	];
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 
-	const day = date.getDate().toString().padStart(2, '0');
-	const month = monthNames[date.getMonth()]?.substring(0, 3);
-	const year = date.getFullYear();
+import enLang from './locale/en/enTranslations.json';
+import frLang from './locale/fr/frTranslations.json';
 
-	return `${month} ${day}, ${year}`;
+// TODO: French language is generated using online tools, replace with correct translations.
+export const resources = {
+	en: {
+		translation: { ...enLang },
+	},
+	fr: {
+		translation: { ...frLang },
+	},
 };
+
+i18n.use(initReactI18next).init({
+	resources,
+	lng: 'en',
+	fallbackLng: 'en',
+	supportedLngs: ['en', 'fr'],
+});
+
+export default i18n;

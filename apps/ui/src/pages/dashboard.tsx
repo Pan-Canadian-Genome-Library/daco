@@ -19,6 +19,7 @@
 
 import { Alert, Col, Flex, Layout, Modal, Row, Typography } from 'antd';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import { applications } from '@/components/mock/applicationMockData';
@@ -31,6 +32,7 @@ const { Content } = Layout;
 const { Text } = Typography;
 
 const DashboardPage = () => {
+	const { t: translate } = useTranslation();
 	const [openModal, setOpenModal] = useState(false);
 	const [modalAppId, setModalAppId] = useState('');
 	const minWidth = useMinWidth();
@@ -50,8 +52,8 @@ const DashboardPage = () => {
 		<>
 			{showDeviceRestriction ? (
 				<Alert
-					message="This website may not be supported by your device."
-					description="Please visit this website using a device with a wider screen for optimal experience and access to all features."
+					message={translate('alert.sizeWarning')}
+					description={translate('alert.sizeDescription')}
 					type="error"
 					style={{ width: '100%' }}
 					showIcon
@@ -84,8 +86,9 @@ const DashboardPage = () => {
 					</ContentWrapper>
 				</Flex>
 				<Modal
-					title={`Are you sure you want to edit Applications: PCGL-${modalAppId}?`}
-					okText={'Edit Application'}
+					title={translate('modal.editTitle', { id: modalAppId })}
+					okText={translate('button.editApplication')}
+					cancelText={translate('button.cancel')}
 					width={'100%'}
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 					open={openModal}
@@ -93,10 +96,7 @@ const DashboardPage = () => {
 					onCancel={() => setOpenModal(false)}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>
-							If so, the application will move back into Draft status and you will need to resubmit the application for
-							review.
-						</Text>
+						<Text>{translate('modal.editDescription')}</Text>
 					</Flex>
 				</Modal>
 			</Content>
