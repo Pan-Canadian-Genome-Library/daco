@@ -28,7 +28,7 @@ const NewApplicationCard = () => {
 	const { token } = useToken();
 
 	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
+		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200 }} hoverable>
 			<Flex justify="center" align="center" vertical gap="middle">
 				<Title level={3}>{translate('dashboard.startNewApp')}</Title>
 				<Button color="default" variant="outlined">

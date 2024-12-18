@@ -1,32 +1,34 @@
+/*
+ * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ *
+ * This program and the accompanying materials are made available under the terms of
+ * the GNU Affero General Public License v3.0. You should have received a copy of the
+ * GNU Affero General Public License along with this program.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 // TODO: test data, subject to change
 
-export interface ApplicationtType {
-	id: string;
-	userId: string;
-	status: ApplicationStatus;
-	createdAt: Date;
-	approvedAt: Date;
-	expiresAt: Date;
-}
+import { Application } from '@/global/types';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
-export enum ApplicationStatus {
-	Draft = 'Draft',
-	RepReview = 'Rep Review',
-	DACReview = 'DAC Review',
-	RepRevision = 'Rep Revision',
-	DACRevision = 'DAC Revision',
-	Approved = 'Approved',
-	Rejected = 'Rejected',
-	Closed = 'Closed',
-	Sign = 'Sign & Submit',
-	Revoked = 'Revoked',
-}
+export const mockUserID = 'testUser@oicr.on.ca';
 
-export const applications: ApplicationtType[] = [
+export const applications: Application[] = [
 	{
 		id: '123',
 		userId: 'user-123',
-		status: ApplicationStatus.Draft,
+		state: ApplicationStates.DRAFT,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -34,7 +36,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '436',
 		userId: 'user-151',
-		status: ApplicationStatus.DACRevision,
+		state: ApplicationStates.DAC_REVIEW,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -42,7 +44,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '7685',
 		userId: 'user-111',
-		status: ApplicationStatus.Approved,
+		state: ApplicationStates.APPROVED,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -50,7 +52,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '143',
 		userId: 'user-231',
-		status: ApplicationStatus.Rejected,
+		state: ApplicationStates.REJECTED,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),
@@ -58,7 +60,7 @@ export const applications: ApplicationtType[] = [
 	{
 		id: '543453',
 		userId: 'user-554',
-		status: ApplicationStatus.Closed,
+		state: ApplicationStates.CLOSED,
 		createdAt: new Date(),
 		approvedAt: new Date(),
 		expiresAt: new Date(),

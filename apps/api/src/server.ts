@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import cors from 'cors';
 import express, { Request, Response } from 'express';
 import path, { dirname } from 'path';
 import * as swaggerUi from 'swagger-ui-express';
@@ -34,6 +35,14 @@ const port = process.env.PORT || 3000;
 
 const startServer = async () => {
 	const app = express();
+
+	if (process.env.IS_DEV) {
+		app.use(
+			cors({
+				origin: 'http://localhost:5173',
+			}),
+		);
+	}
 
 	app.use(applicationRouter);
 

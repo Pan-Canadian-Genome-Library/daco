@@ -12,8 +12,8 @@
 	"dependencies": {
 		"@ant-design/icons": "^5.5.1",
 		"antd": "^5.21.6",
+		"@pcgl-daco/data-model": "workspace:^",
 		"i18next": "^24.1.0",
-		"pcgl-daco": "workspace:^",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-i18next": "^15.2.0",
