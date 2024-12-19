@@ -29,6 +29,7 @@ import { applications } from '@/db/schemas/applications.js';
 
 export const testUserId = 'testUser@oicr.on.ca';
 export const testApplicationId = 1;
+export const testActionId = 1;
 export const PG_DATABASE = 'testUser';
 export const PG_USER = 'testPassword';
 export const PG_PASSWORD = 'postgres';

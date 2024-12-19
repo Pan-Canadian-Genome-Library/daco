@@ -34,6 +34,7 @@ import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src
 import {
 	addInitialApplications,
 	testApplicationId as application_id,
+	testActionId as id,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
@@ -243,6 +244,40 @@ describe('Action Service', () => {
 			assert.strictEqual(actionResult.action, ApplicationActions.REVOKE);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.REVOKED);
+		});
+	});
+
+	describe('Get Actions', () => {
+		it('should get actions requested by id', async () => {
+			const actionResult = await actionService.getActionById({ id });
+
+			assert.ok(actionResult.success && actionResult.data);
+
+			const actionRecord = actionResult.data;
+
+			assert.strictEqual(actionRecord.id, id);
+		});
+
+		it('should get all actions requested by user id', async () => {
+			const actionResult = await actionService.listActions({ user_id });
+
+			assert.ok(actionResult.success && actionResult.data);
+
+			const actionRecords = actionResult.data;
+
+			assert.ok(Array.isArray(actionRecords) && actionRecords[0]);
+			assert.strictEqual(actionRecords[0].user_id, user_id);
+		});
+
+		it('should get all actions requested by application id', async () => {
+			const actionResult = await actionService.listActions({ application_id });
+
+			assert.ok(actionResult.success && actionResult.data);
+
+			const actionRecords = actionResult.data;
+
+			assert.ok(Array.isArray(actionRecords) && actionRecords[0]);
+			assert.strictEqual(actionRecords[0].application_id, application_id);
 		});
 	});
 
