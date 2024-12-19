@@ -77,7 +77,13 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	};
 
 	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
-		if (('key' in event && event.key === 'Enter') || event.type === 'click') {
+		/**
+		 * For keyboard navigation we need to make sure we abide by AIRA best practices. Check for the
+		 * enter key or the space bar.
+		 *
+		 * See for more info: https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/
+		 */
+		if (('key' in event && (event.key === 'Enter' || event.key === ' ')) || event.type === 'click') {
 			event.stopPropagation();
 			const editButtonReference = editButtonRef?.current;
 			/**
@@ -94,6 +100,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 		<Card
 			style={{ backgroundColor: token.colorWhite, minHeight: 200 }}
 			hoverable
+			tabIndex={0} //Required for making the cards keyboard navigable
 			onClick={handleCardClick}
 			onKeyDown={handleCardClick}
 		>
