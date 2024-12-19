@@ -124,7 +124,7 @@ applicationRouter.get(
 		} else {
 			const resultErrors = String(result.errors);
 
-			if (resultErrors === 'Error: Application record not found') {
+			if (resultErrors === 'Error: Application record is undefined') {
 				response.status(404);
 			} else {
 				response.status(500);
