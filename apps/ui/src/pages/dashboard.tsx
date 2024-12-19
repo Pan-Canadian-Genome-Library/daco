@@ -30,6 +30,7 @@ import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicatio
 import { fetch } from '@/global/FetchClient';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application, ServerError } from '@/global/types';
+import { useNavigate } from 'react-router';
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -46,6 +47,7 @@ const DashboardPage = () => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
+	const navigate = useNavigate();
 
 	const showEditApplicationModal = (id: string) => {
 		setModalAppId(id);
@@ -55,6 +57,7 @@ const DashboardPage = () => {
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleOk = () => {
 		setOpenModal(false);
+		navigate(`/application/${modalAppId}`);
 	};
 
 	useEffect(() => {

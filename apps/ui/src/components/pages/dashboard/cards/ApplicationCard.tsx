@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application } from '@/global/types';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 import { useNavigate } from 'react-router';
 
 const { Title, Text } = Typography;
@@ -64,19 +65,16 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
 	};
 
-	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
-		if (('key' in event && event.key === 'Enter') || event.type === 'click') {
+	const handleEditClick = (id: string, state: string, openEdit: (id: string) => void) => {
+		if (state === ApplicationStates.DRAFT) {
 			navigate(`/application/${id}`);
+		} else {
+			openEdit(id);
 		}
 	};
 
 	return (
-		<Card
-			style={{ backgroundColor: token.colorWhite, minHeight: 200 }}
-			hoverable
-			onClick={handleCardClick}
-			onKeyDown={handleCardClick}
-		>
+		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
 			<Flex vertical gap="middle">
 				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
 					<Flex align={isLowResDevice ? 'start' : 'center'} vertical={isLowResDevice} gap="middle">
@@ -100,7 +98,9 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 						) : null}
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
-						{showEdit ? <Button onClick={() => props.openEdit(id)}>{translate('button.edit')}</Button> : null}
+						{showEdit ? (
+							<Button onClick={() => handleEditClick(id, state, props.openEdit)}>{translate('button.edit')}</Button>
+						) : null}
 					</Flex>
 				</Flex>
 				<Title style={{ margin: 0 }} level={3}>
