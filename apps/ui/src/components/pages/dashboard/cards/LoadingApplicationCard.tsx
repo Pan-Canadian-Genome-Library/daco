@@ -17,13 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationsColumnName, OrderBy } from '@/service/types.js';
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import { pcglSkeletonTheme } from '@/components/providers/ThemeProvider';
+import { Card, ConfigProvider, Flex, Skeleton, theme } from 'antd';
 
-export type ApplicationListRequest = {
-	userId: string;
-	state?: ApplicationStateValues;
-	sort?: Array<OrderBy<ApplicationsColumnName>>;
-	page?: number;
-	pageSize?: number;
+const { useToken } = theme;
+
+const LoadingApplicationCard = () => {
+	const { token } = useToken();
+
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }}>
+				<Flex justify="center" align="center" vertical gap="middle">
+					<Skeleton title active />
+				</Flex>
+			</Card>
+		</ConfigProvider>
+	);
 };
+
+export default LoadingApplicationCard;

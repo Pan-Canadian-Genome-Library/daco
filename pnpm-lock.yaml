@@ -99,15 +99,15 @@ importers:
       '@ant-design/icons':
         specifier: ^5.5.1
         version: 5.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@pcgl-daco/data-model':
+        specifier: workspace:^
+        version: link:../../packages/data-model
       antd:
         specifier: ^5.21.6
         version: 5.21.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       i18next:
         specifier: ^24.1.0
         version: 24.1.0(typescript@5.6.2)
-      pcgl-daco:
-        specifier: workspace:^
-        version: link:../..
       react:
         specifier: ^18.3.1
         version: 18.3.1
