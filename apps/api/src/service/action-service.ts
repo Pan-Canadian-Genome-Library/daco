@@ -82,9 +82,23 @@ const actionService = (db: PostgresDb) => {
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		requestRepReview: async (application: ApplicationData) => {
-			const action = ApplicationActions.REQUEST_INSTITUTIONAL_REP;
+		repReview: async (application: ApplicationData) => {
+			const action = ApplicationActions.INSTITUTIONAL_REP_REVIEW;
 			const state_after = ApplicationStates.REP_REVISION;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		repSubmit: async (application: ApplicationData) => {
+			const action = ApplicationActions.INSTITUTIONAL_REP_SUBMIT;
+			const state_after = ApplicationStates.INSTITUTIONAL_REP_REVIEW;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		repRevision: async (application: ApplicationData) => {
+			const action = ApplicationActions.INSTITUTIONAL_REP_REVISION;
+			const state_after = ApplicationStates.INSTITUTIONAL_REP_REVIEW;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
@@ -92,13 +106,6 @@ const actionService = (db: PostgresDb) => {
 		repApproved: async (application: ApplicationData) => {
 			const action = ApplicationActions.INSTITUTIONAL_REP_APPROVED;
 			const state_after = ApplicationStates.DAC_REVIEW;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		repRejected: async (application: ApplicationData) => {
-			const action = ApplicationActions.INSTITUTIONAL_REP_REJECTED;
-			const state_after = ApplicationStates.DRAFT;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
@@ -119,6 +126,13 @@ const actionService = (db: PostgresDb) => {
 		},
 		dacRevision: async (application: ApplicationData) => {
 			const action = ApplicationActions.DAC_REVIEW_REVISIONS;
+			const state_after = ApplicationStates.DAC_REVISIONS_REQUESTED;
+
+			const result = await addActionRecord(application, action, state_after);
+			return result;
+		},
+		dacSubmit: async (application: ApplicationData) => {
+			const action = ApplicationActions.DAC_REVIEW_SUBMIT;
 			const state_after = ApplicationStates.DAC_REVIEW;
 
 			const result = await addActionRecord(application, action, state_after);
