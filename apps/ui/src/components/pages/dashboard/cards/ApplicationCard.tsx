@@ -24,6 +24,8 @@ import { useTranslation } from 'react-i18next';
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application } from '@/global/types';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
+import { useNavigate } from 'react-router';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -40,6 +42,8 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLGMax;
+
+	const navigate = useNavigate();
 
 	const formatDate = (createdAt: Date, expiresAt: Date) => {
 		const createdDate = translate('date.intlDateTime', {
@@ -59,6 +63,14 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 			: translate('generic.notApplicable');
 
 		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
+	};
+
+	const handleEditClick = (id: string, state: string, openEdit: (id: string) => void) => {
+		if (state === ApplicationStates.DRAFT) {
+			navigate(`/application/${id}`);
+		} else {
+			openEdit(id);
+		}
 	};
 
 	return (
@@ -86,7 +98,9 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 						) : null}
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
-						{showEdit ? <Button onClick={() => props.openEdit(id)}>{translate('button.edit')}</Button> : null}
+						{showEdit ? (
+							<Button onClick={() => handleEditClick(id, state, props.openEdit)}>{translate('button.edit')}</Button>
+						) : null}
 					</Flex>
 				</Flex>
 				<Title style={{ margin: 0 }} level={3}>
