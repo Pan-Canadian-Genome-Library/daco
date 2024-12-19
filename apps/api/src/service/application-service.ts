@@ -60,7 +60,7 @@ const applicationService = (db: PostgresDb) => ({
 				// Create associated Actions
 				const actionService = initActionService(db);
 
-				const actionResult = await actionService.createAction(newApplicationRecord[0]);
+				const actionResult = await actionService.create(newApplicationRecord[0]);
 				if (!actionResult.success) throw new Error(actionResult.errors);
 
 				// Join records

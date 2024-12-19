@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { eq } from 'drizzle-orm';
+
 import { type PostgresDb } from '@/db/index.js';
 import { actions } from '@/db/schemas/actions.js';
 import { failure, success } from '@/utils/results.js';
@@ -29,7 +31,7 @@ import {
 import { ApplicationData } from './types.js';
 
 const actionService = (db: PostgresDb) => {
-	// Actions are only additive, a new action is created on transition from one state to the next
+	// New actions are created on every transition from one state to the next
 	const addActionRecord = async (
 		application: ApplicationData,
 		action: ActionValues,
@@ -58,76 +60,90 @@ const actionService = (db: PostgresDb) => {
 	};
 
 	return {
-		createAction: async (application: ApplicationData) => {
+		create: async (application: ApplicationData) => {
 			const action = ApplicationActions.CREATE;
 			const state_after = ApplicationStates.DRAFT;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		withdrawAction: async (application: ApplicationData) => {
+		withdraw: async (application: ApplicationData) => {
 			const action = ApplicationActions.WITHDRAW;
 			const state_after = ApplicationStates.DRAFT;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		closeAction: async (application: ApplicationData) => {
+		close: async (application: ApplicationData) => {
 			const action = ApplicationActions.CLOSE;
 			const state_after = ApplicationStates.CLOSED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		requestRepAction: async (application: ApplicationData) => {
+		requestRepReview: async (application: ApplicationData) => {
 			const action = ApplicationActions.REQUEST_INSTITUTIONAL_REP;
 			const state_after = ApplicationStates.REP_REVISION;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		repApprovedAction: async (application: ApplicationData) => {
+		repApproved: async (application: ApplicationData) => {
 			const action = ApplicationActions.INSTITUTIONAL_REP_APPROVED;
 			const state_after = ApplicationStates.DAC_REVIEW;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		repRejectedAction: async (application: ApplicationData) => {
+		repRejected: async (application: ApplicationData) => {
 			const action = ApplicationActions.INSTITUTIONAL_REP_REJECTED;
 			const state_after = ApplicationStates.DRAFT;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		dacApprovedAction: async (application: ApplicationData) => {
+		dacApproved: async (application: ApplicationData) => {
 			const action = ApplicationActions.DAC_REVIEW_APPROVED;
 			const state_after = ApplicationStates.APPROVED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		dacRejectedAction: async (application: ApplicationData) => {
+		dacRejected: async (application: ApplicationData) => {
 			const action = ApplicationActions.DAC_REVIEW_REJECTED;
 			const state_after = ApplicationStates.REJECTED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		dacRevisionAction: async (application: ApplicationData) => {
+		dacRevision: async (application: ApplicationData) => {
 			const action = ApplicationActions.DAC_REVIEW_REVISIONS;
 			const state_after = ApplicationStates.DAC_REVIEW;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
-		revokeAction: async (application: ApplicationData) => {
+		revoke: async (application: ApplicationData) => {
 			const action = ApplicationActions.REVOKE;
 			const state_after = ApplicationStates.REVOKED;
 
 			const result = await addActionRecord(application, action, state_after);
 			return result;
 		},
+		getActionById: async ({ id }: { id: number }) => {
+			try {
+				const actionRecord = await db.select().from(actions).where(eq(actions.id, id));
+				if (!actionRecord[0]) throw new Error('Application record is undefined');
+
+				return success(actionRecord[0]);
+			} catch (err) {
+				const message = `Error at getActionById with id: ${id}`;
+				console.error(message);
+				console.error(err);
+				return failure(message, err);
+			}
+		},
+		listActions: async () => {},
 	};
 };
 

@@ -69,7 +69,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.createAction(testApplication);
+			const result = await actionService.create(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -87,7 +87,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.withdrawAction(testApplication);
+			const result = await actionService.withdraw(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -105,7 +105,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.closeAction(testApplication);
+			const result = await actionService.close(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -123,7 +123,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.requestRepAction(testApplication);
+			const result = await actionService.requestRepReview(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -141,7 +141,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.repApprovedAction(testApplication);
+			const result = await actionService.repApproved(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -159,7 +159,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.repRejectedAction(testApplication);
+			const result = await actionService.repRejected(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -177,7 +177,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.dacApprovedAction(testApplication);
+			const result = await actionService.dacApproved(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -195,7 +195,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.dacRejectedAction(testApplication);
+			const result = await actionService.dacRejected(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -213,7 +213,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.dacRevisionAction(testApplication);
+			const result = await actionService.dacRevision(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -231,7 +231,7 @@ describe('Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.revokeAction(testApplication);
+			const result = await actionService.revoke(testApplication);
 
 			assert.ok(result.success && result.data);
 
