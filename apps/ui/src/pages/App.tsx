@@ -29,7 +29,8 @@ function App() {
 			<Route element={<PageLayout />}>
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationViewer />} />
+				<Route path="application/:id" element={<ApplicationViewer isEditMode={false} />} />
+				<Route path="application/:id/edit" element={<ApplicationViewer isEditMode />} />
 			</Route>
 		</Routes>
 	);

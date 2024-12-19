@@ -26,7 +26,11 @@ import { Content } from 'antd/es/layout/layout';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-function ApplicationViewer() {
+type ApplicationViewerProps = {
+	isEditMode: boolean;
+};
+
+function ApplicationViewer({ isEditMode }: ApplicationViewerProps) {
 	const params = useParams();
 	const navigate = useNavigate();
 	const [applicationData, setApplicationData] = useState<Application | undefined>(undefined);
@@ -75,6 +79,9 @@ function ApplicationViewer() {
 			<Row style={{ ...contentWrapperStyles }}>
 				{applicationData ? (
 					<Col>
+						<p>
+							Mode is: <strong>{isEditMode ? ' Edit Mode' : ' View Mode'}</strong>
+						</p>
 						<h1>PCGL-{applicationData.id}</h1>
 						<h2>Application Created - {applicationData.created_at.toLocaleString('en-CA')}</h2>
 						<p>Not set up yet.</p>
