@@ -25,6 +25,7 @@ import { getApplicationStateProperties } from '@/components/pages/dashboard/getA
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application } from '@/global/types';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
+import { useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 const { Title, Text } = Typography;
@@ -39,11 +40,13 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const { t: translate } = useTranslation();
 	const { id, state, createdAt, expiresAt } = props.application;
 	const { showEdit, color, showActionRequired } = getApplicationStateProperties(state);
-	const { token } = useToken();
-	const minWidth = useMinWidth();
-	const isLowResDevice = minWidth <= token.screenLGMax;
 
 	const navigate = useNavigate();
+	const minWidth = useMinWidth();
+	const editButtonRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
+	const { token } = useToken();
+
+	const isLowResDevice = minWidth <= token.screenLGMax;
 
 	const formatDate = (createdAt: Date, expiresAt: Date) => {
 		const createdDate = translate('date.intlDateTime', {
@@ -67,14 +70,33 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 
 	const handleEditClick = (id: string, state: string, openEdit: (id: string) => void) => {
 		if (state === ApplicationStates.DRAFT) {
-			navigate(`/application/${id}`);
+			navigate(`/application/${id}/edit`);
 		} else {
 			openEdit(id);
 		}
 	};
 
+	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+		if (('key' in event && event.key === 'Enter') || event.type === 'click') {
+			event.stopPropagation();
+			const editButtonReference = editButtonRef?.current;
+			/**
+			 * Using a ref, we need to check the user isn't trying to click the edit button. If they are
+			 * we already have logic to handle that in `handleEditClick`.
+			 */
+			if (!(event.target === editButtonReference?.children[0] || event.target === editButtonReference)) {
+				navigate(`/application/${id}/`);
+			}
+		}
+	};
+
 	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
+		<Card
+			style={{ backgroundColor: token.colorWhite, minHeight: 200 }}
+			hoverable
+			onClick={handleCardClick}
+			onKeyDown={handleCardClick}
+		>
 			<Flex vertical gap="middle">
 				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
 					<Flex align={isLowResDevice ? 'start' : 'center'} vertical={isLowResDevice} gap="middle">
@@ -99,7 +121,9 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
 						{showEdit ? (
-							<Button onClick={() => handleEditClick(id, state, props.openEdit)}>{translate('button.edit')}</Button>
+							<Button ref={editButtonRef} onClick={() => handleEditClick(id, state, props.openEdit)}>
+								{translate('button.edit')}
+							</Button>
 						) : null}
 					</Flex>
 				</Flex>

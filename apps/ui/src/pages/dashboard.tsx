@@ -57,7 +57,7 @@ const DashboardPage = () => {
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleOk = () => {
 		setOpenModal(false);
-		navigate(`/application/${modalAppId}`);
+		navigate(`/application/${modalAppId}/edit`);
 	};
 
 	useEffect(() => {
