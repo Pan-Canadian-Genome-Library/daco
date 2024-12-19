@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application } from '@/global/types';
+import { useNavigate } from 'react-router';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -40,6 +41,8 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLGMax;
+
+	const navigate = useNavigate();
 
 	const formatDate = (createdAt: Date, expiresAt: Date) => {
 		const createdDate = translate('date.intlDateTime', {
@@ -61,8 +64,19 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
 	};
 
+	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+		if (('key' in event && event.key === 'Enter') || event.type === 'click') {
+			navigate(`/application/${id}`);
+		}
+	};
+
 	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
+		<Card
+			style={{ backgroundColor: token.colorWhite, minHeight: 200 }}
+			hoverable
+			onClick={handleCardClick}
+			onKeyDown={handleCardClick}
+		>
 			<Flex vertical gap="middle">
 				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
 					<Flex align={isLowResDevice ? 'start' : 'center'} vertical={isLowResDevice} gap="middle">
