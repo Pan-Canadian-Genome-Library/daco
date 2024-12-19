@@ -22,16 +22,16 @@ import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { sortQuery } from '@/service/utils.js';
+import { failure, success } from '@/utils/results.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import initActionService from './action-service.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
 	type OrderBy,
-} from '@/service/types.js';
-import { sortQuery } from '@/service/utils.js';
-import { failure, success } from '@/utils/results.js';
-import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import initActionService from './action-service.js';
+} from './types.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {

@@ -17,10 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { actions } from '@/db/schemas/actions.js';
+// TODO: Revisit Sort import { sortQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import {
 	ActionValues,
@@ -28,7 +29,7 @@ import {
 	ApplicationStates,
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationData } from './types.js';
+import { ApplicationData, type ActionsColumnName, type OrderBy } from './types.js';
 
 const actionService = (db: PostgresDb) => {
 	// New actions are created on every transition from one state to the next
@@ -133,7 +134,7 @@ const actionService = (db: PostgresDb) => {
 		getActionById: async ({ id }: { id: number }) => {
 			try {
 				const actionRecord = await db.select().from(actions).where(eq(actions.id, id));
-				if (!actionRecord[0]) throw new Error('Application record is undefined');
+				if (!actionRecord[0]) throw new Error('Action record is undefined');
 
 				return success(actionRecord[0]);
 			} catch (err) {
@@ -143,7 +144,42 @@ const actionService = (db: PostgresDb) => {
 				return failure(message, err);
 			}
 		},
-		listActions: async () => {},
+		listActions: async ({
+			user_id,
+			application_id,
+			sort = [],
+			page = 0,
+			pageSize = 20,
+		}: {
+			user_id?: string;
+			application_id?: number;
+			sort?: Array<OrderBy<ActionsColumnName>>;
+			page?: number;
+			pageSize?: number;
+		}) => {
+			try {
+				const allActions = await db
+					.select()
+					.from(actions)
+					.where(
+						and(
+							user_id ? eq(actions.user_id, String(user_id)) : undefined,
+							application_id ? eq(actions.application_id, application_id) : undefined,
+						),
+					)
+					// TODO: Revisit Sort ...sortQuery(sort)
+					.orderBy(asc(actions.created_at))
+					.offset(page * pageSize)
+					.limit(pageSize);
+
+				return success(allActions);
+			} catch (err) {
+				const message = `Error at listActions with user_id: ${user_id}`;
+				console.error(message);
+				console.error(err);
+				return failure(message, err);
+			}
+		},
 	};
 };
 

@@ -28,6 +28,7 @@ import { actions } from '@/db/schemas/actions.js';
 import { applications } from '@/db/schemas/applications.js';
 import service from '@/service/action-service.js';
 import appService from '@/service/application-service.js';
+import { type ActionService, type ApplicationService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -42,8 +43,8 @@ import {
 
 describe('Action Service', () => {
 	let db: PostgresDb;
-	let actionService: ReturnType<typeof service>;
-	let applicationService: ReturnType<typeof appService>;
+	let actionService: ActionService;
+	let applicationService: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
