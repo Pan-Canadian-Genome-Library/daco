@@ -61,90 +61,42 @@ const actionService = (db: PostgresDb) => {
 	};
 
 	return {
-		create: async (application: ApplicationData) => {
-			const action = ApplicationActions.CREATE;
-			const state_after = ApplicationStates.DRAFT;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		withdraw: async (application: ApplicationData) => {
-			const action = ApplicationActions.WITHDRAW;
-			const state_after = ApplicationStates.DRAFT;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		close: async (application: ApplicationData) => {
-			const action = ApplicationActions.CLOSE;
-			const state_after = ApplicationStates.CLOSED;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		repReview: async (application: ApplicationData) => {
-			const action = ApplicationActions.REQUEST_REP_REVIEW;
-			const state_after = ApplicationStates.INSTITUTIONAL_REP_REVIEW;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		repRevision: async (application: ApplicationData) => {
-			const action = ApplicationActions.INSTITUTIONAL_REP_REVISION;
-			const state_after = ApplicationStates.REP_REVISION;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		repSubmit: async (application: ApplicationData) => {
-			const action = ApplicationActions.INSTITUTIONAL_REP_SUBMIT;
-			const state_after = ApplicationStates.INSTITUTIONAL_REP_REVIEW;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		repApproved: async (application: ApplicationData) => {
-			const action = ApplicationActions.INSTITUTIONAL_REP_APPROVED;
-			const state_after = ApplicationStates.DAC_REVIEW;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		dacApproved: async (application: ApplicationData) => {
-			const action = ApplicationActions.DAC_REVIEW_APPROVED;
-			const state_after = ApplicationStates.APPROVED;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		dacRejected: async (application: ApplicationData) => {
-			const action = ApplicationActions.DAC_REVIEW_REJECTED;
-			const state_after = ApplicationStates.REJECTED;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		dacRevision: async (application: ApplicationData) => {
-			const action = ApplicationActions.DAC_REVIEW_REVISIONS;
-			const state_after = ApplicationStates.DAC_REVISIONS_REQUESTED;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		dacSubmit: async (application: ApplicationData) => {
-			const action = ApplicationActions.DAC_REVIEW_SUBMIT;
-			const state_after = ApplicationStates.DAC_REVIEW;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
-		revoke: async (application: ApplicationData) => {
-			const action = ApplicationActions.REVOKE;
-			const state_after = ApplicationStates.REVOKED;
-
-			const result = await addActionRecord(application, action, state_after);
-			return result;
-		},
+		create: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.CREATE, ApplicationStates.DRAFT),
+		withdraw: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
+		close: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
+		repReview: async (application: ApplicationData) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.REQUEST_REP_REVIEW,
+				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+			),
+		repRevision: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_REVISION, ApplicationStates.REP_REVISION),
+		repSubmit: async (application: ApplicationData) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
+				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+			),
+		repApproved: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationStates.DAC_REVIEW),
+		dacApproved: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
+		dacRejected: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
+		dacRevision: async (application: ApplicationData) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.DAC_REVIEW_REVISIONS,
+				ApplicationStates.DAC_REVISIONS_REQUESTED,
+			),
+		dacSubmit: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
+		revoke: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
 		getActionById: async ({ id }: { id: number }) => {
 			try {
 				const actionRecord = await db.select().from(actions).where(eq(actions.id, id));
