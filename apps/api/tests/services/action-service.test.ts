@@ -243,6 +243,24 @@ describe('Action Service', () => {
 			assert.strictEqual(actionResult.application_id, application_id);
 			assert.strictEqual(actionResult.action, ApplicationActions.DAC_REVIEW_REVISIONS);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.DAC_REVISIONS_REQUESTED);
+		});
+
+		it('should perform DAC_REVIEW_SUBMIT actions with after state DAC_REVIEW', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.dacSubmit(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.DAC_REVIEW_SUBMIT);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.DAC_REVIEW);
 		});
 
