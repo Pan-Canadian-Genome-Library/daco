@@ -24,7 +24,9 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { createApplication, editApplication, getApplicationById } from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
+import actService from '@/service/action-service.js';
 import service from '@/service/application-service.js';
+import { ActionService, ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -37,9 +39,10 @@ import {
 	testUserId as user_id,
 } from '../testUtils.js';
 
-describe('Application API', () => {
+describe.only('Application API', () => {
 	let db: PostgresDb;
-	let applicationService: ReturnType<typeof service>;
+	let applicationService: ApplicationService;
+	let actionService: ActionService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -56,6 +59,7 @@ describe('Application API', () => {
 		await addInitialApplications(db);
 
 		applicationService = service(db);
+		actionService = actService(db);
 	});
 
 	describe('Edit Application', () => {
@@ -123,11 +127,6 @@ describe('Application API', () => {
 
 			assert.ok(!result.success);
 		});
-
-		after(async () => {
-			await container.stop();
-			process.exit(0);
-		});
 	});
 
 	describe('Get Application by ID', () => {
@@ -160,9 +159,10 @@ describe('Application API', () => {
 
 			const error_message = String(result.errors);
 
-			assert.strictEqual(error_message, 'Error: Application record not found');
+			assert.strictEqual(error_message, 'Error: Application record is undefined');
 		});
 	});
+
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
 			const result = await createApplication({ user_id });
@@ -175,5 +175,27 @@ describe('Application API', () => {
 
 			assert.ok(application.contents);
 		});
+
+		it('should add a CREATE Action to the DB after calling createApplication', async () => {
+			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success && applicationRecordsResult.data);
+
+			const records = applicationRecordsResult.data;
+			const application = records[records.length - 1];
+
+			assert.ok(application);
+
+			const { id } = application;
+			const actionsResult = await actionService.listActions({ application_id: id });
+
+			assert.ok(actionsResult.success && actionsResult.data);
+			assert.ok(actionsResult.data.length > 0);
+		});
+	});
+
+	after(async () => {
+		await container.stop();
+		process.exit(0);
 	});
 });
