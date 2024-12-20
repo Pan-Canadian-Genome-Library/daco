@@ -8,6 +8,13 @@
 			"when": 1732142275956,
 			"tag": "0000_init",
 			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1734708997872,
+			"tag": "0001_update_actions_enum",
+			"breakpoints": true
 		}
 	]
 }
