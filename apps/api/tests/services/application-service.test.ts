@@ -26,6 +26,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applications } from '@/db/schemas/applications.js';
 import service from '@/service/application-service.js';
+import { ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -40,7 +41,7 @@ import {
 
 describe('Application Service', () => {
 	let db: PostgresDb;
-	let applicationService: ReturnType<typeof service>;
+	let applicationService: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -67,7 +68,6 @@ describe('Application Service', () => {
 
 			const application = applicationResult.data;
 
-			assert.notEqual(application, null);
 			assert.strictEqual(application?.user_id, user_id);
 			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
 		});

@@ -31,12 +31,14 @@ enum application_action {
 	create
 	withdraw
 	close
-	request_institutional_rep
+	institutional_rep_review
+	institutional_rep_revision
+	institutional_rep_submit
 	institutional_rep_approve
-	institutional_rep_reject
+	dac_review_revision
+	dac_review_submit
 	dac_review_approve
 	dac_review_reject
-	dac_review_revisions
 	revoke
 }
 
