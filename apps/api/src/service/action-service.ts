@@ -83,7 +83,7 @@ const actionService = (db: PostgresDb) => {
 			return result;
 		},
 		repReview: async (application: ApplicationData) => {
-			const action = ApplicationActions.INSTITUTIONAL_REP_REVIEW;
+			const action = ApplicationActions.REQUEST_REP_REVIEW;
 			const state_after = ApplicationStates.INSTITUTIONAL_REP_REVIEW;
 
 			const result = await addActionRecord(application, action, state_after);

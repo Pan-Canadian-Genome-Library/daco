@@ -120,7 +120,7 @@ describe('Action Service', () => {
 			assert.strictEqual(actionResult.state_after, ApplicationStates.CLOSED);
 		});
 
-		it('should perform INSTITUTIONAL_REP_REVIEW actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
+		it('should perform REQUEST_REP_REVIEW actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
 			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
@@ -133,7 +133,7 @@ describe('Action Service', () => {
 
 			assert.strictEqual(actionResult.user_id, user_id);
 			assert.strictEqual(actionResult.application_id, application_id);
-			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REVIEW);
+			assert.strictEqual(actionResult.action, ApplicationActions.REQUEST_REP_REVIEW);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		});
