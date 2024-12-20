@@ -17,9 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { Flex, theme } from 'antd';
+
 import { pcglColors } from '@/components/providers/ThemeProvider';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { Flex, theme } from 'antd';
 
 const { useToken } = theme;
 
