@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Row, Typography, theme } from 'antd';
+import { Button, Col, Flex, Row, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
+import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Text, Title } = Typography;
 const { useToken } = theme;
@@ -52,31 +54,45 @@ const AppViewerHeader = () => {
 
 	return (
 		<StatusBannerWrapper>
-			<Row style={{ width: '100%' }} gutter={token.sizeXXL} wrap>
-				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-					<Flex style={{ height: '100%' }} vertical justify="center" align="start">
-						<Title>{translate('dashboard.title')}</Title>
-						<Text>{formatDate(new Date(), new Date())}</Text>
-					</Flex>
-				</Col>
-				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-					<Flex style={{ height: '100%' }} justify={isLowResDevice ? 'center' : 'end'} align="center">
-						<Flex
-							style={{
-								padding: token.paddingLG,
-								backgroundColor: token.colorBgContainer,
-								borderRadius: token.borderRadius,
-								margin: isLowResDevice ? `${token.paddingMD}px 0` : 'none',
-							}}
-							justify="center"
-							align="center"
-							gap={20}
-						>
-							<Text>Application Status</Text>
+			<Flex style={{ width: '100%' }} justify="center" align="end" vertical>
+				<Row style={{ width: '100%' }} wrap>
+					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
+						<Flex style={{ height: '100%' }} vertical justify="center" align="start">
+							<Title>{translate('dashboard.title')}</Title>
+							<Text>{formatDate(new Date(), new Date())}</Text>
 						</Flex>
-					</Flex>
-				</Col>
-			</Row>
+					</Col>
+					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
+						<Flex style={{ height: '100%' }} justify={isLowResDevice ? 'center' : 'end'} align="center">
+							<Flex
+								flex={1}
+								style={{
+									padding: token.paddingLG,
+									borderRadius: token.borderRadius,
+									margin: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
+								}}
+								justify="center"
+								align="flex-end"
+								vertical
+								gap={'middle'}
+							>
+								<ApplicationStatusSteps currentStatus={ApplicationStates.INSTITUTIONAL_REP_REVIEW} />
+							</Flex>
+						</Flex>
+					</Col>
+				</Row>
+				<Flex
+					gap={'middle'}
+					style={{
+						paddingInline: token.paddingLG,
+						borderRadius: token.borderRadius,
+						marginInline: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
+					}}
+				>
+					<Button>History</Button>
+					<Button>Close Application</Button>
+				</Flex>
+			</Flex>
 		</StatusBannerWrapper>
 	);
 };
