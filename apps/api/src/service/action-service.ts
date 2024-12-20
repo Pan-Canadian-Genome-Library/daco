@@ -17,11 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, asc, eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { actions } from '@/db/schemas/actions.js';
-// TODO: Revisit Sort import { sortQuery } from '@/service/utils.js';
+import { actionsQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import {
 	ActionValues,
@@ -133,8 +133,7 @@ const actionService = (db: PostgresDb) => {
 							application_id ? eq(actions.application_id, application_id) : undefined,
 						),
 					)
-					// TODO: Revisit Sort ...sortQuery(sort)
-					.orderBy(asc(actions.created_at))
+					.orderBy(...actionsQuery(sort))
 					.offset(page * pageSize)
 					.limit(pageSize);
 

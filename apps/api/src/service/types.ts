@@ -25,6 +25,7 @@ import applicationService from '@/service/application-service.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ActionsColumnName = keyof typeof actions.$inferSelect;
+export type SchemaKeys = ApplicationsColumnName | ActionsColumnName;
 
 export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
 
@@ -36,7 +37,7 @@ export type ActionService = ReturnType<typeof actionService>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
-export type OrderBy<Key extends string> = {
+export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';
 	column: Key;
 };
