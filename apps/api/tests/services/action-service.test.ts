@@ -120,12 +120,12 @@ describe('Action Service', () => {
 			assert.strictEqual(actionResult.state_after, ApplicationStates.CLOSED);
 		});
 
-		it('should perform REQUEST_INSTITUTIONAL_REP actions with after state REP_REVISION', async () => {
+		it('should perform INSTITUTIONAL_REP_REVIEW actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
 			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.requestRepReview(testApplication);
+			const result = await actionService.repReview(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -133,9 +133,45 @@ describe('Action Service', () => {
 
 			assert.strictEqual(actionResult.user_id, user_id);
 			assert.strictEqual(actionResult.application_id, application_id);
-			assert.strictEqual(actionResult.action, ApplicationActions.REQUEST_INSTITUTIONAL_REP);
+			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REVIEW);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+		});
+
+		it('should perform INSTITUTIONAL_REP_REVISION actions with after state REP_REVISION', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.repRevision(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REVISION);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.REP_REVISION);
+		});
+
+		it('should perform INSTITUTIONAL_REP_SUBMIT actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
+			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await actionService.repSubmit(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_SUBMIT);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should perform INSTITUTIONAL_REP_APPROVED actions with after state DAC_REVIEW', async () => {
@@ -154,24 +190,6 @@ describe('Action Service', () => {
 			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_APPROVED);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.DAC_REVIEW);
-		});
-
-		it('should perform INSTITUTIONAL_REP_REJECTED actions with after state REJECTED', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
-			assert.ok(testApplicationResult.success && testApplicationResult.data);
-			const testApplication = testApplicationResult.data;
-
-			const result = await actionService.repRejected(testApplication);
-
-			assert.ok(result.success && result.data);
-
-			const actionResult = result.data;
-
-			assert.strictEqual(actionResult.user_id, user_id);
-			assert.strictEqual(actionResult.application_id, application_id);
-			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REJECTED);
-			assert.strictEqual(actionResult.state_before, testApplication.state);
-			assert.strictEqual(actionResult.state_after, ApplicationStates.DRAFT);
 		});
 
 		it('should perform DAC_REVIEW_APPROVED actions with after state APPROVED', async () => {
