@@ -18,13 +18,14 @@
  */
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { Application } from '@pcgl-daco/data-model';
-import { Col, Row, Skeleton } from 'antd';
+import { Col, Row } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 type ApplicationViewerProps = {
 	isEditMode: boolean;
@@ -32,15 +33,18 @@ type ApplicationViewerProps = {
 
 function ApplicationViewer({ isEditMode }: ApplicationViewerProps) {
 	const params = useParams();
-	const navigate = useNavigate();
 	const [applicationData, setApplicationData] = useState<Application | undefined>(undefined);
+	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<ServerError | undefined>(undefined);
 
 	const getApplicationData = async (id: string) => {
 		const data = await fetch(`/applications/${id}`);
 		if (data.ok) {
-			return await data.json();
+			const results = (await data.json()) as Application;
+			setApplicationData(results);
+			setLoading(false);
 		} else {
+			setLoading(false);
 			if (data.status === 404) {
 				//TODO: Might be a good idea to display some type of 404 page, or forward to a standard 404 page
 				// might also be a good idea when we eventually send out 401 / 403 errors.
@@ -58,26 +62,22 @@ function ApplicationViewer({ isEditMode }: ApplicationViewerProps) {
 	};
 
 	useEffect(() => {
-		const id = params.id;
-		if (id !== undefined) {
-			const data = getApplicationData(id);
-			data
-				.then((data: Application) => setApplicationData(data))
-				.catch((error: TypeError) => {
-					setError({
-						message: 'Unable to talk to API',
-						errors: `Failed to get applications, please check your internet connection. - ${error.message}`,
-					});
-				});
-		} else {
-			navigate('/dashboard');
+		async function fetch(id: string | undefined) {
+			if (id) {
+				await getApplicationData(id);
+			}
 		}
-	}, [params.id, navigate]);
+		fetch(params.id);
+	}, [params.id]);
 
 	return (
 		<Content>
 			<Row style={{ ...contentWrapperStyles }}>
-				{applicationData ? (
+				{loading && !error ? (
+					//Loading state.
+					//TODO: Temporary, but we should make this look pretty.
+					<SkeletonLoader />
+				) : applicationData && !error ? (
 					<Col>
 						<p>
 							Mode is: <strong>{isEditMode ? ' Edit Mode' : ' View Mode'}</strong>
@@ -86,14 +86,10 @@ function ApplicationViewer({ isEditMode }: ApplicationViewerProps) {
 						<h2>Application Created - {applicationData.created_at.toLocaleString('en-CA')}</h2>
 						<p>Not set up yet.</p>
 					</Col>
-				) : error === undefined ? (
-					//Loading state.
-					//TODO: Temporary, but we should make this look pretty.
-					<Skeleton loading />
 				) : (
 					<Col>
-						<h1>{error.message}</h1>
-						<h2>{error.errors}</h2>
+						<h1>{error?.message}</h1>
+						<h2>{error?.errors}</h2>
 					</Col>
 				)}
 			</Row>
