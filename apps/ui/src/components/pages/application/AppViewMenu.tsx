@@ -17,35 +17,47 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout, Row } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Flex, Menu, Typography } from 'antd';
 
-import ContentWrapper from '@/components/layouts/ContentWrapper';
-import AppViewerHeader from '@/components/pages/application/AppViewerHeader';
-import AppViewMenu from '@/components/pages/application/AppViewMenu';
+const { Text } = Typography;
 
-const { Content } = Layout;
+type MenuItemType = {
+	id: string;
+	title: string;
+};
 
-const ApplicationViewer = () => {
+const MenuItemList: MenuItemType[] = [
+	{
+		id: '1',
+		title: 'Introduction',
+	},
+];
+
+const MenuItem = ({ id, title }: MenuItemType) => {
 	return (
-		<Content>
-			<Flex style={{ height: '100%' }} vertical>
-				<AppViewerHeader />
-				{/* Multipart form Viewer */}
-				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0 2em 0', gap: '60px' }}>
-					<>
-						<Row style={{ width: '25%' }}>
-							<Col style={{ width: '100%' }}>
-								<AppViewMenu />
-							</Col>
-						</Row>
-						<Row style={{ width: '75%' }}>
-							<Col style={{ background: 'white', width: '100%' }}>Test Area</Col>
-						</Row>
-					</>
-				</ContentWrapper>
+		<Menu.Item key={id}>
+			<Flex style={{ width: '100%' }} justify="space-between">
+				<Text>{title}</Text>
+				<CheckCircleOutlined />
 			</Flex>
-		</Content>
+		</Menu.Item>
 	);
 };
 
-export default ApplicationViewer;
+const AppViewMenu = () => {
+	return (
+		<Menu
+			style={{ width: '100%', minWidth: '200px', padding: '10px', height: '100%' }}
+			defaultSelectedKeys={['1']}
+			defaultOpenKeys={['sub1']}
+			mode="inline"
+		>
+			{MenuItemList.map((item) => (
+				<MenuItem {...item} />
+			))}
+		</Menu>
+	);
+};
+
+export default AppViewMenu;
