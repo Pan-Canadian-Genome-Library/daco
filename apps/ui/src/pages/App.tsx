@@ -19,9 +19,9 @@
 import { Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
+import ApplicationViewer from '@/pages/application/ApplicationViewer';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
-import ApplicationViewer from './application/applicationViewer';
 
 function App() {
 	return (
@@ -30,7 +30,7 @@ function App() {
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
 				<Route path="application/:id" element={<ApplicationViewer isEditMode={false} />} />
-				<Route path="application/:id/edit" element={<ApplicationViewer isEditMode />} />
+				<Route path="application/:id/edit" element={<ApplicationViewer isEditMode={true} />} />
 			</Route>
 		</Routes>
 	);

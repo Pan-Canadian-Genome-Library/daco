@@ -17,15 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { SkeletonLoader } from '@/components/SkeletonLoader';
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { Application } from '@pcgl-daco/data-model';
 import { Col, Row } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+
+import { Application } from '@pcgl-daco/data-model';
+
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 
 type ApplicationViewerProps = {
 	isEditMode: boolean;
