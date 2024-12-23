@@ -76,7 +76,7 @@ const NewApplicationCard = () => {
 	const onGetStartedClick = async () => {
 		const application = await createApplication();
 		if (application && application.id && !error) {
-			navigation(`/application/${application.id}`);
+			navigation(`/application/${application.id}/edit`);
 		}
 	};
 
