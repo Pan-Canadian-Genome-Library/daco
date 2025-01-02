@@ -18,6 +18,7 @@
  */
 
 import { Menu, MenuProps } from 'antd';
+import { useMatch, useNavigate } from 'react-router';
 
 import AppViewMenuItem from '@/components/pages/application/AppViewMenuItem';
 
@@ -25,22 +26,31 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 const MenuItemList: MenuItem[] = [
 	{
-		key: 'Z',
+		key: 'intro',
 		label: <AppViewMenuItem label="Introduction" />,
 	},
 	{
-		key: 'A',
+		key: 'section_a',
 		label: <AppViewMenuItem label="A. Applicant Information" />,
 	},
 ];
 
-const AppViewMenu = ({ currentNavItem = 'Z' }: { currentNavItem?: string }) => {
+const AppViewMenu = () => {
+	const navigate = useNavigate();
+	const match = useMatch('/application/:id/*');
+	const currentMatch = !match?.params['*'] ? 'intro' : match?.params['*'];
+
+	const handleNavigation: MenuProps['onClick'] = (e) => {
+		navigate(e.key);
+	};
+
 	return (
 		<Menu
 			style={{ width: '100%', minWidth: '200px', height: '100%', border: '20px' }}
-			defaultSelectedKeys={[currentNavItem]}
+			defaultSelectedKeys={[currentMatch]}
 			mode="inline"
 			items={MenuItemList}
+			onClick={handleNavigation}
 		/>
 	);
 };

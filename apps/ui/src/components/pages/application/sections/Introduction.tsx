@@ -17,38 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout, Row } from 'antd';
-import { Outlet } from 'react-router';
+import { Flex } from 'antd';
 
-import ContentWrapper from '@/components/layouts/ContentWrapper';
-import AppViewerHeader from '@/components/pages/application/AppViewerHeader';
-import AppViewMenu from '@/components/pages/application/AppViewMenu';
-
-const { Content } = Layout;
-
-const ApplicationViewer = () => {
-	return (
-		<Content>
-			<Flex style={{ height: '100%' }} vertical>
-				<AppViewerHeader />
-				{/* Multipart form Viewer */}
-				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0 2em 0', gap: '60px' }}>
-					<>
-						<Row style={{ width: '25%' }}>
-							<Col style={{ width: '100%' }}>
-								<AppViewMenu />
-							</Col>
-						</Row>
-						<Row style={{ width: '75%' }}>
-							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet />
-							</Col>
-						</Row>
-					</>
-				</ContentWrapper>
-			</Flex>
-		</Content>
-	);
+const Introduction = () => {
+	return <Flex>Introduction</Flex>;
 };
 
-export default ApplicationViewer;
+export default Introduction;
