@@ -17,32 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Menu, MenuProps } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Flex, theme } from 'antd';
 
-import AppViewMenuItem from '@/components/pages/application/AppViewMenuItem';
+const { useToken } = theme;
 
-type MenuItem = Required<MenuProps>['items'][number];
+type AppViewMenuItemProps = {
+	label: string;
+};
 
-const MenuItemList: MenuItem[] = [
-	{
-		key: 'Z',
-		label: <AppViewMenuItem label="Introduction" />,
-	},
-	{
-		key: 'A',
-		label: <AppViewMenuItem label="A. Applicant Information" />,
-	},
-];
+const AppViewMenuItem = ({ label }: AppViewMenuItemProps) => {
+	const { token } = useToken();
 
-const AppViewMenu = ({ currentNavItem = 'Z' }: { currentNavItem?: string }) => {
 	return (
-		<Menu
-			style={{ width: '100%', minWidth: '200px', height: '100%', border: '20px' }}
-			defaultSelectedKeys={[currentNavItem]}
-			mode="inline"
-			items={MenuItemList}
-		/>
+		<Flex style={{ width: '100%', padding: token.paddingLG }} justify="space-between">
+			<>{label}</>
+			<Flex>
+				<CheckCircleOutlined />
+			</Flex>
+		</Flex>
 	);
 };
 
-export default AppViewMenu;
+export default AppViewMenuItem;

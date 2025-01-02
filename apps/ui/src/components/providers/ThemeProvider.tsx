@@ -77,6 +77,16 @@ const pcglTheme: ThemeConfig = {
 			titleFontSize: 24,
 			titleLineHeight: 2,
 		},
+		Menu: {
+			// increase icon color animation change to match text color change
+			motionDurationSlow: '0.1s',
+
+			itemHoverBg: pcglColors.tertiary,
+			itemHoverColor: pcglColors.primary,
+			itemSelectedBg: pcglColors.primary,
+			itemSelectedColor: pcglColors.white,
+			colorBgTextHover: pcglColors.white,
+		},
 	},
 };
 
