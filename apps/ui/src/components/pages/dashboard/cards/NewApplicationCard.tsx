@@ -62,14 +62,14 @@ const NewApplicationCard = () => {
 					message: translate('errors.generic.title'),
 					errors: translate('errors.generic.message'),
 				});
-				return undefined;
+				return;
 			}
 		} catch {
 			setError({
 				message: translate('errors.fetchError.title'),
 				errors: translate('errors.fetchError.message'),
 			});
-			return undefined;
+			return;
 		}
 	};
 
