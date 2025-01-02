@@ -20,15 +20,17 @@
 import { Col, Row } from 'antd';
 import { Content } from 'antd/es/layout/layout';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { Application } from '@pcgl-daco/data-model';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
+import { FetchError, ServerError } from '@/global/types';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { useGetData } from '@/global/hooks/useGetData';
+import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
+import { useTranslation } from 'react-i18next';
 
 type ApplicationViewerProps = {
 	isEditMode: boolean;
@@ -36,42 +38,39 @@ type ApplicationViewerProps = {
 
 function ApplicationViewer({ isEditMode }: ApplicationViewerProps) {
 	const params = useParams();
+	const navigation = useNavigate();
+	const { t: translate } = useTranslation();
+
 	const [applicationData, setApplicationData] = useState<Application | undefined>(undefined);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<ServerError | undefined>(undefined);
 
-	const getApplicationData = async (id: string) => {
-		const data = await fetch(`/applications/${id}`);
-		if (data.ok) {
-			const results = (await data.json()) as Application;
-			setApplicationData(results);
-			setLoading(false);
-		} else {
-			setLoading(false);
-			if (data.status === 404) {
-				//TODO: Might be a good idea to display some type of 404 page, or forward to a standard 404 page
-				// might also be a good idea when we eventually send out 401 / 403 errors.
-				setError({
-					message: 'Application not found.',
-					errors: 'This application does not exist',
-				});
-			} else {
-				setError({
-					message: 'Something went wrong.',
-					errors: data.statusText,
-				});
-			}
-		}
-	};
+	const data = useGetData(`/applications/${params.id}`) as Application | FetchError;
 
 	useEffect(() => {
-		async function fetch(id: string | undefined) {
-			if (id) {
-				await getApplicationData(id);
+		if (data && !('isError' in data)) {
+			/**
+			 * This likely means that the user directly linked the edit page somehow
+			 * when the application was no longer in DRAFT mode. We redirect back to
+			 * the view mode as protection.
+			 *
+			 * In the future, this should also check user ability (can they edit?)
+			 */
+			if (data.state !== ApplicationStates.DRAFT && isEditMode) {
+				navigation(`/application/${data.id}/`, { replace: true });
 			}
+
+			setApplicationData(data);
+			setLoading(false);
+		} else if (data && data.isError) {
+			setLoading(false);
+
+			setError({
+				message: data.statusCode === 404 ? translate('errors.applicationNotFound.title') : data.message,
+				errors: data.statusCode === 404 ? translate('errors.applicationNotFound.message') : data.errors,
+			});
 		}
-		fetch(params.id);
-	}, [params.id]);
+	}, [data, isEditMode, navigation, translate]);
 
 	return (
 		<Content>
