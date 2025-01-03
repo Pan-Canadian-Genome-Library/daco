@@ -32,7 +32,7 @@ const ApplicationViewer = () => {
 			<Flex style={{ height: '100%' }} vertical>
 				<AppHeader />
 				{/* Multipart form Viewer */}
-				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0 2em 0', gap: '60px' }}>
+				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
 					<>
 						<Row style={{ width: '25%' }}>
 							<Col style={{ width: '100%' }}>

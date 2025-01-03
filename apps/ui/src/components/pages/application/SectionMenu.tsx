@@ -56,7 +56,7 @@ const SectionMenu = () => {
 
 	return (
 		<Menu
-			style={{ width: '100%', minWidth: '200px', height: '100%', border: '20px' }}
+			style={{ width: '100%', minWidth: '275px', height: '100%', border: '20px' }}
 			defaultSelectedKeys={[currentMatch]}
 			mode="inline"
 			items={MenuItemList}

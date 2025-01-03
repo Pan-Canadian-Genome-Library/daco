@@ -18,19 +18,15 @@
  */
 
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { Flex, theme } from 'antd';
-
-const { useToken } = theme;
+import { Flex } from 'antd';
 
 type SectionMenuItemProps = {
 	label: string;
 };
 
 const SectionMenuItem = ({ label }: SectionMenuItemProps) => {
-	const { token } = useToken();
-
 	return (
-		<Flex style={{ width: '100%', padding: token.paddingLG }} justify="space-between">
+		<Flex style={{ width: '100%' }} justify="space-between">
 			<>{label}</>
 			<Flex>
 				<CheckCircleOutlined />
