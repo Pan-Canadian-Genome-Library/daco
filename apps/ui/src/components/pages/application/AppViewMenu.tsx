@@ -18,6 +18,7 @@
  */
 
 import { Menu, MenuProps } from 'antd';
+import { useEffect } from 'react';
 import { useMatch, useNavigate } from 'react-router';
 
 import AppViewMenuItem from '@/components/pages/application/AppViewMenuItem';
@@ -37,8 +38,17 @@ const MenuItemList: MenuItem[] = [
 
 const AppViewMenu = () => {
 	const navigate = useNavigate();
+
+	// Grab current section from url
 	const match = useMatch('/application/:id/*');
 	const currentMatch = !match?.params['*'] ? 'intro' : match?.params['*'];
+
+	useEffect(() => {
+		// if the section route is empty, navigate to intro route
+		if (currentMatch === 'intro') {
+			navigate('intro');
+		}
+	}, [currentMatch, navigate]);
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		navigate(e.key);
