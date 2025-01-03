@@ -44,8 +44,12 @@ const TextList = ({ data, isNumbered = false }: TextProps) => {
 
 	return (
 		<ul style={listStyles}>
-			{data.map((item) => {
-				return <List.Item style={listItemStyles}>{item}</List.Item>;
+			{data.map((item, index) => {
+				return (
+					<List.Item key={index} style={listItemStyles}>
+						{item}
+					</List.Item>
+				);
 			})}
 		</ul>
 	);
