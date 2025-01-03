@@ -31,7 +31,7 @@ const SectionWrapper = ({ children }: { children: React.ReactElement }) => {
 	};
 
 	return (
-		<Flex style={{ ...SectionWrapperStyles }} vertical>
+		<Flex style={{ ...SectionWrapperStyles }} vertical gap={'middle'}>
 			{children}
 		</Flex>
 	);

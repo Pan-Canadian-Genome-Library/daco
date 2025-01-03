@@ -17,10 +17,54 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
+import { Flex, Typography } from 'antd';
+
+import ApplicationWrapper from '@/components/layouts/SectionWrapper';
+import SectionFooter from '@/components/pages/application/SectionFooter';
+import TextList from '@/components/TextList';
+import { useTranslation } from 'react-i18next';
+
+const { Title, Text } = Typography;
 
 const Introduction = () => {
-	return <Flex>Introduction</Flex>;
+	const { t: translate } = useTranslation();
+
+	const qualifyData = [
+		translate('intro-section.qualifyPoint1'),
+		translate('intro-section.qualifyPoint2'),
+		translate('intro-section.qualifyPoint3'),
+		translate('intro-section.qualifyPoint4'),
+		translate('intro-section.qualifyPoint5'),
+	];
+
+	const accessData = [
+		translate('intro-section.accessPoint1'),
+		translate('intro-section.accessPoint2'),
+		translate('intro-section.accessPoint3'),
+	];
+
+	return (
+		<ApplicationWrapper>
+			<>
+				<Flex vertical>
+					<Title level={2}>{translate('intro-section.title')}</Title>
+					<Text>{translate('intro-section.qualifyAccess')}</Text>
+					<TextList data={qualifyData} />
+				</Flex>
+				<Flex vertical>
+					<Text>{translate('intro-section.receiveAccess')}</Text>
+					<TextList data={accessData} isNumbered />
+				</Flex>
+				<Flex vertical>
+					<Text>{translate('intro-section.description1')}</Text>
+				</Flex>
+				<Flex vertical>
+					<Text>{translate('intro-section.description2')}</Text>
+				</Flex>
+				<SectionFooter />
+			</>
+		</ApplicationWrapper>
+	);
 };
 
 export default Introduction;

@@ -20,16 +20,17 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import enLang from './locale/en/enTranslations.json';
-import frLang from './locale/fr/frTranslations.json';
+import enApplicationSection from './locale/en/enSection.json';
+import enGeneralLang from './locale/en/enTranslations.json';
+import frGeneralLang from './locale/fr/frTranslations.json';
 
 // TODO: French language is generated using online tools, replace with correct translations.
 export const resources = {
 	en: {
-		translation: { ...enLang },
+		translation: { ...enGeneralLang, ...enApplicationSection },
 	},
 	fr: {
-		translation: { ...frLang },
+		translation: { ...frGeneralLang },
 	},
 };
 

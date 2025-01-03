@@ -47,7 +47,8 @@
 		"login": "Login",
 		"editApplication": "Edit Application",
 		"cancel": "Cancel",
-		"edit": "Edit"
+		"edit": "Edit",
+		"next": "Next"
 	},
 	"label": {
 		"created": "Created",

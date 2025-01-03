@@ -18,6 +18,7 @@
  */
 
 import { Button, Flex, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const { useToken } = theme;
 
@@ -28,11 +29,12 @@ type SectionFooterProps = {
 // TODO: add logic to save data to store and send current data to backend
 const SectionFooter = ({ onSubmit }: SectionFooterProps) => {
 	const { token } = useToken();
+	const { t: translate } = useTranslation();
 
 	return (
 		<Flex style={{ marginTop: token.marginMD }} justify="flex-end">
 			<Button onSubmit={onSubmit} type="primary">
-				Next
+				{translate('button.next')}
 			</Button>
 		</Flex>
 	);
