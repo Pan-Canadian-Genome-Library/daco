@@ -21,14 +21,14 @@ import { Button, Col, Flex, Row, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
-import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
+import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Text, Title } = Typography;
 const { useToken } = theme;
 
-const AppViewerHeader = () => {
+const AppHeader = () => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -76,7 +76,7 @@ const AppViewerHeader = () => {
 								vertical
 								gap={'middle'}
 							>
-								<ApplicationStatusSteps currentStatus={ApplicationStates.INSTITUTIONAL_REP_REVIEW} />
+								<AppStatusSteps currentStatus={ApplicationStates.INSTITUTIONAL_REP_REVIEW} />
 							</Flex>
 						</Flex>
 					</Col>
@@ -97,4 +97,4 @@ const AppViewerHeader = () => {
 	);
 };
 
-export default AppViewerHeader;
+export default AppHeader;

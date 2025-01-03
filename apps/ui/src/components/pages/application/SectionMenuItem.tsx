@@ -17,38 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout, Row } from 'antd';
-import { Outlet } from 'react-router';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Flex, theme } from 'antd';
 
-import ContentWrapper from '@/components/layouts/ContentWrapper';
-import AppViewerHeader from '@/components/pages/application/AppViewerHeader';
-import AppViewMenu from '@/components/pages/application/AppViewMenu';
+const { useToken } = theme;
 
-const { Content } = Layout;
+type SectionMenuItemProps = {
+	label: string;
+};
 
-const ApplicationViewer = () => {
+const SectionMenuItem = ({ label }: SectionMenuItemProps) => {
+	const { token } = useToken();
+
 	return (
-		<Content>
-			<Flex style={{ height: '100%' }} vertical>
-				<AppViewerHeader />
-				{/* Multipart form Viewer */}
-				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0 2em 0', gap: '60px' }}>
-					<>
-						<Row style={{ width: '25%' }}>
-							<Col style={{ width: '100%' }}>
-								<AppViewMenu />
-							</Col>
-						</Row>
-						<Row style={{ width: '75%' }}>
-							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet />
-							</Col>
-						</Row>
-					</>
-				</ContentWrapper>
+		<Flex style={{ width: '100%', padding: token.paddingLG }} justify="space-between">
+			<>{label}</>
+			<Flex>
+				<CheckCircleOutlined />
 			</Flex>
-		</Content>
+		</Flex>
 	);
 };
 
-export default ApplicationViewer;
+export default SectionMenuItem;

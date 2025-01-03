@@ -17,26 +17,52 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CheckCircleOutlined } from '@ant-design/icons';
-import { Flex, theme } from 'antd';
+import { Menu, MenuProps } from 'antd';
+import { useEffect } from 'react';
+import { useMatch, useNavigate } from 'react-router';
 
-const { useToken } = theme;
+import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 
-type AppViewMenuItemProps = {
-	label: string;
-};
+type MenuItem = Required<MenuProps>['items'][number];
 
-const AppViewMenuItem = ({ label }: AppViewMenuItemProps) => {
-	const { token } = useToken();
+const MenuItemList: MenuItem[] = [
+	{
+		key: 'intro',
+		label: <SectionMenuItem label="Introduction" />,
+	},
+	{
+		key: 'section_a',
+		label: <SectionMenuItem label="A. Applicant Information" />,
+	},
+];
+
+const SectionMenu = () => {
+	const navigate = useNavigate();
+
+	// Grab current section from url
+	const match = useMatch('/application/:id/*');
+	const currentMatch = !match?.params['*'] ? 'intro' : match?.params['*'];
+
+	useEffect(() => {
+		// if the section route is empty, navigate to intro route
+		if (currentMatch === 'intro') {
+			navigate('intro');
+		}
+	}, [currentMatch, navigate]);
+
+	const handleNavigation: MenuProps['onClick'] = (e) => {
+		navigate(e.key);
+	};
 
 	return (
-		<Flex style={{ width: '100%', padding: token.paddingLG }} justify="space-between">
-			<>{label}</>
-			<Flex>
-				<CheckCircleOutlined />
-			</Flex>
-		</Flex>
+		<Menu
+			style={{ width: '100%', minWidth: '200px', height: '100%', border: '20px' }}
+			defaultSelectedKeys={[currentMatch]}
+			mode="inline"
+			items={MenuItemList}
+			onClick={handleNavigation}
+		/>
 	);
 };
 
-export default AppViewMenuItem;
+export default SectionMenu;

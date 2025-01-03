@@ -17,52 +17,38 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Menu, MenuProps } from 'antd';
-import { useEffect } from 'react';
-import { useMatch, useNavigate } from 'react-router';
+import { Col, Flex, Layout, Row } from 'antd';
+import { Outlet } from 'react-router';
 
-import AppViewMenuItem from '@/components/pages/application/AppViewMenuItem';
+import ContentWrapper from '@/components/layouts/ContentWrapper';
+import AppHeader from '@/components/pages/application/AppHeader';
+import SectionMenu from '@/components/pages/application/SectionMenu';
 
-type MenuItem = Required<MenuProps>['items'][number];
+const { Content } = Layout;
 
-const MenuItemList: MenuItem[] = [
-	{
-		key: 'intro',
-		label: <AppViewMenuItem label="Introduction" />,
-	},
-	{
-		key: 'section_a',
-		label: <AppViewMenuItem label="A. Applicant Information" />,
-	},
-];
-
-const AppViewMenu = () => {
-	const navigate = useNavigate();
-
-	// Grab current section from url
-	const match = useMatch('/application/:id/*');
-	const currentMatch = !match?.params['*'] ? 'intro' : match?.params['*'];
-
-	useEffect(() => {
-		// if the section route is empty, navigate to intro route
-		if (currentMatch === 'intro') {
-			navigate('intro');
-		}
-	}, [currentMatch, navigate]);
-
-	const handleNavigation: MenuProps['onClick'] = (e) => {
-		navigate(e.key);
-	};
-
+const ApplicationViewer = () => {
 	return (
-		<Menu
-			style={{ width: '100%', minWidth: '200px', height: '100%', border: '20px' }}
-			defaultSelectedKeys={[currentMatch]}
-			mode="inline"
-			items={MenuItemList}
-			onClick={handleNavigation}
-		/>
+		<Content>
+			<Flex style={{ height: '100%' }} vertical>
+				<AppHeader />
+				{/* Multipart form Viewer */}
+				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0 2em 0', gap: '60px' }}>
+					<>
+						<Row style={{ width: '25%' }}>
+							<Col style={{ width: '100%' }}>
+								<SectionMenu />
+							</Col>
+						</Row>
+						<Row style={{ width: '75%' }}>
+							<Col style={{ background: 'white', width: '100%' }}>
+								<Outlet />
+							</Col>
+						</Row>
+					</>
+				</ContentWrapper>
+			</Flex>
+		</Content>
 	);
 };
 
-export default AppViewMenu;
+export default ApplicationViewer;

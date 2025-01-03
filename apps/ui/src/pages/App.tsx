@@ -16,14 +16,15 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 import { Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
-import Introduction from '@/components/pages/application/sections/Introduction';
-import SectionA from '@/components/pages/application/sections/SectionA';
+import Introduction from '@/pages/applications/sections/Introduction';
+import SectionA from '@/pages/applications/sections/SectionA';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
-import ApplicationViewer from './application';
+import ApplicationViewer from './applications/application';
 
 function App() {
 	return (
