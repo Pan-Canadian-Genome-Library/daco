@@ -25,7 +25,7 @@ import Introduction from '@/pages/applications/sections/Introduction';
 import SectionA from '@/pages/applications/sections/SectionA';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
-i;
+
 function App() {
 	return (
 		<Routes>
@@ -36,6 +36,7 @@ function App() {
 					<Route path="intro" element={<Introduction />} />
 					<Route path="section_a" element={<SectionA />} />
 				</Route>
+				{/* TODO: merge */}
 				{/* <Route path="application/:id" element={<ApplicationIndex isEditMode={false} />} />
 				<Route path="application/:id/edit" element={<ApplicationIndex isEditMode={true} />} /> */}
 			</Route>
