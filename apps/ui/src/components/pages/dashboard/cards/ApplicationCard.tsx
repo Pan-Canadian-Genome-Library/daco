@@ -24,6 +24,9 @@ import { useTranslation } from 'react-i18next';
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Application } from '@/global/types';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
+import { useRef } from 'react';
+import { useNavigate } from 'react-router';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
@@ -37,8 +40,12 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	const { t: translate } = useTranslation();
 	const { id, state, createdAt, expiresAt } = props.application;
 	const { showEdit, color, showActionRequired } = getApplicationStateProperties(state);
-	const { token } = useToken();
+
+	const navigate = useNavigate();
 	const minWidth = useMinWidth();
+	const editButtonRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
+	const { token } = useToken();
+
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
 	const formatDate = (createdAt: Date, expiresAt: Date) => {
@@ -61,8 +68,42 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
 	};
 
+	const handleEditClick = (id: string, state: string, openEdit: (id: string) => void) => {
+		if (state === ApplicationStates.DRAFT) {
+			navigate(`/application/${id}/edit`);
+		} else {
+			openEdit(id);
+		}
+	};
+
+	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+		/**
+		 * For keyboard navigation we need to make sure we abide by AIRA best practices. Check for the
+		 * enter key or the space bar.
+		 *
+		 * See for more info: https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/
+		 */
+		if (('key' in event && (event.key === 'Enter' || event.key === ' ')) || event.type === 'click') {
+			event.stopPropagation();
+			const editButtonReference = editButtonRef?.current;
+			/**
+			 * Using a ref, we need to check the user isn't trying to click the edit button. If they are
+			 * we already have logic to handle that in `handleEditClick`.
+			 */
+			if (!(event.target === editButtonReference?.children[0] || event.target === editButtonReference)) {
+				navigate(`/application/${id}/`);
+			}
+		}
+	};
+
 	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200 }} hoverable>
+		<Card
+			style={{ backgroundColor: token.colorWhite, minHeight: 200 }}
+			hoverable
+			tabIndex={0} //Required for making the cards keyboard navigable
+			onClick={handleCardClick}
+			onKeyDown={handleCardClick}
+		>
 			<Flex vertical gap="middle">
 				<Flex style={{ width: '100%' }} align="center" gap={'middle'}>
 					<Flex align={isLowResDevice ? 'start' : 'center'} vertical={isLowResDevice} gap="middle">
@@ -86,7 +127,11 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 						) : null}
 					</Flex>
 					<Flex flex={1} justify="flex-end" align="center">
-						{showEdit ? <Button onClick={() => props.openEdit(id)}>{translate('button.edit')}</Button> : null}
+						{showEdit ? (
+							<Button ref={editButtonRef} onClick={() => handleEditClick(id, state, props.openEdit)}>
+								{translate('button.edit')}
+							</Button>
+						) : null}
 					</Flex>
 				</Flex>
 				<Title style={{ margin: 0 }} level={3}>

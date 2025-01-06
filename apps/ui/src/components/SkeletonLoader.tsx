@@ -17,30 +17,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Route, Routes } from 'react-router';
+import { ConfigProvider, Skeleton } from 'antd';
+import { pcglSkeletonTheme } from './providers/ThemeProvider';
 
-import PageLayout from '@/components/layouts/PageLayout';
-import ApplicationViewer from '@/pages/applications/application';
-import Introduction from '@/pages/applications/sections/Introduction';
-import SectionA from '@/pages/applications/sections/SectionA';
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
-
-function App() {
+const SkeletonLoader = () => {
 	return (
-		<Routes>
-			<Route element={<PageLayout />}>
-				<Route index element={<HomePage />} />
-				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route path="intro" element={<Introduction />} />
-					<Route path="section_a" element={<SectionA />} />
-				</Route>
-				{/* <Route path="application/:id" element={<ApplicationViewer >} />
-				<Route path="application/:id/edit" element={<ApplicationViewer isEditMode={true} />} /> */}
-			</Route>
-		</Routes>
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton active />
+		</ConfigProvider>
 	);
-}
+};
 
-export default App;
+const SkeletonButtonLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Button active />
+		</ConfigProvider>
+	);
+};
+
+const SkeletonAvatarLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Avatar active />
+		</ConfigProvider>
+	);
+};
+
+const SkeletonImageLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Image active />
+		</ConfigProvider>
+	);
+};
+
+export { SkeletonAvatarLoader, SkeletonButtonLoader, SkeletonImageLoader, SkeletonLoader };
