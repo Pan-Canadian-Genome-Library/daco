@@ -17,10 +17,90 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form as AntdForm, Flex, Input } from 'antd';
+import Title from 'antd/es/typography/Title';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
+import ApplicationWrapper from '@/components/layouts/SectionWrapper';
+import SectionFooter from '@/components/pages/application/SectionFooter';
+
+type FieldType = {
+	firstName?: string;
+	middleName?: string;
+	lastName?: string;
+	suffix?: string;
+};
+
+const schema = z.object({
+	firstName: z
+		.string()
+		.min(1, { message: 'Required' })
+		.max(15, { message: 'Username should be less than 15 characters' }),
+	middleName: z.string().max(15, { message: 'Username should be less than 15 characters' }),
+	lastName: z
+		.string()
+		.min(1, { message: 'Required' })
+		.max(15, { message: 'Username should be less than 15 characters' }),
+	suffix: z.string().min(1, { message: 'Required' }),
+});
 
 const SectionA = () => {
-	return <Flex>SectionA</Flex>;
+	const { handleSubmit, register } = useForm({
+		defaultValues: { firstName: '', middleName: '', lastName: '', suffix: '' },
+		resolver: zodResolver(schema),
+	});
+
+	return (
+		<ApplicationWrapper>
+			<>
+				<Flex vertical>
+					<Title level={2}>Applicant Information (Principal Investigator)</Title>
+				</Flex>
+				<Flex style={{ width: '100%' }}>
+					<AntdForm
+						onFinish={handleSubmit((data) => {
+							console.log(data);
+						})}
+						style={{ width: '100%' }}
+					>
+						<Flex style={{ width: '100%' }}>
+							<AntdForm.Item
+								label="First Name"
+								style={{ width: '100%' }}
+								{...register('firstName', { required: true })}
+							>
+								<Input />
+							</AntdForm.Item>
+
+							<AntdForm.Item
+								label="Middle Name"
+								style={{ width: '100%' }}
+								{...register('middleName', { required: true })}
+							>
+								<Input />
+							</AntdForm.Item>
+						</Flex>
+						<Flex style={{ width: '100%' }}>
+							<AntdForm.Item<FieldType>
+								label="Last Name"
+								{...register('lastName', { required: true })}
+								name="lastName"
+								style={{ width: '100%' }}
+								rules={[{ required: true, message: 'Please input your username!' }]}
+							>
+								<Input />
+							</AntdForm.Item>
+
+							<input type="submit" />
+						</Flex>
+					</AntdForm>
+				</Flex>
+				<SectionFooter />
+			</>
+		</ApplicationWrapper>
+	);
 };
 
 export default SectionA;

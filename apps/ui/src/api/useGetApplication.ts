@@ -17,27 +17,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import './i18n/translations';
-import './index.css';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { fetch } from '../global/FetchClient';
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
+const useGetApplication = (id?: string | number) => {
+	const { t: translate } = useTranslation();
 
-import ThemeProvider from '@/components/providers/ThemeProvider';
-import App from '@/pages/App';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+	return useQuery({
+		queryKey: [id],
+		queryFn: async () => {
+			const response = await fetch(`/applications/${id}`);
 
-const queryClient = new QueryClient();
+			if (!response.ok) {
+				let errorText = translate('errors.generic.message');
+				switch (response.status) {
+					case 404:
+						errorText = translate('errors.applicationNotFound.message');
+						break;
+					default:
+						break;
+				}
+				const error = new Error(errorText);
+				error.name = translate('errors.generic.title');
+				throw error;
+			}
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</ThemeProvider>
-		</QueryClientProvider>
-	</StrictMode>,
-);
+			return response.json();
+		},
+	});
+};
+
+export default useGetApplication;

@@ -29,10 +29,7 @@ import { useState } from 'react';
 const { Text, Title } = Typography;
 const { useToken } = theme;
 
-// Test ID
-const appId = 1;
-
-const AppHeader = () => {
+const AppHeader = ({ id }: { id: string }) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -72,7 +69,9 @@ const AppHeader = () => {
 				<Row style={{ width: '100%' }} wrap>
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<Flex style={{ height: '100%' }} vertical justify="center" align="start">
-							<Title>{translate('dashboard.title')}</Title>
+							<Title>
+								{translate('dashboard.title')}: {`PCGL-${id}`}
+							</Title>
 							<Text>{formatDate(new Date(), new Date())}</Text>
 						</Flex>
 					</Col>
@@ -107,7 +106,7 @@ const AppHeader = () => {
 					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
 				</Flex>
 				<Modal
-					title={translate('modal.closeTitle', { id: appId })}
+					title={translate('modal.closeTitle', { id: id })}
 					okText={translate('button.closeApp')}
 					cancelText={translate('button.cancel')}
 					width={'100%'}

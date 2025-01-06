@@ -17,20 +17,37 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout, Row } from 'antd';
-import { Outlet } from 'react-router';
+import { Col, Flex, Layout, Row, Typography } from 'antd';
+import { Outlet, useParams } from 'react-router';
 
+import useGetApplication from '@/api/useGetApplication';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import AppHeader from '@/components/pages/application/AppHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 
 const { Content } = Layout;
+const { Text } = Typography;
 
 const ApplicationViewer = () => {
+	const params = useParams();
+	const { data, isError, error, isLoading } = useGetApplication(params.id);
+
+	// Could probably create a component to make it look nicer here
+	if (isLoading) return <SkeletonLoader />;
+	if (isError)
+		return (
+			<Content>
+				<Flex style={{ height: '100%' }} vertical justify="center" align="center">
+					<Text>{error.name}</Text>
+					<Text>{error.message}</Text>
+				</Flex>
+			</Content>
+		);
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<AppHeader />
+				<AppHeader id={data.id} />
 				{/* Multipart form Viewer */}
 				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
 					<>
