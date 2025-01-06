@@ -17,26 +17,29 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Row } from 'antd';
-import { Content } from 'antd/es/layout/layout';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
+import { Col, Row } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+
 import { Application } from '@pcgl-daco/data-model';
+import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
 
 import { FetchError, ServerError } from '@/global/types';
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { useGetData } from '@/global/hooks/useGetData';
-import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
+
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import ApplicationViewer from '@/components/pages/application/ApplicationViewer';
+
 import { useTranslation } from 'react-i18next';
 
-type ApplicationViewerProps = {
+type ApplicationIndexProps = {
 	isEditMode: boolean;
 };
 
-function ApplicationViewer({ isEditMode }: ApplicationViewerProps) {
+function ApplicationIndex({ isEditMode }: ApplicationIndexProps) {
 	const params = useParams();
 	const navigation = useNavigate();
 	const { t: translate } = useTranslation();
@@ -72,31 +75,18 @@ function ApplicationViewer({ isEditMode }: ApplicationViewerProps) {
 		}
 	}, [data, isEditMode, navigation, translate]);
 
-	return (
+	return error ? (
 		<Content>
 			<Row style={{ ...contentWrapperStyles }}>
-				{loading && !error ? (
-					//Loading state.
-					//TODO: Temporary, but we should make this look pretty.
-					<SkeletonLoader />
-				) : applicationData && !error ? (
-					<Col>
-						<p>
-							Mode is: <strong>{isEditMode ? ' Edit Mode' : ' View Mode'}</strong>
-						</p>
-						<h1>PCGL-{applicationData.id}</h1>
-						<h2>Application Created - {applicationData.created_at.toLocaleString('en-CA')}</h2>
-						<p>Not set up yet.</p>
-					</Col>
-				) : (
-					<Col>
-						<h1>{error?.message}</h1>
-						<h2>{error?.errors}</h2>
-					</Col>
-				)}
+				<Col>
+					<h1>{error?.message}</h1>
+					<h2>{error?.errors}</h2>
+				</Col>
 			</Row>
 		</Content>
+	) : (
+		<ApplicationViewer isEditMode={isEditMode} data={applicationData} loading={loading} />
 	);
 }
 
-export default ApplicationViewer;
+export default ApplicationIndex;
