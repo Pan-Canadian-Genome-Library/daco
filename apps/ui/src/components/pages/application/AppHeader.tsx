@@ -76,7 +76,7 @@ const AppHeader = () => {
 								vertical
 								gap={'middle'}
 							>
-								<AppStatusSteps currentStatus={ApplicationStates.INSTITUTIONAL_REP_REVIEW} />
+								<AppStatusSteps currentStatus={ApplicationStates.DRAFT} />
 							</Flex>
 						</Flex>
 					</Col>

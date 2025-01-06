@@ -25,11 +25,11 @@ import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model
 const { useToken } = theme;
 
 type AppStatusType = {
-	title: StepHeaderOptions;
+	step: StepOptions;
 	state: ApplicationStateValues;
 };
 
-enum StepHeaderOptions {
+enum StepOptions {
 	DRAFT = 'Draft',
 	SIGNED = 'Sign & Submit',
 	REP_REVIEW = 'Rep Review',
@@ -38,36 +38,54 @@ enum StepHeaderOptions {
 
 const appStatusItems: AppStatusType[] = [
 	{
-		title: StepHeaderOptions.DRAFT,
+		step: StepOptions.DRAFT,
 		state: ApplicationStates.DRAFT,
 	},
 	{
-		title: StepHeaderOptions.SIGNED,
+		step: StepOptions.SIGNED,
 		state: ApplicationStates.DRAFT,
 	},
 	{
-		title: StepHeaderOptions.REP_REVIEW,
+		step: StepOptions.REP_REVIEW,
 		state: ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 	},
 	{
-		title: StepHeaderOptions.DAC_REVIEW,
+		step: StepOptions.DAC_REVIEW,
 		state: ApplicationStates.DAC_REVIEW,
 	},
 ];
+
+// Temporary logic
+const isFilled = true;
 
 const AppStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValues }) => {
 	const { token } = useToken();
 
 	const renderAppStatusItems = (): JSX.Element[] => {
 		let foundCurrentState = false;
+		let currentStep = StepOptions.DRAFT;
 
-		// TODO: when we have forms filled in the store, create a check for this in the renderAppStatusItems form
-		//       Moving on for now for this ticket. Got stuck on the logic to switch colors between Draft/Sign&Draft. Will revist in this ticket and remove comment.
+		// Find out what step the application is in
+		switch (currentStatus) {
+			case ApplicationStates.DRAFT:
+				// There could be two options in DRAFT state, either forms are fill or not filled
+				currentStep = isFilled ? StepOptions.SIGNED : StepOptions.DRAFT;
+				break;
+			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+				currentStep = StepOptions.REP_REVIEW;
+				break;
+			case ApplicationStates.DAC_REVIEW:
+				currentStep = StepOptions.DAC_REVIEW;
+				break;
+			default:
+				currentStep = StepOptions.DRAFT;
+		}
 
+		// Until step is found, render green components but once it is found, set current step to yellow and remainder grey
 		return appStatusItems.map((item) => {
 			let color = token.colorSuccess;
 
-			if (item.state === currentStatus) {
+			if (item.step === currentStep) {
 				foundCurrentState = true;
 				color = token.colorWarning;
 			} else if (foundCurrentState) {
@@ -78,12 +96,12 @@ const AppStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValu
 			return (
 				<Flex
 					flex={1}
-					key={item.title}
+					key={item.step}
 					style={{ textWrap: 'nowrap', minWidth: '100px', padding: token.paddingSM, backgroundColor: color }}
 					justify="center"
 					align="center"
 				>
-					{item.title}
+					{item.step}
 				</Flex>
 			);
 		});
