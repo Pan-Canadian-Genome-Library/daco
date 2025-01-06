@@ -21,8 +21,8 @@ import { Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
 import ApplicationViewer from '@/pages/applications/application';
-import Introduction from '@/pages/applications/sections/Introduction';
-import SectionA from '@/pages/applications/sections/SectionA';
+import Introduction from '@/pages/applications/sections/introduction';
+import SectionA from '@/pages/applications/sections/sectionA';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 
