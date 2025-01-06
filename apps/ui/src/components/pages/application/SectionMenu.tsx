@@ -19,29 +19,31 @@
 
 import { Menu, MenuProps } from 'antd';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMatch, useNavigate } from 'react-router';
 
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const MenuItemList: MenuItem[] = [
-	{
-		key: 'intro',
-		label: <SectionMenuItem label="Introduction" />,
-	},
-	{
-		key: 'section_a',
-		label: <SectionMenuItem label="A. Applicant Information" />,
-	},
-];
-
 const SectionMenu = () => {
 	const navigate = useNavigate();
+	const { t: translate } = useTranslation();
 
 	// Grab current section from url
 	const match = useMatch('/application/:id/*');
 	const currentMatch = !match?.params['*'] ? 'intro' : match?.params['*'];
+
+	const MenuItemList: MenuItem[] = [
+		{
+			key: 'intro',
+			label: <SectionMenuItem label={translate('menu.intro')} />,
+		},
+		{
+			key: 'section_a',
+			label: <SectionMenuItem label={translate('menu.sectionA')} />,
+		},
+	];
 
 	useEffect(() => {
 		// if the section route is empty, navigate to intro route

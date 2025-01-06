@@ -89,8 +89,8 @@ const AppHeader = () => {
 						marginInline: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
 					}}
 				>
-					<Button>History</Button>
-					<Button>Close Application</Button>
+					<Button>{translate('button.history')}</Button>
+					<Button>{translate('button.closeApp')}</Button>
 				</Flex>
 			</Flex>
 		</StatusBannerWrapper>
