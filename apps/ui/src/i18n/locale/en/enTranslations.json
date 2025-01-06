@@ -69,7 +69,16 @@
 			"CLOSED": "Closed"
 		}
 	},
-
+	"errors": {
+		"fetchError": {
+			"title": "Unable to contact server",
+			"message": "Hmm, can't seem to contact the server, please check your internet connection."
+		},
+		"generic": {
+			"title": "Something went wrong.",
+			"message": "Unable to process your request, please try again later."
+		}
+	},
 	"generic": {
 		"notApplicable": "N/A"
 	}

@@ -26,6 +26,7 @@
  */
 async function fetchClient(resource: string | URL, options?: RequestInit): Promise<Response> {
 	const applicationAPIPrefix = import.meta.env.VITE_APPLICATION_API_URL;
+	const headers = new Headers({ 'Content-Type': 'application/json' });
 
 	if (typeof resource === 'string') {
 		resource = applicationAPIPrefix + resource;
@@ -33,6 +34,6 @@ async function fetchClient(resource: string | URL, options?: RequestInit): Promi
 		resource.hostname = applicationAPIPrefix;
 	}
 
-	return await fetch(resource, { ...options });
+	return await fetch(resource, { headers: headers, ...options });
 }
 export { fetchClient as fetch };
