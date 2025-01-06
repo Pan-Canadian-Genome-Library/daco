@@ -32,3 +32,8 @@ export interface ServerError {
 	message: string;
 	errors?: string;
 }
+
+export interface FetchError extends ServerError {
+	isError: true;
+	statusCode: number;
+}
