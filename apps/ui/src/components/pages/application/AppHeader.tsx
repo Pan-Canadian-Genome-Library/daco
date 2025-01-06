@@ -17,22 +17,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Col, Flex, Row, theme, Typography } from 'antd';
+import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
 import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
+import { useState } from 'react';
 
 const { Text, Title } = Typography;
 const { useToken } = theme;
+
+// Test ID
+const appId = 1;
 
 const AppHeader = () => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
+	const [openModal, setOpenModal] = useState(false);
+
+	const showCloseApplicationModal = () => {
+		setOpenModal(true);
+	};
+
+	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
+	const handleOk = () => {
+		setOpenModal(false);
+	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
 		const createdDate = translate('date.intlDateTime', {
@@ -90,8 +104,22 @@ const AppHeader = () => {
 					}}
 				>
 					<Button>{translate('button.history')}</Button>
-					<Button>{translate('button.closeApp')}</Button>
+					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
 				</Flex>
+				<Modal
+					title={translate('modal.closeTitle', { id: appId })}
+					okText={translate('button.closeApp')}
+					cancelText={translate('button.cancel')}
+					width={'100%'}
+					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+					open={openModal}
+					onOk={handleOk}
+					onCancel={() => setOpenModal(false)}
+				>
+					<Flex style={{ height: '100%', marginTop: 20 }}>
+						<Text>{translate('modal.closeDescription')}</Text>
+					</Flex>
+				</Modal>
 			</Flex>
 		</StatusBannerWrapper>
 	);
