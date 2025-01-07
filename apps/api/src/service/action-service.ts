@@ -148,4 +148,4 @@ const actionService = (db: PostgresDb) => {
 	};
 };
 
-export default actionService;
+export { actionService };

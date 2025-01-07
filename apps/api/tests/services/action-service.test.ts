@@ -26,8 +26,8 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { actions } from '@/db/schemas/actions.js';
 import { applications } from '@/db/schemas/applications.js';
-import service from '@/service/action-service.js';
-import appService from '@/service/application-service.js';
+import { actionService } from '@/service/action-service.js';
+import { applicationService } from '@/service/application-service.js';
 import { type ActionService, type ApplicationService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
@@ -44,8 +44,8 @@ import {
 
 describe('Action Service', () => {
 	let db: PostgresDb;
-	let actionService: ActionService;
-	let applicationService: ApplicationService;
+	let testActionService: ActionService;
+	let testApplicationService: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -61,17 +61,17 @@ describe('Action Service', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		actionService = service(db);
-		applicationService = appService(db);
+		testActionService = actionService(db);
+		testApplicationService = applicationService(db);
 	});
 
 	describe('All Actions', () => {
 		it('should perform CREATE actions with before state DRAFT and after state DRAFT', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.create(testApplication);
+			const result = await testActionService.create(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -85,11 +85,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform WITHDRAW actions with after state DRAFT', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.withdraw(testApplication);
+			const result = await testActionService.withdraw(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -103,11 +103,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform CLOSE actions with after state CLOSED', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.close(testApplication);
+			const result = await testActionService.close(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -121,11 +121,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform REQUEST_REP_REVIEW actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.repReview(testApplication);
+			const result = await testActionService.repReview(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -139,11 +139,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform INSTITUTIONAL_REP_REVISION actions with after state REP_REVISION', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.repRevision(testApplication);
+			const result = await testActionService.repRevision(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -157,11 +157,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform INSTITUTIONAL_REP_SUBMIT actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.repSubmit(testApplication);
+			const result = await testActionService.repSubmit(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -175,11 +175,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform INSTITUTIONAL_REP_APPROVED actions with after state DAC_REVIEW', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.repApproved(testApplication);
+			const result = await testActionService.repApproved(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -193,11 +193,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform DAC_REVIEW_APPROVED actions with after state APPROVED', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.dacApproved(testApplication);
+			const result = await testActionService.dacApproved(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -211,11 +211,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform DAC_REVIEW_REJECTED actions with after state REJECTED', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.dacRejected(testApplication);
+			const result = await testActionService.dacRejected(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -229,11 +229,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform DAC_REVIEW_REVISIONS actions with after state DAC_REVISIONS_REQUESTED', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.dacRevision(testApplication);
+			const result = await testActionService.dacRevision(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -247,11 +247,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform DAC_REVIEW_SUBMIT actions with after state DAC_REVIEW', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.dacSubmit(testApplication);
+			const result = await testActionService.dacSubmit(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -265,11 +265,11 @@ describe('Action Service', () => {
 		});
 
 		it('should perform REVOKE actions with after state REVOKED', async () => {
-			const testApplicationResult = await applicationService.getApplicationById({ id: 1 });
+			const testApplicationResult = await testApplicationService.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await actionService.revoke(testApplication);
+			const result = await testActionService.revoke(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -285,7 +285,7 @@ describe('Action Service', () => {
 
 	describe('Get Actions', () => {
 		it('should get actions requested by id', async () => {
-			const actionResult = await actionService.getActionById({ id });
+			const actionResult = await testActionService.getActionById({ id });
 
 			assert.ok(actionResult.success && actionResult.data);
 
@@ -295,7 +295,7 @@ describe('Action Service', () => {
 		});
 
 		it('should get all actions requested by user id', async () => {
-			const actionResult = await actionService.listActions({ user_id });
+			const actionResult = await testActionService.listActions({ user_id });
 
 			assert.ok(actionResult.success && actionResult.data);
 
@@ -306,7 +306,7 @@ describe('Action Service', () => {
 		});
 
 		it('should get all actions requested by application id', async () => {
-			const actionResult = await actionService.listActions({ application_id });
+			const actionResult = await testActionService.listActions({ application_id });
 
 			assert.ok(actionResult.success && actionResult.data);
 

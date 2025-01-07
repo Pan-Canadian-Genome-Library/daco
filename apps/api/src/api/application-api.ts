@@ -21,8 +21,8 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
 import { ApplicationListRequest } from '@/routes/types.js';
-import actService from '@/service/action-service.js';
-import appService from '@/service/application-service.js';
+import { actionService } from '@/service/action-service.js';
+import { applicationService } from '@/service/application-service.js';
 import { type ActionService, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 
@@ -33,12 +33,12 @@ import { failure } from '@/utils/results.js';
  */
 export const createApplication = async ({ user_id }: { user_id: string }) => {
 	const database = getDbInstance();
-	const applicationService: ApplicationService = appService(database);
-	const actionService: ActionService = actService(database);
+	const applicationServiceRepo: ApplicationService = applicationService(database);
+	const actionServiceRepo: ActionService = actionService(database);
 
-	const result = await applicationService.createApplication({ user_id });
+	const result = await applicationServiceRepo.createApplication({ user_id });
 	if (result.success && result.data) {
-		await actionService.create(result.data);
+		await actionServiceRepo.create(result.data);
 	}
 
 	return result;
@@ -53,9 +53,9 @@ export const createApplication = async ({ user_id }: { user_id: string }) => {
  */
 export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
-	const applicationService: ApplicationService = appService(database);
+	const applicationServiceRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationService.getApplicationById({ id });
+	const result = await applicationServiceRepo.getApplicationById({ id });
 
 	if (!result.success) {
 		return result;
@@ -70,7 +70,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		state === ApplicationStates.DAC_REVIEW;
 
 	if (isEditState) {
-		const result = await applicationService.editApplication({ id, update });
+		const result = await applicationServiceRepo.editApplication({ id, update });
 		return result;
 	} else {
 		const message = `Cannot update application with state ${state}`;
@@ -90,9 +90,9 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
  */
 export const getAllApplications = async ({ userId, state, sort, page, pageSize }: ApplicationListRequest) => {
 	const database = getDbInstance();
-	const applicationService: ApplicationService = appService(database);
+	const applicationServiceRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationService.listApplications({ user_id: userId, state, sort, page, pageSize });
+	const result = await applicationServiceRepo.listApplications({ user_id: userId, state, sort, page, pageSize });
 
 	return result;
 };
@@ -104,9 +104,9 @@ export const getAllApplications = async ({ userId, state, sort, page, pageSize }
  */
 export const getApplicationById = async ({ applicationId }: { applicationId: number }) => {
 	const database = getDbInstance();
-	const applicationService: ApplicationService = appService(database);
+	const applicationServiceRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationService.getApplicationById({ id: applicationId });
+	const result = await applicationServiceRepo.getApplicationById({ id: applicationId });
 
 	return result;
 };
