@@ -23,10 +23,10 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 
-import ContentWrapper, { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import ContentWrapper from '@/components/layouts/ContentWrapper';
 import AppHeader from '@/components/pages/application/AppHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
-import { SkeletonLoader } from '@/components/SkeletonLoader';
+import ErrorPage from '@/components/pages/ErrorPage';
 import { useGetData } from '@/global/hooks/useGetData';
 import { FetchError, ServerError } from '@/global/types';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
@@ -72,21 +72,7 @@ const ApplicationViewer = () => {
 	}, [data, isEditMode, navigation, translate]);
 
 	// Should make a component for this
-	if (!applicationData || error || loading)
-		return (
-			<Content>
-				<Row style={{ ...contentWrapperStyles }}>
-					{loading ? (
-						<SkeletonLoader />
-					) : (
-						<Col>
-							<h1>{error?.message}</h1>
-							<h2>{error?.errors}</h2>
-						</Col>
-					)}
-				</Row>
-			</Content>
-		);
+	if (!applicationData || error || loading) return <ErrorPage error={error} loading={loading} />;
 
 	return (
 		<Content>
