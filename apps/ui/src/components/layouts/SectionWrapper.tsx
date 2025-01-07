@@ -17,28 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import { Flex, theme } from 'antd';
+import React from 'react';
 
-import enApplicationSection from './locale/en/enSection.json';
-import enGeneralLang from './locale/en/enTranslations.json';
-import frGeneralLang from './locale/fr/frTranslations.json';
+const { useToken } = theme;
 
-// TODO: French language is generated using online tools, replace with correct translations.
-export const resources = {
-	en: {
-		translation: { ...enGeneralLang, ...enApplicationSection },
-	},
-	fr: {
-		translation: { ...frGeneralLang },
-	},
+const SectionWrapper = ({ children }: { children: React.ReactElement }) => {
+	const { token } = useToken();
+
+	const SectionWrapperStyles: React.CSSProperties = {
+		padding: token.paddingXL,
+		width: '100%',
+	};
+
+	return (
+		<Flex style={{ ...SectionWrapperStyles }} vertical gap={'middle'}>
+			{children}
+		</Flex>
+	);
 };
 
-i18n.use(initReactI18next).init({
-	resources,
-	lng: 'en',
-	fallbackLng: 'en',
-	supportedLngs: ['en', 'fr'],
-});
-
-export default i18n;
+export default SectionWrapper;

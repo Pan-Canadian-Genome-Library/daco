@@ -17,28 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Flex } from 'antd';
 
-import enApplicationSection from './locale/en/enSection.json';
-import enGeneralLang from './locale/en/enTranslations.json';
-import frGeneralLang from './locale/fr/frTranslations.json';
-
-// TODO: French language is generated using online tools, replace with correct translations.
-export const resources = {
-	en: {
-		translation: { ...enGeneralLang, ...enApplicationSection },
-	},
-	fr: {
-		translation: { ...frGeneralLang },
-	},
+type SectionMenuItemProps = {
+	label: string;
 };
 
-i18n.use(initReactI18next).init({
-	resources,
-	lng: 'en',
-	fallbackLng: 'en',
-	supportedLngs: ['en', 'fr'],
-});
+const SectionMenuItem = ({ label }: SectionMenuItemProps) => {
+	return (
+		<Flex style={{ width: '100%' }} justify="space-between">
+			<>{label}</>
+			<Flex>
+				<CheckCircleOutlined />
+			</Flex>
+		</Flex>
+	);
+};
 
-export default i18n;
+export default SectionMenuItem;
