@@ -337,6 +337,28 @@ describe('Action Service', () => {
 			assert.ok(firstRecord && lastRecord);
 			assert.ok(firstRecord.id > lastRecord.id);
 		});
+
+		it('should allow sorting requested actions by created_at', async () => {
+			const sort: Array<OrderBy<ActionsColumnName>> = [
+				{
+					direction: 'desc',
+					column: 'created_at',
+				},
+			];
+			const actionResult = await testActionRepo.listActions({ application_id, sort });
+
+			assert.ok(actionResult.success && actionResult.data);
+
+			const actionRecords = actionResult.data;
+
+			assert.ok(Array.isArray(actionRecords));
+
+			const firstRecord = actionRecords[0];
+			const lastRecord = actionRecords[actionRecords.length - 1];
+
+			assert.ok(firstRecord && lastRecord);
+			assert.ok(firstRecord.created_at > lastRecord.created_at);
+		});
 	});
 
 	after(async () => {
