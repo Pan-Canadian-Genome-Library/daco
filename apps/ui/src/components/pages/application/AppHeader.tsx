@@ -18,21 +18,18 @@
  */
 
 import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
 import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
-import { useState } from 'react';
 
 const { Text, Title } = Typography;
 const { useToken } = theme;
 
-// Test ID
-const appId = 1;
-
-const AppHeader = () => {
+const AppHeader = ({ appId }: { appId: number }) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -72,7 +69,9 @@ const AppHeader = () => {
 				<Row style={{ width: '100%' }} wrap>
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<Flex style={{ height: '100%' }} vertical justify="center" align="start">
-							<Title>{translate('dashboard.title')}</Title>
+							<Title>
+								{translate('dashboard.title')}: PCGL-{appId}
+							</Title>
 							<Text>{formatDate(new Date(), new Date())}</Text>
 						</Flex>
 					</Col>

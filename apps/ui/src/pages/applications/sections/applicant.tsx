@@ -19,8 +19,8 @@
 
 import { Flex } from 'antd';
 
-const SectionA = () => {
-	return <Flex>SectionA</Flex>;
+const Applicant = () => {
+	return <Flex>Applicant</Flex>;
 };
 
-export default SectionA;
+export default Applicant;
