@@ -17,6 +17,12 @@
 		"noAccess": "You do not have access to PCGL Controlled Data",
 		"startNewApp": "Start A New Application"
 	},
+	"manage": {
+		"applications": {
+			"title": "Manage Applications",
+			"listTitle": "Dashboard"
+		}
+	},
 	"status": {
 		"404": "Oops, didnt find what you were looking for!"
 	},
