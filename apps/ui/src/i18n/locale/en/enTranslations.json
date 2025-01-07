@@ -69,7 +69,26 @@
 			"CLOSED": "Closed"
 		}
 	},
-
+	"errors": {
+		"http": {
+			"404": {
+				"title": "The requested resource could not be found.",
+				"message": "Sorry, looks like the resource you're trying to access does not exist"
+			}
+		},
+		"applicationNotFound": {
+			"title": "The application you requested could not be found.",
+			"message": "Sorry, looks like the application you're trying to access does not exist"
+		},
+		"fetchError": {
+			"title": "Unable to contact server",
+			"message": "Hmm, can't seem to contact the server, please check your internet connection."
+		},
+		"generic": {
+			"title": "Something went wrong.",
+			"message": "Unable to process your request, please try again later."
+		}
+	},
 	"generic": {
 		"notApplicable": "N/A"
 	}

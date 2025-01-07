@@ -16,24 +16,40 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { Route, Routes } from 'react-router';
 
-import PageLayout from '@/components/layouts/PageLayout';
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
-import ApplicationIndex from './application';
+import { ConfigProvider, Skeleton } from 'antd';
+import { pcglSkeletonTheme } from './providers/ThemeProvider';
 
-function App() {
+const SkeletonLoader = () => {
 	return (
-		<Routes>
-			<Route element={<PageLayout />}>
-				<Route index element={<HomePage />} />
-				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationIndex isEditMode={false} />} />
-				<Route path="application/:id/edit" element={<ApplicationIndex isEditMode={true} />} />
-			</Route>
-		</Routes>
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton active />
+		</ConfigProvider>
 	);
-}
+};
 
-export default App;
+const SkeletonButtonLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Button active />
+		</ConfigProvider>
+	);
+};
+
+const SkeletonAvatarLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Avatar active />
+		</ConfigProvider>
+	);
+};
+
+const SkeletonImageLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Image active />
+		</ConfigProvider>
+	);
+};
+
+export { SkeletonAvatarLoader, SkeletonButtonLoader, SkeletonImageLoader, SkeletonLoader };
