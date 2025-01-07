@@ -33,12 +33,12 @@ import { failure } from '@/utils/results.js';
  */
 export const createApplication = async ({ user_id }: { user_id: string }) => {
 	const database = getDbInstance();
-	const applicationServiceRepo: ApplicationService = applicationService(database);
-	const actionServiceRepo: ActionService = actionService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
+	const actionRepo: ActionService = actionService(database);
 
-	const result = await applicationServiceRepo.createApplication({ user_id });
+	const result = await applicationRepo.createApplication({ user_id });
 	if (result.success && result.data) {
-		await actionServiceRepo.create(result.data);
+		await actionRepo.create(result.data);
 	}
 
 	return result;
@@ -53,9 +53,9 @@ export const createApplication = async ({ user_id }: { user_id: string }) => {
  */
 export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
-	const applicationServiceRepo: ApplicationService = applicationService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationServiceRepo.getApplicationById({ id });
+	const result = await applicationRepo.getApplicationById({ id });
 
 	if (!result.success) {
 		return result;
@@ -70,7 +70,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		state === ApplicationStates.DAC_REVIEW;
 
 	if (isEditState) {
-		const result = await applicationServiceRepo.editApplication({ id, update });
+		const result = await applicationRepo.editApplication({ id, update });
 		return result;
 	} else {
 		const message = `Cannot update application with state ${state}`;
@@ -90,9 +90,9 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
  */
 export const getAllApplications = async ({ userId, state, sort, page, pageSize }: ApplicationListRequest) => {
 	const database = getDbInstance();
-	const applicationServiceRepo: ApplicationService = applicationService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationServiceRepo.listApplications({ user_id: userId, state, sort, page, pageSize });
+	const result = await applicationRepo.listApplications({ user_id: userId, state, sort, page, pageSize });
 
 	return result;
 };
@@ -104,9 +104,9 @@ export const getAllApplications = async ({ userId, state, sort, page, pageSize }
  */
 export const getApplicationById = async ({ applicationId }: { applicationId: number }) => {
 	const database = getDbInstance();
-	const applicationServiceRepo: ApplicationService = applicationService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationServiceRepo.getApplicationById({ id: applicationId });
+	const result = await applicationRepo.getApplicationById({ id: applicationId });
 
 	return result;
 };
