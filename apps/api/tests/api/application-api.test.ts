@@ -39,7 +39,7 @@ import {
 	testUserId as user_id,
 } from '../testUtils.js';
 
-describe.only('Application API', () => {
+describe('Application API', () => {
 	let db: PostgresDb;
 	let applicationService: ApplicationService;
 	let actionService: ActionService;
