@@ -62,35 +62,26 @@ const AppStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValu
 	const { token } = useToken();
 
 	const renderAppStatusItems = (): JSX.Element[] => {
-		let foundCurrentState = false;
-		let currentStep = StepOptions.DRAFT;
+		const stepIndex = appStatusItems.findIndex((step) => {
+			if (step.state === ApplicationStates.DRAFT && currentStatus === ApplicationStates.DRAFT) {
+				// Check if the step is DRAFT and not filled or SIGNED and filled
+				if ((step.step === StepOptions.DRAFT && !isFilled) || (step.step === StepOptions.SIGNED && isFilled)) {
+					return true;
+				}
+				return false;
+			}
 
-		// Find out what step the application is in
-		switch (currentStatus) {
-			case ApplicationStates.DRAFT:
-				// There could be two options in DRAFT state, either forms are fill or not filled
-				currentStep = isFilled ? StepOptions.SIGNED : StepOptions.DRAFT;
-				break;
-			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-				currentStep = StepOptions.REP_REVIEW;
-				break;
-			case ApplicationStates.DAC_REVIEW:
-				currentStep = StepOptions.DAC_REVIEW;
-				break;
-			default:
-				currentStep = StepOptions.DRAFT;
-		}
+			return step.state === currentStatus;
+		});
 
 		// Until step is found, render green components but once it is found, set current step to yellow and remainder grey
-		return appStatusItems.map((item) => {
-			let color = token.colorSuccess;
+		return appStatusItems.map((item, index) => {
+			let color = pcglColors.grey;
 
-			if (item.step === currentStep) {
-				foundCurrentState = true;
-				color = token.colorWarning;
-			} else if (foundCurrentState) {
-				// Since current state is found, the remainder of items will be grey
-				color = pcglColors.grey;
+			if (index < stepIndex) {
+				color = token.colorSuccess;
+			} else if (index === stepIndex) {
+				color = pcglColors.warningPrimary;
 			}
 
 			return (

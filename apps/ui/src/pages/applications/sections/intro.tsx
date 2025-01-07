@@ -18,11 +18,11 @@
  */
 
 import { Flex, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import ApplicationWrapper from '@/components/layouts/SectionWrapper';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import TextList from '@/components/TextList';
-import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 

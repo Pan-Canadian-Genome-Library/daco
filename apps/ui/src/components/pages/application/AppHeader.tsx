@@ -18,18 +18,18 @@
  */
 
 import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
 import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
-import { useState } from 'react';
 
 const { Text, Title } = Typography;
 const { useToken } = theme;
 
-const AppHeader = ({ id }: { id: string }) => {
+const AppHeader = ({ appId }: { appId: number }) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -70,7 +70,7 @@ const AppHeader = ({ id }: { id: string }) => {
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<Flex style={{ height: '100%' }} vertical justify="center" align="start">
 							<Title>
-								{translate('dashboard.title')}: {`PCGL-${id}`}
+								{translate('dashboard.title')}: PCGL-{appId}
 							</Title>
 							<Text>{formatDate(new Date(), new Date())}</Text>
 						</Flex>
@@ -106,7 +106,7 @@ const AppHeader = ({ id }: { id: string }) => {
 					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
 				</Flex>
 				<Modal
-					title={translate('modal.closeTitle', { id: id })}
+					title={translate('modal.closeTitle', { id: appId })}
 					okText={translate('button.closeApp')}
 					cancelText={translate('button.cancel')}
 					width={'100%'}

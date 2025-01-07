@@ -26,13 +26,22 @@ import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
+// Temporary logic
+const isEdit = false;
 const SectionMenu = () => {
 	const navigate = useNavigate();
 	const { t: translate } = useTranslation();
 
 	// Grab current section from url
-	const match = useMatch('/application/:id/*');
-	const currentMatch = !match?.params['*'] ? 'intro' : match?.params['*'];
+	const match = useMatch('/application/:id/:section/*');
+	const currentSection = match?.params.section ?? 'intro';
+
+	useEffect(() => {
+		// if the section route is empty, navigate to intro route
+		if (currentSection === 'intro') {
+			navigate(`intro/${isEdit ? 'edit' : ''}`);
+		}
+	}, [currentSection, navigate]);
 
 	const MenuItemList: MenuItem[] = [
 		{
@@ -40,26 +49,19 @@ const SectionMenu = () => {
 			label: <SectionMenuItem label={translate('menu.intro')} />,
 		},
 		{
-			key: 'section_a',
+			key: 'applicant',
 			label: <SectionMenuItem label={translate('menu.sectionA')} />,
 		},
 	];
 
-	useEffect(() => {
-		// if the section route is empty, navigate to intro route
-		if (currentMatch === 'intro') {
-			navigate('intro');
-		}
-	}, [currentMatch, navigate]);
-
 	const handleNavigation: MenuProps['onClick'] = (e) => {
-		navigate(e.key);
+		navigate(`${e.key}/${isEdit ? 'edit' : ''}`);
 	};
 
 	return (
 		<Menu
 			style={{ width: '100%', minWidth: '275px', height: '100%', border: '20px' }}
-			defaultSelectedKeys={[currentMatch]}
+			defaultSelectedKeys={[currentSection]}
 			mode="inline"
 			items={MenuItemList}
 			onClick={handleNavigation}

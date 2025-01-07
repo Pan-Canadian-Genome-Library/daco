@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ConfigProvider, ThemeConfig } from 'antd';
+import { ConfigProvider, notification, ThemeConfig } from 'antd';
 
 export const pcglColors = {
 	// Main Colors
@@ -87,6 +87,9 @@ const pcglTheme: ThemeConfig = {
 			itemSelectedColor: pcglColors.white,
 			colorBgTextHover: pcglColors.white,
 		},
+		Progress: {
+			remainingColor: pcglColors.primary,
+		},
 	},
 };
 
@@ -128,6 +131,12 @@ export const pcglSkeletonTheme: ThemeConfig = {
 		colorFillSecondary: '#f5f5f5',
 	},
 };
+
+notification.config({
+	placement: 'top',
+	top: 10,
+	duration: 10,
+});
 
 const ThemeProvider = ({ children }: { children: React.ReactElement }) => {
 	return <ConfigProvider theme={pcglTheme}>{children}</ConfigProvider>;

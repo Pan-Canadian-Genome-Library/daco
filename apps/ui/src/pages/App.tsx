@@ -20,9 +20,9 @@
 import { Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
-import ApplicationViewer from '@/pages/applications/application';
-import Introduction from '@/pages/applications/sections/Introduction';
-import SectionA from '@/pages/applications/sections/SectionA';
+import ApplicationViewer from '@/pages/applications';
+import Applicant from '@/pages/applications/sections/applicant';
+import Introduction from '@/pages/applications/sections/intro';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 
@@ -33,11 +33,9 @@ function App() {
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
 				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route path="intro" element={<Introduction />} />
-					<Route path="section_a" element={<SectionA />} />
+					<Route path="intro/edit?" element={<Introduction />} />
+					<Route path="applicant/edit?" element={<Applicant />} />
 				</Route>
-				{/* <Route path="application/:id" element={<ApplicationViewer >} />
-				<Route path="application/:id/edit" element={<ApplicationViewer isEditMode={true} />} /> */}
 			</Route>
 		</Routes>
 	);

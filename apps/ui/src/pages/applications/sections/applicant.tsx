@@ -46,7 +46,7 @@ const schema = z.object({
 	suffix: z.string().min(1, { message: 'Required' }),
 });
 
-const SectionA = () => {
+const Applicant = () => {
 	const { handleSubmit, register } = useForm({
 		defaultValues: { firstName: '', middleName: '', lastName: '', suffix: '' },
 		resolver: zodResolver(schema),
@@ -103,4 +103,4 @@ const SectionA = () => {
 	);
 };
 
-export default SectionA;
+export default Applicant;

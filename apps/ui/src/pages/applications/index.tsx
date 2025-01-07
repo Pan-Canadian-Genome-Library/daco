@@ -18,20 +18,41 @@
  */
 
 import { Col, Flex, Layout, Row, Typography } from 'antd';
-import { Outlet, useParams } from 'react-router';
+import { useEffect } from 'react';
+import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 
-import useGetApplication from '@/api/useGetApplication';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import AppHeader from '@/components/pages/application/AppHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
+
+import useGetApplication from '@/api/useGetApplication';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Content } = Layout;
 const { Text } = Typography;
 
 const ApplicationViewer = () => {
 	const params = useParams();
+	const navigation = useNavigate();
+	const match = useMatch('/application/:id/:section/*');
+	const isEditMode = !!match?.params['*'];
 	const { data, isError, error, isLoading } = useGetApplication(params.id);
+
+	useEffect(() => {
+		if (data && !('isError' in data)) {
+			/**
+			 * This likely means that the user directly linked the edit page somehow
+			 * when the application was no longer in DRAFT mode. We redirect back to
+			 * the view mode as protection.
+			 *
+			 * In the future, this should also check user ability (can they edit?)
+			 */
+			if (data.state !== ApplicationStates.DRAFT && isEditMode) {
+				navigation(`/application/${data.id}/`, { replace: true });
+			}
+		}
+	}, [data, isEditMode, navigation]);
 
 	// Could probably create a component to make it look nicer here
 	if (isLoading) return <SkeletonLoader />;
@@ -44,10 +65,11 @@ const ApplicationViewer = () => {
 				</Flex>
 			</Content>
 		);
+
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<AppHeader id={data.id} />
+				<AppHeader appId={data.id} />
 				{/* Multipart form Viewer */}
 				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
 					<>
