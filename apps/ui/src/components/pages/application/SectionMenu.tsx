@@ -26,22 +26,21 @@ import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-// Temporary logic
-const isEdit = false;
 const SectionMenu = () => {
 	const navigate = useNavigate();
 	const { t: translate } = useTranslation();
 
 	// Grab current section from url
-	const match = useMatch('/application/:id/:section/*');
-	const currentSection = match?.params.section ?? 'intro';
+	const match = useMatch('/application/:id/:section/:edit');
+	const isEditMode = !!match?.params.edit;
+	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
 
 	useEffect(() => {
 		// if the section route is empty, navigate to intro route
 		if (currentSection === 'intro') {
-			navigate(`intro/${isEdit ? 'edit' : ''}`);
+			navigate(`intro/${isEditMode ? 'edit' : ''}`);
 		}
-	}, [currentSection, navigate]);
+	}, [currentSection, navigate, isEditMode]);
 
 	const MenuItemList: MenuItem[] = [
 		{
@@ -55,7 +54,7 @@ const SectionMenu = () => {
 	];
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
-		navigate(`${e.key}/${isEdit ? 'edit' : ''}`);
+		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};
 
 	return (
