@@ -31,7 +31,7 @@ const SectionMenu = () => {
 	const { t: translate } = useTranslation();
 
 	// Grab current section from url
-	const match = useMatch('/application/:id/:section/:edit');
+	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
 

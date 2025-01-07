@@ -35,9 +35,10 @@ const { Text } = Typography;
 const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
-	const match = useMatch('/application/:id/:section/*');
-	const isEditMode = !!match?.params['*'];
+	const match = useMatch('application/:id/:section/:edit?');
+
 	const { data, isError, error, isLoading } = useGetApplication(params.id);
+	const isEditMode = !!match?.params.edit;
 
 	useEffect(() => {
 		if (data && !('isError' in data)) {
