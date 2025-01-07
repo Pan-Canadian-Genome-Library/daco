@@ -37,7 +37,7 @@ const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
 	const { t: translate } = useTranslation();
-	const match = useMatch('/application/:id/:section/:edit');
+	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
 
 	const [applicationData, setApplicationData] = useState<Application | undefined>(undefined);
