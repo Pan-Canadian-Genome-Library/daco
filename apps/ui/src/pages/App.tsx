@@ -20,7 +20,7 @@
 import { Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
-import ApplicationViewer from '@/pages/applications/application';
+import ApplicationViewer from '@/pages/applications';
 import Applicant from '@/pages/applications/sections/applicant';
 import Introduction from '@/pages/applications/sections/intro';
 import DashboardPage from '@/pages/dashboard';
