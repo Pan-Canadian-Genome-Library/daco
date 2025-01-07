@@ -33,8 +33,8 @@ function App() {
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
 				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route path="intro" element={<Introduction />} />
-					<Route path="section_a" element={<SectionA />} />
+					<Route path="intro/edit?" element={<Introduction />} />
+					<Route path="applicant/edit?" element={<SectionA />} />
 				</Route>
 				{/* TODO: merge */}
 				{/* <Route path="application/:id" element={<ApplicationIndex isEditMode={false} />} />
