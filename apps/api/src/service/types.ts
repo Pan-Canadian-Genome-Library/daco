@@ -20,8 +20,8 @@
 import { actions } from '@/db/schemas/actions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
-import actionService from '@/service/action-service.js';
-import applicationService from '@/service/application-service.js';
+import { actionService } from '@/service/action-service.js';
+import { applicationService } from '@/service/application-service.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ActionsColumnName = keyof typeof actions.$inferSelect;

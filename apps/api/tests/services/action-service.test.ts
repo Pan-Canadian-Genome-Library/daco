@@ -28,7 +28,7 @@ import { actions } from '@/db/schemas/actions.js';
 import { applications } from '@/db/schemas/applications.js';
 import { actionService } from '@/service/action-service.js';
 import { applicationService } from '@/service/application-service.js';
-import { type ActionService, type ApplicationService } from '@/service/types.js';
+import { type ActionsColumnName, type ActionService, type ApplicationService, type OrderBy } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -314,6 +314,28 @@ describe('Action Service', () => {
 
 			assert.ok(Array.isArray(actionRecords) && actionRecords[0]);
 			assert.strictEqual(actionRecords[0].application_id, application_id);
+		});
+
+		it('should allow sorting requested actions by id', async () => {
+			const sort: Array<OrderBy<ActionsColumnName>> = [
+				{
+					direction: 'desc',
+					column: 'id',
+				},
+			];
+			const actionResult = await testActionRepo.listActions({ application_id, sort });
+
+			assert.ok(actionResult.success && actionResult.data);
+
+			const actionRecords = actionResult.data;
+
+			assert.ok(Array.isArray(actionRecords));
+
+			const firstRecord = actionRecords[0];
+			const lastRecord = actionRecords[actionRecords.length - 1];
+
+			assert.ok(firstRecord && lastRecord);
+			assert.ok(firstRecord.id > lastRecord.id);
 		});
 	});
 
