@@ -179,6 +179,7 @@ const ManageApplicationsPage = () => {
 					<Flex style={{ width: '100%', height: '100%' }}>
 						<ConfigProvider theme={pcglTableTheme}>
 							<Table
+								pagination={{ pageSize: 20 }}
 								dataSource={tableData}
 								columns={tableColumnConfiguration}
 								style={{ width: '100%', height: '100%' }}
