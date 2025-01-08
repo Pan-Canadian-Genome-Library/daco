@@ -1,0 +1,27 @@
+{
+	"name": "@pcgl-daco/logger-express-middleware",
+	"version": "0.1.0",
+	"description": "Express middleware for logging http requests",
+	"exports": "./dist/index.js",
+	"type": "module",
+	"engines": {
+		"node": ">=18"
+	},
+	"scripts": {
+		"build": "tsc",
+		"test": "vitest run"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"express-requests-logger": "^4.0.0",
+		"@pcgl-daco/logger-eslint-config": "workspace:^",
+		"@pcgl-daco/logger-client": "workspace:^",
+		"@pcgl-daco/logger-types": "workspace:^"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.17",
+		"@types/express-requests-logger": "^3.0.4"
+	}
+}
