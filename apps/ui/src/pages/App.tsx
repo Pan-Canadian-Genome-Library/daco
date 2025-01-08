@@ -25,7 +25,7 @@ import Applicant from '@/pages/applications/sections/applicant';
 import Introduction from '@/pages/applications/sections/intro';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
-import ManageApplicationsPage from './manage/applications';
+import ManageApplicationsPage from '@/pages/manage/applications';
 
 function App() {
 	return (
