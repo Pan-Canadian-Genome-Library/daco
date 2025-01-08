@@ -29,7 +29,9 @@
 	"modal": {
 		"authorization": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access.",
 		"editTitle": "Are you sure you want to edit Applications: PCGL-{{id}}",
-		"editDescription": "If so, the application will move back into Draft status and you will need to resubmit the application for review."
+		"editDescription": "If so, the application will move back into Draft status and you will need to resubmit the application for review.",
+		"closeTitle": "Are you sure you want to close Applications: PCGL-{{id}}",
+		"closeDescription": "Closed application cannot be reopened."
 	},
 	"alert": {
 		"sizeWarning": "This website may not be supported by your device.",
@@ -53,11 +55,16 @@
 		"login": "Login",
 		"editApplication": "Edit Application",
 		"cancel": "Cancel",
-		"edit": "Edit"
+		"edit": "Edit",
+		"next": "Next",
+		"history": "History",
+		"closeApp": "Close Application"
 	},
 	"label": {
 		"created": "Created",
-		"expires": "Expires"
+		"expires": "Expires",
+		"updated": "Updated",
+		"updatedExtended": "Last Updated"
 	},
 	"date": {
 		"intlDateTime": "{{val, datetime}}"
@@ -75,7 +82,30 @@
 			"CLOSED": "Closed"
 		}
 	},
-
+	"menu": {
+		"intro": "Introduction",
+		"sectionA": "A. Applicant Information"
+	},
+	"errors": {
+		"http": {
+			"404": {
+				"title": "The requested resource could not be found.",
+				"message": "Sorry, looks like the resource you're trying to access does not exist"
+			}
+		},
+		"applicationNotFound": {
+			"title": "The application you requested could not be found.",
+			"message": "Sorry, looks like the application you're trying to access does not exist"
+		},
+		"fetchError": {
+			"title": "Unable to contact server",
+			"message": "Hmm, can't seem to contact the server, please check your internet connection."
+		},
+		"generic": {
+			"title": "Something went wrong.",
+			"message": "Unable to process your request, please try again later."
+		}
+	},
 	"generic": {
 		"notApplicable": "N/A"
 	}

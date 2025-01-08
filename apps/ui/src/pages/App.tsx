@@ -16,9 +16,13 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 import { Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
+import ApplicationViewer from '@/pages/applications';
+import Applicant from '@/pages/applications/sections/applicant';
+import Introduction from '@/pages/applications/sections/intro';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from './manage/applications';
@@ -29,6 +33,10 @@ function App() {
 			<Route element={<PageLayout />}>
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
+				<Route path="application/:id" element={<ApplicationViewer />}>
+					<Route path="intro/edit?" element={<Introduction />} />
+					<Route path="applicant/edit?" element={<Applicant />} />
+				</Route>
 				<Route path="manage/applications" element={<ManageApplicationsPage />} />
 			</Route>
 		</Routes>

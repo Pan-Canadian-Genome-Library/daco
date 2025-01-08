@@ -16,29 +16,34 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { Col, Layout, Row } from 'antd';
 
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { ServerError } from '@/global/types';
 
-import enApplicationSection from './locale/en/enSection.json';
-import enGeneralLang from './locale/en/enTranslations.json';
-import frGeneralLang from './locale/fr/frTranslations.json';
+const { Content } = Layout;
 
-// TODO: French language is generated using online tools, replace with correct translations.
-export const resources = {
-	en: {
-		translation: { ...enGeneralLang, ...enApplicationSection },
-	},
-	fr: {
-		translation: { ...frGeneralLang },
-	},
+type ErrorProps = {
+	loading: boolean;
+	error?: ServerError;
 };
 
-i18n.use(initReactI18next).init({
-	resources,
-	lng: 'en',
-	fallbackLng: 'en',
-	supportedLngs: ['en', 'fr'],
-});
+const ErrorPage = ({ error, loading }: ErrorProps) => {
+	return (
+		<Content>
+			<Row style={{ ...contentWrapperStyles }}>
+				{loading ? (
+					<SkeletonLoader />
+				) : (
+					<Col>
+						<h1>{error?.message}</h1>
+						<h2>{error?.errors}</h2>
+					</Col>
+				)}
+			</Row>
+		</Content>
+	);
+};
 
-export default i18n;
+export default ErrorPage;

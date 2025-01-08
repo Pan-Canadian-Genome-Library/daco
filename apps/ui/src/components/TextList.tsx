@@ -16,29 +16,43 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { List, theme } from 'antd';
 
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+const { useToken } = theme;
 
-import enApplicationSection from './locale/en/enSection.json';
-import enGeneralLang from './locale/en/enTranslations.json';
-import frGeneralLang from './locale/fr/frTranslations.json';
-
-// TODO: French language is generated using online tools, replace with correct translations.
-export const resources = {
-	en: {
-		translation: { ...enGeneralLang, ...enApplicationSection },
-	},
-	fr: {
-		translation: { ...frGeneralLang },
-	},
+type TextProps = {
+	data: string[];
+	isNumbered?: boolean;
 };
 
-i18n.use(initReactI18next).init({
-	resources,
-	lng: 'en',
-	fallbackLng: 'en',
-	supportedLngs: ['en', 'fr'],
-});
+/**
+ *  @description Component to display a list of string data
+ *  purpose: Antd has a List component but does not allow usage of standard css list-style like disc or numbers.
+ */
+const TextList = ({ data, isNumbered = false }: TextProps) => {
+	const { token } = useToken();
 
-export default i18n;
+	const listStyles: React.CSSProperties = {
+		margin: 0,
+		listStyleType: isNumbered ? 'number' : 'disc',
+	};
+	const listItemStyles: React.CSSProperties = {
+		fontSize: token.fontSizeLG,
+		margin: `${token.marginXS}px 0px`,
+		lineHeight: token.lineHeight,
+	};
+
+	return (
+		<ul style={listStyles}>
+			{data.map((item, index) => {
+				return (
+					<List.Item key={index} style={listItemStyles}>
+						{item}
+					</List.Item>
+				);
+			})}
+		</ul>
+	);
+};
+
+export default TextList;

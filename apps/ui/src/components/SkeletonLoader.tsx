@@ -17,28 +17,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import { ConfigProvider, Skeleton } from 'antd';
+import { pcglSkeletonTheme } from './providers/ThemeProvider';
 
-import enApplicationSection from './locale/en/enSection.json';
-import enGeneralLang from './locale/en/enTranslations.json';
-import frGeneralLang from './locale/fr/frTranslations.json';
-
-// TODO: French language is generated using online tools, replace with correct translations.
-export const resources = {
-	en: {
-		translation: { ...enGeneralLang, ...enApplicationSection },
-	},
-	fr: {
-		translation: { ...frGeneralLang },
-	},
+const SkeletonLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton active />
+		</ConfigProvider>
+	);
 };
 
-i18n.use(initReactI18next).init({
-	resources,
-	lng: 'en',
-	fallbackLng: 'en',
-	supportedLngs: ['en', 'fr'],
-});
+const SkeletonButtonLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Button active />
+		</ConfigProvider>
+	);
+};
 
-export default i18n;
+const SkeletonAvatarLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Avatar active />
+		</ConfigProvider>
+	);
+};
+
+const SkeletonImageLoader = () => {
+	return (
+		<ConfigProvider theme={pcglSkeletonTheme}>
+			<Skeleton.Image active />
+		</ConfigProvider>
+	);
+};
+
+export { SkeletonAvatarLoader, SkeletonButtonLoader, SkeletonImageLoader, SkeletonLoader };
