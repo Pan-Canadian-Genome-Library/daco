@@ -19,14 +19,13 @@
 
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { Flex, theme, Typography } from 'antd';
+import { Flex, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 const { useToken } = theme;
-const { Text } = Typography;
 
 interface StatusBarColumnType {
-	value: ApplicationStateValues | string;
+	value: ApplicationStateValues;
 }
 
 const StatusTableColumn = ({ value }: StatusBarColumnType) => {

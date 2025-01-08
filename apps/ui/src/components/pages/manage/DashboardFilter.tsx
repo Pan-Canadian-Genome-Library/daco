@@ -25,45 +25,67 @@ import { useTranslation } from 'react-i18next';
 
 const { useToken } = theme;
 
-interface Filter {
-	name: string;
-	amount: number | undefined;
-	key: ApplicationStateValues | 'TOTAL' | string;
+/**
+ * The allowable values that a filter can be for the manage applications interface.
+ **/
+export type FilterKeyType = ApplicationStateValues | 'TOTAL';
+interface DashboardFilterProps {
+	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
+	availableStates: { key: FilterKeyType; amount: number }[];
 }
 
-interface DashboardFilterProps {
-	onFilterChange: (filtersEnabled: string[]) => void;
-	availableStates: { key: string; amount: number }[];
+interface Filter {
+	name: string;
+	amount: number;
+	key: FilterKeyType;
 }
 
 const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 
-	const [filterStates, setFilterStates] = useState<Array<ApplicationStateValues | 'TOTAL' | string>>(['TOTAL']);
+	//By default we want the "Total" filter selected, displaying all possible application types.
+	const [filterStates, setFilterStates] = useState<Array<FilterKeyType>>(['TOTAL']);
 
+	// The currently displayed filters in the interface, this is determined by whatever is sent in by fetched data.
 	const displayedFilters: Filter[] = [
-		{ name: 'Total', key: 'TOTAL', amount: availableStates.find((state) => state.key === 'TOTAL')?.amount },
-		...Array.from(Object.keys(ApplicationStates)).map((possibleState) => {
+		{
+			name: 'Total',
+			key: 'TOTAL',
+			amount: availableStates.find((state) => state.key === 'TOTAL')?.amount || 0,
+		},
+		...Object.keys(ApplicationStates).map((possibleState): Filter => {
 			return {
 				name: translate(`application.states.${possibleState}`),
-				amount: availableStates.find((state) => state.key === possibleState)?.amount,
-				key: possibleState,
+				amount: availableStates.find((state) => state.key === possibleState)?.amount || 0,
+				key: possibleState as FilterKeyType,
 			};
 		}),
 	];
 
-	const handleChange = (selectedFilter: ApplicationStateValues | 'TOTAL' | string, checked: boolean) => {
+	const handleChange = (selectedFilter: FilterKeyType, checked: boolean) => {
 		let nextSelectedFilters = checked
 			? [...filterStates, selectedFilter]
 			: filterStates.filter((t) => t !== selectedFilter);
 
+		/**
+		 * If the user selects total, it makes no sense to have any other filters selected,
+		 * in this case, we empty out the selected filters, adn replace them with just TOTAL
+		 **/
 		if (selectedFilter === 'TOTAL') {
 			nextSelectedFilters = ['TOTAL'];
 		} else if (filterStates.includes('TOTAL')) {
+			/**
+			 * If the user selects anything else besides total and the total filter is still in the list
+			 * drop the total filter, and keep everything else.
+			 **/
 			nextSelectedFilters = nextSelectedFilters.filter((filters) => filters !== 'TOTAL');
 		}
 
+		/**
+		 * Finally, if the user selects everything, we want to just assume they want the total
+		 * deselect everything, and select total
+		 **/
 		if (nextSelectedFilters.length === displayedFilters.length - 1) {
 			nextSelectedFilters = ['TOTAL'];
 		}

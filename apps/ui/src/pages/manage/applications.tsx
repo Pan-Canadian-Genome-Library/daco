@@ -20,7 +20,7 @@
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { mockTableData } from '@/components/mock/applicationMockData';
 import PageHeader from '@/components/pages/global/PageHeader';
-import DashboardFilter from '@/components/pages/manage/DashboardFilter';
+import DashboardFilter, { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
 import StatusTableColumn from '@/components/pages/manage/StatusTableColumn';
 import { pcglTableTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
@@ -31,11 +31,12 @@ import { ConfigProvider, Flex, Layout, Table, theme, Typography } from 'antd';
 import { useMemo, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
+
 const { Content } = Layout;
 const { Text, Link } = Typography;
 const { useToken } = theme;
 
-interface TableDataType {
+interface TableData {
 	id: number;
 	institution: string;
 	institution_country: string;
@@ -43,6 +44,11 @@ interface TableDataType {
 	updated_at: number;
 	applicant_institutional_email: string;
 	state: string;
+}
+
+interface FilterState {
+	key: FilterKeyType;
+	amount: number;
 }
 
 const tableColumnConfiguration = [
@@ -90,16 +96,27 @@ const tableColumnConfiguration = [
 		title: 'Status',
 		dataIndex: 'state',
 		key: 'state',
-		render: (value: string) => <StatusTableColumn value={value} />,
+		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
 		sorter: (a: { state: string }, b: { state: string }) => (a.state < b.state ? -1 : a.state > b.state ? 1 : 0),
 	},
 ];
 
-const calculateFilterAmounts = (data: TableDataType[]) => {
-	const availableStates = [];
-	for (const appState of Object.keys(ApplicationStates)) {
-		availableStates.push({ key: appState, amount: data.filter((data) => data.state === appState).length });
+/**
+ * Calculates the number shown beside the filter at the top of the page.
+ * Example: 10 Total | 3 DAC Review, etc...
+ * @param data The data displayed within the table.
+ * @returns A FilterState object, containing the unique key of the filter and how many applications are filed under it/
+ */
+const calculateFilterAmounts = (data: TableData[]) => {
+	const availableStates: FilterState[] = [];
+
+	for (const appState of Object.keys(ApplicationStates) as FilterKeyType[]) {
+		availableStates.push({
+			key: appState,
+			amount: data.filter((data) => data.state === appState).length,
+		});
 	}
+
 	availableStates.push({ key: 'TOTAL', amount: data.length });
 	return availableStates;
 };
@@ -109,15 +126,24 @@ const ManageApplicationsPage = () => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 
-	const [tableData, setTableData] = useState<Array<TableDataType>>(mockTableData);
+	const [tableData, setTableData] = useState<Array<TableData>>(mockTableData);
 
+	/**
+	 * Given that we don't need to constantly recalculate how many applications are at a current state
+	 * we memoize the value after calculating to avoid expensive recalculation.
+	 *
+	 * Right now this array has zero dependencies but once it's
+	 * connected up to the API, we should add that value as a dependant
+	 */
 	const filterAmounts = useMemo(() => calculateFilterAmounts(mockTableData), []);
 
-	const handleFilterChange = (filtersActive: Array<ApplicationStateValues | 'TOTAL' | string>) => {
+	const handleFilterChange = (filtersActive: Array<FilterKeyType>) => {
+		//In this case, we've likely selected the "Total" filter, just display what we've got from the initial call to the server.
 		if (filtersActive.length === 1 && filtersActive.includes('TOTAL')) {
 			setTableData(mockTableData);
 		} else {
 			const filteredData = [];
+			//Otherwise we want to filter down to whatever applications match our currently filtered state.
 			for (const filterKey of filtersActive) {
 				const filtered = mockTableData.filter((data) => data.state === filterKey);
 				if (filtered.length) {
