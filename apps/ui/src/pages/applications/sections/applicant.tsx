@@ -75,9 +75,9 @@ const Applicant = () => {
 	return (
 		<ApplicationWrapper>
 			<>
-				{/* just react-hook-form / antd / zod  */}
-				{/* If we were not to use antd or react-hook-form antd */}
+				{/* just react-hook-form / antd / zod / antd-zod */}
 				{/*Needs to utilize the <Controller/> component to interact with antd could possibly make a custom component*/}
+				{/* antd-zod is supported and recommended on zod's official website */}
 				<Flex style={{ width: '100%' }} vertical>
 					<Title level={4}>With RHF + antd-zod (RHF/antd/zod/antd-zod)</Title>
 					<Form style={{ width: '100%' }} onFinish={handleSubmit(onSubmit)} layout="vertical">
@@ -88,6 +88,39 @@ const Applicant = () => {
 								return (
 									<Item label="First Name" name={'firstName'} rules={[rules]}>
 										<Input onChange={onChange} value={value} />
+									</Item>
+								);
+							}}
+						/>
+
+						<Controller
+							name="suffix"
+							control={control}
+							render={({ field }) => {
+								return (
+									<Item label="suffix" name={'suffix'} rules={[rules]}>
+										<Select {...field}>
+											<Select.Option value="mr">Mr</Select.Option>
+											<Select.Option value="mrs">Mrs</Select.Option>
+											<Select.Option value="dr">Dr</Select.Option>
+										</Select>
+									</Item>
+								);
+							}}
+						/>
+
+						<Controller
+							name="randomNum"
+							control={control}
+							render={({ field }) => {
+								return (
+									<Item label="RandomNum" name={'randomNum'} rules={[rules]}>
+										<Radio.Group {...field}>
+											<Radio value={'A'}>A</Radio>
+											<Radio value={'B'}>B</Radio>
+											<Radio value={'C'}>C</Radio>
+											<Radio value={4}>D</Radio>
+										</Radio.Group>
 									</Item>
 								);
 							}}

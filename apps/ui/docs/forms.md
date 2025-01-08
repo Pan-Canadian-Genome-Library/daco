@@ -5,7 +5,7 @@ Libraries and bindings:
 - [Zod validation](https://zod.dev/)
 - [React-Hook-Form](https://react-hook-form.com/)
   - [react-hook-form-antd](https://github.com/jsun969/react-hook-form-antd) (gives us a component that simplifies antd/rhf integration. open for discussion)
-  - [antd-zod](https://github.com/MrBr/antd-zod) (is a good option if we do not want use RFH. open for discussion)
+  - [antd-zod](https://github.com/MrBr/antd-zod) (changes zod schema into antd rules. A good option if we do not want use RFH. open for discussion)
 - [react-query](https://tanstack.com/query/v5/docs/framework/react/overview)
 
 NOTE: open for discussion are libraries recommend by both react-hook-form and zod on their respective pages
