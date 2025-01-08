@@ -17,28 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import { Button, Flex, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import enApplicationSection from './locale/en/enSection.json';
-import enGeneralLang from './locale/en/enTranslations.json';
-import frGeneralLang from './locale/fr/frTranslations.json';
+const { useToken } = theme;
 
-// TODO: French language is generated using online tools, replace with correct translations.
-export const resources = {
-	en: {
-		translation: { ...enGeneralLang, ...enApplicationSection },
-	},
-	fr: {
-		translation: { ...frGeneralLang },
-	},
+type SectionFooterProps = {
+	onSubmit?: () => void;
 };
 
-i18n.use(initReactI18next).init({
-	resources,
-	lng: 'en',
-	fallbackLng: 'en',
-	supportedLngs: ['en', 'fr'],
-});
+// TODO: add logic to save data to store and send current data to backend
+const SectionFooter = ({ onSubmit }: SectionFooterProps) => {
+	const { token } = useToken();
+	const { t: translate } = useTranslation();
 
-export default i18n;
+	return (
+		<Flex style={{ marginTop: token.marginMD }} justify="flex-end">
+			<Button onSubmit={onSubmit} type="primary">
+				{translate('button.next')}
+			</Button>
+		</Flex>
+	);
+};
+
+export default SectionFooter;

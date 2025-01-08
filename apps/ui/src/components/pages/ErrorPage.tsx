@@ -16,42 +16,34 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { Col, Row } from 'antd';
-import { Content } from 'antd/es/layout/layout';
-
-import { Application } from '@pcgl-daco/data-model';
+import { Col, Layout, Row } from 'antd';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { ServerError } from '@/global/types';
 
-type ApplicationViewerProps = {
-	isEditMode: boolean;
-	data: Application | undefined;
+const { Content } = Layout;
+
+type ErrorProps = {
 	loading: boolean;
+	error?: ServerError;
 };
 
-function ApplicationViewer({ isEditMode, data, loading }: ApplicationViewerProps) {
+const ErrorPage = ({ error, loading }: ErrorProps) => {
 	return (
 		<Content>
 			<Row style={{ ...contentWrapperStyles }}>
 				{loading ? (
-					//Loading state.
-					//TODO: Temporary, but we should make this look pretty.
 					<SkeletonLoader />
 				) : (
 					<Col>
-						<p>
-							Mode is: <strong>{isEditMode ? ' Edit Mode' : ' View Mode'}</strong>
-						</p>
-						<h1>PCGL-{data.id}</h1>
-						<h2>Application Created - {data.created_at.toLocaleString('en-CA')}</h2>
-						<p>Not set up yet.</p>
+						<h1>{error?.message}</h1>
+						<h2>{error?.errors}</h2>
 					</Col>
 				)}
 			</Row>
 		</Content>
 	);
-}
+};
 
-export default ApplicationViewer;
+export default ErrorPage;
