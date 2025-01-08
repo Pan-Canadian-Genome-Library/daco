@@ -19,11 +19,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import {
-	EmptyOrOptionalOhipNumber,
-	OhipNumber,
-	OptionalOhipNumber,
-} from '../../src/entities/fields/index.js';
+import { EmptyOrOptionalOhipNumber, OhipNumber, OptionalOhipNumber } from '../../src/entities/fields/index.js';
 
 describe('OhipNumber', () => {
 	it('Must be a string of 10 digits', () => {

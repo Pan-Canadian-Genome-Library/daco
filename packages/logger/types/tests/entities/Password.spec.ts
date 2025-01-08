@@ -22,9 +22,7 @@ import { describe, expect, it } from 'vitest';
 import { Password } from '../../src/entities/index.js';
 
 describe('Password', () => {
-
 	describe('Regex pattern matches', () => {
-
 		it('Validates if containing at least one lowercase, one uppercase letter, and meets length requirements', () => {
 			expect(Password.safeParse('lDpFymuoDGzPMMKhIuSa').success).true;
 			expect(Password.safeParse('ulFITAmbMqanHhBOQrnyDkXyfxBZcZETZGOhfgGkvfaYoqVs').success).true;
@@ -64,8 +62,8 @@ describe('Password', () => {
 		});
 		it('Does not validate if it contains only special characters', () => {
 			expect(Password.safeParse('$^@#%$^$%^^@#%$').success).false;
-			expect(Password.safeParse('$$$$$$$$$$$$$').success).false
-		})
+			expect(Password.safeParse('$$$$$$$$$$$$$').success).false;
+		});
 
 		it('Validates if it contains a special character', () => {
 			expect(Password.safeParse('LDpFymuoDGzPMMKhIuS@').success).true;
@@ -81,8 +79,13 @@ describe('Password', () => {
 		});
 
 		it('Does not validate if it has more than the max length of characters', () => {
-			expect(Password.safeParse('wfinaWIBxHumkRGomtLgqWvauHxIiiGFtSDUPgUgvzdtjULquHxIiiGFtSDUPgUgvzdtjULq').success).false;
-			expect(Password.safeParse('3kK4aFH9gHP6KItfFPm40exzfH6Ne6UKMXv8cLsKn1VqU8Cjm9sdgjkdfgh33wfinaWIBxHumkRGomtLgqWvauHxIiiGFtSDUPgUgvzdtjULquHxIiiG').success).false;
+			expect(Password.safeParse('wfinaWIBxHumkRGomtLgqWvauHxIiiGFtSDUPgUgvzdtjULquHxIiiGFtSDUPgUgvzdtjULq').success)
+				.false;
+			expect(
+				Password.safeParse(
+					'3kK4aFH9gHP6KItfFPm40exzfH6Ne6UKMXv8cLsKn1VqU8Cjm9sdgjkdfgh33wfinaWIBxHumkRGomtLgqWvauHxIiiGFtSDUPgUgvzdtjULquHxIiiG',
+				).success,
+			).false;
 		});
 
 		it('Does not validate if it has less than the min length of characters', () => {
@@ -98,7 +101,5 @@ describe('Password', () => {
 		it('Does not validate if it is undefined', () => {
 			expect(Password.safeParse(undefined).success).false;
 		});
-
 	});
-
 });

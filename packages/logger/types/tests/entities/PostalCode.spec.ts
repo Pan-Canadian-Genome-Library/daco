@@ -19,11 +19,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import {
-	EmptyOrOptionalPostalCode,
-	OptionalPostalCode,
-	PostalCode,
-} from '../../src/entities/fields/index.js';
+import { EmptyOrOptionalPostalCode, OptionalPostalCode, PostalCode } from '../../src/entities/fields/index.js';
 
 describe('PostalCode', () => {
 	it('Must be 6 characters long and in postal code format', () => {

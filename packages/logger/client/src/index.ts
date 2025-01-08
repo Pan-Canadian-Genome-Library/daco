@@ -21,6 +21,6 @@ import { default as Logger } from './logger.js';
 
 export default Logger;
 
-export * from './logger.js';
 export * from './config.js';
+export * from './logger.js';
 export * from './LogLevel.js';

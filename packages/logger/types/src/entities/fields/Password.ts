@@ -19,10 +19,7 @@
 
 import { z } from 'zod';
 
-import {
-	PASSWORD_MAXIMUM_LENGTH,
-	PASSWORD_MINIMUM_LENGTH,
-} from '../../common/lengthConstraints.js';
+import { PASSWORD_MAXIMUM_LENGTH, PASSWORD_MINIMUM_LENGTH } from '../../common/lengthConstraints.js';
 import {
 	PASSWORD_ALLOWED_CHARS_REGEX,
 	PASSWORD_LOWERCASE_LETTERS_REGEX,
@@ -41,10 +38,7 @@ export const uppercase = new RegExp(PASSWORD_UPPERCASE_LETTERS_REGEX);
 export const UppercaseRequirement = z.string().regex(uppercase);
 export type UppercaseRequirement = z.infer<typeof UppercaseRequirement>;
 
-export const LengthRequirement = z
-	.string()
-	.min(PASSWORD_MINIMUM_LENGTH)
-	.max(PASSWORD_MAXIMUM_LENGTH);
+export const LengthRequirement = z.string().min(PASSWORD_MINIMUM_LENGTH).max(PASSWORD_MAXIMUM_LENGTH);
 export type LengthRequirement = z.infer<typeof LengthRequirement>;
 
 export const Password = z.string().regex(PASSWORD_REGEX);

@@ -25,8 +25,7 @@ import {
 	PHONE_NUMBER_LENGTH,
 } from './lengthConstraints.js';
 
-export const NAME_REGEX =
-	/^[A-Za-zÀÂÇÉÈÊËÏÎÔÙÛÜàâçéèêëïôùû]+([ -]+[A-Za-zÀÂÇÉÈÊËÏÎÔÙÛÜàâçéèêëïôùû]+)*$/;
+export const NAME_REGEX = /^[A-Za-zÀÂÇÉÈÊËÏÎÔÙÛÜàâçéèêëïôùû]+([ -]+[A-Za-zÀÂÇÉÈÊËÏÎÔÙÛÜàâçéèêëïôùû]+)*$/;
 export const NANOID_REGEX = new RegExp(`^[A-Za-z0-9]{${NANOID_LENGTH}}$`);
 export const OHIP_NUMBER_REGEX = new RegExp(`^[0-9]{${OHIP_NUMBER_LENGTH}}$`);
 export const PHONE_NUMBER_REGEX = new RegExp(`^[0-9]{${PHONE_NUMBER_LENGTH}}$`);

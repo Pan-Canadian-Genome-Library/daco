@@ -19,11 +19,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import {
-	PhoneNumber,
-	OptionalPhoneNumber,
-	EmptyOrOptionalPhoneNumber,
-} from '../../src/entities/fields/index.js';
+import { EmptyOrOptionalPhoneNumber, OptionalPhoneNumber, PhoneNumber } from '../../src/entities/fields/index.js';
 
 describe('PhoneNumber', () => {
 	it('Must be a string containing 10 digits', () => {

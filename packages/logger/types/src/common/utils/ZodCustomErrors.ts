@@ -27,7 +27,7 @@ const ZOD_CUSTOM_ERRORS = [
 	'guardianHasParticipantPhoneNumber',
 	'guardianInfoMissing',
 	'invalidEmail',
-  'invalidOhipNumber',
+	'invalidOhipNumber',
 	'invalidPasswordLength',
 	'invalidPhoneNumber',
 	'missingAssentFormAcknowledgementForConsentGroup',

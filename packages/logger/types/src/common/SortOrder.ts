@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
 import { generateSchema } from '@anatine/zod-openapi';
 import type { SchemaObject } from 'openapi3-ts/oas31';
+import { z } from 'zod';
 
 const SORT_ORDERS = ['asc', 'desc'] as const;
 export const SortOrder = z.enum(SORT_ORDERS);

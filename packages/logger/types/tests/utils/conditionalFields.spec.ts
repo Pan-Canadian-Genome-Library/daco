@@ -27,12 +27,7 @@ import {
 	hasRequiredSelfIdentifiedGender,
 	hasRequiredSelfReportedPrimaryCancerDiagnosis,
 } from '../../src/common/index.js';
-import {
-	ConsentGroup,
-	Gender,
-	HistoryOfCancer,
-	PrimaryCancerDiagnosis,
-} from '../../src/entities/index.js';
+import { ConsentGroup, Gender, HistoryOfCancer, PrimaryCancerDiagnosis } from '../../src/entities/index.js';
 import { hasRequiredOhipFormInfo } from '../../src/services/consentUi/utils/index.js';
 
 const mockCompleteGuardianFields = {

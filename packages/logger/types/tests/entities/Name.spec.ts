@@ -19,7 +19,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { Name, OptionalName, EmptyOrOptionalName } from '../../src/entities/fields/index.js';
+import { EmptyOrOptionalName, Name, OptionalName } from '../../src/entities/fields/index.js';
 
 describe('Name', () => {
 	it('Can be a string containing only letters', () => {
@@ -73,18 +73,17 @@ describe('Name', () => {
 		expect(Name.safeParse('Homer Simpon!').success).false;
 	});
 	it('Can contain French accents', () => {
-		expect(Name.safeParse('ÀÂÇÉÈÊËÏÎÔÙÛÜ àâçéèêëïôùû').success).true
-		expect(Name.safeParse('Homér Sïmpsôn').success).true
-	})
+		expect(Name.safeParse('ÀÂÇÉÈÊËÏÎÔÙÛÜ àâçéèêëïôùû').success).true;
+		expect(Name.safeParse('Homér Sïmpsôn').success).true;
+	});
 	it('Can contain hyphen', () => {
-		expect(Name.safeParse('Homer - Simpson').success).true
-		expect(Name.safeParse('Homer-Simpson').success).true
-
-	})
+		expect(Name.safeParse('Homer - Simpson').success).true;
+		expect(Name.safeParse('Homer-Simpson').success).true;
+	});
 	it('Cannot start or end with a hyphen', () => {
-		expect(Name.safeParse('-Homer Simpson').success).false
-		expect(Name.safeParse('Homer Simpson-').success).false
-	})
+		expect(Name.safeParse('-Homer Simpson').success).false;
+		expect(Name.safeParse('Homer Simpson-').success).false;
+	});
 });
 
 describe('OptionalName', () => {
@@ -139,18 +138,17 @@ describe('OptionalName', () => {
 		expect(OptionalName.safeParse('Homer Simpon!').success).false;
 	});
 	it('Can contain French accents', () => {
-		expect(OptionalName.safeParse('ÀÂÇÉÈÊËÏÎÔÙÛÜ àâçéèêëïôùû').success).true
-		expect(OptionalName.safeParse('Homér Sïmpsôn').success).true
-	})
+		expect(OptionalName.safeParse('ÀÂÇÉÈÊËÏÎÔÙÛÜ àâçéèêëïôùû').success).true;
+		expect(OptionalName.safeParse('Homér Sïmpsôn').success).true;
+	});
 	it('Can contain hyphen', () => {
-		expect(OptionalName.safeParse('Homer - Simpson').success).true
-		expect(OptionalName.safeParse('Homer-Simpson').success).true
-
-	})
+		expect(OptionalName.safeParse('Homer - Simpson').success).true;
+		expect(OptionalName.safeParse('Homer-Simpson').success).true;
+	});
 	it('Cannot start or end with a hyphen', () => {
-		expect(OptionalName.safeParse('-Homer Simpson').success).false
-		expect(OptionalName.safeParse('Homer Simpson-').success).false
-	})
+		expect(OptionalName.safeParse('-Homer Simpson').success).false;
+		expect(OptionalName.safeParse('Homer Simpson-').success).false;
+	});
 });
 
 describe('EmptyOrOptionalName', () => {
@@ -205,16 +203,15 @@ describe('EmptyOrOptionalName', () => {
 		expect(EmptyOrOptionalName.safeParse('Homer Simpon!').success).false;
 	});
 	it('Can contain French accents', () => {
-		expect(EmptyOrOptionalName.safeParse('ÀÂÇÉÈÊËÏÎÔÙÛÜ àâçéèêëïôùû').success).true
-		expect(EmptyOrOptionalName.safeParse('Homér Sïmpsôn').success).true
-	})
+		expect(EmptyOrOptionalName.safeParse('ÀÂÇÉÈÊËÏÎÔÙÛÜ àâçéèêëïôùû').success).true;
+		expect(EmptyOrOptionalName.safeParse('Homér Sïmpsôn').success).true;
+	});
 	it('Can contain hyphen', () => {
-		expect(EmptyOrOptionalName.safeParse('Homer - Simpson').success).true
-		expect(EmptyOrOptionalName.safeParse('Homer-Simpson').success).true
-
-	})
+		expect(EmptyOrOptionalName.safeParse('Homer - Simpson').success).true;
+		expect(EmptyOrOptionalName.safeParse('Homer-Simpson').success).true;
+	});
 	it('Cannot start or end with a hyphen', () => {
-		expect(EmptyOrOptionalName.safeParse('-Homer Simpson').success).false
-		expect(EmptyOrOptionalName.safeParse('Homer Simpson-').success).false
-	})
+		expect(EmptyOrOptionalName.safeParse('-Homer Simpson').success).false;
+		expect(EmptyOrOptionalName.safeParse('Homer Simpson-').success).false;
+	});
 });

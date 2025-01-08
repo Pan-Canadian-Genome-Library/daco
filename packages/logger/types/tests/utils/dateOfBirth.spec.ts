@@ -29,12 +29,12 @@ export const setupDateOfBirthTest = () => {
 
 	const monthDay = `${month}/${day}/`;
 	const exactlyMinimumAgeDateOfBirth = getISODate(new Date(`${monthDay}${year - MINIMUM_AGE_IN_YEARS}`));
-	const olderThanMinimumAgeDateOfBirth = getISODate(new Date(
-		`${monthDay}${year - Math.floor(MINIMUM_AGE_IN_YEARS * 1.5)}`,
-	));
-	const lessThanMinimumAgeDateOfBirth = getISODate(new Date(
-		`${monthDay}${year - Math.ceil(MINIMUM_AGE_IN_YEARS / 2)}`,
-	));
+	const olderThanMinimumAgeDateOfBirth = getISODate(
+		new Date(`${monthDay}${year - Math.floor(MINIMUM_AGE_IN_YEARS * 1.5)}`),
+	);
+	const lessThanMinimumAgeDateOfBirth = getISODate(
+		new Date(`${monthDay}${year - Math.ceil(MINIMUM_AGE_IN_YEARS / 2)}`),
+	);
 	const futureDateOfBirth = getISODate(new Date(`${monthDay}${year + MINIMUM_AGE_IN_YEARS}`));
 
 	return {

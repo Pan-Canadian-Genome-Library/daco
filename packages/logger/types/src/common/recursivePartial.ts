@@ -24,6 +24,6 @@ export type RecursivePartial<T = object> = {
 	[P in keyof T]?: T[P] extends Array<infer I>
 		? Array<RecursivePartial<I>>
 		: T[P] extends Record<string, any>
-		? RecursivePartial<T[P]>
-		: T[P];
+			? RecursivePartial<T[P]>
+			: T[P];
 };

@@ -19,8 +19,8 @@
 
 import { z } from 'zod';
 
-import { NanoId } from './fields/index.js';
 import { ConsentQuestionId } from './ConsentQuestion.js';
+import { NanoId } from './fields/index.js';
 
 export const ParticipantResponseBase = z.object({
 	consentQuestionId: ConsentQuestionId,

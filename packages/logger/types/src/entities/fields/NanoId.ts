@@ -23,8 +23,7 @@ import { z } from 'zod';
 
 import { NANOID_REGEX } from '../../common/regexes.js';
 
-export const ID_ALPHABET =
-	'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' as const;
+export const ID_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' as const;
 
 export const NanoId = z.string().regex(NANOID_REGEX);
 export type NanoId = z.infer<typeof NanoId>;

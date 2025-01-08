@@ -19,13 +19,7 @@
 
 import { z } from 'zod';
 
-import {
-	Name,
-	OptionalEmail,
-	OptionalName,
-	OptionalPhoneNumber,
-	PhoneNumber,
-} from './fields/index.js';
+import { Name, OptionalEmail, OptionalName, OptionalPhoneNumber, PhoneNumber } from './fields/index.js';
 
 export const GuardianBaseFields = z.object({
 	guardianEmailAddress: OptionalEmail,

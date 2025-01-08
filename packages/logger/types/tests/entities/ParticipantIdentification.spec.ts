@@ -20,9 +20,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { getISODate } from '../../src/common/utils/dateOfBirth.js';
+import { ConsentGroup, LifecycleState, Province } from '../../src/entities/fields/index.js';
 import { ParticipantIdentification } from '../../src/entities/index.js';
 import { formatZodFieldErrorsForTesting } from '../utils/zodUtils.js';
-import { ConsentGroup, LifecycleState, Province } from '../../src/entities/fields/index.js';
 
 const mockGuardianData = {
 	guardianEmailAddress: 'marge@example.com',

@@ -46,10 +46,7 @@ export const transformEmptyStringToUndefined = (input?: string) => input?.trim()
  * replaceParams('Translated this string on a {{dayOfWeek}} in {{ dayOfMonth }}.', { dayOfWeek: 'Thursday', dayOfMonth: 'October' } )
  * // returns 'Translated this string on a Thursday in October.'
  */
-export const replaceParams = (
-	original: string,
-	replacements?: Record<string, string | number>,
-): string => {
+export const replaceParams = (original: string, replacements?: Record<string, string | number>): string => {
 	return Object.entries(replacements || {}).reduce((acc, [key, value]) => {
 		const tagRegex = new RegExp(`{{[\\s]*${key}[\\s]*}}`, REGEX_FLAG_GLOBAL);
 		return acc.replace(tagRegex, String(value));

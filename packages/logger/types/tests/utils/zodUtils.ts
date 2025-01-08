@@ -29,9 +29,7 @@ type FieldErrors = {
  * @param result The object resulting from Zod SafeParse
  * @returns An array of objects: { path, message }
  */
-export const formatZodFieldErrorsForTesting = (
-	result: z.SafeParseReturnType<any, any>,
-): FieldErrors => {
+export const formatZodFieldErrorsForTesting = (result: z.SafeParseReturnType<any, any>): FieldErrors => {
 	const resultJsonParsed = JSON.parse((result as { error: Error }).error.message);
 	return resultJsonParsed.map((item: z.CustomErrorParams) => ({
 		path: (item.path && item.path[0]) || '',

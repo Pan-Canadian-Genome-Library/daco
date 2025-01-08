@@ -24,11 +24,9 @@
  * For backend error messaging only.
  */
 export const refinementErrorMessages = {
-	clinicianInstitutionalEmailDomainNotAllowed:
-		'Clinician institutional email domain is not allowed',
+	clinicianInstitutionalEmailDomainNotAllowed: 'Clinician institutional email domain is not allowed',
 	hasRequiredSelfIdentifiedGender: 'Invalid selfIdentifiedGender value for genderIdentity',
-	hasRequiredSelfReportedPrimaryCancerDiagnosis:
-		'Invalid selfReportedPrimaryCancerDiagnosis value for historyOfCancer',
+	hasRequiredSelfReportedPrimaryCancerDiagnosis: 'Invalid selfReportedPrimaryCancerDiagnosis value for historyOfCancer',
 	hasRequiredAssentFormAcknowledgement: '',
 	hasRequiredAssentFormIdentifier: '',
 	hasRequiredOhipInfo: 'Invalid ohip information for hasOhip status',
