@@ -30,7 +30,6 @@ type TextProps = {
  *  @description Component to display a list of string data
  *  purpose: Antd has a List component but does not allow usage of standard css list-style like disc or numbers.
  */
-
 const TextList = ({ data, isNumbered = false }: TextProps) => {
 	const { token } = useToken();
 
