@@ -90,6 +90,10 @@ const pcglTheme: ThemeConfig = {
 		Progress: {
 			remainingColor: pcglColors.primary,
 		},
+		Divider: {
+			colorSplit: pcglColors.grey,
+			verticalMarginInline: 20,
+		},
 	},
 };
 
