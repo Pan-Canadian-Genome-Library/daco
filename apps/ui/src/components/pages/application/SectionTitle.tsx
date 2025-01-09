@@ -24,9 +24,10 @@ const { Title, Text } = Typography;
 interface SectionTitleProps extends PropsWithChildren {
 	title: string;
 	text?: string[];
+	showDivider?: boolean;
 }
 
-const SectionTitle = ({ title, text = [], children }: SectionTitleProps) => {
+const SectionTitle = ({ title, text = [], showDivider = true, children }: SectionTitleProps) => {
 	return (
 		<Flex vertical>
 			<Title level={2}>{title}</Title>
@@ -36,7 +37,7 @@ const SectionTitle = ({ title, text = [], children }: SectionTitleProps) => {
 				})}
 			</Flex>
 			{children}
-			<Divider />
+			{showDivider && <Divider />}
 		</Flex>
 	);
 };

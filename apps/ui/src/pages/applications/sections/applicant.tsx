@@ -18,9 +18,27 @@
  */
 
 import { Flex } from 'antd';
+import { useTranslation } from 'react-i18next';
+
+import SectionWrapper from '@/components/layouts/SectionWrapper';
+import SectionFooter from '@/components/pages/application/SectionFooter';
+import SectionTitle from '@/components/pages/application/SectionTitle';
 
 const Applicant = () => {
-	return <Flex>Applicant</Flex>;
+	const { t: translate } = useTranslation();
+	return (
+		<SectionWrapper>
+			<>
+				<Flex vertical>
+					<SectionTitle
+						title={translate('applicant-section.title')}
+						text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
+					/>
+					<SectionFooter />
+				</Flex>
+			</>
+		</SectionWrapper>
+	);
 };
 
 export default Applicant;

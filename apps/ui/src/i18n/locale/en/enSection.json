@@ -13,5 +13,10 @@
 		"accessPoint3": "Submit the signed application for review by the Data Access Compliance Office (DACO) in the “Sign and Submit” section of this application.",
 		"description1": "During the application process, you must submit a summary of your research project. Your project will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the donors and the security of the donors' data. If your application is approved, you agree that your applicant's name, institution, and scientific lay summary may be included in a public registry of projects that have been granted access to PCGL Controlled Data.",
 		"description2": "If the Data Access Compliance Office (DACO) approves your application, access to the PCGL Controlled Data will be granted starting from the date you are approved for access. An annual agreement must be made by the applicant and a bi-annual renewal must be completed in order to access/use controlled data beyond that two-year time period."
+	},
+	"applicant-section": {
+		"title": "Applicant Information (Principal Investigator)",
+		"description1": "Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to apply for federal research grants, etc.).",
+		"description2": "Please include a valid institutional email address that will be used to log in to PCGL and will be the email address associated with PCGL Controlled Data access."
 	}
 }
