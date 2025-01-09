@@ -17,30 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
-import { useTranslation } from 'react-i18next';
+import { Divider, Flex, Typography } from 'antd';
+import { PropsWithChildren } from 'react';
 
-import SectionWrapper from '@/components/layouts/SectionWrapper';
-import SectionContent from '@/components/pages/application/SectionContent';
-import SectionFooter from '@/components/pages/application/SectionFooter';
-import SectionTitle from '@/components/pages/application/SectionTitle';
+const { Title } = Typography;
 
-const Applicant = () => {
-	const { t: translate } = useTranslation();
+interface SectionContentProps extends PropsWithChildren {
+	title: string;
+	showDivider?: boolean;
+}
+
+const SectionContent = ({ title, showDivider = true, children }: SectionContentProps) => {
 	return (
-		<SectionWrapper>
-			<>
-				<Flex vertical>
-					<SectionTitle
-						title={translate('applicant-section.title')}
-						text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
-					/>
-					<SectionContent title={'Principal Investigator Information'}></SectionContent>
-					<SectionFooter />
-				</Flex>
-			</>
-		</SectionWrapper>
+		<Flex vertical>
+			<Title level={4}>{title}</Title>
+			{children}
+			{showDivider && <Divider />}
+		</Flex>
 	);
 };
 
-export default Applicant;
+export default SectionContent;
