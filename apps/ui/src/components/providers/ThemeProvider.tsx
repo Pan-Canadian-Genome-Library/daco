@@ -73,6 +73,9 @@ const pcglTheme: ThemeConfig = {
 		Typography: {
 			fontSize: 16,
 		},
+		Tag: {
+			colorFillSecondary: pcglColors.white,
+		},
 		Modal: {
 			titleFontSize: 24,
 			titleLineHeight: 2,
@@ -118,6 +121,21 @@ export const pcglFooterTheme: ThemeConfig = {
 			colorText: pcglColors.white,
 			colorLink: pcglColors.quaternary,
 			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
+		},
+	},
+};
+
+//Table Themes
+export const pcglTableTheme: ThemeConfig = {
+	token: {
+		colorBgContainer: '#fff',
+	},
+	components: {
+		Table: {
+			headerBg: '#fafafa',
+			headerSortActiveBg: '#f0f0f0',
+			headerSortHoverBg: '#f0f0f0',
+			rowHoverBg: 'rgba(0, 0, 0, 0.02)',
 		},
 	},
 };
