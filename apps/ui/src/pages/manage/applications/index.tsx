@@ -17,89 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { mockTableData } from '@/components/mock/applicationMockData';
 import PageHeader from '@/components/pages/global/PageHeader';
-import DashboardFilter, { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
-import StatusTableColumn from '@/components/pages/manage/StatusTableColumn';
-import { pcglTableTheme } from '@/components/providers/ThemeProvider';
-import { useMinWidth } from '@/global/hooks/useMinWidth';
+import ManageApplicationsDashboard, { FilterState } from '@/components/pages/manage/Dashboard';
+import { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
-import { ConfigProvider, Flex, Layout, Table, theme, Typography } from 'antd';
+import { Flex, Layout } from 'antd';
 import { useMemo, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 
 const { Content } = Layout;
-const { Text, Link } = Typography;
-const { useToken } = theme;
-
-interface TableData {
-	id: number;
-	institution: string;
-	institution_country: string;
-	applicant_full_name: string;
-	updated_at: number;
-	applicant_institutional_email: string;
-	state: string;
-}
-
-interface FilterState {
-	key: FilterKeyType;
-	amount: number;
-}
-
-const tableColumnConfiguration = [
-	{
-		title: 'Application #',
-		dataIndex: 'id',
-		key: 'id',
-		render: (value: string) => (
-			<Link href={`/application/${value}`} style={{ textDecoration: 'underline' }}>
-				PCGL-{value}
-			</Link>
-		),
-		sorter: (a: { id: number }, b: { id: number }) => a.id - b.id,
-	},
-	{
-		title: 'Institution',
-		dataIndex: 'institution',
-		key: 'institution',
-	},
-	{
-		title: 'Country',
-		dataIndex: 'institution_country',
-		key: 'institution_country',
-	},
-	{
-		title: 'Applicant',
-		dataIndex: 'applicant_full_name',
-		key: 'applicant_full_name',
-	},
-	{
-		title: 'Email',
-		dataIndex: 'applicant_institutional_email',
-		key: 'applicant_institutional_email',
-	},
-	{
-		title: 'Updated',
-		dataIndex: 'updated_at',
-		key: 'updated_at',
-		render: (value: number) => new Date(value).toLocaleDateString('en-CA'),
-		sorter: (a: { updated_at: number }, b: { updated_at: number }) => {
-			return new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
-		},
-	},
-	{
-		title: 'Status',
-		dataIndex: 'state',
-		key: 'state',
-		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
-		sorter: (a: { state: string }, b: { state: string }) => (a.state < b.state ? -1 : a.state > b.state ? 1 : 0),
-	},
-];
 
 /**
  * Calculates the number shown beside the filter at the top of the page.
@@ -123,8 +52,6 @@ const calculateFilterAmounts = (data: TableData[]) => {
 
 const ManageApplicationsPage = () => {
 	const { t: translate } = useTranslation();
-	const { token } = useToken();
-	const minWidth = useMinWidth();
 
 	const [tableData, setTableData] = useState<Array<TableData>>(mockTableData);
 
@@ -159,35 +86,11 @@ const ManageApplicationsPage = () => {
 		<Content>
 			<Flex vertical>
 				<PageHeader title={translate('manage.applications.title')} />
-				<Flex
-					style={{ ...contentWrapperStyles, padding: `${token.paddingLG}px ${token.paddingLG}px` }}
-					gap={token.paddingSM}
-					vertical
-				>
-					<Flex
-						justify="space-between"
-						align="center"
-						vertical={minWidth <= token.screenLGMax}
-						gap={minWidth <= token.screenLGMax ? token.paddingSM : 0}
-					>
-						<Text>{translate('manage.applications.listTitle')}</Text>
-						<DashboardFilter
-							onFilterChange={(filtersActive) => handleFilterChange(filtersActive)}
-							availableStates={filterAmounts}
-						/>
-					</Flex>
-					<Flex style={{ width: '100%', height: '100%' }}>
-						<ConfigProvider theme={pcglTableTheme}>
-							<Table
-								rowKey={(record: TableData) => `PCGL-${record.id}-${record.institution}`}
-								pagination={{ pageSize: 20 }}
-								dataSource={tableData}
-								columns={tableColumnConfiguration}
-								style={{ width: '100%', height: '100%' }}
-							/>
-						</ConfigProvider>
-					</Flex>
-				</Flex>
+				<ManageApplicationsDashboard
+					filterCounts={filterAmounts}
+					data={tableData}
+					onFilterChange={handleFilterChange}
+				/>
 			</Flex>
 		</Content>
 	);
