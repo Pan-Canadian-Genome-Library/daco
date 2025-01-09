@@ -17,10 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { default as Logger } from './logger.js';
-
-export default Logger;
-
 export * from './config.js';
 export * from './logger.js';
 export * from './LogLevel.js';

@@ -17,14 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { LogLevel, LogLevels, Logger } from '@pcgl-daco/logger-client';
 import { RequestHandler } from 'express';
 import ExpressRequestLogger from 'express-requests-logger';
+import { LogLevel, LogLevels, LoggerType } from '../client/index.js';
 
 import { MiddlewareData } from './dependencyDataTypes.js';
 
 export type ExpressLoggerConfig = {
-	logger: Logger;
+	logger: LoggerType;
 	excludeURLs?: string[];
 };
 
@@ -80,7 +80,7 @@ const formatLogMessage = (data?: MiddlewareData, ...params: any[]): object => {
  * but in fact they use all of debug, info, warn, and error. So we return an untyped object
  * with each of those methods pointing to our own handler.
  *  */
-const transformLogger = (original: Logger) => {
+const transformLogger = (original: LoggerType) => {
 	const namedLogger = original.forModule('ExpressLogger');
 
 	const replacementLogFunction = (data: object, ...inputs: any[]) => {
@@ -120,7 +120,7 @@ const swaggerUiPaths = ['api-docs', 'swagger-ui', 'favicon'];
  * @param config
  * @returns
  */
-const ExpressLogger = (config: ExpressLoggerConfig): RequestHandler => {
+export const ExpressLogger = (config: ExpressLoggerConfig): RequestHandler => {
 	const { logger } = config;
 
 	return ExpressRequestLogger({
@@ -130,5 +130,3 @@ const ExpressLogger = (config: ExpressLoggerConfig): RequestHandler => {
 		excludeURLs: [...(config.excludeURLs || []), ...swaggerUiPaths],
 	});
 };
-
-export default ExpressLogger;

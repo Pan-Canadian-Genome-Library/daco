@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RecursivePartial } from '@pcgl-daco/logging-types/common';
+import { RecursivePartial } from '../types/recursivePartial.js';
 
 /*
  * The types here are hints to help us format the data returned by the express-request-logger middleware.

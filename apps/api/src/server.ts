@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ExpressLogger from '@pcgl-daco/logger-express-middleware';
+import { ExpressLogger } from '@pcgl-daco/logger';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 

@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RecursivePartial } from '@pcgl-daco/logger-types/common';
 import { LoggerOptions, createLogger, format, transports } from 'winston';
+import { RecursivePartial } from '../types/recursivePartial.js';
 
 import { LogLevel, LogLevels } from './LogLevel.js';
 import { LoggerConfig } from './config.js';
@@ -27,17 +27,17 @@ import { unknownToString } from './utils/stringUtils.js';
 const { combine, timestamp, colorize, printf } = format;
 
 export type LogFunction = (...messages: any[]) => void;
-export type Logger = {
+export type LoggerType = {
 	debug: LogFunction;
 	info: LogFunction;
 	warn: LogFunction;
 	error: LogFunction;
 	log: (level: LogLevel, ...args: Parameters<LogFunction>) => ReturnType<LogFunction>;
 
-	forModule: (...moduleNames: string[]) => Logger;
+	forModule: (...moduleNames: string[]) => LoggerType;
 };
 
-const Logger = (config?: RecursivePartial<LoggerConfig>) => {
+export const Logger = (config?: RecursivePartial<LoggerConfig>) => {
 	const logLevel = config?.level ?? LogLevels.DEBUG;
 
 	/* ===== Transports ===== */
@@ -82,7 +82,7 @@ const Logger = (config?: RecursivePartial<LoggerConfig>) => {
 	 * @param moduleNames
 	 * @returns
 	 */
-	const createNamedLogger = (...moduleNames: string[]): Logger => {
+	const createNamedLogger = (...moduleNames: string[]): LoggerType => {
 		/* ===== Logging ===== */
 		const formatMessage = (message: any) => {
 			const messageAsString = unknownToString(message, { space: 2 });
@@ -147,7 +147,7 @@ const Logger = (config?: RecursivePartial<LoggerConfig>) => {
 			 * moduleLogger.info('log messages from the module'); // "[ServiceName.ModuleName] log messages from the module"
 			 * ```
 			 */
-			forModule: (...subModuleNames: string[]): Logger => {
+			forModule: (...subModuleNames: string[]): LoggerType => {
 				return createNamedLogger(...moduleNames, ...subModuleNames);
 			},
 		};
@@ -156,5 +156,3 @@ const Logger = (config?: RecursivePartial<LoggerConfig>) => {
 	// Return a logger with no module names
 	return createNamedLogger();
 };
-
-export default Logger;

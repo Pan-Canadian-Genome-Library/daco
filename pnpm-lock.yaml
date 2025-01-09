@@ -32,12 +32,9 @@ importers:
       '@pcgl-daco/data-model':
         specifier: workspace:^
         version: link:../../packages/data-model
-      '@pcgl-daco/logger-client':
+      '@pcgl-daco/logger':
         specifier: workspace:^
-        version: link:../../packages/logger/client
-      '@pcgl-daco/logger-express-middleware':
-        specifier: workspace:^
-        version: link:../../packages/logger/express-middleware
+        version: link:../../packages/logger
       '@types/body-parser':
         specifier: ^1.19.5
         version: 1.19.5
@@ -174,30 +171,39 @@ importers:
         specifier: ^5.5.3
         version: 5.6.2
 
-  packages/logger/client:
+  packages/logger:
     dependencies:
+      express-requests-logger:
+        specifier: ^4.0.0
+        version: 4.0.1
       winston:
         specifier: ^3.10.0
         version: 3.17.0
     devDependencies:
-      '@pcgl-daco/logger-eslint-config':
-        specifier: workspace:^
-        version: link:../eslint-config
-      '@pcgl-daco/logger-types':
-        specifier: workspace:^
-        version: link:../types
-      dotenv:
-        specifier: ^16.3.1
-        version: 16.4.7
-
-  packages/logger/eslint-config:
-    devDependencies:
+      '@anatine/zod-openapi':
+        specifier: ^2.2.0
+        version: 2.2.6(openapi3-ts@4.4.0)(zod@3.23.8)
+      '@types/express':
+        specifier: ^4.17.17
+        version: 4.17.21
+      '@types/express-requests-logger':
+        specifier: ^3.0.4
+        version: 3.0.4
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.2.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.40.0)(typescript@5.6.2))(eslint@8.40.0)(typescript@5.6.2)
       '@typescript-eslint/parser':
         specifier: ^6.2.0
         version: 6.21.0(eslint@8.40.0)(typescript@5.6.2)
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.4.7
       eslint:
         specifier: 8.40.0
         version: 8.40.0
@@ -213,43 +219,6 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.0.0
         version: 5.2.1(eslint-config-prettier@8.10.0(eslint@8.40.0))(eslint@8.40.0)(prettier@3.3.3)
-
-  packages/logger/express-middleware:
-    dependencies:
-      '@pcgl-daco/logger-client':
-        specifier: workspace:^
-        version: link:../client
-      '@pcgl-daco/logger-eslint-config':
-        specifier: workspace:^
-        version: link:../eslint-config
-      '@pcgl-daco/logger-types':
-        specifier: workspace:^
-        version: link:../types
-      express-requests-logger:
-        specifier: ^4.0.0
-        version: 4.0.1
-    devDependencies:
-      '@types/express':
-        specifier: ^4.17.17
-        version: 4.17.21
-      '@types/express-requests-logger':
-        specifier: ^3.0.4
-        version: 3.0.4
-
-  packages/logger/types:
-    dependencies:
-      '@anatine/zod-openapi':
-        specifier: ^2.2.0
-        version: 2.2.6(openapi3-ts@4.4.0)(zod@3.23.8)
-      '@pcgl-daco/logger-eslint-config':
-        specifier: workspace:^
-        version: link:../eslint-config
-      date-fns:
-        specifier: ^4.1.0
-        version: 4.1.0
-      dayjs:
-        specifier: ^1.11.13
-        version: 1.11.13
       openapi3-ts:
         specifier: ^4.1.2
         version: 4.4.0
