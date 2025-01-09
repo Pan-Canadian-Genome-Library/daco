@@ -17,15 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Logger } from '@pcgl-daco/logger';
+import { Logger, LogLevels } from '@pcgl-daco/logger';
 
-// import { getAppConfig } from './config/index.js';
-
-// const config = getAppConfig();
+const { IS_DEV } = process.env;
 
 const logger = Logger({
-	// logFile: !config.isProduction,
-	// level: config.isProduction ? LogLevels.INFO : LogLevels.DEBUG,
+	logFile: !IS_DEV,
+	level: IS_DEV ? LogLevels.INFO : LogLevels.DEBUG,
 }).forModule('PCGL-DACO-API');
 
 export default logger;
