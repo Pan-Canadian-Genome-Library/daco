@@ -22,7 +22,7 @@ import { RecursivePartial } from '../types/recursivePartial.js';
 
 import { LogLevel, LogLevels } from './LogLevel.js';
 import { LoggerConfig } from './config.js';
-import { unknownToString } from './utils/stringUtils.js';
+import { unknownToString } from './stringUtils.js';
 
 const { combine, timestamp, colorize, printf } = format;
 
