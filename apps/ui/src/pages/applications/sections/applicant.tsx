@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
+import { Col, Form, Input, Row, Select, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
@@ -25,20 +25,89 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 
+const { Text } = Typography;
+
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	return (
 		<SectionWrapper>
-			<>
-				<Flex vertical>
-					<SectionTitle
-						title={translate('applicant-section.title')}
-						text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
-					/>
-					<SectionContent title={'Principal Investigator Information'}></SectionContent>
-					<SectionFooter />
-				</Flex>
-			</>
+			<Form layout="vertical">
+				<SectionTitle
+					title={translate('applicant-section.title')}
+					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
+				/>
+				<SectionContent title={'Principal Investigator Information'}>
+					<Row>
+						<Col span={4}>
+							<Form.Item label="Title:">
+								<Select>
+									<Select.Option value="rapper">Rapper</Select.Option>
+								</Select>
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="First Name:" required>
+								<Input />
+							</Form.Item>
+						</Col>
+						<Col span={12}>
+							<Form.Item label="Middle Name:">
+								<Input />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Last Name:" required>
+								<Input />
+							</Form.Item>
+						</Col>
+						<Col span={12}>
+							<Form.Item label="Suffix:">
+								<Input />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Primary Affiliation:" required>
+								<Text style={{ fontSize: '0.75rem' }}>The legal entity responsible for this application.</Text>
+								<Input />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Institutional Email:" required>
+								<Text style={{ fontSize: '0.75rem' }}>
+									Must be the institutional email address of the Principal Investigator.
+								</Text>
+								<Input />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Researcher Profile:" required>
+								<Text style={{ fontSize: '0.75rem' }}>
+									Please provide a link to your profile on your institution/company website.
+								</Text>
+								<Input />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Position Title:" required>
+								<Input />
+							</Form.Item>
+						</Col>
+					</Row>
+				</SectionContent>
+				<SectionFooter />
+			</Form>
 		</SectionWrapper>
 	);
 };

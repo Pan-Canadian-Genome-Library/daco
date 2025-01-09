@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /*
  * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
  *
@@ -94,12 +95,17 @@ const pcglTheme: ThemeConfig = {
 			colorSplit: pcglColors.grey,
 			verticalMarginInline: 20,
 		},
+		Select: {
+			colorBgContainer: pcglColors.white,
+		},
+		Input: {
+			colorBgContainer: pcglColors.white,
+		},
 	},
 };
 
 // Header Theme Configurations
 export const pcglHeaderTheme: ThemeConfig = {
-	...pcglTheme,
 	token: {
 		colorLink: pcglColors.black,
 		colorLinkHover: 'rgba(0,0,0,0.5)',
