@@ -20,7 +20,6 @@
 /**
  * Convert an unknown value into a string. Intended for parsing caught errors.
  * @param input
- * @returns
  */
 export function unknownToString(
 	input: unknown,

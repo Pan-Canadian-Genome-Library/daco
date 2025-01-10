@@ -67,7 +67,6 @@ export const Logger = (config?: RecursivePartial<LoggerConfig>) => {
 	/* ===== Config ===== */
 	const options: LoggerOptions = {
 		silent: config?.silent ?? false,
-
 		transports: loggerTransports,
 	};
 	const logger = createLogger(options);
@@ -79,7 +78,6 @@ export const Logger = (config?: RecursivePartial<LoggerConfig>) => {
 	 * These are used to indicate which module is generating the log message.
 	 *
 	 * @param moduleNames
-	 * @returns
 	 */
 	const createNamedLogger = (...moduleNames: string[]): LoggerType => {
 		/* ===== Logging ===== */
@@ -132,7 +130,6 @@ export const Logger = (config?: RecursivePartial<LoggerConfig>) => {
 			 * This will use the same logger instance, but log statements will include the sub module names
 			 * in their message.
 			 * @param subServices
-			 * @returns
 			 *
 			 * @example
 			 * ```

@@ -34,7 +34,6 @@ export type ExpressLoggerConfig = {
  * Auth errors from the user are logged as WARN, this includes Forbidden and Unauthorized requests.
  * Everything else is logged as INFO
  * @param maybeResponse
- * @returns
  */
 const selectLevelForResponse = (maybeResponse: { response?: { status_code?: unknown } }): LogLevel => {
 	const statusCode = maybeResponse?.response?.status_code;
@@ -118,7 +117,6 @@ const swaggerUiPaths = ['api-docs', 'swagger-ui', 'favicon'];
  * ```
  *
  * @param config
- * @returns
  */
 export const ExpressLogger = (config: ExpressLoggerConfig): RequestHandler => {
 	const { logger } = config;
