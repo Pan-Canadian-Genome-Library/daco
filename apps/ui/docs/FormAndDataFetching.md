@@ -7,10 +7,6 @@ Libraries and bindings:
   - [antd-zod](https://github.com/MrBr/antd-zod) (changes zod schema into antd rules)
 - [react-query](https://tanstack.com/query/v5/docs/framework/react/overview)
 
-(Already Included)
-
-- [Antd Forms](https://ant.design/components/form)
-
 ## Usage of libraries with Antd
 
 Since we are relying on antd to handle the UI, it is important that the libraries we use work well with antd
@@ -24,7 +20,7 @@ React-hook-form is an alternative lightweight library that allows developers to 
 
 - Uses hooks to manage form inputs or elements
 - Allows usage of third-party libraries form components using their `<Controller/>` element, which will be integral with Antd
-- Easily integrated with thirdpart validators such as `Zod` but using `useForm` field passing in `zodResolver(schema)`
+- Easily integrated with third-party validators such as `Zod` but using `useForm` field passing in `zodResolver(schema)`
 - allows more options for the developer to work with `formState`
 
 ### Zod (validation)
@@ -38,7 +34,7 @@ React-hook-form is an alternative lightweight library that allows developers to 
 React-query is a data fetching library that makes fetching, caching and handling api state much easier for the developer.
 By passing the fetching function (using fetchApi or Axios), and passing it through react-query hooks, it gives
 the developer a set of `state` variables such as `isLoading`,`isError` and `error` without writing any custom solution of `useEffect` and `useState`
-hooks to acquire similar functionality. react-query generally doesn't force the developer to follow their patterns or paradims and can still get custom when needed.
+hooks to acquire similar functionality. react-query generally doesn't force the developer to follow their patterns or paradigms and can still get custom when needed.
 
 We can isolate our api fetching logic into hooks and generally keep the components api logic free, allow more room in the components to focus on UI solutions.
 Heres an example of creating a hook:
