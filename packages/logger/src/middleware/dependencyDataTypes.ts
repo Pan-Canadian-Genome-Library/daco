@@ -27,7 +27,6 @@ import { RecursivePartial } from '../types/recursivePartial.js';
  *
  * Every property is made optional with RecursivePartial to make sure that developers always check for existence before using them.
  */
-//
 
 export type MiddlewareResponse = RecursivePartial<{
 	status_code?: number;
