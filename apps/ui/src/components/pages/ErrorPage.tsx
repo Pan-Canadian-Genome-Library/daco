@@ -26,7 +26,7 @@ const { Content } = Layout;
 
 type ErrorProps = {
 	loading: boolean;
-	error?: ServerError;
+	error: ServerError | null;
 };
 
 const ErrorPage = ({ error, loading }: ErrorProps) => {

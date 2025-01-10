@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Flex, Layout, Row, Typography } from 'antd';
+import { Col, Flex, Layout, Row } from 'antd';
 import { useEffect } from 'react';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 
@@ -26,11 +26,10 @@ import AppHeader from '@/components/pages/application/AppHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/useGetApplication';
-import { SkeletonLoader } from '@/components/SkeletonLoader';
+import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Content } = Layout;
-const { Text } = Typography;
 
 const ApplicationViewer = () => {
 	const params = useParams();
@@ -55,17 +54,7 @@ const ApplicationViewer = () => {
 		}
 	}, [data, isEditMode, navigation]);
 
-	// Could probably create a component to make it look nicer here
-	if (isLoading) return <SkeletonLoader />;
-	if (isError)
-		return (
-			<Content>
-				<Flex style={{ height: '100%' }} vertical justify="center" align="center">
-					<Text>{error.name}</Text>
-					<Text>{error.message}</Text>
-				</Flex>
-			</Content>
-		);
+	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
 	return (
 		<Content>

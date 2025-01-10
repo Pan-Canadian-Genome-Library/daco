@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ServerError } from '@/global/types';
+import { Application } from '@pcgl-daco/data-model';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { fetch } from '../global/FetchClient';
@@ -24,26 +26,28 @@ import { fetch } from '../global/FetchClient';
 const useGetApplication = (id?: string | number) => {
 	const { t: translate } = useTranslation();
 
-	return useQuery({
+	return useQuery<Application, ServerError>({
 		queryKey: [id],
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}`);
 
 			if (!response.ok) {
-				let errorText = translate('errors.generic.message');
+				const error = {
+					message: translate('errors.generic.title'),
+					errors: translate('errors.generic.message'),
+				};
+
 				switch (response.status) {
 					case 404:
-						errorText = translate('errors.applicationNotFound.message');
-						break;
-					default:
+						error.message = translate('errors.http.404.title');
+						error.errors = translate('errors.http.404.message');
 						break;
 				}
-				const error = new Error(errorText);
-				error.name = translate('errors.generic.title');
+
 				throw error;
 			}
 
-			return response.json();
+			return await response.json();
 		},
 	});
 };
