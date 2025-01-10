@@ -16,14 +16,15 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { ServerError } from '@/global/types';
-import { Application } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { fetch } from '../global/FetchClient';
+
+import { mockUserID } from '@/components/mock/applicationMockData';
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { Application } from '@pcgl-daco/data-model';
 
 const useCreateApplication = () => {
 	const navigation = useNavigate();
@@ -35,7 +36,7 @@ const useCreateApplication = () => {
 				method: 'POST',
 				body: JSON.stringify({
 					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: null,
+					userId: mockUserID,
 				}),
 			});
 

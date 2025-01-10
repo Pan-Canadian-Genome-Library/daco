@@ -17,11 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ServerError } from '@/global/types';
-import { Application } from '@pcgl-daco/data-model';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { fetch } from '../global/FetchClient';
+
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { Application } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {
 	const { t: translate } = useTranslation();
