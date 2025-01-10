@@ -19,17 +19,18 @@
 
 import { mockTableData } from '@/components/mock/applicationMockData';
 import PageHeader from '@/components/pages/global/PageHeader';
-import ManageApplicationsDashboard, { FilterState } from '@/components/pages/manage/Dashboard';
 import { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
+import ManagementDashboard, { FilterState, TableData } from '@/components/pages/manage/ManagementDashboard';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
 
 import { Flex, Layout } from 'antd';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
-
+const POSSIBLE_FILTERS = ['TOTAL', ...Object.values(ApplicationStates)] as FilterKeyType[];
 /**
  * Calculates the number shown beside the filter at the top of the page.
  * Example: 10 Total | 3 DAC Review, etc...
@@ -54,6 +55,26 @@ const ManageApplicationsPage = () => {
 	const { t: translate } = useTranslation();
 
 	const [tableData, setTableData] = useState<Array<TableData>>(mockTableData);
+	const [filters, setFilters] = useState<Array<FilterKeyType>>([]);
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	useEffect(() => {
+		const urlSetFilters = searchParams.get('filters');
+		const filterParam = new URLSearchParams();
+		if (!urlSetFilters) {
+			filterParam.set('filters', 'TOTAL');
+			setSearchParams(filterParam);
+		} else {
+			const filtersProvided = urlSetFilters.split(',');
+			for (const providedFilters of filtersProvided) {
+				if (!POSSIBLE_FILTERS.find((possibleFilters) => possibleFilters === providedFilters)) {
+					filterParam.set('filters', 'TOTAL');
+					setSearchParams(filterParam);
+					return;
+				}
+			}
+		}
+	}, [searchParams, setSearchParams]);
 
 	/**
 	 * Given that we don't need to constantly recalculate how many applications are at a current state
@@ -64,32 +85,49 @@ const ManageApplicationsPage = () => {
 	 */
 	const filterAmounts = useMemo(() => calculateFilterAmounts(mockTableData), []);
 
-	const handleFilterChange = (filtersActive: Array<FilterKeyType>) => {
-		//In this case, we've likely selected the "Total" filter, just display what we've got from the initial call to the server.
-		if (filtersActive.length === 1 && filtersActive.includes('TOTAL')) {
-			setTableData(mockTableData);
-		} else {
-			const filteredData = [];
-			//Otherwise we want to filter down to whatever applications match our currently filtered state.
-			for (const filterKey of filtersActive) {
-				const filtered = mockTableData.filter((data) => data.state === filterKey);
-				if (filtered.length) {
-					filteredData.push(...filtered);
-				}
+	const handleFilterChange = useCallback(
+		(filtersActive: Array<FilterKeyType>, shouldSetParams: boolean) => {
+			setFilters(filtersActive);
+			if (shouldSetParams) {
+				const filterParam = new URLSearchParams();
+				filterParam.set('filters', filtersActive.flat().toString());
+				setSearchParams(filterParam);
 			}
+			//In this case, we've likely selected the "Total" filter, just display what we've got from the initial call to the server.
+			if (filtersActive.length === 1 && filtersActive.includes('TOTAL')) {
+				setTableData(mockTableData);
+			} else {
+				const filteredData = [];
+				//Otherwise we want to filter down to whatever applications match our currently filtered state.
+				for (const filterKey of filtersActive) {
+					const filtered = mockTableData.filter((data) => data.state === filterKey);
+					if (filtered.length) {
+						filteredData.push(...filtered);
+					}
+				}
+				setTableData(filteredData);
+			}
+		},
+		[setSearchParams],
+	);
 
-			setTableData(filteredData);
+	useEffect(() => {
+		const currentFilters = searchParams.get('filters');
+		if (currentFilters) {
+			const filters = currentFilters.split(',') as FilterKeyType[];
+			handleFilterChange(filters, false);
 		}
-	};
+	}, [handleFilterChange, searchParams]);
 
 	return (
 		<Content>
 			<Flex vertical>
 				<PageHeader title={translate('manage.applications.title')} />
-				<ManageApplicationsDashboard
+				<ManagementDashboard
 					filterCounts={filterAmounts}
 					data={tableData}
-					onFilterChange={handleFilterChange}
+					filters={filters}
+					onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled, true)}
 				/>
 			</Flex>
 		</Content>

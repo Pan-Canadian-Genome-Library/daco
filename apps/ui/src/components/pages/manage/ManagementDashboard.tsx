@@ -49,6 +49,7 @@ export interface FilterState {
 interface ManagementDashboardProps {
 	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
 	filterCounts: FilterState[];
+	filters: FilterKeyType[];
 	data: TableData[];
 }
 
@@ -102,7 +103,7 @@ const tableColumnConfiguration = [
 	},
 ];
 
-const ManagementDashboard = ({ onFilterChange, filterCounts, data }: ManagementDashboardProps) => {
+const ManagementDashboard = ({ onFilterChange, filterCounts, filters, data }: ManagementDashboardProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -122,6 +123,7 @@ const ManagementDashboard = ({ onFilterChange, filterCounts, data }: ManagementD
 				<Text>{translate('manage.applications.listTitle')}</Text>
 				<DashboardFilter
 					onFilterChange={(filtersActive) => onFilterChange(filtersActive)}
+					filters={filters}
 					availableStates={filterCounts}
 				/>
 			</Flex>

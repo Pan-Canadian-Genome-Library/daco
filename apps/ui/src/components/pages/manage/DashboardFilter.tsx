@@ -20,7 +20,7 @@
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { Flex, Tag, theme } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { useToken } = theme;
@@ -31,6 +31,7 @@ const { useToken } = theme;
 export type FilterKeyType = ApplicationStateValues | 'TOTAL';
 interface DashboardFilterProps {
 	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
+	filters: FilterKeyType[];
 	availableStates: { key: FilterKeyType; amount: number }[];
 }
 
@@ -40,12 +41,12 @@ interface Filter {
 	key: FilterKeyType;
 }
 
-const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterProps) => {
+const DashboardFilter = ({ onFilterChange, filters, availableStates }: DashboardFilterProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 
 	//By default we want the "Total" filter selected, displaying all possible application types.
-	const [filterStates, setFilterStates] = useState<Array<FilterKeyType>>(['TOTAL']);
+	const [filterStates, setFilterStates] = useState<Array<FilterKeyType>>([]);
 
 	// The currently displayed filters in the interface, this is determined by whatever is sent in by fetched data.
 	const displayedFilters: Filter[] = [
@@ -71,10 +72,10 @@ const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterPro
 		/**
 		 * If the user selects total, it makes no sense to have any other filters selected,
 		 * in this case, we empty out the selected filters, adn replace them with just TOTAL
-		 * 
+		 *
 		 * Also if the user unselects all filters, default back to total.
 		 **/
-		if (selectedFilter === 'TOTAL' || nextSelectedFilters.length === 0) {
+		if (selectedFilter === 'TOTAL' || (nextSelectedFilters.length === 0 && filters.length === 0)) {
 			nextSelectedFilters = ['TOTAL'];
 		} else if (filterStates.includes('TOTAL')) {
 			/**
@@ -94,6 +95,10 @@ const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterPro
 		setFilterStates(nextSelectedFilters);
 		onFilterChange(nextSelectedFilters);
 	};
+
+	useEffect(() => {
+		setFilterStates([...filters]);
+	}, [filters]);
 
 	return (
 		<Flex gap={token.paddingXXS}>
