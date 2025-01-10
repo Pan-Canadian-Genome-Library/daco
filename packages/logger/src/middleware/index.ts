@@ -55,7 +55,7 @@ const selectLevelForResponse = (maybeResponse: { response?: { status_code?: unkn
 	return LogLevels.INFO;
 };
 
-// Disbaling eslint unused variable - We are passed params from the middleware but we don't use them. Leaving them in the function signature unused, just for awareness.
+// Disabling eslint unused variable - We are passed params from the middleware but we don't use them. Leaving them in the function signature unused, just for awareness.
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const formatLogMessage = (data?: MiddlewareData, ...params: any[]): object => {
 	const response = data?.response;
