@@ -17,7 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { mockUserID } from '@/components/mock/applicationMockData';
+import { ServerError } from '@/global/types';
+import { Application } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -28,31 +29,33 @@ const useCreateApplication = () => {
 	const navigation = useNavigate();
 	const { t: translate } = useTranslation();
 
-	return useMutation({
+	return useMutation<Application, ServerError>({
 		mutationFn: async () => {
-			const result = await fetch('/applications/create', {
+			const response = await fetch('/applications/create', {
 				method: 'POST',
 				body: JSON.stringify({
 					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
+					userId: null,
 				}),
 			});
 
-			if (!result.ok) {
-				let errorText = translate('errors.generic.message');
-				switch (result.status) {
-					case 404:
-						errorText = translate('errors.applicationNotFound.message');
-						break;
-					default:
+			if (!response.ok) {
+				const error = {
+					message: translate('errors.generic.title'),
+					errors: translate('errors.generic.message'),
+				};
+
+				switch (response.status) {
+					case 400:
+						error.message = translate('errors.fetchError.title');
+						error.errors = translate('errors.fetchError.message');
 						break;
 				}
-				const error = new Error(errorText);
-				error.name = translate('errors.generic.title');
+
 				throw error;
 			}
 
-			return result.json();
+			return await response.json();
 		},
 		onError: (error) => {
 			notification.error({
