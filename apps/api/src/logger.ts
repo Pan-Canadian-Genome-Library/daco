@@ -19,11 +19,11 @@
 
 import { Logger, LogLevels } from '@pcgl-daco/logger';
 
-const { IS_DEV } = process.env;
+const { IS_PROD } = process.env;
 
 const logger = Logger({
-	logFile: !IS_DEV,
-	level: IS_DEV ? LogLevels.INFO : LogLevels.DEBUG,
+	logFile: !IS_PROD,
+	level: IS_PROD ? LogLevels.INFO : LogLevels.DEBUG,
 }).forModule('PCGL-DACO-API');
 
 export default logger;

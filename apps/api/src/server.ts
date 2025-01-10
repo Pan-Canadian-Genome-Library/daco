@@ -39,7 +39,7 @@ const port = process.env.PORT || 3000;
 const startServer = async () => {
 	const app = express();
 
-	if (process.env.IS_DEV) {
+	if (!process.env.IS_PROD) {
 		app.use(
 			cors({
 				origin: 'http://localhost:5173',
