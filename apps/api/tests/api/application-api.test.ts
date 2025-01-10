@@ -24,9 +24,8 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { createApplication, editApplication, getApplicationById } from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { actionService } from '@/service/action-service.js';
 import { applicationService } from '@/service/application-service.js';
-import { ActionService, ApplicationService } from '@/service/types.js';
+import { ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -42,7 +41,6 @@ import {
 describe('Application API', () => {
 	let db: PostgresDb;
 	let testApplicationRepo: ApplicationService;
-	let testActionRepo: ActionService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -59,7 +57,6 @@ describe('Application API', () => {
 		await addInitialApplications(db);
 
 		testApplicationRepo = applicationService(db);
-		testActionRepo = actionService(db);
 	});
 
 	describe('Edit Application', () => {
@@ -174,23 +171,6 @@ describe('Application API', () => {
 			assert.strictEqual(application.user_id, user_id);
 
 			assert.ok(application.contents);
-		});
-
-		it('should add a CREATE Action to the DB after calling createApplication', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success && applicationRecordsResult.data);
-
-			const records = applicationRecordsResult.data;
-			const application = records[records.length - 1];
-
-			assert.ok(application);
-
-			const { id } = application;
-			const actionsResult = await testActionRepo.listActions({ application_id: id });
-
-			assert.ok(actionsResult.success && actionsResult.data);
-			assert.ok(actionsResult.data.length > 0);
 		});
 	});
 

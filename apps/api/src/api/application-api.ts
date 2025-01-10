@@ -21,9 +21,8 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
 import { ApplicationListRequest } from '@/routes/types.js';
-import { actionService } from '@/service/action-service.js';
 import { applicationService } from '@/service/application-service.js';
-import { type ActionService, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
+import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 
 /**
@@ -34,12 +33,8 @@ import { failure } from '@/utils/results.js';
 export const createApplication = async ({ user_id }: { user_id: string }) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationService(database);
-	const actionRepo: ActionService = actionService(database);
 
 	const result = await applicationRepo.createApplication({ user_id });
-	if (result.success && result.data) {
-		await actionRepo.create(result.data);
-	}
 
 	return result;
 };
