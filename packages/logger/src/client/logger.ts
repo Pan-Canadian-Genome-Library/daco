@@ -33,7 +33,6 @@ export type LoggerType = {
 	warn: LogFunction;
 	error: LogFunction;
 	log: (level: LogLevel, ...args: Parameters<LogFunction>) => ReturnType<LogFunction>;
-
 	forModule: (...moduleNames: string[]) => LoggerType;
 };
 
