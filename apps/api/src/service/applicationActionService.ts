@@ -20,8 +20,8 @@
 import { and, eq } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
-import { actions } from '@/db/schemas/actions.js';
-import { actionsQuery } from '@/service/utils.js';
+import { applicationActions } from '@/db/schemas/applicationActions.js';
+import { applicationActionsQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import {
 	ActionValues,
@@ -29,9 +29,9 @@ import {
 	ApplicationStates,
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationData, type ActionsColumnName, type OrderBy } from './types.js';
+import { ApplicationData, type ApplicationActionsColumnName, type OrderBy } from './types.js';
 
-const actionService = (db: PostgresDb) => {
+const applicationActionService = (db: PostgresDb) => {
 	// New actions are created on every transition from one state to the next
 	const addActionRecord = async (
 		application: ApplicationData,
@@ -39,7 +39,7 @@ const actionService = (db: PostgresDb) => {
 		state_after: ApplicationStateValues,
 	) => {
 		const { id: application_id, user_id, state: state_before } = application;
-		const newAction: typeof actions.$inferInsert = {
+		const newAction: typeof applicationActions.$inferInsert = {
 			application_id,
 			user_id,
 			action,
@@ -48,7 +48,7 @@ const actionService = (db: PostgresDb) => {
 		};
 
 		try {
-			const newActionRecord = await db.insert(actions).values(newAction).returning();
+			const newActionRecord = await db.insert(applicationActions).values(newAction).returning();
 			if (!newActionRecord[0]) throw new Error('Application record is undefined');
 
 			return success(newActionRecord[0]);
@@ -99,7 +99,7 @@ const actionService = (db: PostgresDb) => {
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
 		getActionById: async ({ id }: { id: number }) => {
 			try {
-				const actionRecord = await db.select().from(actions).where(eq(actions.id, id));
+				const actionRecord = await db.select().from(applicationActions).where(eq(applicationActions.id, id));
 				if (!actionRecord[0]) throw new Error('Action record is undefined');
 
 				return success(actionRecord[0]);
@@ -119,21 +119,21 @@ const actionService = (db: PostgresDb) => {
 		}: {
 			user_id?: string;
 			application_id?: number;
-			sort?: Array<OrderBy<ActionsColumnName>>;
+			sort?: Array<OrderBy<ApplicationActionsColumnName>>;
 			page?: number;
 			pageSize?: number;
 		}) => {
 			try {
 				const allActions = await db
 					.select()
-					.from(actions)
+					.from(applicationActions)
 					.where(
 						and(
-							user_id ? eq(actions.user_id, String(user_id)) : undefined,
-							application_id ? eq(actions.application_id, application_id) : undefined,
+							user_id ? eq(applicationActions.user_id, String(user_id)) : undefined,
+							application_id ? eq(applicationActions.application_id, application_id) : undefined,
 						),
 					)
-					.orderBy(...actionsQuery(sort))
+					.orderBy(...applicationActionsQuery(sort))
 					.offset(page * pageSize)
 					.limit(pageSize);
 
@@ -148,4 +148,4 @@ const actionService = (db: PostgresDb) => {
 	};
 };
 
-export { actionService };
+export { applicationActionService };

@@ -24,11 +24,16 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { actions } from '@/db/schemas/actions.js';
+import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
-import { actionService } from '@/service/action-service.js';
-import { applicationService } from '@/service/application-service.js';
-import { type ActionsColumnName, type ActionService, type ApplicationService, type OrderBy } from '@/service/types.js';
+import { applicationActionService } from '@/service/applicationActionService.js';
+import { applicationService } from '@/service/applicationService.js';
+import {
+	type ApplicationActionsColumnName,
+	type ApplicationActionService,
+	type ApplicationService,
+	type OrderBy,
+} from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -44,7 +49,7 @@ import {
 
 describe('Action Service', () => {
 	let db: PostgresDb;
-	let testActionRepo: ActionService;
+	let testActionRepo: ApplicationActionService;
 	let testApplicationRepo: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
@@ -61,7 +66,7 @@ describe('Action Service', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		testActionRepo = actionService(db);
+		testActionRepo = applicationActionService(db);
 		testApplicationRepo = applicationService(db);
 	});
 
@@ -317,7 +322,7 @@ describe('Action Service', () => {
 		});
 
 		it('should allow sorting requested actions by id', async () => {
-			const sort: Array<OrderBy<ActionsColumnName>> = [
+			const sort: Array<OrderBy<ApplicationActionsColumnName>> = [
 				{
 					direction: 'desc',
 					column: 'id',
@@ -339,7 +344,7 @@ describe('Action Service', () => {
 		});
 
 		it('should allow sorting requested actions by created_at', async () => {
-			const sort: Array<OrderBy<ActionsColumnName>> = [
+			const sort: Array<OrderBy<ApplicationActionsColumnName>> = [
 				{
 					direction: 'desc',
 					column: 'created_at',
@@ -362,7 +367,7 @@ describe('Action Service', () => {
 	});
 
 	after(async () => {
-		await db.delete(actions).where(eq(actions.user_id, user_id));
+		await db.delete(applicationActions).where(eq(applicationActions.user_id, user_id));
 		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);

@@ -25,7 +25,7 @@ import { applications } from '@/db/schemas/applications.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { actionService } from './action-service.js';
+import { applicationActionService } from './applicationActionService.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
@@ -58,7 +58,7 @@ const applicationService = (db: PostgresDb) => ({
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
 				// Create associated Actions
-				const actionRepo = actionService(db);
+				const actionRepo = applicationActionService(db);
 				const actionResult = await actionRepo.create(newApplicationRecord[0]);
 				if (!actionResult.success) throw new Error(actionResult.errors);
 

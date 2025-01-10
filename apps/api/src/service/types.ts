@@ -17,23 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { actions } from '@/db/schemas/actions.js';
+import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
-import { actionService } from '@/service/action-service.js';
-import { applicationService } from '@/service/application-service.js';
+import { applicationActionService } from '@/service/applicationActionService.js';
+import { applicationService } from '@/service/applicationService.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
-export type ActionsColumnName = keyof typeof actions.$inferSelect;
-export type SchemaKeys = ApplicationsColumnName | ActionsColumnName;
+export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
+export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
 export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
 
 export type ApplicationData = typeof applications.$inferSelect;
-export type ActionData = typeof actions.$inferSelect;
+export type ApplicationActionData = typeof applicationActions.$inferSelect;
 
 export type ApplicationService = ReturnType<typeof applicationService>;
-export type ActionService = ReturnType<typeof actionService>;
+export type ApplicationActionService = ReturnType<typeof applicationActionService>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 

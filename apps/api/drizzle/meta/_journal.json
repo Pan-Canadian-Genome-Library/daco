@@ -22,6 +22,13 @@
 			"when": 1734720618556,
 			"tag": "0002_rename_rep_action",
 			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1736548413556,
+			"tag": "0003_rename_actions_table",
+			"breakpoints": true
 		}
 	]
 }

@@ -18,7 +18,7 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
-import { applicationService } from '@/service/application-service.js';
+import { applicationService } from '@/service/applicationService.js';
 import { ApplicationData } from '@/service/types.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';

@@ -21,7 +21,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
 import { ApplicationListRequest } from '@/routes/types.js';
-import { applicationService } from '@/service/application-service.js';
+import { applicationService } from '@/service/applicationService.js';
 import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 

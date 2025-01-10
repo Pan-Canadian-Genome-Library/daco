@@ -19,7 +19,7 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { actions } from './actions.js';
+import { applicationActions } from './applicationActions.js';
 import { applicationContents } from './applicationContents.js';
 
 export const applicationStatesEnum = pgEnum('application_states', [
@@ -50,5 +50,5 @@ export const applicationsRelations = relations(applications, ({ one, many }) => 
 		fields: [applications.contents],
 		references: [applicationContents.id],
 	}),
-	actions: many(actions),
+	actions: many(applicationActions),
 }));
