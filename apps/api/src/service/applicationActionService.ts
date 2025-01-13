@@ -95,6 +95,12 @@ const applicationActionService = (db: PostgresDb) => {
 			),
 		dacSubmit: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
+		draftSubmit: async (application: ApplicationData) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.REQUEST_REP_REVIEW,
+				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+			),
 		revoke: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
 		getActionById: async ({ id }: { id: number }) => {

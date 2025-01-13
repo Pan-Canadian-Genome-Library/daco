@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { createApplication, editApplication, getApplicationById } from '@/api/application-api.js';
+import { createApplication, editApplication, getApplicationById } from '@/api/applicationApi.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationService } from '@/service/types.js';

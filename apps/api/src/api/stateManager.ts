@@ -18,6 +18,7 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
+import { applicationActionService } from '@/service/applicationActionService.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationData } from '@/service/types.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
@@ -71,6 +72,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
 				await this.dispatch(submit);
+
+				const db = getDbInstance();
+				const applicationRepo = applicationService(db);
+				const applicationActionRepo = applicationActionService(db);
+
+				await db.transaction(async (tx) => {
+					await applicationActionRepo.draftSubmit(this._application);
+					const { id } = this._application;
+					const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+					await applicationRepo.findOneAndUpdate({ id, update });
+				});
+
 				return validationResult;
 			} else {
 				return failure(`Cannot submit application with state ${this.getState()}`);
