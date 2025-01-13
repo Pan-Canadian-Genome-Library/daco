@@ -38,7 +38,7 @@ const SectionMenu = () => {
 	useEffect(() => {
 		// if the section route is empty, navigate to intro route
 		if (currentSection === 'intro') {
-			navigate(`intro/${isEditMode ? 'edit' : ''}`);
+			navigate(`intro/${isEditMode ? 'edit' : ''}`, { replace: true });
 		}
 	}, [currentSection, navigate, isEditMode]);
 
