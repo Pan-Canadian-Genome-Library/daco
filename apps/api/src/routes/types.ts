@@ -22,7 +22,7 @@ import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
 export type ApplicationListRequest = {
 	userId: string;
-	state?: ApplicationStateValues;
+	state?: ApplicationStateValues[];
 	sort?: Array<OrderBy<ApplicationsColumnName>>;
 	page?: number;
 	pageSize?: number;

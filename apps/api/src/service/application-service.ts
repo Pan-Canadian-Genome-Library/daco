@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
@@ -169,13 +169,13 @@ const applicationService = (db: PostgresDb) => ({
 	},
 	listApplications: async ({
 		user_id,
-		state,
+		state = [],
 		sort = [],
 		page = 0,
 		pageSize = 20,
 	}: {
 		user_id?: string;
-		state?: ApplicationStateValues;
+		state?: ApplicationStateValues[];
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
@@ -187,14 +187,14 @@ const applicationService = (db: PostgresDb) => ({
 				.where(
 					and(
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
-						state ? eq(applications.state, state) : undefined,
+						state ? inArray(applications.state, state) : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...sortQuery(sort))
 				.offset(page * pageSize);
 
-			const allApplications = rawApplicationData.slice(page, pageSize).map((application) => {
+			let allApplications = rawApplicationData.slice(page, pageSize).map((application) => {
 				return {
 					id: application.applications.id,
 					user_id: application.applications.user_id,
@@ -210,6 +210,23 @@ const applicationService = (db: PostgresDb) => ({
 					},
 				};
 			});
+
+			/**
+			 * We only want to sort DAC_REVIEW records to the top if:
+			 * - The user hasn't sorted by any filter
+			 * - If the sorting filters include DAC_REVIEW
+			 * 	- Keeping in mind that if it includes JUST DAC_REVIEW, then we skip
+			 * 	 since the sorting will be handled by drizzle in this case.
+			 */
+			if (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW))) {
+				const reviewApplications = allApplications.filter(
+					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
+				);
+				allApplications = [
+					...reviewApplications,
+					...allApplications.filter((applications) => applications.state !== ApplicationStates.DAC_REVIEW),
+				];
+			}
 
 			const applicationsList = {
 				applications: allApplications,
