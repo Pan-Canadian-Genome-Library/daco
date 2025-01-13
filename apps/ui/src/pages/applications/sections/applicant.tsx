@@ -17,10 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
+import { Typography } from 'antd';
+
+import ApplicationWrapper from '@/components/layouts/SectionWrapper';
+
+const { Text } = Typography;
 
 const Applicant = () => {
-	return <Flex>Applicant</Flex>;
+	return (
+		<ApplicationWrapper>
+			<Text>Applicant</Text>
+		</ApplicationWrapper>
+	);
 };
 
 export default Applicant;
