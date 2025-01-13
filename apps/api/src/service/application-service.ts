@@ -181,14 +181,8 @@ const applicationService = (db: PostgresDb) => ({
 		pageSize?: number;
 	}) => {
 		try {
-			const allApplications = await db
-				.select({
-					id: applications.id,
-					user_id: applications.user_id,
-					state: applications.state,
-					createdAt: applications.created_at,
-					updatedAt: applications.updated_at,
-				})
+			const rawApplicationData = await db
+				.select()
 				.from(applications)
 				.where(
 					and(
@@ -196,9 +190,27 @@ const applicationService = (db: PostgresDb) => ({
 						state ? eq(applications.state, state) : undefined,
 					),
 				)
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...sortQuery(sort))
 				.offset(page * pageSize)
 				.limit(pageSize);
+
+			const allApplications = rawApplicationData.map((application) => {
+				return {
+					id: application.applications.id,
+					user_id: application.applications.user_id,
+					state: application.applications.state,
+					createdAt: application.applications.created_at,
+					updatedAt: application.applications.updated_at,
+					content: {
+						firstName: application.application_contents?.applicant_first_name,
+						lastName: application.application_contents?.applicant_last_name,
+						email: application.application_contents?.applicant_institutional_email,
+						country: application.application_contents?.institution_country,
+						institution: application.application_contents?.applicant_primary_affiliation,
+					},
+				};
+			});
 
 			return success(allApplications);
 		} catch (err) {
