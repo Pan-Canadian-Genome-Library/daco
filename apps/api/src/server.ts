@@ -17,8 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ExpressLogger } from '@pcgl-daco/logger';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+
 import path, { dirname } from 'path';
 import * as swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from 'url';
@@ -26,6 +28,7 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/application-router.js';
+import logger from './logger.js';
 
 const { npm_package_version } = process.env;
 const __filename = fileURLToPath(import.meta.url);
@@ -36,13 +39,15 @@ const port = process.env.PORT || 3000;
 const startServer = async () => {
 	const app = express();
 
-	if (process.env.IS_DEV) {
+	if (!process.env.IS_PROD) {
 		app.use(
 			cors({
 				origin: 'http://localhost:5173',
 			}),
 		);
 	}
+
+	app.use(ExpressLogger({ logger }));
 
 	app.use(applicationRouter);
 
