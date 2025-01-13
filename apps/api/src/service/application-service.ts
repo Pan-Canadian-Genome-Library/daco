@@ -192,17 +192,16 @@ const applicationService = (db: PostgresDb) => ({
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...sortQuery(sort))
-				.offset(page * pageSize)
-				.limit(pageSize);
+				.offset(page * pageSize);
 
-			const allApplications = rawApplicationData.map((application) => {
+			const allApplications = rawApplicationData.slice(page, pageSize).map((application) => {
 				return {
 					id: application.applications.id,
 					user_id: application.applications.user_id,
 					state: application.applications.state,
 					createdAt: application.applications.created_at,
 					updatedAt: application.applications.updated_at,
-					content: {
+					applicantInformation: {
 						firstName: application.application_contents?.applicant_first_name,
 						lastName: application.application_contents?.applicant_last_name,
 						email: application.application_contents?.applicant_institutional_email,
@@ -212,7 +211,16 @@ const applicationService = (db: PostgresDb) => ({
 				};
 			});
 
-			return success(allApplications);
+			const applicationsList = {
+				applications: allApplications,
+				paging: {
+					totalRecords: rawApplicationData.length,
+					page: page,
+					pageSize: pageSize,
+				},
+			};
+
+			return success(applicationsList);
 		} catch (err) {
 			const message = `Error at listApplications with user_id: ${user_id} state: ${state}`;
 			console.error(message);
