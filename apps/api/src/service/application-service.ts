@@ -31,6 +31,7 @@ import {
 import { sortQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import logger from '@/logger.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -77,6 +78,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 		try {
 			const application = await db.transaction(async (transaction) => {
@@ -114,6 +116,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
 		try {
 			const application = await db
@@ -130,6 +133,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	getApplicationById: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
@@ -143,6 +147,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	getApplicationWithContents: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db
@@ -167,6 +172,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	listApplications: async ({
 		user_id,
 		state = [],
@@ -181,6 +187,10 @@ const applicationService = (db: PostgresDb) => ({
 		pageSize?: number;
 	}) => {
 		try {
+			if (page < 0 || pageSize < 0) {
+				throw Error('Page and/or page size must be non-negative values.');
+			}
+
 			const rawApplicationData = await db
 				.select()
 				.from(applications)
@@ -213,10 +223,10 @@ const applicationService = (db: PostgresDb) => ({
 
 			/**
 			 * We only want to sort DAC_REVIEW records to the top if:
-			 * - The user hasn't sorted by any filter
-			 * - If the sorting filters include DAC_REVIEW
-			 * 	- Keeping in mind that if it includes JUST DAC_REVIEW, then we skip
-			 * 	 since the sorting will be handled by drizzle in this case.
+			 * 	- The user hasn't sorted by any filter
+			 * 	- If the sorting filters include DAC_REVIEW
+			 * 		- Keeping in mind that if it includes JUST DAC_REVIEW, then we skip
+			 * 		 since the sorting will already be handled by drizzle in this case.
 			 */
 			if (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW))) {
 				const reviewApplications = allApplications.filter(
@@ -240,8 +250,8 @@ const applicationService = (db: PostgresDb) => ({
 			return success(applicationsList);
 		} catch (err) {
 			const message = `Error at listApplications with user_id: ${user_id} state: ${state}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 			return failure(message, err);
 		}
 	},

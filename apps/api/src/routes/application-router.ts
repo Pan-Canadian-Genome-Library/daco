@@ -103,7 +103,13 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 	if (result.success) {
 		res.status(200).send(result.data);
 	} else {
-		res.status(500).send({ message: result.message, errors: String(result.errors) });
+		const errorReturn = { message: result.message, errors: String(result.errors) };
+
+		if (errorReturn.errors.includes('Page and/or page size must be non-negative values')) {
+			res.status(400).send(errorReturn);
+		} else {
+			res.status(500).send(errorReturn);
+		}
 	}
 });
 
