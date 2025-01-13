@@ -71,7 +71,7 @@ const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterPro
 		/**
 		 * If the user selects total, it makes no sense to have any other filters selected,
 		 * in this case, we empty out the selected filters, adn replace them with just TOTAL
-		 * 
+		 *
 		 * Also if the user unselects all filters, default back to total.
 		 **/
 		if (selectedFilter === 'TOTAL' || nextSelectedFilters.length === 0) {
