@@ -95,8 +95,8 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 		userId,
 		state,
 		sort,
-		page: parseInt(page),
-		pageSize: parseInt(pageSize),
+		page: page ? parseInt(page) : undefined,
+		pageSize: pageSize ? parseInt(pageSize) : undefined,
 	});
 
 	if (result.success) {
