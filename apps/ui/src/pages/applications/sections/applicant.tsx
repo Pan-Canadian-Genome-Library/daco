@@ -110,7 +110,46 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title="Institution/Company Mailing Address"></SectionContent>
+				<SectionContent title="Institution/Company Mailing Address">
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Country" required>
+								<Input disabled={!isEditMode} />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Street Address:" required>
+								<Input disabled={!isEditMode} />
+							</Form.Item>
+						</Col>
+						<Col span={12}>
+							<Form.Item label="Building">
+								<Input disabled={!isEditMode} />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Province:" required>
+								<Input disabled={!isEditMode} />
+							</Form.Item>
+						</Col>
+						<Col span={12}>
+							<Form.Item label="City:" required>
+								<Input disabled={!isEditMode} />
+							</Form.Item>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<Form.Item label="Postal/Zip Code:" required>
+								<Input disabled={!isEditMode} />
+							</Form.Item>
+						</Col>
+					</Row>
+				</SectionContent>
 				<SectionFooter />
 			</Form>
 		</SectionWrapper>
