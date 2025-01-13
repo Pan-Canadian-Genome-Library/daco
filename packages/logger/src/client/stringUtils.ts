@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,30 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Route, Routes } from 'react-router';
-
-import PageLayout from '@/components/layouts/PageLayout';
-import ApplicationViewer from '@/pages/applications';
-import Applicant from '@/pages/applications/sections/applicant';
-import Introduction from '@/pages/applications/sections/intro';
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
-import ManageApplicationsPage from '@/pages/manage/applications';
-
-function App() {
-	return (
-		<Routes>
-			<Route element={<PageLayout />}>
-				<Route index element={<HomePage />} />
-				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route path="intro/edit?" element={<Introduction />} />
-					<Route path="applicant/edit?" element={<Applicant />} />
-				</Route>
-				<Route path="manage/applications" element={<ManageApplicationsPage />} />
-			</Route>
-		</Routes>
-	);
+/**
+ * Convert an unknown value into a string. Intended for parsing caught errors.
+ * @param input
+ */
+export function unknownToString(
+	input: unknown,
+	jsonOptions?: { replacer?: (this: any, key: string, value: any) => any; space?: string | number },
+): string {
+	if (input instanceof Error) {
+		return input.message;
+	} else if (typeof input === 'object') {
+		return JSON.stringify(input, jsonOptions?.replacer, jsonOptions?.space);
+	} else {
+		return `${input}`;
+	}
 }
-
-export default App;

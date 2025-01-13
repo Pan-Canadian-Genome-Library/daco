@@ -22,7 +22,7 @@ import ContentWrapper from './ContentWrapper';
 
 const { useToken } = theme;
 
-const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => {
+const StatusBannerWrapper = ({ children, style }: { children: React.ReactElement; style?: React.CSSProperties }) => {
 	const { token } = useToken();
 
 	const StatusBannerWrapperStyles: React.CSSProperties = {
@@ -32,7 +32,7 @@ const StatusBannerWrapper = ({ children }: { children: React.ReactElement }) => 
 	};
 
 	return (
-		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorWhite }}>
+		<Flex style={{ ...StatusBannerWrapperStyles, backgroundColor: token.colorWhite, ...style }}>
 			<ContentWrapper>{children}</ContentWrapper>
 		</Flex>
 	);
