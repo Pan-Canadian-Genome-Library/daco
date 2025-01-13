@@ -88,7 +88,11 @@ const ApplicationViewer = () => {
 						</Row>
 						<Row style={{ width: '75%' }}>
 							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet />
+								<Outlet
+									context={{
+										isEditMode,
+									}}
+								/>
 							</Col>
 						</Row>
 					</>

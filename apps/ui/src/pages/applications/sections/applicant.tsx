@@ -24,11 +24,15 @@ import SectionWrapper from '@/components/layouts/SectionWrapper';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { ApplicationContext } from '@/global/types';
+import { useOutletContext } from 'react-router';
 
 const { Text } = Typography;
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
+	const { isEditMode } = useOutletContext<ApplicationContext>();
+
 	return (
 		<SectionWrapper>
 			<Form layout="vertical">
@@ -40,7 +44,7 @@ const Applicant = () => {
 					<Row>
 						<Col span={4}>
 							<Form.Item label="Title:">
-								<Select>
+								<Select disabled={!isEditMode}>
 									<Select.Option value="rapper">Rapper</Select.Option>
 								</Select>
 							</Form.Item>
@@ -49,24 +53,24 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<Form.Item label="First Name:" required>
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 						<Col span={12}>
 							<Form.Item label="Middle Name:">
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
 							<Form.Item label="Last Name:" required>
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 						<Col span={12}>
 							<Form.Item label="Suffix:">
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 					</Row>
@@ -74,7 +78,7 @@ const Applicant = () => {
 						<Col span={12}>
 							<Form.Item label="Primary Affiliation:" required>
 								<Text style={{ fontSize: '0.75rem' }}>The legal entity responsible for this application.</Text>
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 					</Row>
@@ -84,7 +88,7 @@ const Applicant = () => {
 								<Text style={{ fontSize: '0.75rem' }}>
 									Must be the institutional email address of the Principal Investigator.
 								</Text>
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 					</Row>
@@ -94,18 +98,19 @@ const Applicant = () => {
 								<Text style={{ fontSize: '0.75rem' }}>
 									Please provide a link to your profile on your institution/company website.
 								</Text>
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
 							<Form.Item label="Position Title:" required>
-								<Input />
+								<Input disabled={!isEditMode} />
 							</Form.Item>
 						</Col>
 					</Row>
 				</SectionContent>
+				<SectionContent title="Institution/Company Mailing Address"></SectionContent>
 				<SectionFooter />
 			</Form>
 		</SectionWrapper>

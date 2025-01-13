@@ -45,11 +45,11 @@ const SectionMenu = () => {
 	const MenuItemList: MenuItem[] = [
 		{
 			key: 'intro',
-			label: <SectionMenuItem label={translate('menu.intro')} />,
+			label: <SectionMenuItem label={translate('menu.intro')} isEditMode={isEditMode} />,
 		},
 		{
 			key: 'applicant',
-			label: <SectionMenuItem label={translate('menu.sectionA')} />,
+			label: <SectionMenuItem label={translate('menu.sectionA')} isEditMode={isEditMode} />,
 		},
 	];
 

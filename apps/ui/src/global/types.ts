@@ -37,3 +37,7 @@ export interface FetchError extends ServerError {
 	isError: true;
 	statusCode: number;
 }
+
+export interface ApplicationContext {
+	isEditMode: boolean;
+}
