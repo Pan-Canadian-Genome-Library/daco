@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,27 +17,40 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import './i18n/translations';
-import './index.css';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { Application } from '@pcgl-daco/data-model';
 
-import ThemeProvider from '@/components/providers/ThemeProvider';
-import App from '@/pages/App';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const useGetApplication = (id?: string | number) => {
+	const { t: translate } = useTranslation();
 
-const queryClient = new QueryClient();
+	return useQuery<Application, ServerError>({
+		queryKey: [id],
+		queryFn: async () => {
+			const response = await fetch(`/applications/${id}`);
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</ThemeProvider>
-		</QueryClientProvider>
-	</StrictMode>,
-);
+			if (!response.ok) {
+				const error = {
+					message: translate('errors.generic.title'),
+					errors: translate('errors.generic.message'),
+				};
+
+				switch (response.status) {
+					case 404:
+						error.message = translate('errors.http.404.title');
+						error.errors = translate('errors.http.404.message');
+						break;
+				}
+
+				throw error;
+			}
+
+			return await response.json();
+		},
+	});
+};
+
+export default useGetApplication;
