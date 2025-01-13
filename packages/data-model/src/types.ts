@@ -61,7 +61,7 @@ export const ApplicationActions = {
 	REVOKE: 'REVOKE',
 } as const;
 
-export type ActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
+export type ApplicationActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
 
 export enum ApplicationAgreements {
 	'dac_agreement_software_updates',
@@ -162,7 +162,7 @@ export type ApplicationActionData = {
 	applicationId: number; // TODO: Implement BigInt;
 	createdAt: Date;
 	userId: string;
-	action: ActionValues;
+	action: ApplicationActionValues;
 	stateBefore: ApplicationStateValues;
 	stateAfter: ApplicationStateValues;
 	revisionsRequestId: number; // TODO: Implement BigInt

@@ -24,8 +24,8 @@ import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationActionsQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import {
-	ActionValues,
 	ApplicationActions,
+	ApplicationActionValues,
 	ApplicationStates,
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
@@ -35,7 +35,7 @@ const applicationActionService = (db: PostgresDb) => {
 	// New actions are created on every transition from one state to the next
 	const addActionRecord = async (
 		application: ApplicationData,
-		action: ActionValues,
+		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
 	) => {
 		const { id: application_id, user_id, state: state_before } = application;

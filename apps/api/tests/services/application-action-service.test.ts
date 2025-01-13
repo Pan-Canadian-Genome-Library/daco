@@ -47,7 +47,7 @@ import {
 	testUserId as user_id,
 } from '../testUtils.js';
 
-describe('Action Service', () => {
+describe('Application Action Service', () => {
 	let db: PostgresDb;
 	let testActionRepo: ApplicationActionService;
 	let testApplicationRepo: ApplicationService;
