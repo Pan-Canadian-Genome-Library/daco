@@ -22,6 +22,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import logger from '@/logger.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
@@ -31,7 +32,6 @@ import {
 import { sortQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import logger from '@/logger.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
