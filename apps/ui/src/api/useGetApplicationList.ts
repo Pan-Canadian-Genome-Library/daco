@@ -21,12 +21,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
-import { Application, ServerError } from '@/global/types';
+import { ApplicationList, ServerError } from '@/global/types';
 
 const useGetApplicationList = (id?: string | number) => {
 	const { t: translate } = useTranslation();
 
-	return useQuery<Application[], ServerError>({
+	return useQuery<ApplicationList, ServerError>({
 		queryKey: [id],
 		queryFn: async () => {
 			const response = await fetch(`/applications?userId=${id}`);
