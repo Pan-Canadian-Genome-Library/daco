@@ -187,7 +187,13 @@ const applicationService = (db: PostgresDb) => ({
 		pageSize?: number;
 	}) => {
 		try {
-			if (page < 0 || pageSize < 0) {
+			/**
+			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
+			 * This should be handled at at the router layer, but just in-case.
+			 */
+			if (Number.isNaN(page) || Number.isNaN(pageSize)) {
+				throw Error('Page and/or page size must be a positive integer.');
+			} else if (page < 0 || pageSize < 0) {
 				throw Error('Page and/or page size must be non-negative values.');
 			}
 

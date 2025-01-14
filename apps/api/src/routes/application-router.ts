@@ -81,6 +81,9 @@ applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
 applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res) => {
 	const { userId, state: stateQuery, sort: sortQuery, page, pageSize } = req.query;
 
+	const pageRequested = page ? parseInt(page) : undefined;
+	const pageSizeRequested = pageSize ? parseInt(pageSize) : undefined;
+
 	//  Temporary userId check until validation/dto flow is confirmed
 	//  - reflect changes in swagger once refactored
 	if (!userId) {
@@ -88,28 +91,43 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 		return;
 	}
 
+	/**
+	 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
+	 * If it is, we need to throw a client error, warning them that that's a bad request.
+	 */
+	if (
+		(pageRequested !== undefined && Number.isNaN(pageRequested)) ||
+		(pageSizeRequested !== undefined && Number.isNaN(pageSizeRequested))
+	) {
+		res.status(400).send({ message: 'Page and/or page size must be a positive integer.' });
+		return;
+	} else if (
+		(pageRequested !== undefined && pageRequested < 0) ||
+		(pageSizeRequested !== undefined && pageSizeRequested < 0)
+	) {
+		res.status(400).send({ message: 'Page and/or page size must be a non-negative value.' });
+		return;
+	}
+
 	// Check if sort exists and parse it if true
 	const sort = !!sortQuery ? JSON.parse(sortQuery) : [];
-	const state = !!stateQuery ? JSON.parse(stateQuery) : [];
+	let state = !!stateQuery ? JSON.parse(stateQuery) : [];
 
 	const result = await getAllApplications({
 		userId,
 		state,
 		sort,
-		page: page ? parseInt(page) : undefined,
-		pageSize: pageSize ? parseInt(pageSize) : undefined,
+		page: pageRequested,
+		pageSize: pageSizeRequested,
 	});
 
 	if (result.success) {
 		res.status(200).send(result.data);
+		return;
 	} else {
 		const errorReturn = { message: result.message, errors: String(result.errors) };
-
-		if (errorReturn.errors.includes('Page and/or page size must be non-negative values')) {
-			res.status(400).send(errorReturn);
-		} else {
-			res.status(500).send(errorReturn);
-		}
+		res.status(500).send(errorReturn);
+		return;
 	}
 });
 
