@@ -17,14 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { mockUserID } from '@/components/mock/applicationMockData';
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { Application } from '@pcgl-daco/data-model/src/types';
-import { Button, Card, Flex, notification, theme, Typography } from 'antd';
-import { useEffect, useState } from 'react';
+import useCreateApplication from '@/api/useCreateApplication';
+import { Button, Card, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 const { Title } = Typography;
 const { useToken } = theme;
@@ -32,59 +27,14 @@ const { useToken } = theme;
 const NewApplicationCard = () => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
-	const navigation = useNavigate();
-	const [error, setError] = useState<ServerError | undefined>(undefined);
 
-	useEffect(() => {
-		if (error) {
-			notification.error({
-				message: error.message,
-				description: error.errors,
-			});
-		}
-	}, [error]);
-
-	const createApplication = async () => {
-		try {
-			const result = await fetch('/applications/create', {
-				method: 'POST',
-				body: JSON.stringify({
-					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
-				}),
-			});
-
-			if (result.ok) {
-				const applicationData = (await result.json()) as Application;
-				return applicationData;
-			} else {
-				setError({
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				});
-				return;
-			}
-		} catch {
-			setError({
-				message: translate('errors.fetchError.title'),
-				errors: translate('errors.fetchError.message'),
-			});
-			return;
-		}
-	};
-
-	const onGetStartedClick = async () => {
-		const application = await createApplication();
-		if (application && application.id && !error) {
-			navigation(`/application/${application.id}/edit`);
-		}
-	};
+	const { mutate: createNewApplication } = useCreateApplication();
 
 	return (
 		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200 }} hoverable>
 			<Flex justify="center" align="center" vertical gap="middle">
 				<Title level={3}>{translate('dashboard.startNewApp')}</Title>
-				<Button color="default" variant="outlined" onClick={onGetStartedClick}>
+				<Button color="default" variant="outlined" onClick={() => createNewApplication()}>
 					{translate('button.getStarted')}
 				</Button>
 			</Flex>
