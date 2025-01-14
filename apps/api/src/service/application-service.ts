@@ -203,7 +203,7 @@ const applicationService = (db: PostgresDb) => ({
 				.where(
 					and(
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
-						state ? inArray(applications.state, state) : undefined,
+						state.length ? inArray(applications.state, state) : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
