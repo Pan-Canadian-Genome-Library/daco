@@ -24,14 +24,14 @@ import SectionWrapper from '@/components/layouts/SectionWrapper';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationContext } from '@/global/types';
+import { ApplicationOutletContext } from '@/global/types';
 import { useOutletContext } from 'react-router';
 
 const { Text } = Typography;
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationContext>();
+	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	return (
 		<SectionWrapper>
