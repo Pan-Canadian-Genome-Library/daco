@@ -17,136 +17,237 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Form, Input, Row, Select, Typography } from 'antd';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Col, Form, Row } from 'antd';
+import { createSchemaFieldRule } from 'antd-zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
+import * as z from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import InputBox from '@/components/pages/application/form-components/InputBox';
+import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
-import { useOutletContext } from 'react-router';
 
-const { Text } = Typography;
+type FieldType = {
+	applicantTitle: string;
+	applicantFirstName: string;
+	applicantLastName: string;
+	applicantSuffix: string;
+	applicantPrimaryAffiliation: string;
+	applicantInstitutAffiliation: string;
+	applicantProfileUrl: string;
+	applicantPositionTitle: string;
+	institutionCountry: string;
+	institutionState: string;
+	institutionCity: string;
+	institutionStreetAddress: string;
+	institutionPostalCode: string;
+	institutionBuilding: string;
+};
+
+const schema = z.object({
+	applicantTitle: z.string().min(1, { message: 'Required' }),
+	applicantFirstName: z
+		.string()
+		.min(1, { message: 'Required' })
+		.max(15, { message: 'First name should be less than 15 characters' }),
+});
+
+const rule = createSchemaFieldRule(schema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
+	const { handleSubmit, control } = useForm<FieldType>({
+		resolver: zodResolver(schema),
+	});
+
+	const onSubmit: SubmitHandler<FieldType> = (data) => {
+		console.log(data);
+	};
+
 	return (
 		<SectionWrapper>
-			<Form layout="vertical">
+			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
 				<SectionTitle
 					title={translate('applicant-section.title')}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
+				<input type="submit" />
 				<SectionContent title={'Principal Investigator Information'}>
 					<Row>
 						<Col span={4}>
-							<Form.Item label="Title:">
-								<Select disabled={!isEditMode}>
-									<Select.Option value="rapper">Rapper</Select.Option>
-								</Select>
-							</Form.Item>
+							<SelectBox
+								label="Title:"
+								name="applicantTitle"
+								control={control}
+								rule={rule}
+								options={[]}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="First Name:" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item label="Middle Name:">
-								<Input disabled={!isEditMode} />
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row gutter={26}>
-						<Col span={12}>
-							<Form.Item label="Last Name:" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item label="Suffix:">
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="First Name:"
+								name="applicantFirstName"
+								subLabel="Must be the institutional email address of the Principal Investigator."
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="Primary Affiliation:" required>
-								<Text style={{ fontSize: '0.75rem' }}>The legal entity responsible for this application.</Text>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Last Name:"
+								name="applicantLastName"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
+						</Col>
+						<Col span={12}>
+							<InputBox
+								label="Suffix:"
+								name="applicantSuffix"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="Institutional Email:" required>
-								<Text style={{ fontSize: '0.75rem' }}>
-									Must be the institutional email address of the Principal Investigator.
-								</Text>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Primary Affiliation::"
+								subLabel="The legal entity responsible for this application."
+								name="applicantPrimaryAffiliation"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="Researcher Profile:" required>
-								<Text style={{ fontSize: '0.75rem' }}>
-									Please provide a link to your profile on your institution/company website.
-								</Text>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Institutional Email:"
+								subLabel="Must be the institutional email address of the Principal Investigator."
+								name="applicantInstitutAffiliation"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="Position Title:" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Researcher Profile:"
+								subLabel="Please provide a link to your profile on your institution/company website."
+								name="applicantProfileUrl"
+								placeHolder="https://"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<InputBox
+								label="Profile Title:"
+								name="applicantPositionTitle"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 				</SectionContent>
 				<SectionContent title="Institution/Company Mailing Address">
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="Country" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Country:"
+								name="institutionCountry"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="Street Address:" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Street Address:"
+								name="institutionStreetAddress"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 						<Col span={12}>
-							<Form.Item label="Building">
-								<Input disabled={!isEditMode} />
-							</Form.Item>
-						</Col>
-					</Row>
-					<Row gutter={26}>
-						<Col span={12}>
-							<Form.Item label="Province:" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item label="City:" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Building:"
+								name="institutionBuilding"
+								control={control}
+								rule={rule}
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col span={12}>
-							<Form.Item label="Postal/Zip Code:" required>
-								<Input disabled={!isEditMode} />
-							</Form.Item>
+							<InputBox
+								label="Province:"
+								name="institutionState"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
+						</Col>
+						<Col span={12}>
+							<InputBox
+								label="City:"
+								name="institutionCity"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col span={12}>
+							<InputBox
+								label="Postal/Zip Code:"
+								name="institutionPostalCode"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
 						</Col>
 					</Row>
 				</SectionContent>
