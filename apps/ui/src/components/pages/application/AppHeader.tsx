@@ -107,7 +107,8 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 						marginInline: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
 					}}
 				>
-					<Button>{translate('button.history')}</Button>
+					{/* TODO: Disable for MVP */}
+					{/* <Button>{translate('button.history')}</Button> */}
 					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
 				</Flex>
 				<Modal
