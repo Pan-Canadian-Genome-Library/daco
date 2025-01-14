@@ -81,7 +81,7 @@ const Applicant = () => {
 				/>
 				<SectionContent title={translate('applicant-section.section1')}>
 					<Row>
-						<Col span={4}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
 								label={translate('applicant-section.form.title')}
 								name="applicantTitle"
@@ -94,7 +94,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.firstName')}
 								name="applicantFirstName"
@@ -106,7 +106,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.lastName')}
 								name="applicantLastName"
@@ -116,7 +116,7 @@ const Applicant = () => {
 								disabled={!isEditMode}
 							/>
 						</Col>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.suffix')}
 								name="applicantSuffix"
@@ -128,7 +128,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.primaryAffiliation')}
 								subLabel={translate('applicant-section.form.primaryAffiliationSubLabel')}
@@ -141,7 +141,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.primaryEmail')}
 								subLabel={translate('applicant-section.form.primaryEmailLabel')}
@@ -154,7 +154,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.researcherProfile')}
 								subLabel={translate('applicant-section.form.researcherProfileLabel')}
@@ -168,7 +168,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.positionTitle')}
 								name="applicantPositionTitle"
@@ -182,7 +182,7 @@ const Applicant = () => {
 				</SectionContent>
 				<SectionContent title={translate('applicant-section.section2')}>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.country')}
 								name="institutionCountry"
@@ -194,7 +194,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.streetAddress')}
 								name="institutionStreetAddress"
@@ -204,7 +204,7 @@ const Applicant = () => {
 								disabled={!isEditMode}
 							/>
 						</Col>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.building')}
 								name="institutionBuilding"
@@ -215,7 +215,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.state')}
 								name="institutionState"
@@ -225,7 +225,7 @@ const Applicant = () => {
 								disabled={!isEditMode}
 							/>
 						</Col>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.city')}
 								name="institutionCity"
@@ -237,7 +237,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 					<Row gutter={26}>
-						<Col span={12}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.postalCode')}
 								name="institutionPostalCode"
