@@ -279,7 +279,6 @@ components:
               type: string
               nullable: true
               description: The applicant's associated institution. Can be NULL.
-
     Applications:
       type: object
       properties:
@@ -313,6 +312,10 @@ components:
           format: date-time
           nullable: true
           description: When the application expires. Can be NULL.
+        content:
+          type: number
+          description: The ID of the record containing the content of the application.
+
     PagingInformation:
       type: object
       description: Information regarding what current page of results.
