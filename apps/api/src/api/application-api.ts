@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationState, ApplicationStates, ApproveApplication } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
 import { ApplicationListRequest } from '@/routes/types.js';
 import applicationService from '@/service/application-service.js';
 import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
+import { canTransitionTo } from '@/service/ApplicationStateMachine.js';
 
 /**
  * Creates a new application and returns the created data.
@@ -105,3 +106,62 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 
 	return result;
 };
+
+export const approveApplication = async ({
+  applicationId,
+  approverId,
+}: ApproveApplication): Promise<{
+  success: boolean;
+  message?: string;
+  errors?: string | Error;
+  data?: any;
+}> => {
+  try {
+    // Fetch application
+	const database = getDbInstance();
+	const service: ApplicationService = applicationService(database);
+	const result = await service.getApplicationById({ id:applicationId });
+
+	if (!result.success) {
+		return {
+			success: false,
+			message: 'Application not found.',
+			errors: 'ApplicationNotFound',
+		  };
+	}
+
+	const { state } = result.data;
+	if(state ===  ApplicationStates.APPROVED){
+		return {
+			success: false,
+			message: 'application is already approved.',
+			errors: 'ApprovalConflict',
+		  };
+	}
+
+    // Check if we can transition to "APPROVED" state
+    if (!canTransitionTo(state as ApplicationState, ApplicationStates.APPROVED)) {
+		return {
+		  success: false,
+		  message: 'Invalid state transition.',
+		  errors: 'InvalidState',
+		};
+	  }
+    
+    result.data.state = ApplicationStates.APPROVED;
+
+	const update = { state: ApplicationStates.APPROVED, approved_at: new Date()};
+
+    // Save changes
+    const updated_result = await service.findOneAndUpdate( { id:applicationId , update });
+
+    return { success: true, data: updated_result };
+  } catch (error) {
+    const message = `Unable to approve application with id: ${applicationId}`;
+			console.error(message);
+			console.error(error);
+			return failure(message, error);
+  }
+};
+
+

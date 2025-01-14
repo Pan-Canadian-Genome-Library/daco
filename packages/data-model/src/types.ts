@@ -223,3 +223,11 @@ export type Application = {
 	expires_at: Date;
 	contents: ApplicationContents;
 };
+
+export type ApproveApplication =  {
+	applicationId: number; // The ID of the application to be approved
+	approverId: number;    // The ID of the user approving the application
+  }
+
+export type ApplicationState = typeof ApplicationStates[keyof typeof ApplicationStates];
+

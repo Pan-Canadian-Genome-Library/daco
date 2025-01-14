@@ -20,7 +20,8 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createApplication, editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
+
+import { approveApplication, createApplication, editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -135,4 +136,68 @@ applicationRouter.get(
 	},
 );
 
+applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
+  
+	const { applicationId, approverId }: { applicationId?: number; approverId?: number } = req.body;
+
+	if (typeof applicationId !== 'number' || typeof approverId !== 'number') {
+		res.status(400).send({
+		  message: 'Invalid request. Both applicationId and approverId are required and must be numbers.',
+		  errors: 'MissingOrInvalidParameters',
+		});
+		return;
+	  }
+
+  
+	  // Validate input
+	  if (!applicationId || !approverId) {
+		 res.status(400).send({
+		  message: 'Invalid request. Both applicationId and approverId are required.',
+		  errors: 'MissingParameters',
+		});
+	  }
+  
+	  try {
+		// Call the service function
+		const result = await approveApplication({ applicationId, approverId });
+  
+		if (result.success) {
+		   res.status(200).send({
+			message: 'Application approved successfully.',
+			data: result.data,
+		  });
+		}
+  
+		const resultErrors = String(result.errors);
+  
+		if (resultErrors === 'ApplicationNotFound') {
+		   res.status(404).send({
+			message: result.message,
+			errors: resultErrors,
+		  });
+		} else if (resultErrors === 'ApprovalConflict') {
+		   res.status(409).send({
+			message: result.message,
+			errors: resultErrors,
+		  });
+		} else if (resultErrors === 'InvalidState') {
+		   res.status(400).send({
+			message: result.message,
+			errors: resultErrors,
+		  });
+		}
+  
+		 res.status(500).send({
+		  message: 'An unexpected error occurred.',
+		  errors: resultErrors,
+		});
+	  } catch (error) {
+		 res.status(500).send({
+		  message: 'Internal server error.',
+		  errors: String(error),
+		});
+	  }
+	}
+  );
+  
 export default applicationRouter;

@@ -196,6 +196,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationRecord'
+  /applications/approve:
+    post:
+      tags:
+        - Applications
+      summary: Approve an application.
+      requestBody:
+        description: Request body containing approval details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/ApproveApplication'
+    responses:
+      '200':
+        description: Application successfully approved.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Applications'
+      '400':
+        description: Invalid request - missing or invalid approval data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/responses/ClientErrors'
+      '404':
+        description: Application not found.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/responses/ClientErrors'
+      '500':
+        description: Server error - Unable to process approval.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/responses/ServerErrors'
 
 components:
   schemas:
@@ -370,6 +407,19 @@ components:
           description: Changes to make to the application
           type: object
           $ref: '#/components/schemas/ApplicationContents'
+
+    ApproveApplication:
+      type: object
+      required:
+        - applicantId
+        - applicationId
+      properties:
+        applicantId:
+          type: number
+          description: The id of the Applicant
+        applicationId:
+          description: The id of the Applicantion
+          type: number
 
   responses:
     ClientErrors:
