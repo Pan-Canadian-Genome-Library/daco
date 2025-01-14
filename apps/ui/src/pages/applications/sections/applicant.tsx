@@ -79,11 +79,11 @@ const Applicant = () => {
 					title={translate('applicant-section.title')}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
-				<SectionContent title={'Principal Investigator Information'}>
+				<SectionContent title={translate('applicant-section.section1')}>
 					<Row>
 						<Col span={4}>
 							<SelectBox
-								label="Title:"
+								label={translate('applicant-section.form.title')}
 								name="applicantTitle"
 								control={control}
 								rule={rule}
@@ -96,9 +96,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="First Name:"
+								label={translate('applicant-section.form.firstName')}
 								name="applicantFirstName"
-								subLabel="Must be the institutional email address of the Principal Investigator."
 								control={control}
 								rule={rule}
 								required
@@ -109,7 +108,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Last Name:"
+								label={translate('applicant-section.form.lastName')}
 								name="applicantLastName"
 								control={control}
 								rule={rule}
@@ -119,7 +118,7 @@ const Applicant = () => {
 						</Col>
 						<Col span={12}>
 							<InputBox
-								label="Suffix:"
+								label={translate('applicant-section.form.suffix')}
 								name="applicantSuffix"
 								control={control}
 								rule={rule}
@@ -131,8 +130,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Primary Affiliation::"
-								subLabel="The legal entity responsible for this application."
+								label={translate('applicant-section.form.primaryAffiliation')}
+								subLabel={translate('applicant-section.form.primaryAffiliationSubLabel')}
 								name="applicantPrimaryAffiliation"
 								control={control}
 								rule={rule}
@@ -144,8 +143,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Institutional Email:"
-								subLabel="Must be the institutional email address of the Principal Investigator."
+								label={translate('applicant-section.form.primaryEmail')}
+								subLabel={translate('applicant-section.form.primaryEmailLabel')}
 								name="applicantInstitutAffiliation"
 								control={control}
 								rule={rule}
@@ -157,8 +156,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Researcher Profile:"
-								subLabel="Please provide a link to your profile on your institution/company website."
+								label={translate('applicant-section.form.researcherProfile')}
+								subLabel={translate('applicant-section.form.researcherProfileLabel')}
 								name="applicantProfileUrl"
 								placeHolder="https://"
 								control={control}
@@ -171,7 +170,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Profile Title:"
+								label={translate('applicant-section.form.positionTitle')}
 								name="applicantPositionTitle"
 								control={control}
 								rule={rule}
@@ -181,11 +180,11 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title="Institution/Company Mailing Address">
+				<SectionContent title={translate('applicant-section.section2')}>
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Country:"
+								label={translate('applicant-section.form.country')}
 								name="institutionCountry"
 								control={control}
 								rule={rule}
@@ -197,7 +196,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Street Address:"
+								label={translate('applicant-section.form.streetAddress')}
 								name="institutionStreetAddress"
 								control={control}
 								rule={rule}
@@ -207,7 +206,7 @@ const Applicant = () => {
 						</Col>
 						<Col span={12}>
 							<InputBox
-								label="Building:"
+								label={translate('applicant-section.form.building')}
 								name="institutionBuilding"
 								control={control}
 								rule={rule}
@@ -218,7 +217,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Province:"
+								label={translate('applicant-section.form.state')}
 								name="institutionState"
 								control={control}
 								rule={rule}
@@ -228,7 +227,7 @@ const Applicant = () => {
 						</Col>
 						<Col span={12}>
 							<InputBox
-								label="City:"
+								label={translate('applicant-section.form.city')}
 								name="institutionCity"
 								control={control}
 								rule={rule}
@@ -240,7 +239,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col span={12}>
 							<InputBox
-								label="Postal/Zip Code:"
+								label={translate('applicant-section.form.postalCode')}
 								name="institutionPostalCode"
 								control={control}
 								rule={rule}
