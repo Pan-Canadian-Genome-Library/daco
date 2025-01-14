@@ -63,22 +63,38 @@ paths:
           name: state
           schema:
             type: string
-          description: Retrieve specific application items in a certain State
+          description: |
+            Retrieve specific application items in a certain State. This may be an array to to get multiple application types. The states that may be requested, may be the following enum values: `["DRAFT", "INSTITUTIONAL_REP_REVIEW"," DAC_REVIEW", "DAC_REVISIONS_REQUESTED", "REJECTED", "APPROVED", "CLOSED", "REVOKED"]`.
+            <br/>
+            <br/>
+            **For Example:** `["APPROVED", "REJECTED"]` to get both approved and rejected applications.
+            <br/>
+            <br/>
+            *Note:* These values *are* case sensitive.
         - in: query
           name: sort
           schema:
             type: string
-          description: Sort application items
+          description: |
+            Sort application items. Sorting application items takes in a JSON representation of an array and object combination.  This contains the column you'd like to sort by (id, user_id, state, created_at, approved_at, expires_at) and the direction (asc, desc).
+            <br/>
+            <br/>
+            **For Example:** `[{"direction":"desc","column":"id"}]`. 
+            <br/>
+            <br/>
+            *Note:* you may sort by multiple columns, just keep adding objects into the array.
         - in: query
           name: page
           schema:
-            type: string
-          description: Retrieve specific page of application items
+            type: number
+            minimum: 0
+          description: Retrieve specific page of application items. All page counts start from zero (0) and must be a positive number. If none is provided, the default is 0.
         - in: query
           name: pageSize
           schema:
-            type: string
-          description: Max number of application items per page
+            type: number
+            minimum: 0
+          description: Max number of application items per page. Must be a positive number. If the property isn't provided, the default is 20.
       responses:
         '500':
           description: 'Cannot return applications list'
@@ -87,7 +103,7 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
         '400':
-          description: 'Error retrieving applications - Please provide user ID'
+          description: 'Occurs when no User ID is provided, or page and/or page size are negative values.'
           content:
             application/json:
               schema:
@@ -213,28 +229,66 @@ components:
           enum:
             [DRAFT, INSTITUTIONAL_REP_REVIEW, DAC_REVIEW, DAC_REVISIONS_REQUESTED, REJECTED, APPROVED, CLOSED, REVOKED]
           description: The current state that the application is in.
-        created_at:
+        createdAt:
           type: string
           format: date-time
           description: When the application was created
-        approved_at:
+        approvedAt:
           type: string
           format: date-time
           nullable: true
           description: When the application was approved. Can be NULL.
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           nullable: true
           description: When the application was updated. Can be NULL.
-        expires_at:
+        expiresAt:
           type: string
           format: date-time
           nullable: true
           description: When the application expires. Can be NULL.
-        contents:
+        applicantInformation:
+          type: object
+          description: Information about the applicant who applied in the application.
+          properties:
+            firstName:
+              type: string
+              nullable: true
+              description: The first name of the applicant. Can be NULL.
+            lastName:
+              type: string
+              nullable: true
+              description: The last name of the applicant. Can be NULL.
+            email:
+              type: string
+              nullable: true
+              description: The email address of the applicant. Can be NULL.
+            country:
+              type: string
+              nullable: true
+              description: The country of the applicant's associated institution. Can be NULL.
+            institution:
+              type: string
+              nullable: true
+              description: The applicant's associated institution. Can be NULL.
+        paging:
+          type: object
+          $ref: '#/components/schemas/PagingInformation'
+
+    PagingInformation:
+      type: object
+      description: Information regarding what current page of results.
+      properties:
+        totalRecords:
           type: number
-          description: A ID referring to the entry with the application contents.
+          description: The total number of records in the current result set.
+        page:
+          type: number
+          description: The current page of results, starts from 0. Default is 0.
+        pageSize:
+          type: number
+          description: The current page size. Default is 20.
 
     ApplicationContents:
       type: object
