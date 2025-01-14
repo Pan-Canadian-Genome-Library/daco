@@ -19,7 +19,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 				return (
 					<Item label={props.label} required={props.required}>
 						<Item label={props.subLabel} name={props.name as string} rules={[props.rule]}>
-							<Input {...field} placeholder={props.placeHolder} />
+							<Input {...field} disabled={props.disabled} placeholder={props.placeHolder} />
 						</Item>
 					</Item>
 				);
