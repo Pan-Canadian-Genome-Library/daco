@@ -113,9 +113,16 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Applications'
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApplicationWithApplicantInfo'
+                  paging:
+                    type: object
+                    $ref: '#/components/schemas/PagingInformation'
+
   /applications/{applicationId}:
     get:
       tags:
@@ -215,7 +222,7 @@ paths:
 
 components:
   schemas:
-    Applications:
+    ApplicationWithApplicantInfo:
       type: object
       properties:
         id:
@@ -272,10 +279,40 @@ components:
               type: string
               nullable: true
               description: The applicant's associated institution. Can be NULL.
-        paging:
-          type: object
-          $ref: '#/components/schemas/PagingInformation'
 
+    Applications:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        user_id:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [DRAFT, INSTITUTIONAL_REP_REVIEW, DAC_REVIEW, DAC_REVISIONS_REQUESTED, REJECTED, APPROVED, CLOSED, REVOKED]
+          description: The current state that the application is in.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the application was created
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
     PagingInformation:
       type: object
       description: Information regarding what current page of results.
