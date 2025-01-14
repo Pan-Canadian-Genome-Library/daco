@@ -79,7 +79,6 @@ const Applicant = () => {
 					title={translate('applicant-section.title')}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
-				<input type="submit" />
 				<SectionContent title={'Principal Investigator Information'}>
 					<Row>
 						<Col span={4}>
