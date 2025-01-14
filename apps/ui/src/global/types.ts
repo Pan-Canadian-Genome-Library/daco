@@ -18,6 +18,7 @@
  */
 
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { RuleRender } from 'antd/es/form';
 
 export interface Application {
 	id: string;
@@ -40,4 +41,10 @@ export interface FetchError extends ServerError {
 
 export interface ApplicationOutletContext {
 	isEditMode: boolean;
+}
+
+export interface BasicFormFieldProps {
+	label?: string;
+	rule: RuleRender;
+	required?: boolean;
 }
