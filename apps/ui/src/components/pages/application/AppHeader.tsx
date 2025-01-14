@@ -24,12 +24,17 @@ import { useTranslation } from 'react-i18next';
 import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
 import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
+import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 const { Text, Title } = Typography;
 const { useToken } = theme;
 
-const AppHeader = ({ appId }: { appId: number }) => {
+type AppHeaderProps = {
+	id: number;
+	state: ApplicationStateValues;
+};
+
+const AppHeader = ({ id, state }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -70,7 +75,7 @@ const AppHeader = ({ appId }: { appId: number }) => {
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<Flex style={{ height: '100%' }} vertical justify="center" align="start">
 							<Title>
-								{translate('dashboard.title')}: PCGL-{appId}
+								{translate('dashboard.title')}: PCGL-{id}
 							</Title>
 							<Text>{formatDate(new Date(), new Date())}</Text>
 						</Flex>
@@ -89,7 +94,7 @@ const AppHeader = ({ appId }: { appId: number }) => {
 								vertical
 								gap={'middle'}
 							>
-								<AppStatusSteps currentStatus={ApplicationStates.DRAFT} />
+								<AppStatusSteps currentStatus={state} />
 							</Flex>
 						</Flex>
 					</Col>
@@ -106,7 +111,7 @@ const AppHeader = ({ appId }: { appId: number }) => {
 					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
 				</Flex>
 				<Modal
-					title={translate('modal.closeTitle', { id: appId })}
+					title={translate('modal.closeTitle', { id: id })}
 					okText={translate('button.closeApp')}
 					cancelText={translate('button.cancel')}
 					width={'100%'}
