@@ -49,7 +49,7 @@ const SectionMenu = () => {
 		},
 		{
 			key: 'applicant',
-			label: <SectionMenuItem label={translate('menu.sectionA')} isEditMode={isEditMode} />,
+			label: <SectionMenuItem label={translate('menu.applicant')} isEditMode={isEditMode} />,
 		},
 	];
 

@@ -84,7 +84,7 @@
 	},
 	"menu": {
 		"intro": "Introduction",
-		"sectionA": "A. Applicant Information"
+		"applicant": "A. Applicant Information"
 	},
 	"errors": {
 		"http": {
