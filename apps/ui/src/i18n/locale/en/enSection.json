@@ -39,5 +39,30 @@
 			"city": "City:",
 			"postalCode": "Postal/Zip Code:"
 		}
+	},
+	"institutional-section": {
+		"title": "Institutional Representative",
+		"description1": "An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
+		"section1": "Institutional Representative",
+		"section2": "Institution/Company Mailing Address",
+		"form": {
+			"title": "Title:",
+			"firstName": "First Name:",
+			"lastName": "Last Name:",
+			"suffix": "Suffix:",
+			"primaryAffiliation": "Primary Affiliation:",
+			"primaryAffiliationSubLabel": "The legal entity responsible for this application.",
+			"primaryEmail": "Institutional Email:",
+			"primaryEmailLabel": "Must be the institutional email address of the Principal Investigator.",
+			"researcherProfile": "Researcher Profile:",
+			"researcherProfileLabel": "Please provide a link to your profile on your institution/company website.",
+			"positionTitle": "Position Title:",
+			"country": "Country:",
+			"streetAddress": "Street Address:",
+			"building": "Building:",
+			"state": "Province:",
+			"city": "City:",
+			"postalCode": "Postal/Zip Code:"
+		}
 	}
 }
