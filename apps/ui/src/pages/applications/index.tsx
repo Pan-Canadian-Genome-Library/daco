@@ -59,18 +59,22 @@ const ApplicationViewer = () => {
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<AppHeader appId={data.id} />
+				<AppHeader id={data.id} state={data.state} />
 				{/* Multipart form Viewer */}
 				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
 					<>
-						<Row style={{ width: '25%' }}>
+						<Row style={{ width: '20%' }}>
 							<Col style={{ width: '100%' }}>
 								<SectionMenu />
 							</Col>
 						</Row>
-						<Row style={{ width: '75%' }}>
+						<Row style={{ width: '80%' }}>
 							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet />
+								<Outlet
+									context={{
+										isEditMode,
+									}}
+								/>
 							</Col>
 						</Row>
 					</>

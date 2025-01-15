@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,25 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, theme } from 'antd';
-import React from 'react';
+import { Divider, Flex, Typography } from 'antd';
+import { PropsWithChildren } from 'react';
 
-const { useToken } = theme;
+const { Title } = Typography;
 
-const SectionWrapper = ({ children }: { children: React.ReactElement }) => {
-	const { token } = useToken();
+interface SectionContentProps extends PropsWithChildren {
+	title: string;
+	showDivider?: boolean;
+}
 
-	const SectionWrapperStyles: React.CSSProperties = {
-		padding: token.paddingXL,
-		paddingInline: '4rem',
-		width: '100%',
-	};
-
+const SectionContent = ({ title, showDivider = true, children }: SectionContentProps) => {
 	return (
-		<Flex style={{ ...SectionWrapperStyles }} vertical gap={'middle'}>
+		<Flex vertical>
+			<Title level={4}>{title}</Title>
 			{children}
+			{showDivider && <Divider />}
 		</Flex>
 	);
 };
 
-export default SectionWrapper;
+export default SectionContent;
