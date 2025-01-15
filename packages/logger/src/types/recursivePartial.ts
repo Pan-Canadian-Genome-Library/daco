@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,27 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import './i18n/translations';
-import './index.css';
-
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
-
-import ThemeProvider from '@/components/providers/ThemeProvider';
-import App from '@/pages/App';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
-
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</ThemeProvider>
-		</QueryClientProvider>
-	</StrictMode>,
-);
+/**
+ * Makes all properties optional recursively including nested objects and the objects inside arrays.
+ */
+export type RecursivePartial<T = object> = {
+	[P in keyof T]?: T[P] extends Array<infer I>
+		? Array<RecursivePartial<I>>
+		: T[P] extends Record<string, any>
+			? RecursivePartial<T[P]>
+			: T[P];
+};
