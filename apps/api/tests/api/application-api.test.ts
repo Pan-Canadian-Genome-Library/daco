@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { createApplication, editApplication, getApplicationById } from '@/api/application-api.js';
+import { createApplication, editApplication, getApplicationById } from '@/api/applicationApi.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationService } from '@/service/types.js';
@@ -92,10 +92,10 @@ describe('Application API', () => {
 			assert.strictEqual(state, ApplicationStates.DRAFT);
 
 			const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-			const reviewRecord = await testApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
+			const reviewRecordResult = await testApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
 
-			assert.ok(Array.isArray(reviewRecord) && reviewRecord[0]);
-			assert.strictEqual(reviewRecord[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+			assert.ok(reviewRecordResult.success && reviewRecordResult.data[0]);
+			assert.strictEqual(reviewRecordResult.data[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
 			const contentUpdate = { applicant_last_name: 'User' };
 			const result = await editApplication({ id, update: contentUpdate });

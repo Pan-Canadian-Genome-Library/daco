@@ -18,6 +18,7 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
+import { applicationActionService } from '@/service/applicationActionService.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationData } from '@/service/types.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
@@ -70,10 +71,28 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
-				await this.dispatch(submit);
-				return validationResult;
+				try {
+					await this.dispatch(submit);
+
+					const db = getDbInstance();
+					const applicationRepo = applicationService(db);
+					const applicationActionRepo = applicationActionService(db);
+
+					return await db.transaction(async (tx) => {
+						const actionResult = await applicationActionRepo.draftSubmit(this._application);
+						if (!actionResult.success) return actionResult;
+
+						const { id } = this._application;
+						const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+						const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+
+						return applicationResult;
+					});
+				} catch (error) {
+					return failure(`Cannot submit application with state ${this.getState()}`, error);
+				}
 			} else {
-				return failure(`Cannot submit application with state ${this.getState()}`);
+				return failure(`Invalid submission at submitDraft with state ${this.getState()}`);
 			}
 		} else {
 			return failure(`Cannot submit application with state ${this.getState()}`);

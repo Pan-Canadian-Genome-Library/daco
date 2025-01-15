@@ -20,7 +20,7 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createApplication, editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
+import { createApplication, editApplication, getAllApplications, getApplicationById } from '@/api/applicationApi.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
