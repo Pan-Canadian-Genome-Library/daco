@@ -210,22 +210,24 @@ const applicationService = (db: PostgresDb) => ({
 				.orderBy(...sortQuery(sort))
 				.offset(page * pageSize);
 
-			let allApplications = rawApplicationData.slice(page, pageSize).map((application) => {
-				return {
-					id: application.applications.id,
-					user_id: application.applications.user_id,
-					state: application.applications.state,
-					createdAt: application.applications.created_at,
-					updatedAt: application.applications.updated_at,
-					applicantInformation: {
-						firstName: application.application_contents?.applicant_first_name,
-						lastName: application.application_contents?.applicant_last_name,
-						email: application.application_contents?.applicant_institutional_email,
-						country: application.application_contents?.institution_country,
-						institution: application.application_contents?.applicant_primary_affiliation,
-					},
-				};
-			});
+			let allApplications = rawApplicationData
+				.slice(page, pageSize + 1)
+				.map(({ applications, application_contents }) => {
+					return {
+						id: applications.id,
+						user_id: applications.user_id,
+						state: applications.state,
+						createdAt: applications.created_at,
+						updatedAt: applications.updated_at,
+						applicantInformation: {
+							firstName: application_contents?.applicant_first_name,
+							lastName: application_contents?.applicant_last_name,
+							email: application_contents?.applicant_institutional_email,
+							country: application_contents?.institution_country,
+							institution: application_contents?.applicant_primary_affiliation,
+						},
+					};
+				});
 
 			/**
 			 * We only want to sort DAC_REVIEW records to the top if:
