@@ -84,7 +84,8 @@
 	},
 	"menu": {
 		"intro": "Introduction",
-		"sectionA": "A. Applicant Information"
+		"sectionA": "A. Applicant Information",
+		"institutional": "B. Institutional Representative "
 	},
 	"errors": {
 		"http": {

@@ -17,32 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Route, Routes } from 'react-router';
+import { Typography } from 'antd';
 
-import PageLayout from '@/components/layouts/PageLayout';
-import ApplicationViewer from '@/pages/applications';
-import Applicant from '@/pages/applications/sections/applicant';
-import Institutional from '@/pages/applications/sections/institutional';
-import Introduction from '@/pages/applications/sections/intro';
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
-import ManageApplicationsPage from '@/pages/manage/applications';
+import SectionWrapper from '@/components/layouts/SectionWrapper';
 
-function App() {
+const { Text } = Typography;
+
+const Institutional = () => {
 	return (
-		<Routes>
-			<Route element={<PageLayout />}>
-				<Route index element={<HomePage />} />
-				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route path="intro/edit?" element={<Introduction />} />
-					<Route path="applicant/edit?" element={<Applicant />} />
-					<Route path="institutional/edit?" element={<Institutional />} />
-				</Route>
-				<Route path="manage/applications" element={<ManageApplicationsPage />} />
-			</Route>
-		</Routes>
+		<SectionWrapper>
+			<Text>Institutional</Text>
+		</SectionWrapper>
 	);
-}
+};
 
-export default App;
+export default Institutional;

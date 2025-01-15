@@ -51,6 +51,10 @@ const SectionMenu = () => {
 			key: 'applicant',
 			label: <SectionMenuItem label={translate('menu.sectionA')} />,
 		},
+		{
+			key: 'institutional',
+			label: <SectionMenuItem label={translate('menu.institutional')} />,
+		},
 	];
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
