@@ -87,7 +87,14 @@ const Applicant = () => {
 								name="applicantTitle"
 								control={control}
 								rule={rule}
-								options={[]}
+								options={[
+									{ value: 'dr', label: 'Dr' },
+									{ value: 'miss', label: 'Miss' },
+									{ value: 'mr', label: 'Mr' },
+									{ value: 'mrs', label: 'Mrs' },
+									{ value: 'ms', label: 'Ms' },
+									{ value: 'prof', label: 'Prof' },
+								]}
 								required
 								disabled={!isEditMode}
 							/>

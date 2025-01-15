@@ -25,7 +25,10 @@ import { BasicFormFieldProps } from '@/global/types';
 const { Item } = Form;
 
 interface SelectBoxProps extends BasicFormFieldProps {
-	options?: never[]; // The actual data type from Select options from antd
+	options?: {
+		label: string;
+		value: string;
+	}[];
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
