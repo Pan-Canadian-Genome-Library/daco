@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './actions.js';
 export * from './agreements.js';
+export * from './applicationActions.js';
 export * from './applicationContents.js';
 export * from './applications.js';
 export * from './collaborators.js';

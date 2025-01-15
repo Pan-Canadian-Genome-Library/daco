@@ -19,6 +19,7 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applicationActions } from './applicationActions.js';
 import { applicationContents } from './applicationContents.js';
 
 export const applicationStatesEnum = pgEnum('application_states', [
@@ -44,9 +45,10 @@ export const applications = pgTable('applications', {
 	contents: bigint({ mode: 'number' }),
 });
 
-export const applicationsRelations = relations(applications, ({ one }) => ({
+export const applicationsRelations = relations(applications, ({ one, many }) => ({
 	application_contents: one(applicationContents, {
 		fields: [applications.contents],
 		references: [applicationContents.id],
 	}),
+	actions: many(applicationActions),
 }));

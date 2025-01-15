@@ -46,18 +46,22 @@ export enum ApplicationReviewOutcomes {
 	'REVISIONS_REQUESTED',
 }
 
-export enum ApplicationActions {
-	'CREATE',
-	'WITHDRAW',
-	'CLOSE',
-	'REQUEST_INSTITUTIONAL_REP',
-	'INSTITUTIONAL_REP_APPROVED',
-	'INSTITUTIONAL_REP_REJECTED',
-	'DAC_REVIEW_APPROVED',
-	'DAC_REVIEW_REJECTED',
-	'DAC_REVIEW_REVISIONS',
-	'REVOKE',
-}
+export const ApplicationActions = {
+	CREATE: 'CREATE',
+	WITHDRAW: 'WITHDRAW',
+	CLOSE: 'CLOSE',
+	REQUEST_REP_REVIEW: 'REQUEST_REP_REVIEW',
+	INSTITUTIONAL_REP_REVISION: 'INSTITUTIONAL_REP_REVISION',
+	INSTITUTIONAL_REP_SUBMIT: 'INSTITUTIONAL_REP_SUBMIT',
+	INSTITUTIONAL_REP_APPROVED: 'INSTITUTIONAL_REP_APPROVED',
+	DAC_REVIEW_APPROVED: 'DAC_REVIEW_APPROVED',
+	DAC_REVIEW_SUBMIT: 'DAC_REVIEW_SUBMIT',
+	DAC_REVIEW_REJECTED: 'DAC_REVIEW_REJECTED',
+	DAC_REVIEW_REVISIONS: 'DAC_REVIEW_REVISIONS',
+	REVOKE: 'REVOKE',
+} as const;
+
+export type ApplicationActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
 
 export enum ApplicationAgreements {
 	'dac_agreement_software_updates',
@@ -158,7 +162,7 @@ export type ApplicationActionData = {
 	applicationId: number; // TODO: Implement BigInt;
 	createdAt: Date;
 	userId: string;
-	action: ApplicationActions;
+	action: ApplicationActionValues;
 	stateBefore: ApplicationStateValues;
 	stateAfter: ApplicationStateValues;
 	revisionsRequestId: number; // TODO: Implement BigInt

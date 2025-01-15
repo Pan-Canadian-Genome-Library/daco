@@ -17,21 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
-import applicationService from '@/service/application-service.js';
+import { applicationActionService } from '@/service/applicationActionService.js';
+import { applicationService } from '@/service/applicationService.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
+export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
+export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
 export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
 
 export type ApplicationData = typeof applications.$inferSelect;
+export type ApplicationActionData = typeof applicationActions.$inferSelect;
 
 export type ApplicationService = ReturnType<typeof applicationService>;
+export type ApplicationActionService = ReturnType<typeof applicationActionService>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
-export type OrderBy<Key extends string> = {
+export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';
 	column: Key;
 };
