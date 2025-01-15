@@ -67,12 +67,6 @@ const applicationActionService = (db: PostgresDb) => {
 			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
 		close: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
-		repReview: async (application: ApplicationData) =>
-			await addActionRecord(
-				application,
-				ApplicationActions.REQUEST_REP_REVIEW,
-				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
-			),
 		repRevision: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_REVISION, ApplicationStates.REP_REVISION),
 		repSubmit: async (application: ApplicationData) =>

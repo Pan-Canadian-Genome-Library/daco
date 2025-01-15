@@ -128,7 +128,7 @@ const applicationService = (db: PostgresDb) => ({
 				.where(eq(applications.id, id))
 				.returning();
 
-			return application;
+			return success(application);
 		} catch (err) {
 			const message = `Error at findOneAndUpdate with id: ${id}`;
 			console.error(message);

@@ -130,7 +130,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.repReview(testApplication);
+			const result = await testActionRepo.draftSubmit(testApplication);
 
 			assert.ok(result.success && result.data);
 

@@ -71,22 +71,28 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
-				await this.dispatch(submit);
+				try {
+					await this.dispatch(submit);
 
-				const db = getDbInstance();
-				const applicationRepo = applicationService(db);
-				const applicationActionRepo = applicationActionService(db);
+					const db = getDbInstance();
+					const applicationRepo = applicationService(db);
+					const applicationActionRepo = applicationActionService(db);
 
-				await db.transaction(async (tx) => {
-					await applicationActionRepo.draftSubmit(this._application);
-					const { id } = this._application;
-					const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-					await applicationRepo.findOneAndUpdate({ id, update });
-				});
+					return await db.transaction(async (tx) => {
+						const actionResult = await applicationActionRepo.draftSubmit(this._application);
+						if (!actionResult.success) return actionResult;
 
-				return validationResult;
+						const { id } = this._application;
+						const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+						const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+
+						return applicationResult;
+					});
+				} catch (error) {
+					return failure(`Cannot submit application with state ${this.getState()}`, error);
+				}
 			} else {
-				return failure(`Cannot submit application with state ${this.getState()}`);
+				return failure(`Invalid submission at submitDraft with state ${this.getState()}`);
 			}
 		} else {
 			return failure(`Cannot submit application with state ${this.getState()}`);

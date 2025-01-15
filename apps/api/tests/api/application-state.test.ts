@@ -23,6 +23,9 @@ import { after, before, describe, it } from 'node:test';
 
 import { ApplicationStateManager, createApplicationStateManager } from '@/api/stateManager.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
+import { applicationActionService } from '@/service/applicationActionService.js';
+import { applicationService } from '@/service/applicationService.js';
+import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
@@ -43,6 +46,9 @@ describe('State Machine', () => {
 	let container: StartedPostgreSqlContainer;
 	let testStateManager: ApplicationStateManager;
 
+	let testActionRepo: ApplicationActionService;
+	let testApplicationRepo: ApplicationService;
+
 	before(async () => {
 		container = await new PostgreSqlContainer()
 			.withUsername(PG_USER)
@@ -55,6 +61,9 @@ describe('State Machine', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
+
+		testActionRepo = applicationActionService(db);
+		testApplicationRepo = applicationService(db);
 	});
 
 	describe('Application State Manager', () => {
@@ -93,6 +102,21 @@ describe('State Machine', () => {
 			await testStateManager.submitDraft();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === 'REQUEST_REP_REVIEW' &&
+						record.state_before === 'DRAFT' &&
+						record.state_after === 'INSTITUTIONAL_REP_REVIEW',
+				),
+			);
+
+			const applicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			assert.ok(applicationResult.success && applicationResult.data);
+			assert.ok(applicationResult.data.state === 'INSTITUTIONAL_REP_REVIEW');
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', async () => {
