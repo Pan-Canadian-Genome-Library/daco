@@ -64,7 +64,7 @@ paths:
           schema:
             type: string
           description: |
-            Retrieve specific application items in a certain State. This may be an array to to get multiple application types. The states that may be requested, may be the following enum values: `["DRAFT", "INSTITUTIONAL_REP_REVIEW"," DAC_REVIEW", "DAC_REVISIONS_REQUESTED", "REJECTED", "APPROVED", "CLOSED", "REVOKED"]`.
+            Retrieve specific application items in a certain State. This may be an array to get multiple application types. The states that may be requested, may be the following enum values: `["DRAFT", "INSTITUTIONAL_REP_REVIEW"," DAC_REVIEW", "DAC_REVISIONS_REQUESTED", "REJECTED", "APPROVED", "CLOSED", "REVOKED"]`.
             <br/>
             <br/>
             **For Example:** `["APPROVED", "REJECTED"]` to get both approved and rejected applications.
