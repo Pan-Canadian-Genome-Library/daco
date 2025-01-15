@@ -118,7 +118,7 @@ const DashboardPage = () => {
 									<Col xs={24} md={24} lg={12}>
 										<NewApplicationCard />
 									</Col>
-									{applicationData.map((applicationItem) => {
+									{applicationData.applications.map((applicationItem) => {
 										return (
 											<Col key={applicationItem.id} xs={24} md={24} lg={12}>
 												<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />
