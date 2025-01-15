@@ -112,7 +112,7 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
 				</Flex>
 				<Modal
-					title={translate('modal.closeTitle', { id: id })}
+					title={translate('modal.closeTitle', { id })}
 					okText={translate('button.closeApp')}
 					cancelText={translate('button.cancel')}
 					width={'100%'}
