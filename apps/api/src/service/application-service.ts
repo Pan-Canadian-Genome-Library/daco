@@ -248,7 +248,7 @@ const applicationService = (db: PostgresDb) => ({
 
 			const applicationsList = {
 				applications: allApplications,
-				paging: {
+				pagingMetadata: {
 					totalRecords: rawApplicationData.length,
 					page: page,
 					pageSize: pageSize,

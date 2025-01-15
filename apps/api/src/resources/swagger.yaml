@@ -119,9 +119,9 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/ApplicationWithApplicantInfo'
-                  paging:
+                  pagingMetadata:
                     type: object
-                    $ref: '#/components/schemas/PagingInformation'
+                    $ref: '#/components/schemas/PagingMetadata'
 
   /applications/{applicationId}:
     get:
@@ -316,7 +316,7 @@ components:
           type: number
           description: The ID of the record containing the content of the application.
 
-    PagingInformation:
+    PagingMetadata:
       type: object
       description: Information regarding what current page of results.
       properties:

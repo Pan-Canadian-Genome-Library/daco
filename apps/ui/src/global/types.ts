@@ -37,7 +37,7 @@ interface ApplicationWithApplicantInformation extends Application {
 	};
 }
 
-export interface PagingInformation {
+export interface PagingMetadata {
 	totalRecords: number;
 	page: number;
 	pageSize: number;
@@ -45,7 +45,7 @@ export interface PagingInformation {
 
 export interface ApplicationList {
 	applications: ApplicationWithApplicantInformation[];
-	paging: PagingInformation;
+	pagingMetadata: PagingMetadata;
 }
 
 export interface ServerError {
