@@ -34,10 +34,13 @@ const { Content } = Layout;
 const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
+
+	// grab current route and its relevant information
 	const match = useMatch('application/:id/:section/:edit?');
+	const isEditMode = !!match?.params.edit;
+	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
 
 	const { data, isError, error, isLoading } = useGetApplication(params.id);
-	const isEditMode = !!match?.params.edit;
 
 	useEffect(() => {
 		if (data && !('isError' in data)) {
@@ -63,12 +66,12 @@ const ApplicationViewer = () => {
 				{/* Multipart form Viewer */}
 				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
 					<>
-						<Row style={{ width: '20%' }}>
+						<Row style={{ width: '25%' }}>
 							<Col style={{ width: '100%' }}>
-								<SectionMenu />
+								<SectionMenu currentSection={currentSection} isEditMode={isEditMode} />
 							</Col>
 						</Row>
-						<Row style={{ width: '80%' }}>
+						<Row style={{ width: '75%' }}>
 							<Col style={{ background: 'white', width: '100%' }}>
 								<Outlet
 									context={{

@@ -19,20 +19,20 @@
 
 import { Menu, MenuProps } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useMatch, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const SectionMenu = () => {
+type SectionMenuProps = {
+	currentSection: string;
+	isEditMode: boolean;
+};
+
+const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const { t: translate } = useTranslation();
-
-	// Grab current section from url
-	const match = useMatch('application/:id/:section/:edit?');
-	const isEditMode = !!match?.params.edit;
-	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
 
 	const MenuItemList: MenuItem[] = [
 		{
@@ -55,7 +55,7 @@ const SectionMenu = () => {
 
 	return (
 		<Menu
-			style={{ width: '100%', minWidth: '275px', height: '100%', border: '20px' }}
+			style={{ width: '100%', height: '100%' }}
 			defaultSelectedKeys={[currentSection]}
 			mode="inline"
 			items={MenuItemList}
