@@ -20,7 +20,13 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createApplication, editApplication, getAllApplications, getApplicationById, getApplicationStateTotals } from '@/api/application-api.js';
+import {
+	createApplication,
+	editApplication,
+	getAllApplications,
+	getApplicationById,
+	getApplicationStateTotals,
+} from '@/api/application-api.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -135,16 +141,19 @@ applicationRouter.get(
 	},
 );
 
-// TODO: - Refactor endpoint logic once validation/dto flow is in place
-//       - verify if user can access applications
-//       - validate queryParam options using zod
+/**
+ * Gets the total of how many applications are in each state type (APPROVED, REJECTED, etc...),
+ * including a TOTAL count.
+ *
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can access the specified application. This should be done and refactored.
+ * 	- Validate request params using Zod.
+ */
 applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {}, {}, any>, res) => {
 	const { userId } = req.query;
 
-	//  Temporary userId check until validation/dto flow is confirmed
-	//  - reflect changes in swagger once refactored
 	if (!userId) {
-		res.status(400).send({ message: 'User Id is required' });
+		res.status(400).send({ message: 'User Id is Required' });
 		return;
 	}
 
@@ -158,6 +167,5 @@ applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {
 		res.status(500).send({ message: result.message, errors: String(result.errors) });
 	}
 });
-
 
 export default applicationRouter;

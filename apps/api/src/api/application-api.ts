@@ -106,7 +106,7 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 	return result;
 };
 /**
- * 
+ * Gets the total of how many applications are in each state type, including a TOTAL count.
  * @param userId - The ID of the current user.
  * @returns Success with the details of the application / Failure with Error.
  */
@@ -114,7 +114,7 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
 	const database = getDbInstance();
 	const service: ApplicationService = applicationService(database);
 
-	const result = await service.getStateTotals({ user_id: userId });
+	const result = await service.applicationStateTotals({ user_id: userId });
 
 	return result;
 };

@@ -209,11 +209,7 @@ const applicationService = (db: PostgresDb) => ({
 		}
 	},
 
-	getStateTotals: async ({ user_id }: { user_id?: string }) => {
-		// const allStates = Object.keys(ApplicationStates).map((state) => {
-		// 	return ;
-		// });
-		// console.log(...allStates);
+	applicationStateTotals: async ({ user_id }: { user_id?: string }) => {
 		const rawApplicationData = await db
 			.select({
 				APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
@@ -223,7 +219,7 @@ const applicationService = (db: PostgresDb) => ({
 				DRAFT: db.$count(applications, eq(applications.state, 'DRAFT')),
 				INSTITUTIONAL_REP_REVIEW: db.$count(applications, eq(applications.state, 'INSTITUTIONAL_REP_REVIEW')),
 				REJECTED: db.$count(applications, eq(applications.state, 'REJECTED')),
-				REP_REVISION: db.$count(applications, eq(applications.state, 'REP_REVISION')),
+				// REP_REVISION: db.$count(applications, eq(applications.state, 'REP_REVISION')),
 				REVOKED: db.$count(applications, eq(applications.state, 'REVOKED')),
 				TOTAL: db.$count(applications),
 			})
