@@ -230,9 +230,27 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
+			stateValue = testStateManager.getState();
+			assert.strictEqual(stateValue, DAC_REVIEW);
+
 			await testStateManager.approveDacReview();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, APPROVED);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.DAC_REVIEW_APPROVED &&
+						record.state_before === ApplicationStates.DAC_REVIEW &&
+						record.state_after === ApplicationStates.APPROVED,
+				),
+			);
+
+			const applicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			assert.ok(applicationResult.success && applicationResult.data);
+			assert.ok(applicationResult.data.state === ApplicationStates.APPROVED);
 		});
 
 		it('should change from APPROVED to REVOKED on revoked', async () => {

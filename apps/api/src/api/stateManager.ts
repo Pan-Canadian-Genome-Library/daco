@@ -133,7 +133,33 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async submitDacRevision() {
-		return this.submitDraft();
+		if (this.can(submit)) {
+			try {
+				await this.dispatch(submit);
+
+				const db = getDbInstance();
+				const applicationRepo = applicationService(db);
+				const applicationActionRepo = applicationActionService(db);
+
+				return await db.transaction(async (tx) => {
+					const actionResult = await applicationActionRepo.dacSubmit(this._application);
+					if (!actionResult.success) return actionResult;
+
+					const { id } = this._application;
+					const update = { state: ApplicationStates.DAC_REVIEW };
+					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+					if (applicationResult.success && applicationResult.data[0]) {
+						this._application = applicationResult.data[0];
+					}
+
+					return applicationResult;
+				});
+			} catch (error) {
+				return failure(`Error submitting application with id ${this._application.id}`, error);
+			}
+		} else {
+			return failure(`Cannot submit application with state ${this.getState()}`);
+		}
 	}
 
 	private async _onSubmit() {
@@ -253,9 +279,30 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async approveDacReview() {
+		// TODO: need check for && state
 		if (this.can(approve)) {
-			await this.dispatch(approve);
-			return success(approve);
+			try {
+				await this.dispatch(approve);
+				const db = getDbInstance();
+				const applicationRepo = applicationService(db);
+				const applicationActionRepo = applicationActionService(db);
+
+				// TODO: Pass tx as argument, make reusable function using state_after from action svc
+				return await db.transaction(async (tx) => {
+					const actionResult = await applicationActionRepo.dacApproved(this._application);
+					if (!actionResult.success) return actionResult;
+
+					const { id } = this._application;
+					const update = { state: ApplicationStates.APPROVED };
+					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+					if (applicationResult.success && applicationResult.data[0]) {
+						this._application = applicationResult.data[0];
+					}
+					return applicationResult;
+				});
+			} catch (error) {
+				return failure(`Error approving application with id ${this._application.id}`, error);
+			}
 		} else {
 			return failure(`Cannot approve application with state ${this.getState()}`);
 		}
