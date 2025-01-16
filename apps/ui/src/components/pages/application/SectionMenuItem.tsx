@@ -18,7 +18,9 @@
  */
 
 import { CheckCircleOutlined, LockOutlined } from '@ant-design/icons';
-import { Flex } from 'antd';
+import { Flex, Typography } from 'antd';
+
+const { Text } = Typography;
 
 type SectionMenuItemProps = {
 	label: string;
@@ -32,7 +34,10 @@ type SectionMenuItemProps = {
 const SectionMenuItem = ({ label, isEditMode }: SectionMenuItemProps) => {
 	return (
 		<Flex style={{ width: '100%' }} justify="space-between">
-			<>{label}</>
+			<Text style={{ color: 'inherit' }} ellipsis>
+				{label}
+			</Text>
+
 			<Flex>{!isEditMode ? <LockOutlined /> : <CheckCircleOutlined />}</Flex>
 		</Flex>
 	);
