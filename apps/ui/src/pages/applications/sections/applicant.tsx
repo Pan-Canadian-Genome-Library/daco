@@ -39,7 +39,7 @@ type FieldType = {
 	applicantLastName: string;
 	applicantSuffix: string;
 	applicantPrimaryAffiliation: string;
-	applicantInstitutAffiliation: string;
+	applicantInstituteAffiliation: string;
 	applicantProfileUrl: string;
 	applicantPositionTitle: string;
 	institutionCountry: string;
@@ -152,7 +152,7 @@ const Applicant = () => {
 							<InputBox
 								label={translate('applicant-section.form.primaryEmail')}
 								subLabel={translate('applicant-section.form.primaryEmailLabel')}
-								name="applicantInstitutAffiliation"
+								name="applicantInstituteAffiliation"
 								control={control}
 								rule={rule}
 								required
