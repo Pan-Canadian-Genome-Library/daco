@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,25 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, theme } from 'antd';
-import React from 'react';
+import { Divider, Flex, Typography } from 'antd';
+import { PropsWithChildren } from 'react';
 
-const { useToken } = theme;
+const { Title, Text } = Typography;
 
-const SectionWrapper = ({ children }: { children: React.ReactElement }) => {
-	const { token } = useToken();
+interface SectionTitleProps extends PropsWithChildren {
+	title: string;
+	text?: string[];
+	showDivider?: boolean;
+}
 
-	const SectionWrapperStyles: React.CSSProperties = {
-		padding: token.paddingXL,
-		paddingInline: '4rem',
-		width: '100%',
-	};
-
+const SectionTitle = ({ title, text = [], showDivider = true, children }: SectionTitleProps) => {
 	return (
-		<Flex style={{ ...SectionWrapperStyles }} vertical gap={'middle'}>
+		<Flex vertical>
+			<Title level={2}>{title}</Title>
+			<Flex vertical gap={'middle'}>
+				{text.map((text, index) => {
+					return <Text key={index}>{text}</Text>;
+				})}
+			</Flex>
 			{children}
+			{showDivider && <Divider />}
 		</Flex>
 	);
 };
 
-export default SectionWrapper;
+export default SectionTitle;
