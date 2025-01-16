@@ -208,6 +208,33 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
+	getStateTotals: async ({ user_id }: { user_id?: string }) => {
+		// const allStates = Object.keys(ApplicationStates).map((state) => {
+		// 	return ;
+		// });
+		// console.log(...allStates);
+		const rawApplicationData = await db
+			.select({
+				APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
+				CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
+				DAC_REVIEW: db.$count(applications, eq(applications.state, 'DAC_REVIEW')),
+				DAC_REVISIONS_REQUESTED: db.$count(applications, eq(applications.state, 'DAC_REVISIONS_REQUESTED')),
+				DRAFT: db.$count(applications, eq(applications.state, 'DRAFT')),
+				INSTITUTIONAL_REP_REVIEW: db.$count(applications, eq(applications.state, 'INSTITUTIONAL_REP_REVIEW')),
+				REJECTED: db.$count(applications, eq(applications.state, 'REJECTED')),
+				REP_REVISION: db.$count(applications, eq(applications.state, 'REP_REVISION')),
+				REVOKED: db.$count(applications, eq(applications.state, 'REVOKED')),
+				TOTAL: db.$count(applications),
+			})
+			.from(applications)
+			.limit(1);
+		if (rawApplicationData) {
+			return success(rawApplicationData[0]);
+		} else {
+			return failure(rawApplicationData);
+		}
+	},
 });
 
 export default applicationService;

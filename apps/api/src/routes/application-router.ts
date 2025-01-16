@@ -20,7 +20,7 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createApplication, editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
+import { createApplication, editApplication, getAllApplications, getApplicationById, getApplicationStateTotals } from '@/api/application-api.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -134,5 +134,30 @@ applicationRouter.get(
 		}
 	},
 );
+
+// TODO: - Refactor endpoint logic once validation/dto flow is in place
+//       - verify if user can access applications
+//       - validate queryParam options using zod
+applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {}, {}, any>, res) => {
+	const { userId } = req.query;
+
+	//  Temporary userId check until validation/dto flow is confirmed
+	//  - reflect changes in swagger once refactored
+	if (!userId) {
+		res.status(400).send({ message: 'User Id is required' });
+		return;
+	}
+
+	const result = await getApplicationStateTotals({
+		userId,
+	});
+
+	if (result.success) {
+		res.status(200).send(result.data);
+	} else {
+		res.status(500).send({ message: result.message, errors: String(result.errors) });
+	}
+});
+
 
 export default applicationRouter;
