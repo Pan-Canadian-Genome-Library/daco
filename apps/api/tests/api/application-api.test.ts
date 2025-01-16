@@ -68,9 +68,11 @@ describe('Application API', () => {
 			const applicationRecordsResult = await applicationService.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
-			const { id } = applicationRecordsResult.data[0];
+			const { id } = applicationRecordsResult.data.applications[0];
 
 			const update = { applicant_first_name: 'Test' };
 
@@ -89,9 +91,11 @@ describe('Application API', () => {
 			const applicationRecordsResult = await applicationService.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
-			const { id, state } = applicationRecordsResult.data[0];
+			const { id, state } = applicationRecordsResult.data.applications[0];
 
 			assert.strictEqual(state, ApplicationStates.DRAFT);
 
@@ -117,8 +121,10 @@ describe('Application API', () => {
 			const applicationRecordsResult = await applicationService.listApplications({ user_id });
 			assert.ok(applicationRecordsResult.success);
 
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
-			const { id } = applicationRecordsResult.data[0];
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
 
 			const stateUpdate = { state: ApplicationStates.CLOSED };
 			await applicationService.findOneAndUpdate({ id, update: stateUpdate });
@@ -153,9 +159,11 @@ describe('Application API', () => {
 
 			assert.ok(applicationRecordsResult.success);
 
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
-			const last_id = applicationRecordsResult.data[applicationRecordsResult.data.length - 1];
+			const last_id = applicationRecordsResult.data.applications[applicationRecordsResult.data.applications.length - 1];
 
 			assert.ok(last_id?.id);
 

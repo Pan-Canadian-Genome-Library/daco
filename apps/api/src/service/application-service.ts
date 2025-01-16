@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
@@ -78,6 +78,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 		try {
 			const application = await db.transaction(async (transaction) => {
@@ -115,6 +116,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
 		try {
 			const application = await db
@@ -131,6 +133,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	getApplicationById: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
@@ -144,6 +147,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	getApplicationWithContents: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db
@@ -168,44 +172,94 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	listApplications: async ({
 		user_id,
-		state,
+		state = [],
 		sort = [],
 		page = 0,
 		pageSize = 20,
 	}: {
 		user_id?: string;
-		state?: ApplicationStateValues;
+		state?: ApplicationStateValues[];
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
 	}) => {
 		try {
-			const allApplications = await db
-				.select({
-					id: applications.id,
-					user_id: applications.user_id,
-					state: applications.state,
-					createdAt: applications.created_at,
-					updatedAt: applications.updated_at,
-				})
+			/**
+			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
+			 * This should be handled at at the router layer, but just in-case.
+			 */
+			if (Number.isNaN(page) || Number.isNaN(pageSize)) {
+				throw Error('Page and/or page size must be a positive integer.');
+			} else if (page < 0 || pageSize < 0) {
+				throw Error('Page and/or page size must be non-negative values.');
+			}
+
+			const rawApplicationData = await db
+				.select()
 				.from(applications)
 				.where(
 					and(
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
-						state ? eq(applications.state, state) : undefined,
+						state.length ? inArray(applications.state, state) : undefined,
 					),
 				)
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...sortQuery(sort))
-				.offset(page * pageSize)
-				.limit(pageSize);
+				.offset(page * pageSize);
 
-			return success(allApplications);
+			let allApplications = rawApplicationData
+				.slice(page, pageSize + 1)
+				.map(({ applications, application_contents }) => {
+					return {
+						id: applications.id,
+						user_id: applications.user_id,
+						state: applications.state,
+						createdAt: applications.created_at,
+						updatedAt: applications.updated_at,
+						applicantInformation: {
+							firstName: application_contents?.applicant_first_name,
+							lastName: application_contents?.applicant_last_name,
+							email: application_contents?.applicant_institutional_email,
+							country: application_contents?.institution_country,
+							institution: application_contents?.applicant_primary_affiliation,
+						},
+					};
+				});
+
+			/**
+			 * We only want to sort DAC_REVIEW records to the top if:
+			 * 	- The user hasn't sorted by any filter
+			 * 	- If the sorting filters include DAC_REVIEW
+			 * 		- Keeping in mind that if it includes JUST DAC_REVIEW, then we skip
+			 * 		 since the sorting will already be handled by drizzle in this case.
+			 */
+			if (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW))) {
+				const reviewApplications = allApplications.filter(
+					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
+				);
+				allApplications = [
+					...reviewApplications,
+					...allApplications.filter((applications) => applications.state !== ApplicationStates.DAC_REVIEW),
+				];
+			}
+
+			const applicationsList = {
+				applications: allApplications,
+				pagingMetadata: {
+					totalRecords: rawApplicationData.length,
+					page: page,
+					pageSize: pageSize,
+				},
+			};
+
+			return success(applicationsList);
 		} catch (err) {
 			const message = `Error at listApplications with user_id: ${user_id} state: ${state}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 			return failure(message, err);
 		}
 	},
