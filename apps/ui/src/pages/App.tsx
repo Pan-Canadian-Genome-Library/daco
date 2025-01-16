@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Route, Routes } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
 import ApplicationViewer from '@/pages/applications';
@@ -35,6 +35,7 @@ function App() {
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
 				<Route path="application/:id" element={<ApplicationViewer />}>
+					<Route index element={<Navigate to="intro" />} />
 					<Route path="intro/edit?" element={<Introduction />} />
 					<Route path="applicant/edit?" element={<Applicant />} />
 					<Route path="institutional/edit?" element={<Institutional />} />

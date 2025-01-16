@@ -18,7 +18,6 @@
  */
 
 import { Menu, MenuProps } from 'antd';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMatch, useNavigate } from 'react-router';
 
@@ -34,13 +33,6 @@ const SectionMenu = () => {
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
-
-	useEffect(() => {
-		// if the section route is empty, navigate to intro route
-		if (currentSection === 'intro') {
-			navigate(`intro/${isEditMode ? 'edit' : ''}`, { replace: true });
-		}
-	}, [currentSection, navigate, isEditMode]);
 
 	const MenuItemList: MenuItem[] = [
 		{
