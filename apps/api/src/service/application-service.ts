@@ -22,6 +22,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import logger from '@/logger.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
@@ -226,6 +227,7 @@ const applicationService = (db: PostgresDb) => ({
 				})
 				.from(applications)
 				.limit(1);
+
 			if (rawApplicationData && rawApplicationData.length) {
 				return success(rawApplicationData[0]);
 			} else {
@@ -244,8 +246,8 @@ const applicationService = (db: PostgresDb) => ({
 			}
 		} catch (exception) {
 			const message = `Error at applicationStateTotals with user_id: ${user_id}.`;
-			console.error(message);
-			console.error(exception);
+			logger.error(message);
+			logger.error(exception);
 			return failure(message, exception);
 		}
 	},
