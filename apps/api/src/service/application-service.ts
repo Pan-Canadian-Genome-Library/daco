@@ -210,25 +210,43 @@ const applicationService = (db: PostgresDb) => ({
 	},
 
 	applicationStateTotals: async ({ user_id }: { user_id?: string }) => {
-		const rawApplicationData = await db
-			.select({
-				APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
-				CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
-				DAC_REVIEW: db.$count(applications, eq(applications.state, 'DAC_REVIEW')),
-				DAC_REVISIONS_REQUESTED: db.$count(applications, eq(applications.state, 'DAC_REVISIONS_REQUESTED')),
-				DRAFT: db.$count(applications, eq(applications.state, 'DRAFT')),
-				INSTITUTIONAL_REP_REVIEW: db.$count(applications, eq(applications.state, 'INSTITUTIONAL_REP_REVIEW')),
-				REJECTED: db.$count(applications, eq(applications.state, 'REJECTED')),
-				// REP_REVISION: db.$count(applications, eq(applications.state, 'REP_REVISION')),
-				REVOKED: db.$count(applications, eq(applications.state, 'REVOKED')),
-				TOTAL: db.$count(applications),
-			})
-			.from(applications)
-			.limit(1);
-		if (rawApplicationData) {
-			return success(rawApplicationData[0]);
-		} else {
-			return failure(rawApplicationData);
+		try {
+			const rawApplicationData = await db
+				.select({
+					APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
+					CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
+					DAC_REVIEW: db.$count(applications, eq(applications.state, 'DAC_REVIEW')),
+					DAC_REVISIONS_REQUESTED: db.$count(applications, eq(applications.state, 'DAC_REVISIONS_REQUESTED')),
+					DRAFT: db.$count(applications, eq(applications.state, 'DRAFT')),
+					INSTITUTIONAL_REP_REVIEW: db.$count(applications, eq(applications.state, 'INSTITUTIONAL_REP_REVIEW')),
+					REJECTED: db.$count(applications, eq(applications.state, 'REJECTED')),
+					// REP_REVISION: db.$count(applications, eq(applications.state, 'REP_REVISION')),
+					REVOKED: db.$count(applications, eq(applications.state, 'REVOKED')),
+					TOTAL: db.$count(applications),
+				})
+				.from(applications)
+				.limit(1);
+			if (rawApplicationData && rawApplicationData.length) {
+				return success(rawApplicationData[0]);
+			} else {
+				return success({
+					APPROVED: 0,
+					CLOSED: 0,
+					DAC_REVIEW: 0,
+					DAC_REVISIONS_REQUESTED: 0,
+					DRAFT: 0,
+					INSTITUTIONAL_REP_REVIEW: 0,
+					REJECTED: 0,
+					// REP_REVISION: 0,
+					REVOKED: 0,
+					TOTAL: 0,
+				});
+			}
+		} catch (exception) {
+			const message = `Error at applicationStateTotals with user_id: ${user_id}.`;
+			console.error(message);
+			console.error(exception);
+			return failure(message, exception);
 		}
 	},
 });
