@@ -22,6 +22,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import logger from '@/logger.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
@@ -206,6 +207,48 @@ const applicationService = (db: PostgresDb) => ({
 			console.error(message);
 			console.error(err);
 			return failure(message, err);
+		}
+	},
+
+	applicationStateTotals: async ({ user_id }: { user_id?: string }) => {
+		try {
+			const rawApplicationData = await db
+				.select({
+					APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
+					CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
+					DAC_REVIEW: db.$count(applications, eq(applications.state, 'DAC_REVIEW')),
+					DAC_REVISIONS_REQUESTED: db.$count(applications, eq(applications.state, 'DAC_REVISIONS_REQUESTED')),
+					DRAFT: db.$count(applications, eq(applications.state, 'DRAFT')),
+					INSTITUTIONAL_REP_REVIEW: db.$count(applications, eq(applications.state, 'INSTITUTIONAL_REP_REVIEW')),
+					REJECTED: db.$count(applications, eq(applications.state, 'REJECTED')),
+					REP_REVISION: db.$count(applications, eq(applications.state, 'REP_REVISION')),
+					REVOKED: db.$count(applications, eq(applications.state, 'REVOKED')),
+					TOTAL: db.$count(applications),
+				})
+				.from(applications)
+				.limit(1);
+
+			if (rawApplicationData && rawApplicationData.length) {
+				return success(rawApplicationData[0]);
+			} else {
+				return success({
+					APPROVED: 0,
+					CLOSED: 0,
+					DAC_REVIEW: 0,
+					DAC_REVISIONS_REQUESTED: 0,
+					DRAFT: 0,
+					INSTITUTIONAL_REP_REVIEW: 0,
+					REJECTED: 0,
+					REP_REVISION: 0,
+					REVOKED: 0,
+					TOTAL: 0,
+				});
+			}
+		} catch (exception) {
+			const message = `Error at applicationStateTotals with user_id: ${user_id}.`;
+			logger.error(message);
+			logger.error(exception);
+			return failure(message, exception);
 		}
 	},
 });

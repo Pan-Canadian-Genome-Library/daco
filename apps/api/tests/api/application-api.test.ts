@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -22,7 +22,12 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { createApplication, editApplication, getApplicationById } from '@/api/application-api.js';
+import {
+	createApplication,
+	editApplication,
+	getApplicationById,
+	getApplicationStateTotals,
+} from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import service from '@/service/application-service.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -163,6 +168,27 @@ describe('Application API', () => {
 			assert.strictEqual(error_message, 'Error: Application record not found');
 		});
 	});
+
+	describe('Get Application Metadata', () => {
+		it('should get the counts for each of the application states', async () => {
+			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+
+			const result = await getApplicationStateTotals({ userId: user_id });
+
+			const totalDraftApplications = applicationRecordsResult.data.filter((apps) => apps.state === 'DRAFT').length;
+
+			assert.ok(result.success);
+			assert.ok(result.data);
+
+			assert.equal(result.data.DRAFT, totalDraftApplications);
+			assert.equal(result.data.TOTAL, applicationRecordsResult.data.length);
+		});
+	});
+
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
 			const result = await createApplication({ user_id });
