@@ -34,14 +34,14 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 
 type FieldType = {
-	InstitutionalTitle: string;
-	InstitutionalFirstName: string;
-	InstitutionalLastName: string;
-	InstitutionalSuffix: string;
-	InstitutionalPrimaryAffiliation: string;
-	InstitutionalInstitutAffiliation: string;
-	InstitutionalProfileUrl: string;
-	InstitutionalPositionTitle: string;
+	institutionalTitle: string;
+	institutionalFirstName: string;
+	institutionalLastName: string;
+	institutionalSuffix: string;
+	institutionalPrimaryAffiliation: string;
+	institutionalInstituteAffiliation: string;
+	institutionalProfileUrl: string;
+	institutionalPositionTitle: string;
 	institutionCountry: string;
 	institutionState: string;
 	institutionCity: string;
@@ -51,7 +51,7 @@ type FieldType = {
 };
 
 const schema = z.object({
-	InstitutionalTitle: z.string().min(1, { message: 'Required' }),
+	institutionalTitle: z.string().min(1, { message: 'Required' }),
 	InstitutionalFirstName: z
 		.string()
 		.min(1, { message: 'Required' })
@@ -84,7 +84,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
 								label={translate('institutional-section.form.title')}
-								name="InstitutionalTitle"
+								name="institutionalTitle"
 								control={control}
 								rule={rule}
 								options={[
@@ -104,7 +104,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('institutional-section.form.firstName')}
-								name="InstitutionalFirstName"
+								name="institutionalTitle"
 								control={control}
 								rule={rule}
 								required
@@ -116,7 +116,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('institutional-section.form.lastName')}
-								name="InstitutionalLastName"
+								name="institutionalLastName"
 								control={control}
 								rule={rule}
 								required
@@ -126,7 +126,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('institutional-section.form.suffix')}
-								name="InstitutionalSuffix"
+								name="institutionalSuffix"
 								control={control}
 								rule={rule}
 								required
@@ -139,7 +139,7 @@ const Institutional = () => {
 							<InputBox
 								label={translate('institutional-section.form.primaryAffiliation')}
 								subLabel={translate('institutional-section.form.primaryAffiliationSubLabel')}
-								name="InstitutionalPrimaryAffiliation"
+								name="institutionalPrimaryAffiliation"
 								control={control}
 								rule={rule}
 								required
@@ -152,7 +152,7 @@ const Institutional = () => {
 							<InputBox
 								label={translate('institutional-section.form.primaryEmail')}
 								subLabel={translate('institutional-section.form.primaryEmailLabel')}
-								name="InstitutionalInstitutAffiliation"
+								name="institutionalInstituteAffiliation"
 								control={control}
 								rule={rule}
 								required
@@ -165,7 +165,7 @@ const Institutional = () => {
 							<InputBox
 								label={translate('institutional-section.form.researcherProfile')}
 								subLabel={translate('institutional-section.form.researcherProfileLabel')}
-								name="InstitutionalProfileUrl"
+								name="institutionalProfileUrl"
 								placeHolder="https://"
 								control={control}
 								rule={rule}
@@ -178,7 +178,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('institutional-section.form.positionTitle')}
-								name="InstitutionalPositionTitle"
+								name="institutionalPositionTitle"
 								control={control}
 								rule={rule}
 								required
