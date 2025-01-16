@@ -224,10 +224,7 @@ export type Application = {
 	contents: ApplicationContents;
 };
 
-export type ApproveApplication =  {
+export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
-	approverId: number;    // The ID of the user approving the application
-  }
-
-export type ApplicationState = typeof ApplicationStates[keyof typeof ApplicationStates];
-
+	approverId: number; // The ID of the user approving the application
+};

@@ -20,8 +20,13 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-
-import { approveApplication, createApplication, editApplication, getAllApplications, getApplicationById } from '@/api/application-api.js';
+import {
+	approveApplication,
+	createApplication,
+	editApplication,
+	getAllApplications,
+	getApplicationById,
+} from '@/api/application-api.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -137,67 +142,72 @@ applicationRouter.get(
 );
 
 applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
-  
 	const { applicationId, approverId }: { applicationId?: number; approverId?: number } = req.body;
 
 	if (typeof applicationId !== 'number' || typeof approverId !== 'number') {
 		res.status(400).send({
-		  message: 'Invalid request. Both applicationId and approverId are required and must be numbers.',
-		  errors: 'MissingOrInvalidParameters',
+			message: 'Invalid request. Both applicationId and approverId are required and must be numbers.',
+			errors: 'MissingOrInvalidParameters',
 		});
 		return;
-	  }
+	}
 
-  
-	  // Validate input
-	  if (!applicationId || !approverId) {
-		 res.status(400).send({
-		  message: 'Invalid request. Both applicationId and approverId are required.',
-		  errors: 'MissingParameters',
+	// Validate input
+	if (!applicationId || !approverId) {
+		res.status(400).send({
+			message: 'Invalid request. Both applicationId and approverId are required.',
+			errors: 'MissingParameters',
 		});
-	  }
-  
-	  try {
+	}
+
+	try {
 		// Call the service function
 		const result = await approveApplication({ applicationId, approverId });
-  
+
 		if (result.success) {
-		   res.status(200).send({
-			message: 'Application approved successfully.',
-			data: result.data,
-		  });
+			res.status(200).send({
+				message: 'Application approved successfully.',
+				data: result.data,
+			});
 		}
-  
-		const resultErrors = String(result.errors);
-  
-		if (resultErrors === 'ApplicationNotFound') {
-		   res.status(404).send({
-			message: result.message,
-			errors: resultErrors,
-		  });
-		} else if (resultErrors === 'ApprovalConflict') {
-		   res.status(409).send({
-			message: result.message,
-			errors: resultErrors,
-		  });
-		} else if (resultErrors === 'InvalidState') {
-		   res.status(400).send({
-			message: result.message,
-			errors: resultErrors,
-		  });
+
+		let status = 200;
+		let message = 'Application approved successfully.';
+		let errors = null;
+
+		if (!result.success) {
+			// Set appropriate error details
+			switch (result.errors) {
+				case 'ApplicationNotFound':
+					status = 404;
+					message = result.message || 'Application not found.';
+					errors = result.errors;
+					break;
+				case 'ApprovalConflict':
+					status = 409;
+					message = result.message || 'Approval conflict detected.';
+					errors = result.errors;
+					break;
+				case 'InvalidState':
+					status = 400;
+					message = result.message || 'Invalid application state.';
+					errors = result.errors;
+					break;
+				default:
+					status = 500;
+					message = 'An unexpected error occurred.';
+					errors = result.errors;
+			}
 		}
-  
-		 res.status(500).send({
-		  message: 'An unexpected error occurred.',
-		  errors: resultErrors,
+
+		// Send response
+		res.status(status).send({ message, errors, data: result.success ? result.data : undefined });
+	} catch (error) {
+		res.status(500).send({
+			message: 'Internal server error.',
+			errors: String(error),
 		});
-	  } catch (error) {
-		 res.status(500).send({
-		  message: 'Internal server error.',
-		  errors: String(error),
-		});
-	  }
 	}
-  );
-  
+});
+
 export default applicationRouter;

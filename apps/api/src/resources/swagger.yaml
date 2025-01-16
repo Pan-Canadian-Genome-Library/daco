@@ -418,7 +418,7 @@ components:
           type: number
           description: The id of the Applicant
         applicationId:
-          description: The id of the Applicantion
+          description: The id of the Application
           type: number
 
   responses:
