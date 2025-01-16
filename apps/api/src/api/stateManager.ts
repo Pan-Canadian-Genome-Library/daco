@@ -85,26 +85,51 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 						const { id } = this._application;
 						const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
 						const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+						if (applicationResult.success && applicationResult.data[0]) {
+							this._application = applicationResult.data[0];
+						}
 
 						return applicationResult;
 					});
 				} catch (error) {
-					return failure(`Cannot submit application with state ${this.getState()}`, error);
+					return failure(`Error submitting application with id ${this._application.id}`, error);
 				}
 			} else {
-				return failure(`Invalid submission at submitDraft with state ${this.getState()}`);
+				return validationResult;
 			}
 		} else {
 			return failure(`Cannot submit application with state ${this.getState()}`);
 		}
 	}
 
-	async submitRepReview() {
-		return this.submitDraft();
-	}
-
 	async submitRepRevision() {
-		return this.submitDraft();
+		if (this.can(submit)) {
+			try {
+				await this.dispatch(submit);
+
+				const db = getDbInstance();
+				const applicationRepo = applicationService(db);
+				const applicationActionRepo = applicationActionService(db);
+
+				return await db.transaction(async (tx) => {
+					const actionResult = await applicationActionRepo.repSubmit(this._application);
+					if (!actionResult.success) return actionResult;
+
+					const { id } = this._application;
+					const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+					if (applicationResult.success && applicationResult.data[0]) {
+						this._application = applicationResult.data[0];
+					}
+
+					return applicationResult;
+				});
+			} catch (error) {
+				return failure(`Error submitting application with id ${this._application.id}`, error);
+			}
+		} else {
+			return failure(`Cannot submit application with state ${this.getState()}`);
+		}
 	}
 
 	async submitDacRevision() {
@@ -140,8 +165,28 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// Revise
 	async reviseRepReview() {
 		if (this.can(revision_request)) {
-			await this.dispatch(revision_request);
-			return success(revision_request);
+			try {
+				await this.dispatch(revision_request);
+
+				const db = getDbInstance();
+				const applicationRepo = applicationService(db);
+				const applicationActionRepo = applicationActionService(db);
+
+				return await db.transaction(async (tx) => {
+					const actionResult = await applicationActionRepo.repRevision(this._application);
+					if (!actionResult.success) return actionResult;
+
+					const { id } = this._application;
+					const update = { state: ApplicationStates.REP_REVISION };
+					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+					if (applicationResult.success && applicationResult.data[0]) {
+						this._application = applicationResult.data[0];
+					}
+					return applicationResult;
+				});
+			} catch (error) {
+				return failure(`Error revising application with id ${this._application.id}`, error);
+			}
 		} else {
 			return failure(`Cannot revise application with state ${this.getState()}`);
 		}
@@ -178,6 +223,35 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Approve
+	async approveRepReview() {
+		if (this.can(approve)) {
+			try {
+				await this.dispatch(approve);
+				const db = getDbInstance();
+				const applicationRepo = applicationService(db);
+				const applicationActionRepo = applicationActionService(db);
+
+				// TODO: Pass tx as argument, make reusable function using state_after from action svc
+				return await db.transaction(async (tx) => {
+					const actionResult = await applicationActionRepo.repApproved(this._application);
+					if (!actionResult.success) return actionResult;
+
+					const { id } = this._application;
+					const update = { state: ApplicationStates.DAC_REVIEW };
+					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+					if (applicationResult.success && applicationResult.data[0]) {
+						this._application = applicationResult.data[0];
+					}
+					return applicationResult;
+				});
+			} catch (error) {
+				return failure(`Error approving application with id ${this._application.id}`, error);
+			}
+		} else {
+			return failure(`Cannot approve application with state ${this.getState()}`);
+		}
+	}
+
 	async approveDacReview() {
 		if (this.can(approve)) {
 			await this.dispatch(approve);
@@ -188,7 +262,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onApproved() {
-		return success('post dispatch on close');
+		return success('post dispatch on approve');
 	}
 
 	// Reject
@@ -234,7 +308,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		REP_REVISION,
 		this._onRevision,
 	);
-	private repReviewSubmitTransition = transition(INSTITUTIONAL_REP_REVIEW, submit, DAC_REVIEW, this._onSubmit);
+	private repReviewApproveTransition = transition(INSTITUTIONAL_REP_REVIEW, approve, DAC_REVIEW, this._onApproved);
 
 	// Rep Revision
 	private repRevisionSubmitTransition = transition(REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
@@ -272,7 +346,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.repReviewCloseTransition,
 		this.repReviewEditTransition,
 		this.repReviewRevisionTransition,
-		this.repReviewSubmitTransition,
+		this.repReviewApproveTransition,
 		this.repRevisionSubmitTransition,
 	];
 
