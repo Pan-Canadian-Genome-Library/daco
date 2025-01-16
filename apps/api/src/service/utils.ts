@@ -23,11 +23,12 @@ import { applications } from '@/db/schemas/applications.js';
 import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
 
 export const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
-			)
-		: [asc(applications.created_at)];
+	const orderByArguments =
+		sort && sort.length
+			? sort.map((sortBy) =>
+					sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
+				)
+			: [asc(applications.created_at)];
 
 	return orderByArguments;
 };
