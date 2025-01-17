@@ -72,7 +72,7 @@ const HomePage = () => {
 					</Col>
 				</Row>
 			</Row>
-			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '80%' }} align={'top'} gutter={token.paddingXL}>
+			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '80%' }} align={'top'} gutter={[90, 40]}>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'middle'}>
 						<Title level={2}>{translate('homepage.overviewTitle')}</Title>
