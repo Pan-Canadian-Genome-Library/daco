@@ -18,7 +18,7 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
-import applicationService from '@/service/application-service.js';
+import { applicationService } from '@/service/applicationService.js';
 import { ApplicationData } from '@/service/types.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
@@ -28,7 +28,7 @@ import { validateContent } from './validation.js';
 const {
 	DRAFT,
 	INSTITUTIONAL_REP_REVIEW,
-	REP_REVISION,
+	INSTITUTIONAL_REP_REVISION_REQUESTED,
 	DAC_REVIEW,
 	DAC_REVISIONS_REQUESTED,
 	REJECTED,
@@ -212,13 +212,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	private repReviewRevisionTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
 		revision_request,
-		REP_REVISION,
+		INSTITUTIONAL_REP_REVISION_REQUESTED,
 		this._onRevision,
 	);
 	private repReviewSubmitTransition = transition(INSTITUTIONAL_REP_REVIEW, submit, DAC_REVIEW, this._onSubmit);
 
 	// Rep Revision
-	private repRevisionSubmitTransition = transition(REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
+	private repRevisionSubmitTransition = transition(
+		INSTITUTIONAL_REP_REVISION_REQUESTED,
+		submit,
+		INSTITUTIONAL_REP_REVIEW,
+		this._onSubmit,
+	);
 
 	// DAC Review
 	private dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, this._onApproved);
