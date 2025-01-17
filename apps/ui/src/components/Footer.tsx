@@ -75,12 +75,10 @@ const FooterComponent = () => {
 	const linkStyle: React.CSSProperties = {
 		textAlign: 'center',
 		textWrap: 'nowrap',
-		fontSize: minWidth <= token.screenLG ? token.fontSize : token.fontSizeLG,
 	};
 
-	const textStyle: React.CSSProperties = {
+	const complicanceTextStyle: React.CSSProperties = {
 		textAlign: minWidth <= token.screenXL ? 'start' : 'center',
-		fontSize: minWidth <= token.screenLG ? token.fontSize : token.fontSizeLG,
 		alignSelf: 'center',
 	};
 
@@ -137,7 +135,7 @@ const FooterComponent = () => {
 							))}
 						</Flex>
 					</Flex>
-					<Text style={textStyle}>
+					<Text style={complicanceTextStyle}>
 						&copy; {new Date().getFullYear()} PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API
 						v1.0
 					</Text>
