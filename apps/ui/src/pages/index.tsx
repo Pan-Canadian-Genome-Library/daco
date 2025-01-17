@@ -54,7 +54,7 @@ const HomePage = () => {
 	return (
 		<Content>
 			<Row className="hero-background-image" align="middle">
-				<Row align="middle" style={{ ...heroStyle, width: isResponsiveMode ? '90%' : '95%' }}>
+				<Row align="middle" style={{ ...heroStyle, width: isResponsiveMode ? '90%' : '80%' }}>
 					<Col
 						span={24}
 						lg={12}
@@ -72,7 +72,7 @@ const HomePage = () => {
 					</Col>
 				</Row>
 			</Row>
-			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} align={'top'} gutter={token.paddingXL}>
+			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '80%' }} align={'top'} gutter={token.paddingXL}>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'middle'}>
 						<Title level={2}>{translate('homepage.overviewTitle')}</Title>
