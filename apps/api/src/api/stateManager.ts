@@ -59,10 +59,36 @@ type ApplicationTransitions = ITransition<
 	ApplicationTransitionCallback
 >;
 
+type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionService>, 'listActions'>;
+
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
 	private _application: ApplicationData;
 	public readonly initState: ApplicationStateValues;
+
+	async _updateRecords(method: AddActionMethods) {
+		const db = getDbInstance();
+		const applicationRepo = applicationService(db);
+		const applicationActionRepo = applicationActionService(db);
+
+		// TODO: Pass tx as argument, make reusable function using state_after from action svc
+		return await db.transaction(async (tx) => {
+			const actionResult = await applicationActionRepo[method](this._application);
+			if (!actionResult.success) return actionResult;
+
+			const { state_after } = actionResult.data;
+			// TODO: Resolve Drizzle pgEnum type issues
+			const state = state_after as ApplicationStateValues;
+			const { id } = this._application;
+			const update = { state };
+			const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+			if (applicationResult.success && applicationResult.data[0]) {
+				this._application = applicationResult.data[0];
+			}
+
+			return applicationResult;
+		});
+	}
 
 	// Handler Methods
 	// Submit
@@ -74,23 +100,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 				try {
 					await this.dispatch(submit);
 
-					const db = getDbInstance();
-					const applicationRepo = applicationService(db);
-					const applicationActionRepo = applicationActionService(db);
-
-					return await db.transaction(async (tx) => {
-						const actionResult = await applicationActionRepo.draftSubmit(this._application);
-						if (!actionResult.success) return actionResult;
-
-						const { id } = this._application;
-						const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-						const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
-						if (applicationResult.success && applicationResult.data[0]) {
-							this._application = applicationResult.data[0];
-						}
-
-						return applicationResult;
-					});
+					return await this._updateRecords('draftSubmit');
 				} catch (error) {
 					return failure(`Error submitting application with id ${this._application.id}`, error);
 				}
@@ -107,23 +117,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			try {
 				await this.dispatch(submit);
 
-				const db = getDbInstance();
-				const applicationRepo = applicationService(db);
-				const applicationActionRepo = applicationActionService(db);
-
-				return await db.transaction(async (tx) => {
-					const actionResult = await applicationActionRepo.repSubmit(this._application);
-					if (!actionResult.success) return actionResult;
-
-					const { id } = this._application;
-					const update = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
-					if (applicationResult.success && applicationResult.data[0]) {
-						this._application = applicationResult.data[0];
-					}
-
-					return applicationResult;
-				});
+				return await this._updateRecords('repSubmit');
 			} catch (error) {
 				return failure(`Error submitting application with id ${this._application.id}`, error);
 			}
@@ -137,23 +131,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			try {
 				await this.dispatch(submit);
 
-				const db = getDbInstance();
-				const applicationRepo = applicationService(db);
-				const applicationActionRepo = applicationActionService(db);
-
-				return await db.transaction(async (tx) => {
-					const actionResult = await applicationActionRepo.dacSubmit(this._application);
-					if (!actionResult.success) return actionResult;
-
-					const { id } = this._application;
-					const update = { state: ApplicationStates.DAC_REVIEW };
-					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
-					if (applicationResult.success && applicationResult.data[0]) {
-						this._application = applicationResult.data[0];
-					}
-
-					return applicationResult;
-				});
+				return await this._updateRecords('dacSubmit');
 			} catch (error) {
 				return failure(`Error submitting application with id ${this._application.id}`, error);
 			}
@@ -194,22 +172,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			try {
 				await this.dispatch(revision_request);
 
-				const db = getDbInstance();
-				const applicationRepo = applicationService(db);
-				const applicationActionRepo = applicationActionService(db);
-
-				return await db.transaction(async (tx) => {
-					const actionResult = await applicationActionRepo.repRevision(this._application);
-					if (!actionResult.success) return actionResult;
-
-					const { id } = this._application;
-					const update = { state: ApplicationStates.REP_REVISION };
-					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
-					if (applicationResult.success && applicationResult.data[0]) {
-						this._application = applicationResult.data[0];
-					}
-					return applicationResult;
-				});
+				return await this._updateRecords('repRevision');
 			} catch (error) {
 				return failure(`Error revising application with id ${this._application.id}`, error);
 			}
@@ -253,23 +216,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		if (this.can(approve)) {
 			try {
 				await this.dispatch(approve);
-				const db = getDbInstance();
-				const applicationRepo = applicationService(db);
-				const applicationActionRepo = applicationActionService(db);
-
-				// TODO: Pass tx as argument, make reusable function using state_after from action svc
-				return await db.transaction(async (tx) => {
-					const actionResult = await applicationActionRepo.repApproved(this._application);
-					if (!actionResult.success) return actionResult;
-
-					const { id } = this._application;
-					const update = { state: ApplicationStates.DAC_REVIEW };
-					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
-					if (applicationResult.success && applicationResult.data[0]) {
-						this._application = applicationResult.data[0];
-					}
-					return applicationResult;
-				});
+				return await this._updateRecords('repApproved');
 			} catch (error) {
 				return failure(`Error approving application with id ${this._application.id}`, error);
 			}
@@ -283,23 +230,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		if (this.can(approve)) {
 			try {
 				await this.dispatch(approve);
-				const db = getDbInstance();
-				const applicationRepo = applicationService(db);
-				const applicationActionRepo = applicationActionService(db);
-
-				// TODO: Pass tx as argument, make reusable function using state_after from action svc
-				return await db.transaction(async (tx) => {
-					const actionResult = await applicationActionRepo.dacApproved(this._application);
-					if (!actionResult.success) return actionResult;
-
-					const { id } = this._application;
-					const update = { state: ApplicationStates.APPROVED };
-					const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
-					if (applicationResult.success && applicationResult.data[0]) {
-						this._application = applicationResult.data[0];
-					}
-					return applicationResult;
-				});
+				return await this._updateRecords('dacApproved');
 			} catch (error) {
 				return failure(`Error approving application with id ${this._application.id}`, error);
 			}
