@@ -29,7 +29,7 @@ import { validateContent } from './validation.js';
 const {
 	DRAFT,
 	INSTITUTIONAL_REP_REVIEW,
-	REP_REVISION,
+	INSTITUTIONAL_REP_REVISION_REQUESTED,
 	DAC_REVIEW,
 	DAC_REVISIONS_REQUESTED,
 	REJECTED,
@@ -283,13 +283,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	private repReviewRevisionTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
 		revision_request,
-		REP_REVISION,
+		INSTITUTIONAL_REP_REVISION_REQUESTED,
 		this._onRevision,
 	);
 	private repReviewApproveTransition = transition(INSTITUTIONAL_REP_REVIEW, approve, DAC_REVIEW, this._onApproved);
 
 	// Rep Revision
-	private repRevisionSubmitTransition = transition(REP_REVISION, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
+	private repRevisionSubmitTransition = transition(
+		INSTITUTIONAL_REP_REVISION_REQUESTED,
+		submit,
+		INSTITUTIONAL_REP_REVIEW,
+		this._onSubmit,
+	);
 
 	// DAC Review
 	private dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, this._onApproved);

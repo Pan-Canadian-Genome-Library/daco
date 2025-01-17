@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,27 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import './i18n/translations';
-import './index.css';
+import { Form, Select } from 'antd';
+import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
+import { BasicFormFieldProps } from '@/global/types';
 
-import ThemeProvider from '@/components/providers/ThemeProvider';
-import App from '@/pages/App';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const { Item } = Form;
 
-const queryClient = new QueryClient();
+interface SelectBoxProps extends BasicFormFieldProps {
+	options?: {
+		label: string;
+		value: string;
+	}[];
+}
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</ThemeProvider>
-		</QueryClientProvider>
-	</StrictMode>,
-);
+const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
+	return (
+		<Controller
+			name={props.name}
+			control={props.control}
+			render={({ field }) => {
+				return (
+					<Item label={props.label} name={props.name as string} rules={[props.rule]} required={props.required}>
+						<Select {...field} disabled={props.disabled} options={props.options} />
+					</Item>
+				);
+			}}
+		/>
+	);
+};
+
+export default SelectBox;

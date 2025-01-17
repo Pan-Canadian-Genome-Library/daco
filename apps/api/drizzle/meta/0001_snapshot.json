@@ -1,83 +1,9 @@
 {
-	"id": "e22d01bc-d440-4c84-b84a-bb42483743ad",
+	"id": "613f24bc-7b49-4c17-9dde-39099f48ae9f",
 	"prevId": "3664b66f-cca1-4b88-a166-1af0e3ac6a52",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
-		"public.actions": {
-			"name": "actions",
-			"schema": "",
-			"columns": {
-				"id": {
-					"name": "id",
-					"type": "bigint",
-					"primaryKey": true,
-					"notNull": true,
-					"identity": {
-						"type": "always",
-						"name": "actions_id_seq",
-						"schema": "public",
-						"increment": "1",
-						"startWith": "1",
-						"minValue": "1",
-						"maxValue": "9223372036854775807",
-						"cache": "1",
-						"cycle": false
-					}
-				},
-				"application_id": {
-					"name": "application_id",
-					"type": "bigint",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"created_at": {
-					"name": "created_at",
-					"type": "timestamp",
-					"primaryKey": false,
-					"notNull": true,
-					"default": "now()"
-				},
-				"user_id": {
-					"name": "user_id",
-					"type": "varchar(100)",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"action": {
-					"name": "action",
-					"type": "action_types",
-					"typeSchema": "public",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"revisions_request_id": {
-					"name": "revisions_request_id",
-					"type": "bigint",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"state_before": {
-					"name": "state_before",
-					"type": "varchar(255)",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"state_after": {
-					"name": "state_after",
-					"type": "varchar(255)",
-					"primaryKey": false,
-					"notNull": true
-				}
-			},
-			"indexes": {},
-			"foreignKeys": {},
-			"compositePrimaryKeys": {},
-			"uniqueConstraints": {},
-			"policies": {},
-			"checkConstraints": {},
-			"isRLSEnabled": false
-		},
 		"public.agreements": {
 			"name": "agreements",
 			"schema": "",
@@ -133,6 +59,80 @@
 				"agreed_at": {
 					"name": "agreed_at",
 					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.application_actions": {
+			"name": "application_actions",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "bigint",
+					"primaryKey": true,
+					"notNull": true,
+					"identity": {
+						"type": "always",
+						"name": "application_actions_id_seq",
+						"schema": "public",
+						"increment": "1",
+						"startWith": "1",
+						"minValue": "1",
+						"maxValue": "9223372036854775807",
+						"cache": "1",
+						"cycle": false
+					}
+				},
+				"application_id": {
+					"name": "application_id",
+					"type": "bigint",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"action": {
+					"name": "action",
+					"type": "application_action_types",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"revisions_request_id": {
+					"name": "revisions_request_id",
+					"type": "bigint",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"state_before": {
+					"name": "state_before",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"state_after": {
+					"name": "state_after",
+					"type": "varchar(255)",
 					"primaryKey": false,
 					"notNull": true
 				}
@@ -740,24 +740,6 @@
 		}
 	},
 	"enums": {
-		"public.action_types": {
-			"name": "action_types",
-			"schema": "public",
-			"values": [
-				"CREATE",
-				"WITHDRAW",
-				"CLOSE",
-				"INSTITUTIONAL_REP_REVIEW",
-				"INSTITUTIONAL_REP_REVISION",
-				"INSTITUTIONAL_REP_SUBMIT",
-				"INSTITUTIONAL_REP_APPROVED",
-				"DAC_REVIEW_REVISIONS",
-				"DAC_REVIEW_SUBMIT",
-				"DAC_REVIEW_APPROVED",
-				"DAC_REVIEW_REJECTED",
-				"REVOKE"
-			]
-		},
 		"public.agreement_types": {
 			"name": "agreement_types",
 			"schema": "public",
@@ -773,13 +755,31 @@
 				"dac_agreement_read_and_agreed"
 			]
 		},
+		"public.application_action_types": {
+			"name": "application_action_types",
+			"schema": "public",
+			"values": [
+				"CREATE",
+				"WITHDRAW",
+				"CLOSE",
+				"SUBMIT_DRAFT",
+				"INSTITUTIONAL_REP_REVISION_REQUEST",
+				"INSTITUTIONAL_REP_SUBMIT",
+				"INSTITUTIONAL_REP_APPROVED",
+				"DAC_REVIEW_REVISION_REQUEST",
+				"DAC_REVIEW_SUBMIT",
+				"DAC_REVIEW_APPROVED",
+				"DAC_REVIEW_REJECTED",
+				"REVOKE"
+			]
+		},
 		"public.application_states": {
 			"name": "application_states",
 			"schema": "public",
 			"values": [
 				"DRAFT",
 				"INSTITUTIONAL_REP_REVIEW",
-				"REP_REVISION",
+				"INSTITUTIONAL_REP_REVISION_REQUESTED",
 				"DAC_REVIEW",
 				"DAC_REVISIONS_REQUESTED",
 				"REJECTED",

@@ -67,8 +67,14 @@ const applicationActionService = (db: PostgresDb) => {
 			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
 		close: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
+		draftSubmit: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.SUBMIT_DRAFT, ApplicationStates.INSTITUTIONAL_REP_REVIEW),
 		repRevision: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_REVISION, ApplicationStates.REP_REVISION),
+			await addActionRecord(
+				application,
+				ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
+				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+			),
 		repSubmit: async (application: ApplicationData) =>
 			await addActionRecord(
 				application,
@@ -84,17 +90,11 @@ const applicationActionService = (db: PostgresDb) => {
 		dacRevision: async (application: ApplicationData) =>
 			await addActionRecord(
 				application,
-				ApplicationActions.DAC_REVIEW_REVISIONS,
+				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
 				ApplicationStates.DAC_REVISIONS_REQUESTED,
 			),
 		dacSubmit: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
-		draftSubmit: async (application: ApplicationData) =>
-			await addActionRecord(
-				application,
-				ApplicationActions.REQUEST_REP_REVIEW,
-				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
-			),
 		revoke: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
 		getActionById: async ({ id }: { id: number }) => {

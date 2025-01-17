@@ -29,10 +29,10 @@ This app uses features from Node ^20.9, in combination with TSX for TypeScript s
 
 - Drizzle is configured to read the schema from the build directory (`/dist`) due to a known Drizzle Kit issue with ESM imports. Any Drizzle Kit operations (including migrations) require first building the application with `pnpm run build`.
 
-- See // https://github.com/drizzle-team/drizzle-orm/issues/2705 for more information.
+    - See // https://github.com/drizzle-team/drizzle-orm/issues/2705 for more information.
 
 - In addition, there is a known issue when using `pnpm drizzle-kit generate / pnpm drizzle-kit migrate` for future migrations. `generate` may work but `migrate` can throw an error that a given enum is already defined:  https://github.com/drizzle-team/drizzle-orm/issues/3206
 
-- The current work around is to run `pnpm drizzle-kit generate`, then use `pnpm drizzle-kit up` to update the Drizzle snapshots.
+    - The current work around is to run `pnpm drizzle-kit generate`, then use `pnpm drizzle-kit up` to update the Drizzle snapshots.
 
 - A schema dbml (database markup language) file can be generated using the script `pnpm run dbml`. This file is found at `./src/db/schema.dbml`.

@@ -125,7 +125,7 @@ describe('Application Action Service', () => {
 			assert.strictEqual(actionResult.state_after, ApplicationStates.CLOSED);
 		});
 
-		it('should perform REQUEST_REP_REVIEW actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
+		it('should perform SUBMIT_DRAFT actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
 			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
@@ -138,7 +138,7 @@ describe('Application Action Service', () => {
 
 			assert.strictEqual(actionResult.user_id, user_id);
 			assert.strictEqual(actionResult.application_id, application_id);
-			assert.strictEqual(actionResult.action, ApplicationActions.REQUEST_REP_REVIEW);
+			assert.strictEqual(actionResult.action, ApplicationActions.SUBMIT_DRAFT);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		});
@@ -156,9 +156,9 @@ describe('Application Action Service', () => {
 
 			assert.strictEqual(actionResult.user_id, user_id);
 			assert.strictEqual(actionResult.application_id, application_id);
-			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REVISION);
+			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
-			assert.strictEqual(actionResult.state_after, ApplicationStates.REP_REVISION);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should perform INSTITUTIONAL_REP_SUBMIT actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
@@ -246,7 +246,7 @@ describe('Application Action Service', () => {
 
 			assert.strictEqual(actionResult.user_id, user_id);
 			assert.strictEqual(actionResult.application_id, application_id);
-			assert.strictEqual(actionResult.action, ApplicationActions.DAC_REVIEW_REVISIONS);
+			assert.strictEqual(actionResult.action, ApplicationActions.DAC_REVIEW_REVISION_REQUEST);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
 			assert.strictEqual(actionResult.state_after, ApplicationStates.DAC_REVISIONS_REQUESTED);
 		});

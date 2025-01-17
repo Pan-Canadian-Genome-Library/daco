@@ -39,7 +39,7 @@ const {
 	DRAFT,
 	INSTITUTIONAL_REP_REVIEW,
 	REJECTED,
-	REP_REVISION,
+	INSTITUTIONAL_REP_REVISION_REQUESTED,
 	REVOKED,
 } = ApplicationStates;
 
@@ -139,11 +139,11 @@ describe('State Machine', () => {
 			assert.strictEqual(stateValue, CLOSED);
 		});
 
-		it('should change from INSTITUTIONAL_REP_REVIEW to REP_REVISION on revision_request', async () => {
+		it('should change from INSTITUTIONAL_REP_REVIEW to INSTITUTIONAL_REP_REVISION_REQUESTED on revision_request', async () => {
 			await testStateManager.submitDraft();
 			await testStateManager.reviseRepReview();
 			stateValue = testStateManager.getState();
-			assert.strictEqual(stateValue, REP_REVISION);
+			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
 		});
 
 		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', async () => {

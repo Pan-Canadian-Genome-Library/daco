@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,34 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Application } from '@pcgl-daco/data-model';
 import { Col, Flex, Layout, Row } from 'antd';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import AppHeader from '@/components/pages/application/AppHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
+
+import useGetApplication from '@/api/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
-import { useGetData } from '@/global/hooks/useGetData';
-import { FetchError, ServerError } from '@/global/types';
-import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Content } = Layout;
 
 const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
-	const { t: translate } = useTranslation();
 	const match = useMatch('application/:id/:section/:edit?');
+
+	const { data, isError, error, isLoading } = useGetApplication(params.id);
 	const isEditMode = !!match?.params.edit;
-
-	const [applicationData, setApplicationData] = useState<Application | undefined>(undefined);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<ServerError | undefined>(undefined);
-
-	const data = useGetData(`/applications/${params.id}`) as Application | FetchError;
 
 	useEffect(() => {
 		if (data && !('isError' in data)) {
@@ -58,37 +51,30 @@ const ApplicationViewer = () => {
 			if (data.state !== ApplicationStates.DRAFT && isEditMode) {
 				navigation(`/application/${data.id}/`, { replace: true });
 			}
-
-			setApplicationData(data);
-			setLoading(false);
-		} else if (data && data.isError) {
-			setLoading(false);
-
-			setError({
-				message: data.statusCode === 404 ? translate('errors.applicationNotFound.title') : data.message,
-				errors: data.statusCode === 404 ? translate('errors.applicationNotFound.message') : data.errors,
-			});
 		}
-	}, [data, isEditMode, navigation, translate]);
+	}, [data, isEditMode, navigation]);
 
-	// Should make a component for this
-	if (!applicationData || error || loading) return <ErrorPage error={error} loading={loading} />;
+	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<AppHeader appId={applicationData.id} />
+				<AppHeader id={data.id} state={data.state} />
 				{/* Multipart form Viewer */}
 				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
 					<>
-						<Row style={{ width: '25%' }}>
+						<Row style={{ width: '20%' }}>
 							<Col style={{ width: '100%' }}>
 								<SectionMenu />
 							</Col>
 						</Row>
-						<Row style={{ width: '75%' }}>
+						<Row style={{ width: '80%' }}>
 							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet />
+								<Outlet
+									context={{
+										isEditMode,
+									}}
+								/>
 							</Col>
 						</Row>
 					</>

@@ -47,7 +47,7 @@ export const getApplicationStateProperties = (applicationState: ApplicationState
 			color = pcglColors.warningPrimary;
 			showActionRequired = false;
 			break;
-		case ApplicationStates.REP_REVISION:
+		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
 			showEdit = true;
 			color = pcglColors.warningPrimary;
 			showActionRequired = true;
