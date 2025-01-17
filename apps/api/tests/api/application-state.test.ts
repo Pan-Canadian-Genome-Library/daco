@@ -110,7 +110,7 @@ describe('State Machine', () => {
 			assert.ok(
 				actionResult.data.find(
 					(record) =>
-						record.action === ApplicationActions.REQUEST_REP_REVIEW &&
+						record.action === ApplicationActions.SUBMIT_DRAFT &&
 						record.state_before === ApplicationStates.DRAFT &&
 						record.state_after === ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 				),
