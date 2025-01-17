@@ -99,7 +99,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			if (validationResult.success) {
 				try {
 					await this.dispatch(submit);
-
 					return await this._updateRecords('draftSubmit');
 				} catch (error) {
 					return failure(`Error submitting application with id ${this._application.id}`, error);
@@ -116,7 +115,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		if (this.can(submit)) {
 			try {
 				await this.dispatch(submit);
-
 				return await this._updateRecords('repSubmit');
 			} catch (error) {
 				return failure(`Error submitting application with id ${this._application.id}`, error);
@@ -130,7 +128,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		if (this.can(submit)) {
 			try {
 				await this.dispatch(submit);
-
 				return await this._updateRecords('dacSubmit');
 			} catch (error) {
 				return failure(`Error submitting application with id ${this._application.id}`, error);
@@ -171,7 +168,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		if (this.can(revision_request)) {
 			try {
 				await this.dispatch(revision_request);
-
 				return await this._updateRecords('repRevision');
 			} catch (error) {
 				return failure(`Error revising application with id ${this._application.id}`, error);
