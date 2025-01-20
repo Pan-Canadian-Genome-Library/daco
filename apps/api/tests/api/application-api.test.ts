@@ -179,11 +179,15 @@ describe('Application API', () => {
 
 			assert.ok(applicationRecordsResult.success);
 
-			assert.ok(Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
 			const result = await getApplicationStateTotals({ userId: user_id });
 
-			const totalDraftApplications = applicationRecordsResult.data.applications.filter((apps) => apps.state === 'DRAFT').length;
+			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
+				(apps) => apps.state === 'DRAFT',
+			).length;
 
 			assert.ok(result.success);
 			assert.ok(result.data);
