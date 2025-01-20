@@ -17,30 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Route, Routes } from 'react-router';
+import './i18n/translations';
+import './index.css';
 
-import PageLayout from '@/components/layouts/PageLayout';
-import ApplicationViewer from '@/pages/applications';
-import Applicant from '@/pages/applications/sections/applicant';
-import Introduction from '@/pages/applications/sections/intro';
-import DashboardPage from '@/pages/dashboard';
-import HomePage from '@/pages/index';
-import ManageApplicationsPage from '@/pages/manage/applications';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 
-function App() {
-	return (
-		<Routes>
-			<Route element={<PageLayout />}>
-				<Route index element={<HomePage />} />
-				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route path="intro/edit?" element={<Introduction />} />
-					<Route path="applicant/edit?" element={<Applicant />} />
-				</Route>
-				<Route path="manage/applications" element={<ManageApplicationsPage />} />
-			</Route>
-		</Routes>
-	);
-}
+import ThemeProvider from '@/components/providers/ThemeProvider';
+import AppRouter from '@/pages/AppRouter';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export default App;
+const queryClient = new QueryClient();
+
+createRoot(document.getElementById('root')!).render(
+	<StrictMode>
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider>
+				<BrowserRouter>
+					<AppRouter />
+				</BrowserRouter>
+			</ThemeProvider>
+		</QueryClientProvider>
+	</StrictMode>,
+);

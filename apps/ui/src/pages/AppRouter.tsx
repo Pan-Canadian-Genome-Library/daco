@@ -17,26 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
+import { Route, Routes } from 'react-router';
 
-import ThemeProvider from '@/components/providers/ThemeProvider';
-import AppRouter from '@/pages/AppRouter';
-import './client/index.css';
-import './i18n/translations';
+import PageLayout from '@/components/layouts/PageLayout';
+import ApplicationViewer from '@/pages/applications';
+import Applicant from '@/pages/applications/sections/applicant';
+import Introduction from '@/pages/applications/sections/intro';
+import DashboardPage from '@/pages/dashboard';
+import HomePage from '@/pages/index';
+import ManageApplicationsPage from '@/pages/manage/applications';
 
-const queryClient = new QueryClient();
+function AppRouter() {
+	return (
+		<Routes>
+			<Route element={<PageLayout />}>
+				<Route index element={<HomePage />} />
+				<Route path="dashboard" element={<DashboardPage />} />
+				<Route path="application/:id" element={<ApplicationViewer />}>
+					<Route path="intro/edit?" element={<Introduction />} />
+					<Route path="applicant/edit?" element={<Applicant />} />
+				</Route>
+				<Route path="manage/applications" element={<ManageApplicationsPage />} />
+			</Route>
+		</Routes>
+	);
+}
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<BrowserRouter>
-					<AppRouter />
-				</BrowserRouter>
-			</ThemeProvider>
-		</QueryClientProvider>
-	</StrictMode>,
-);
+export default AppRouter;

@@ -4,8 +4,8 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build": "rimraf ./dist && tsc && vite build",
+		"dev": "vite .",
+		"build": "vite build --emptyOutDir .",
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},
