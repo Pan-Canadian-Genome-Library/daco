@@ -1,23 +1,18 @@
 server {
- listen 3000;
+ listen 3000 default_server;
  root   /usr/share/nginx/html;
  index  index.html;
  etag   on;
 
- location /api {
+ location /api/ {
    rewrite /api/(.*) /$1  break;
    proxy_pass $API_URL;
    proxy_redirect off;
    proxy_buffering off;
  
-   # Stuff to add later
+   # Proxy information for backend
    proxy_set_header X-Real-IP $remote_addr;
    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
- 
-   # For websockets
-   proxy_set_header Upgrade $http_upgrade;
-   proxy_set_header Connection "upgrade";
-   proxy_set_header Host $host;
  }
 
  location / {
