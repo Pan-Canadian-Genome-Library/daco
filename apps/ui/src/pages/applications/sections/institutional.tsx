@@ -36,6 +36,7 @@ import { ApplicationOutletContext } from '@/global/types';
 type FieldType = {
 	institutionalTitle: string;
 	institutionalFirstName: string;
+	institutionalmiddleName: string;
 	institutionalLastName: string;
 	institutionalSuffix: string;
 	institutionalPrimaryAffiliation: string;
@@ -108,6 +109,15 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
+								disabled={!isEditMode}
+							/>
+						</Col>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+							<InputBox
+								label={translate('institutional-section.form.middleName')}
+								name="institutionalmiddleName"
+								control={control}
+								rule={rule}
 								disabled={!isEditMode}
 							/>
 						</Col>

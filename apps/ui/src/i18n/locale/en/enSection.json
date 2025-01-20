@@ -23,6 +23,7 @@
 		"form": {
 			"title": "Title:",
 			"firstName": "First Name:",
+			"middleName": "Middle Name:",
 			"lastName": "Last Name:",
 			"suffix": "Suffix:",
 			"primaryAffiliation": "Primary Affiliation:",
@@ -48,6 +49,7 @@
 		"form": {
 			"title": "Title:",
 			"firstName": "First Name:",
+			"middleName": "Middle Name:",
 			"lastName": "Last Name:",
 			"suffix": "Suffix:",
 			"primaryAffiliation": "Primary Affiliation:",

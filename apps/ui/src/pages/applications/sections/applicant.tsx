@@ -111,6 +111,15 @@ const Applicant = () => {
 								disabled={!isEditMode}
 							/>
 						</Col>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+							<InputBox
+								label={translate('applicant-section.form.middleName')}
+								name="applicantFirstName"
+								control={control}
+								rule={rule}
+								disabled={!isEditMode}
+							/>
+						</Col>
 					</Row>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -129,7 +138,6 @@ const Applicant = () => {
 								name="applicantSuffix"
 								control={control}
 								rule={rule}
-								required
 								disabled={!isEditMode}
 							/>
 						</Col>
