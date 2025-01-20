@@ -114,7 +114,5 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
 	const database = getDbInstance();
 	const service: ApplicationService = applicationService(database);
 
-	const result = await service.applicationStateTotals({ user_id: userId });
-
-	return result;
+	return await service.applicationStateTotals({ user_id: userId });
 };
