@@ -266,7 +266,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter />
+				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);

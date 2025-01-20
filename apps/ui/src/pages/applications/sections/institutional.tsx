@@ -266,7 +266,7 @@ const Institutional = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter />
+				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);
