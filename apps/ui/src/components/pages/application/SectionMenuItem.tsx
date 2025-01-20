@@ -19,6 +19,7 @@
 
 import { CheckCircleOutlined, LockOutlined } from '@ant-design/icons';
 import { Flex, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -32,10 +33,11 @@ type SectionMenuItemProps = {
  *   - what would the endpoint response look like?
  */
 const SectionMenuItem = ({ label, isEditMode }: SectionMenuItemProps) => {
+	const { t: translate } = useTranslation();
 	return (
 		<Flex style={{ width: '100%' }} justify="space-between">
 			<Text style={{ color: 'inherit' }} ellipsis>
-				{label}
+				{translate(`menu.${label}`)}
 			</Text>
 
 			<Flex>{!isEditMode ? <LockOutlined /> : <CheckCircleOutlined />}</Flex>

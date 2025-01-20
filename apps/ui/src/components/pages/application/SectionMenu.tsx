@@ -18,12 +18,10 @@
  */
 
 import { Menu, MenuProps } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
-
-type MenuItem = Required<MenuProps>['items'][number];
+import { ApplicationSectionRoutes } from '@/pages/App';
 
 type SectionMenuProps = {
 	currentSection: string;
@@ -32,22 +30,6 @@ type SectionMenuProps = {
 
 const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 	const navigate = useNavigate();
-	const { t: translate } = useTranslation();
-
-	const MenuItemList: MenuItem[] = [
-		{
-			key: 'intro',
-			label: <SectionMenuItem label={translate('menu.intro')} isEditMode={isEditMode} />,
-		},
-		{
-			key: 'applicant',
-			label: <SectionMenuItem label={translate('menu.applicant')} isEditMode={isEditMode} />,
-		},
-		{
-			key: 'institutional',
-			label: <SectionMenuItem label={translate('menu.institutional')} isEditMode={isEditMode} />,
-		},
-	];
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
@@ -56,9 +38,14 @@ const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 	return (
 		<Menu
 			style={{ width: '100%', height: '100%' }}
-			defaultSelectedKeys={[currentSection]}
+			selectedKeys={[currentSection]}
 			mode="inline"
-			items={MenuItemList}
+			items={ApplicationSectionRoutes.map((item) => {
+				return {
+					key: item.route,
+					label: <SectionMenuItem label={item.route} isEditMode={isEditMode} />,
+				};
+			})}
 			onClick={handleNavigation}
 		/>
 	);
