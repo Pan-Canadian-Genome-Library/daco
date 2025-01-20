@@ -80,7 +80,7 @@ describe('Application Service', () => {
 
 			assert.ok(applicationRecordsResult.success && applicationRecordsResult.data);
 
-			const records = applicationRecordsResult.data;
+			const records = applicationRecordsResult.data.applications;
 			const application = records[records.length - 1];
 
 			assert.ok(application);
@@ -346,11 +346,13 @@ describe('Application Service', () => {
 		it('should list statistics for how many applications are in each state category', async () => {
 			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
 			assert.ok(appStateTotals.success);
+			
 			const allStates = appStateTotals.data;
 
 			const allApplications = await testApplicationService.listApplications({ user_id });
 			assert.ok(allApplications.success);
-			const applicationRecords = allApplications.data;
+
+			const applicationRecords = allApplications.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 
