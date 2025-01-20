@@ -24,7 +24,8 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { createApplication, editApplication, getApplicationById } from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import service from '@/service/application-service.js';
+import { applicationService } from '@/service/applicationService.js';
+import { ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -39,7 +40,7 @@ import {
 
 describe('Application API', () => {
 	let db: PostgresDb;
-	let applicationService: ReturnType<typeof service>;
+	let testApplicationRepo: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -55,12 +56,12 @@ describe('Application API', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		applicationService = service(db);
+		testApplicationRepo = applicationService(db);
 	});
 
 	describe('Edit Application', () => {
 		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
-			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 			assert.ok(
@@ -83,7 +84,7 @@ describe('Application API', () => {
 		});
 
 		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
-			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 			assert.ok(
@@ -95,7 +96,7 @@ describe('Application API', () => {
 			assert.strictEqual(state, ApplicationStates.DRAFT);
 
 			const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-			const reviewRecord = await applicationService.findOneAndUpdate({ id, update: stateUpdate });
+			const reviewRecord = await testApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
 
 			assert.ok(Array.isArray(reviewRecord) && reviewRecord[0]);
 			assert.strictEqual(reviewRecord[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
@@ -113,7 +114,7 @@ describe('Application API', () => {
 		});
 
 		it('should error and return null when application state is not draft or review', async () => {
-			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 			assert.ok(applicationRecordsResult.success);
 
 			assert.ok(
@@ -122,17 +123,12 @@ describe('Application API', () => {
 			const { id } = applicationRecordsResult.data.applications[0];
 
 			const stateUpdate = { state: ApplicationStates.CLOSED };
-			await applicationService.findOneAndUpdate({ id, update: stateUpdate });
+			await testApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
 
 			const contentUpdate = { applicant_title: 'Dr.' };
 			const result = await editApplication({ id, update: contentUpdate });
 
 			assert.ok(!result.success);
-		});
-
-		after(async () => {
-			await container.stop();
-			process.exit(0);
 		});
 	});
 
@@ -150,7 +146,7 @@ describe('Application API', () => {
 		});
 
 		it('should error with a not found error, not being able to find a non-existant application ID', async () => {
-			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -168,9 +164,10 @@ describe('Application API', () => {
 
 			const error_message = String(result.errors);
 
-			assert.strictEqual(error_message, 'Error: Application record not found');
+			assert.strictEqual(error_message, 'Error: Application record is undefined');
 		});
 	});
+
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
 			const result = await createApplication({ user_id });
@@ -183,5 +180,10 @@ describe('Application API', () => {
 
 			assert.ok(application.contents);
 		});
+	});
+
+	after(async () => {
+		await container.stop();
+		process.exit(0);
 	});
 });

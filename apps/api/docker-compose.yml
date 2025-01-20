@@ -3,6 +3,7 @@ name: pcgl-daco-database
 services:
   postgres:
     image: postgres:15-alpine
+    container_name: pcgl-daco-postgres
     ports:
       - 5432:5432
     volumes:

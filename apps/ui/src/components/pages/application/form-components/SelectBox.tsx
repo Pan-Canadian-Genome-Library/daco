@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,28 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { asc, desc } from 'drizzle-orm';
+import { Form, Select } from 'antd';
+import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
-import { applicationActions } from '@/db/schemas/applicationActions.js';
-import { applications } from '@/db/schemas/applications.js';
-import { type ApplicationActionsColumnName, type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
+import { BasicFormFieldProps } from '@/global/types';
 
-export const applicationsQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
-			)
-		: [asc(applications.created_at)];
+const { Item } = Form;
 
-	return orderByArguments;
+interface SelectBoxProps extends BasicFormFieldProps {
+	options?: {
+		label: string;
+		value: string;
+	}[];
+}
+
+const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
+	return (
+		<Controller
+			name={props.name}
+			control={props.control}
+			render={({ field }) => {
+				return (
+					<Item label={props.label} name={props.name as string} rules={[props.rule]} required={props.required}>
+						<Select {...field} disabled={props.disabled} options={props.options} />
+					</Item>
+				);
+			}}
+		/>
+	);
 };
 
-export const applicationActionsQuery = (sort?: Array<OrderBy<ApplicationActionsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applicationActions[sortBy.column]) : desc(applicationActions[sortBy.column]),
-			)
-		: [asc(applicationActions.created_at)];
-
-	return orderByArguments;
-};
+export default SelectBox;

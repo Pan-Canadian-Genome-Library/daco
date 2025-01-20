@@ -23,15 +23,16 @@ import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import logger from '@/logger.js';
+import { applicationsQuery } from '@/service/utils.js';
+import { failure, success } from '@/utils/results.js';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import { applicationActionService } from './applicationActionService.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
 	type OrderBy,
-} from '@/service/types.js';
-import { sortQuery } from '@/service/utils.js';
-import { failure, success } from '@/utils/results.js';
-import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+} from './types.js';
 
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
@@ -47,23 +48,28 @@ const applicationService = (db: PostgresDb) => ({
 				if (!newApplicationRecord[0]) throw new Error('Application record is undefined');
 
 				// Create associated ApplicationContents
-				const { id } = newApplicationRecord[0];
+				const { id: application_id } = newApplicationRecord[0];
 
 				const newAppContents: typeof applicationContents.$inferInsert = {
-					application_id: id,
+					application_id,
 					created_at: new Date(),
 					updated_at: new Date(),
 				};
 				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
+				// Create associated Actions
+				const actionRepo = applicationActionService(db);
+				const actionResult = await actionRepo.create(newApplicationRecord[0]);
+				if (!actionResult.success) throw new Error(actionResult.errors);
+
 				// Join records
-				const { id: contentsId } = newAppContentsRecord[0];
+				const { id: contents_id } = newAppContentsRecord[0];
 
 				const application = await transaction
 					.update(applications)
-					.set({ contents: contentsId })
-					.where(eq(applications.id, id))
+					.set({ contents: contents_id })
+					.where(eq(applications.id, application_id))
 					.returning();
 
 				return application[0];
@@ -207,7 +213,7 @@ const applicationService = (db: PostgresDb) => ({
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
-				.orderBy(...sortQuery(sort))
+				.orderBy(...applicationsQuery(sort))
 				.offset(page * pageSize);
 
 			let allApplications = rawApplicationData
@@ -265,4 +271,4 @@ const applicationService = (db: PostgresDb) => ({
 	},
 });
 
-export default applicationService;
+export { applicationService };

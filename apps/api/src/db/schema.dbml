@@ -1,16 +1,3 @@
-enum action_types {
-  CREATE
-  WITHDRAW
-  CLOSE
-  REQUEST_INSTITUTIONAL_REP
-  INSTITUTIONAL_REP_APPROVED
-  INSTITUTIONAL_REP_REJECTED
-  DAC_REVIEW_APPROVED
-  DAC_REVIEW_REJECTED
-  DAC_REVIEW_REVISIONS
-  REVOKE
-}
-
 enum agreement_types {
   dac_agreement_software_updates
   dac_agreement_non_disclosure
@@ -23,9 +10,25 @@ enum agreement_types {
   dac_agreement_read_and_agreed
 }
 
+enum application_action_types {
+  CREATE
+  WITHDRAW
+  CLOSE
+  SUBMIT_DRAFT
+  INSTITUTIONAL_REP_REVISION_REQUEST
+  INSTITUTIONAL_REP_SUBMIT
+  INSTITUTIONAL_REP_APPROVED
+  DAC_REVIEW_REVISION_REQUEST
+  DAC_REVIEW_SUBMIT
+  DAC_REVIEW_APPROVED
+  DAC_REVIEW_REJECTED
+  REVOKE
+}
+
 enum application_states {
   DRAFT
   INSTITUTIONAL_REP_REVIEW
+  INSTITUTIONAL_REP_REVISION_REQUESTED
   DAC_REVIEW
   DAC_REVISIONS_REQUESTED
   REJECTED
@@ -39,17 +42,6 @@ enum file_types {
   ETHICS_LETTER
 }
 
-table actions {
-  id bigint [pk, not null]
-  application_id bigint [not null]
-  created_at timestamp [not null, default: `now()`]
-  user_id varchar(100) [not null]
-  action action_types [not null]
-  revisions_request_id bigint
-  state_before varchar(255) [not null]
-  state_after varchar(255) [not null]
-}
-
 table agreements {
   id bigint [pk, not null]
   application_id bigint
@@ -58,6 +50,17 @@ table agreements {
   agreement_text text [not null]
   agreement_type agreement_types [not null]
   agreed_at timestamp [not null]
+}
+
+table application_actions {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  created_at timestamp [not null, default: `now()`]
+  user_id varchar(100) [not null]
+  action application_action_types [not null]
+  revisions_request_id bigint
+  state_before varchar(255) [not null]
+  state_after varchar(255) [not null]
 }
 
 table application_contents {
@@ -153,11 +156,11 @@ table revision_requests {
   requested_studies_notes text
 }
 
-ref: actions.application_id - applications.id
-
-ref: actions.revisions_request_id > revision_requests.id
-
 ref: agreements.application_id > application_contents.application_id
+
+ref: application_actions.application_id > applications.id
+
+ref: application_actions.revisions_request_id > revision_requests.id
 
 ref: applications.contents - application_contents.id
 
