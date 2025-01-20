@@ -54,12 +54,8 @@ const HomePage = () => {
 	return (
 		<Content>
 			<Row className="hero-background-image" align="middle">
-				<Row align="middle" style={{ ...heroStyle, width: isResponsiveMode ? '90%' : '80%' }}>
-					<Col
-						span={24}
-						lg={12}
-						style={{ padding: !isResponsiveMode ? `0 ${token.padding}px` : `0 ${token.paddingXXS}px` }}
-					>
+				<Row align="middle" style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} gutter={[90, 60]}>
+					<Col span={24} lg={12}>
 						<Flex vertical>
 							<Title style={{ color: token.colorTextSecondary }}> {translate('homepage.title')}</Title>
 							<Paragraph style={{ color: token.colorTextSecondary }}>{translate('homepage.introduction')}</Paragraph>
@@ -72,7 +68,7 @@ const HomePage = () => {
 					</Col>
 				</Row>
 			</Row>
-			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '80%' }} align={'top'} gutter={[90, 40]}>
+			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} align={'top'} gutter={[90, 60]}>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'middle'}>
 						<Title level={2}>{translate('homepage.overviewTitle')}</Title>
