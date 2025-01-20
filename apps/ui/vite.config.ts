@@ -10,7 +10,6 @@ const API_PROXY_PATH = '/api';
 export default ({ mode }: { mode: string }) => {
 	process.env = { ...process.env, ...loadEnv(mode, process.cwd(), ['VITE', 'API']) };
 	const apiHost = process.env.API_URL || 'http://localhost:3000';
-	const vitePort = Number(process.env.PORT || '3000');
 
 	// https://vitejs.dev/config/
 	return defineConfig({
@@ -48,7 +47,6 @@ export default ({ mode }: { mode: string }) => {
 					rewrite: (path) => path.replace(API_PROXY_PATH, ''),
 				},
 			},
-			port: vitePort,
 		},
 	});
 };
