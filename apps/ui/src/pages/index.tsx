@@ -17,15 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useState } from 'react';
-
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
+import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { Trans, useTranslation } from 'react-i18next';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
