@@ -204,7 +204,21 @@ const applicationService = (db: PostgresDb) => ({
 			}
 
 			const rawApplicationData = await db
-				.select()
+				.select({
+					id: applications.id,
+					user_id: applications.user_id,
+					state: applications.state,
+					createdAt: applications.created_at,
+					updatedAt: applications.updated_at,
+					applicantInformation: {
+						createdAt: applicationContents.created_at,
+						firstName: applicationContents.applicant_first_name,
+						lastName: applicationContents.applicant_last_name,
+						email: applicationContents.applicant_institutional_email,
+						country: applicationContents.institution_country,
+						institution: applicationContents.applicant_primary_affiliation,
+					},
+				})
 				.from(applications)
 				.where(
 					and(
@@ -214,28 +228,22 @@ const applicationService = (db: PostgresDb) => ({
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...applicationsQuery(sort))
-				.offset(page * pageSize);
+				.offset(page * pageSize)
+				.limit(pageSize);
 
-			let allApplications = rawApplicationData
-				.slice(page, pageSize + 1)
-				.map(({ applications, application_contents }) => {
-					return {
-						id: applications.id,
-						user_id: applications.user_id,
-						state: applications.state,
-						createdAt: applications.created_at,
-						updatedAt: applications.updated_at,
-						applicantInformation: {
-							firstName: application_contents?.applicant_first_name,
-							lastName: application_contents?.applicant_last_name,
-							email: application_contents?.applicant_institutional_email,
-							country: application_contents?.institution_country,
-							institution: application_contents?.applicant_primary_affiliation,
-						},
-					};
-				});
+			const applicationRecordsCount = await db.$count(
+				applications,
+				and(
+					user_id ? eq(applications.user_id, String(user_id)) : undefined,
+					state.length ? inArray(applications.state, state) : undefined,
+				),
+			);
+
+			let returnableApplications = rawApplicationData;
 
 			/**
+			 * Sort DAC_REVIEW records to the top to display on the front end, however...
+			 *
 			 * We only want to sort DAC_REVIEW records to the top if:
 			 * 	- The user hasn't sorted by any filter
 			 * 	- If the sorting filters include DAC_REVIEW
@@ -243,19 +251,20 @@ const applicationService = (db: PostgresDb) => ({
 			 * 		 since the sorting will already be handled by drizzle in this case.
 			 */
 			if (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW))) {
-				const reviewApplications = allApplications.filter(
+				const reviewApplications = returnableApplications.filter(
 					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
 				);
-				allApplications = [
+
+				returnableApplications = [
 					...reviewApplications,
-					...allApplications.filter((applications) => applications.state !== ApplicationStates.DAC_REVIEW),
+					...returnableApplications.filter((applications) => applications.state !== ApplicationStates.DAC_REVIEW),
 				];
 			}
 
 			const applicationsList = {
-				applications: allApplications,
+				applications: returnableApplications,
 				pagingMetadata: {
-					totalRecords: rawApplicationData.length,
+					totalRecords: applicationRecordsCount,
 					page: page,
 					pageSize: pageSize,
 				},

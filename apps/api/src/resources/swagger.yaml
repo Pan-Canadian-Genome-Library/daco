@@ -259,6 +259,11 @@ components:
           type: object
           description: Information about the applicant who applied in the application.
           properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: When the application contents record was created
+              nullable: false
             firstName:
               type: string
               nullable: true
