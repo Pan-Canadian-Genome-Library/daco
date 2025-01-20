@@ -48,9 +48,11 @@
 		"publicationPolicy": "Publication Policy",
 		"contact": "Contact Us",
 		"pcglWebsite": "PCGL Website",
-		"dataPlatform": "Data Platform"
+		"dataPlatform": "Data Platform",
+		"applications": "My Applications"
 	},
 	"button": {
+		"logout": "Logout",
 		"getStarted": "Get Started",
 		"login": "Login",
 		"editApplication": "Edit Application",
