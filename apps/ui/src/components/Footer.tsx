@@ -94,7 +94,7 @@ const FooterComponent = () => {
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
-				<Link target="_blank" style={{ margin: minWidth <= token.screenXL ? '1rem 0 0 0' : '0 -8rem 0 0' }}>
+				<Link target="_blank" style={{ margin: minWidth <= token.screenXL ? '1rem auto 0 0' : '0 -8rem 0 0' }}>
 					<Image
 						width={200}
 						src={PCGLFOOTER}
