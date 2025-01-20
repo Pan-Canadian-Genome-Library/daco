@@ -119,7 +119,7 @@
 				"dash": "draw",
 				"size": "m",
 				"font": "sans",
-				"text": "vite - localhost:3000",
+				"text": "vite - localhost:5173",
 				"align": "start",
 				"verticalAlign": "start",
 				"growY": 0,
@@ -214,7 +214,7 @@
 				"dash": "draw",
 				"size": "m",
 				"font": "sans",
-				"text": "tsx watch - localhost:3001",
+				"text": "tsx watch - localhost:3000",
 				"align": "start",
 				"verticalAlign": "start",
 				"growY": 0,
@@ -1291,9 +1291,9 @@
 		{
 			"id": "pointer:pointer",
 			"typeName": "pointer",
-			"x": 1247.3380308339556,
-			"y": 61.188805315507295,
-			"lastActivityTimestamp": 1737349106971,
+			"x": 1505.067466285015,
+			"y": -11.253710566943345,
+			"lastActivityTimestamp": 1737389234245,
 			"meta": {}
 		},
 		{
@@ -1313,8 +1313,8 @@
 			"screenBounds": {
 				"x": 0,
 				"y": 0,
-				"w": 784,
-				"h": 667
+				"w": 1418,
+				"h": 596
 			},
 			"insets": [
 				false,
@@ -1357,9 +1357,9 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 231.79959255527632,
-			"y": 241.37685041954137,
-			"z": 0.38447233780514223,
+			"x": 748.8642545371715,
+			"y": 19.821475420647886,
+			"z": 0.46139513251122233,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"
