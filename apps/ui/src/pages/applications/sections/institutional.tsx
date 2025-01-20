@@ -36,7 +36,7 @@ import { ApplicationOutletContext } from '@/global/types';
 type FieldType = {
 	institutionalTitle: string;
 	institutionalFirstName: string;
-	institutionalmiddleName: string;
+	institutionalMiddleName: string;
 	institutionalLastName: string;
 	institutionalSuffix: string;
 	institutionalPrimaryAffiliation: string;
@@ -86,6 +86,7 @@ const Institutional = () => {
 							<SelectBox
 								label={translate('institutional-section.form.title')}
 								name="institutionalTitle"
+								placeholder="Select"
 								control={control}
 								rule={rule}
 								options={[
@@ -105,7 +106,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('institutional-section.form.firstName')}
-								name="institutionalTitle"
+								name="institutionalFirstName"
 								control={control}
 								rule={rule}
 								required
@@ -115,7 +116,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('institutional-section.form.middleName')}
-								name="institutionalmiddleName"
+								name="institutionalMiddleName"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -139,7 +140,6 @@ const Institutional = () => {
 								name="institutionalSuffix"
 								control={control}
 								rule={rule}
-								required
 								disabled={!isEditMode}
 							/>
 						</Col>

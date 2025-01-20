@@ -36,6 +36,7 @@ import { ApplicationOutletContext } from '@/global/types';
 type FieldType = {
 	applicantTitle: string;
 	applicantFirstName: string;
+	applicantMiddleName: string;
 	applicantLastName: string;
 	applicantSuffix: string;
 	applicantPrimaryAffiliation: string;
@@ -85,6 +86,7 @@ const Applicant = () => {
 							<SelectBox
 								label={translate('applicant-section.form.title')}
 								name="applicantTitle"
+								placeholder="Select"
 								control={control}
 								rule={rule}
 								options={[
@@ -114,7 +116,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.middleName')}
-								name="applicantFirstName"
+								name="applicantMiddleName"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
