@@ -74,9 +74,9 @@ RUN touch /var/run/nginx.pid && \
 # Switch to new user
 USER ${APP_USER}
 
-# Copy site (dist dir) and nginx conf
+# Copy site and nginx config
 COPY --from=base ${DACO_UI_DIR}/dist /usr/share/nginx/html
-COPY --from=base ${DACO_UI_DIR}/docker/nginx.conf /etc/nginx/conf.d
+COPY --from=base ${DACO_UI_DIR}/docker/nginx.conf.template /etc/nginx/templates/nginx.conf.template
 RUN rm -f /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
