@@ -28,6 +28,24 @@ import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
 
+export const ApplicationSectionRoutes = [
+	{
+		route: 'intro',
+		path: 'intro/edit?',
+		element: <Introduction />,
+	},
+	{
+		route: 'applicant',
+		path: 'applicant/edit?',
+		element: <Applicant />,
+	},
+	{
+		route: 'institutional',
+		path: 'institutional/edit?',
+		element: <Institutional />,
+	},
+];
+
 function App() {
 	return (
 		<Routes>
@@ -36,9 +54,10 @@ function App() {
 				<Route path="dashboard" element={<DashboardPage />} />
 				<Route path="application/:id" element={<ApplicationViewer />}>
 					<Route index element={<Navigate to="intro" replace={true} />} />
-					<Route path="intro/edit?" element={<Introduction />} />
-					<Route path="applicant/edit?" element={<Applicant />} />
-					<Route path="institutional/edit?" element={<Institutional />} />
+					{/* Application Section Routes */}
+					{ApplicationSectionRoutes.map((item) => (
+						<Route key={item.route} path={item.path} element={item.element} />
+					))}
 				</Route>
 				<Route path="manage/applications" element={<ManageApplicationsPage />} />
 			</Route>
