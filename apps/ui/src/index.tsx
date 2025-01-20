@@ -25,7 +25,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 
 import ThemeProvider from '@/components/providers/ThemeProvider';
-import App from '@/pages/App';
+import AppRouter from '@/pages/AppRouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
@@ -35,7 +35,7 @@ createRoot(document.getElementById('root')!).render(
 		<QueryClientProvider client={queryClient}>
 			<ThemeProvider>
 				<BrowserRouter>
-					<App />
+					<AppRouter />
 				</BrowserRouter>
 			</ThemeProvider>
 		</QueryClientProvider>

@@ -23,38 +23,40 @@ import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core
 import { applications } from './applications.js';
 import { revisionRequests } from './revisionRequests.js';
 
-export const actionTypesEnum = pgEnum('action_types', [
+export const applicationActionTypesEnum = pgEnum('application_action_types', [
 	'CREATE',
 	'WITHDRAW',
 	'CLOSE',
-	'REQUEST_INSTITUTIONAL_REP',
+	'SUBMIT_DRAFT',
+	'INSTITUTIONAL_REP_REVISION_REQUEST',
+	'INSTITUTIONAL_REP_SUBMIT',
 	'INSTITUTIONAL_REP_APPROVED',
-	'INSTITUTIONAL_REP_REJECTED',
+	'DAC_REVIEW_REVISION_REQUEST',
+	'DAC_REVIEW_SUBMIT',
 	'DAC_REVIEW_APPROVED',
 	'DAC_REVIEW_REJECTED',
-	'DAC_REVIEW_REVISIONS',
 	'REVOKE',
 ]);
 
-export const actions = pgTable('actions', {
+export const applicationActions = pgTable('application_actions', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 	user_id: varchar({ length: 100 }).notNull(),
-	action: actionTypesEnum().notNull(),
+	action: applicationActionTypesEnum().notNull(),
 	revisions_request_id: bigint({ mode: 'number' }),
 	state_before: varchar({ length: 255 }).notNull(),
 	state_after: varchar({ length: 255 }).notNull(),
 });
 // TODO: may need reference to a content diff
 
-export const actionsRelations = relations(actions, ({ one }) => ({
+export const applicationActionsRelations = relations(applicationActions, ({ one }) => ({
 	application_id: one(applications, {
-		fields: [actions.application_id],
+		fields: [applicationActions.application_id],
 		references: [applications.id],
 	}),
 	revisions_request_id: one(revisionRequests, {
-		fields: [actions.revisions_request_id],
+		fields: [applicationActions.revisions_request_id],
 		references: [revisionRequests.id],
 	}),
 }));

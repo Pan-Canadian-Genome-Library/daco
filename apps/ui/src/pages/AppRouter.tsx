@@ -27,7 +27,7 @@ import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
 
-function App() {
+function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<PageLayout />}>
@@ -43,4 +43,4 @@ function App() {
 	);
 }
 
-export default App;
+export default AppRouter;
