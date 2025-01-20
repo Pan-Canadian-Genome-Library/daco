@@ -226,5 +226,4 @@ export type Application = {
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
-	approverId: number; // The ID of the user approving the application
 };

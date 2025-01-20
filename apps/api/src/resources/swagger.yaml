@@ -208,31 +208,31 @@ paths:
           application/json:
             schema:
               $ref: '#/components/requests/ApproveApplication'
-    responses:
-      '200':
-        description: Application successfully approved.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Applications'
-      '400':
-        description: Invalid request - missing or invalid approval data.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/responses/ClientErrors'
-      '404':
-        description: Application not found.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/responses/ClientErrors'
-      '500':
-        description: Server error - Unable to process approval.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/responses/ServerErrors'
+      responses:
+        '200':
+          description: Application successfully approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applications'
+        '400':
+          description: Invalid request - missing or invalid approval data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server error - Unable to process approval.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
 
 components:
   schemas:
@@ -411,12 +411,8 @@ components:
     ApproveApplication:
       type: object
       required:
-        - applicantId
         - applicationId
       properties:
-        applicantId:
-          type: number
-          description: The id of the Applicant
         applicationId:
           description: The id of the Application
           type: number

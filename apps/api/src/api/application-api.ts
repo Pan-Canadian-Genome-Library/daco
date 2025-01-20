@@ -109,7 +109,6 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 
 export const approveApplication = async ({
 	applicationId,
-	approverId,
 }: ApproveApplication): Promise<{
 	success: boolean;
 	message?: string;
@@ -122,13 +121,7 @@ export const approveApplication = async ({
 		const service: ApplicationService = applicationService(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
-		if (!result.success) {
-			return {
-				success: false,
-				message: 'Application not found.',
-				errors: 'ApplicationNotFound',
-			};
-		}
+		if (!result.success) return result;
 
 		const application = result.data;
 
@@ -143,10 +136,11 @@ export const approveApplication = async ({
 		}
 
 		const approvalResult = await appStateManager.approveDacReview();
+		console.log(approvalResult);
 		if (!approvalResult.success) {
 			return {
 				success: false,
-				message: 'Failed to approve application.',
+				message: approvalResult.message || 'Failed to approve application.',
 				errors: 'StateTransitionError',
 			};
 		}

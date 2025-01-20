@@ -142,27 +142,27 @@ applicationRouter.get(
 );
 
 applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
-	const { applicationId, approverId }: { applicationId?: number; approverId?: number } = req.body;
+	const { applicationId }: { applicationId?: number; approverId?: number } = req.body;
 
-	if (typeof applicationId !== 'number' || typeof approverId !== 'number') {
+	if (typeof applicationId !== 'number') {
 		res.status(400).send({
-			message: 'Invalid request. Both applicationId and approverId are required and must be numbers.',
+			message: 'Invalid request. ApplicationId must be of type numbers.',
 			errors: 'MissingOrInvalidParameters',
 		});
 		return;
 	}
 
 	// Validate input
-	if (!applicationId || !approverId) {
+	if (!applicationId) {
 		res.status(400).send({
-			message: 'Invalid request. Both applicationId and approverId are required.',
+			message: 'Invalid request. ApplicationId is required.',
 			errors: 'MissingParameters',
 		});
 	}
 
 	try {
 		// Call the service function
-		const result = await approveApplication({ applicationId, approverId });
+		const result = await approveApplication({ applicationId });
 
 		if (result.success) {
 			res.status(200).send({
@@ -195,7 +195,7 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 					break;
 				default:
 					status = 500;
-					message = 'An unexpected error occurred.';
+					message = result.message || 'An unexpected error occurred.';
 					errors = result.errors;
 			}
 		}
