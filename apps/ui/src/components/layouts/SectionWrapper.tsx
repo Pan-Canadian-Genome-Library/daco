@@ -27,6 +27,7 @@ const SectionWrapper = ({ children }: { children: React.ReactElement }) => {
 
 	const SectionWrapperStyles: React.CSSProperties = {
 		padding: token.paddingXL,
+		paddingInline: '4rem',
 		width: '100%',
 	};
 

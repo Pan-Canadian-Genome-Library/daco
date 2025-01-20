@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -45,11 +45,11 @@ const SectionMenu = () => {
 	const MenuItemList: MenuItem[] = [
 		{
 			key: 'intro',
-			label: <SectionMenuItem label={translate('menu.intro')} />,
+			label: <SectionMenuItem label={translate('menu.intro')} isEditMode={isEditMode} />,
 		},
 		{
 			key: 'applicant',
-			label: <SectionMenuItem label={translate('menu.sectionA')} />,
+			label: <SectionMenuItem label={translate('menu.applicant')} isEditMode={isEditMode} />,
 		},
 	];
 
