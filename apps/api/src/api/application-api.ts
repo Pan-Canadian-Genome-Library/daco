@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -104,4 +104,15 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 	const result = await applicationRepo.getApplicationById({ id: applicationId });
 
 	return result;
+};
+/**
+ * Gets the total of how many applications are in each state type, including a TOTAL count.
+ * @param userId - The ID of the current user.
+ * @returns Success with the details of the application / Failure with Error.
+ */
+export const getApplicationStateTotals = async ({ userId }: { userId: string }) => {
+	const database = getDbInstance();
+	const service: ApplicationService = applicationService(database);
+
+	return await service.applicationStateTotals({ user_id: userId });
 };

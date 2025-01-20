@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -335,6 +335,31 @@ describe('Application Service', () => {
 
 			assert.ok(editedApplication.contents);
 			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicant_first_name);
+		});
+	});
+
+	describe('Get Application Metadata', () => {
+		before(async () => {
+			await addInitialApplications(db);
+		});
+
+		it('should list statistics for how many applications are in each state category', async () => {
+			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
+			assert.ok(appStateTotals.success);
+			const allStates = appStateTotals.data;
+
+			const allApplications = await testApplicationService.listApplications({ user_id });
+			assert.ok(allApplications.success);
+			const applicationRecords = allApplications.data;
+
+			assert.ok(Array.isArray(applicationRecords));
+
+			assert.ok(allStates);
+
+			const allDraftRecords = applicationRecords.filter((records) => records.state === 'DRAFT');
+
+			assert.equal(allStates.DRAFT, allDraftRecords.length);
+			assert.equal(allStates.TOTAL, applicationRecords.length);
 		});
 	});
 
