@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationSectionRoutes } from '@/pages/App';
+import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { Button, Flex, theme } from 'antd';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

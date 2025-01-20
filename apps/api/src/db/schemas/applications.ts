@@ -19,12 +19,13 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { applicationActions } from './applicationActions.js';
 import { applicationContents } from './applicationContents.js';
 
 export const applicationStatesEnum = pgEnum('application_states', [
 	'DRAFT',
 	'INSTITUTIONAL_REP_REVIEW',
-	'REP_REVISION',
+	'INSTITUTIONAL_REP_REVISION_REQUESTED',
 	'DAC_REVIEW',
 	'DAC_REVISIONS_REQUESTED',
 	'REJECTED',
@@ -44,9 +45,10 @@ export const applications = pgTable('applications', {
 	contents: bigint({ mode: 'number' }),
 });
 
-export const applicationsRelations = relations(applications, ({ one }) => ({
+export const applicationsRelations = relations(applications, ({ one, many }) => ({
 	application_contents: one(applicationContents, {
 		fields: [applications.contents],
 		references: [applicationContents.id],
 	}),
+	actions: many(applicationActions),
 }));

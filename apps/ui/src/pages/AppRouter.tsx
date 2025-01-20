@@ -46,7 +46,7 @@ export const ApplicationSectionRoutes = [
 	},
 ];
 
-function App() {
+function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<PageLayout />}>
@@ -65,4 +65,4 @@ function App() {
 	);
 }
 
-export default App;
+export default AppRouter;

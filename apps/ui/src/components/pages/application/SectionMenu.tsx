@@ -21,7 +21,7 @@ import { Menu, MenuProps } from 'antd';
 import { useNavigate } from 'react-router';
 
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
-import { ApplicationSectionRoutes } from '@/pages/App';
+import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 
 type SectionMenuProps = {
 	currentSection: string;
