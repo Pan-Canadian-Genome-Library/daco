@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,15 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Route, Routes } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
 import ApplicationViewer from '@/pages/applications';
 import Applicant from '@/pages/applications/sections/applicant';
+import Institutional from '@/pages/applications/sections/institutional';
 import Introduction from '@/pages/applications/sections/intro';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
+
+export const ApplicationSectionRoutes = [
+	{
+		route: 'intro',
+		path: 'intro/edit?',
+		element: <Introduction />,
+	},
+	{
+		route: 'applicant',
+		path: 'applicant/edit?',
+		element: <Applicant />,
+	},
+	{
+		route: 'institutional',
+		path: 'institutional/edit?',
+		element: <Institutional />,
+	},
+];
 
 function AppRouter() {
 	return (
@@ -34,8 +53,11 @@ function AppRouter() {
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
 				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route path="intro/edit?" element={<Introduction />} />
-					<Route path="applicant/edit?" element={<Applicant />} />
+					<Route index element={<Navigate to="intro" replace={true} />} />
+					{/* Application Section Routes */}
+					{ApplicationSectionRoutes.map((item) => (
+						<Route key={item.route} path={item.path} element={item.element} />
+					))}
 				</Route>
 				<Route path="manage/applications" element={<ManageApplicationsPage />} />
 			</Route>

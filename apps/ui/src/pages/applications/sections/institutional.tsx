@@ -34,15 +34,15 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 
 type FieldType = {
-	applicantTitle: string;
-	applicantFirstName: string;
-	applicantMiddleName: string;
-	applicantLastName: string;
-	applicantSuffix: string;
-	applicantPrimaryAffiliation: string;
-	applicantInstituteAffiliation: string;
-	applicantProfileUrl: string;
-	applicantPositionTitle: string;
+	institutionalTitle: string;
+	institutionalFirstName: string;
+	institutionalMiddleName: string;
+	institutionalLastName: string;
+	institutionalSuffix: string;
+	institutionalPrimaryAffiliation: string;
+	institutionalInstituteAffiliation: string;
+	institutionalProfileUrl: string;
+	institutionalPositionTitle: string;
 	institutionCountry: string;
 	institutionState: string;
 	institutionCity: string;
@@ -52,8 +52,8 @@ type FieldType = {
 };
 
 const schema = z.object({
-	applicantTitle: z.string().min(1, { message: 'Required' }),
-	applicantFirstName: z
+	institutionalTitle: z.string().min(1, { message: 'Required' }),
+	InstitutionalFirstName: z
 		.string()
 		.min(1, { message: 'Required' })
 		.max(15, { message: 'First name should be less than 15 characters' }),
@@ -61,7 +61,7 @@ const schema = z.object({
 
 const rule = createSchemaFieldRule(schema);
 
-const Applicant = () => {
+const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
@@ -77,15 +77,15 @@ const Applicant = () => {
 		<SectionWrapper>
 			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
 				<SectionTitle
-					title={translate('applicant-section.title')}
-					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
+					title={translate('institutional-section.title')}
+					text={[translate('institutional-section.description1')]}
 				/>
-				<SectionContent title={translate('applicant-section.section1')}>
+				<SectionContent title={translate('institutional-section.section1')}>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
-								label={translate('applicant-section.form.title')}
-								name="applicantTitle"
+								label={translate('institutional-section.form.title')}
+								name="institutionalTitle"
 								placeholder="Select"
 								control={control}
 								rule={rule}
@@ -105,8 +105,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.firstName')}
-								name="applicantFirstName"
+								label={translate('institutional-section.form.firstName')}
+								name="institutionalFirstName"
 								control={control}
 								rule={rule}
 								required
@@ -115,8 +115,8 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.middleName')}
-								name="applicantMiddleName"
+								label={translate('institutional-section.form.middleName')}
+								name="institutionalMiddleName"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -126,8 +126,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.lastName')}
-								name="applicantLastName"
+								label={translate('institutional-section.form.lastName')}
+								name="institutionalLastName"
 								control={control}
 								rule={rule}
 								required
@@ -136,8 +136,8 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.suffix')}
-								name="applicantSuffix"
+								label={translate('institutional-section.form.suffix')}
+								name="institutionalSuffix"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -147,22 +147,9 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.primaryAffiliation')}
-								subLabel={translate('applicant-section.form.primaryAffiliationSubLabel')}
-								name="applicantPrimaryAffiliation"
-								control={control}
-								rule={rule}
-								required
-								disabled={!isEditMode}
-							/>
-						</Col>
-					</Row>
-					<Row gutter={26}>
-						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<InputBox
-								label={translate('applicant-section.form.primaryEmail')}
-								subLabel={translate('applicant-section.form.primaryEmailLabel')}
-								name="applicantInstituteAffiliation"
+								label={translate('institutional-section.form.primaryAffiliation')}
+								subLabel={translate('institutional-section.form.primaryAffiliationSubLabel')}
+								name="institutionalPrimaryAffiliation"
 								control={control}
 								rule={rule}
 								required
@@ -173,9 +160,22 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.researcherProfile')}
-								subLabel={translate('applicant-section.form.researcherProfileLabel')}
-								name="applicantProfileUrl"
+								label={translate('institutional-section.form.primaryEmail')}
+								subLabel={translate('institutional-section.form.primaryEmailLabel')}
+								name="institutionalInstituteAffiliation"
+								control={control}
+								rule={rule}
+								required
+								disabled={!isEditMode}
+							/>
+						</Col>
+					</Row>
+					<Row gutter={26}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+							<InputBox
+								label={translate('institutional-section.form.researcherProfile')}
+								subLabel={translate('institutional-section.form.researcherProfileLabel')}
+								name="institutionalProfileUrl"
 								placeHolder="https://"
 								control={control}
 								rule={rule}
@@ -187,8 +187,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.positionTitle')}
-								name="applicantPositionTitle"
+								label={translate('institutional-section.form.positionTitle')}
+								name="institutionalPositionTitle"
 								control={control}
 								rule={rule}
 								required
@@ -197,11 +197,11 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title={translate('applicant-section.section2')}>
+				<SectionContent title={translate('institutional-section.section2')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.country')}
+								label={translate('institutional-section.form.country')}
 								name="institutionCountry"
 								control={control}
 								rule={rule}
@@ -213,7 +213,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.streetAddress')}
+								label={translate('institutional-section.form.streetAddress')}
 								name="institutionStreetAddress"
 								control={control}
 								rule={rule}
@@ -223,7 +223,7 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.building')}
+								label={translate('institutional-section.form.building')}
 								name="institutionBuilding"
 								control={control}
 								rule={rule}
@@ -234,7 +234,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.state')}
+								label={translate('institutional-section.form.state')}
 								name="institutionState"
 								control={control}
 								rule={rule}
@@ -244,7 +244,7 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.city')}
+								label={translate('institutional-section.form.city')}
 								name="institutionCity"
 								control={control}
 								rule={rule}
@@ -256,7 +256,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.postalCode')}
+								label={translate('institutional-section.form.postalCode')}
 								name="institutionPostalCode"
 								control={control}
 								rule={rule}
@@ -266,10 +266,10 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);
 };
 
-export default Applicant;
+export default Institutional;

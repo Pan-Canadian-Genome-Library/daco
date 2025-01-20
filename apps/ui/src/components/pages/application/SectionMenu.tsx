@@ -18,40 +18,18 @@
  */
 
 import { Menu, MenuProps } from 'antd';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useMatch, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
+import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 
-type MenuItem = Required<MenuProps>['items'][number];
+type SectionMenuProps = {
+	currentSection: string;
+	isEditMode: boolean;
+};
 
-const SectionMenu = () => {
+const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 	const navigate = useNavigate();
-	const { t: translate } = useTranslation();
-
-	// Grab current section from url
-	const match = useMatch('application/:id/:section/:edit?');
-	const isEditMode = !!match?.params.edit;
-	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
-
-	useEffect(() => {
-		// if the section route is empty, navigate to intro route
-		if (currentSection === 'intro') {
-			navigate(`intro/${isEditMode ? 'edit' : ''}`, { replace: true });
-		}
-	}, [currentSection, navigate, isEditMode]);
-
-	const MenuItemList: MenuItem[] = [
-		{
-			key: 'intro',
-			label: <SectionMenuItem label={translate('menu.intro')} isEditMode={isEditMode} />,
-		},
-		{
-			key: 'applicant',
-			label: <SectionMenuItem label={translate('menu.applicant')} isEditMode={isEditMode} />,
-		},
-	];
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
@@ -59,10 +37,15 @@ const SectionMenu = () => {
 
 	return (
 		<Menu
-			style={{ width: '100%', minWidth: '275px', height: '100%', border: '20px' }}
-			defaultSelectedKeys={[currentSection]}
+			style={{ width: '100%', height: '100%' }}
+			selectedKeys={[currentSection]}
 			mode="inline"
-			items={MenuItemList}
+			items={ApplicationSectionRoutes.map((item) => {
+				return {
+					key: item.route,
+					label: <SectionMenuItem label={item.route} isEditMode={isEditMode} />,
+				};
+			})}
 			onClick={handleNavigation}
 		/>
 	);
