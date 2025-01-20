@@ -167,7 +167,7 @@ describe('Application API', () => {
 
 	describe('Get Application Metadata', () => {
 		it('should get the counts for each of the application states', async () => {
-			const applicationRecordsResult = await applicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 

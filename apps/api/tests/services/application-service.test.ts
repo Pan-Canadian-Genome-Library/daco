@@ -343,11 +343,11 @@ describe('Application Service', () => {
 		});
 
 		it('should list statistics for how many applications are in each state category', async () => {
-			const appStateTotals = await applicationService.applicationStateTotals({ user_id });
+			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
 			assert.ok(appStateTotals.success);
 			const allStates = appStateTotals.data;
 
-			const allApplications = await applicationService.listApplications({ user_id });
+			const allApplications = await testApplicationService.listApplications({ user_id });
 			assert.ok(allApplications.success);
 			const applicationRecords = allApplications.data;
 

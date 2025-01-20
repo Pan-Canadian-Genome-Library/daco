@@ -227,7 +227,10 @@ const applicationService = (db: PostgresDb) => ({
 					DRAFT: db.$count(applications, eq(applications.state, 'DRAFT')),
 					INSTITUTIONAL_REP_REVIEW: db.$count(applications, eq(applications.state, 'INSTITUTIONAL_REP_REVIEW')),
 					REJECTED: db.$count(applications, eq(applications.state, 'REJECTED')),
-					REP_REVISION: db.$count(applications, eq(applications.state, 'REP_REVISION')),
+					INSTITUTIONAL_REP_REVISION_REQUESTED: db.$count(
+						applications,
+						eq(applications.state, 'INSTITUTIONAL_REP_REVISION_REQUESTED'),
+					),
 					REVOKED: db.$count(applications, eq(applications.state, 'REVOKED')),
 					TOTAL: db.$count(applications),
 				})
@@ -245,7 +248,7 @@ const applicationService = (db: PostgresDb) => ({
 					DRAFT: 0,
 					INSTITUTIONAL_REP_REVIEW: 0,
 					REJECTED: 0,
-					REP_REVISION: 0,
+					INSTITUTIONAL_REP_REVISION_REQUESTED: 0,
 					REVOKED: 0,
 					TOTAL: 0,
 				});
