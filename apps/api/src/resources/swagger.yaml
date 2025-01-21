@@ -325,7 +325,7 @@ components:
           format: date-time
           nullable: true
           description: When the application expires. Can be NULL.
-        applicantInformation:
+        contents:
           type: object
           description: Information about the applicant who applied in the application.
           properties:

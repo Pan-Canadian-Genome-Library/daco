@@ -27,15 +27,21 @@ export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
 export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
-export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
+export type ApplicationContentInsert = typeof applicationContents.$inferInsert;
+export type ApplicationContentUpdates = Partial<ApplicationContentInsert>;
+export type ApplicationInsert = typeof applications.$inferInsert;
+export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+
+export interface JoinedApplicationRecord extends Omit<ApplicationData, 'contents'> {
+	contents: ApplicationContentUpdates | null;
+}
 
 export type ApplicationData = typeof applications.$inferSelect;
 export type ApplicationActionData = typeof applicationActions.$inferSelect;
+export type ApplicationContentData = typeof applications.$inferSelect;
 
 export type ApplicationService = ReturnType<typeof applicationService>;
 export type ApplicationActionService = ReturnType<typeof applicationActionService>;
-
-export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
 export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';

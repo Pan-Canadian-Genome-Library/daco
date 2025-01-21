@@ -224,7 +224,7 @@ export type Application = {
 	userId: string;
 	state: ApplicationStateValues;
 	created_at: Date;
-	approved_at: Date;
-	expires_at: Date;
+	approved_at: Date | null;
+	expires_at: Date | null;
 	contents: ApplicationContents;
 };

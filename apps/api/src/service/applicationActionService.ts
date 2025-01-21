@@ -68,12 +68,24 @@ const applicationActionService = (db: PostgresDb) => {
 	return {
 		create: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.CREATE, ApplicationStates.DRAFT),
-		withdraw: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
 		close: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
 		draftSubmit: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.SUBMIT_DRAFT, ApplicationStates.INSTITUTIONAL_REP_REVIEW),
+		dacApproved: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
+		dacRejected: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
+		dacRevision: async (application: ApplicationData) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
+				ApplicationStates.DAC_REVISIONS_REQUESTED,
+			),
+		dacSubmit: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
+		edit: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.EDIT, ApplicationStates.DRAFT),
 		repRevision: async (application: ApplicationData) =>
 			await addActionRecord(
 				application,
@@ -88,20 +100,10 @@ const applicationActionService = (db: PostgresDb) => {
 			),
 		repApproved: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationStates.DAC_REVIEW),
-		dacApproved: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
-		dacRejected: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
-		dacRevision: async (application: ApplicationData) =>
-			await addActionRecord(
-				application,
-				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
-				ApplicationStates.DAC_REVISIONS_REQUESTED,
-			),
-		dacSubmit: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
 		revoke: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
+		withdraw: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
 		getActionById: async ({ id }: { id: number }): Promise<Success<ApplicationActionData> | Failure> => {
 			try {
 				const actionRecord = await db.select().from(applicationActions).where(eq(applicationActions.id, id));
