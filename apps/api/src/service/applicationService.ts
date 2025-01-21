@@ -40,13 +40,18 @@ import {
 /**
  * ApplicationService provides methods for Applications DB access
  * @param db - Drizzle Postgres DB Instance
- * @method createApplication: Create new Application record @returns AsyncResult<ApplicationData>
- * @method editApplication: Update Application Contents and parent Application record @returns AsyncResult<JoinedApplicationRecord>
- * @method findOneAndUpdate: Update a base Application record @returns AsyncResult<ApplicationData>
- * @method getApplicationById: Find a specific Application record @returns AsyncResult<ApplicationData>
- * @method getApplicationWithContents: Find an Application record with Contents included @returns AsyncResult<JoinedApplicationRecord>
- * @method listApplications: Find multiple sorted Application records @returns Array<OrderBy<ApplicationsColumnName>>; page?: number; pageSize?: number; })
- * @method applicationStateTotals: Obtain count for all Application records with each State @returns
+ * @method createApplication: Create new Application record
+ * 	-	@returns: AsyncResult<ApplicationData>
+ * @method editApplication: Update Application Contents and parent Application record
+ * 	-	@returns: AsyncResult<JoinedApplicationRecord>
+ * @method findOneAndUpdate: Update a base Application record
+ * 	-	@returns: AsyncResult<ApplicationData>
+ * @method getApplicationById: Find a specific Application record
+ * 	-	@returns: AsyncResult<ApplicationData>
+ * @method getApplicationWithContents: Find an Application record with Contents included
+ * 	-	@returns: AsyncResult<JoinedApplicationRecord>
+ * @method listApplications: Find multiple sorted Application records
+ * @method applicationStateTotals: Obtain count for all Application records with each State
  */
 
 const applicationService = (db: PostgresDb) => ({
