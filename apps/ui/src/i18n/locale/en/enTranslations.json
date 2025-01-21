@@ -76,7 +76,7 @@
 			"DRAFT": "Draft",
 			"INSTITUTIONAL_REP_REVIEW": "Rep Review",
 			"DAC_REVIEW": "DAC Review",
-			"REP_REVISION": "Rep Revisions",
+			"INSTITUTIONAL_REP_REVISION_REQUESTED": "Rep Revisions",
 			"DAC_REVISIONS_REQUESTED": "DAC Revisions",
 			"REJECTED": "Rejected",
 			"REVOKED": "Revoked",
