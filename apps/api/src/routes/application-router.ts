@@ -27,6 +27,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 } from '@/api/applicationController.js';
+import { isPositiveNumber } from '@/utils/routes.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -85,7 +86,7 @@ applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
 //       - verify if user can access applications
 //       - validate queryParam options using zod
 applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res) => {
-	const { userId, state, sort: sortQuery, page, pageSize } = req.query;
+	const { userId, state: stateQuery, sort: sortQuery, page, pageSize } = req.query;
 
 	//  Temporary userId check until validation/dto flow is confirmed
 	//  - reflect changes in swagger once refactored
@@ -94,21 +95,40 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 		return;
 	}
 
+	const pageRequested = page ? parseInt(page) : undefined;
+	const pageSizeRequested = pageSize ? parseInt(pageSize) : undefined;
+
+	/**
+	 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
+	 * If it is, we need to throw a client error, warning them that that's a bad request.
+	 */
+	if (
+		(pageRequested !== undefined && !isPositiveNumber(pageRequested)) ||
+		(pageSizeRequested !== undefined && !isPositiveNumber(pageSizeRequested))
+	) {
+		res.status(400).send({ message: 'Page and/or page size must be a positive integer.' });
+		return;
+	}
+
 	// Check if sort exists and parse it if true
 	const sort = !!sortQuery ? JSON.parse(sortQuery) : [];
+	const state = !!stateQuery ? JSON.parse(stateQuery) : [];
 
 	const result = await getAllApplications({
 		userId,
 		state,
 		sort,
-		page: parseInt(page),
-		pageSize: parseInt(pageSize),
+		page: pageRequested,
+		pageSize: pageSizeRequested,
 	});
 
 	if (result.success) {
 		res.status(200).send(result.data);
+		return;
 	} else {
-		res.status(500).send({ message: result.message, errors: String(result.errors) });
+		const errorReturn = { message: result.message, errors: String(result.errors) };
+		res.status(500).send(errorReturn);
+		return;
 	}
 });
 

@@ -80,7 +80,7 @@ describe('Application Service', () => {
 
 			assert.ok(applicationRecordsResult.success && applicationRecordsResult.data);
 
-			const records = applicationRecordsResult.data;
+			const records = applicationRecordsResult.data.applications;
 			const application = records[records.length - 1];
 
 			assert.ok(application);
@@ -99,7 +99,7 @@ describe('Application Service', () => {
 
 			assert.ok(applicationRecordsResult.success);
 
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.ok(applicationRecords[0]);
@@ -122,7 +122,7 @@ describe('Application Service', () => {
 
 			assert.ok(applicationRecordsResult.success);
 
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.ok(applicationRecords[0]);
@@ -145,7 +145,7 @@ describe('Application Service', () => {
 			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.ok(applicationRecords[0]);
@@ -159,11 +159,11 @@ describe('Application Service', () => {
 
 		it('should filter by state', async () => {
 			const applicationRecordsResult = await testApplicationService.listApplications({
-				state: ApplicationStates.DRAFT,
+				state: [ApplicationStates.DRAFT],
 			});
 
 			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.ok(applicationRecords[0]);
@@ -186,7 +186,7 @@ describe('Application Service', () => {
 			});
 
 			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.ok(applicationRecords[0]);
@@ -205,7 +205,7 @@ describe('Application Service', () => {
 			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.ok(applicationRecords[0]);
@@ -230,7 +230,7 @@ describe('Application Service', () => {
 			const updatedRecordsResult = await testApplicationService.listApplications({ user_id });
 
 			assert.ok(updatedRecordsResult.success);
-			const updatedRecords = updatedRecordsResult.data;
+			const updatedRecords = updatedRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(updatedRecords));
 			assert.ok(updatedRecords[0]);
@@ -255,7 +255,7 @@ describe('Application Service', () => {
 				],
 			});
 			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 			assert.ok(applicationRecords.length >= 3);
@@ -274,17 +274,18 @@ describe('Application Service', () => {
 			const paginationResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 10 });
 
 			assert.ok(paginationResult.success);
-			const paginatedRecords = paginationResult.data;
+			const paginatedRecords = paginationResult.data.applications;
 
 			// Test that only 10 were returned
 			assert.ok(Array.isArray(paginatedRecords));
+
 			assert.strictEqual(paginatedRecords.length, 10);
 
 			const allRecordsResult = await testApplicationService.listApplications({ user_id });
 
 			assert.ok(allRecordsResult.success);
 
-			const allRecords = allRecordsResult.data;
+			const allRecords = allRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(allRecords));
 
@@ -317,7 +318,7 @@ describe('Application Service', () => {
 
 			assert.ok(applicationRecordsResult.success);
 
-			const applicationRecords = applicationRecordsResult.data;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
 
@@ -345,11 +346,13 @@ describe('Application Service', () => {
 		it('should list statistics for how many applications are in each state category', async () => {
 			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
 			assert.ok(appStateTotals.success);
+
 			const allStates = appStateTotals.data;
 
 			const allApplications = await testApplicationService.listApplications({ user_id });
 			assert.ok(allApplications.success);
-			const applicationRecords = allApplications.data;
+
+			const applicationRecords = allApplications.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
 
