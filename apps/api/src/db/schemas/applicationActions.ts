@@ -27,6 +27,7 @@ export const applicationActionTypesEnum = pgEnum('application_action_types', [
 	'CREATE',
 	'WITHDRAW',
 	'CLOSE',
+	'EDIT',
 	'SUBMIT_DRAFT',
 	'INSTITUTIONAL_REP_REVISION_REQUEST',
 	'INSTITUTIONAL_REP_SUBMIT',

@@ -82,6 +82,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			const { id } = this._application;
 			const update = { state };
 			const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+			console.log(applicationResult);
 			if (applicationResult.success && applicationResult.data[0]) {
 				this._application = applicationResult.data[0];
 			}
@@ -93,13 +94,14 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// Handler Methods
 	// Submit
 	async submitDraft() {
-		if (this.can(submit)) {
+		if (this.can(submit) && this._application.state === ApplicationStates.DRAFT) {
 			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
 				try {
 					await this.dispatch(submit);
-					return await this._updateRecords('draftSubmit');
+					const updateResult = await this._updateRecords('draftSubmit');
+					return updateResult;
 				} catch (error) {
 					return failure(`Error submitting application with id ${this._application.id}`, error);
 				}
@@ -112,10 +114,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async submitRepRevision() {
-		if (this.can(submit)) {
+		if (this.can(submit) && this._application.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
 			try {
 				await this.dispatch(submit);
-				return await this._updateRecords('repSubmit');
+				const updateResult = await this._updateRecords('repSubmit');
+				return updateResult;
 			} catch (error) {
 				return failure(`Error submitting application with id ${this._application.id}`, error);
 			}
@@ -125,10 +128,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async submitDacRevision() {
-		if (this.can(submit)) {
+		if (this.can(submit) && this._application.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
 			try {
 				await this.dispatch(submit);
-				return await this._updateRecords('dacSubmit');
+				const updateResult = await this._updateRecords('dacSubmit');
+				return updateResult;
 			} catch (error) {
 				return failure(`Error submitting application with id ${this._application.id}`, error);
 			}
@@ -143,9 +147,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Edit
 	async editDraft() {
+		// TODO: Draft should not create actions when editing
 		if (this.can(edit)) {
 			await this.dispatch(edit);
-			return success(edit);
+			const updateResult = await this._updateRecords('edit');
+			return updateResult;
 		} else {
 			return failure(`Cannot edit application with state ${this.getState()}`);
 		}
@@ -165,10 +171,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Revise
 	async reviseRepReview() {
-		if (this.can(revision_request)) {
+		if (this.can(revision_request) && this._application.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
 			try {
 				await this.dispatch(revision_request);
-				return await this._updateRecords('repRevision');
+				const updateResult = await this._updateRecords('repRevision');
+				return updateResult;
 			} catch (error) {
 				return failure(`Error revising application with id ${this._application.id}`, error);
 			}
@@ -178,7 +185,17 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async reviseDacReview() {
-		return this.reviseRepReview();
+		if (this.can(revision_request) && this._application.state === ApplicationStates.DAC_REVIEW) {
+			try {
+				await this.dispatch(revision_request);
+				const updateResult = await this._updateRecords('dacRevision');
+				return updateResult;
+			} catch (error) {
+				return failure(`Error revising application with id ${this._application.id}`, error);
+			}
+		} else {
+			return failure(`Cannot revise application with state ${this.getState()}`);
+		}
 	}
 
 	private async _onRevision() {
@@ -209,10 +226,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Approve
 	async approveRepReview() {
-		if (this.can(approve)) {
+		if (this.can(approve) && this._application.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
 			try {
 				await this.dispatch(approve);
-				return await this._updateRecords('repApproved');
+				const updateResult = await this._updateRecords('repApproved');
+				return updateResult;
 			} catch (error) {
 				return failure(`Error approving application with id ${this._application.id}`, error);
 			}
@@ -222,11 +240,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async approveDacReview() {
-		// TODO: need check for && state
-		if (this.can(approve)) {
+		if (this.can(approve) && this._application.state === ApplicationStates.DAC_REVIEW) {
 			try {
 				await this.dispatch(approve);
-				return await this._updateRecords('dacApproved');
+				const updateResult = await this._updateRecords('dacApproved');
+				return updateResult;
 			} catch (error) {
 				return failure(`Error approving application with id ${this._application.id}`, error);
 			}

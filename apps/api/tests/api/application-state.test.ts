@@ -146,13 +146,15 @@ describe('State Machine', () => {
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
 		});
 
-		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', async () => {
+		it('should change from INSTITUTIONAL_REP_REVISION_REQUESTED to INSTITUTIONAL_REP_REVIEW on submit', async () => {
+			stateValue = testStateManager.getState();
 			await testStateManager.submitRepRevision();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on approval', async () => {
+			stateValue = testStateManager.getState();
 			await testStateManager.approveRepReview();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
@@ -174,12 +176,14 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
+			stateValue = testStateManager.getState();
 			await testStateManager.reviseDacReview();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', async () => {
+			stateValue = testStateManager.getState();
 			await testStateManager.submitDacRevision();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
@@ -219,13 +223,16 @@ describe('State Machine', () => {
 			const result = await createApplicationStateManager({ id: 3 });
 			assert.ok(result.success);
 
-			const dacReviewManager = result.data;
-			stateValue = dacReviewManager.getState();
+			const dacStateManager = result.data;
+			await dacStateManager.submitDraft();
+			await dacStateManager.approveRepReview();
+
+			stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			await dacReviewManager.closeDacReview();
+			await dacStateManager.closeDacReview();
 
-			stateValue = dacReviewManager.getState();
+			stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
 		});
 
