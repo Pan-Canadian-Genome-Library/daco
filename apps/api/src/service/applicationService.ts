@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
@@ -84,6 +84,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 		try {
 			const application = await db.transaction(async (transaction) => {
@@ -121,6 +122,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
 		try {
 			const application = await db
@@ -137,6 +139,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	getApplicationById: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
@@ -150,6 +153,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	getApplicationWithContents: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db
@@ -174,44 +178,103 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
 	listApplications: async ({
 		user_id,
-		state,
+		state = [],
 		sort = [],
 		page = 0,
 		pageSize = 20,
 	}: {
 		user_id?: string;
-		state?: ApplicationStateValues;
+		state?: ApplicationStateValues[];
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
 	}) => {
 		try {
-			const allApplications = await db
+			/**
+			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
+			 * This should be handled at at the router layer, but just in-case.
+			 */
+			if (Number.isNaN(page) || Number.isNaN(pageSize)) {
+				throw Error('Page and/or page size must be a positive integer.');
+			} else if (page < 0 || pageSize < 0) {
+				throw Error('Page and/or page size must be non-negative values.');
+			}
+
+			const rawApplicationData = await db
 				.select({
 					id: applications.id,
 					user_id: applications.user_id,
 					state: applications.state,
 					createdAt: applications.created_at,
 					updatedAt: applications.updated_at,
+					applicantInformation: {
+						createdAt: applicationContents.created_at,
+						firstName: applicationContents.applicant_first_name,
+						lastName: applicationContents.applicant_last_name,
+						email: applicationContents.applicant_institutional_email,
+						country: applicationContents.institution_country,
+						institution: applicationContents.applicant_primary_affiliation,
+					},
 				})
 				.from(applications)
 				.where(
 					and(
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
-						state ? eq(applications.state, state) : undefined,
+						state.length ? inArray(applications.state, state) : undefined,
 					),
 				)
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...applicationsQuery(sort))
 				.offset(page * pageSize)
 				.limit(pageSize);
 
-			return success(allApplications);
+			const applicationRecordsCount = await db.$count(
+				applications,
+				and(
+					user_id ? eq(applications.user_id, String(user_id)) : undefined,
+					state.length ? inArray(applications.state, state) : undefined,
+				),
+			);
+
+			let returnableApplications = rawApplicationData;
+
+			/**
+			 * Sort DAC_REVIEW records to the top to display on the front end, however...
+			 *
+			 * We only want to sort DAC_REVIEW records to the top if:
+			 * 	- The user hasn't sorted by any filter
+			 * 	- If the sorting filters include DAC_REVIEW
+			 * 		- Keeping in mind that if it includes JUST DAC_REVIEW, then we skip
+			 * 		 since the sorting will already be handled by drizzle in this case.
+			 */
+			if (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW))) {
+				const reviewApplications = returnableApplications.filter(
+					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
+				);
+
+				returnableApplications = [
+					...reviewApplications,
+					...returnableApplications.filter((applications) => applications.state !== ApplicationStates.DAC_REVIEW),
+				];
+			}
+
+			const applicationsList = {
+				applications: returnableApplications,
+				pagingMetadata: {
+					totalRecords: applicationRecordsCount,
+					page: page,
+					pageSize: pageSize,
+				},
+			};
+
+			return success(applicationsList);
 		} catch (err) {
 			const message = `Error at listApplications with user_id: ${user_id} state: ${state}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 			return failure(message, err);
 		}
 	},

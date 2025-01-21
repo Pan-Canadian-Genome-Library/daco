@@ -158,7 +158,7 @@ describe('Application Action Service', () => {
 			assert.strictEqual(actionResult.application_id, application_id);
 			assert.strictEqual(actionResult.action, ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST);
 			assert.strictEqual(actionResult.state_before, testApplication.state);
-			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED);
 		});
 
 		it('should perform INSTITUTIONAL_REP_SUBMIT actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
