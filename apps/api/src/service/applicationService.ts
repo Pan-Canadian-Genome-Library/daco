@@ -32,7 +32,6 @@ import {
 	JoinedApplicationRecord,
 	type ApplicationContentUpdates,
 	type ApplicationData,
-	type ApplicationInsert,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
 	type OrderBy,
@@ -141,7 +140,7 @@ const applicationService = (db: PostgresDb) => ({
 	}: {
 		id: number;
 		update: ApplicationUpdates;
-	}): AsyncResult<ApplicationInsert> => {
+	}): AsyncResult<ApplicationData> => {
 		try {
 			const application = await db
 				.update(applications)

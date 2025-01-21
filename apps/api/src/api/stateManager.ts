@@ -83,8 +83,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			const update = { state };
 			const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
 
-			if (applicationResult.success && applicationResult.data[0]) {
-				this._application = applicationResult.data[0];
+			if (applicationResult.success && applicationResult.data) {
+				this._application = applicationResult.data;
 			}
 
 			return applicationResult;
