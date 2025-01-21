@@ -22,7 +22,7 @@ import { and, eq } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationActionsQuery } from '@/service/utils.js';
-import { failure, Failure, success, Success } from '@/utils/results.js';
+import { type AsyncResult, failure, success } from '@/utils/results.js';
 import {
 	ApplicationActions,
 	ApplicationActionValues,
@@ -36,13 +36,33 @@ import {
 	type OrderBy,
 } from './types.js';
 
+/**
+ * ApplicationActionService provides methods for ApplicationActions DB access
+ * @param db - Drizzle Postgres DB Instance
+ * @method addActionRecord: async ( application: ApplicationData, action: ApplicationActionValues, state_after: ApplicationStateValues ): AsyncResult<ApplicationActionData>
+ * @method create: create: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method close: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method draftSubmit: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method dacApproved: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method dacRejected: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method dacRevision: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method dacSubmit: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method edit: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method repRevision: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method repApproved: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method revoke: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method withdraw: async (application: ApplicationData): AsyncResult<ApplicationActionData>
+ * @method getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionData>
+ * @method listActions: async ({ user_id?: string; application_id?: number; sort?: Array<OrderBy<ApplicationActionsColumnName>>; page?: number; pageSize?: number; }): AsyncResult<ApplicationActionData[]>
+ */
+
 const applicationActionService = (db: PostgresDb) => {
 	// New actions are created on every transition from one state to the next
 	const addActionRecord = async (
 		application: ApplicationData,
 		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
-	): Promise<Success<ApplicationActionData> | Failure> => {
+	): AsyncResult<ApplicationActionData> => {
 		const { id: application_id, user_id, state: state_before } = application;
 		const newAction: typeof applicationActions.$inferInsert = {
 			application_id,
@@ -104,7 +124,7 @@ const applicationActionService = (db: PostgresDb) => {
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
 		withdraw: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
-		getActionById: async ({ id }: { id: number }): Promise<Success<ApplicationActionData> | Failure> => {
+		getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionData> => {
 			try {
 				const actionRecord = await db.select().from(applicationActions).where(eq(applicationActions.id, id));
 				if (!actionRecord[0]) throw new Error('Action record is undefined');
@@ -129,7 +149,7 @@ const applicationActionService = (db: PostgresDb) => {
 			sort?: Array<OrderBy<ApplicationActionsColumnName>>;
 			page?: number;
 			pageSize?: number;
-		}): Promise<Success<ApplicationActionData[]> | Failure> => {
+		}): AsyncResult<ApplicationActionData[]> => {
 			try {
 				const allActions = await db
 					.select()

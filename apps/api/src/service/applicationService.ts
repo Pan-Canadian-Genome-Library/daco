@@ -37,6 +37,18 @@ import {
 	type OrderBy,
 } from './types.js';
 
+/**
+ * ApplicationService provides methods for Applications DB access
+ * @param db - Drizzle Postgres DB Instance
+ * @method createApplication: async ({ user_id: string }): AsyncResult<ApplicationData>
+ * @method editApplication: async ({ id: number; update: ApplicationContentUpdates; }): AsyncResult<JoinedApplicationRecord>
+ * @method findOneAndUpdate: async ({ id: number; update: ApplicationUpdates; }): AsyncResult<ApplicationData>
+ * @method getApplicationById: async ({ id: number }): AsyncResult<ApplicationData>
+ * @method getApplicationWithContents: async ({ id: number }): AsyncResult<JoinedApplicationRecord>
+ * @method listApplications: async ({ user_id?: string; state?: ApplicationStateValues[]; sort?: Array<OrderBy<ApplicationsColumnName>>; page?: number; pageSize?: number; })
+ * @method applicationStateTotals: async ({ user_id }: { user_id?: string })
+ */
+
 const applicationService = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationData> => {
 		const newApplication: typeof applications.$inferInsert = {
