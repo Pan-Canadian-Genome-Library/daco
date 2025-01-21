@@ -23,7 +23,7 @@
  * @returns True if the value is a valid number and is positive, false otherwise.
  */
 export const isPositiveNumber = (num: number) => {
-	if (Number.isNaN(num) === false && num > 0) {
+	if (Number.isNaN(num) === false && num >= 0) {
 		return true;
 	}
 	return false;

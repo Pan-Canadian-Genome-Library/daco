@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,28 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { asc, desc } from 'drizzle-orm';
+import { Divider, Flex, Typography } from 'antd';
+import { PropsWithChildren } from 'react';
 
-import { applicationActions } from '@/db/schemas/applicationActions.js';
-import { applications } from '@/db/schemas/applications.js';
-import { type ApplicationActionsColumnName, type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
+const { Title, Text } = Typography;
 
-export const applicationsQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
-			)
-		: [asc(applications.created_at)];
+interface SectionTitleProps extends PropsWithChildren {
+	title: string;
+	text?: string[];
+	showDivider?: boolean;
+}
 
-	return orderByArguments;
+const SectionTitle = ({ title, text = [], showDivider = true, children }: SectionTitleProps) => {
+	return (
+		<Flex vertical>
+			<Title level={2}>{title}</Title>
+			<Flex vertical gap={'middle'}>
+				{text.map((text, index) => {
+					return <Text key={index}>{text}</Text>;
+				})}
+			</Flex>
+			{children}
+			{showDivider && <Divider />}
+		</Flex>
+	);
 };
 
-export const applicationActionsQuery = (sort?: Array<OrderBy<ApplicationActionsColumnName>>) => {
-	const orderByArguments = sort
-		? sort.map((sortBy) =>
-				sortBy.direction === 'asc' ? asc(applicationActions[sortBy.column]) : desc(applicationActions[sortBy.column]),
-			)
-		: [asc(applicationActions.created_at)];
-
-	return orderByArguments;
-};
+export default SectionTitle;

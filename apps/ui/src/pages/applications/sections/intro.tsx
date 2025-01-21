@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -22,12 +22,16 @@ import { useTranslation } from 'react-i18next';
 
 import ApplicationWrapper from '@/components/layouts/SectionWrapper';
 import SectionFooter from '@/components/pages/application/SectionFooter';
+import SectionTitle from '@/components/pages/application/SectionTitle';
 import TextList from '@/components/TextList';
+import { ApplicationOutletContext } from '@/global/types';
+import { useOutletContext } from 'react-router';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const Introduction = () => {
 	const { t: translate } = useTranslation();
+	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	const qualifyData = [
 		translate('intro-section.qualifyPoint1'),
@@ -46,22 +50,24 @@ const Introduction = () => {
 	return (
 		<ApplicationWrapper>
 			<>
-				<Flex vertical>
-					<Title level={2}>{translate('intro-section.title')}</Title>
-					<Text>{translate('intro-section.qualifyAccess')}</Text>
-					<TextList data={qualifyData} />
-				</Flex>
-				<Flex vertical>
-					<Text>{translate('intro-section.receiveAccess')}</Text>
-					<TextList data={accessData} isNumbered />
-				</Flex>
-				<Flex vertical>
-					<Text>{translate('intro-section.description1')}</Text>
-				</Flex>
-				<Flex vertical>
-					<Text>{translate('intro-section.description2')}</Text>
-				</Flex>
-				<SectionFooter />
+				<SectionTitle title={translate('intro-section.title')} showDivider={false}>
+					<Flex vertical>
+						<Text>{translate('intro-section.qualifyAccess')}</Text>
+						<TextList data={qualifyData} />
+					</Flex>
+					<Flex vertical>
+						<Text>{translate('intro-section.receiveAccess')}</Text>
+						<TextList data={accessData} isNumbered />
+					</Flex>
+					<Flex vertical>
+						<Text>{translate('intro-section.description1')}</Text>
+					</Flex>
+					<Flex vertical>
+						<Text>{translate('intro-section.description2')}</Text>
+					</Flex>
+				</SectionTitle>
+
+				<SectionFooter currentRoute="intro" isEditMode={isEditMode} />
 			</>
 		</ApplicationWrapper>
 	);

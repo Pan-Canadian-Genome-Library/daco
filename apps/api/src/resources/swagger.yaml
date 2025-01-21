@@ -64,7 +64,7 @@ paths:
           schema:
             type: string
           description: |
-            Retrieve specific application items in a certain State. This may be an array to get multiple application types. The states that may be requested, may be the following enum values: `["DRAFT", "INSTITUTIONAL_REP_REVIEW"," DAC_REVIEW", "DAC_REVISIONS_REQUESTED", "REJECTED", "APPROVED", "CLOSED", "REVOKED"]`.
+            Retrieve specific application items in a certain State. This may be an array to get multiple application types. The states that may be requested, may be the following enum values: `["DRAFT", "INSTITUTIONAL_REP_REVIEW"," DAC_REVIEW", "DAC_REVISIONS_REQUESTED", "INSTITUTIONAL_REP_REVISION_REQUESTED", "REJECTED", "APPROVED", "CLOSED", "REVOKED"]`.
             <br/>
             <br/>
             **For Example:** `["APPROVED", "REJECTED"]` to get both approved and rejected applications.
@@ -206,7 +206,7 @@ paths:
                   REJECTED:
                     type: number
                     nullable: false
-                  REP_REVISION:
+                  INSTITUTIONAL_REP_REVISION_REQUESTED:
                     type: number
                     nullable: false
                   REVOKED:
@@ -294,7 +294,17 @@ components:
         state:
           type: string
           enum:
-            [DRAFT, INSTITUTIONAL_REP_REVIEW, DAC_REVIEW, DAC_REVISIONS_REQUESTED, REJECTED, APPROVED, CLOSED, REVOKED]
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              DAC_REVISIONS_REQUESTED,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
           description: The current state that the application is in.
         createdAt:
           type: string
@@ -319,6 +329,11 @@ components:
           type: object
           description: Information about the applicant who applied in the application.
           properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: When the application contents record was created
+              nullable: false
             firstName:
               type: string
               nullable: true
@@ -351,7 +366,17 @@ components:
         state:
           type: string
           enum:
-            [DRAFT, INSTITUTIONAL_REP_REVIEW, DAC_REVIEW, DAC_REVISIONS_REQUESTED, REJECTED, APPROVED, CLOSED, REVOKED]
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              DAC_REVISIONS_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
           description: The current state that the application is in.
         createdAt:
           type: string
