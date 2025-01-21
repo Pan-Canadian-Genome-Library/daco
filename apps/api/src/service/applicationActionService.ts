@@ -22,14 +22,19 @@ import { and, eq } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationActionsQuery } from '@/service/utils.js';
-import { failure, success } from '@/utils/results.js';
+import { failure, Failure, success, Success } from '@/utils/results.js';
 import {
 	ApplicationActions,
 	ApplicationActionValues,
 	ApplicationStates,
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationData, type ApplicationActionsColumnName, type OrderBy } from './types.js';
+import {
+	type ApplicationActionData,
+	type ApplicationActionsColumnName,
+	type ApplicationData,
+	type OrderBy,
+} from './types.js';
 
 const applicationActionService = (db: PostgresDb) => {
 	// New actions are created on every transition from one state to the next
@@ -37,7 +42,7 @@ const applicationActionService = (db: PostgresDb) => {
 		application: ApplicationData,
 		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
-	) => {
+	): Promise<Success<ApplicationActionData> | Failure> => {
 		const { id: application_id, user_id, state: state_before } = application;
 		const newAction: typeof applicationActions.$inferInsert = {
 			application_id,
@@ -61,28 +66,14 @@ const applicationActionService = (db: PostgresDb) => {
 	};
 
 	return {
-		close: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
 		create: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.CREATE, ApplicationStates.DRAFT),
-		dacApproved: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
-		dacRejected: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
-		dacRevision: async (application: ApplicationData) =>
-			await addActionRecord(
-				application,
-				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
-				ApplicationStates.DAC_REVISIONS_REQUESTED,
-			),
-		dacSubmit: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
+		withdraw: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
+		close: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
 		draftSubmit: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.SUBMIT_DRAFT, ApplicationStates.INSTITUTIONAL_REP_REVIEW),
-		edit: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.EDIT, ApplicationStates.DRAFT),
-		repApproved: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationStates.DAC_REVIEW),
 		repRevision: async (application: ApplicationData) =>
 			await addActionRecord(
 				application,
@@ -95,11 +86,23 @@ const applicationActionService = (db: PostgresDb) => {
 				ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
 				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 			),
+		repApproved: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationStates.DAC_REVIEW),
+		dacApproved: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
+		dacRejected: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
+		dacRevision: async (application: ApplicationData) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
+				ApplicationStates.DAC_REVISIONS_REQUESTED,
+			),
+		dacSubmit: async (application: ApplicationData) =>
+			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
 		revoke: async (application: ApplicationData) =>
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
-		withdraw: async (application: ApplicationData) =>
-			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
-		getActionById: async ({ id }: { id: number }) => {
+		getActionById: async ({ id }: { id: number }): Promise<Success<ApplicationActionData> | Failure> => {
 			try {
 				const actionRecord = await db.select().from(applicationActions).where(eq(applicationActions.id, id));
 				if (!actionRecord[0]) throw new Error('Action record is undefined');
@@ -124,7 +127,7 @@ const applicationActionService = (db: PostgresDb) => {
 			sort?: Array<OrderBy<ApplicationActionsColumnName>>;
 			page?: number;
 			pageSize?: number;
-		}) => {
+		}): Promise<Success<ApplicationActionData[]> | Failure> => {
 			try {
 				const allActions = await db
 					.select()
