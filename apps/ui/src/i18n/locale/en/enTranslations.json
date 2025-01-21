@@ -58,7 +58,9 @@
 		"edit": "Edit",
 		"next": "Next",
 		"history": "History",
-		"closeApp": "Close Application"
+		"closeApp": "Close Application",
+		"back": "Back",
+		"submitApplication": "Submit Application"
 	},
 	"label": {
 		"created": "Created",
@@ -84,7 +86,8 @@
 	},
 	"menu": {
 		"intro": "Introduction",
-		"sectionA": "A. Applicant Information"
+		"institutional": "B. Institutional Representative",
+		"applicant": "A. Applicant Information"
 	},
 	"errors": {
 		"http": {

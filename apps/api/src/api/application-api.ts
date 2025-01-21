@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -21,7 +21,7 @@ import { ApplicationStates, ApproveApplication } from '@pcgl-daco/data-model/src
 
 import { getDbInstance } from '@/db/index.js';
 import { ApplicationListRequest } from '@/routes/types.js';
-import applicationService from '@/service/application-service.js';
+import { applicationService } from '@/service/applicationService.js';
 import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 import { ApplicationStateManager } from './states.js';
@@ -33,9 +33,9 @@ import { ApplicationStateManager } from './states.js';
  */
 export const createApplication = async ({ user_id }: { user_id: string }) => {
 	const database = getDbInstance();
-	const service: ApplicationService = applicationService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await service.createApplication({ user_id });
+	const result = await applicationRepo.createApplication({ user_id });
 
 	return result;
 };
@@ -49,9 +49,9 @@ export const createApplication = async ({ user_id }: { user_id: string }) => {
  */
 export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
-	const service: ApplicationService = applicationService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await service.getApplicationById({ id });
+	const result = await applicationRepo.getApplicationById({ id });
 
 	if (!result.success) {
 		return result;
@@ -66,7 +66,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		state === ApplicationStates.DAC_REVIEW;
 
 	if (isEditState) {
-		const result = await service.editApplication({ id, update });
+		const result = await applicationRepo.editApplication({ id, update });
 		return result;
 	} else {
 		const message = `Cannot update application with state ${state}`;
@@ -86,9 +86,9 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
  */
 export const getAllApplications = async ({ userId, state, sort, page, pageSize }: ApplicationListRequest) => {
 	const database = getDbInstance();
-	const service: ApplicationService = applicationService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await service.listApplications({ user_id: userId, state, sort, page, pageSize });
+	const result = await applicationRepo.listApplications({ user_id: userId, state, sort, page, pageSize });
 
 	return result;
 };
@@ -100,9 +100,9 @@ export const getAllApplications = async ({ userId, state, sort, page, pageSize }
  */
 export const getApplicationById = async ({ applicationId }: { applicationId: number }) => {
 	const database = getDbInstance();
-	const service: ApplicationService = applicationService(database);
+	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await service.getApplicationById({ id: applicationId });
+	const result = await applicationRepo.getApplicationById({ id: applicationId });
 
 	return result;
 };
@@ -157,5 +157,5 @@ export const approveApplication = async ({
 		console.error(message);
 		console.error(error);
 		return failure(message, error);
-	}
+  }
 };

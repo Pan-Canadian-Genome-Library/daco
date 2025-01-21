@@ -19,15 +19,26 @@
 
 import { asc, desc } from 'drizzle-orm';
 
+import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
-import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
+import { type ApplicationActionsColumnName, type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
 
-export const sortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
+export const applicationsQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
 	const orderByArguments = sort
 		? sort.map((sortBy) =>
 				sortBy.direction === 'asc' ? asc(applications[sortBy.column]) : desc(applications[sortBy.column]),
 			)
 		: [asc(applications.created_at)];
+
+	return orderByArguments;
+};
+
+export const applicationActionsQuery = (sort?: Array<OrderBy<ApplicationActionsColumnName>>) => {
+	const orderByArguments = sort
+		? sort.map((sortBy) =>
+				sortBy.direction === 'asc' ? asc(applicationActions[sortBy.column]) : desc(applicationActions[sortBy.column]),
+			)
+		: [asc(applicationActions.created_at)];
 
 	return orderByArguments;
 };

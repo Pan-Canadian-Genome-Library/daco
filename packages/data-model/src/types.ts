@@ -22,7 +22,7 @@
 export const ApplicationStates = {
 	DRAFT: 'DRAFT',
 	INSTITUTIONAL_REP_REVIEW: 'INSTITUTIONAL_REP_REVIEW',
-	REP_REVISION: 'REP_REVISION',
+	INSTITUTIONAL_REP_REVISION_REQUESTED: 'INSTITUTIONAL_REP_REVISION_REQUESTED',
 	DAC_REVIEW: 'DAC_REVIEW',
 	DAC_REVISIONS_REQUESTED: 'DAC_REVISIONS_REQUESTED',
 	REJECTED: 'REJECTED',
@@ -46,18 +46,22 @@ export enum ApplicationReviewOutcomes {
 	'REVISIONS_REQUESTED',
 }
 
-export enum ApplicationActions {
-	'CREATE',
-	'WITHDRAW',
-	'CLOSE',
-	'REQUEST_INSTITUTIONAL_REP',
-	'INSTITUTIONAL_REP_APPROVED',
-	'INSTITUTIONAL_REP_REJECTED',
-	'DAC_REVIEW_APPROVED',
-	'DAC_REVIEW_REJECTED',
-	'DAC_REVIEW_REVISIONS',
-	'REVOKE',
-}
+export const ApplicationActions = {
+	CREATE: 'CREATE',
+	WITHDRAW: 'WITHDRAW',
+	CLOSE: 'CLOSE',
+	SUBMIT_DRAFT: 'SUBMIT_DRAFT',
+	INSTITUTIONAL_REP_REVISION_REQUEST: 'INSTITUTIONAL_REP_REVISION_REQUEST',
+	INSTITUTIONAL_REP_SUBMIT: 'INSTITUTIONAL_REP_SUBMIT',
+	INSTITUTIONAL_REP_APPROVED: 'INSTITUTIONAL_REP_APPROVED',
+	DAC_REVIEW_APPROVED: 'DAC_REVIEW_APPROVED',
+	DAC_REVIEW_SUBMIT: 'DAC_REVIEW_SUBMIT',
+	DAC_REVIEW_REJECTED: 'DAC_REVIEW_REJECTED',
+	DAC_REVIEW_REVISION_REQUEST: 'DAC_REVIEW_REVISION_REQUEST',
+	REVOKE: 'REVOKE',
+} as const;
+
+export type ApplicationActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
 
 export enum ApplicationAgreements {
 	'dac_agreement_software_updates',
@@ -158,7 +162,7 @@ export type ApplicationActionData = {
 	applicationId: number; // TODO: Implement BigInt;
 	createdAt: Date;
 	userId: string;
-	action: ApplicationActions;
+	action: ApplicationActionValues;
 	stateBefore: ApplicationStateValues;
 	stateAfter: ApplicationStateValues;
 	revisionsRequestId: number; // TODO: Implement BigInt

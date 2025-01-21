@@ -18,8 +18,11 @@
  */
 
 import { Alert, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
+
+import useGetApplicationList from '@/api/useGetApplicationList';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { mockUserID } from '@/components/mock/applicationMockData';
@@ -27,10 +30,7 @@ import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatus
 import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
-import { fetch } from '@/global/FetchClient';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { Application, ServerError } from '@/global/types';
-import { useNavigate } from 'react-router';
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -41,13 +41,11 @@ const DashboardPage = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const [modalAppId, setModalAppId] = useState('');
 
-	const [applicationData, setApplicationData] = useState<Array<Application> | undefined>(undefined);
-	const [error, setError] = useState<ServerError | undefined>(undefined);
-
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
 	const navigate = useNavigate();
+	const { data: applicationData, error } = useGetApplicationList(mockUserID);
 
 	const showEditApplicationModal = (id: string) => {
 		setModalAppId(id);
@@ -60,35 +58,6 @@ const DashboardPage = () => {
 		//TODO: No endpoint exists to move this to draft mode in the API just yet, this needs to be done otherwise we redirect to view mode automatically.
 		navigate(`/application/${modalAppId}/edit`);
 	};
-
-	useEffect(() => {
-		async function getApplicationData() {
-			const result = await fetch(`/applications?userId=${mockUserID}`);
-			if (result.ok) {
-				return await result.json();
-			} else {
-				const serverError: ServerError = await result.json();
-
-				setError({
-					message: serverError.message,
-					errors: serverError.errors ?? result.statusText,
-				});
-
-				return [];
-			}
-		}
-		const data = getApplicationData();
-
-		data
-			.then((data: Application[]) => setApplicationData(data))
-			.catch((error: TypeError) => {
-				setError({
-					message: 'Unable to talk to API',
-					errors: `Failed to get applications, please check your internet connection. - ${error.message}`,
-				});
-				setApplicationData([]);
-			});
-	}, []);
 
 	return (
 		<>
@@ -149,7 +118,7 @@ const DashboardPage = () => {
 									<Col xs={24} md={24} lg={12}>
 										<NewApplicationCard />
 									</Col>
-									{applicationData.map((applicationItem) => {
+									{applicationData.applications.map((applicationItem) => {
 										return (
 											<Col key={applicationItem.id} xs={24} md={24} lg={12}>
 												<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />

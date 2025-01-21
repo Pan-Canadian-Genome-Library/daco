@@ -17,20 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CheckCircleOutlined } from '@ant-design/icons';
-import { Flex } from 'antd';
+import { CheckCircleOutlined, LockOutlined } from '@ant-design/icons';
+import { Flex, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
+
+const { Text } = Typography;
 
 type SectionMenuItemProps = {
 	label: string;
+	isEditMode?: boolean;
 };
-
-const SectionMenuItem = ({ label }: SectionMenuItemProps) => {
+/**
+ * TODO: once we are in the DAC/REP revision state in the application, consider the following:
+ * - determine which icon is to be rendered if REP/DAC requests revisions to a particular section (there could be checkmark or exclamation mark)
+ *   - what would the endpoint response look like?
+ */
+const SectionMenuItem = ({ label, isEditMode }: SectionMenuItemProps) => {
+	const { t: translate } = useTranslation();
 	return (
 		<Flex style={{ width: '100%' }} justify="space-between">
-			<>{label}</>
-			<Flex>
-				<CheckCircleOutlined />
-			</Flex>
+			<Text style={{ color: 'inherit' }} ellipsis>
+				{translate(`menu.${label}`)}
+			</Text>
+
+			<Flex>{!isEditMode ? <LockOutlined /> : <CheckCircleOutlined />}</Flex>
 		</Flex>
 	);
 };
