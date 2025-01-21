@@ -132,6 +132,67 @@ paths:
               schema:
                 $ref: '#/components/schemas/Applications'
 
+  /applications/metadata/counts:
+    get:
+      tags:
+        - Applications
+      summary: Gets the total number of applications in each state / status category.
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+      responses:
+        '500':
+          description: 'Error getting the total number of applications in each state / status category'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error the total number of applications in each state / status category - No User ID specified.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'The object containing the metadata information'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  APPROVED:
+                    type: number
+                    nullable: false
+                  CLOSED:
+                    type: number
+                    nullable: false
+                  DAC_REVIEW:
+                    type: number
+                    nullable: false
+                  DAC_REVISIONS_REQUESTED:
+                    type: number
+                    nullable: false
+                  DRAFT:
+                    type: number
+                    nullable: false
+                  INSTITUTIONAL_REP_REVIEW:
+                    type: number
+                    nullable: false
+                  REJECTED:
+                    type: number
+                    nullable: false
+                  REP_REVISION:
+                    type: number
+                    nullable: false
+                  REVOKED:
+                    type: number
+                    nullable: false
+                  TOTAL:
+                    type: number
+                    nullable: false
+
   /applications/create:
     post:
       tags:
@@ -196,7 +257,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationRecord'
-
 components:
   schemas:
     Applications:

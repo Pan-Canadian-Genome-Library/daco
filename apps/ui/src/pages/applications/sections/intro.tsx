@@ -24,11 +24,14 @@ import ApplicationWrapper from '@/components/layouts/SectionWrapper';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import TextList from '@/components/TextList';
+import { ApplicationOutletContext } from '@/global/types';
+import { useOutletContext } from 'react-router';
 
 const { Text } = Typography;
 
 const Introduction = () => {
 	const { t: translate } = useTranslation();
+	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	const qualifyData = [
 		translate('intro-section.qualifyPoint1'),
@@ -64,7 +67,7 @@ const Introduction = () => {
 					</Flex>
 				</SectionTitle>
 
-				<SectionFooter />
+				<SectionFooter currentRoute="intro" isEditMode={isEditMode} />
 			</>
 		</ApplicationWrapper>
 	);

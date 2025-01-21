@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -22,7 +22,12 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { createApplication, editApplication, getApplicationById } from '@/api/applicationApi.js';
+import {
+	createApplication,
+	editApplication,
+	getApplicationById,
+	getApplicationStateTotals,
+} from '@/api/applicationApi.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationService } from '@/service/types.js';
@@ -157,6 +162,26 @@ describe('Application API', () => {
 			const error_message = String(result.errors);
 
 			assert.strictEqual(error_message, 'Error: Application record is undefined');
+		});
+	});
+
+	describe('Get Application Metadata', () => {
+		it('should get the counts for each of the application states', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+
+			const result = await getApplicationStateTotals({ userId: user_id });
+
+			const totalDraftApplications = applicationRecordsResult.data.filter((apps) => apps.state === 'DRAFT').length;
+
+			assert.ok(result.success);
+			assert.ok(result.data);
+
+			assert.equal(result.data.DRAFT, totalDraftApplications);
+			assert.equal(result.data.TOTAL, applicationRecordsResult.data.length);
 		});
 	});
 
