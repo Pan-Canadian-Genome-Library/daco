@@ -27,7 +27,7 @@ import {
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
-} from '@/api/applicationApi.js';
+} from '@/api/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationService } from '@/service/types.js';

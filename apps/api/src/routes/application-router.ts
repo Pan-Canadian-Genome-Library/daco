@@ -26,7 +26,7 @@ import {
 	getAllApplications,
 	getApplicationById,
 	getApplicationStateTotals,
-} from '@/api/applicationApi.js';
+} from '@/api/applicationController.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
