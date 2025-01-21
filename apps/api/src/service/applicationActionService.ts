@@ -39,21 +39,21 @@ import {
 /**
  * ApplicationActionService provides methods for ApplicationActions DB access
  * @param db - Drizzle Postgres DB Instance
- * @method addActionRecord: async ( application: ApplicationData, action: ApplicationActionValues, state_after: ApplicationStateValues ): AsyncResult<ApplicationActionData>
- * @method create: create: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method close: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method draftSubmit: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method dacApproved: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method dacRejected: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method dacRevision: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method dacSubmit: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method edit: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method repRevision: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method repApproved: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method revoke: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method withdraw: async (application: ApplicationData): AsyncResult<ApplicationActionData>
- * @method getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionData>
- * @method listActions: async ({ user_id?: string; application_id?: number; sort?: Array<OrderBy<ApplicationActionsColumnName>>; page?: number; pageSize?: number; }): AsyncResult<ApplicationActionData[]>
+ * @method addActionRecord: Template method for adding an Action record @returns AsyncResult<ApplicationActionData>
+ * @method create: Add Create action  @returns AsyncResult<ApplicationActionData>
+ * @method close: Add Close action @returns AsyncResult<ApplicationActionData>
+ * @method draftSubmit: Add Submit action from Draft @returns AsyncResult<ApplicationActionData>
+ * @method dacApproved: Add Approve action from DacReview @returns AsyncResult<ApplicationActionData>
+ * @method dacRejected: Add Rejected action from DacReview @returns AsyncResult<ApplicationActionData>
+ * @method dacRevision: Add Revision action from DacReview @returns AsyncResult<ApplicationActionData>
+ * @method dacSubmit: Add Submit action from DacReview @returns AsyncResult<ApplicationActionData>
+ * @method edit: Add Edit action @returns AsyncResult<ApplicationActionData>
+ * @method repRevision: Add Revision action from INSTITUTIONAL_REP_REVIEW @returns AsyncResult<ApplicationActionData>
+ * @method repApproved: Add Approved from INSTITUTIONAL_REP_REVIEW @returns AsyncResult<ApplicationActionData>
+ * @method revoke: Add Revoked action @returns AsyncResult<ApplicationActionData>
+ * @method withdraw: Add Revoked action @returns AsyncResult<ApplicationActionData>
+ * @method getActionById: Find a specific Action record @returns AsyncResult<ApplicationActionData>
+ * @method listActions: Find multiple Actions related to a given User or Application @returns AsyncResult<ApplicationActionData[]>
  */
 
 const applicationActionService = (db: PostgresDb) => {
