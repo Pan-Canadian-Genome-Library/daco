@@ -30,6 +30,7 @@ export interface Application {
 }
 interface ApplicationWithApplicantInformation extends Application {
 	applicantInfo: {
+		createdAt: Date;
 		firstName: string;
 		lastName: string;
 		email: string;
