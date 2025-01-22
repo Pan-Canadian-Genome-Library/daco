@@ -87,7 +87,8 @@
 	"menu": {
 		"intro": "Introduction",
 		"institutional": "B. Institutional Representative",
-		"applicant": "A. Applicant Information"
+		"applicant": "A. Applicant Information",
+		"collaborators": "C. Collaborators"
 	},
 	"errors": {
 		"http": {
