@@ -20,7 +20,7 @@
 import { getDbInstance } from '@/db/index.js';
 import { applicationActionService } from '@/service/applicationActionService.js';
 import { applicationService } from '@/service/applicationService.js';
-import { type ApplicationData } from '@/service/types.js';
+import { type AddActionMethods, type ApplicationData } from '@/service/types.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
 import { type AsyncResult, failure, success } from '../utils/results.js';
@@ -59,8 +59,6 @@ type ApplicationTransitions = ITransition<
 	ApplicationTransitionCallback
 >;
 
-type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionService>, 'listActions'>;
-
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
 	private _application: ApplicationData;
@@ -89,13 +87,13 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		const applicationRepo = applicationService(db);
 		const applicationActionRepo = applicationActionService(db);
 
-		// TODO: Pass tx as argument, make reusable function using state_after from action svc
+		// TODO: Refactor transactions
 		return await db.transaction(async (tx) => {
 			const actionResult = await applicationActionRepo[method](this._application);
 			if (!actionResult.success) return actionResult;
 
 			const { state_after } = actionResult.data;
-			// TODO: Resolve Drizzle pgEnum type issues
+			// TODO: Drizzle pgEnum will not accept ApplicationStates as an argument
 			const state = state_after as ApplicationStateValues;
 			const { id } = this._application;
 			const update = { state };

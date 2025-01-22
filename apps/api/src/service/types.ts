@@ -42,6 +42,7 @@ export type ApplicationContentData = typeof applications.$inferSelect;
 
 export type ApplicationService = ReturnType<typeof applicationService>;
 export type ApplicationActionService = ReturnType<typeof applicationActionService>;
+export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionService>, 'listActions'>;
 
 export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';
