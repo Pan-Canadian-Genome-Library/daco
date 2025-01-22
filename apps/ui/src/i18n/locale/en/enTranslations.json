@@ -94,6 +94,14 @@
 			"404": {
 				"title": "The requested resource could not be found.",
 				"message": "Sorry, looks like the resource you're trying to access does not exist"
+			},
+			"400": {
+				"title": "That was a bad request.",
+				"message": "Sorry, looks your browser sent a bad request, please reload the page and try again."
+			},
+			"500": {
+				"title": "Something went wrong.",
+				"message": "Sorry, something went wrong while processing your request, please try again later."
 			}
 		},
 		"applicationNotFound": {

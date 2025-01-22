@@ -28,7 +28,7 @@ export interface Application {
 	approvedAt: Date;
 	expiresAt: Date;
 }
-interface ApplicationWithApplicantInformation extends Application {
+export interface ApplicationWithApplicantInformation extends Application {
 	applicantInfo: {
 		createdAt: Date;
 		firstName: string;
@@ -37,6 +37,18 @@ interface ApplicationWithApplicantInformation extends Application {
 		country: string;
 		institution: string;
 	};
+}
+
+export interface ApplicationCountMetadata {
+	DRAFT: number;
+	INSTITUTIONAL_REP_REVIEW: number;
+	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
+	DAC_REVIEW: number;
+	DAC_REVISIONS_REQUESTED: number;
+	REJECTED: number;
+	APPROVED: number;
+	CLOSED: number;
+	REVOKED: number;
 }
 
 export interface PagingMetadata {

@@ -31,7 +31,6 @@ const useGetApplicationCounts = (id?: string | number) => {
 
 		queryFn: async () => {
 			const response = await fetch(`/applications/metadata/counts?userId=${id}`);
-			console.log("here", response)
 
 			if (!response.ok) {
 				const error = {

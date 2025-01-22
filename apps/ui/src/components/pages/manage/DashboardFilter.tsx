@@ -92,12 +92,15 @@ const DashboardFilter = ({ onFilterChange, filters, availableStates }: Dashboard
 		if (nextSelectedFilters.length === displayedFilters.length - 1) {
 			nextSelectedFilters = ['TOTAL'];
 		}
+
 		setFilterStates(nextSelectedFilters);
 		onFilterChange(nextSelectedFilters);
 	};
 
 	useEffect(() => {
-		setFilterStates([...filters]);
+		if (filters && filters.length) {
+			setFilterStates([...filters]);
+		}
 	}, [filters]);
 
 	return (
