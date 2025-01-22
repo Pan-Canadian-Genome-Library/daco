@@ -58,7 +58,7 @@ const HomePage = () => {
 						<Flex vertical>
 							<Title style={{ color: token.colorTextSecondary }}> {translate('homepage.title')}</Title>
 							<Paragraph style={{ color: token.colorTextSecondary }}>{translate('homepage.introduction')}</Paragraph>
-							<Col span={6}>
+							<Col span={6} style={{ padding: 0 }}>
 								<Button type="link" color="primary" variant="solid" onClick={() => setOpenModal(true)}>
 									{translate('button.getStarted')}
 								</Button>
