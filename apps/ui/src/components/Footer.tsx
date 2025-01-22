@@ -17,13 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ConfigProvider, Flex, Grid, Image, Layout, Typography, theme } from 'antd';
+import { Col, ConfigProvider, Flex, Grid, Image, Layout, Row, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
-import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -36,7 +35,6 @@ interface LinkType {
 
 const FooterComponent = () => {
 	const { t: translate } = useTranslation();
-	const minWidth = useMinWidth();
 	const { token } = useToken();
 	const breakpoints = useBreakpoint();
 
@@ -74,81 +72,125 @@ const FooterComponent = () => {
 	];
 
 	const linkStyle: React.CSSProperties = {
-		textAlign: 'center',
+		textAlign: breakpoints.md ? 'center' : 'left',
 		textWrap: 'nowrap',
 	};
 
 	const complianceTextStyle: React.CSSProperties = {
-		textAlign: minWidth <= token.screenXL ? 'start' : 'center',
+		textAlign: breakpoints.lg ? 'center' : 'start',
 		alignSelf: 'center',
+		width: '100%',
 	};
 
 	const footerStyle: React.CSSProperties = {
 		display: 'flex',
-		flexDirection: minWidth <= token.screenXL ? 'column' : 'row',
+		flexDirection: breakpoints.lg ? 'row' : 'column',
 		justifyItems: 'center',
 		alignItems: 'center',
-		padding: minWidth <= token.screenLG ? `2rem 1.75rem` : token.Layout?.footerPadding,
-		gap: minWidth <= token.screenXL ? token.paddingXL : '0rem',
+		padding: breakpoints.lg ? token.Layout?.footerPadding : `2rem 1.75rem`,
+		gap: breakpoints.lg ? '0rem' : token.paddingXL,
 	};
 
 	const logoStyles: React.CSSProperties = {
 		margin: (() => {
 			if (breakpoints.md) return '1rem auto 0 0';
 			if (breakpoints.xl) return '0 -8rem 0 0';
-			return '1rem 0 0 0';
+			return '1rem auto';
 		})(),
 	};
 
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
-				<Link target="_blank" style={logoStyles}>
-					<Image
-						width={200}
-						src={PCGLFOOTER}
-						preview={false}
-						alt="Pan-Canadian Genome Library / Librairie Pancanadienne de Génomique"
-					/>
-				</Link>
-				<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={token.paddingMD}>
-					<Flex
-						gap={token.paddingMD}
-						style={{ width: '100%' }}
-						vertical={minWidth <= token.screenXL ? false : true}
-						justify={minWidth <= token.screenXL ? 'space-between' : 'center'}
-						align={minWidth <= token.screenXL ? 'flex-start' : 'center'}
-					>
-						<Flex
-							gap={token.paddingMD}
-							justify="center"
-							align={minWidth <= token.screenXL ? 'start' : 'center'}
-							vertical={minWidth <= token.screenXL ? true : false}
-						>
-							{pcglLinks.map((itemLink) => (
-								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
-									{itemLink.name}
-								</Link>
-							))}
+				{breakpoints.lg ? (
+					<>
+						<Link target="_blank" style={logoStyles}>
+							<Image
+								width={200}
+								src={PCGLFOOTER}
+								preview={false}
+								alt="Pan-Canadian Genome Library / Librairie Pancanadienne de Génomique"
+							/>
+						</Link>
+						<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={token.paddingMD}>
+							<Flex
+								gap={token.paddingMD}
+								style={{ width: '100%' }}
+								vertical={breakpoints.lg ? true : false}
+								justify={breakpoints.lg ? 'center' : 'space-between'}
+								align={breakpoints.lg ? 'center' : 'flex-start'}
+							>
+								<Flex
+									gap={token.paddingMD}
+									justify="center"
+									align={breakpoints.lg ? 'center' : 'start'}
+									vertical={breakpoints.lg ? false : true}
+								>
+									{pcglLinks.map((itemLink) => (
+										<Link key={itemLink.name} style={linkStyle} underline target="_blank">
+											{itemLink.name}
+										</Link>
+									))}
+								</Flex>
+								<Text style={complianceTextStyle}>
+									&copy; {new Date().getFullYear()} PCGL Data Access Compliance Office. All rights reserved. UI v1.0 -
+									API v1.0
+								</Text>
+								<Flex
+									gap={token.paddingMD}
+									justify="center"
+									align={breakpoints.lg ? 'center' : 'start'}
+									vertical={breakpoints.lg ? false : true}
+								>
+									{policiesConditionsLinks.map((itemLink) => (
+										<Link key={itemLink.name} style={linkStyle} underline target="_blank">
+											{itemLink.name}
+										</Link>
+									))}
+								</Flex>
+							</Flex>
 						</Flex>
+					</>
+				) : (
+					<>
 						<Flex
+							style={{ ...contentWrapperStyles, width: '100%' }}
+							flex={1}
 							gap={token.paddingMD}
-							justify="center"
-							align={minWidth <= token.screenXL ? 'start' : 'center'}
-							vertical={minWidth <= token.screenXL ? true : false}
+							justify={breakpoints.md ? 'space-between' : 'center'}
+							vertical={breakpoints.md ? false : true}
 						>
-							{policiesConditionsLinks.map((itemLink) => (
-								<Link key={itemLink.name} style={linkStyle} underline target="_blank">
-									{itemLink.name}
-								</Link>
-							))}
+							<Link target="_blank" style={logoStyles}>
+								<Image
+									width={200}
+									src={PCGLFOOTER}
+									preview={false}
+									alt="Pan-Canadian Genome Library / Librairie Pancanadienne de Génomique"
+								/>
+							</Link>
+							<Row align={'middle'} justify={'center'} gutter={[0, token.padding]} wrap>
+								{pcglLinks.concat(policiesConditionsLinks).map((itemLink) => (
+									<Col md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
+										<Flex justify={breakpoints.md ? 'flex-start' : 'center'}>
+											<Link
+												key={itemLink.name}
+												style={{ ...linkStyle, width: breakpoints.md ? 'auto' : 100 }}
+												underline
+												target="_blank"
+											>
+												{itemLink.name}
+											</Link>
+										</Flex>
+									</Col>
+								))}
+							</Row>
 						</Flex>
-					</Flex>
-					<Text style={complianceTextStyle}>
-						&copy; {new Date().getFullYear()} PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API
-						v1.0
-					</Text>
-				</Flex>
+						<Text style={complianceTextStyle}>
+							&copy; {new Date().getFullYear()} PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API
+							v1.0
+						</Text>
+					</>
+				)}
 			</Footer>
 		</ConfigProvider>
 	);
