@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ConfigProvider, Flex, Image, Layout, Typography, theme } from 'antd';
+import { ConfigProvider, Flex, Grid, Image, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
@@ -28,7 +28,7 @@ import { useMinWidth } from '@/global/hooks/useMinWidth';
 const { Footer } = Layout;
 const { Text, Link } = Typography;
 const { useToken } = theme;
-
+const { useBreakpoint } = Grid;
 interface LinkType {
 	name: string;
 	href?: string;
@@ -38,6 +38,7 @@ const FooterComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
+	const breakpoints = useBreakpoint();
 
 	const pcglLinks: LinkType[] = [
 		{
@@ -91,10 +92,18 @@ const FooterComponent = () => {
 		gap: minWidth <= token.screenXL ? token.paddingXL : '0rem',
 	};
 
+	const logoStyles: React.CSSProperties = {
+		margin: (() => {
+			if (breakpoints.md) return '1rem auto 0 0';
+			if (breakpoints.xl) return '0 -8rem 0 0';
+			return '1rem 0 0 0';
+		})(),
+	};
+
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
-				<Link target="_blank" style={{ margin: minWidth <= token.screenXL ? '1rem auto 0 0' : '0 -8rem 0 0' }}>
+				<Link target="_blank" style={logoStyles}>
 					<Image
 						width={200}
 						src={PCGLFOOTER}
