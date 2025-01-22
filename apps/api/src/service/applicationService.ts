@@ -326,9 +326,7 @@ const applicationService = (db: PostgresDb) => ({
 				.from(applications)
 				.limit(1);
 
-			if (rawApplicationData && rawApplicationData.length) {
-				return success(rawApplicationData[0]);
-			} else {
+			if (!rawApplicationData[0] && rawApplicationData.length) {
 				return success({
 					APPROVED: 0,
 					CLOSED: 0,
@@ -342,6 +340,8 @@ const applicationService = (db: PostgresDb) => ({
 					TOTAL: 0,
 				});
 			}
+			const applicationTotals = rawApplicationData[0] as ApplicationStateTotals;
+			return success(applicationTotals);
 		} catch (exception) {
 			const message = `Error at applicationStateTotals with user_id: ${user_id}.`;
 			logger.error(message);
