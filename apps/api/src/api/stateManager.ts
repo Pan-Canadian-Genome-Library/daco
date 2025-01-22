@@ -109,10 +109,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Handler Methods
 	// Submit
+	// TODO: Add Validation + Edit Content service methods
 	async submitDraft() {
 		const transitionResult = this._canPerformAction(submit, ApplicationStates.DRAFT);
 		if (transitionResult.success) {
-			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
 				return await this._dispatchAndUpdateAction(submit, 'draftSubmit');
@@ -147,10 +147,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Edit
+	// TODO: Add Validation + Edit Content service methods
 	async editDraft() {
 		const transitionResult = this._canPerformAction(edit, ApplicationStates.DRAFT);
 		if (transitionResult.success) {
-			// TODO: Add Validation
 			const validationResult = await validateContent(this._application);
 			return validationResult;
 		} else {
@@ -181,6 +181,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Revise
+	// TODO: Add Validation + Edit Content service methods
 	async reviseRepReview() {
 		const transitionResult = this._canPerformAction(revision_request, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		if (transitionResult.success) {
