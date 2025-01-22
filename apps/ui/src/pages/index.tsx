@@ -17,15 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useState } from 'react';
-
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
+import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { Trans, useTranslation } from 'react-i18next';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -54,16 +53,12 @@ const HomePage = () => {
 	return (
 		<Content>
 			<Row className="hero-background-image" align="middle">
-				<Row align="middle" style={{ ...heroStyle, width: isResponsiveMode ? '90%' : '95%' }}>
-					<Col
-						span={24}
-						lg={12}
-						style={{ padding: !isResponsiveMode ? `0 ${token.padding}px` : `0 ${token.paddingXXS}px` }}
-					>
+				<Row align="middle" style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} gutter={[90, 60]}>
+					<Col span={24} lg={12}>
 						<Flex vertical>
 							<Title style={{ color: token.colorTextSecondary }}> {translate('homepage.title')}</Title>
 							<Paragraph style={{ color: token.colorTextSecondary }}>{translate('homepage.introduction')}</Paragraph>
-							<Col span={6}>
+							<Col span={6} style={{ padding: 0 }}>
 								<Button type="link" color="primary" variant="solid" onClick={() => setOpenModal(true)}>
 									{translate('button.getStarted')}
 								</Button>
@@ -72,7 +67,7 @@ const HomePage = () => {
 					</Col>
 				</Row>
 			</Row>
-			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} align={'top'} gutter={token.paddingXL}>
+			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} align={'top'} gutter={[90, 60]}>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'middle'}>
 						<Title level={2}>{translate('homepage.overviewTitle')}</Title>

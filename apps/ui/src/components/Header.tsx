@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -19,9 +19,10 @@
 
 import React, { useState } from 'react';
 
-import { CloseOutlined, MenuOutlined } from '@ant-design/icons';
+import { CloseOutlined, LogoutOutlined, MenuOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
@@ -79,6 +80,12 @@ const HeaderComponent = () => {
 		// TODO: Handle the transition over to the the login page
 	};
 
+	// Temporary logic
+	// Once we have the authorization setup, we can remove isHome and location
+	// This is purely temp UI logic
+	const location = useLocation();
+	const isHome = location.pathname === '/';
+
 	const menuItems: (MenuLink | MenuButton)[] = [
 		{
 			name: translate('links.policies'),
@@ -96,14 +103,20 @@ const HeaderComponent = () => {
 			position: 'left',
 		},
 		{
-			name: translate('links.apply'),
+			name: isHome ? translate('links.apply') : translate('links.applications'),
 			href: '#',
 			position: 'right',
 		},
 		{
-			name: translate('button.login'),
+			name: translate(`button.${isHome ? 'login' : 'logout'}`),
 			onClickAction: onLoginClick,
-			buttonProps: { color: 'primary', variant: 'solid' },
+			buttonProps: {
+				type: `${isHome ? 'default' : 'text'}`,
+				color: `${isHome ? 'primary' : 'default'}`,
+				variant: `${isHome ? 'solid' : 'text'}`,
+				icon: !isHome ? <LogoutOutlined /> : null,
+				iconPosition: 'end',
+			},
 			position: 'right',
 		},
 	];
