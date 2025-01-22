@@ -41,6 +41,19 @@ export type ApplicationActionData = typeof applicationActions.$inferSelect;
 export type ApplicationContentData = typeof applications.$inferSelect;
 
 export type ApplicationService = ReturnType<typeof applicationService>;
+export type ApplicationStateTotals = {
+	APPROVED: number;
+	CLOSED: number;
+	DAC_REVIEW: number;
+	DAC_REVISIONS_REQUESTED: number;
+	DRAFT: number;
+	INSTITUTIONAL_REP_REVIEW: number;
+	REJECTED: number;
+	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
+	REVOKED: number;
+	TOTAL: number;
+};
+
 export type ApplicationActionService = ReturnType<typeof applicationActionService>;
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionService>, 'listActions'>;
 

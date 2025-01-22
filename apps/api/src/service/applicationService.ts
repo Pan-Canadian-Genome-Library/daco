@@ -28,11 +28,12 @@ import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { applicationActionService } from './applicationActionService.js';
 import {
-	ApplicationContentInsert,
 	JoinedApplicationRecord,
+	type ApplicationContentInsert,
 	type ApplicationContentUpdates,
 	type ApplicationData,
 	type ApplicationsColumnName,
+	type ApplicationStateTotals,
 	type ApplicationUpdates,
 	type OrderBy,
 } from './types.js';
@@ -304,8 +305,7 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-	// TODO: Explicit Types
-	applicationStateTotals: async ({ user_id }: { user_id?: string }) => {
+	applicationStateTotals: async ({ user_id }: { user_id?: string }): AsyncResult<ApplicationStateTotals> => {
 		try {
 			const rawApplicationData = await db
 				.select({
