@@ -128,6 +128,7 @@ export const pcglFooterTheme: ThemeConfig = {
 			footerBg: pcglColors.secondary,
 		},
 		Typography: {
+			fontSize: 12,
 			colorText: pcglColors.white,
 			colorLink: pcglColors.quaternary,
 			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
