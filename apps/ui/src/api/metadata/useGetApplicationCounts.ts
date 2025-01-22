@@ -21,39 +21,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
-import { ApplicationList, ServerError } from '@/global/types';
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { ApplicationCountMetadata, ServerError } from '@/global/types';
 
-interface ApplicationListSortingOptions {
-	direction: 'desc' | 'asc';
-	column: 'id' | 'user_id' | 'state' | 'created_at' | 'approved_at' | 'expires_at';
-}
-interface ApplicationListParams {
-	userId: string;
-	state?: ApplicationStateValues[];
-	sort?: ApplicationListSortingOptions[];
-	page?: number;
-	pageSize?: number;
-}
-
-const useGetApplicationList = ({ userId, state, sort, page, pageSize }: ApplicationListParams) => {
+const useGetApplicationCounts = (id?: string | number) => {
 	const { t: translate } = useTranslation();
-	const queryParams = new URLSearchParams({ userId: userId });
 
-	if (state) {
-		queryParams.set('state', state.toString());
-	} else if (sort) {
-		queryParams.set('sort', sort.toString());
-	} else if (page) {
-		queryParams.set('page', page.toString());
-	} else if (pageSize) {
-		queryParams.set('pageSize', pageSize.toString());
-	}
+	return useQuery<ApplicationCountMetadata, ServerError>({
+		queryKey: [id],
 
-	return useQuery<ApplicationList, ServerError>({
-		queryKey: [userId, state, sort, page, pageSize],
 		queryFn: async () => {
-			const response = await fetch(`/applications?${queryParams.toString()}`);
+			const response = await fetch(`/applications/metadata/counts?userId=${id}`);
+			console.log("here", response)
 
 			if (!response.ok) {
 				const error = {
@@ -62,9 +40,17 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 				};
 
 				switch (response.status) {
+					case 400:
+						error.message = translate('errors.http.400.title');
+						error.errors = translate('errors.http.400.message');
+						break;
 					case 404:
 						error.message = translate('errors.http.404.title');
 						error.errors = translate('errors.http.404.message');
+						break;
+					default:
+						error.message = translate('errors.http.500.title');
+						error.errors = translate('errors.http.500.message');
 						break;
 				}
 
@@ -76,4 +62,4 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 	});
 };
 
-export default useGetApplicationList;
+export default useGetApplicationCounts;
