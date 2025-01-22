@@ -78,7 +78,7 @@ const FooterComponent = () => {
 		textWrap: 'nowrap',
 	};
 
-	const complicanceTextStyle: React.CSSProperties = {
+	const complianceTextStyle: React.CSSProperties = {
 		textAlign: minWidth <= token.screenXL ? 'start' : 'center',
 		alignSelf: 'center',
 	};
@@ -144,7 +144,7 @@ const FooterComponent = () => {
 							))}
 						</Flex>
 					</Flex>
-					<Text style={complicanceTextStyle}>
+					<Text style={complianceTextStyle}>
 						&copy; {new Date().getFullYear()} PCGL Data Access Compliance Office. All rights reserved. UI v1.0 - API
 						v1.0
 					</Text>
