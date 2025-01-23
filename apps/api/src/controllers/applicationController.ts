@@ -124,26 +124,26 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
  * @param {ApproveApplication} param0
  * @param {ApproveApplication} param0.applicationId
  * @returns {Promise<{
-* 	success: boolean;
-* 	message?: string;
-* 	errors?: string | Error;
-* 	data?: any;
-* }>}
-*/
-export const approveApplication = async ({ applicationId }: ApproveApplication): AsyncResult<ApplicationData[]> => {
-   try {
-	   // Fetch application
-	   const database = getDbInstance();
-	   const service: ApplicationService = applicationService(database);
-	   const result = await service.getApplicationById({ id: applicationId });
+ * 	success: boolean;
+ * 	message?: string;
+ * 	errors?: string | Error;
+ * 	data?: any;
+ * }>}
+ */
+export const approveApplication = async ({ applicationId }: ApproveApplication): AsyncResult<ApplicationData> => {
+	try {
+		// Fetch application
+		const database = getDbInstance();
+		const service: ApplicationService = applicationService(database);
+		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
 		}
 
-	   const application = result.data;
+		const application = result.data;
 
-	   const appStateManager = new ApplicationStateManager(application);
+		const appStateManager = new ApplicationStateManager(application);
 
 		if (appStateManager.state === ApplicationStates.APPROVED) {
 			return failure('Application is already approved.', 'ApprovalConflict');
@@ -155,15 +155,14 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 			return failure(approvalResult.message || 'Failed to approve application.', 'StateTransitionError');
 		}
 
-	   const update = { state: appStateManager.state, approved_at: new Date() };
-	   const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		const update = { state: appStateManager.state, approved_at: new Date() };
+		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
 
-	   return updatedResult;
-   } catch (error) {
-	   const message = `Unable to approve application with id: ${applicationId}`;
-	   console.error(message);
-	   console.error(error);
-	   return failure(message, error);
-   }
+		return updatedResult;
+	} catch (error) {
+		const message = `Unable to approve application with id: ${applicationId}`;
+		console.error(message);
+		console.error(error);
+		return failure(message, error);
+	}
 };
-
