@@ -23,7 +23,7 @@ import { getDbInstance } from '@/db/index.js';
 import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationService } from '@/service/applicationService.js';
 import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
-import { failure } from '@/utils/results.js';
+import { failure, success } from '@/utils/results.js';
 
 /**
  * Creates a new application and returns the created data.
@@ -102,6 +102,29 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 	const applicationRepo: ApplicationService = applicationService(database);
 
 	const result = await applicationRepo.getApplicationById({ id: applicationId });
+
+	if (result.success) {
+		const {
+			id,
+			user_id: userId,
+			state,
+			created_at: createdAt,
+			approved_at: approvedAt,
+			updated_at: updatedAt,
+			expires_at: expiresAt,
+			contents,
+		} = result.data;
+		return success({
+			id,
+			userId,
+			state,
+			createdAt,
+			approvedAt,
+			updatedAt,
+			expiresAt,
+			contents,
+		});
+	}
 
 	return result;
 };
