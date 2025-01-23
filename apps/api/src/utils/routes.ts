@@ -17,6 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { type ApplicationResponseData } from '@/routes/types.js';
+import { type ApplicationData } from '@/service/types.js';
+
 /**
  * Helper function to determine if value is a valid number and is positive.
  * @param num Any integer value
@@ -27,4 +30,33 @@ export const isPositiveNumber = (num: number) => {
 		return true;
 	}
 	return false;
+};
+
+/**
+ * Helper function to convert Postgres snake_case to FE camelCase
+ * @param data Database Application Record
+ * @returns ApplicationResponseData - Application record with updated keys
+ */
+export const aliasApplicationData = (data: ApplicationData): ApplicationResponseData => {
+	const {
+		id,
+		user_id: userId,
+		state,
+		created_at: createdAt,
+		approved_at: approvedAt,
+		updated_at: updatedAt,
+		expires_at: expiresAt,
+		contents,
+	} = data;
+
+	return {
+		id,
+		userId,
+		state,
+		createdAt,
+		approvedAt,
+		updatedAt,
+		expiresAt,
+		contents,
+	};
 };

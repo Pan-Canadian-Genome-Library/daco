@@ -27,3 +27,14 @@ export type ApplicationListRequest = {
 	page?: number;
 	pageSize?: number;
 };
+
+export type ApplicationResponseData = {
+	id: number;
+	userId: string;
+	state: ApplicationStateValues;
+	createdAt: Date;
+	approvedAt: Date | null;
+	updatedAt: Date | null;
+	expiresAt: Date | null;
+	contents: number | null;
+};

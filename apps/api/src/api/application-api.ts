@@ -24,6 +24,7 @@ import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationService } from '@/service/applicationService.js';
 import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { failure, success } from '@/utils/results.js';
+import { aliasApplicationData } from '@/utils/routes.js';
 
 /**
  * Creates a new application and returns the created data.
@@ -104,26 +105,8 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 	const result = await applicationRepo.getApplicationById({ id: applicationId });
 
 	if (result.success) {
-		const {
-			id,
-			user_id: userId,
-			state,
-			created_at: createdAt,
-			approved_at: approvedAt,
-			updated_at: updatedAt,
-			expires_at: expiresAt,
-			contents,
-		} = result.data;
-		return success({
-			id,
-			userId,
-			state,
-			createdAt,
-			approvedAt,
-			updatedAt,
-			expiresAt,
-			contents,
-		});
+		const responseData = aliasApplicationData(result.data);
+		return success(responseData);
 	}
 
 	return result;

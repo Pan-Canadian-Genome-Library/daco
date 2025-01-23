@@ -153,7 +153,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Applications'
+                $ref: '#/components/responses/ApplicationResponse'
 
   /applications/metadata/counts:
     get:
@@ -551,6 +551,53 @@ components:
           $ref: '#/components/schemas/ApplicationContents'
 
   responses:
+    ApplicationResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        userId:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              DAC_REVISIONS_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
+          description: The current state that the application is in.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the application was created
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+        content:
+          type: number
+          description: The ID of the record containing the content of the application.
+
     ClientErrors:
       type: object
       required:
