@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationStates, ApproveApplication } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
 import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationService } from '@/service/applicationService.js';
-import { type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
-import { failure } from '@/utils/results.js';
+import { ApplicationData, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
+import { AsyncResult, failure } from '@/utils/results.js';
+import { ApplicationStateManager } from './states.js';
 
 /**
  * Creates a new application and returns the created data.
@@ -116,3 +117,53 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
 
 	return await service.applicationStateTotals({ user_id: userId });
 };
+/**
+ * Approves the application by providing the applicationId
+ *
+ * @async
+ * @param {ApproveApplication} param0
+ * @param {ApproveApplication} param0.applicationId
+ * @returns {Promise<{
+* 	success: boolean;
+* 	message?: string;
+* 	errors?: string | Error;
+* 	data?: any;
+* }>}
+*/
+export const approveApplication = async ({ applicationId }: ApproveApplication): AsyncResult<ApplicationData[]> => {
+   try {
+	   // Fetch application
+	   const database = getDbInstance();
+	   const service: ApplicationService = applicationService(database);
+	   const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+	   const application = result.data;
+
+	   const appStateManager = new ApplicationStateManager(application);
+
+		if (appStateManager.state === ApplicationStates.APPROVED) {
+			return failure('Application is already approved.', 'ApprovalConflict');
+		}
+
+		const approvalResult = await appStateManager.approveDacReview();
+
+		if (!approvalResult.success) {
+			return failure(approvalResult.message || 'Failed to approve application.', 'StateTransitionError');
+		}
+
+	   const update = { state: appStateManager.state, approved_at: new Date() };
+	   const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+	   return updatedResult;
+   } catch (error) {
+	   const message = `Unable to approve application with id: ${applicationId}`;
+	   console.error(message);
+	   console.error(error);
+	   return failure(message, error);
+   }
+};
+
