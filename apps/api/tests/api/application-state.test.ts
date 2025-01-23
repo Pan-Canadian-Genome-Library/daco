@@ -21,7 +21,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { ApplicationStateManager, createApplicationStateManager } from '@/api/stateManager.js';
+import { ApplicationStateManager, createApplicationStateManager } from '@/controllers/stateManager.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
