@@ -24,13 +24,14 @@ export interface Application {
 	id: string;
 	userId: string;
 	state: ApplicationStateValues;
-	createdAt: Date;
-	approvedAt: Date;
-	expiresAt: Date;
+	createdAt: string;
+	approvedAt: string;
+	updatedAt: string;
+	expiresAt: string;
 }
 export interface ApplicationWithApplicantInformation extends Application {
-	applicantInfo: {
-		createdAt: Date;
+	applicantInformation: {
+		createdAt: string;
 		firstName: string;
 		lastName: string;
 		email: string;
