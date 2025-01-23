@@ -17,13 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { mockTableData } from '@/components/mock/applicationMockData';
+import useGetApplicationCounts from '@/api/metadata/useGetApplicationCounts';
+import useGetApplicationList from '@/api/useGetApplicationList';
+import { mockUserID } from '@/components/mock/applicationMockData';
+import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
-import ManagementDashboard, { FilterState, TableData } from '@/components/pages/manage/ManagementDashboard';
+import ManagementDashboard, { FilterState, TableParams } from '@/components/pages/manage/ManagementDashboard';
+import { ApplicationCountMetadata, ApplicationWithApplicantInformation } from '@/global/types';
+import { isValidPageNumber } from '@/global/utils';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
+import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
-import { Flex, Layout } from 'antd';
+import { Flex, Layout, TablePaginationConfig } from 'antd';
+import { SorterResult } from 'antd/es/table/interface';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
@@ -37,44 +44,163 @@ const POSSIBLE_FILTERS = ['TOTAL', ...Object.values(ApplicationStates)] as Filte
  * @param data The data displayed within the table.
  * @returns A FilterState object, containing the unique key of the filter and how many applications are filed under it/
  */
-const calculateFilterAmounts = (data: TableData[]) => {
+const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata) => {
 	const availableStates: FilterState[] = [];
 
-	for (const appState of Object.keys(ApplicationStates) as FilterKeyType[]) {
+	for (const appState of Object.keys(countMetadata)) {
 		availableStates.push({
-			key: appState,
-			amount: data.filter((data) => data.state === appState).length,
+			key: appState as ApplicationStateValues,
+			amount: countMetadata[appState as keyof ApplicationCountMetadata],
 		});
 	}
-
-	availableStates.push({ key: 'TOTAL', amount: data.length });
 	return availableStates;
 };
 
-const ManageApplicationsPage = () => {
-	const { t: translate } = useTranslation();
+const parsePageNumber = (pageNumber: number | string | null | undefined) => {
+	if (pageNumber) {
+		const parsedPage = typeof pageNumber === 'string' ? parseInt(pageNumber) : pageNumber;
+		if (isValidPageNumber(parsedPage)) {
+			return parsedPage;
+		}
+		return 0;
+	} else {
+		return 0;
+	}
+};
 
-	const [tableData, setTableData] = useState<Array<TableData>>(mockTableData);
+const ManageApplicationsPage = () => {
 	const [filters, setFilters] = useState<Array<FilterKeyType>>([]);
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [page, setPage] = useState<number>(parsePageNumber(searchParams.get('page')));
+	const [tableParams, setTableParams] = useState<TableParams>({
+		pagination: {
+			current: 1,
+			pageSize: 20,
+			total: undefined,
+		},
+	});
+
+	const { t: translate } = useTranslation();
+
+	const {
+		data: tableData,
+		error: tableError,
+		isLoading: isTableLoading,
+		refetch: tableDataRefetch,
+	} = useGetApplicationList({
+		userId: mockUserID,
+		state: filters.find((filter) => filter === 'TOTAL')
+			? undefined
+			: [...filters.map((filter) => filter as ApplicationStateValues)],
+		page: page,
+	});
+
+	const handleFilterChange = useCallback(
+		async (filtersActive: Array<FilterKeyType>, setParamsAndFetch: boolean) => {
+			setFilters(filtersActive);
+
+			if (setParamsAndFetch) {
+				setSearchParams((prev) => {
+					prev.set('filters', filtersActive.flat().toString());
+					return prev;
+				});
+
+				await tableDataRefetch({ cancelRefetch: true });
+			}
+		},
+		[setSearchParams, tableDataRefetch],
+	);
+
+	const handleTableChange = async ({
+		pagination,
+	}: {
+		pagination: TablePaginationConfig;
+		sorter: SorterResult<ApplicationWithApplicantInformation>[] | SorterResult<ApplicationWithApplicantInformation>;
+	}) => {
+		const page = parsePageNumber(pagination.current);
+
+		if (page > 0) {
+			setPage(page - 1);
+		} else {
+			setPage(page);
+		}
+
+		await tableDataRefetch();
+	};
 
 	useEffect(() => {
+		let currentPage = tableData?.pagingMetadata.page;
+		const currentFilters = searchParams.get('filters');
+
+		setPage(parsePageNumber(currentPage));
+
+		console.log(currentPage);
+
+		if (currentPage) {
+			currentPage = currentPage + 1;
+		} else {
+			currentPage = 1;
+		}
+
+		if (currentFilters) {
+			const filters = currentFilters.split(',') as FilterKeyType[];
+			setPage(page);
+			handleFilterChange(filters, false);
+		}
+
+		setTableParams({
+			pagination: {
+				current: currentPage,
+				pageSize: tableData?.pagingMetadata.pageSize,
+				total: tableData?.pagingMetadata.totalRecords,
+			},
+		});
+	}, [handleFilterChange, page, searchParams, tableData]);
+
+	/**
+	 * This sets the initial state for the page on load.
+	 *
+	 * We need to check what filters currently exist in the URL, and apply them into the current filters object
+	 */
+	useEffect(() => {
 		const urlSetFilters = searchParams.get('filters');
-		const filterParam = new URLSearchParams();
-		if (!urlSetFilters) {
-			filterParam.set('filters', 'TOTAL');
-			setSearchParams(filterParam);
+		const urlSetPage = searchParams.get('page');
+		const allUrlParams = new URLSearchParams();
+
+		if (!urlSetFilters || !urlSetPage || !isValidPageNumber(Number.parseInt(urlSetPage))) {
+			allUrlParams.set('filters', 'TOTAL');
+			allUrlParams.set('page', '0');
+			setSearchParams(allUrlParams);
 		} else {
 			const filtersProvided = urlSetFilters.split(',');
 			for (const providedFilters of filtersProvided) {
 				if (!POSSIBLE_FILTERS.find((possibleFilters) => possibleFilters === providedFilters)) {
-					filterParam.set('filters', 'TOTAL');
-					setSearchParams(filterParam);
+					allUrlParams.set('filters', 'TOTAL');
+					allUrlParams.set('page', '0');
+					setSearchParams(allUrlParams);
 					return;
 				}
 			}
 		}
-	}, [searchParams, setSearchParams]);
+	}, [filters, searchParams, setSearchParams]);
+
+	// useEffect(() => {
+	// 	const currentFilters = searchParams.get('filters');
+	// 	const currentPage = searchParams.get('page');
+	// 	const page = parsePageNumber(currentPage);
+
+	// 	if (currentFilters) {
+	// 		const filters = currentFilters.split(',') as FilterKeyType[];
+	// 		setPage(page);
+	// 		handleFilterChange(filters, false);
+	// 	}
+	// }, [handleFilterChange, searchParams]);
+
+	const {
+		data: filterMetadata,
+		error: filterMetaDataError,
+		isLoading: areFiltersLoading,
+	} = useGetApplicationCounts(mockUserID);
 
 	/**
 	 * Given that we don't need to constantly recalculate how many applications are at a current state
@@ -83,52 +209,25 @@ const ManageApplicationsPage = () => {
 	 * Right now this array has zero dependencies but once it's
 	 * connected up to the API, we should add that value as a dependant
 	 */
-	const filterAmounts = useMemo(() => calculateFilterAmounts(mockTableData), []);
-
-	const handleFilterChange = useCallback(
-		(filtersActive: Array<FilterKeyType>, shouldSetParams: boolean) => {
-			setFilters(filtersActive);
-			if (shouldSetParams) {
-				const filterParam = new URLSearchParams();
-				filterParam.set('filters', filtersActive.flat().toString());
-				setSearchParams(filterParam);
-			}
-			//In this case, we've likely selected the "Total" filter, just display what we've got from the initial call to the server.
-			if (filtersActive.length === 1 && filtersActive.includes('TOTAL')) {
-				setTableData(mockTableData);
-			} else {
-				const filteredData = [];
-				//Otherwise we want to filter down to whatever applications match our currently filtered state.
-				for (const filterKey of filtersActive) {
-					const filtered = mockTableData.filter((data) => data.state === filterKey);
-					if (filtered.length) {
-						filteredData.push(...filtered);
-					}
-				}
-				setTableData(filteredData);
-			}
-		},
-		[setSearchParams],
-	);
-
-	useEffect(() => {
-		const currentFilters = searchParams.get('filters');
-		if (currentFilters) {
-			const filters = currentFilters.split(',') as FilterKeyType[];
-			handleFilterChange(filters, false);
-		}
-	}, [handleFilterChange, searchParams]);
+	const filterAmounts = useMemo(() => (filterMetadata ? calculateFilterAmounts(filterMetadata) : []), [filterMetadata]);
 
 	return (
 		<Content>
 			<Flex vertical>
 				<PageHeader title={translate('manage.applications.title')} />
-				<ManagementDashboard
-					filterCounts={filterAmounts}
-					data={tableData}
-					filters={filters}
-					onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled, true)}
-				/>
+				{filterMetaDataError || areFiltersLoading ? (
+					<ErrorPage loading={areFiltersLoading} error={filterMetaDataError || tableError} />
+				) : (
+					<ManagementDashboard
+						filterCounts={filterAmounts}
+						loading={isTableLoading}
+						data={tableData && tableData.applications ? tableData.applications : []}
+						filters={filters}
+						pagination={tableParams.pagination}
+						onTableChange={handleTableChange}
+						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled, true)}
+					/>
+				)}
 			</Flex>
 		</Content>
 	);

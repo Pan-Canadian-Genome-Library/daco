@@ -22,88 +22,115 @@ import DashboardFilter, { FilterKeyType } from '@/components/pages/manage/Dashbo
 import StatusTableColumn from '@/components/pages/manage/StatusTableColumn';
 import { pcglTableTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { ApplicationWithApplicantInformation } from '@/global/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
-import { ConfigProvider, Flex, Table, theme, Typography } from 'antd';
+import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
+import { FilterValue, SorterResult } from 'antd/es/table/interface';
 
 import { useTranslation } from 'react-i18next';
 
 const { Text, Link } = Typography;
 const { useToken } = theme;
 
-export interface TableData {
-	id: number;
-	institution: string;
-	institution_country: string;
-	applicant_full_name: string;
-	updated_at: number;
-	applicant_institutional_email: string;
-	state: string;
-}
-
 export interface FilterState {
 	key: FilterKeyType;
 	amount: number;
 }
 
+export interface TableParams {
+	pagination?: TablePaginationConfig;
+}
+
 interface ManagementDashboardProps {
 	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
+	onTableChange: ({
+		pagination,
+		filters,
+		sorter,
+	}: {
+		pagination: TablePaginationConfig;
+		filters: Record<string, FilterValue | null>;
+		sorter: SorterResult<ApplicationWithApplicantInformation>[] | SorterResult<ApplicationWithApplicantInformation>;
+	}) => void;
 	filterCounts: FilterState[];
 	filters: FilterKeyType[];
-	data: TableData[];
+	data: ApplicationWithApplicantInformation[];
+	loading: boolean;
+	pagination: TablePaginationConfig;
 }
 
 const tableColumnConfiguration = [
 	{
 		title: 'Application #',
 		dataIndex: 'id',
-		key: 'id',
-		render: (value: string) => (
+		render: (value: number) => (
 			<Link href={`/application/${value}`} style={{ textDecoration: 'underline' }}>
 				PCGL-{value}
 			</Link>
 		),
-		sorter: (a: { id: number }, b: { id: number }) => a.id - b.id,
+		// sortDirections: ['ascend', 'descend']
+		sorter: true,
+		// sorter: (a: ApplicationWithApplicantInformation, b: ApplicationWithApplicantInformation) =>
+		// 	parseInt(a.id) - parseInt(b.id),
 	},
 	{
 		title: 'Institution',
-		dataIndex: 'institution',
+		dataIndex: ['applicantInformation', 'institution'],
 		key: 'institution',
+		render: (value: string, record: ApplicationWithApplicantInformation) =>
+			record.applicantInformation.institution ? record.applicantInformation.institution : '-',
 	},
 	{
 		title: 'Country',
-		dataIndex: 'institution_country',
-		key: 'institution_country',
+		dataIndex: ['applicantInformation', 'country'],
+		render: (value: string, record: ApplicationWithApplicantInformation) =>
+			record.applicantInformation.country ? record.applicantInformation.country : '-',
 	},
 	{
 		title: 'Applicant',
-		dataIndex: 'applicant_full_name',
-		key: 'applicant_full_name',
+		dataIndex: ['applicantInformation', 'firstName'],
+		render: (value: string, record: ApplicationWithApplicantInformation) =>
+			record.applicantInformation.firstName && record.applicantInformation.lastName
+				? `${record.applicantInformation.firstName} ${record.applicantInformation.lastName}`
+				: '-',
+		key: 'applicant-info-' + new Date().getTime(),
 	},
 	{
 		title: 'Email',
-		dataIndex: 'applicant_institutional_email',
-		key: 'applicant_institutional_email',
+		dataIndex: ['applicantInformation', 'email'],
+		render: (value: string, record: ApplicationWithApplicantInformation) =>
+			record.applicantInformation.email ? record.applicantInformation.email : '-',
 	},
 	{
 		title: 'Updated',
-		dataIndex: 'updated_at',
-		key: 'updated_at',
-		render: (value: number) => new Date(value).toLocaleDateString('en-CA'),
-		sorter: (a: { updated_at: number }, b: { updated_at: number }) => {
-			return new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
-		},
+		dataIndex: 'updatedAt',
+		key: 'updatedAt',
+		render: (value?: string) => (value ? new Date(value).toLocaleDateString('en-CA') : '-'),
+		sorter: true,
+		// sorter: (a: ApplicationWithApplicantInformation, b: ApplicationWithApplicantInformation) => {
+		// 	return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+		// },
 	},
 	{
 		title: 'Status',
 		dataIndex: 'state',
 		key: 'state',
 		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
-		sorter: (a: { state: string }, b: { state: string }) => (a.state < b.state ? -1 : a.state > b.state ? 1 : 0),
+		sorter: true,
+		// sorter: (a: { state: string }, b: { state: string }) => (a.state < b.state ? -1 : a.state > b.state ? 1 : 0),
 	},
 ];
 
-const ManagementDashboard = ({ onFilterChange, filterCounts, filters, data }: ManagementDashboardProps) => {
+const ManagementDashboard = ({
+	onFilterChange,
+	onTableChange,
+	filterCounts,
+	filters,
+	pagination,
+	data,
+	loading,
+}: ManagementDashboardProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -130,10 +157,14 @@ const ManagementDashboard = ({ onFilterChange, filterCounts, filters, data }: Ma
 			<Flex style={{ width: '100%', height: '100%' }}>
 				<ConfigProvider theme={pcglTableTheme}>
 					<Table
-						rowKey={(record: TableData) => `PCGL-${record.id}-${record.institution}`}
-						pagination={{ pageSize: 10 }}
+						rowKey={(record) => {
+							return `${record.id}-${record.createdAt}`;
+						}}
 						dataSource={data}
+						loading={loading}
 						columns={tableColumnConfiguration}
+						pagination={pagination}
+						onChange={(pagination, filters, sorter) => onTableChange({ pagination, filters, sorter })}
 						style={{ width: '100%', height: '100%' }}
 					/>
 				</ConfigProvider>
