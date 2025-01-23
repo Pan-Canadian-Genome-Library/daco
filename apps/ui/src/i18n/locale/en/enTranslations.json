@@ -59,10 +59,12 @@
 		"cancel": "Cancel",
 		"edit": "Edit",
 		"next": "Next",
+		"delete": "Delete",
 		"history": "History",
 		"closeApp": "Close Application",
 		"back": "Back",
-		"submitApplication": "Submit Application"
+		"submitApplication": "Submit Application",
+		"addCollab": "Add Collaborator"
 	},
 	"label": {
 		"created": "Created",

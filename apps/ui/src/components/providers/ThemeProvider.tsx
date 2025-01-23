@@ -66,6 +66,13 @@ const pcglTheme: ThemeConfig = {
 		colorIcon: pcglColors.primary,
 	},
 	components: {
+		Table: {
+			colorBgContainer: '#fff',
+			headerBg: '#fafafa',
+			headerSortActiveBg: '#f0f0f0',
+			headerSortHoverBg: '#f0f0f0',
+			rowHoverBg: 'rgba(0, 0, 0, 0.02)',
+		},
 		Button: {
 			fontWeight: 700,
 			defaultColor: pcglColors.black,
