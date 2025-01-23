@@ -118,7 +118,7 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
 	return await service.applicationStateTotals({ user_id: userId });
 };
 /**
- * Description placeholder
+ * Approves the application by providing the applicationId
  *
  * @async
  * @param {ApproveApplication} param0
@@ -137,21 +137,23 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 	   const service: ApplicationService = applicationService(database);
 	   const result = await service.getApplicationById({ id: applicationId });
 
-	   if (!result.success) return result;
+		if (!result.success) {
+			return result;
+		}
 
 	   const application = result.data;
 
 	   const appStateManager = new ApplicationStateManager(application);
 
-	   if (appStateManager.state === ApplicationStates.APPROVED)
-		   return failure('Application is already approved.', 'ApprovalConflict');
+		if (appStateManager.state === ApplicationStates.APPROVED) {
+			return failure('Application is already approved.', 'ApprovalConflict');
+		}
 
-	   const approvalResult = await appStateManager.approveDacReview();
+		const approvalResult = await appStateManager.approveDacReview();
 
-	   console.log(approvalResult);
-
-	   if (!approvalResult.success)
-		   return failure(approvalResult.message || 'Failed to approve application.', 'StateTransitionError');
+		if (!approvalResult.success) {
+			return failure(approvalResult.message || 'Failed to approve application.', 'StateTransitionError');
+		}
 
 	   const update = { state: appStateManager.state, approved_at: new Date() };
 	   const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
