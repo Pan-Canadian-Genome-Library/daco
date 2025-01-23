@@ -69,9 +69,11 @@ describe('Application API', () => {
 			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
-			const { id } = applicationRecordsResult.data[0];
+			const { id } = applicationRecordsResult.data.applications[0];
 
 			const update = { applicant_first_name: 'Test' };
 
@@ -90,9 +92,11 @@ describe('Application API', () => {
 			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
-			const { id, state } = applicationRecordsResult.data[0];
+			const { id, state } = applicationRecordsResult.data.applications[0];
 
 			assert.strictEqual(state, ApplicationStates.DRAFT);
 
@@ -118,8 +122,10 @@ describe('Application API', () => {
 			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 			assert.ok(applicationRecordsResult.success);
 
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
-			const { id } = applicationRecordsResult.data[0];
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
 
 			const stateUpdate = { state: ApplicationStates.CLOSED };
 			await testApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
@@ -149,9 +155,11 @@ describe('Application API', () => {
 
 			assert.ok(applicationRecordsResult.success);
 
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
-			const last_id = applicationRecordsResult.data[applicationRecordsResult.data.length - 1];
+			const last_id = applicationRecordsResult.data.applications[applicationRecordsResult.data.applications.length - 1];
 
 			assert.ok(last_id?.id);
 
@@ -171,17 +179,21 @@ describe('Application API', () => {
 
 			assert.ok(applicationRecordsResult.success);
 
-			assert.ok(Array.isArray(applicationRecordsResult.data) && applicationRecordsResult.data[0]);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
 			const result = await getApplicationStateTotals({ userId: user_id });
 
-			const totalDraftApplications = applicationRecordsResult.data.filter((apps) => apps.state === 'DRAFT').length;
+			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
+				(apps) => apps.state === 'DRAFT',
+			).length;
 
 			assert.ok(result.success);
 			assert.ok(result.data);
 
 			assert.equal(result.data.DRAFT, totalDraftApplications);
-			assert.equal(result.data.TOTAL, applicationRecordsResult.data.length);
+			assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
 		});
 	});
 

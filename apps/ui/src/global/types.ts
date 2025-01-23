@@ -28,6 +28,27 @@ export interface Application {
 	approvedAt: Date;
 	expiresAt: Date;
 }
+interface ApplicationWithApplicantInformation extends Application {
+	applicantInfo: {
+		createdAt: Date;
+		firstName: string;
+		lastName: string;
+		email: string;
+		country: string;
+		institution: string;
+	};
+}
+
+export interface PagingMetadata {
+	totalRecords: number;
+	page: number;
+	pageSize: number;
+}
+
+export interface ApplicationList {
+	applications: ApplicationWithApplicantInformation[];
+	pagingMetadata: PagingMetadata;
+}
 
 export interface ServerError {
 	message: string;
