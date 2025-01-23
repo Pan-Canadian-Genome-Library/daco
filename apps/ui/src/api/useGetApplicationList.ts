@@ -41,9 +41,9 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 	const queryParams = new URLSearchParams({ userId: userId });
 
 	if (state) {
-		queryParams.set('state', state.toString());
+		queryParams.set('state', JSON.stringify(state));
 	} else if (sort) {
-		queryParams.set('sort', sort.toString());
+		queryParams.set('sort', JSON.stringify(sort));
 	} else if (page) {
 		queryParams.set('page', page.toString());
 	} else if (pageSize) {
