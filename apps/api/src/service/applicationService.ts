@@ -29,9 +29,9 @@ import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model
 import { applicationActionService } from './applicationActionService.js';
 import {
 	type ApplicationContentUpdates,
-	type ApplicationData,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
+	type JoinedApplicationRecord,
 	type OrderBy,
 } from './types.js';
 
@@ -141,9 +141,17 @@ const applicationService = (db: PostgresDb) => ({
 		}
 	},
 
-	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationData> => {
+	getApplicationById: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
 		try {
-			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+			const applicationRecord = await db
+				.select({
+					...applications,
+					contents: applicationContents,
+				})
+				.from(applications)
+				.where(eq(applications.id, id))
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			return success(applicationRecord[0]);

@@ -29,6 +29,10 @@ export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
 export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
 
+export interface JoinedApplicationRecord extends Omit<ApplicationData, 'contents'> {
+	contents: ApplicationContentUpdates | null;
+}
+
 export type ApplicationData = typeof applications.$inferSelect;
 export type ApplicationActionData = typeof applicationActions.$inferSelect;
 
