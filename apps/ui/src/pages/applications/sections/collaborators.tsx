@@ -18,13 +18,9 @@
  */
 
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Col, Flex, Form, Row, Space, Table, TableProps, theme } from 'antd';
-import { useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Button, Col, Flex, Row, Space, Table, TableProps, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
-import * as z from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -34,14 +30,6 @@ import { ApplicationOutletContext } from '@/global/types';
 
 const { useToken } = theme;
 
-type FieldType = {
-	test: string;
-};
-
-const schema = z.object({});
-
-// const rule = createSchemaFieldRule(schema);
-
 interface CollabTableData {
 	id: number;
 	firstName: string;
@@ -49,21 +37,10 @@ interface CollabTableData {
 	institutionalEmail: string;
 	title: string;
 }
-
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
-	// Temporary state logic
-	const [data] = useState<CollabTableData[]>([
-		{
-			id: 1,
-			firstName: 'John',
-			lastName: 'Doe',
-			institutionalEmail: 'thy.john.doe@oicr.ca',
-			title: 'PI',
-		},
-	]);
 
 	const columns: TableProps<CollabTableData>['columns'] = [
 		{
@@ -102,17 +79,9 @@ const Collaborators = () => {
 		},
 	];
 
-	const { handleSubmit } = useForm<FieldType>({
-		resolver: zodResolver(schema),
-	});
-
-	const onSubmit: SubmitHandler<FieldType> = (data) => {
-		console.log(data);
-	};
-
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<>
 				<SectionTitle
 					title={translate('collab-section.title')}
 					text={[translate('collab-section.description1'), translate('collab-section.note')]}
@@ -122,7 +91,15 @@ const Collaborators = () => {
 					<Table<CollabTableData>
 						rowKey={(record: CollabTableData) => `PCGL-${record.id}`}
 						columns={columns}
-						dataSource={data}
+						dataSource={[
+							{
+								id: 1,
+								firstName: 'John',
+								lastName: 'Doe',
+								institutionalEmail: 'thy.john.doe@oicr.ca',
+								title: 'PI',
+							},
+						]}
 						pagination={false}
 					/>
 					<Row justify={'end'}>
@@ -137,7 +114,7 @@ const Collaborators = () => {
 					</Row>
 				</SectionContent>
 				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />
-			</Form>
+			</>
 		</SectionWrapper>
 	);
 };
