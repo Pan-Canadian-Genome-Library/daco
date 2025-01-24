@@ -642,8 +642,107 @@ components:
           nullable: true
           description: When the application expires. Can be NULL.
         content:
-          type: number
-          description: The ID of the record containing the content of the application.
+          type: object
+          description: The Application Contents returned to the UI
+          $ref: '#/components/responses/ApplicationContentsResponse'
+
+    ApplicationContentsResponse:
+      type: object
+      description: Complete Application details
+      properties:
+        applicantFirstName:
+          type: string
+          description: Applicant's first name
+        applicantMiddleName:
+          type: string
+          description: Applicant's middle name
+        applicantLastName:
+          type: string
+          description: Applicant's last name
+        applicantTitle:
+          type: string
+          description: Applicant's formal title
+        applicantSuffix:
+          type: string
+          description: Applicant's formal suffix
+        applicantPositionTitle:
+          type: string
+          description: Applicant's professional title
+        applicantPrimaryAffiliation:
+          type: string
+          description: Applicant's institution
+        applicantInstitutionalEmail:
+          type: string
+          description: Applicant's email
+        applicantProfileUrl:
+          type: string
+          description: Applicant's profile URL
+        # Institutional Rep
+        institutionalRepTitle:
+          type: string
+          description: Institutional representative's professional title
+        institutionalRepFirstName:
+          type: string
+          description: Institutional representative's first name
+        institutionalRepMiddleName:
+          type: string
+          description: Institutional representative's middle name
+        institutionalRepLastName:
+          type: string
+          description: Institutional representative's last name
+        institutionalRepSuffix:
+          type: string
+          description: Institutional representative's formal suffix
+        institutionalRepPrimaryAffiliation:
+          type: string
+          description: Institutional representative's affiliation
+        institutionalRepEmail:
+          type: string
+          description: Institutional representative's email
+        institutionalRepProfileUrl:
+          type: string
+          description: Institutional representative's profile URL
+        institutionalRepPositionTitle:
+          type: string
+          description: Institutional representative's professional title
+        # Institution
+        institutionCountry:
+          type: string
+          description: Address of Institution - Country
+        institutionState:
+          type: string
+          description: Address of Institution - State
+        institutionCity:
+          type: string
+          description: Address of Institution - City
+        institutionStreetAddress:
+          type: string
+          description: Address of Institution - street name and number
+        institutionPostalCode:
+          type: string
+          description: Address of Institution - postal code
+        institutionBuilding:
+          type: string
+          description: Address of Institution - specific building name if required
+        # Project
+        projectTitle:
+          type: string
+          description: Name of project
+        projectWebsite:
+          type: string
+          description: URL of project website
+        projectAbstract:
+          type: string
+          description: Brief description of project
+        projectMethodology:
+          type: string
+          description: Description of scientific approach used in the project
+        projectSummary:
+          type: string
+          description: In depth text summary of project
+        projectPublicationUrls:
+          type: array
+          description: URLs of publications related to the project
 
     ClientErrors:
       type: object
