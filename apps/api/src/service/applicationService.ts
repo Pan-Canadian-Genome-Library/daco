@@ -159,17 +159,19 @@ const applicationService = (db: PostgresDb) => ({
 	getApplicationWithContents: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
 		try {
 			const applicationRecord = await db
-				.select({
-					...applications,
-					contents: applicationContents,
-				})
+				.select()
 				.from(applications)
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
-			return success(applicationRecord[0]);
+			const application = {
+				...applicationRecord[0].applications,
+				contents: applicationRecord[0].application_contents,
+			};
+
+			return success(application);
 		} catch (err) {
 			const message = `Error at getApplicationById with id: ${id}`;
 			console.error(message);

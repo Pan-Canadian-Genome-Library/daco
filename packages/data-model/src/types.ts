@@ -98,19 +98,6 @@ export const ApplicationMessages = {
 
 // Data Types
 
-export type PersonalInfo = {
-	userId?: string | null;
-	title?: string | null;
-	firstName?: string | null;
-	middleName?: string | null;
-	lastName?: string | null;
-	suffix?: string | null;
-	primaryAffiliation?: string | null;
-	institutionalEmail?: string | null;
-	researcherProfileURL?: string | null;
-	positionTitle?: string | null;
-};
-
 export interface Applicant {
 	applicantFirstName?: string | null;
 	applicantLastName?: string | null;
