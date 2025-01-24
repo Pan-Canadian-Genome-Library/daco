@@ -17,13 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pgGenerate } from 'drizzle-dbml-generator'; // Using Postgres for this example
-
 import * as schema from '@/db/schemas/index.js';
+import logger from '@/logger.js';
+import { pgGenerate } from 'drizzle-dbml-generator'; // Using Postgres for this example
 
 const out = './src/db/schema.dbml';
 const relational = true;
 
 pgGenerate({ schema, out, relational });
 
-console.log(`Schema DBML Generated at ${out}`);
+logger.info(`Schema DBML Generated at ${out}`);
