@@ -21,9 +21,9 @@ import { getDbInstance } from '@/db/index.js';
 import { applicationActionService } from '@/service/applicationActionService.js';
 import { applicationService } from '@/service/applicationService.js';
 import { type AddActionMethods, type ApplicationData } from '@/service/types.js';
+import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
-import { type AsyncResult, failure, success } from '../utils/results.js';
 import { validateContent } from './validation.js';
 
 const {
