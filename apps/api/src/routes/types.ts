@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationsColumnName, OrderBy } from '@/service/types.js';
+import { ApplicationContentUpdates, ApplicationsColumnName, OrderBy } from '@/service/types.js';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
 export type ApplicationListRequest = {
@@ -36,5 +36,45 @@ export type ApplicationResponseData = {
 	approvedAt: Date | null;
 	updatedAt: Date | null;
 	expiresAt: Date | null;
-	contents: number | null;
+	contents: ApplicationContentResponse | null;
+};
+
+export type ApplicationContentResponse = {
+	applicationId: ApplicationContentUpdates['application_id'];
+	createdAt: ApplicationContentUpdates['created_at'];
+	updatedAt: ApplicationContentUpdates['updated_at'];
+	applicantFirstName: ApplicationContentUpdates['applicant_first_name'];
+	applicantLastName: ApplicationContentUpdates['applicant_last_name'];
+	applicantMiddleName: ApplicationContentUpdates['applicant_middle_name'];
+	applicantTitle: ApplicationContentUpdates['applicant_title'];
+	applicantSuffix: ApplicationContentUpdates['applicant_suffix'];
+	applicantPositionTitle: ApplicationContentUpdates['applicant_position_title'];
+	applicantPrimaryAffiliation: ApplicationContentUpdates['applicant_primary_affiliation'];
+	applicantInstitutionalEmail: ApplicationContentUpdates['applicant_institutional_email'];
+	applicantProfileUrl: ApplicationContentUpdates['applicant_profile_url'];
+	institutionalRepTitle: ApplicationContentUpdates['institutional_rep_title'];
+	institutionalRepFirstName: ApplicationContentUpdates['institutional_rep_first_name'];
+	institutionalRepMiddleName: ApplicationContentUpdates['institutional_rep_middle_name'];
+	institutionalRepLastName: ApplicationContentUpdates['institutional_rep_last_name'];
+	institutionalRepSuffix: ApplicationContentUpdates['institutional_rep_suffix'];
+	institutionalRepPrimaryAffiliation: ApplicationContentUpdates['institutional_rep_primary_affiliation'];
+	institutionalRepEmail: ApplicationContentUpdates['institutional_rep_email'];
+	institutionalRepProfileUrl: ApplicationContentUpdates['institutional_rep_profile_url'];
+	institutionalRepPositionTitle: ApplicationContentUpdates['institutional_rep_position_title'];
+	institutionCountry: ApplicationContentUpdates['institution_country'];
+	institutionState: ApplicationContentUpdates['institution_state'];
+	institutionCity: ApplicationContentUpdates['institution_city'];
+	institutionStreetAddress: ApplicationContentUpdates['institution_street_address'];
+	institutionPostalCode: ApplicationContentUpdates['institution_postal_code'];
+	institutionBuilding: ApplicationContentUpdates['institution_building'];
+	projectTitle: ApplicationContentUpdates['project_title'];
+	projectWebsite: ApplicationContentUpdates['project_website'];
+	projectAbstract: ApplicationContentUpdates['project_abstract'];
+	projectMethodology: ApplicationContentUpdates['project_methodology'];
+	projectSummary: ApplicationContentUpdates['project_summary'];
+	projectPublicationUrls: ApplicationContentUpdates['project_publication_urls'];
+	requestedStudies: ApplicationContentUpdates['requested_studies'];
+	ethicsReviewRequired: ApplicationContentUpdates['ethics_review_required'];
+	ethicsLetter: ApplicationContentUpdates['ethics_letter'];
+	signedPdf: ApplicationContentUpdates['signed_pdf'];
 };

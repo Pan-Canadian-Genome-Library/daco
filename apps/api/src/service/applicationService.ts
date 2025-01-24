@@ -141,7 +141,22 @@ const applicationService = (db: PostgresDb) => ({
 		}
 	},
 
-	getApplicationById: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
+	getApplicationById: async ({ id }: { id: number }) => {
+		try {
+			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
+
+			return success(applicationRecord[0]);
+		} catch (err) {
+			const message = `Error at getApplicationById with id: ${id}`;
+			console.error(message);
+			console.error(err);
+			return failure(message, err);
+		}
+	},
+
+	getApplicationWithContents: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
 		try {
 			const applicationRecord = await db
 				.select({
@@ -155,30 +170,6 @@ const applicationService = (db: PostgresDb) => ({
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			return success(applicationRecord[0]);
-		} catch (err) {
-			const message = `Error at getApplicationById with id: ${id}`;
-			console.error(message);
-			console.error(err);
-			return failure(message, err);
-		}
-	},
-
-	getApplicationWithContents: async ({ id }: { id: number }) => {
-		try {
-			const applicationRecord = await db
-				.select()
-				.from(applications)
-				.where(eq(applications.id, id))
-				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
-
-			if (!applicationRecord[0]) throw new Error('Application record not found');
-
-			const application = {
-				...applicationRecord[0].applications,
-				contents: applicationRecord[0].application_contents,
-			};
-
-			return success(application);
 		} catch (err) {
 			const message = `Error at getApplicationById with id: ${id}`;
 			console.error(message);

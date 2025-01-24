@@ -18,7 +18,7 @@
  */
 
 import { type ApplicationResponseData } from '@/routes/types.js';
-import { type ApplicationData } from '@/service/types.js';
+import { type JoinedApplicationRecord } from '@/service/types.js';
 
 /**
  * Helper function to determine if value is a valid number and is positive.
@@ -37,7 +37,7 @@ export const isPositiveNumber = (num: number) => {
  * @param data Database Application Record
  * @returns ApplicationResponseData - Application record with updated keys
  */
-export const aliasApplicationData = (data: ApplicationData): ApplicationResponseData => {
+export const aliasApplicationData = (data: JoinedApplicationRecord): ApplicationResponseData => {
 	const {
 		id,
 		user_id: userId,
@@ -46,8 +46,50 @@ export const aliasApplicationData = (data: ApplicationData): ApplicationResponse
 		approved_at: approvedAt,
 		updated_at: updatedAt,
 		expires_at: expiresAt,
-		contents,
+		contents: applicationContents,
 	} = data;
+
+	const contents = applicationContents
+		? {
+				applicationId: applicationContents.application_id,
+				createdAt: applicationContents.created_at,
+				updatedAt: applicationContents.updated_at,
+				applicantFirstName: applicationContents.applicant_first_name,
+				applicantLastName: applicationContents.applicant_last_name,
+				applicantMiddleName: applicationContents.applicant_middle_name,
+				applicantTitle: applicationContents.applicant_title,
+				applicantSuffix: applicationContents.applicant_suffix,
+				applicantPositionTitle: applicationContents.applicant_position_title,
+				applicantPrimaryAffiliation: applicationContents.applicant_primary_affiliation,
+				applicantInstitutionalEmail: applicationContents.applicant_institutional_email,
+				applicantProfileUrl: applicationContents.applicant_profile_url,
+				institutionalRepTitle: applicationContents.institutional_rep_title,
+				institutionalRepFirstName: applicationContents.institutional_rep_first_name,
+				institutionalRepMiddleName: applicationContents.institutional_rep_middle_name,
+				institutionalRepLastName: applicationContents.institutional_rep_last_name,
+				institutionalRepSuffix: applicationContents.institutional_rep_suffix,
+				institutionalRepPrimaryAffiliation: applicationContents.institutional_rep_primary_affiliation,
+				institutionalRepEmail: applicationContents.institutional_rep_email,
+				institutionalRepProfileUrl: applicationContents.institutional_rep_profile_url,
+				institutionalRepPositionTitle: applicationContents.institutional_rep_position_title,
+				institutionCountry: applicationContents.institution_country,
+				institutionState: applicationContents.institution_state,
+				institutionCity: applicationContents.institution_city,
+				institutionStreetAddress: applicationContents.institution_street_address,
+				institutionPostalCode: applicationContents.institution_postal_code,
+				institutionBuilding: applicationContents.institution_building,
+				projectTitle: applicationContents.project_title,
+				projectWebsite: applicationContents.project_website,
+				projectAbstract: applicationContents.project_abstract,
+				projectMethodology: applicationContents.project_methodology,
+				projectSummary: applicationContents.project_summary,
+				projectPublicationUrls: applicationContents.project_publication_urls,
+				requestedStudies: applicationContents.requested_studies,
+				ethicsReviewRequired: applicationContents.ethics_review_required,
+				ethicsLetter: applicationContents.ethics_letter,
+				signedPdf: applicationContents.signed_pdf,
+			}
+		: null;
 
 	return {
 		id,

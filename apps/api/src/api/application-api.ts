@@ -103,7 +103,7 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationRepo.getApplicationById({ id: applicationId });
+	const result = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
 	if (result.success) {
 		const responseData = aliasApplicationData(result.data);
