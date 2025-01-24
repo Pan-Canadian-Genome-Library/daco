@@ -743,6 +743,10 @@ components:
         projectPublicationUrls:
           type: array
           description: URLs of publications related to the project
+        # Studies
+        requested_studies:
+          type: array
+          description: List of studies
 
     ClientErrors:
       type: object

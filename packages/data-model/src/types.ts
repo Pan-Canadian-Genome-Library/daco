@@ -144,12 +144,6 @@ export interface RequestedStudies {
 	requestedStudies?: string[] | null;
 }
 
-export interface EthicsData {
-	ethicsReviewRequired?: boolean | null;
-	ethicsLetter?: number | null;
-	signedPdf?: number | null;
-}
-
 export type ApplicationResponseData = {
 	id: number;
 	userId: string;
@@ -169,14 +163,19 @@ export type ApplicationContentsResponse = {
 	Institution &
 	InstitutionalRep &
 	Project &
-	RequestedStudies &
-	EthicsData;
+	RequestedStudies;
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 };
 
 // TODO: Additional Types to be updated
+export interface EthicsData {
+	ethicsReviewRequired?: boolean | null;
+	ethicsLetter?: number | null;
+	signedPdf?: number | null;
+}
+
 export interface Collaborator {
 	collaboratorFirstName?: string | null;
 	collaboratorMiddleName?: string | null;
