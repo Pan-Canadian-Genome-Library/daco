@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationResponseData } from '@/routes/types.js';
 import { type JoinedApplicationRecord } from '@/service/types.js';
+import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model/src/types.js';
 
 /**
  * Helper function to determine if value is a valid number and is positive.
@@ -49,7 +49,7 @@ export const aliasApplicationData = (data: JoinedApplicationRecord): Application
 		contents: applicationContents,
 	} = data;
 
-	const contents = applicationContents
+	const contents: ApplicationContentsResponse | null = applicationContents
 		? {
 				applicationId: applicationContents.application_id,
 				createdAt: applicationContents.created_at,
