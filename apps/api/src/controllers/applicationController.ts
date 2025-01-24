@@ -24,7 +24,7 @@ import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationData, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
 import { AsyncResult, failure } from '@/utils/results.js';
-import { ApplicationStateManager } from './states.js';
+import { ApplicationStateManager } from './stateManager.js';
 
 /**
  * Creates a new application and returns the created data.
