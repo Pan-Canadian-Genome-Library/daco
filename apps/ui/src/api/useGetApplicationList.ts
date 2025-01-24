@@ -42,16 +42,19 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 
 	if (state) {
 		queryParams.set('state', JSON.stringify(state));
-	} else if (sort) {
+	}
+	if (sort) {
 		queryParams.set('sort', JSON.stringify(sort));
-	} else if (page) {
+	}
+	if (page !== undefined) {
 		queryParams.set('page', page.toString());
-	} else if (pageSize) {
+	}
+	if (pageSize !== undefined) {
 		queryParams.set('pageSize', pageSize.toString());
 	}
 
 	return useQuery<ApplicationList, ServerError>({
-		queryKey: [userId, state, sort, page, pageSize],
+		queryKey: [queryParams],
 		queryFn: async () => {
 			const response = await fetch(`/applications?${queryParams.toString()}`);
 

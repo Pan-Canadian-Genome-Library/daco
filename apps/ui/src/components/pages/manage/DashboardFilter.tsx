@@ -29,6 +29,7 @@ const { useToken } = theme;
  * The allowable values that a filter can be for the manage applications interface.
  **/
 export type FilterKeyType = ApplicationStateValues | 'TOTAL';
+
 interface DashboardFilterProps {
 	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
 	filters: FilterKeyType[];

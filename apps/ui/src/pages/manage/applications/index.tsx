@@ -24,20 +24,165 @@ import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
 import ManagementDashboard, { FilterState, TableParams } from '@/components/pages/manage/ManagementDashboard';
-import { ApplicationCountMetadata, ApplicationWithApplicantInformation } from '@/global/types';
+import { ApplicationCountMetadata } from '@/global/types';
 import { isValidPageNumber } from '@/global/utils';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 import { Flex, Layout, TablePaginationConfig } from 'antd';
-import { SorterResult } from 'antd/es/table/interface';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
+
 const POSSIBLE_FILTERS = ['TOTAL', ...Object.values(ApplicationStates)] as FilterKeyType[];
+
+const ManageApplicationsPage = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [tableParams, setTableParams] = useState<TableParams>({
+		pagination: {
+			current: 1,
+			pageSize: 20,
+			total: 0,
+		},
+	});
+
+	const { t: translate } = useTranslation();
+
+	/**
+	 * Network calls, table and filter metadata
+	 */
+	const {
+		data: tableData,
+		error: tableError,
+		isLoading: isTableLoading,
+		refetch: tableDataRefetch,
+	} = useGetApplicationList({
+		userId: mockUserID,
+		state: parseFilters(searchParams.get('filters')).find((filter) => filter === 'TOTAL')
+			? undefined
+			: [...parseFilters(searchParams.get('filters')).map((filter) => filter as ApplicationStateValues)],
+		page: parsePageNumber(tableParams.pagination?.current, true),
+	});
+
+	const {
+		data: filterMetadata,
+		error: filterMetaDataError,
+		isLoading: areFiltersLoading,
+	} = useGetApplicationCounts(mockUserID);
+
+	const handleFilterChange = (filtersActive: Array<FilterKeyType>) => {
+		setSearchParams((prev) => {
+			prev.set('filters', filtersActive.flat().toString());
+			prev.set('page', '1');
+			return prev;
+		});
+	};
+
+	const handleTableChange = async ({ pagination }: { pagination: TablePaginationConfig }) => {
+		const page = pagination.current;
+		setSearchParams((prev) => {
+			prev.set('page', parsePageNumber(page, false).toString());
+			return prev;
+		});
+	};
+
+	/**
+	 * This effect is required to validate and set state based off our URL.
+	 */
+	useEffect(() => {
+		const urlSetFilters = searchParams.get('filters');
+		const urlSetPage = searchParams.get('page');
+		const allUrlParams = new URLSearchParams();
+
+		/**
+		 * If somehow the user ends up at our page with just `/manage/applications` and no URL set state
+		 * we have to reset to a known good state, and exit out with the defaults.
+		 */
+		if (!urlSetFilters || !urlSetPage || !isValidPageNumber(Number.parseInt(urlSetPage))) {
+			allUrlParams.set('filters', 'TOTAL');
+			allUrlParams.set('page', '1');
+			setSearchParams(allUrlParams);
+			return;
+		}
+
+		/**
+		 * Even with the user having a URL-bound state, we can't true that they have a known set of filters selected.
+		 * We should validate  this first before continuing.
+		 */
+		const filtersProvided = urlSetFilters.split(',');
+
+		if (isValidFilterSet(filtersProvided) == false) {
+			//If not, we want to reset the URL state to defaults.
+			allUrlParams.set('filters', 'TOTAL');
+			allUrlParams.set('page', '1');
+			setSearchParams(allUrlParams);
+			return;
+		}
+
+		/**
+		 * Once both edge cases have been validated, start providing the parsed state to the table.
+		 */
+		setTableParams((prev) => {
+			return {
+				...prev,
+				pagination: {
+					...prev.pagination,
+					current: parsePageNumber(urlSetPage, false),
+				},
+			};
+		});
+	}, [searchParams, setSearchParams]);
+
+	useEffect(() => {
+		tableDataRefetch();
+	}, [tableDataRefetch, tableParams]);
+	/**
+	 * Once we receive data from the sever, reapply it to our table.
+	 */
+	useEffect(() => {
+		const serverPaginationState = tableData?.pagingMetadata;
+
+		if (serverPaginationState) {
+			setTableParams((prev) => {
+				return {
+					...prev,
+					pagination: {
+						...prev.pagination,
+						pageSize: serverPaginationState.pageSize,
+						total: serverPaginationState.totalRecords,
+					},
+				};
+			});
+		}
+	}, [setSearchParams, tableData]);
+
+	return (
+		<Content>
+			<Flex vertical>
+				<PageHeader title={translate('manage.applications.title')} />
+				{filterMetaDataError || areFiltersLoading ? (
+					<ErrorPage loading={areFiltersLoading} error={filterMetaDataError || tableError} />
+				) : (
+					<ManagementDashboard
+						filterCounts={filterMetadata ? calculateFilterAmounts(filterMetadata) : []}
+						loading={isTableLoading}
+						data={tableData && tableData.applications ? tableData.applications : []}
+						filters={parseFilters(searchParams.get('filters'))}
+						pagination={tableParams.pagination ? tableParams.pagination : {}}
+						onTableChange={handleTableChange}
+						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled)}
+					/>
+				)}
+			</Flex>
+		</Content>
+	);
+};
+
+export default ManageApplicationsPage;
+
 /**
  * Calculates the number shown beside the filter at the top of the page.
  * Example: 10 Total | 3 DAC Review, etc...
@@ -56,181 +201,41 @@ const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata) => {
 	return availableStates;
 };
 
-const parsePageNumber = (pageNumber: number | string | null | undefined) => {
+/**
+ *
+ * @param pageNumber
+ * @param forNetwork
+ * @returns
+ */
+const parsePageNumber = (pageNumber?: number | string | null, forNetwork?: boolean) => {
 	if (pageNumber) {
 		const parsedPage = typeof pageNumber === 'string' ? parseInt(pageNumber) : pageNumber;
 		if (isValidPageNumber(parsedPage)) {
-			return parsedPage;
+			return forNetwork ? parsedPage - 1 : parsedPage;
 		}
-		return 0;
+		return forNetwork ? 0 : 1;
 	} else {
-		return 0;
+		return forNetwork ? 0 : 1;
 	}
 };
 
-const ManageApplicationsPage = () => {
-	const [filters, setFilters] = useState<Array<FilterKeyType>>([]);
-	const [searchParams, setSearchParams] = useSearchParams();
-	const [page, setPage] = useState<number>(parsePageNumber(searchParams.get('page')));
-	const [tableParams, setTableParams] = useState<TableParams>({
-		pagination: {
-			current: 1,
-			pageSize: 20,
-			total: undefined,
-		},
-	});
-
-	const { t: translate } = useTranslation();
-
-	const {
-		data: tableData,
-		error: tableError,
-		isLoading: isTableLoading,
-		refetch: tableDataRefetch,
-	} = useGetApplicationList({
-		userId: mockUserID,
-		state: filters.find((filter) => filter === 'TOTAL')
-			? undefined
-			: [...filters.map((filter) => filter as ApplicationStateValues)],
-		page: page,
-	});
-
-	const handleFilterChange = useCallback(
-		async (filtersActive: Array<FilterKeyType>, setParamsAndFetch: boolean) => {
-			setFilters(filtersActive);
-
-			if (setParamsAndFetch) {
-				setSearchParams((prev) => {
-					prev.set('filters', filtersActive.flat().toString());
-					return prev;
-				});
-
-				await tableDataRefetch({ cancelRefetch: true });
-			}
-		},
-		[setSearchParams, tableDataRefetch],
-	);
-
-	const handleTableChange = async ({
-		pagination,
-	}: {
-		pagination: TablePaginationConfig;
-		sorter: SorterResult<ApplicationWithApplicantInformation>[] | SorterResult<ApplicationWithApplicantInformation>;
-	}) => {
-		const page = parsePageNumber(pagination.current);
-
-		if (page > 0) {
-			setPage(page - 1);
-		} else {
-			setPage(page);
+const parseFilters = (rawURLFilters?: string | null) => {
+	if (rawURLFilters) {
+		const decodedFilters = rawURLFilters.split(',');
+		if (isValidFilterSet(decodedFilters)) {
+			return decodedFilters as FilterKeyType[];
 		}
-
-		await tableDataRefetch();
-	};
-
-	useEffect(() => {
-		let currentPage = tableData?.pagingMetadata.page;
-		const currentFilters = searchParams.get('filters');
-
-		setPage(parsePageNumber(currentPage));
-
-		console.log(currentPage);
-
-		if (currentPage) {
-			currentPage = currentPage + 1;
-		} else {
-			currentPage = 1;
-		}
-
-		if (currentFilters) {
-			const filters = currentFilters.split(',') as FilterKeyType[];
-			setPage(page);
-			handleFilterChange(filters, false);
-		}
-
-		setTableParams({
-			pagination: {
-				current: currentPage,
-				pageSize: tableData?.pagingMetadata.pageSize,
-				total: tableData?.pagingMetadata.totalRecords,
-			},
-		});
-	}, [handleFilterChange, page, searchParams, tableData]);
-
-	/**
-	 * This sets the initial state for the page on load.
-	 *
-	 * We need to check what filters currently exist in the URL, and apply them into the current filters object
-	 */
-	useEffect(() => {
-		const urlSetFilters = searchParams.get('filters');
-		const urlSetPage = searchParams.get('page');
-		const allUrlParams = new URLSearchParams();
-
-		if (!urlSetFilters || !urlSetPage || !isValidPageNumber(Number.parseInt(urlSetPage))) {
-			allUrlParams.set('filters', 'TOTAL');
-			allUrlParams.set('page', '0');
-			setSearchParams(allUrlParams);
-		} else {
-			const filtersProvided = urlSetFilters.split(',');
-			for (const providedFilters of filtersProvided) {
-				if (!POSSIBLE_FILTERS.find((possibleFilters) => possibleFilters === providedFilters)) {
-					allUrlParams.set('filters', 'TOTAL');
-					allUrlParams.set('page', '0');
-					setSearchParams(allUrlParams);
-					return;
-				}
-			}
-		}
-	}, [filters, searchParams, setSearchParams]);
-
-	// useEffect(() => {
-	// 	const currentFilters = searchParams.get('filters');
-	// 	const currentPage = searchParams.get('page');
-	// 	const page = parsePageNumber(currentPage);
-
-	// 	if (currentFilters) {
-	// 		const filters = currentFilters.split(',') as FilterKeyType[];
-	// 		setPage(page);
-	// 		handleFilterChange(filters, false);
-	// 	}
-	// }, [handleFilterChange, searchParams]);
-
-	const {
-		data: filterMetadata,
-		error: filterMetaDataError,
-		isLoading: areFiltersLoading,
-	} = useGetApplicationCounts(mockUserID);
-
-	/**
-	 * Given that we don't need to constantly recalculate how many applications are at a current state
-	 * we memoize the value after calculating to avoid expensive recalculation.
-	 *
-	 * Right now this array has zero dependencies but once it's
-	 * connected up to the API, we should add that value as a dependant
-	 */
-	const filterAmounts = useMemo(() => (filterMetadata ? calculateFilterAmounts(filterMetadata) : []), [filterMetadata]);
-
-	return (
-		<Content>
-			<Flex vertical>
-				<PageHeader title={translate('manage.applications.title')} />
-				{filterMetaDataError || areFiltersLoading ? (
-					<ErrorPage loading={areFiltersLoading} error={filterMetaDataError || tableError} />
-				) : (
-					<ManagementDashboard
-						filterCounts={filterAmounts}
-						loading={isTableLoading}
-						data={tableData && tableData.applications ? tableData.applications : []}
-						filters={filters}
-						pagination={tableParams.pagination}
-						onTableChange={handleTableChange}
-						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled, true)}
-					/>
-				)}
-			</Flex>
-		</Content>
-	);
+		return ['TOTAL'] as FilterKeyType[];
+	} else {
+		return ['TOTAL'] as FilterKeyType[];
+	}
 };
 
-export default ManageApplicationsPage;
+const isValidFilterSet = (rawFilters: string[]) => {
+	for (const providedFilters of rawFilters) {
+		if (!POSSIBLE_FILTERS.find((possibleFilters) => possibleFilters === providedFilters)) {
+			return false;
+		}
+	}
+	return true;
+};
