@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { drizzle } from 'drizzle-orm/node-postgres';
-
 import { setStatus, Status } from '@/app-health.js';
+import logger from '@/logger.js';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
 export type PostgresDb = ReturnType<typeof drizzle>;
 
@@ -38,7 +38,7 @@ export const connectToDb = (connectionString: string): PostgresDb => {
 		setStatus('db', { status: Status.OK });
 		return db;
 	} catch (err) {
-		console.log('Error on Database startup: \n', err);
+		logger.error('Error on Database startup: \n', err);
 
 		if (err instanceof Error) {
 			setStatus('db', { status: Status.ERROR, info: { err: err.message } });

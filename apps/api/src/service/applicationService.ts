@@ -95,8 +95,10 @@ const applicationService = (db: PostgresDb) => ({
 			return success(application);
 		} catch (err) {
 			const message = `Error at createApplication with user_id: ${user_id}`;
-			console.error(message);
-			console.error(err);
+
+			logger.error(message);
+			logger.error(err);
+
 			return failure(message, err);
 		}
 	},
@@ -140,8 +142,8 @@ const applicationService = (db: PostgresDb) => ({
 			return success(application);
 		} catch (err) {
 			const message = `Error at editApplication with id: ${id}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 			return failure(message, err);
 		}
 	},
@@ -163,8 +165,8 @@ const applicationService = (db: PostgresDb) => ({
 			return success(application[0]);
 		} catch (err) {
 			const message = `Error at findOneAndUpdate with id: ${id}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 			return failure(message, err);
 		}
 	},
@@ -176,8 +178,8 @@ const applicationService = (db: PostgresDb) => ({
 			return success(applicationRecord[0]);
 		} catch (err) {
 			const message = `Error at getApplicationById with id: ${id}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 			return failure(message, err);
 		}
 	},
@@ -199,8 +201,8 @@ const applicationService = (db: PostgresDb) => ({
 			return success(application);
 		} catch (err) {
 			const message = `Error at getApplicationById with id: ${id}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 
 			return failure(message, err);
 		}

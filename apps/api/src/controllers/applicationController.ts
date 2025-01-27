@@ -20,6 +20,7 @@
 import { ApplicationStates, ApproveApplication } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
+import logger from '@/logger.js';
 import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationData, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
@@ -70,7 +71,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		return result;
 	} else {
 		const message = `Cannot update application with state ${state}`;
-		console.error(message);
+		logger.error(message);
 		return failure(message);
 	}
 };
@@ -161,8 +162,8 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 		return updatedResult;
 	} catch (error) {
 		const message = `Unable to approve application with id: ${applicationId}`;
-		console.error(message);
-		console.error(error);
+		logger.error(message);
+		logger.error(error);
 		return failure(message, error);
 	}
 };
