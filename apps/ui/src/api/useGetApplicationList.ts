@@ -69,6 +69,14 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 						error.message = translate('errors.http.404.title');
 						error.errors = translate('errors.http.404.message');
 						break;
+					case 400:
+						error.message = translate('errors.http.400.title');
+						error.errors = translate('errors.http.400.message');
+						break;
+					case 500:
+						error.message = translate('errors.http.500.title');
+						error.errors = translate('errors.http.500.message');
+						break;
 				}
 
 				throw error;
