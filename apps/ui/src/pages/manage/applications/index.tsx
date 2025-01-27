@@ -61,7 +61,7 @@ const ManageApplicationsPage = () => {
 	const {
 		data: tableData,
 		error: tableError,
-		isLoading: isTableLoading,
+		isFetching: isTableLoading,
 		refetch: tableDataRefetch,
 	} = useGetApplicationList({
 		userId: mockUserID,

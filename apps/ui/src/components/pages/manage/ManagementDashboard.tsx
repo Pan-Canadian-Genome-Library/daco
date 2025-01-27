@@ -21,7 +21,6 @@ import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import DashboardFilter, { FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import { pcglTableTheme } from '@/components/providers/ThemeProvider';
-import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationWithApplicantInformation } from '@/global/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
@@ -69,7 +68,7 @@ const tableColumnConfiguration = [
 				PCGL-{value}
 			</Link>
 		),
-		sorter: { multiple: 3 },
+		sorter: { multiple: 1 },
 	},
 	{
 		title: 'Institution',
@@ -93,7 +92,7 @@ const tableColumnConfiguration = [
 			record.applicantInformation.firstName && record.applicantInformation.lastName
 				? `${record.applicantInformation.firstName} ${record.applicantInformation.lastName}`
 				: '-',
-		sorter: { multiple: 3 },
+		// sorter: { multiple: 3 }, NOTE: Post-MVP according to specs
 	},
 	{
 		title: 'Email',
@@ -107,7 +106,7 @@ const tableColumnConfiguration = [
 		dataIndex: 'updatedAt',
 		key: 'updatedAt',
 		render: (value?: string) => (value ? new Date(value).toLocaleDateString('en-CA') : '-'),
-		sorter: { multiple: 3 },
+		sorter: { multiple: 2 },
 	},
 	{
 		title: 'Status',
@@ -129,7 +128,6 @@ const ManagementDashboard = ({
 }: ManagementDashboardProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
-	const minWidth = useMinWidth();
 
 	return (
 		<Flex
@@ -137,18 +135,15 @@ const ManagementDashboard = ({
 			gap={token.paddingSM}
 			vertical
 		>
-			<Flex
-				justify="space-between"
-				align="center"
-				vertical={minWidth <= token.screenLGMax}
-				gap={minWidth <= token.screenLGMax ? token.paddingSM : 0}
-			>
-				<Text>{translate('manage.applications.listTitle')}</Text>
+			<Flex justify="right" align="center">
 				<DashboardFilter
 					onFilterChange={(filtersActive) => onFilterChange(filtersActive)}
 					filters={filters}
 					availableStates={filterCounts}
 				/>
+			</Flex>
+			<Flex justify="left" align="center" style={{ width: '100%', margin: '0 0 .5rem .5rem' }}>
+				<Text>{translate('manage.applications.listTitle')}</Text>
 			</Flex>
 			<Flex style={{ width: '100%', height: '100%' }}>
 				<ConfigProvider theme={pcglTableTheme}>
