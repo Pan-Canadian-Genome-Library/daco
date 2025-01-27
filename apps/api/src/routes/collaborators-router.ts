@@ -29,13 +29,21 @@ const jsonParser = bodyParser.json();
  * Add Collaborator
  */
 collaboratorsRouter.post(
-	'/collaborators',
+	'/collaborators/create',
 	jsonParser,
 	async (
 		request: Request<
 			{},
 			{},
-			{ applicationId: number; firstName: string; lastName: string; positionTitle: string; institutionalEmail: string },
+			{
+				applicationId: number;
+				firstName: string;
+				middleName: string;
+				lastName: string;
+				suffix: string;
+				positionTitle: string;
+				institutionalEmail: string;
+			},
 			any
 		>,
 		response,
@@ -43,7 +51,9 @@ collaboratorsRouter.post(
 		const {
 			applicationId: application_id,
 			firstName: first_name,
+			middleName: middle_name,
 			lastName: last_name,
+			suffix,
 			positionTitle: position_title,
 			institutionalEmail: institutional_email,
 		} = request.body;
@@ -61,8 +71,10 @@ collaboratorsRouter.post(
 		const result = await createCollaborators({
 			application_id,
 			first_name,
+			middle_name,
 			last_name,
 			position_title,
+			suffix,
 			institutional_email,
 		});
 
