@@ -24,13 +24,14 @@ import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
-import { failure, success } from '@/utils/results.js';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { applicationActionService } from './applicationActionService.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
+	type JoinedApplicationRecord,
 	type OrderBy,
 } from './types.js';
 
@@ -143,6 +144,7 @@ const applicationService = (db: PostgresDb) => ({
 	getApplicationById: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			return success(applicationRecord[0]);
@@ -154,7 +156,7 @@ const applicationService = (db: PostgresDb) => ({
 		}
 	},
 
-	getApplicationWithContents: async ({ id }: { id: number }) => {
+	getApplicationWithContents: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
 		try {
 			const applicationRecord = await db
 				.select()
@@ -162,7 +164,7 @@ const applicationService = (db: PostgresDb) => ({
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
-			if (!applicationRecord[0]) throw new Error('Application record not found');
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			const application = {
 				...applicationRecord[0].applications,

@@ -24,13 +24,13 @@ import { useNavigate } from 'react-router';
 import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { Application } from '@pcgl-daco/data-model';
+import { ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useCreateApplication = () => {
 	const navigation = useNavigate();
 	const { t: translate } = useTranslation();
 
-	return useMutation<Application, ServerError>({
+	return useMutation<ApplicationResponseData, ServerError>({
 		mutationFn: async () => {
 			const response = await fetch('/applications/create', {
 				method: 'POST',

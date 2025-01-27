@@ -19,11 +19,12 @@
 
 export {
 	type Applicant,
-	type Application,
+	type ApplicationContentsResponse,
+	type ApplicationResponseData,
 	type Collaborator,
+	type EthicsData,
 	type Institution,
-	type PersonalInfo,
+	type InstitutionalRep,
 	type Project,
+	type RequestedStudies,
 } from './types.js';
-
-export { demoApplication } from './demoData.js';

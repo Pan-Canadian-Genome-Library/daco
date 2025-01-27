@@ -24,7 +24,8 @@ import logger from '@/logger.js';
 import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationService } from '@/service/applicationService.js';
 import { ApplicationData, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
-import { AsyncResult, failure } from '@/utils/results.js';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { aliasApplicationData } from '@/utils/routes.js';
 import { ApplicationStateManager } from './states.js';
 
 /**
@@ -103,7 +104,12 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationService(database);
 
-	const result = await applicationRepo.getApplicationById({ id: applicationId });
+	const result = await applicationRepo.getApplicationWithContents({ id: applicationId });
+
+	if (result.success) {
+		const responseData = aliasApplicationData(result.data);
+		return success(responseData);
+	}
 
 	return result;
 };

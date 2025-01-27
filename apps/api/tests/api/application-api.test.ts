@@ -102,7 +102,6 @@ describe('Application API', () => {
 
 			const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
 			const reviewRecordResult = await testApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
-
 			assert.ok(reviewRecordResult.success && reviewRecordResult.data[0]);
 			assert.strictEqual(reviewRecordResult.data[0].state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
