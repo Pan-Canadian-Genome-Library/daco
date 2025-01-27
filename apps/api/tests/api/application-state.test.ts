@@ -21,9 +21,14 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { ApplicationStateManager, createApplicationStateManager } from '@/api/states.js';
+import { ApplicationStateManager, createApplicationStateManager } from '@/controllers/stateManager.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import { applicationActions } from '@/db/schemas/applicationActions.js';
+import { applications } from '@/db/schemas/applications.js';
+import { applicationActionService } from '@/service/applicationActionService.js';
+import { applicationService } from '@/service/applicationService.js';
+import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
+import { ApplicationActions, ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
 const {
@@ -43,6 +48,9 @@ describe('State Machine', () => {
 	let container: StartedPostgreSqlContainer;
 	let testStateManager: ApplicationStateManager;
 
+	let testActionRepo: ApplicationActionService;
+	let testApplicationRepo: ApplicationService;
+
 	before(async () => {
 		container = await new PostgreSqlContainer()
 			.withUsername(PG_USER)
@@ -55,6 +63,9 @@ describe('State Machine', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
+
+		testActionRepo = applicationActionService(db);
+		testApplicationRepo = applicationService(db);
 	});
 
 	describe('Application State Manager', () => {
@@ -93,6 +104,21 @@ describe('State Machine', () => {
 			await testStateManager.submitDraft();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.SUBMIT_DRAFT &&
+						record.state_before === ApplicationStates.DRAFT &&
+						record.state_after === ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+				),
+			);
+
+			const applicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			assert.ok(applicationResult.success && applicationResult.data);
+			assert.ok(applicationResult.data.state === 'INSTITUTIONAL_REP_REVIEW');
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', async () => {
@@ -120,41 +146,47 @@ describe('State Machine', () => {
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
 		});
 
-		it('should change from REP_REVISION to INSTITUTIONAL_REP_REVIEW on submit', async () => {
+		it('should change from INSTITUTIONAL_REP_REVISION_REQUESTED to INSTITUTIONAL_REP_REVIEW on submit', async () => {
+			stateValue = testStateManager.getState();
 			await testStateManager.submitRepRevision();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 		});
 
-		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on submit', async () => {
-			await testStateManager.submitRepReview();
+		it('should change from INSTITUTIONAL_REP_REVIEW to DAC_REVIEW on approval', async () => {
+			stateValue = testStateManager.getState();
+			await testStateManager.approveRepReview();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.INSTITUTIONAL_REP_APPROVED &&
+						record.state_before === ApplicationStates.INSTITUTIONAL_REP_REVIEW &&
+						record.state_after === ApplicationStates.DAC_REVIEW,
+				),
+			);
+
+			const applicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			assert.ok(applicationResult.success && applicationResult.data);
+			assert.ok(applicationResult.data.state === ApplicationStates.DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
+			stateValue = testStateManager.getState();
 			await testStateManager.reviseDacReview();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', async () => {
+			stateValue = testStateManager.getState();
 			await testStateManager.submitDacRevision();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
-		});
-
-		it('should change from DAC_REVIEW to DRAFT on edit', async () => {
-			const result = await createApplicationStateManager({ id: 3 });
-			assert.ok(result.success);
-
-			const draftReviewManager = result.data;
-			await draftReviewManager.submitDraft();
-			await draftReviewManager.submitRepReview();
-			await draftReviewManager.editDacReview();
-
-			stateValue = draftReviewManager.getState();
-			assert.strictEqual(stateValue, DRAFT);
 		});
 
 		it('should change from DAC_REVIEW to REJECTED on rejected', async () => {
@@ -163,7 +195,7 @@ describe('State Machine', () => {
 
 			const dacReviewManager = result.data;
 			await dacReviewManager.submitDraft();
-			await dacReviewManager.submitRepReview();
+			await dacReviewManager.approveRepReview();
 
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
@@ -174,27 +206,58 @@ describe('State Machine', () => {
 			assert.strictEqual(stateValue, REJECTED);
 		});
 
+		it('should change from DAC_REVIEW to DRAFT on edit', async () => {
+			const result = await createApplicationStateManager({ id: 3 });
+			assert.ok(result.success);
+
+			const draftReviewManager = result.data;
+			await draftReviewManager.submitDraft();
+			await draftReviewManager.approveRepReview();
+			await draftReviewManager.editDacReview();
+
+			stateValue = draftReviewManager.getState();
+			assert.strictEqual(stateValue, DRAFT);
+		});
+
 		it('should change from DAC_REVIEW to CLOSED on close', async () => {
 			const result = await createApplicationStateManager({ id: 3 });
 			assert.ok(result.success);
 
-			const dacReviewManager = result.data;
-			await dacReviewManager.submitDraft();
-			await dacReviewManager.submitRepReview();
+			const dacStateManager = result.data;
+			await dacStateManager.submitDraft();
+			await dacStateManager.approveRepReview();
 
-			stateValue = dacReviewManager.getState();
+			stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			await dacReviewManager.closeDacReview();
+			await dacStateManager.closeDacReview();
 
-			stateValue = dacReviewManager.getState();
+			stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
+			stateValue = testStateManager.getState();
+			assert.strictEqual(stateValue, DAC_REVIEW);
+
 			await testStateManager.approveDacReview();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, APPROVED);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.DAC_REVIEW_APPROVED &&
+						record.state_before === ApplicationStates.DAC_REVIEW &&
+						record.state_after === ApplicationStates.APPROVED,
+				),
+			);
+
+			const applicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			assert.ok(applicationResult.success && applicationResult.data);
+			assert.ok(applicationResult.data.state === ApplicationStates.APPROVED);
 		});
 
 		it('should change from APPROVED to REVOKED on revoked', async () => {
@@ -205,6 +268,8 @@ describe('State Machine', () => {
 	});
 
 	after(async () => {
+		await db.delete(applicationActions);
+		await db.delete(applications);
 		await container.stop();
 		process.exit(0);
 	});
