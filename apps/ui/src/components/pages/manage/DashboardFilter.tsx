@@ -28,18 +28,18 @@ const { useToken } = theme;
 /**
  * The allowable values that a filter can be for the manage applications interface.
  **/
-export type FilterKeyType = ApplicationStateValues | 'TOTAL';
+export type FilterKeys = ApplicationStateValues | 'TOTAL';
 
 interface DashboardFilterProps {
-	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
-	filters: FilterKeyType[];
-	availableStates: { key: FilterKeyType; amount: number }[];
+	onFilterChange: (filtersEnabled: FilterKeys[]) => void;
+	filters: FilterKeys[];
+	availableStates: { key: FilterKeys; amount: number }[];
 }
 
 interface Filter {
 	name: string;
 	amount: number;
-	key: FilterKeyType;
+	key: FilterKeys;
 }
 
 const DashboardFilter = ({ onFilterChange, filters, availableStates }: DashboardFilterProps) => {
@@ -47,7 +47,7 @@ const DashboardFilter = ({ onFilterChange, filters, availableStates }: Dashboard
 	const { token } = useToken();
 
 	//By default we want the "Total" filter selected, displaying all possible application types.
-	const [filterStates, setFilterStates] = useState<Array<FilterKeyType>>([]);
+	const [filterStates, setFilterStates] = useState<Array<FilterKeys>>([]);
 
 	// The currently displayed filters in the interface, this is determined by whatever is sent in by fetched data.
 	const displayedFilters: Filter[] = [
@@ -60,12 +60,12 @@ const DashboardFilter = ({ onFilterChange, filters, availableStates }: Dashboard
 			return {
 				name: translate(`application.states.${possibleState}`),
 				amount: availableStates.find((state) => state.key === possibleState)?.amount || 0,
-				key: possibleState as FilterKeyType,
+				key: possibleState as FilterKeys,
 			};
 		}),
 	];
 
-	const handleChange = (selectedFilter: FilterKeyType, checked: boolean) => {
+	const handleChange = (selectedFilter: FilterKeys, checked: boolean) => {
 		let nextSelectedFilters = checked
 			? [...filterStates, selectedFilter]
 			: filterStates.filter((t) => t !== selectedFilter);

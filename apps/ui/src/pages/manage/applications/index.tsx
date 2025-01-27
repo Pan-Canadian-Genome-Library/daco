@@ -22,8 +22,8 @@ import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/useG
 import { mockUserID } from '@/components/mock/applicationMockData';
 import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
-import { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
-import ManagementDashboard, { FilterState, TableParams } from '@/components/pages/manage/ManagementDashboard';
+import { FilterKeys } from '@/components/pages/manage/DashboardFilter';
+import ManagementDashboard, { FilterState } from '@/components/pages/manage/ManagementDashboard';
 import { ApplicationCountMetadata, ApplicationWithApplicantInformation } from '@/global/types';
 import { isValidPageNumber } from '@/global/utils';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
@@ -38,13 +38,17 @@ import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
 
-const POSSIBLE_FILTERS = ['TOTAL', ...Object.values(ApplicationStates)] as FilterKeyType[];
+export interface TableProperties {
+	pagination: TablePaginationConfig;
+}
+
+const POSSIBLE_FILTERS = ['TOTAL', ...Object.values(ApplicationStates)] as FilterKeys[];
 
 const ManageApplicationsPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
 
-	const [tableParams, setTableParams] = useState<TableParams>({
+	const [tableParams, setTableParams] = useState<TableProperties>({
 		pagination: {
 			current: 1,
 			pageSize: 20,
@@ -74,7 +78,11 @@ const ManageApplicationsPage = () => {
 		isLoading: areFiltersLoading,
 	} = useGetApplicationCounts(mockUserID);
 
-	const handleFilterChange = (filtersActive: Array<FilterKeyType>) => {
+	/**
+	 * Gets called whenever `DashboardFilter` updates its state.
+	 * @param filtersActive The array of the filters applied.
+	 */
+	const handleFilterChange = (filtersActive: Array<FilterKeys>) => {
 		setSearchParams((prev) => {
 			prev.set('filters', filtersActive.flat().toString());
 			prev.set('page', '1');
@@ -82,6 +90,10 @@ const ManageApplicationsPage = () => {
 		});
 	};
 
+	/**
+	 * Is called whenever the table has a change or update in its sorting, pagination or filtering.
+	 * @see @link https://ant.design/components/table#table-demo-ajax
+	 */
 	const handleTableChange = async ({
 		pagination,
 		sorter,
@@ -300,11 +312,11 @@ const parseFilters = (filtersFromQuery?: string | null) => {
 	if (filtersFromQuery) {
 		const decodedFilters = filtersFromQuery.split(',');
 		if (isValidFilterSet(decodedFilters)) {
-			return decodedFilters as FilterKeyType[];
+			return decodedFilters as FilterKeys[];
 		}
-		return ['TOTAL'] as FilterKeyType[];
+		return ['TOTAL'] as FilterKeys[];
 	} else {
-		return ['TOTAL'] as FilterKeyType[];
+		return ['TOTAL'] as FilterKeys[];
 	}
 };
 

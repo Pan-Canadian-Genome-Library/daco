@@ -18,8 +18,8 @@
  */
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import DashboardFilter, { FilterKeyType } from '@/components/pages/manage/DashboardFilter';
-import StatusTableColumn from '@/components/pages/manage/StatusTableColumn';
+import DashboardFilter, { FilterKeys } from '@/components/pages/manage/DashboardFilter';
+import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import { pcglTableTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationWithApplicantInformation } from '@/global/types';
@@ -34,7 +34,7 @@ const { Text, Link } = Typography;
 const { useToken } = theme;
 
 export interface FilterState {
-	key: FilterKeyType;
+	key: FilterKeys;
 	amount: number;
 }
 
@@ -43,7 +43,7 @@ export interface TableParams {
 }
 
 interface ManagementDashboardProps {
-	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
+	onFilterChange: (filtersEnabled: FilterKeys[]) => void;
 	onTableChange: ({
 		pagination,
 		filters,
@@ -54,7 +54,7 @@ interface ManagementDashboardProps {
 		sorter: SorterResult<ApplicationWithApplicantInformation>[] | SorterResult<ApplicationWithApplicantInformation>;
 	}) => void;
 	filterCounts: FilterState[];
-	filters: FilterKeyType[];
+	filters: FilterKeys[];
 	data: ApplicationWithApplicantInformation[];
 	loading: boolean;
 	pagination: TablePaginationConfig;

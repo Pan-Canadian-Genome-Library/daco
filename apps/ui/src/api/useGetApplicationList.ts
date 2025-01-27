@@ -44,7 +44,6 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 		queryParams.set('state', JSON.stringify(state));
 	}
 	if (sort) {
-		console.log(sort)
 		queryParams.set('sort', JSON.stringify(sort));
 	}
 	if (page !== undefined) {

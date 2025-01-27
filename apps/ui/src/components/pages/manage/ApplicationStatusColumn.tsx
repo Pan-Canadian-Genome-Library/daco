@@ -24,11 +24,11 @@ import { useTranslation } from 'react-i18next';
 
 const { useToken } = theme;
 
-interface StatusBarColumnType {
+interface StatusColumnProps {
 	value: ApplicationStateValues;
 }
 
-const StatusTableColumn = ({ value }: StatusBarColumnType) => {
+const ApplicationStatusColumn = ({ value }: StatusColumnProps) => {
 	const { token } = useToken();
 	const { t: translate } = useTranslation();
 	return (
@@ -41,4 +41,4 @@ const StatusTableColumn = ({ value }: StatusBarColumnType) => {
 	);
 };
 
-export default StatusTableColumn;
+export default ApplicationStatusColumn;
