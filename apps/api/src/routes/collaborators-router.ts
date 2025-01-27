@@ -20,7 +20,7 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createApplication } from '@/api/application-api.js';
+import { createCollaborators } from '@/api/collaborators-api.js';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -31,15 +31,23 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/collaborators',
 	jsonParser,
-	async (request: Request<{}, {}, { userId: string }, any>, response) => {
-		const { userId } = request.body;
+	async (
+		request: Request<
+			{},
+			{},
+			{ first_name: string; last_name: string; position_title: string; institutional_email: string },
+			any
+		>,
+		response,
+	) => {
+		const { first_name, last_name, position_title, institutional_email } = request.body;
 
-		if (!userId) {
+		if (!first_name || !last_name || !position_title || !institutional_email) {
 			response.status(400).send({ message: 'User ID is required.' });
 			return;
 		}
 
-		const result = await createApplication({ user_id: userId });
+		const result = await createCollaborators({ first_name, last_name, position_title, institutional_email });
 
 		if (result.success) {
 			response.status(201).send(result.data);

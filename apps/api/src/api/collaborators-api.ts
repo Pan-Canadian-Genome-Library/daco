@@ -23,14 +23,32 @@ import { type CollaboratorsService } from '@/service/types.js';
 
 /**
  * Creates a new application and returns the created data.
- * @param user_id - The ID of the user requesting the creation of the application.
- * @returns Success with Application data / Failure with Error.
+ * @param first_name - The ID of the user requesting the creation of the application.
+ * @param last_name - The ID of the user requesting the creation of the application.
+ * @param position_title - The ID of the user requesting the creation of the application.
+ * @param institutional_email - The ID of the user requesting the creation of the application.
+ * @returns Success with Collaborator data / Failure with Error.
  */
-export const createCollaborators = async ({ user_id }: { user_id: string }) => {
+export const createCollaborators = async ({
+	first_name,
+	last_name,
+	position_title,
+	institutional_email,
+}: {
+	first_name: string;
+	last_name: string;
+	position_title: string;
+	institutional_email: string;
+}) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsService(database);
 
-	const result = await collaboratorsRepo.createCollaborators({ user_id });
+	const result = await collaboratorsRepo.createCollaborators({
+		first_name,
+		last_name,
+		position_title,
+		institutional_email,
+	});
 
 	return result;
 };

@@ -17,59 +17,52 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
-
 import { type PostgresDb } from '@/db/index.js';
-import { applicationContents } from '@/db/schemas/applicationContents.js';
-import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.js';
 import logger from '@/logger.js';
 import { failure, success } from '@/utils/results.js';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { applicationActionService } from './applicationActionService.js';
 
 const collaboratorsService = (db: PostgresDb) => ({
-	createCollaborators: async ({ user_id }: { user_id: string }) => {
-		const newApplication: typeof applications.$inferInsert = {
-			user_id,
-			state: ApplicationStates.DRAFT,
+	createCollaborators: async ({
+		first_name,
+		last_name,
+		position_title,
+		institutional_email,
+	}: {
+		first_name: string;
+		last_name: string;
+		position_title: string;
+		institutional_email: string;
+	}) => {
+		const newCollaborators: typeof collaborators.$inferInsert = {
+			first_name,
+			last_name,
+			position_title,
+			institutional_email,
 		};
 
 		try {
-			const application = await db.transaction(async (transaction) => {
-				// Create Application
-				const newApplicationRecord = await transaction.insert(applications).values(newApplication).returning();
-				if (!newApplicationRecord[0]) throw new Error('Application record is undefined');
+			const collaboratorRecords = await db.transaction(async (transaction) => {
+				// Create Collaborators
+				const newCollaboratorRecords = await transaction.insert(collaborators).values(newCollaborators).returning();
+				if (!newCollaboratorRecords[0]) throw new Error('Collaborator records are undefined');
 
 				// Create associated ApplicationContents
-				const { id: application_id } = newApplicationRecord[0];
+				// const { id: application_id } = newApplicationRecord[0];
 
-				const newAppContents: typeof applicationContents.$inferInsert = {
-					application_id,
-					created_at: new Date(),
-					updated_at: new Date(),
-				};
-				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
-				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
+				// const newAppContents: typeof applicationContents.$inferInsert = {
+				// 	application_id,
+				// 	created_at: new Date(),
+				// 	updated_at: new Date(),
+				// };
+				// const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
+				// if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
-				// Create associated Actions
-				const actionRepo = applicationActionService(db);
-				const actionResult = await actionRepo.create(newApplicationRecord[0]);
-				if (!actionResult.success) throw new Error(actionResult.errors);
-
-				// Join records
-				const { id: contents_id } = newAppContentsRecord[0];
-
-				const application = await transaction
-					.update(applications)
-					.set({ contents: contents_id })
-					.where(eq(applications.id, application_id))
-					.returning();
-
-				return application[0];
+				return newCollaboratorRecords;
 			});
-			return success(application);
+			return success(collaboratorRecords);
 		} catch (err) {
-			const message = `Error at createApplication with user_id: ${user_id}`;
+			const message = `Error at createCollaborators`;
 
 			logger.error(message);
 			logger.error(err);
