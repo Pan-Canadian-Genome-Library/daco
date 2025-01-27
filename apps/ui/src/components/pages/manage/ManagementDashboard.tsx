@@ -18,8 +18,8 @@
  */
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import DashboardFilter, { FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
+import DashboardFilter, { FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import { pcglTableTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationWithApplicantInformation } from '@/global/types';
