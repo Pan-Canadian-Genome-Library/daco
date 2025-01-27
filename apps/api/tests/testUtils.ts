@@ -26,6 +26,7 @@ import { fileURLToPath } from 'url';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import logger from '@/logger.js';
 
 export const testUserId = 'testUser@oicr.on.ca';
 export const testApplicationId = 1;
@@ -42,8 +43,8 @@ export const initTestMigration = async (db: PostgresDb) => {
 	try {
 		await migrate(db, { migrationsFolder });
 	} catch (err) {
-		console.log('Error Migrating on Database startup');
-		console.log(err);
+		logger.error('Error Migrating on Database startup');
+		logger.error(err);
 		throw err;
 	}
 };
