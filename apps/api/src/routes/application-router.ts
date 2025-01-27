@@ -234,28 +234,4 @@ applicationRouter.post(
 	},
 );
 
-/**
- * Add Collaborator
- */
-applicationRouter.post(
-	'/applications/collaborators',
-	jsonParser,
-	async (request: Request<{}, {}, { userId: string }, any>, response) => {
-		const { userId } = request.body;
-
-		if (!userId) {
-			response.status(400).send({ message: 'User ID is required.' });
-			return;
-		}
-
-		const result = await createApplication({ user_id: userId });
-
-		if (result.success) {
-			response.status(201).send(result.data);
-		} else {
-			response.status(500).send({ message: result.message, errors: String(result.errors) });
-		}
-	},
-);
-
 export default applicationRouter;

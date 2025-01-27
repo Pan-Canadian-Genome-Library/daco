@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,27 +17,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { bigint, pgTable, text, varchar } from 'drizzle-orm/pg-core';
-import { applicationContents } from './applicationContents.js';
+import bodyParser from 'body-parser';
+import express, { Request } from 'express';
 
-export const collaborators = pgTable('collaborators', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }),
-	first_name: varchar({ length: 255 }).notNull(),
-	middle_name: varchar({ length: 255 }),
-	last_name: varchar({ length: 255 }).notNull(),
-	title: varchar({ length: 255 }),
-	suffix: varchar({ length: 255 }),
-	position_title: varchar({ length: 255 }).notNull(),
-	institutional_email: varchar({ length: 320 }).notNull(),
-	profile_url: text(),
-	collaborator_type: text(),
-});
+import { createApplication } from '@/api/application-api.js';
 
-export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
-	application_id: one(applicationContents, {
-		fields: [collaborators.application_id],
-		references: [applicationContents.application_id],
-	}),
-}));
+const collaboratorsRouter = express.Router();
+const jsonParser = bodyParser.json();
+
+/**
+ * Add Collaborator
+ */
+collaboratorsRouter.post(
+	'/collaborators',
+	jsonParser,
+	async (request: Request<{}, {}, { userId: string }, any>, response) => {
+		const { userId } = request.body;
+
+		if (!userId) {
+			response.status(400).send({ message: 'User ID is required.' });
+			return;
+		}
+
+		const result = await createApplication({ user_id: userId });
+
+		if (result.success) {
+			response.status(201).send(result.data);
+		} else {
+			response.status(500).send({ message: result.message, errors: String(result.errors) });
+		}
+	},
+);
+
+export default collaboratorsRouter;
