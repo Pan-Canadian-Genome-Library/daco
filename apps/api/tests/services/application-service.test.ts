@@ -202,7 +202,15 @@ describe('Application Service', () => {
 		});
 
 		it('should allow sorting records by updated_at', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationService.listApplications({
+				user_id,
+				sort: [
+					{
+						direction: 'asc',
+						column: 'created_at',
+					},
+				],
+			});
 
 			assert.ok(applicationRecordsResult.success);
 			const applicationRecords = applicationRecordsResult.data.applications;
@@ -227,7 +235,15 @@ describe('Application Service', () => {
 				update: { state: ApplicationStates.REJECTED },
 			});
 
-			const updatedRecordsResult = await testApplicationService.listApplications({ user_id });
+			const updatedRecordsResult = await testApplicationService.listApplications({
+				user_id,
+				sort: [
+					{
+						direction: 'asc',
+						column: 'updated_at',
+					},
+				],
+			});
 
 			assert.ok(updatedRecordsResult.success);
 			const updatedRecords = updatedRecordsResult.data.applications;

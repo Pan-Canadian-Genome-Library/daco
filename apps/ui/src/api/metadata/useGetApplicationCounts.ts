@@ -17,28 +17,48 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ExclamationCircleFilled } from '@ant-design/icons';
-import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { Flex, theme } from 'antd';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-const { useToken } = theme;
+import { fetch } from '@/global/FetchClient';
+import { ApplicationCountMetadata, ServerError } from '@/global/types';
 
-interface StatusBarColumnType {
-	value: ApplicationStateValues;
-}
-
-const StatusTableColumn = ({ value }: StatusBarColumnType) => {
-	const { token } = useToken();
+const useGetApplicationCounts = (id?: string | number) => {
 	const { t: translate } = useTranslation();
-	return (
-		<Flex gap={token.padding} justify="space-between">
-			{translate(`application.states.${value}`)}
-			{value === ApplicationStates.DAC_REVIEW ? (
-				<ExclamationCircleFilled style={{ color: token.colorPrimary }} />
-			) : null}
-		</Flex>
-	);
+
+	return useQuery<ApplicationCountMetadata, ServerError>({
+		queryKey: [id],
+
+		queryFn: async () => {
+			const response = await fetch(`/applications/metadata/counts?userId=${id}`);
+
+			if (!response.ok) {
+				const error = {
+					message: translate('errors.generic.title'),
+					errors: translate('errors.generic.message'),
+				};
+
+				switch (response.status) {
+					case 400:
+						error.message = translate('errors.http.400.title');
+						error.errors = translate('errors.http.400.message');
+						break;
+					case 404:
+						error.message = translate('errors.http.404.title');
+						error.errors = translate('errors.http.404.message');
+						break;
+					default:
+						error.message = translate('errors.http.500.title');
+						error.errors = translate('errors.http.500.message');
+						break;
+				}
+
+				throw error;
+			}
+
+			return await response.json();
+		},
+	});
 };
 
-export default StatusTableColumn;
+export default useGetApplicationCounts;

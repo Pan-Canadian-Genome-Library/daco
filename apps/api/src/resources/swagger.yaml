@@ -103,7 +103,7 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
         '400':
-          description: 'Occurs when no User ID is provided, or page and/or page size are negative values.'
+          description: 'Occurs when no User ID is provided, an error has occurred while processing JSON provided for the state/sort values, or page and/or page size are negative values.'
           content:
             application/json:
               schema:
