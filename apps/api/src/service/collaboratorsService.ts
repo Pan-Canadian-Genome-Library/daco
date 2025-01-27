@@ -24,6 +24,7 @@ import { failure, success } from '@/utils/results.js';
 
 const collaboratorsService = (db: PostgresDb) => ({
 	createCollaborators: async ({
+		application_id,
 		first_name,
 		middle_name,
 		last_name,
@@ -31,6 +32,7 @@ const collaboratorsService = (db: PostgresDb) => ({
 		suffix,
 		institutional_email,
 	}: {
+		application_id: number;
 		first_name: string;
 		middle_name?: string;
 		last_name: string;
@@ -39,6 +41,7 @@ const collaboratorsService = (db: PostgresDb) => ({
 		institutional_email: string;
 	}) => {
 		const newCollaborators: typeof collaborators.$inferInsert = {
+			application_id,
 			first_name,
 			middle_name,
 			last_name,

@@ -30,6 +30,7 @@ import { type CollaboratorsService } from '@/service/types.js';
  * @returns Success with Collaborator data array / Failure with Error.
  */
 export const createCollaborators = async ({
+	application_id,
 	first_name,
 	middle_name,
 	last_name,
@@ -37,6 +38,7 @@ export const createCollaborators = async ({
 	suffix,
 	institutional_email,
 }: {
+	application_id: number;
 	first_name: string;
 	middle_name?: string;
 	last_name: string;
@@ -48,6 +50,7 @@ export const createCollaborators = async ({
 	const collaboratorsRepo: CollaboratorsService = collaboratorsService(database);
 
 	const result = await collaboratorsRepo.createCollaborators({
+		application_id,
 		first_name,
 		middle_name,
 		last_name,

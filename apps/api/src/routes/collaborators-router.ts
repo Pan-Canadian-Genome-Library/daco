@@ -35,19 +35,36 @@ collaboratorsRouter.post(
 		request: Request<
 			{},
 			{},
-			{ first_name: string; last_name: string; position_title: string; institutional_email: string },
+			{ applicationId: number; firstName: string; lastName: string; positionTitle: string; institutionalEmail: string },
 			any
 		>,
 		response,
 	) => {
-		const { first_name, last_name, position_title, institutional_email } = request.body;
+		const {
+			applicationId: application_id,
+			firstName: first_name,
+			lastName: last_name,
+			positionTitle: position_title,
+			institutionalEmail: institutional_email,
+		} = request.body;
 
-		if (!first_name || !last_name || !position_title || !institutional_email) {
-			response.status(400).send({ message: 'User ID is required.' });
+		if (!application_id) {
+			response.status(400).send({ message: 'applicationId is missing, cannot create Collaborators' });
 			return;
 		}
 
-		const result = await createCollaborators({ first_name, last_name, position_title, institutional_email });
+		if (!first_name || !last_name || !position_title || !institutional_email) {
+			response.status(400).send({ message: 'Required Collaborator details are missing.' });
+			return;
+		}
+
+		const result = await createCollaborators({
+			application_id,
+			first_name,
+			last_name,
+			position_title,
+			institutional_email,
+		});
 
 		if (result.success) {
 			response.status(201).send(result.data);
