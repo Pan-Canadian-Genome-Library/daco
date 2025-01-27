@@ -22,22 +22,26 @@ import { collaboratorsService } from '@/service/collaboratorsService.js';
 import { type CollaboratorsService } from '@/service/types.js';
 
 /**
- * Creates a new application and returns the created data.
- * @param first_name - The ID of the user requesting the creation of the application.
- * @param last_name - The ID of the user requesting the creation of the application.
- * @param position_title - The ID of the user requesting the creation of the application.
- * @param institutional_email - The ID of the user requesting the creation of the application.
- * @returns Success with Collaborator data / Failure with Error.
+ * Creates a new collaborator and returns the created data.
+ * @param first_name - Collaborator's first name
+ * @param last_name - Collaborator's last name
+ * @param position_title - Collaborator's position title
+ * @param institutional_email - Collaborator's institutional email address
+ * @returns Success with Collaborator data array / Failure with Error.
  */
 export const createCollaborators = async ({
 	first_name,
+	middle_name,
 	last_name,
 	position_title,
+	suffix,
 	institutional_email,
 }: {
 	first_name: string;
+	middle_name?: string;
 	last_name: string;
 	position_title: string;
+	suffix?: string;
 	institutional_email: string;
 }) => {
 	const database = getDbInstance();
@@ -45,8 +49,10 @@ export const createCollaborators = async ({
 
 	const result = await collaboratorsRepo.createCollaborators({
 		first_name,
+		middle_name,
 		last_name,
 		position_title,
+		suffix,
 		institutional_email,
 	});
 
