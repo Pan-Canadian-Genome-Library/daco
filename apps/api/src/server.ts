@@ -28,6 +28,7 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/application-router.js';
+import collaboratorsRouter from '@/routes/collaborators-router.js';
 import logger from './logger.js';
 
 const { npm_package_version } = process.env;
@@ -50,6 +51,7 @@ const startServer = async () => {
 	app.use(ExpressLogger({ logger }));
 
 	app.use(applicationRouter);
+	app.use(collaboratorsRouter);
 
 	app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))));
 

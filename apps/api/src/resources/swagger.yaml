@@ -280,6 +280,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationRecord'
+
   /applications/approve:
     post:
       tags:
@@ -317,6 +318,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
+  /collaborators/create:
+    post:
+      tags:
+        - Collaborators
+      summary: Create new Collaborators for an application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/CollaboratorCreation'
+      responses:
+        '500':
+          description: 'Error creating collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error creating Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '201':
+          description: 'Application created'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Collaborators'
 
 components:
   schemas:
@@ -564,6 +598,34 @@ components:
           type: object
           $ref: '#/components/schemas/ApplicationContents'
 
+    Collaborators:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the collaborator in the database.
+        application_id:
+          type: number
+          description: The Application ID associated with the Collaborator.
+        first_name:
+          type: string
+          description: The collaborator's first name
+        middle_name:
+          type: string
+          description: The collaborator's middle name
+        last_name:
+          type: string
+          description: The collaborator's last name
+        suffix:
+          type: string
+          description: The collaborator's additional name suffix
+        position_title:
+          type: string
+          description: The collaborator's job title
+        institutional_email:
+          type: string
+          description: The collaborator's contact email
+
   requests:
     ApplicationCreation:
       type: object
@@ -596,6 +658,37 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+
+    CollaboratorCreation:
+      type: object
+      required:
+        - applicationId
+        - firstName
+        - lastName
+        - positionTitle
+        - institutionalEmail
+      properties:
+        applicationId:
+          type: number
+          description: The Application ID associated with the Collaborator.
+        firstName:
+          type: string
+          description: The collaborator's first name
+        middleName:
+          type: string
+          description: The collaborator's middle name
+        lastName:
+          type: string
+          description: The collaborator's last name
+        suffix:
+          type: string
+          description: The collaborator's additional name suffix
+        positionTitle:
+          type: string
+          description: The collaborator's job title
+        institutionalEmail:
+          type: string
+          description: The collaborator's contact email
 
   responses:
     ClientErrors:

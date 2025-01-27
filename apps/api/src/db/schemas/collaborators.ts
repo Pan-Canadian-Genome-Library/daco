@@ -33,7 +33,6 @@ export const collaborators = pgTable('collaborators', {
 	institutional_email: varchar({ length: 320 }).notNull(),
 	profile_url: text(),
 	collaborator_type: text(),
-	// TODO: need email? how do we connect this
 });
 
 export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
