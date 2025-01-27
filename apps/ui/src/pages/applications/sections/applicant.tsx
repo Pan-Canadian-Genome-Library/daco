@@ -18,12 +18,12 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { applicantInformationSchema, ApplicantInformationType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
-import * as z from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import InputBox from '@/components/pages/application/form-components/InputBox';
@@ -33,43 +33,17 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 
-type FieldType = {
-	applicantTitle: string;
-	applicantFirstName: string;
-	applicantMiddleName: string;
-	applicantLastName: string;
-	applicantSuffix: string;
-	applicantPrimaryAffiliation: string;
-	applicantInstituteAffiliation: string;
-	applicantProfileUrl: string;
-	applicantPositionTitle: string;
-	institutionCountry: string;
-	institutionState: string;
-	institutionCity: string;
-	institutionStreetAddress: string;
-	institutionPostalCode: string;
-	institutionBuilding: string;
-};
-
-const schema = z.object({
-	applicantTitle: z.string().min(1, { message: 'Required' }),
-	applicantFirstName: z
-		.string()
-		.min(1, { message: 'Required' })
-		.max(15, { message: 'First name should be less than 15 characters' }),
-});
-
-const rule = createSchemaFieldRule(schema);
+const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<FieldType>({
-		resolver: zodResolver(schema),
+	const { handleSubmit, control } = useForm<ApplicantInformationType>({
+		resolver: zodResolver(applicantInformationSchema),
 	});
 
-	const onSubmit: SubmitHandler<FieldType> = (data) => {
+	const onSubmit: SubmitHandler<ApplicantInformationType> = (data) => {
 		console.log(data);
 	};
 
@@ -266,7 +240,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
 			</Form>
 		</SectionWrapper>
 	);
