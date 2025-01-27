@@ -22,9 +22,9 @@ import * as z from 'zod';
 export type ApplicantInformationType = {
 	applicantTitle: string;
 	applicantFirstName: string;
-	applicantMiddleName: string;
+	applicantMiddleName?: string;
 	applicantLastName: string;
-	applicantSuffix: string;
+	applicantSuffix?: string;
 	applicantPrimaryAffiliation: string;
 	applicantInstituteAffiliation: string;
 	applicantProfileUrl: string;
@@ -34,10 +34,10 @@ export type ApplicantInformationType = {
 	institutionCity: string;
 	institutionStreetAddress: string;
 	institutionPostalCode: string;
-	institutionBuilding: string;
+	institutionBuilding?: string;
 };
 
-export const applicantInformationSchema = z.object({
+export const applicantInformationSchema: z.ZodType<ApplicantInformationType> = z.object({
 	applicantTitle: z.string({ message: 'Please fill out the required field' }),
 	applicantFirstName: z
 		.string({ message: 'Please fill out the required field' })
