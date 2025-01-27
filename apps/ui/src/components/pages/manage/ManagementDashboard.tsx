@@ -69,10 +69,7 @@ const tableColumnConfiguration = [
 				PCGL-{value}
 			</Link>
 		),
-		// sortDirections: ['ascend', 'descend']
-		sorter: true,
-		// sorter: (a: ApplicationWithApplicantInformation, b: ApplicationWithApplicantInformation) =>
-		// 	parseInt(a.id) - parseInt(b.id),
+		sorter: { multiple: 3 },
 	},
 	{
 		title: 'Institution',
@@ -84,21 +81,24 @@ const tableColumnConfiguration = [
 	{
 		title: 'Country',
 		dataIndex: ['applicantInformation', 'country'],
+		key: 'country',
 		render: (value: string, record: ApplicationWithApplicantInformation) =>
 			record.applicantInformation.country ? record.applicantInformation.country : '-',
 	},
 	{
 		title: 'Applicant',
 		dataIndex: ['applicantInformation', 'firstName'],
+		key: 'applicant',
 		render: (value: string, record: ApplicationWithApplicantInformation) =>
 			record.applicantInformation.firstName && record.applicantInformation.lastName
 				? `${record.applicantInformation.firstName} ${record.applicantInformation.lastName}`
 				: '-',
-		key: 'applicant-info-' + new Date().getTime(),
+		sorter: { multiple: 3 },
 	},
 	{
 		title: 'Email',
 		dataIndex: ['applicantInformation', 'email'],
+		key: 'email',
 		render: (value: string, record: ApplicationWithApplicantInformation) =>
 			record.applicantInformation.email ? record.applicantInformation.email : '-',
 	},
@@ -107,18 +107,14 @@ const tableColumnConfiguration = [
 		dataIndex: 'updatedAt',
 		key: 'updatedAt',
 		render: (value?: string) => (value ? new Date(value).toLocaleDateString('en-CA') : '-'),
-		sorter: true,
-		// sorter: (a: ApplicationWithApplicantInformation, b: ApplicationWithApplicantInformation) => {
-		// 	return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-		// },
+		sorter: { multiple: 3 },
 	},
 	{
 		title: 'Status',
 		dataIndex: 'state',
 		key: 'state',
 		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
-		sorter: true,
-		// sorter: (a: { state: string }, b: { state: string }) => (a.state < b.state ? -1 : a.state > b.state ? 1 : 0),
+		sorter: { multiple: 3 },
 	},
 ];
 

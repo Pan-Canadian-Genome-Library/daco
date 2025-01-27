@@ -24,9 +24,9 @@ import { fetch } from '@/global/FetchClient';
 import { ApplicationList, ServerError } from '@/global/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
-interface ApplicationListSortingOptions {
+export interface ApplicationListSortingOptions {
 	direction: 'desc' | 'asc';
-	column: 'id' | 'user_id' | 'state' | 'created_at' | 'approved_at' | 'expires_at';
+	column: 'user_id' | 'id' | 'created_at' | 'updated_at' | 'state' | 'approved_at' | 'expires_at';
 }
 interface ApplicationListParams {
 	userId: string;
@@ -44,6 +44,7 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 		queryParams.set('state', JSON.stringify(state));
 	}
 	if (sort) {
+		console.log(sort)
 		queryParams.set('sort', JSON.stringify(sort));
 	}
 	if (page !== undefined) {
