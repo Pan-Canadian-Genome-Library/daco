@@ -23,7 +23,7 @@ import { PropsWithChildren } from 'react';
 const { Title } = Typography;
 
 interface SectionContentProps extends PropsWithChildren {
-	title: string;
+	title?: string;
 	showDivider?: boolean;
 }
 

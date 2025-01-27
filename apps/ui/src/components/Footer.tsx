@@ -170,7 +170,7 @@ const FooterComponent = () => {
 							</Link>
 							<Row align={'middle'} justify={'center'} gutter={[0, token.padding]} wrap>
 								{pcglLinks.concat(policiesConditionsLinks).map((itemLink) => (
-									<Col md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
+									<Col key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
 										<Flex justify={breakpoints.md ? 'flex-start' : 'center'}>
 											<Link
 												key={itemLink.name}
