@@ -22,6 +22,7 @@ import { Navigate, Route, Routes } from 'react-router';
 import PageLayout from '@/components/layouts/PageLayout';
 import ApplicationViewer from '@/pages/applications';
 import Applicant from '@/pages/applications/sections/applicant';
+import Collaborators from '@/pages/applications/sections/collaborators';
 import Institutional from '@/pages/applications/sections/institutional';
 import Introduction from '@/pages/applications/sections/intro';
 import DashboardPage from '@/pages/dashboard';
@@ -43,6 +44,11 @@ export const ApplicationSectionRoutes = [
 		route: 'institutional',
 		path: 'institutional/edit?',
 		element: <Institutional />,
+	},
+	{
+		route: 'collaborators',
+		path: 'collaborators/edit?',
+		element: <Collaborators />,
 	},
 ];
 

@@ -21,6 +21,7 @@ import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
 import {
+	approveApplication,
 	createApplication,
 	editApplication,
 	getAllApplications,
@@ -192,6 +193,50 @@ applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {
 		res.status(200).send(result.data);
 	} else {
 		res.status(500).send({ message: result.message, errors: String(result.errors) });
+	}
+});
+applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
+	const { applicationId }: { applicationId?: number } = req.body;
+
+	if (typeof applicationId !== 'number' || !applicationId) {
+		res.status(400).send({
+			message: 'Invalid request. ApplicationId must be a valid number and is required.',
+			errors: 'MissingOrInvalidParameters',
+		});
+		return;
+	}
+
+	try {
+		const result = await approveApplication({ applicationId });
+
+		if (result.success) {
+			res.status(200).send({
+				message: 'Application approved successfully.',
+				data: result.data,
+			});
+		} else {
+			let status = 500;
+			let message = result.message || 'An unexpected error occurred.';
+			let errors = result.errors;
+
+			if (errors === 'ApplicationNotFound') {
+				status = 404;
+				message = 'Application not found.';
+			} else if (errors === 'ApprovalConflict') {
+				status = 409;
+				message = 'Approval conflict detected.';
+			} else if (errors === 'InvalidState') {
+				status = 400;
+				message = 'Invalid application state.';
+			}
+
+			res.status(status).send({ message, errors });
+		}
+	} catch (error) {
+		res.status(500).send({
+			message: 'Internal server error.',
+			errors: String(error),
+		});
 	}
 });
 

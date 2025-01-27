@@ -66,6 +66,13 @@ const pcglTheme: ThemeConfig = {
 		colorIcon: pcglColors.primary,
 	},
 	components: {
+		Table: {
+			colorBgContainer: '#fff',
+			headerBg: '#fafafa',
+			headerSortActiveBg: '#f0f0f0',
+			headerSortHoverBg: '#f0f0f0',
+			rowHoverBg: 'rgba(0, 0, 0, 0.02)',
+		},
 		Button: {
 			fontWeight: 700,
 			defaultColor: pcglColors.black,
@@ -128,6 +135,7 @@ export const pcglFooterTheme: ThemeConfig = {
 			footerBg: pcglColors.secondary,
 		},
 		Typography: {
+			fontSize: 12,
 			colorText: pcglColors.white,
 			colorLink: pcglColors.quaternary,
 			colorLinkHover: 'rgba(255, 214, 231, 0.5)',

@@ -21,6 +21,7 @@ import { and, eq } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
+import logger from '@/logger.js';
 import { applicationActionsQuery } from '@/service/utils.js';
 import { failure, success } from '@/utils/results.js';
 import {
@@ -54,8 +55,8 @@ const applicationActionService = (db: PostgresDb) => {
 			return success(newActionRecord[0]);
 		} catch (err) {
 			const message = `Error creating action with user_id: ${user_id} & application_id: ${application_id}`;
-			console.error(message);
-			console.error(err);
+			logger.error(message);
+			logger.error(err);
 			return failure(message, err);
 		}
 	};
@@ -105,8 +106,8 @@ const applicationActionService = (db: PostgresDb) => {
 				return success(actionRecord[0]);
 			} catch (err) {
 				const message = `Error at getActionById with id: ${id}`;
-				console.error(message);
-				console.error(err);
+				logger.error(message);
+				logger.error(err);
 				return failure(message, err);
 			}
 		},
@@ -140,8 +141,8 @@ const applicationActionService = (db: PostgresDb) => {
 				return success(allActions);
 			} catch (err) {
 				const message = `Error at listActions with user_id: ${user_id}`;
-				console.error(message);
-				console.error(err);
+				logger.error(message);
+				logger.error(err);
 				return failure(message, err);
 			}
 		},
