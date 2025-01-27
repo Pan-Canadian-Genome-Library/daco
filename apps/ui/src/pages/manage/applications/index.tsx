@@ -185,7 +185,7 @@ const ManageApplicationsPage = () => {
 	}, [tableDataRefetch, tableParams, sorting]);
 
 	/**
-	 * Once we receive data from the sever, reapply it to our table.
+	 * Once we receive data from the server, reapply it to our table.
 	 */
 	useEffect(() => {
 		const serverPaginationState = tableData?.pagingMetadata;
