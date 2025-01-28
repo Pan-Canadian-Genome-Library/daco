@@ -22,6 +22,8 @@ import express, { Request } from 'express';
 
 import { createCollaborators } from '@/api/collaborators-api.js';
 
+import { getApplicationById } from '@/api/application-api.js';
+
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
 
@@ -48,6 +50,8 @@ collaboratorsRouter.post(
 		>,
 		response,
 	) => {
+		// TODO: Add Real Auth
+		const { authorization } = request.headers;
 		const {
 			applicationId: application_id,
 			firstName: first_name,
@@ -58,6 +62,11 @@ collaboratorsRouter.post(
 			institutionalEmail: institutional_email,
 		} = request.body;
 
+		if (!authorization) {
+			response.status(400).send({ message: 'Unauthorized, cannot create Collaborators' });
+			return;
+		}
+
 		if (!application_id) {
 			response.status(400).send({ message: 'applicationId is missing, cannot create Collaborators' });
 			return;
@@ -66,6 +75,24 @@ collaboratorsRouter.post(
 		if (!first_name || !last_name || !position_title || !institutional_email) {
 			response.status(400).send({ message: 'Required Collaborator details are missing.' });
 			return;
+		}
+
+		// TODO: Add Real Auth
+		// Validate User is Applicant
+		const parsedUser = { user_id: 'testUser@oicr.on.ca' };
+
+		const applicationResult = await getApplicationById({ applicationId: application_id });
+
+		if (!applicationResult.success) {
+			return response
+				.status(500)
+				.send({ message: applicationResult.message, errors: String(applicationResult.errors) });
+		}
+
+		const application = applicationResult.data;
+
+		if (!(parsedUser.user_id === application.user_id)) {
+			return response.status(500).send({ message: 'Unauthorized, cannot create Collaborators' });
 		}
 
 		const result = await createCollaborators({
@@ -80,8 +107,10 @@ collaboratorsRouter.post(
 
 		if (result.success) {
 			response.status(201).send(result.data);
+			return;
 		} else {
 			response.status(500).send({ message: result.message, errors: String(result.errors) });
+			return;
 		}
 	},
 );
