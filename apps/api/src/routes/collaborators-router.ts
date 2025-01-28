@@ -38,9 +38,9 @@ collaboratorsRouter.post(
 			{
 				applicationId: number;
 				firstName: string;
-				middleName: string;
+				middleName?: string;
 				lastName: string;
-				suffix: string;
+				suffix?: string;
 				positionTitle: string;
 				institutionalEmail: string;
 			},
