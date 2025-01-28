@@ -33,15 +33,13 @@ export const applicantInformationSchema = z.object({
 		.email({ message: 'Please enter a valid email address.' }),
 	applicantProfileUrl: z
 		.string({ message: 'Please fill out the required field' })
-		.url({ message: 'Please enter a valid Url address.' })
-		.refine((val) => val.startsWith('https://') || val.startsWith('http://'), {
-			message: 'Please enter a valid url. Must begin with http:// or https://.',
-			path: ['url'],
-		}),
+		.url({ message: 'Please enter a valid url. Must begin with http:// or https://.' }),
 	applicantPositionTitle: z.string({ message: 'Please fill out the required field' }),
 	institutionCountry: z.string({ message: 'Please fill out the required field' }),
 	institutionState: z.string({ message: 'Please fill out the required field' }),
 	institutionCity: z.string({ message: 'Please fill out the required field' }),
-	institutionPostalCode: z.string({ message: 'Please fill out the required field' }),
+	institutionPostalCode: z
+		.string({ message: 'Please fill out the required field' })
+		.regex(/^[A-Za-z0-9\- ]+$/, { message: 'Please enter a valid postal code.' }),
 	institutionStreetAddress: z.string({ message: 'Please fill out the required field' }),
 });
