@@ -19,24 +19,6 @@
 
 import * as z from 'zod';
 
-export type ApplicantInformationType = {
-	applicantTitle: string;
-	applicantFirstName: string;
-	applicantMiddleName?: string;
-	applicantLastName: string;
-	applicantSuffix?: string;
-	applicantPrimaryAffiliation: string;
-	applicantInstituteAffiliation: string;
-	applicantProfileUrl: string;
-	applicantPositionTitle: string;
-	institutionCountry: string;
-	institutionState: string;
-	institutionCity: string;
-	institutionStreetAddress: string;
-	institutionPostalCode: string;
-	institutionBuilding?: string;
-};
-
 export const applicantInformationSchema = z.object({
 	applicantTitle: z.string({ message: 'Please fill out the required field' }),
 	applicantFirstName: z

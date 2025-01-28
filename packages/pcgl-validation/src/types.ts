@@ -17,5 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './types.js';
-export * from './validation.js';
+export type ApplicantInformationSchemaType = {
+	applicantTitle: string;
+	applicantFirstName: string;
+	applicantMiddleName?: string;
+	applicantLastName: string;
+	applicantSuffix?: string;
+	applicantPrimaryAffiliation: string;
+	applicantInstituteAffiliation: string;
+	applicantProfileUrl: string;
+	applicantPositionTitle: string;
+	institutionCountry: string;
+	institutionState: string;
+	institutionCity: string;
+	institutionStreetAddress: string;
+	institutionPostalCode: string;
+	institutionBuilding?: string;
+};
