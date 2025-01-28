@@ -30,7 +30,7 @@ import {
 } from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationService } from '@/service/applicationService.js';
-import { ApplicationService } from '@/service/types.js';
+import { type ApplicationServiceType } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -45,7 +45,7 @@ import {
 
 describe('Application API', () => {
 	let db: PostgresDb;
-	let testApplicationRepo: ApplicationService;
+	let testApplicationRepo: ApplicationServiceType;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {

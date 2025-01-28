@@ -36,8 +36,8 @@ export interface JoinedApplicationRecord extends Omit<ApplicationData, 'contents
 export type ApplicationData = typeof applications.$inferSelect;
 export type ApplicationActionData = typeof applicationActions.$inferSelect;
 
-export type ApplicationService = ReturnType<typeof applicationService>;
-export type ApplicationActionService = ReturnType<typeof applicationActionService>;
+export type ApplicationServiceType = ReturnType<typeof applicationService>;
+export type ApplicationActionServiceType = ReturnType<typeof applicationActionService>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 

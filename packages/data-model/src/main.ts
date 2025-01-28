@@ -18,13 +18,13 @@
  */
 
 export {
-	type Applicant,
+	type ApplicantType,
 	type ApplicationContentsResponse,
 	type ApplicationResponseData,
-	type Collaborator,
-	type EthicsData,
-	type Institution,
-	type InstitutionalRep,
-	type Project,
-	type RequestedStudies,
+	type CollaboratorType,
+	type EthicsDataType,
+	type InstitutionType,
+	type InstitutionalRepType,
+	type ProjectType,
+	type RequestedStudiesType,
 } from './types.js';
