@@ -232,7 +232,7 @@ export interface Files {
 	id: number;
 	applicationId: number;
 	type: FileType;
-	SubmitterUserId: number;
+	submitterUserId: number;
 	submitted_at: Date;
 	content: any;
 	filename: string;
