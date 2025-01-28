@@ -18,7 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { applicantInformationSchema, ApplicantInformationType } from '@pcgl-daco/validation';
+import { applicantInformationSchema, ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -39,11 +39,11 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<ApplicantInformationType>({
+	const { handleSubmit, control } = useForm<ApplicantInformationSchemaType>({
 		resolver: zodResolver(applicantInformationSchema),
 	});
 
-	const onSubmit: SubmitHandler<ApplicantInformationType> = (data) => {
+	const onSubmit: SubmitHandler<ApplicantInformationSchemaType> = (data) => {
 		console.log(data);
 	};
 
