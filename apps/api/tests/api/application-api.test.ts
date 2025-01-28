@@ -29,7 +29,7 @@ import {
 	getApplicationStateTotals,
 } from '@/api/application-api.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationService } from '@/service/applicationService.js';
+import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationServiceType } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
@@ -61,7 +61,7 @@ describe('Application API', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		testApplicationRepo = applicationService(db);
+		testApplicationRepo = applicationSvc(db);
 	});
 
 	describe('Edit Application', () => {

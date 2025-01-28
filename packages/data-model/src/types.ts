@@ -98,7 +98,7 @@ export const ApplicationMessages = {
 
 // Data Types
 
-export interface ApplicantType {
+export interface ApplicantDTO {
 	applicantFirstName?: string | null;
 	applicantLastName?: string | null;
 	applicantMiddleName?: string | null;
@@ -110,7 +110,7 @@ export interface ApplicantType {
 	applicantPositionTitle?: string | null;
 }
 
-export type InstitutionalRepType = {
+export type InstitutionalRepDTO = {
 	institutionalRepTitle?: string | null;
 	institutionalRepFirstName?: string | null;
 	institutionalRepMiddleName?: string | null;
@@ -122,7 +122,7 @@ export type InstitutionalRepType = {
 	institutionalRepPositionTitle?: string | null;
 };
 
-export type InstitutionType = {
+export type InstitutionDTO = {
 	institutionCountry?: string | null;
 	institutionState?: string | null;
 	institutionStreetAddress?: string | null;
@@ -131,7 +131,7 @@ export type InstitutionType = {
 	institutionPostalCode?: string | null;
 };
 
-export type ProjectType = {
+export type ProjectDTO = {
 	projectTitle?: string | null;
 	projectWebsite?: string | null;
 	projectAbstract?: string | null;
@@ -140,7 +140,7 @@ export type ProjectType = {
 	projectPublicationUrls?: string[] | null;
 };
 
-export interface RequestedStudiesType {
+export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
 
@@ -159,24 +159,24 @@ export type ApplicationContentsResponse = {
 	applicationId?: number;
 	createdAt?: Date;
 	updatedAt?: Date | null;
-} & ApplicantType &
-	InstitutionType &
-	InstitutionalRepType &
-	ProjectType &
-	RequestedStudiesType;
+} & ApplicantDTO &
+	InstitutionDTO &
+	InstitutionalRepDTO &
+	ProjectDTO &
+	RequestedStudiesDTO;
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 };
 
 // TODO: Additional Types to be updated
-export interface EthicsDataType {
+export interface EthicsDataDTO {
 	ethicsReviewRequired?: boolean | null;
 	ethicsLetter?: number | null;
 	signedPdf?: number | null;
 }
 
-export interface CollaboratorType {
+export interface CollaboratorDTO {
 	collaboratorFirstName?: string | null;
 	collaboratorMiddleName?: string | null;
 	collaboratorLastName?: string | null;
@@ -188,13 +188,13 @@ export interface CollaboratorType {
 	collaboratorType?: string | null;
 }
 
-export type RevisionRequestType = {
+export type RevisionRequestDTO = {
 	id: number;
 	applicationId: number;
 	createdAt: Date;
 	createdBy: string;
 	version: number;
-	changes: ApplicationActionType[];
+	changes: ApplicationActionDTO[];
 	comments?: string;
 	applicantApproved: Boolean;
 	applicantNotes?: string;
@@ -208,7 +208,7 @@ export type RevisionRequestType = {
 	requestedStudiesNotes?: string;
 };
 
-export type ApplicationActionType = {
+export type ApplicationActionDTO = {
 	id: number;
 	applicationId: number;
 	createdAt: Date;
@@ -219,7 +219,7 @@ export type ApplicationActionType = {
 	revisionsRequestId: number;
 };
 
-export interface AgreementsType {
+export interface AgreementsDTO {
 	id: number;
 	userId: string;
 	name: string;
@@ -228,7 +228,7 @@ export interface AgreementsType {
 	agreedAt: Date;
 }
 
-export interface FilesType {
+export interface FilesDTO {
 	id: number;
 	applicationId: number;
 	type: FileType;

@@ -26,8 +26,8 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
-import { applicationActionService } from '@/service/applicationActionService.js';
-import { applicationService } from '@/service/applicationService.js';
+import { applicationActionSvc } from '@/service/applicationActionService.js';
+import { applicationSvc } from '@/service/applicationService.js';
 import {
 	type ApplicationActionsColumnName,
 	type ApplicationActionServiceType,
@@ -66,8 +66,8 @@ describe('Application Action Service', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		testActionRepo = applicationActionService(db);
-		testApplicationRepo = applicationService(db);
+		testActionRepo = applicationActionSvc(db);
+		testApplicationRepo = applicationSvc(db);
 	});
 
 	describe('All Actions', () => {

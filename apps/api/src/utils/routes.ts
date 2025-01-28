@@ -37,7 +37,7 @@ export const isPositiveNumber = (num: number) => {
  * @param data Database Application Record
  * @returns ApplicationResponseData - Application record with updated keys
  */
-export const aliasApplicationData = (data: JoinedApplicationRecord): ApplicationResponseData => {
+export const aliasApplicationModel = (data: JoinedApplicationRecord): ApplicationResponseData => {
 	const {
 		id,
 		user_id: userId,
