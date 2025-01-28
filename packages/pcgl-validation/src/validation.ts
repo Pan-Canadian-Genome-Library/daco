@@ -37,7 +37,7 @@ export type ApplicantInformationType = {
 	institutionBuilding?: string;
 };
 
-export const applicantInformationSchema: z.ZodType<ApplicantInformationType> = z.object({
+export const applicantInformationSchema = z.object({
 	applicantTitle: z.string({ message: 'Please fill out the required field' }),
 	applicantFirstName: z
 		.string({ message: 'Please fill out the required field' })

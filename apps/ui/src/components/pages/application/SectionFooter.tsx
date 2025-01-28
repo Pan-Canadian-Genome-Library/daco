@@ -55,10 +55,6 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 		navigate(`/application/${id}/${previousRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
-	const nextSection = () => {
-		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
-	};
-
 	const submitApplication = () => {
 		console.log('Submit application');
 	};
@@ -71,7 +67,7 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 				</Button>
 			) : null}
 			{nextRoute ? (
-				<Button onClick={nextSection} type="primary">
+				<Button htmlType="submit" type="primary">
 					{translate('button.next')}
 				</Button>
 			) : (
