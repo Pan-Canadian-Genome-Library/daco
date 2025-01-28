@@ -41,10 +41,10 @@ export const applicantInformationSchema: z.ZodType<ApplicantInformationType> = z
 	applicantTitle: z.string({ message: 'Please fill out the required field' }),
 	applicantFirstName: z
 		.string({ message: 'Please fill out the required field' })
-		.min(2, { message: 'Must bet at least 2 characters long' }),
+		.min(2, { message: 'Must be at least 2 characters long' }),
 	applicantLastName: z
 		.string({ message: 'Please fill out the required field' })
-		.min(2, { message: 'Must bet at least 2 characters long' }),
+		.min(2, { message: 'Must be at least 2 characters long' }),
 	applicantPrimaryAffiliation: z.string({ message: 'Please fill out the required field' }),
 	applicantInstituteAffiliation: z
 		.string({ message: 'Please fill out the required field' })
