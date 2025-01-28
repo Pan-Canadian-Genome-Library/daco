@@ -49,7 +49,7 @@ const Applicant = () => {
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form layout="vertical">
 				<SectionTitle
 					title={translate('applicant-section.title')}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
