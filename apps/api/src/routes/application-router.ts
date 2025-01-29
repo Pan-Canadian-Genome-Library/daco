@@ -116,7 +116,7 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 
 	try {
 		sort = sortQuery ? JSON.parse(sortQuery) : [];
-		state = sortQuery ? JSON.parse(stateQuery) : [];
+		state = stateQuery ? JSON.parse(stateQuery) : [];
 	} catch {
 		res.status(400).send({ message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.' });
 		return;
