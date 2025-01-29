@@ -22,7 +22,7 @@ import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { collaboratorsService } from '@/service/collaboratorsService.js';
+import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -34,7 +34,7 @@ export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'content
 	contents: ApplicationContentUpdates | null;
 }
 
-export type CollaboratorsService = ReturnType<typeof collaboratorsService>;
+export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 export type ApplicationModel = typeof applications.$inferSelect;
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 

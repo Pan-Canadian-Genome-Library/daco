@@ -22,7 +22,7 @@ import { collaborators } from '@/db/schemas/collaborators.js';
 import logger from '@/logger.js';
 import { failure, success } from '@/utils/results.js';
 
-const collaboratorsService = (db: PostgresDb) => ({
+const collaboratorsSvc = (db: PostgresDb) => ({
 	createCollaborators: async ({
 		application_id,
 		first_name,
@@ -81,4 +81,4 @@ const collaboratorsService = (db: PostgresDb) => ({
 	},
 });
 
-export { collaboratorsService };
+export { collaboratorsSvc };
