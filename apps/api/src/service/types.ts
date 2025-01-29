@@ -20,6 +20,7 @@
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
@@ -42,6 +43,7 @@ export type ApplicationActionServiceType = ReturnType<typeof applicationActionSv
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+export type CollaboratorModel = typeof collaborators.$inferInsert;
 
 export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';

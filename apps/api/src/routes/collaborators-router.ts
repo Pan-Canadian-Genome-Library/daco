@@ -18,66 +18,60 @@
  */
 
 import bodyParser from 'body-parser';
-import express from 'express';
+import express, { Request } from 'express';
 
 import { createCollaborators } from '@/api/collaboratorsController.js';
+import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
 
+type CollaboratorRequest = {
+	applicationId: number;
+	collaborators: CollaboratorDTO[];
+};
+
 /**
  * Add Collaborator
  */
-collaboratorsRouter.post('/collaborators/create', jsonParser, async (request, response) => {
-	// TODO: Add Real Auth
-	const { authorization } = request.headers;
-	const {
-		applicationId: application_id,
-		firstName: first_name,
-		middleName: middle_name,
-		lastName: last_name,
-		suffix,
-		positionTitle: position_title,
-		institutionalEmail: institutional_email,
-	} = request.body;
+collaboratorsRouter.post(
+	'/collaborators/create',
+	jsonParser,
+	async (request: Request<{}, {}, CollaboratorRequest, any>, response) => {
+		// TODO: Add Real Auth
+		const { authorization } = request.headers;
+		const { applicationId: application_id, collaborators } = request.body;
 
-	if (!first_name || !last_name || !position_title || !institutional_email) {
-		response.status(400).send({ message: 'Required Collaborator details are missing.' });
-		return;
-	}
-
-	if (!authorization) {
-		response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
-		return;
-	}
-
-	if (!application_id) {
-		response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
-		return;
-	}
-
-	const result = await createCollaborators({
-		application_id,
-		first_name,
-		middle_name,
-		last_name,
-		position_title,
-		suffix,
-		institutional_email,
-	});
-
-	if (result.success) {
-		response.status(201).send(result.data);
-		return;
-	} else {
-		if (result.message === 'Unauthorized, cannot create Collaborators') {
-			response.status(401);
-		} else {
-			response.status(500);
+		if (!authorization) {
+			response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
+			return;
 		}
-		response.send({ message: result.message, errors: String(result.errors) });
-		return;
-	}
-});
+
+		if (!application_id) {
+			response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
+			return;
+		}
+
+		const result = await createCollaborators({
+			application_id,
+			collaborators,
+		});
+
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			if (result.message === 'Required Collaborator details are missing.') {
+				response.status(400);
+			} else if (result.message === 'Unauthorized, cannot create Collaborators') {
+				response.status(401);
+			} else {
+				response.status(500);
+			}
+			response.send({ message: result.message, errors: String(result.errors) });
+			return;
+		}
+	},
+);
 
 export default collaboratorsRouter;

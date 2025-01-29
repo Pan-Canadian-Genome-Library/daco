@@ -20,8 +20,16 @@
 import { getDbInstance } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
-import { type ApplicationServiceType, type CollaboratorsService } from '@/service/types.js';
+import { type ApplicationServiceType, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
+import { CollaboratorDTO } from '@pcgl-daco/data-model';
+
+interface ValidCollaboratorDTO extends CollaboratorDTO {
+	collaboratorFirstName: string;
+	collaboratorLastName: string;
+	collaboratorPositionTitle: string;
+	collaboratorInstitutionalEmail: string;
+}
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -33,20 +41,10 @@ import { failure } from '@/utils/results.js';
  */
 export const createCollaborators = async ({
 	application_id,
-	first_name,
-	middle_name,
-	last_name,
-	position_title,
-	suffix,
-	institutional_email,
+	collaborators,
 }: {
 	application_id: number;
-	first_name: string;
-	middle_name?: string;
-	last_name: string;
-	position_title: string;
-	suffix?: string;
-	institutional_email: string;
+	collaborators: CollaboratorDTO[];
 }) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
@@ -62,20 +60,37 @@ export const createCollaborators = async ({
 		return applicationResult;
 	}
 
+	const validCollaborators: ValidCollaboratorDTO[] = collaborators.filter(
+		(data): data is ValidCollaboratorDTO =>
+			!data.collaboratorFirstName ||
+			!data.collaboratorLastName ||
+			!data.collaboratorPositionTitle ||
+			!data.collaboratorInstitutionalEmail,
+	);
+
+	if (!(validCollaborators.length === collaborators.length)) {
+		return failure('Required Collaborator details are missing.');
+	}
+
 	const application = applicationResult.data;
 
 	if (!(parsedUser.user_id === application.user_id)) {
 		return failure('Unauthorized, cannot create Collaborators');
 	}
 
+	const newCollaborators: CollaboratorModel[] = validCollaborators.map((data) => ({
+		first_name: data.collaboratorFirstName,
+		middle_name: data.collaboratorMiddleName,
+		last_name: data.collaboratorLastName,
+		suffix: data.collaboratorSuffix,
+		position_title: data.collaboratorPositionTitle,
+		institutional_email: data.collaboratorInstitutionalEmail,
+		application_id,
+	}));
+
 	const result = await collaboratorsRepo.createCollaborators({
 		application_id,
-		first_name,
-		middle_name,
-		last_name,
-		position_title,
-		suffix,
-		institutional_email,
+		newCollaborators,
 	});
 
 	return result;

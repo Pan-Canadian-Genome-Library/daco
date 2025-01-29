@@ -21,35 +21,16 @@ import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import logger from '@/logger.js';
 import { failure, success } from '@/utils/results.js';
+import { type CollaboratorModel } from './types.js';
 
 const collaboratorsSvc = (db: PostgresDb) => ({
 	createCollaborators: async ({
 		application_id,
-		first_name,
-		middle_name,
-		last_name,
-		position_title,
-		suffix,
-		institutional_email,
+		newCollaborators,
 	}: {
 		application_id: number;
-		first_name: string;
-		middle_name?: string;
-		last_name: string;
-		position_title: string;
-		suffix?: string;
-		institutional_email: string;
+		newCollaborators: CollaboratorModel[];
 	}) => {
-		const newCollaborators: typeof collaborators.$inferInsert = {
-			application_id,
-			first_name,
-			middle_name,
-			last_name,
-			position_title,
-			suffix,
-			institutional_email,
-		};
-
 		try {
 			const collaboratorRecords = await db.transaction(async (transaction) => {
 				// Create Collaborators
