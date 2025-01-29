@@ -50,6 +50,9 @@ i18n.use(initReactI18next).init({
 
 /**
  * Translation error mapping for custom error messages
+ *  NOTE: Question translating the other default errors options:
+ *  - 1. we install the zod-translation package
+ *  - 2. we add translations as we go from the CustomFormErrorTranslationMapping
  */
 const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 	/**
