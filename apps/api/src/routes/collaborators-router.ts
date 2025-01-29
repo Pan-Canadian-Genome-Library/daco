@@ -20,7 +20,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 
-import { createCollaborators } from '@/api/collaborators-api.js';
+import { createCollaborators } from '@/api/collaboratorsController.js';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
