@@ -30,8 +30,8 @@ import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
 	type ApplicationActionsColumnName,
-	type ApplicationActionServiceType,
-	type ApplicationServiceType,
+	type ApplicationActionService,
+	type ApplicationService,
 	type OrderBy,
 } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -49,8 +49,8 @@ import {
 
 describe('Application Action Service', () => {
 	let db: PostgresDb;
-	let testActionRepo: ApplicationActionServiceType;
-	let testApplicationRepo: ApplicationServiceType;
+	let testActionRepo: ApplicationActionService;
+	let testApplicationRepo: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {

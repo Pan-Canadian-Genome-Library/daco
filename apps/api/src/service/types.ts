@@ -42,8 +42,8 @@ export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
-export type ApplicationServiceType = ReturnType<typeof applicationSvc>;
-export type ApplicationActionServiceType = ReturnType<typeof applicationActionSvc>;
+export type ApplicationService = ReturnType<typeof applicationSvc>;
+export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 
 export type ApplicationStateTotals = {
