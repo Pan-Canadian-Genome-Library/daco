@@ -134,23 +134,19 @@ const ManageApplicationsPage = () => {
 	useEffect(() => {
 		const allUrlParams = new URLSearchParams();
 
+		const missingOrInvalidPageState =
+			!appliedFilters || !appliedPage || !isValidPageNumber(Number.parseInt(appliedPage));
+
+		const unknownFilters = !isFilterKeySet(parseFilters(appliedFilters));
+
 		/**
 		 * If somehow the user ends up at our page with just `/manage/applications` and no URL set state
 		 * we have to reset to a known good state, and exit out with the defaults.
-		 */
-		if (!appliedFilters || !appliedPage || !isValidPageNumber(Number.parseInt(appliedPage))) {
-			allUrlParams.set('filters', 'TOTAL');
-			allUrlParams.set('page', '1');
-			setSearchParams(allUrlParams);
-			return;
-		}
-
-		/**
-		 * Even with the user having a URL-bound state, we can't true that they have a known set of filters selected.
+		 *
+		 * If they _do_ have a URL-bound state, we can't trust that they have a known set of "good" filters selected.
 		 * We should validate this first before continuing.
 		 */
-		if (isFilterKeySet(parseFilters(appliedFilters)) == false) {
-			//If not, we want to reset the URL state to defaults.
+		if (missingOrInvalidPageState || unknownFilters) {
 			allUrlParams.set('filters', 'TOTAL');
 			allUrlParams.set('page', '1');
 			setSearchParams(allUrlParams);
