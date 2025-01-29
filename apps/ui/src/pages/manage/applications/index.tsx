@@ -43,6 +43,10 @@ export interface TableProperties {
 
 const ManageApplicationsPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
+
+	const appliedFilters = searchParams.get('filters');
+	const appliedPage = searchParams.get('page');
+
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
@@ -63,7 +67,7 @@ const ManageApplicationsPage = () => {
 	} = useGetApplicationList({
 		userId: mockUserID,
 		sort: sorting ? sorting : undefined,
-		state: parseFilters(searchParams.get('filters')).filter((filter) => isApplicationStateValue(filter)),
+		state: parseFilters(appliedFilters).filter((filter) => isApplicationStateValue(filter)),
 		page: parsePageNumber(tableParams.pagination?.current, true),
 	});
 
@@ -128,16 +132,13 @@ const ManageApplicationsPage = () => {
 	 * This effect is required to validate and set state based off our URL on load, and otherwise.
 	 */
 	useEffect(() => {
-		const urlSetFilters = searchParams.get('filters');
-		const urlSetPage = searchParams.get('page');
-
 		const allUrlParams = new URLSearchParams();
 
 		/**
 		 * If somehow the user ends up at our page with just `/manage/applications` and no URL set state
 		 * we have to reset to a known good state, and exit out with the defaults.
 		 */
-		if (!urlSetFilters || !urlSetPage || !isValidPageNumber(Number.parseInt(urlSetPage))) {
+		if (!appliedFilters || !appliedPage || !isValidPageNumber(Number.parseInt(appliedPage))) {
 			allUrlParams.set('filters', 'TOTAL');
 			allUrlParams.set('page', '1');
 			setSearchParams(allUrlParams);
@@ -148,9 +149,7 @@ const ManageApplicationsPage = () => {
 		 * Even with the user having a URL-bound state, we can't true that they have a known set of filters selected.
 		 * We should validate this first before continuing.
 		 */
-		const filtersProvided = urlSetFilters.split(',');
-
-		if (isFilterKeySet(filtersProvided) == false) {
+		if (isFilterKeySet(parseFilters(appliedFilters)) == false) {
 			//If not, we want to reset the URL state to defaults.
 			allUrlParams.set('filters', 'TOTAL');
 			allUrlParams.set('page', '1');
@@ -166,11 +165,11 @@ const ManageApplicationsPage = () => {
 				...prev,
 				pagination: {
 					...prev.pagination,
-					current: parsePageNumber(urlSetPage, false),
+					current: parsePageNumber(appliedPage, false),
 				},
 			};
 		});
-	}, [searchParams, setSearchParams]);
+	}, [appliedFilters, appliedPage, setSearchParams]);
 
 	/**
 	 * Whenever the table params change we want to ensure we fire off a network request.
@@ -210,7 +209,7 @@ const ManageApplicationsPage = () => {
 						filterCounts={filterMetadata ? calculateFilterAmounts(filterMetadata) : []}
 						loading={isTableLoading}
 						data={tableData && tableData.applications ? tableData.applications : []}
-						filters={parseFilters(searchParams.get('filters')).filter((filter) => isFilterKey(filter))}
+						filters={parseFilters(appliedFilters).filter((filter) => isFilterKey(filter))}
 						pagination={tableParams.pagination ? tableParams.pagination : {}}
 						onTableChange={handleTableChange}
 						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled)}
