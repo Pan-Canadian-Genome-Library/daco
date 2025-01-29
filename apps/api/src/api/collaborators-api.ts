@@ -18,8 +18,10 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
-import { collaboratorsService } from '@/service/collaboratorsService.js';
-import { type CollaboratorsService } from '@/service/types.js';
+import { applicationSvc } from '@/service/applicationService.js';
+import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import { type ApplicationServiceType, type CollaboratorsService } from '@/service/types.js';
+import { failure } from '@/utils/results.js';
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -47,7 +49,24 @@ export const createCollaborators = async ({
 	institutional_email: string;
 }) => {
 	const database = getDbInstance();
-	const collaboratorsRepo: CollaboratorsService = collaboratorsService(database);
+	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationServiceType = applicationSvc(database);
+
+	// TODO: Add Real Auth
+	// Validate User is Applicant
+	const parsedUser = { user_id: 'testUser@oicr.on.ca' };
+
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+
+	if (!applicationResult.success) {
+		return applicationResult;
+	}
+
+	const application = applicationResult.data;
+
+	if (!(parsedUser.user_id === application.user_id)) {
+		return failure('Unauthorized, cannot create Collaborators');
+	}
 
 	const result = await collaboratorsRepo.createCollaborators({
 		application_id,
