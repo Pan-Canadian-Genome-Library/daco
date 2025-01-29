@@ -27,19 +27,19 @@ export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
 export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
-export type ApplicationContentInsert = typeof applicationContents.$inferInsert;
-export type ApplicationContentUpdates = Partial<ApplicationContentInsert>;
-export type ApplicationInsert = typeof applications.$inferInsert;
-export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+export type ApplicationModel = typeof applications.$inferInsert;
+export type ApplicationUpdates = Partial<ApplicationModel>;
+export type ApplicationContentModel = typeof applicationContents.$inferInsert;
+export type ApplicationContentUpdates = Partial<ApplicationContentModel>;
 
-export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'contents'> {
+export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
 
-export type ApplicationModel = typeof applications.$inferSelect;
-export type ApplicationActionModel = typeof applicationActions.$inferSelect;
+export type ApplicationRecord = typeof applications.$inferSelect;
+export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
 
-export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'contents'> {
+export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
 export type ApplicationService = ReturnType<typeof applicationSvc>;

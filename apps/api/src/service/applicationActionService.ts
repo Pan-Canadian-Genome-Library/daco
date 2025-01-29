@@ -31,9 +31,9 @@ import {
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
 import {
-	type ApplicationActionModel,
+	type ApplicationActionRecord,
 	type ApplicationActionsColumnName,
-	type ApplicationModel,
+	type ApplicationRecord,
 	type OrderBy,
 } from './types.js';
 
@@ -60,10 +60,10 @@ import {
 const applicationActionSvc = (db: PostgresDb) => {
 	// New actions are created on every transition from one state to the next
 	const addActionRecord = async (
-		application: ApplicationModel,
+		application: ApplicationRecord,
 		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
-	): AsyncResult<ApplicationActionModel> => {
+	): AsyncResult<ApplicationActionRecord> => {
 		const { id: application_id, user_id, state: state_before } = application;
 		const newAction: typeof applicationActions.$inferInsert = {
 			application_id,
@@ -87,43 +87,43 @@ const applicationActionSvc = (db: PostgresDb) => {
 	};
 
 	return {
-		create: async (application: ApplicationModel) =>
+		create: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.CREATE, ApplicationStates.DRAFT),
-		close: async (application: ApplicationModel) =>
+		close: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
-		draftSubmit: async (application: ApplicationModel) =>
+		draftSubmit: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.SUBMIT_DRAFT, ApplicationStates.INSTITUTIONAL_REP_REVIEW),
-		dacApproved: async (application: ApplicationModel) =>
+		dacApproved: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
-		dacRejected: async (application: ApplicationModel) =>
+		dacRejected: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
-		dacRevision: async (application: ApplicationModel) =>
+		dacRevision: async (application: ApplicationRecord) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
 				ApplicationStates.DAC_REVISIONS_REQUESTED,
 			),
-		dacSubmit: async (application: ApplicationModel) =>
+		dacSubmit: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
-		repRevision: async (application: ApplicationModel) =>
+		repRevision: async (application: ApplicationRecord) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
 				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
 			),
-		repSubmit: async (application: ApplicationModel) =>
+		repSubmit: async (application: ApplicationRecord) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
 				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 			),
-		repApproved: async (application: ApplicationModel) =>
+		repApproved: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationStates.DAC_REVIEW),
-		revoke: async (application: ApplicationModel) =>
+		revoke: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
-		withdraw: async (application: ApplicationModel) =>
+		withdraw: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
-		getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionModel> => {
+		getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionRecord> => {
 			try {
 				const actionRecord = await db.select().from(applicationActions).where(eq(applicationActions.id, id));
 				if (!actionRecord[0]) throw new Error('Action record is undefined');
@@ -148,7 +148,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 			sort?: Array<OrderBy<ApplicationActionsColumnName>>;
 			page?: number;
 			pageSize?: number;
-		}): AsyncResult<ApplicationActionModel[]> => {
+		}): AsyncResult<ApplicationActionRecord[]> => {
 			try {
 				const allActions = await db
 					.select()

@@ -20,7 +20,7 @@
 import { getDbInstance } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type AddActionMethods, type ApplicationModel } from '@/service/types.js';
+import { type AddActionMethods, type ApplicationRecord } from '@/service/types.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
@@ -61,7 +61,7 @@ type ApplicationTransitions = ITransition<
 
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
-	private _application: ApplicationModel;
+	private _application: ApplicationRecord;
 	public readonly initState: ApplicationStateValues;
 
 	_canPerformAction(action: ApplicationStateEvents, targetState: ApplicationStateValues) {
@@ -342,7 +342,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.repRevisionSubmitTransition,
 	];
 
-	constructor(application: ApplicationModel) {
+	constructor(application: ApplicationRecord) {
 		const { id, state } = application;
 		super(state);
 		this._id = id;

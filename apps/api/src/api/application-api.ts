@@ -23,10 +23,10 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { ApplicationRecord, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
+import { ApplicationRecord, type ApplicationContentUpdates, type ApplicationServiceType } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
-import { ApplicationStateManager } from './stateManager.js';
+import { ApplicationStateManager } from './states.js';
 
 /**
  * Creates a new application and returns the created data.
@@ -35,7 +35,7 @@ import { ApplicationStateManager } from './stateManager.js';
  */
 export const createApplication = async ({ user_id }: { user_id: string }) => {
 	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const applicationRepo: ApplicationServiceType = applicationSvc(database);
 
 	const result = await applicationRepo.createApplication({ user_id });
 
@@ -51,7 +51,7 @@ export const createApplication = async ({ user_id }: { user_id: string }) => {
  */
 export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
 	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const applicationRepo: ApplicationServiceType = applicationSvc(database);
 
 	const result = await applicationRepo.getApplicationById({ id });
 
@@ -88,7 +88,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
  */
 export const getAllApplications = async ({ userId, state, sort, page, pageSize }: ApplicationListRequest) => {
 	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const applicationRepo: ApplicationServiceType = applicationSvc(database);
 
 	const result = await applicationRepo.listApplications({ user_id: userId, state, sort, page, pageSize });
 
@@ -102,7 +102,7 @@ export const getAllApplications = async ({ userId, state, sort, page, pageSize }
  */
 export const getApplicationById = async ({ applicationId }: { applicationId: number }) => {
 	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const applicationRepo: ApplicationServiceType = applicationSvc(database);
 
 	const result = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
@@ -120,7 +120,7 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
  */
 export const getApplicationStateTotals = async ({ userId }: { userId: string }) => {
 	const database = getDbInstance();
-	const service: ApplicationService = applicationSvc(database);
+	const service: ApplicationServiceType = applicationSvc(database);
 
 	return await service.applicationStateTotals({ user_id: userId });
 };
@@ -137,11 +137,11 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
  * 	data?: any;
  * }>}
  */
-export const approveApplication = async ({ applicationId }: ApproveApplication): AsyncResult<ApplicationRecord> => {
+export const approveApplication = async ({ applicationId }: ApproveApplication): AsyncResult<ApplicationRecord[]> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const service: ApplicationServiceType = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {

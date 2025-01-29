@@ -28,9 +28,9 @@ import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { applicationActionSvc } from './applicationActionService.js';
 import {
-	type ApplicationContentInsert,
+	type ApplicationContentModel,
 	type ApplicationContentUpdates,
-	type ApplicationModel,
+	type ApplicationRecord,
 	type ApplicationsColumnName,
 	type ApplicationStateTotals,
 	type ApplicationUpdates,
@@ -51,7 +51,7 @@ import {
  */
 
 const applicationSvc = (db: PostgresDb) => ({
-	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationModel> => {
+	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
 			state: ApplicationStates.DRAFT,
@@ -66,7 +66,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				// Create associated ApplicationContents
 				const { id: application_id } = newApplicationRecord[0];
 
-				const newAppContents: Pick<ApplicationContentInsert, 'application_id' | 'created_at' | 'updated_at'> = {
+				const newAppContents: Pick<ApplicationContentModel, 'application_id' | 'created_at' | 'updated_at'> = {
 					application_id,
 					created_at: new Date(),
 					updated_at: new Date(),
@@ -153,7 +153,7 @@ const applicationSvc = (db: PostgresDb) => ({
 	}: {
 		id: number;
 		update: ApplicationUpdates;
-	}): AsyncResult<ApplicationModel> => {
+	}): AsyncResult<ApplicationRecord> => {
 		try {
 			const application = await db
 				.update(applications)
@@ -170,7 +170,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationModel> => {
+	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationRecord> => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
 
@@ -233,7 +233,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				throw Error('Page and/or page size must be non-negative values.');
 			}
 
-			const rawApplicationModel = await db
+			const rawApplicationRecord = await db
 				.select({
 					id: applications.id,
 					user_id: applications.user_id,
@@ -269,7 +269,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				),
 			);
 
-			let returnableApplications = rawApplicationModel;
+			let returnableApplications = rawApplicationRecord;
 
 			/**
 			 * Sort DAC_REVIEW records to the top to display on the front end, however...
@@ -310,7 +310,7 @@ const applicationSvc = (db: PostgresDb) => ({
 	},
 	applicationStateTotals: async ({ user_id }: { user_id?: string }): AsyncResult<ApplicationStateTotals> => {
 		try {
-			const rawApplicationModel = await db
+			const rawApplicationRecord = await db
 				.select({
 					APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
 					CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
@@ -329,8 +329,8 @@ const applicationSvc = (db: PostgresDb) => ({
 				.from(applications)
 				.limit(1);
 
-			if (rawApplicationModel[0] && rawApplicationModel.length) {
-				return success(rawApplicationModel[0]);
+			if (rawApplicationRecord[0] && rawApplicationRecord.length) {
+				return success(rawApplicationRecord[0]);
 			} else {
 				return success({
 					APPROVED: 0,
