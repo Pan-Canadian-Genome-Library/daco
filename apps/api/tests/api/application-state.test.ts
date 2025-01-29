@@ -121,10 +121,11 @@ describe('State Machine', () => {
 			assert.ok(applicationResult.data.state === 'INSTITUTIONAL_REP_REVIEW');
 		});
 
-		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on edit', async () => {
-			await testStateManager.editRepReview();
+		it('should allow edit on INSTITUTIONAL_REP_REVIEW', async () => {
+			const editResult = await testStateManager.editRepReview();
 			stateValue = testStateManager.getState();
-			assert.strictEqual(stateValue, DRAFT);
+			assert.ok(editResult.success);
+			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to CLOSED on close', async () => {
@@ -133,7 +134,6 @@ describe('State Machine', () => {
 
 			const dacReviewManager = result.data;
 			await dacReviewManager.submitDraft();
-
 			await dacReviewManager.closeRepReview();
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
@@ -141,8 +141,9 @@ describe('State Machine', () => {
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to INSTITUTIONAL_REP_REVISION_REQUESTED on revision_request', async () => {
 			await testStateManager.submitDraft();
-			await testStateManager.reviseRepReview();
+			const revisionResult = await testStateManager.reviseRepReview();
 			stateValue = testStateManager.getState();
+			assert.ok(revisionResult.success);
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
 		});
 
@@ -206,17 +207,18 @@ describe('State Machine', () => {
 			assert.strictEqual(stateValue, REJECTED);
 		});
 
-		it('should change from DAC_REVIEW to DRAFT on edit', async () => {
+		it('should allow edit on DAC_REVIEW', async () => {
 			const result = await createApplicationStateManager({ id: 3 });
 			assert.ok(result.success);
 
 			const draftReviewManager = result.data;
 			await draftReviewManager.submitDraft();
 			await draftReviewManager.approveRepReview();
-			await draftReviewManager.editDacReview();
+			const editResult = await draftReviewManager.editDacReview();
 
 			stateValue = draftReviewManager.getState();
-			assert.strictEqual(stateValue, DRAFT);
+			assert.ok(editResult.success);
+			assert.strictEqual(stateValue, DAC_REVIEW);
 		});
 
 		it('should change from DAC_REVIEW to CLOSED on close', async () => {

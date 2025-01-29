@@ -158,19 +158,23 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
+	// TODO: Add Validation + Edit Content service methods
 	async editRepReview() {
 		const transitionResult = this._canPerformAction(edit, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(edit, 'edit');
+			const validationResult = await validateContent(this._application);
+			return validationResult;
 		} else {
 			return transitionResult;
 		}
 	}
 
+	// TODO: Add Validation + Edit Content service methods
 	async editDacReview() {
 		const transitionResult = this._canPerformAction(edit, ApplicationStates.DAC_REVIEW);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(edit, 'edit');
+			const validationResult = await validateContent(this._application);
+			return validationResult;
 		} else {
 			return transitionResult;
 		}
@@ -181,7 +185,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Revise
-	// TODO: Add Validation + Edit Content service methods
 	async reviseRepReview() {
 		const transitionResult = this._canPerformAction(revision_request, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		if (transitionResult.success) {

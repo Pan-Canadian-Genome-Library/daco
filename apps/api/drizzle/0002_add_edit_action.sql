@@ -1,1 +1,0 @@
-ALTER TYPE "public"."application_action_types" ADD VALUE 'EDIT' BEFORE 'SUBMIT_DRAFT';

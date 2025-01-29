@@ -105,8 +105,6 @@ const applicationActionSvc = (db: PostgresDb) => {
 			),
 		dacSubmit: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
-		edit: async (application: ApplicationModel) =>
-			await addActionRecord(application, ApplicationActions.EDIT, ApplicationStates.DRAFT),
 		repRevision: async (application: ApplicationModel) =>
 			await addActionRecord(
 				application,
