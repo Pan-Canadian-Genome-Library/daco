@@ -17,20 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export type ApplicantInformationSchemaType = {
-	applicantTitle: string;
-	applicantFirstName: string;
-	applicantMiddleName?: string;
-	applicantLastName: string;
-	applicantSuffix?: string;
-	applicantPrimaryAffiliation: string;
-	applicantInstituteAffiliation: string;
-	applicantProfileUrl: string;
-	applicantPositionTitle: string;
-	institutionCountry: string;
-	institutionState: string;
-	institutionCity: string;
-	institutionStreetAddress: string;
-	institutionPostalCode: string;
-	institutionBuilding?: string;
-};
+import { z } from 'zod';
+import { NonEmptyString, OptionalString } from './common/strings.js';
+import { ONLY_ALPHANUMERIC } from './utils/regex.js';
+
+// Applicant Information Form Section
+export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
+export const applicantInformationSchema = z.object({
+	applicantTitle: NonEmptyString,
+	applicantFirstName: NonEmptyString,
+	applicantMiddleName: OptionalString,
+	applicantLastName: NonEmptyString,
+	applicantSuffix: OptionalString,
+	applicantPrimaryAffiliation: NonEmptyString,
+	applicantInstituteAffiliation: NonEmptyString.email(),
+	applicantProfileUrl: NonEmptyString.url(),
+	applicantPositionTitle: NonEmptyString,
+	institutionCountry: NonEmptyString,
+	institutionState: NonEmptyString,
+	institutionCity: NonEmptyString,
+	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	institutionStreetAddress: NonEmptyString,
+	institutionBuilding: OptionalString,
+});
