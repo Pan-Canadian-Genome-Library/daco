@@ -30,12 +30,12 @@ import {
 	ApplicationStates,
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { ApplicationData, type ApplicationActionsColumnName, type OrderBy } from './types.js';
+import { ApplicationModel, type ApplicationActionsColumnName, type OrderBy } from './types.js';
 
-const applicationActionService = (db: PostgresDb) => {
+const applicationActionSvc = (db: PostgresDb) => {
 	// New actions are created on every transition from one state to the next
 	const addActionRecord = async (
-		application: ApplicationData,
+		application: ApplicationModel,
 		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
 	) => {
@@ -62,41 +62,41 @@ const applicationActionService = (db: PostgresDb) => {
 	};
 
 	return {
-		create: async (application: ApplicationData) =>
+		create: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.CREATE, ApplicationStates.DRAFT),
-		withdraw: async (application: ApplicationData) =>
+		withdraw: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
-		close: async (application: ApplicationData) =>
+		close: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
-		draftSubmit: async (application: ApplicationData) =>
+		draftSubmit: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.SUBMIT_DRAFT, ApplicationStates.INSTITUTIONAL_REP_REVIEW),
-		repRevision: async (application: ApplicationData) =>
+		repRevision: async (application: ApplicationModel) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
 				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
 			),
-		repSubmit: async (application: ApplicationData) =>
+		repSubmit: async (application: ApplicationModel) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
 				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 			),
-		repApproved: async (application: ApplicationData) =>
+		repApproved: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationStates.DAC_REVIEW),
-		dacApproved: async (application: ApplicationData) =>
+		dacApproved: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
-		dacRejected: async (application: ApplicationData) =>
+		dacRejected: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
-		dacRevision: async (application: ApplicationData) =>
+		dacRevision: async (application: ApplicationModel) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
 				ApplicationStates.DAC_REVISIONS_REQUESTED,
 			),
-		dacSubmit: async (application: ApplicationData) =>
+		dacSubmit: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
-		revoke: async (application: ApplicationData) =>
+		revoke: async (application: ApplicationModel) =>
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
 		getActionById: async ({ id }: { id: number }) => {
 			try {
@@ -149,4 +149,4 @@ const applicationActionService = (db: PostgresDb) => {
 	};
 };
 
-export { applicationActionService };
+export { applicationActionSvc };
