@@ -87,7 +87,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		const applicationRepo = applicationSvc(db);
 		const applicationActionRepo = applicationActionSvc(db);
 
-		// TODO: Refactor transactions
+		// TODO: Refactor use of shared transactions https://github.com/Pan-Canadian-Genome-Library/daco/issues/178
 		return await db.transaction(async (tx) => {
 			const actionResult = await applicationActionRepo[method](this._application);
 			if (!actionResult.success) return actionResult;
