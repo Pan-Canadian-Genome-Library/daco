@@ -26,15 +26,15 @@ import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { applicationActionService } from './applicationActionService.js';
+import { applicationActionSvc } from './applicationActionService.js';
 import {
-	JoinedApplicationRecord,
 	type ApplicationContentInsert,
 	type ApplicationContentUpdates,
-	type ApplicationData,
+	type ApplicationModel,
 	type ApplicationsColumnName,
 	type ApplicationStateTotals,
 	type ApplicationUpdates,
+	type JoinedApplicationRecord,
 	type OrderBy,
 } from './types.js';
 
@@ -50,8 +50,8 @@ import {
  * @method applicationStateTotals: Obtain count for all Application records with each State
  */
 
-const applicationService = (db: PostgresDb) => ({
-	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationData> => {
+const applicationSvc = (db: PostgresDb) => ({
+	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationModel> => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
 			state: ApplicationStates.DRAFT,
@@ -75,7 +75,7 @@ const applicationService = (db: PostgresDb) => ({
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
 				// Create associated Actions
-				const actionRepo = applicationActionService(db);
+				const actionRepo = applicationActionSvc(db);
 				const actionResult = await actionRepo.create(newApplicationRecord[0]);
 				if (!actionResult.success) throw new Error(actionResult.errors);
 
@@ -153,7 +153,7 @@ const applicationService = (db: PostgresDb) => ({
 	}: {
 		id: number;
 		update: ApplicationUpdates;
-	}): AsyncResult<ApplicationData> => {
+	}): AsyncResult<ApplicationModel> => {
 		try {
 			const application = await db
 				.update(applications)
@@ -170,9 +170,10 @@ const applicationService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationData> => {
+	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationModel> => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			return success(applicationRecord[0]);
@@ -191,7 +192,7 @@ const applicationService = (db: PostgresDb) => ({
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
-			if (!applicationRecord[0]) throw new Error('Application record not found');
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			const application = {
 				...applicationRecord[0].applications,
@@ -232,7 +233,7 @@ const applicationService = (db: PostgresDb) => ({
 				throw Error('Page and/or page size must be non-negative values.');
 			}
 
-			const rawApplicationData = await db
+			const rawApplicationModel = await db
 				.select({
 					id: applications.id,
 					user_id: applications.user_id,
@@ -268,7 +269,7 @@ const applicationService = (db: PostgresDb) => ({
 				),
 			);
 
-			let returnableApplications = rawApplicationData;
+			let returnableApplications = rawApplicationModel;
 
 			/**
 			 * Sort DAC_REVIEW records to the top to display on the front end, however...
@@ -309,7 +310,7 @@ const applicationService = (db: PostgresDb) => ({
 	},
 	applicationStateTotals: async ({ user_id }: { user_id?: string }): AsyncResult<ApplicationStateTotals> => {
 		try {
-			const rawApplicationData = await db
+			const rawApplicationModel = await db
 				.select({
 					APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
 					CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
@@ -328,7 +329,9 @@ const applicationService = (db: PostgresDb) => ({
 				.from(applications)
 				.limit(1);
 
-			if (!rawApplicationData[0] && rawApplicationData.length) {
+			if (rawApplicationModel[0] && rawApplicationModel.length) {
+				return success(rawApplicationModel[0]);
+			} else {
 				return success({
 					APPROVED: 0,
 					CLOSED: 0,
@@ -342,8 +345,6 @@ const applicationService = (db: PostgresDb) => ({
 					TOTAL: 0,
 				});
 			}
-			const applicationTotals = rawApplicationData[0] as ApplicationStateTotals;
-			return success(applicationTotals);
 		} catch (exception) {
 			const message = `Error at applicationStateTotals with user_id: ${user_id}.`;
 			logger.error(message);
@@ -353,4 +354,4 @@ const applicationService = (db: PostgresDb) => ({
 	},
 });
 
-export { applicationService };
+export { applicationSvc };

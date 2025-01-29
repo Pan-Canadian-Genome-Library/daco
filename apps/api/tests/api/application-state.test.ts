@@ -25,10 +25,10 @@ import { ApplicationStateManager, createApplicationStateManager } from '@/contro
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
-import { applicationActionService } from '@/service/applicationActionService.js';
-import { applicationService } from '@/service/applicationService.js';
-import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
-import { ApplicationActions, ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import { applicationActionSvc } from '@/service/applicationActionService.js';
+import { applicationSvc } from '@/service/applicationService.js';
+import { type ApplicationActionServiceType, type ApplicationServiceType } from '@/service/types.js';
+import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
 
 const {
@@ -48,8 +48,8 @@ describe('State Machine', () => {
 	let container: StartedPostgreSqlContainer;
 	let testStateManager: ApplicationStateManager;
 
-	let testActionRepo: ApplicationActionService;
-	let testApplicationRepo: ApplicationService;
+	let testActionRepo: ApplicationActionServiceType;
+	let testApplicationRepo: ApplicationServiceType;
 
 	before(async () => {
 		container = await new PostgreSqlContainer()
@@ -64,8 +64,8 @@ describe('State Machine', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		testActionRepo = applicationActionService(db);
-		testApplicationRepo = applicationService(db);
+		testActionRepo = applicationActionSvc(db);
+		testApplicationRepo = applicationSvc(db);
 	});
 
 	describe('Application State Manager', () => {

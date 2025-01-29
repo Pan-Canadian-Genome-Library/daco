@@ -73,7 +73,7 @@ applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
 		res.send(result.data);
 	} else {
 		// TODO: System Error Handling
-		if (String(result.errors) === 'Error: Application record not found') {
+		if (String(result.errors) === 'Error: Application record is undefined') {
 			res.status(404);
 		} else {
 			res.status(500);
@@ -212,7 +212,7 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 			let message = result.message || 'An unexpected error occurred.';
 			let errors = result.errors;
 
-			if (errors === 'ApplicationNotFound') {
+			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
 				status = 404;
 				message = 'Application not found.';
 			} else if (errors === 'ApprovalConflict') {

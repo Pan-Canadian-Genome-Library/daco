@@ -18,9 +18,9 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
-import { applicationActionService } from '@/service/applicationActionService.js';
-import { applicationService } from '@/service/applicationService.js';
-import { type AddActionMethods, type ApplicationData } from '@/service/types.js';
+import { applicationActionSvc } from '@/service/applicationActionService.js';
+import { applicationSvc } from '@/service/applicationService.js';
+import { type AddActionMethods, type ApplicationModel } from '@/service/types.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
@@ -61,7 +61,7 @@ type ApplicationTransitions = ITransition<
 
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
-	private _application: ApplicationData;
+	private _application: ApplicationModel;
 	public readonly initState: ApplicationStateValues;
 
 	_canPerformAction(action: ApplicationStateEvents, targetState: ApplicationStateValues) {
@@ -84,8 +84,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	async _updateRecords(method: AddActionMethods) {
 		const db = getDbInstance();
-		const applicationRepo = applicationService(db);
-		const applicationActionRepo = applicationActionService(db);
+		const applicationRepo = applicationSvc(db);
+		const applicationActionRepo = applicationActionSvc(db);
 
 		// TODO: Refactor transactions
 		return await db.transaction(async (tx) => {
@@ -339,7 +339,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.repRevisionSubmitTransition,
 	];
 
-	constructor(application: ApplicationData) {
+	constructor(application: ApplicationModel) {
 		const { id, state } = application;
 		super(state);
 		this._id = id;
@@ -360,7 +360,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 export const createApplicationStateManager = async ({ id }: { id: number }) => {
 	const database = getDbInstance();
-	const service: ReturnType<typeof applicationService> = applicationService(database);
+	const service: ReturnType<typeof applicationSvc> = applicationSvc(database);
 
 	const result = await service.getApplicationById({ id });
 	if (!result.success) {

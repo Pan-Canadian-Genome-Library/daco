@@ -20,8 +20,8 @@
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
-import { applicationActionService } from '@/service/applicationActionService.js';
-import { applicationService } from '@/service/applicationService.js';
+import { applicationActionSvc } from '@/service/applicationActionService.js';
+import { applicationSvc } from '@/service/applicationService.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -32,15 +32,20 @@ export type ApplicationContentUpdates = Partial<ApplicationContentInsert>;
 export type ApplicationInsert = typeof applications.$inferInsert;
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 
-export interface JoinedApplicationRecord extends Omit<ApplicationData, 'contents'> {
+export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
 
-export type ApplicationData = typeof applications.$inferSelect;
-export type ApplicationActionData = typeof applicationActions.$inferSelect;
-export type ApplicationContentData = typeof applications.$inferSelect;
+export type ApplicationModel = typeof applications.$inferSelect;
+export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 
-export type ApplicationService = ReturnType<typeof applicationService>;
+export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'contents'> {
+	contents: ApplicationContentUpdates | null;
+}
+export type ApplicationServiceType = ReturnType<typeof applicationSvc>;
+export type ApplicationActionServiceType = ReturnType<typeof applicationActionSvc>;
+export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
+
 export type ApplicationStateTotals = {
 	APPROVED: number;
 	CLOSED: number;
@@ -53,9 +58,6 @@ export type ApplicationStateTotals = {
 	REVOKED: number;
 	TOTAL: number;
 };
-
-export type ApplicationActionService = ReturnType<typeof applicationActionService>;
-export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionService>, 'listActions'>;
 
 export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';

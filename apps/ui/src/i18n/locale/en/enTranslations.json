@@ -59,10 +59,12 @@
 		"cancel": "Cancel",
 		"edit": "Edit",
 		"next": "Next",
+		"delete": "Delete",
 		"history": "History",
 		"closeApp": "Close Application",
 		"back": "Back",
-		"submitApplication": "Submit Application"
+		"submitApplication": "Submit Application",
+		"addCollab": "Add Collaborator"
 	},
 	"label": {
 		"created": "Created",
@@ -89,7 +91,8 @@
 	"menu": {
 		"intro": "Introduction",
 		"institutional": "B. Institutional Representative",
-		"applicant": "A. Applicant Information"
+		"applicant": "A. Applicant Information",
+		"collaborators": "C. Collaborators"
 	},
 	"errors": {
 		"http": {

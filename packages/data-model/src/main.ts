@@ -18,12 +18,13 @@
  */
 
 export {
-	type Applicant,
-	type Application,
-	type Collaborator,
-	type Institution,
-	type PersonalInfo,
-	type Project,
+	type ApplicantDTO,
+	type ApplicationContentsResponse,
+	type ApplicationResponseData,
+	type CollaboratorDTO,
+	type EthicsDataDTO,
+	type InstitutionDTO,
+	type InstitutionalRepDTO,
+	type ProjectDTO,
+	type RequestedStudiesDTO,
 } from './types.js';
-
-export { demoApplication } from './demoData.js';
