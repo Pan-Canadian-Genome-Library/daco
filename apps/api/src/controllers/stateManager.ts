@@ -288,7 +288,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Rep Review
 	private repReviewCloseTransition = transition(INSTITUTIONAL_REP_REVIEW, close, CLOSED, this._onClose);
-	private repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, DRAFT, this._onEdit);
+	private repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, INSTITUTIONAL_REP_REVIEW, this._onEdit);
 	private repReviewRevisionTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
 		revision_request,
@@ -308,7 +308,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// DAC Review
 	private dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, this._onApproved);
 	private dacReviewCloseTransition = transition(DAC_REVIEW, close, CLOSED, this._onClose);
-	private dacReviewEditTransition = transition(DAC_REVIEW, edit, DRAFT, this._onEdit);
+	private dacReviewEditTransition = transition(DAC_REVIEW, edit, DAC_REVIEW, this._onEdit);
 	private dacReviewRevisionTransition = transition(
 		DAC_REVIEW,
 		revision_request,
