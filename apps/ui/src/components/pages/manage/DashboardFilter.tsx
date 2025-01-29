@@ -56,11 +56,12 @@ const DashboardFilter = ({ onFilterChange, filters, availableStates }: Dashboard
 			key: 'TOTAL',
 			amount: availableStates.find((state) => state.key === 'TOTAL')?.amount || 0,
 		},
-		...Object.keys(ApplicationStates).map((possibleState): Filter => {
+
+		...Object.values(ApplicationStates).map((possibleState: FilterKeys): Filter => {
 			return {
 				name: translate(`application.states.${possibleState}`),
 				amount: availableStates.find((state) => state.key === possibleState)?.amount || 0,
-				key: possibleState as FilterKeys,
+				key: possibleState,
 			};
 		}),
 	];

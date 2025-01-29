@@ -92,7 +92,6 @@ const tableColumnConfiguration = [
 			record.applicantInformation.firstName && record.applicantInformation.lastName
 				? `${record.applicantInformation.firstName} ${record.applicantInformation.lastName}`
 				: '-',
-		// sorter: { multiple: 3 }, NOTE: Post-MVP according to specs
 	},
 	{
 		title: 'Email',

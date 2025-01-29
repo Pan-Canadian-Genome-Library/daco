@@ -40,10 +40,10 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 	const { t: translate } = useTranslation();
 	const queryParams = new URLSearchParams({ userId: userId });
 
-	if (state) {
+	if (state && state.length) {
 		queryParams.set('state', JSON.stringify(state));
 	}
-	if (sort) {
+	if (sort && sort.length) {
 		queryParams.set('sort', JSON.stringify(sort));
 	}
 	if (page !== undefined) {

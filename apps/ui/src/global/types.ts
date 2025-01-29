@@ -50,6 +50,7 @@ export interface ApplicationCountMetadata {
 	APPROVED: number;
 	CLOSED: number;
 	REVOKED: number;
+	TOTAL: number;
 }
 
 export interface PagingMetadata {
