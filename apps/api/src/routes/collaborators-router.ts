@@ -41,18 +41,18 @@ collaboratorsRouter.post('/collaborators/create', jsonParser, async (request, re
 		institutionalEmail: institutional_email,
 	} = request.body;
 
+	if (!first_name || !last_name || !position_title || !institutional_email) {
+		response.status(400).send({ message: 'Required Collaborator details are missing.' });
+		return;
+	}
+
 	if (!authorization) {
-		response.status(400).send({ message: 'Unauthorized, cannot create Collaborators' });
+		response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
 		return;
 	}
 
 	if (!application_id) {
-		response.status(400).send({ message: 'applicationId is missing, cannot create Collaborators' });
-		return;
-	}
-
-	if (!first_name || !last_name || !position_title || !institutional_email) {
-		response.status(400).send({ message: 'Required Collaborator details are missing.' });
+		response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
 		return;
 	}
 
@@ -70,7 +70,12 @@ collaboratorsRouter.post('/collaborators/create', jsonParser, async (request, re
 		response.status(201).send(result.data);
 		return;
 	} else {
-		response.status(500).send({ message: result.message, errors: String(result.errors) });
+		if (result.message === 'Unauthorized, cannot create Collaborators') {
+			response.status(401);
+		} else {
+			response.status(500);
+		}
+		response.send({ message: result.message, errors: String(result.errors) });
 		return;
 	}
 });
