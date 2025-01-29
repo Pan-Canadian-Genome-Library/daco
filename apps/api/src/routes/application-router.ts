@@ -27,8 +27,10 @@ import {
 	getAllApplications,
 	getApplicationById,
 	getApplicationStateTotals,
+	rejectApplication,
 } from '@/api/application-api.js';
 import { isPositiveNumber } from '@/utils/routes.js';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -230,6 +232,52 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 			message: 'Internal server error.',
 			errors: String(error),
 		});
+	}
+});
+
+applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
+	const { applicationId } = req.body;
+
+	if (!applicationId) {
+		res.status(400).json({ message: 'Application ID is required.' });
+	}
+
+	if (typeof applicationId !== 'number' || !applicationId) {
+		res.status(400).send({
+			message: 'Invalid request. ApplicationId must be a valid number and is required.',
+			errors: 'MissingOrInvalidParameters',
+		});
+		return;
+	}
+
+	const result = await getApplicationById({ applicationId });
+
+	if (result.success) {
+		const { state } = result.data;
+
+		if (state === ApplicationStates.REJECTED) {
+			res.status(400).json({ message: 'Application is already rejected and cannot be modified.' });
+		}
+
+		if (state !== ApplicationStates.DAC_REVIEW) {
+			res.status(400).json({ message: 'Application must be in DAC Review status to be rejected.' });
+		}
+
+		// Reject the application
+		const rejectedApplication = await rejectApplication({ applicationId });
+
+		if (rejectedApplication.success) {
+			res.status(200).send({
+				message: 'Application rejected successfully.',
+				data: rejectedApplication.data,
+			});
+		} else {
+			let message = rejectedApplication.message || 'An unexpected error occurred.';
+			let errors = rejectedApplication.errors;
+			res.status(500).send({ message, errors });
+		}
+	} else {
+		res.status(404).json({ message: 'Application not found.' });
 	}
 });
 

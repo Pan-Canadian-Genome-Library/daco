@@ -28,6 +28,7 @@ import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { applicationActionSvc } from './applicationActionService.js';
 import {
+	ApplicationModel,
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
@@ -320,6 +321,25 @@ const applicationSvc = (db: PostgresDb) => ({
 			}
 		} catch (exception) {
 			const message = `Error at applicationStateTotals with user_id: ${user_id}.`;
+			logger.error(message);
+			logger.error(exception);
+			return failure(message, exception);
+		}
+	},
+
+	rejectApplication: async ({ applicationId }: { applicationId: number }): AsyncResult<ApplicationModel> => {
+		try {
+			const application = await db
+				.update(applications)
+				.set({ state: 'REJECTED', updated_at: sql`NOW()` })
+				.where(eq(applications.id, applicationId))
+				.returning();
+
+			if (!application[0]) throw new Error('Application record is undefined');
+
+			return success(application[0]);
+		} catch (exception) {
+			const message = `Error at rejectApplication with applicationId: ${applicationId}.`;
 			logger.error(message);
 			logger.error(exception);
 			return failure(message, exception);
