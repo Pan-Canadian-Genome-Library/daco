@@ -25,9 +25,9 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applications } from '@/db/schemas/applications.js';
-import { applicationActionService } from '@/service/applicationActionService.js';
-import { applicationService } from '@/service/applicationService.js';
-import { ApplicationActionService, ApplicationService } from '@/service/types.js';
+import { applicationActionSvc } from '@/service/applicationActionService.js';
+import { applicationSvc } from '@/service/applicationService.js';
+import { type ApplicationActionServiceType, type ApplicationServiceType } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -42,8 +42,8 @@ import {
 
 describe('Application Service', () => {
 	let db: PostgresDb;
-	let testApplicationService: ApplicationService;
-	let testActionRepo: ApplicationActionService;
+	let testApplicationService: ApplicationServiceType;
+	let testActionRepo: ApplicationActionServiceType;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -59,8 +59,8 @@ describe('Application Service', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		testApplicationService = applicationService(db);
-		testActionRepo = applicationActionService(db);
+		testApplicationService = applicationSvc(db);
+		testActionRepo = applicationActionSvc(db);
 	});
 
 	describe('Create Applications', () => {

@@ -18,8 +18,8 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
-import { applicationService } from '@/service/applicationService.js';
-import { ApplicationData } from '@/service/types.js';
+import { applicationSvc } from '@/service/applicationService.js';
+import { ApplicationModel } from '@/service/types.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
 import { AsyncResult, failure, success } from '../utils/results.js';
@@ -60,7 +60,7 @@ type ApplicationTransitions = ITransition<
 
 export class ApplicationStateManager extends StateMachine<ApplicationStateValues, ApplicationStateEvents> {
 	private readonly _id: number;
-	private _application: ApplicationData;
+	private _application: ApplicationModel;
 	public readonly initState: ApplicationStateValues;
 
 	// Handler Methods
@@ -262,7 +262,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.repRevisionSubmitTransition,
 	];
 
-	constructor(application: ApplicationData) {
+	constructor(application: ApplicationModel) {
 		const { id, state } = application;
 		super(state);
 		this._id = id;
@@ -283,7 +283,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 export const createApplicationStateManager = async ({ id }: { id: number }) => {
 	const database = getDbInstance();
-	const service: ReturnType<typeof applicationService> = applicationService(database);
+	const service: ReturnType<typeof applicationSvc> = applicationSvc(database);
 
 	const result = await service.getApplicationById({ id });
 	if (!result.success) {

@@ -24,17 +24,18 @@ import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
-import { failure, success } from '@/utils/results.js';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { applicationActionService } from './applicationActionService.js';
+import { applicationActionSvc } from './applicationActionService.js';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
+	type JoinedApplicationRecord,
 	type OrderBy,
 } from './types.js';
 
-const applicationService = (db: PostgresDb) => ({
+const applicationSvc = (db: PostgresDb) => ({
 	createApplication: async ({ user_id }: { user_id: string }) => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
@@ -59,7 +60,7 @@ const applicationService = (db: PostgresDb) => ({
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
 
 				// Create associated Actions
-				const actionRepo = applicationActionService(db);
+				const actionRepo = applicationActionSvc(db);
 				const actionResult = await actionRepo.create(newApplicationRecord[0]);
 				if (!actionResult.success) throw new Error(actionResult.errors);
 
@@ -143,6 +144,7 @@ const applicationService = (db: PostgresDb) => ({
 	getApplicationById: async ({ id }: { id: number }) => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
+
 			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			return success(applicationRecord[0]);
@@ -154,7 +156,7 @@ const applicationService = (db: PostgresDb) => ({
 		}
 	},
 
-	getApplicationWithContents: async ({ id }: { id: number }) => {
+	getApplicationWithContents: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
 		try {
 			const applicationRecord = await db
 				.select()
@@ -162,7 +164,7 @@ const applicationService = (db: PostgresDb) => ({
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
-			if (!applicationRecord[0]) throw new Error('Application record not found');
+			if (!applicationRecord[0]) throw new Error('Application record is undefined');
 
 			const application = {
 				...applicationRecord[0].applications,
@@ -203,7 +205,7 @@ const applicationService = (db: PostgresDb) => ({
 				throw Error('Page and/or page size must be non-negative values.');
 			}
 
-			const rawApplicationData = await db
+			const rawApplicationModel = await db
 				.select({
 					id: applications.id,
 					user_id: applications.user_id,
@@ -239,7 +241,7 @@ const applicationService = (db: PostgresDb) => ({
 				),
 			);
 
-			let returnableApplications = rawApplicationData;
+			let returnableApplications = rawApplicationModel;
 
 			/**
 			 * Sort DAC_REVIEW records to the top to display on the front end, however...
@@ -282,7 +284,7 @@ const applicationService = (db: PostgresDb) => ({
 
 	applicationStateTotals: async ({ user_id }: { user_id?: string }) => {
 		try {
-			const rawApplicationData = await db
+			const rawApplicationModel = await db
 				.select({
 					APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
 					CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
@@ -301,8 +303,8 @@ const applicationService = (db: PostgresDb) => ({
 				.from(applications)
 				.limit(1);
 
-			if (rawApplicationData && rawApplicationData.length) {
-				return success(rawApplicationData[0]);
+			if (rawApplicationModel && rawApplicationModel.length) {
+				return success(rawApplicationModel[0]);
 			} else {
 				return success({
 					APPROVED: 0,
@@ -326,4 +328,4 @@ const applicationService = (db: PostgresDb) => ({
 	},
 });
 
-export { applicationService };
+export { applicationSvc };

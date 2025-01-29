@@ -97,53 +97,104 @@ export const ApplicationMessages = {
 };
 
 // Data Types
-// TODO: Which fields are optional?
 
-export type PersonalInfo = {
-	userId: string;
-	title: string;
-	firstName: string;
-	middleName: string;
-	lastName: string;
-	suffix: string;
-	primaryAffiliation: string;
-	institutionalEmail: string;
-	researcherProfileURL: string;
-	positionTitle: string;
-};
-
-export interface Applicant extends PersonalInfo {}
-
-export interface Collaborator extends Applicant {
-	collaboratorType: string;
+export interface ApplicantDTO {
+	applicantFirstName?: string | null;
+	applicantLastName?: string | null;
+	applicantMiddleName?: string | null;
+	applicantTitle?: string | null;
+	applicantSuffix?: string | null;
+	applicantPrimaryAffiliation?: string | null;
+	applicantInstitutionalEmail?: string | null;
+	applicantProfileUrl?: string | null;
+	applicantPositionTitle?: string | null;
 }
 
-export type Institution = {
-	country: string;
-	streetAddress: string;
-	building?: string;
-	suite?: string;
-	city: string;
-	province: string; // TODO: Handle Province or State?
-	postalCode: string;
+export type InstitutionalRepDTO = {
+	institutionalRepTitle?: string | null;
+	institutionalRepFirstName?: string | null;
+	institutionalRepMiddleName?: string | null;
+	institutionalRepLastName?: string | null;
+	institutionalRepSuffix?: string | null;
+	institutionalRepPrimaryAffiliation?: string | null;
+	institutionalRepEmail?: string | null;
+	institutionalRepProfileUrl?: string | null;
+	institutionalRepPositionTitle?: string | null;
 };
 
-export type Project = {
-	title: string;
-	website: string;
-	abstract: string;
-	methodology: string;
-	summary: string;
-	publicationUrls: string[];
+export type InstitutionDTO = {
+	institutionCountry?: string | null;
+	institutionState?: string | null;
+	institutionStreetAddress?: string | null;
+	institutionBuilding?: string | null;
+	institutionCity?: string | null;
+	institutionPostalCode?: string | null;
 };
 
-export type RevisionRequest = {
-	id: number; // TODO: Implement BigInt
-	applicationId: number; // TODO: Implement BigInt;
+export type ProjectDTO = {
+	projectTitle?: string | null;
+	projectWebsite?: string | null;
+	projectAbstract?: string | null;
+	projectMethodology?: string | null;
+	projectSummary?: string | null;
+	projectPublicationUrls?: string[] | null;
+};
+
+export interface RequestedStudiesDTO {
+	requestedStudies?: string[] | null;
+}
+
+export type ApplicationResponseData = {
+	id: number;
+	userId: string;
+	state: ApplicationStateValues;
+	createdAt: Date;
+	approvedAt?: Date | null;
+	updatedAt?: Date | null;
+	expiresAt?: Date | null;
+	contents: ApplicationContentsResponse | null;
+};
+
+export type ApplicationContentsResponse = {
+	applicationId?: number;
+	createdAt?: Date;
+	updatedAt?: Date | null;
+} & ApplicantDTO &
+	InstitutionDTO &
+	InstitutionalRepDTO &
+	ProjectDTO &
+	RequestedStudiesDTO;
+
+export type ApproveApplication = {
+	applicationId: number; // The ID of the application to be approved
+};
+
+// TODO: Additional Types to be updated
+export interface EthicsDataDTO {
+	ethicsReviewRequired?: boolean | null;
+	ethicsLetter?: number | null;
+	signedPdf?: number | null;
+}
+
+export interface CollaboratorDTO {
+	collaboratorFirstName?: string | null;
+	collaboratorMiddleName?: string | null;
+	collaboratorLastName?: string | null;
+	collaboratorSuffix?: string | null;
+	collaboratorPrimaryAffiliation?: string | null;
+	collaboratorInstitutionalEmail?: string | null;
+	collaboratorResearcherProfileURL?: string | null;
+	collaboratorPositionTitle?: string | null;
+	collaboratorType?: string | null;
+}
+
+export type RevisionRequestDTO = {
+	id: number;
+	applicationId: number;
 	createdAt: Date;
 	createdBy: string;
 	version: number;
-	changes: {}[]; // TODO: Define structure, maybe ApplicationActionData[] ?
+	changes: ApplicationActionDTO[];
 	comments?: string;
 	applicantApproved: Boolean;
 	applicantNotes?: string;
@@ -157,77 +208,32 @@ export type RevisionRequest = {
 	requestedStudiesNotes?: string;
 };
 
-export type ApplicationActionData = {
-	id: number; // TODO: Implement BigInt;
-	applicationId: number; // TODO: Implement BigInt;
+export type ApplicationActionDTO = {
+	id: number;
+	applicationId: number;
 	createdAt: Date;
 	userId: string;
 	action: ApplicationActionValues;
 	stateBefore: ApplicationStateValues;
 	stateAfter: ApplicationStateValues;
-	revisionsRequestId: number; // TODO: Implement BigInt
-	// TODO: may need reference to a content diff
+	revisionsRequestId: number;
 };
 
-export type Agreements = {
-	id: number; // TODO: Implement BigInt;
+export interface AgreementsDTO {
+	id: number;
 	userId: string;
 	name: string;
 	agreementText: string;
-	agreementType: string; // enum, need to review possible agreements needed
+	agreementType: string;
 	agreedAt: Date;
-};
+}
 
-export type Files = {
-	id: number; // TODO: Implement BigInt;
-	applicationId: number; // TODO: Implement BigInt;
+export interface FilesDTO {
+	id: number;
+	applicationId: number;
 	type: FileType;
-	SubmitterUserId: number; // TODO: Implement BigInt;
-	submitted_at: Date;
-	content: any; // TODO: Add correct type
+	submitterUserId: number;
+	submittedAt: Date;
+	content: any;
 	filename: string;
-};
-
-export type EthicsData = {
-	ethicsReviewRequired: boolean;
-	ethicsLetter?: number; // TODO: Implement BigInt;
-	signedPdf?: number; // TODO: Implement BigInt;
-};
-
-export type ApplicationContents = {
-	createdAt: Date;
-	updatedAt: Date;
-	applicant: Applicant;
-	institution?: Institution;
-	institutionalRepresentative?: {
-		personalInformation: PersonalInfo;
-		institution: Institution;
-	};
-	collaborators?: Collaborator[];
-	projectInformation?: Project;
-	requestedStudies?: {
-		studyIds: string[]; //TODO: requested study information
-	};
-	ethics?: EthicsData;
-	files?: Files[];
-	dataAccessAgreements?: Agreements[];
-	appendices?: {
-		agreements: { name: string; agreement: boolean }[];
-	};
-	signatures?: Files[];
-	revisions?: RevisionRequest[];
-};
-
-export type Application = {
-	id: number; // TODO: Implement BigInt;
-	userId: string;
-	state: ApplicationStateValues;
-	created_at: Date;
-	approved_at: Date;
-	expires_at: Date;
-	contents: ApplicationContents;
-};
-
-export type ApproveApplication = {
-	applicationId: number; // The ID of the application to be approved
-};
+}
