@@ -22,14 +22,11 @@ import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/useG
 import { mockUserID } from '@/components/mock/applicationMockData';
 import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
-import { FilterKeys } from '@/components/pages/manage/DashboardFilter';
+import { FilterKeys, isFilterKey } from '@/components/pages/manage/DashboardFilter';
 import ManagementDashboard, { FilterState } from '@/components/pages/manage/ManagementDashboard';
 import { ApplicationCountMetadata, ApplicationWithApplicantInformation } from '@/global/types';
 import { isValidPageNumber } from '@/global/utils';
 import { isApplicationStateValue } from '@pcgl-daco/data-model';
-// import { isApplicationStateValue } from '@pcgl-daco/data-model';
-import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 import { Flex, Layout, TablePaginationConfig } from 'antd';
 import { Key, SorterResult } from 'antd/es/table/interface';
@@ -43,8 +40,6 @@ const { Content } = Layout;
 export interface TableProperties {
 	pagination: TablePaginationConfig;
 }
-
-const POSSIBLE_FILTERS: FilterKeys[] = ['TOTAL', ...Object.values(ApplicationStates)];
 
 const ManageApplicationsPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -68,7 +63,7 @@ const ManageApplicationsPage = () => {
 	} = useGetApplicationList({
 		userId: mockUserID,
 		sort: sorting ? sorting : undefined,
-		state: parseFilters(searchParams.get('filters'), true),
+		state: parseFilters(searchParams.get('filters')).filter((filter) => isApplicationStateValue(filter)),
 		page: parsePageNumber(tableParams.pagination?.current, true),
 	});
 
@@ -215,7 +210,7 @@ const ManageApplicationsPage = () => {
 						filterCounts={filterMetadata ? calculateFilterAmounts(filterMetadata) : []}
 						loading={isTableLoading}
 						data={tableData && tableData.applications ? tableData.applications : []}
-						filters={parseFilters(searchParams.get('filters'), false)}
+						filters={parseFilters(searchParams.get('filters')).filter((filter) => isFilterKey(filter))}
 						pagination={tableParams.pagination ? tableParams.pagination : {}}
 						onTableChange={handleTableChange}
 						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled)}
@@ -266,10 +261,10 @@ const parseSortingOptions = (column: string | Key | readonly Key[]) => {
  * @param data The data provided via the backend `metadata/counts` endpoint.
  * @returns A `FilterState` object, containing the unique key of the filter and how many applications are filed under it.
  */
-const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata) => {
+const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata): FilterState[] => {
 	const availableStates: FilterState[] = [];
 	for (const appState of Object.keys(countMetadata)) {
-		if (isApplicationStateValue(appState) || appState === 'TOTAL')
+		if (isFilterKey(appState))
 			availableStates.push({
 				key: appState,
 				amount: countMetadata[appState],
@@ -287,7 +282,7 @@ const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata) => {
  * @param forAPI If the processed page number you'd like back is being sent to the server (count from zero)
  * @returns A `number` that has been validated and converted.
  */
-const parsePageNumber = (pageNumber?: number | string | null, forAPI?: boolean) => {
+const parsePageNumber = (pageNumber?: number | string | null, forAPI?: boolean): number => {
 	if (pageNumber) {
 		const parsedPage = typeof pageNumber === 'string' ? parseInt(pageNumber) : pageNumber;
 		if (isValidPageNumber(parsedPage)) {
@@ -298,25 +293,18 @@ const parsePageNumber = (pageNumber?: number | string | null, forAPI?: boolean) 
 };
 
 /**
- * Gets and parses filters from the URL params. It also validates if the filters are contained within
- * the possible set of filters. It then returns the set decoded and ready to use.
+ * Gets and parses filters from the URL params. Given that the search param may be null or otherwise invalid
+ * this function returns a normalized string array.
  *
  * @param rawFilters The raw string of filters from the query param.
- * @returns A validated and typed set of the current filters. Will return just `TOTAL` if set is invalid.
+ * @returns A standardized string array of potential filters.
  */
-const parseFilters = (rawFilters?: string | null, forAPI?: boolean): ApplicationStateValues[] | FilterKeys[] => {
+const parseFilters = (rawFilters?: string | null): string[] => {
 	if (rawFilters) {
 		const decodedFilters = rawFilters.split(',');
-		if (forAPI) {
-			return decodedFilters.filter((filter) => isApplicationStateValue(filter));
-		}
-
-		if (isFilterKeySet(decodedFilters)) {
-			return decodedFilters;
-		}
+		return decodedFilters;
 	}
-
-	return forAPI ? [] : ['TOTAL'];
+	return [];
 };
 
 /**
@@ -326,7 +314,7 @@ const parseFilters = (rawFilters?: string | null, forAPI?: boolean): Application
  */
 const isFilterKeySet = (appliedFilters: string[]): appliedFilters is FilterKeys[] => {
 	for (const appliedFilter of appliedFilters) {
-		if (!POSSIBLE_FILTERS.find((possibleFilters) => possibleFilters === appliedFilter)) {
+		if (!isFilterKey(appliedFilter)) {
 			return false;
 		}
 	}

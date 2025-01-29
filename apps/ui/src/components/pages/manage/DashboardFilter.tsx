@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { isApplicationStateValue } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { Flex, Tag, theme } from 'antd';
@@ -122,3 +123,15 @@ const DashboardFilter = ({ onFilterChange, filters, availableStates }: Dashboard
 };
 
 export default DashboardFilter;
+
+/**
+ * A type guard to ensure that a passed in string is a part of a valid filter state.
+ * @param filter A potentially valid filter
+ * @returns A boolean ensuring that a filter is a part of of the set of valid filter states (`true`) or not (`false`)
+ */
+export const isFilterKey = (filter: string): filter is FilterKeys => {
+	if (filter && (isApplicationStateValue(filter) || filter === 'TOTAL')) {
+		return true;
+	}
+	return false;
+};
