@@ -17,5 +17,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './types.js';
-export * from './validationSchemas.js';
+import { NonEmptyString } from '@/common/strings.js';
+import { POSTA_CODE_REGEX } from '@/utils/regex.js';
+import { z } from 'zod';
+
+export const applicantInformationSchema = z.object({
+	applicantTitle: NonEmptyString,
+	applicantFirstName: NonEmptyString,
+	applicantLastName: NonEmptyString,
+	applicantPrimaryAffiliation: NonEmptyString,
+	applicantInstituteAffiliation: NonEmptyString.email(),
+	applicantProfileUrl: NonEmptyString.url(),
+	applicantPositionTitle: NonEmptyString,
+	institutionCountry: NonEmptyString,
+	institutionState: NonEmptyString,
+	institutionCity: NonEmptyString,
+	institutionPostalCode: NonEmptyString.regex(POSTA_CODE_REGEX),
+	institutionStreetAddress: NonEmptyString,
+});

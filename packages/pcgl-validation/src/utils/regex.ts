@@ -17,5 +17,4 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './types.js';
-export * from './validationSchemas.js';
+export const POSTA_CODE_REGEX = /^[A-Za-z0-9\- ]+$/;

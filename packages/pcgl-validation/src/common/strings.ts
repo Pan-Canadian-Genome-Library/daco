@@ -17,5 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './types.js';
-export * from './validationSchemas.js';
+import { z } from 'zod';
+
+export const TrimmedString = z.string().trim();
+export type TrimmedString = z.infer<typeof TrimmedString>;
+
+// string with at least 2 non-whitespace character
+export const NonEmptyString = TrimmedString.min(2);
+export type NonEmptyString = z.infer<typeof NonEmptyString>;
+
+// string with at least 2 non-whitespace character, or undefined
+export const OptionalString = NonEmptyString.optional();
+export type OptionalString = z.infer<typeof OptionalString>;
