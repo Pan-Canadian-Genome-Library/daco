@@ -20,8 +20,8 @@
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
-import { applicationActionService } from '@/service/applicationActionService.js';
-import { applicationService } from '@/service/applicationService.js';
+import { applicationActionSvc } from '@/service/applicationActionService.js';
+import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsService } from '@/service/collaboratorsService.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
@@ -30,12 +30,16 @@ export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
 export type ApplicationContentUpdates = Partial<typeof applicationContents.$inferInsert>;
 
-export type ApplicationData = typeof applications.$inferSelect;
-export type ApplicationActionData = typeof applicationActions.$inferSelect;
+export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'contents'> {
+	contents: ApplicationContentUpdates | null;
+}
 
-export type ApplicationService = ReturnType<typeof applicationService>;
-export type ApplicationActionService = ReturnType<typeof applicationActionService>;
 export type CollaboratorsService = ReturnType<typeof collaboratorsService>;
+export type ApplicationModel = typeof applications.$inferSelect;
+export type ApplicationActionModel = typeof applicationActions.$inferSelect;
+
+export type ApplicationServiceType = ReturnType<typeof applicationSvc>;
+export type ApplicationActionServiceType = ReturnType<typeof applicationActionSvc>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
 

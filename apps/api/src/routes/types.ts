@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationsColumnName, OrderBy } from '@/service/types.js';
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
+import { type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
 export type ApplicationListRequest = {
 	userId: string;
