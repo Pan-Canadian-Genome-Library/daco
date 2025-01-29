@@ -17,4 +17,5 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const POSTA_CODE_REGEX = /^[A-Za-z0-9\- ]+$/;
+// only alphanumeric values
+export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;

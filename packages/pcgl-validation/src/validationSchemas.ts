@@ -18,7 +18,7 @@
  */
 
 import { NonEmptyString } from '@/common/strings.js';
-import { POSTA_CODE_REGEX } from '@/utils/regex.js';
+import { ONLY_ALPHANUMERIC } from '@/utils/regex.js';
 import { z } from 'zod';
 
 export const applicantInformationSchema = z.object({
@@ -32,6 +32,6 @@ export const applicantInformationSchema = z.object({
 	institutionCountry: NonEmptyString,
 	institutionState: NonEmptyString,
 	institutionCity: NonEmptyString,
-	institutionPostalCode: NonEmptyString.regex(POSTA_CODE_REGEX),
+	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 	institutionStreetAddress: NonEmptyString,
 });
