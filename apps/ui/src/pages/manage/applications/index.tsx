@@ -276,7 +276,7 @@ const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata): Filter
  * Processes a page number passed into it, checking if it's valid, and if it needs to be converted into a int.
  *
  * Additionally, since page numbers on the server count from 0, whereas `antd` counts from 1, it can convert from
- * either or using the `forNetwork` param.
+ * either or using the `forAPI` param.
  * @param pageNumber The current page that the user is on in the UI from the URL
  * @param forAPI If the processed page number you'd like back is being sent to the server (count from zero)
  * @returns A `number` that has been validated and converted.
