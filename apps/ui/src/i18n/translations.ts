@@ -50,7 +50,7 @@ i18n.use(initReactI18next).init({
 
 /**
  * Translation error mapping for custom error messages
- * NOTE: If the zod schema from has a {message:...} contained in one of the fields, it will not trigger the translation mapping and will prioritize the {message:...} object
+ * NOTE: If the zod schema has a {message:...} contained in one of the fields, it will not trigger the translation mapping and will prioritize the {message:...} object
  */
 const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 	/**
