@@ -66,6 +66,10 @@ export const createCollaborators = async ({
 		return failure('Unauthorized, cannot create Collaborators');
 	}
 
+	if (!(application.state === 'DRAFT')) {
+		return failure(`Can only add Collaborators when Application is in state DRAFT`);
+	}
+
 	const validCollaborators: ValidCollaboratorDTO[] = collaborators.filter(
 		(data): data is ValidCollaboratorDTO =>
 			!!data.collaboratorFirstName &&

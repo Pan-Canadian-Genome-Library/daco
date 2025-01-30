@@ -62,7 +62,10 @@ collaboratorsRouter.post(
 			response.status(201).send(result.data);
 			return;
 		} else {
-			if (result.message === 'Required Collaborator details are missing.') {
+			if (
+				result.message === 'Required Collaborator details are missing.' ||
+				result.message === 'Can only add Collaborators when Application is in state DRAFT'
+			) {
 				response.status(400);
 			} else if (result.message === 'Unauthorized, cannot create Collaborators') {
 				response.status(401);
