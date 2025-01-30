@@ -22,7 +22,6 @@ import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import * as z from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import InputBox from '@/components/pages/application/form-components/InputBox';
@@ -30,66 +29,22 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@/global/constants';
-// import { useOutletContext } from 'react-router';
-// import { ApplicationOutletContext } from '@/global/types';
+import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
+import { ApplicationOutletContext } from '@/global/types';
+import { institutionalRepSchema, InstitutionalRepSchemaType } from '@pcgl-daco/validation';
+import { useOutletContext } from 'react-router';
 
-type FieldType = {
-	institutionalTitle: string;
-	institutionalFirstName: string;
-	institutionalMiddleName: string;
-	institutionalLastName: string;
-	institutionalSuffix: string;
-	institutionalPrimaryAffiliation: string;
-	institutionalInstituteAffiliation: string;
-	institutionalProfileUrl: string;
-	institutionalPositionTitle: string;
-	institutionCountry: string;
-	institutionState: string;
-	institutionCity: string;
-	institutionStreetAddress: string;
-	institutionPostalCode: string;
-	institutionBuilding: string;
-};
-
-const schema = z.object({
-	institutionalTitle: z.string().min(1, { message: 'Required' }),
-	institutionalFirstName: z
-		.string()
-		.min(1, { message: 'Please fill out the required field.' })
-		.max(250, { message: 'First name should be less than 250 characters' }),
-	institutionalLastName: z
-		.string()
-		.min(1, { message: 'Please fill out the required field.' })
-		.max(250, { message: 'Last name should be less than 250 characters' }),
-	institutionalPrimaryAffiliation: z
-		.string()
-		.min(1, { message: 'Please fill out the required field.' })
-		.max(250, { message: 'Last name should be less than 250 characters' }),
-	institutionalInstituteAffiliation: z
-		.string()
-		.email('Please enter a valid email address.')
-		.min(1, { message: 'Please fill out the required field.' })
-		.max(300, { message: 'Last name should be less than 300 characters' }),
-	institutionalProfileUrl: z
-		.string()
-		.url('Please enter a valid profile link')
-		.min(1, { message: 'Please fill out the required field.' })
-		.max(200, { message: 'Profile link should be less than 200 characters' }),
-});
-
-const rule = createSchemaFieldRule(schema);
+const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const isEditMode = true;
-	// const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<FieldType>({
-		resolver: zodResolver(schema),
+	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
+		resolver: zodResolver(institutionalRepSchema),
 	});
 
-	const onSubmit: SubmitHandler<FieldType> = (data) => {
+	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
 		console.log(data);
 	};
 
@@ -109,14 +64,9 @@ const Institutional = () => {
 								placeholder="Select"
 								control={control}
 								rule={rule}
-								options={[
-									{ value: 'dr', label: 'Dr.' },
-									{ value: 'miss', label: 'Miss.' },
-									{ value: 'mr', label: 'Mr.' },
-									{ value: 'mrs', label: 'Mrs.' },
-									{ value: 'ms', label: 'Ms.' },
-									{ value: 'prof', label: 'Prof.' },
-								]}
+								options={PERSONAL_TITLES.map((titles) => {
+									return { value: titles.en, label: titles.en };
+								})}
 								required
 								disabled={!isEditMode}
 							/>
@@ -200,6 +150,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.researcherProfile')}
 								subLabel={translate('institutional-section.form.researcherProfileLabel')}
 								name="institutionalProfileUrl"
+								autoComplete="url"
 								placeHolder="https://"
 								control={control}
 								rule={rule}

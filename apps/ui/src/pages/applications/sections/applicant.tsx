@@ -32,6 +32,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
+import { PERSONAL_TITLES } from '@/global/constants';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
 
@@ -63,14 +64,9 @@ const Applicant = () => {
 								placeholder="Select"
 								control={control}
 								rule={rule}
-								options={[
-									{ value: 'dr', label: 'Dr' },
-									{ value: 'miss', label: 'Miss' },
-									{ value: 'mr', label: 'Mr' },
-									{ value: 'mrs', label: 'Mrs' },
-									{ value: 'ms', label: 'Ms' },
-									{ value: 'prof', label: 'Prof' },
-								]}
+								options={PERSONAL_TITLES.map((titles) => {
+									return { value: titles.en, label: titles.en };
+								})}
 								required
 								disabled={!isEditMode}
 							/>
