@@ -41,18 +41,16 @@ interface ValidCollaboratorDTO extends CollaboratorDTO {
  */
 export const createCollaborators = async ({
 	application_id,
+	user_id,
 	collaborators,
 }: {
 	application_id: number;
+	user_id: string;
 	collaborators: CollaboratorDTO[];
 }) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
 	const applicationRepo: ApplicationServiceType = applicationSvc(database);
-
-	// TODO: Add Real Auth
-	// Validate User is Applicant
-	const parsedUser = { user_id: 'testUser@oicr.on.ca' };
 
 	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
 
@@ -60,22 +58,24 @@ export const createCollaborators = async ({
 		return applicationResult;
 	}
 
+	const application = applicationResult.data;
+
+	// TODO: Add Real Auth
+	// Validate User is Applicant
+	if (!(user_id === application.user_id)) {
+		return failure('Unauthorized, cannot create Collaborators');
+	}
+
 	const validCollaborators: ValidCollaboratorDTO[] = collaborators.filter(
 		(data): data is ValidCollaboratorDTO =>
-			!data.collaboratorFirstName ||
-			!data.collaboratorLastName ||
-			!data.collaboratorPositionTitle ||
-			!data.collaboratorInstitutionalEmail,
+			!!data.collaboratorFirstName &&
+			!!data.collaboratorLastName &&
+			!!data.collaboratorPositionTitle &&
+			!!data.collaboratorInstitutionalEmail,
 	);
 
 	if (!(validCollaborators.length === collaborators.length)) {
 		return failure('Required Collaborator details are missing.');
-	}
-
-	const application = applicationResult.data;
-
-	if (!(parsedUser.user_id === application.user_id)) {
-		return failure('Unauthorized, cannot create Collaborators');
 	}
 
 	const newCollaborators: CollaboratorModel[] = validCollaborators.map((data) => ({
@@ -89,7 +89,6 @@ export const createCollaborators = async ({
 	}));
 
 	const result = await collaboratorsRepo.createCollaborators({
-		application_id,
 		newCollaborators,
 	});
 

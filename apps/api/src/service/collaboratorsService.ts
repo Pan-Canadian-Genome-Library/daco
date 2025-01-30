@@ -21,34 +21,23 @@ import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import logger from '@/logger.js';
 import { failure, success } from '@/utils/results.js';
-import { type CollaboratorModel } from './types.js';
+import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
 
 const collaboratorsSvc = (db: PostgresDb) => ({
-	createCollaborators: async ({
-		application_id,
-		newCollaborators,
-	}: {
-		application_id: number;
-		newCollaborators: CollaboratorModel[];
-	}) => {
+	createCollaborators: async ({ newCollaborators }: { newCollaborators: CollaboratorModel[] }) => {
 		try {
 			const collaboratorRecords = await db.transaction(async (transaction) => {
 				// Create Collaborators
-				const newCollaboratorRecords = await transaction.insert(collaborators).values(newCollaborators).returning();
-				if (!newCollaboratorRecords[0]) throw new Error('Collaborator records are undefined');
+				const newRecords: CollaboratorRecord[] = [];
 
-				// Create associated ApplicationContents
-				// const { id: application_id } = newApplicationRecord[0];
+				newCollaborators.forEach(async (collaborator) => {
+					const newCollaboratorRecord = await transaction.insert(collaborators).values(collaborator).returning();
+					if (!newCollaboratorRecord[0]) throw new Error(`Collaborator records are undefined: ${collaborator}`);
 
-				// const newAppContents: typeof applicationContents.$inferInsert = {
-				// 	application_id,
-				// 	created_at: new Date(),
-				// 	updated_at: new Date(),
-				// };
-				// const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
-				// if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
+					newRecords.push(newCollaboratorRecord[0]);
+				});
 
-				return newCollaboratorRecords;
+				return newRecords;
 			});
 			return success(collaboratorRecords);
 		} catch (err) {

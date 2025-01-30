@@ -28,6 +28,7 @@ const jsonParser = bodyParser.json();
 
 type CollaboratorRequest = {
 	applicationId: number;
+	userId: string;
 	collaborators: CollaboratorDTO[];
 };
 
@@ -38,11 +39,10 @@ collaboratorsRouter.post(
 	'/collaborators/create',
 	jsonParser,
 	async (request: Request<{}, {}, CollaboratorRequest, any>, response) => {
-		// TODO: Add Real Auth
-		const { authorization } = request.headers;
-		const { applicationId: application_id, collaborators } = request.body;
+		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
-		if (!authorization) {
+		// TODO: Add Real Auth
+		if (!user_id) {
 			response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
 			return;
 		}
@@ -54,6 +54,7 @@ collaboratorsRouter.post(
 
 		const result = await createCollaborators({
 			application_id,
+			user_id,
 			collaborators,
 		});
 

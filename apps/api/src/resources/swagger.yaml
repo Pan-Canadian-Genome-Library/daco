@@ -330,7 +330,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/requests/CollaboratorCreation'
+              type: object
+              properties:
+                applicationId:
+                  type: number
+                  description: ID of the related Application record that new Collaborators are associated with
+                userId:
+                  type: string
+                  description: Temporary, Applicant's User Id, required for authorization
+                collaborators:
+                  $ref: '#/components/requests/CreateCollaborators'
       responses:
         '500':
           description: 'Error creating collaborators'
@@ -345,7 +354,7 @@ paths:
               schema:
                 $ref: '#/components/responses/ClientErrors'
         '201':
-          description: 'Application created'
+          description: 'Collaborators created'
           content:
             application/json:
               schema:
@@ -659,34 +668,36 @@ components:
           description: The id of the Application
           type: number
 
-    CollaboratorCreation:
+    CreateCollaborators:
+      type: array
+      description: Array of new Collaborators to create
+      items:
+        $ref: '#/components/requests/NewCollaborator'
+
+    NewCollaborator:
       type: object
       required:
-        - applicationId
-        - firstName
-        - lastName
-        - positionTitle
-        - institutionalEmail
+        - collaboratorFirstName
+        - collaboratorLastName
+        - collaboratorPositionTitle
+        - collaboratorInstitutionalEmail
       properties:
-        applicationId:
-          type: number
-          description: The Application ID associated with the Collaborator.
-        firstName:
+        collaboratorFirstName:
           type: string
           description: The collaborator's first name
-        middleName:
+        collaboratorMiddleName:
           type: string
           description: The collaborator's middle name
-        lastName:
+        collaboratorLastName:
           type: string
           description: The collaborator's last name
-        suffix:
+        collaboratorSuffix:
           type: string
           description: The collaborator's additional name suffix
-        positionTitle:
+        collaboratorPositionTitle:
           type: string
           description: The collaborator's job title
-        institutionalEmail:
+        collaboratorInstitutionalEmail:
           type: string
           description: The collaborator's contact email
 

@@ -37,6 +37,7 @@ export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'content
 
 export type ApplicationModel = typeof applications.$inferSelect;
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
+export type CollaboratorRecord = typeof collaborators.$inferSelect;
 
 export type ApplicationServiceType = ReturnType<typeof applicationSvc>;
 export type ApplicationActionServiceType = ReturnType<typeof applicationActionSvc>;
