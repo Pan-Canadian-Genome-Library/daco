@@ -21,9 +21,9 @@ import { ApplicationStates, ApproveApplication } from '@pcgl-daco/data-model/src
 
 import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
-import { ApplicationListRequest } from '@/routes/types.js';
+import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { ApplicationRecord, type ApplicationContentUpdates, type ApplicationService } from '@/service/types.js';
+import { type ApplicationContentUpdates, type ApplicationRecord, type ApplicationService } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
 import { ApplicationStateManager } from './stateManager.js';
