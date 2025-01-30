@@ -18,7 +18,7 @@
  */
 
 import { z } from 'zod';
-import { NonEmptyString, OptionalString } from './common/strings.js';
+import { EmptyOrOptionalString, NonEmptyString } from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 // Applicant Information Form Section
@@ -26,9 +26,9 @@ export type ApplicantInformationSchemaType = z.infer<typeof applicantInformation
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
 	applicantFirstName: NonEmptyString,
-	applicantMiddleName: OptionalString,
+	applicantMiddleName: EmptyOrOptionalString,
 	applicantLastName: NonEmptyString,
-	applicantSuffix: OptionalString,
+	applicantSuffix: EmptyOrOptionalString,
 	applicantPrimaryAffiliation: NonEmptyString,
 	applicantInstituteAffiliation: NonEmptyString.email(),
 	applicantProfileUrl: NonEmptyString.url(),
@@ -38,5 +38,5 @@ export const applicantInformationSchema = z.object({
 	institutionCity: NonEmptyString,
 	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 	institutionStreetAddress: NonEmptyString,
-	institutionBuilding: OptionalString,
+	institutionBuilding: EmptyOrOptionalString,
 });
