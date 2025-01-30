@@ -43,7 +43,6 @@ export const applicantInformationSchema = z.object({
 	institutionBuilding: EmptyOrOptionalString,
 });
 
-
 export const institutionalRepSchema = z.object({
 	institutionalTitle: NonEmptyString,
 	institutionalFirstName: NonEmptyString,

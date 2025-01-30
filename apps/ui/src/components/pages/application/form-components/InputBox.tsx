@@ -24,9 +24,24 @@ import { BasicFormFieldProps } from '@/global/types';
 
 const { Item } = Form;
 
-interface InputBoxProps extends BasicFormFieldProps, HTMLFormElement {
+interface InputBoxProps extends BasicFormFieldProps {
 	subLabel?: string;
 	placeHolder?: string;
+	type?: 'email' | 'password' | 'tel' | 'hidden' | 'text' | 'url';
+	autoComplete?:
+		| 'on'
+		| 'off'
+		| 'tel'
+		| 'email'
+		| 'name'
+		| 'given-name'
+		| 'additional-name'
+		| 'family-name'
+		| 'honorific-suffix'
+		| 'organization'
+		| 'street-address'
+		| 'country-name'
+		| 'url';
 }
 
 const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBoxProps) => {
@@ -40,7 +55,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 						<Item label={props.subLabel} name={props.name as string} rules={[props.rule]}>
 							<Input
 								{...field}
-								autoComplete={props.autocomplete ?? ''}
+								autoComplete={props.autoComplete ?? ''}
 								type={props.type ?? 'text'}
 								disabled={props.disabled}
 								placeholder={props.placeHolder}

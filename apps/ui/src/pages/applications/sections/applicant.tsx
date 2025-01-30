@@ -31,8 +31,8 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
 import { PERSONAL_TITLES } from '@/global/constants';
+import { ApplicationOutletContext } from '@/global/types';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
 
