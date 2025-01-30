@@ -32,7 +32,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 	return (
 		<Modal
 			title={'Add A Collaborator'}
-			okText={'Add Collaborator'}
+			okText={translate('button.addCollab')}
 			cancelText={translate('button.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
