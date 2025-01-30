@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,13 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
-import { type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import { z } from 'zod';
+import { NonEmptyString, OptionalString } from './common/strings.js';
+import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
-export type ApplicationListRequest = {
-	userId: string;
-	state?: ApplicationStateValues[];
-	sort?: Array<OrderBy<ApplicationsColumnName>>;
-	page?: number;
-	pageSize?: number;
-};
+// Applicant Information Form Section
+export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
+export const applicantInformationSchema = z.object({
+	applicantTitle: NonEmptyString,
+	applicantFirstName: NonEmptyString,
+	applicantMiddleName: OptionalString,
+	applicantLastName: NonEmptyString,
+	applicantSuffix: OptionalString,
+	applicantPrimaryAffiliation: NonEmptyString,
+	applicantInstituteAffiliation: NonEmptyString.email(),
+	applicantProfileUrl: NonEmptyString.url(),
+	applicantPositionTitle: NonEmptyString,
+	institutionCountry: NonEmptyString,
+	institutionState: NonEmptyString,
+	institutionCity: NonEmptyString,
+	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	institutionStreetAddress: NonEmptyString,
+	institutionBuilding: OptionalString,
+});

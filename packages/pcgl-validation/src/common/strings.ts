@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,13 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
-import { type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import { z } from 'zod';
 
-export type ApplicationListRequest = {
-	userId: string;
-	state?: ApplicationStateValues[];
-	sort?: Array<OrderBy<ApplicationsColumnName>>;
-	page?: number;
-	pageSize?: number;
-};
+export const TrimmedString = z.string().trim();
+export type TrimmedString = z.infer<typeof TrimmedString>;
+
+// string with at least 2 non-whitespace character
+export const NonEmptyString = TrimmedString.min(2);
+export type NonEmptyString = z.infer<typeof NonEmptyString>;
+
+// string with at least 2 non-whitespace character, or undefined
+export const OptionalString = NonEmptyString.optional();
+export type OptionalString = z.infer<typeof OptionalString>;
