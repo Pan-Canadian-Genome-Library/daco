@@ -17,16 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export {
-	type ApplicantDTO,
-	type ApplicationContentsResponse,
-	type ApplicationResponseData,
-	type CollaboratorDTO,
-	type EthicsDataDTO,
-	type InstitutionDTO,
-	type InstitutionalRepDTO,
-	type ProjectDTO,
-	type RequestedStudiesDTO,
-} from './types.js';
+import { ApplicationStates, ApplicationStateValues } from './types.js';
 
-export { isApplicationStateValue } from './utils.js';
+/**
+ * Type check to see if a provided string value is a valid Application State value.
+ * @param value A string containing a possible valid Application State value.
+ * @returns A boolean, `true` if valid, `false` if not.
+ */
+const isApplicationStateValue = (value: string): value is ApplicationStateValues => {
+	if (Object.keys(ApplicationStates).includes(value)) {
+		return true;
+	}
+	return false;
+};
+
+export { isApplicationStateValue };

@@ -22,14 +22,41 @@ import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ApplicationList, ServerError } from '@/global/types';
+import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
-const useGetApplicationList = (id?: string | number) => {
+export interface ApplicationListSortingOptions {
+	direction: 'desc' | 'asc';
+	column: 'user_id' | 'id' | 'created_at' | 'updated_at' | 'state' | 'approved_at' | 'expires_at';
+}
+interface ApplicationListParams {
+	userId: string;
+	state?: ApplicationStateValues[];
+	sort?: ApplicationListSortingOptions[];
+	page?: number;
+	pageSize?: number;
+}
+
+const useGetApplicationList = ({ userId, state, sort, page, pageSize }: ApplicationListParams) => {
 	const { t: translate } = useTranslation();
+	const queryParams = new URLSearchParams({ userId: userId });
+
+	if (state && state.length) {
+		queryParams.set('state', JSON.stringify(state));
+	}
+	if (sort && sort.length) {
+		queryParams.set('sort', JSON.stringify(sort));
+	}
+	if (page !== undefined) {
+		queryParams.set('page', page.toString());
+	}
+	if (pageSize !== undefined) {
+		queryParams.set('pageSize', pageSize.toString());
+	}
 
 	return useQuery<ApplicationList, ServerError>({
-		queryKey: [id],
+		queryKey: [queryParams],
 		queryFn: async () => {
-			const response = await fetch(`/applications?userId=${id}`);
+			const response = await fetch(`/applications?${queryParams.toString()}`);
 
 			if (!response.ok) {
 				const error = {
@@ -41,6 +68,14 @@ const useGetApplicationList = (id?: string | number) => {
 					case 404:
 						error.message = translate('errors.http.404.title');
 						error.errors = translate('errors.http.404.message');
+						break;
+					case 400:
+						error.message = translate('errors.http.400.title');
+						error.errors = translate('errors.http.400.message');
+						break;
+					case 500:
+						error.message = translate('errors.http.500.title');
+						error.errors = translate('errors.http.500.message');
 						break;
 				}
 
