@@ -27,5 +27,5 @@ export const NonEmptyString = TrimmedString.min(2);
 export type NonEmptyString = z.infer<typeof NonEmptyString>;
 
 // string with at least 2 non-whitespace character, or undefined
-export const OptionalString = NonEmptyString.optional();
+export const OptionalString = NonEmptyString.optional().or(z.literal(''));
 export type OptionalString = z.infer<typeof OptionalString>;
