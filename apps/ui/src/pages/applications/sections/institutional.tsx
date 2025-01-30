@@ -22,7 +22,6 @@ import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router';
 import * as z from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
@@ -31,7 +30,9 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
+import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@/global/constants';
+// import { useOutletContext } from 'react-router';
+// import { ApplicationOutletContext } from '@/global/types';
 
 type FieldType = {
 	institutionalTitle: string;
@@ -53,17 +54,36 @@ type FieldType = {
 
 const schema = z.object({
 	institutionalTitle: z.string().min(1, { message: 'Required' }),
-	InstitutionalFirstName: z
+	institutionalFirstName: z
 		.string()
-		.min(1, { message: 'Required' })
-		.max(15, { message: 'First name should be less than 15 characters' }),
+		.min(1, { message: 'Please fill out the required field.' })
+		.max(250, { message: 'First name should be less than 250 characters' }),
+	institutionalLastName: z
+		.string()
+		.min(1, { message: 'Please fill out the required field.' })
+		.max(250, { message: 'Last name should be less than 250 characters' }),
+	institutionalPrimaryAffiliation: z
+		.string()
+		.min(1, { message: 'Please fill out the required field.' })
+		.max(250, { message: 'Last name should be less than 250 characters' }),
+	institutionalInstituteAffiliation: z
+		.string()
+		.email('Please enter a valid email address.')
+		.min(1, { message: 'Please fill out the required field.' })
+		.max(300, { message: 'Last name should be less than 300 characters' }),
+	institutionalProfileUrl: z
+		.string()
+		.url('Please enter a valid profile link')
+		.min(1, { message: 'Please fill out the required field.' })
+		.max(200, { message: 'Profile link should be less than 200 characters' }),
 });
 
 const rule = createSchemaFieldRule(schema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const isEditMode = true;
+	// const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	const { handleSubmit, control } = useForm<FieldType>({
 		resolver: zodResolver(schema),
@@ -90,12 +110,12 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								options={[
-									{ value: 'dr', label: 'Dr' },
-									{ value: 'miss', label: 'Miss' },
-									{ value: 'mr', label: 'Mr' },
-									{ value: 'mrs', label: 'Mrs' },
-									{ value: 'ms', label: 'Ms' },
-									{ value: 'prof', label: 'Prof' },
+									{ value: 'dr', label: 'Dr.' },
+									{ value: 'miss', label: 'Miss.' },
+									{ value: 'mr', label: 'Mr.' },
+									{ value: 'mrs', label: 'Mrs.' },
+									{ value: 'ms', label: 'Ms.' },
+									{ value: 'prof', label: 'Prof.' },
 								]}
 								required
 								disabled={!isEditMode}
@@ -108,6 +128,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.firstName')}
 								name="institutionalFirstName"
 								control={control}
+								autoComplete="given-name"
 								rule={rule}
 								required
 								disabled={!isEditMode}
@@ -117,6 +138,7 @@ const Institutional = () => {
 							<InputBox
 								label={translate('institutional-section.form.middleName')}
 								name="institutionalMiddleName"
+								autoComplete="additional-name"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -129,6 +151,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.lastName')}
 								name="institutionalLastName"
 								control={control}
+								autoComplete="family-name"
 								rule={rule}
 								required
 								disabled={!isEditMode}
@@ -139,6 +162,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.suffix')}
 								name="institutionalSuffix"
 								control={control}
+								autoComplete="honorific-suffix"
 								rule={rule}
 								disabled={!isEditMode}
 							/>
@@ -200,11 +224,15 @@ const Institutional = () => {
 				<SectionContent title={translate('institutional-section.section2')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<InputBox
+							<SelectBox
 								label={translate('institutional-section.form.country')}
 								name="institutionCountry"
 								control={control}
 								rule={rule}
+								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
+									return { value: areas.iso, label: areas.en };
+								})}
+								defaultValue={'CAN'}
 								required
 								disabled={!isEditMode}
 							/>

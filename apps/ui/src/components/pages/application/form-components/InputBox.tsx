@@ -24,7 +24,7 @@ import { BasicFormFieldProps } from '@/global/types';
 
 const { Item } = Form;
 
-interface InputBoxProps extends BasicFormFieldProps {
+interface InputBoxProps extends BasicFormFieldProps, HTMLFormElement {
 	subLabel?: string;
 	placeHolder?: string;
 }
@@ -38,7 +38,13 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 				return (
 					<Item label={props.label} required={props.required}>
 						<Item label={props.subLabel} name={props.name as string} rules={[props.rule]}>
-							<Input {...field} disabled={props.disabled} placeholder={props.placeHolder} />
+							<Input
+								{...field}
+								autoComplete={props.autocomplete ?? ''}
+								type={props.type ?? 'text'}
+								disabled={props.disabled}
+								placeholder={props.placeHolder}
+							/>
 						</Item>
 					</Item>
 				);

@@ -40,7 +40,13 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 			render={({ field }) => {
 				return (
 					<Item label={props.label} name={props.name as string} rules={[props.rule]} required={props.required}>
-						<Select {...field} disabled={props.disabled} options={props.options} placeholder={props.placeholder} />
+						<Select
+							{...field}
+							defaultValue={props.defaultValue}
+							disabled={props.disabled}
+							options={props.options}
+							placeholder={props.placeholder}
+						/>
 					</Item>
 				);
 			}}
