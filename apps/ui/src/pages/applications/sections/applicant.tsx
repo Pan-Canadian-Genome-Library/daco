@@ -31,7 +31,7 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { PERSONAL_TITLES } from '@/global/constants';
+import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
@@ -170,11 +170,15 @@ const Applicant = () => {
 				<SectionContent title={translate('applicant-section.section2')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<InputBox
+							<SelectBox
 								label={translate('applicant-section.form.country')}
 								name="institutionCountry"
 								control={control}
 								rule={rule}
+								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
+									return { value: areas.iso, label: areas.en };
+								})}
+								defaultValue={'CAN'}
 								required
 								disabled={!isEditMode}
 							/>
