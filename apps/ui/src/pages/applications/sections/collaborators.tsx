@@ -39,6 +39,7 @@ interface CollabTableData {
 	institutionalEmail: string;
 	title: string;
 }
+
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();

@@ -16,8 +16,17 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { Flex, Modal, Typography } from 'antd';
+
+import { ApplicationOutletContext } from '@/global/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
+import { createSchemaFieldRule } from 'antd-zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
+import { z } from 'zod';
+
+import InputBox from '@/components/pages/application/form-components/InputBox';
 
 const { Text } = Typography;
 
@@ -26,12 +35,32 @@ type AddCollaboratorModalProps = {
 	setIsOpen: (val: boolean) => void;
 };
 
+const schema = z.object({
+	firstName: z.string().min(1, { message: 'Required' }),
+	middleName: z.string().min(1, { message: 'Required' }),
+	lastName: z.string().min(1, { message: 'Required' }),
+	suffix: z.string().min(1, { message: 'Required' }),
+	primaryEmail: z.string().min(1, { message: 'Required' }),
+	positionTitle: z.string().min(1, { message: 'Required' }),
+});
+
+const rule = createSchemaFieldRule(schema);
+
 const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
+	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+
+	const { handleSubmit, control } = useForm<z.infer<typeof schema>>({
+		resolver: zodResolver(schema),
+	});
+
+	const onSubmit: SubmitHandler<z.infer<typeof schema>> = (data) => {
+		console.log(data);
+	};
 
 	return (
 		<Modal
-			title={'Add A Collaborator'}
+			title={translate('collab-section.addModalTitle')}
 			okText={translate('button.addCollab')}
 			cancelText={translate('button.cancel')}
 			width={'100%'}
@@ -40,12 +69,76 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 			onOk={() => setIsOpen(false)}
 			onCancel={() => setIsOpen(false)}
 		>
-			<Flex style={{ height: '100%', marginTop: 20 }}>
-				<Text>
-					{
-						'Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL and will be the email address associated with PCGL Controlled Data access.'
-					}
-				</Text>
+			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
+				<Text>{translate('collab-section.addModalDescription')}</Text>
+				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+					<Flex vertical>
+						<Row gutter={26}>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+								<InputBox
+									label={translate('collab-section.form.firstName')}
+									name="firstName"
+									control={control}
+									rule={rule}
+									required
+									disabled={!isEditMode}
+								/>
+							</Col>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+								<InputBox
+									label={translate('collab-section.form.middleName')}
+									name="middleName"
+									control={control}
+									rule={rule}
+									disabled={!isEditMode}
+								/>
+							</Col>
+						</Row>
+						<Row gutter={26}>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+								<InputBox
+									label={translate('collab-section.form.lastName')}
+									name="lastName"
+									control={control}
+									rule={rule}
+									required
+									disabled={!isEditMode}
+								/>
+							</Col>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+								<InputBox
+									label={translate('collab-section.form.suffix')}
+									name="suffix"
+									control={control}
+									rule={rule}
+									disabled={!isEditMode}
+								/>
+							</Col>
+						</Row>
+						<Row gutter={26}>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+								<InputBox
+									label={translate('collab-section.form.primaryEmail')}
+									name="primaryEmail"
+									control={control}
+									rule={rule}
+									required
+									disabled={!isEditMode}
+								/>
+							</Col>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+								<InputBox
+									label={translate('collab-section.form.positionTitle')}
+									name="positionTitle"
+									control={control}
+									rule={rule}
+									required
+									disabled={!isEditMode}
+								/>
+							</Col>
+						</Row>
+					</Flex>
+				</Form>
 			</Flex>
 		</Modal>
 	);
