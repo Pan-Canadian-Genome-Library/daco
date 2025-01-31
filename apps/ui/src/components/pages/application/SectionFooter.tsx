@@ -56,7 +56,8 @@ const SectionFooter = ({ currentRoute, isEditMode, onSubmit }: SectionFooterProp
 	};
 
 	const nextSection = () => {
-		if (!!onSubmit) {
+		// Temp logic to trigger validation errors on ui edit mode
+		if (!!onSubmit && isEditMode) {
 			onSubmit();
 			return;
 		}

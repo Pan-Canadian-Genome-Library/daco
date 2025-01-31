@@ -257,10 +257,11 @@ const applicationSvc = (db: PostgresDb) => ({
 					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
 				);
 
-				returnableApplications = [
-					...reviewApplications,
-					...returnableApplications.filter((applications) => applications.state !== ApplicationStates.DAC_REVIEW),
-				];
+				const nonReviewApplications = returnableApplications.filter(
+					(applications) => applications.state !== ApplicationStates.DAC_REVIEW,
+				);
+
+				returnableApplications = [...reviewApplications, ...nonReviewApplications];
 			}
 
 			const applicationsList = {
