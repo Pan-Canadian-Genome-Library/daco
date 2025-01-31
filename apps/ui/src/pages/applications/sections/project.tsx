@@ -31,20 +31,20 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
-import { institutionalRepSchema, InstitutionalRepSchemaType } from '@pcgl-daco/validation';
+import { projectInformationSchema, ProjectInformationSchemaType } from '@pcgl-daco/validation';
 import { useOutletContext } from 'react-router';
 
-const rule = createSchemaFieldRule(institutionalRepSchema);
+const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
-		resolver: zodResolver(institutionalRepSchema),
+	const { handleSubmit, control } = useForm<ProjectInformationSchemaType>({
+		resolver: zodResolver(projectInformationSchema),
 	});
 
-	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
+	const onSubmit: SubmitHandler<ProjectInformationSchemaType> = (data) => {
 		console.log(data);
 	};
 
@@ -67,6 +67,8 @@ const Project = () => {
 						<InputBox
 							label={translate('project-section.section0.form.projectWebsite')}
 							name="projectWebsite"
+							type="url"
+							placeHolder="https://"
 							control={control}
 							rule={rule}
 							disabled={!isEditMode}
@@ -150,7 +152,7 @@ const Project = () => {
 											]}
 										/>
 									}
-									name="projectBackground"
+									name="projectLaySummary"
 									control={control}
 									rule={rule}
 									required
@@ -171,7 +173,7 @@ const Project = () => {
 								placeHolder="https://"
 								type="url"
 								label={translate('project-section.section3.form.urlPage')}
-								name="projectURL1"
+								name="relevantPublicationURL1"
 								control={control}
 								rule={rule}
 								required
@@ -179,7 +181,7 @@ const Project = () => {
 							/>
 						</Col>
 					</Row>
-					<Row>
+					<Row style={{ margin: '1rem 0' }}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 								<InputBox
@@ -187,7 +189,7 @@ const Project = () => {
 									placeHolder="https://"
 									type="url"
 									label={translate('project-section.section3.form.urlPage')}
-									name="projectURL2"
+									name="relevantPublicationURL2"
 									control={control}
 									rule={rule}
 									required
@@ -204,7 +206,7 @@ const Project = () => {
 									placeHolder="https://"
 									type="url"
 									label={translate('project-section.section3.form.urlPage')}
-									name="projectURL3"
+									name="relevantPublicationURL3"
 									control={control}
 									rule={rule}
 									required
