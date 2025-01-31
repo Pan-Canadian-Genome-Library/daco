@@ -45,7 +45,7 @@ const DashboardPage = () => {
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
 	const navigate = useNavigate();
-	const { data: applicationData, error } = useGetApplicationList(mockUserID);
+	const { data: applicationData, error } = useGetApplicationList({ userId: mockUserID });
 
 	const showEditApplicationModal = (id: string) => {
 		setModalAppId(id);

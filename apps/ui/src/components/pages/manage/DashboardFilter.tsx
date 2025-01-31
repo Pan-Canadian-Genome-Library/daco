@@ -17,10 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { isApplicationStateValue } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/dist/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { Flex, Tag, theme } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { useToken } = theme;
@@ -28,24 +29,26 @@ const { useToken } = theme;
 /**
  * The allowable values that a filter can be for the manage applications interface.
  **/
-export type FilterKeyType = ApplicationStateValues | 'TOTAL';
+export type FilterKeys = ApplicationStateValues | 'TOTAL';
+
 interface DashboardFilterProps {
-	onFilterChange: (filtersEnabled: FilterKeyType[]) => void;
-	availableStates: { key: FilterKeyType; amount: number }[];
+	onFilterChange: (filtersEnabled: FilterKeys[]) => void;
+	filters: FilterKeys[];
+	availableStates: { key: FilterKeys; amount: number }[];
 }
 
 interface Filter {
 	name: string;
 	amount: number;
-	key: FilterKeyType;
+	key: FilterKeys;
 }
 
-const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterProps) => {
+const DashboardFilter = ({ onFilterChange, filters, availableStates }: DashboardFilterProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 
 	//By default we want the "Total" filter selected, displaying all possible application types.
-	const [filterStates, setFilterStates] = useState<Array<FilterKeyType>>(['TOTAL']);
+	const [filterStates, setFilterStates] = useState<Array<FilterKeys>>([]);
 
 	// The currently displayed filters in the interface, this is determined by whatever is sent in by fetched data.
 	const displayedFilters: Filter[] = [
@@ -54,16 +57,17 @@ const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterPro
 			key: 'TOTAL',
 			amount: availableStates.find((state) => state.key === 'TOTAL')?.amount || 0,
 		},
-		...Object.keys(ApplicationStates).map((possibleState): Filter => {
+
+		...Object.values(ApplicationStates).map((possibleState: FilterKeys): Filter => {
 			return {
 				name: translate(`application.states.${possibleState}`),
 				amount: availableStates.find((state) => state.key === possibleState)?.amount || 0,
-				key: possibleState as FilterKeyType,
+				key: possibleState,
 			};
 		}),
 	];
 
-	const handleChange = (selectedFilter: FilterKeyType, checked: boolean) => {
+	const handleChange = (selectedFilter: FilterKeys, checked: boolean) => {
 		let nextSelectedFilters = checked
 			? [...filterStates, selectedFilter]
 			: filterStates.filter((t) => t !== selectedFilter);
@@ -74,7 +78,7 @@ const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterPro
 		 *
 		 * Also if the user unselects all filters, default back to total.
 		 **/
-		if (selectedFilter === 'TOTAL' || nextSelectedFilters.length === 0) {
+		if (selectedFilter === 'TOTAL' || (nextSelectedFilters.length === 0 && filters.length === 0)) {
 			nextSelectedFilters = ['TOTAL'];
 		} else if (filterStates.includes('TOTAL')) {
 			/**
@@ -91,9 +95,16 @@ const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterPro
 		if (nextSelectedFilters.length === displayedFilters.length - 1) {
 			nextSelectedFilters = ['TOTAL'];
 		}
+
 		setFilterStates(nextSelectedFilters);
 		onFilterChange(nextSelectedFilters);
 	};
+
+	useEffect(() => {
+		if (filters && filters.length) {
+			setFilterStates([...filters]);
+		}
+	}, [filters]);
 
 	return (
 		<Flex gap={token.paddingXXS}>
@@ -112,3 +123,15 @@ const DashboardFilter = ({ onFilterChange, availableStates }: DashboardFilterPro
 };
 
 export default DashboardFilter;
+
+/**
+ * A type guard to ensure that a passed in string is a part of a valid filter state.
+ * @param filter A potentially valid filter
+ * @returns A boolean ensuring that a filter is a part of of the set of valid filter states (`true`) or not (`false`)
+ */
+export const isFilterKey = (filter: string): filter is FilterKeys => {
+	if (filter && (isApplicationStateValue(filter) || filter === 'TOTAL')) {
+		return true;
+	}
+	return false;
+};
