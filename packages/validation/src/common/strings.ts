@@ -18,6 +18,7 @@
  */
 
 import { z } from 'zod';
+import { WORDS } from '../utils/regex.js';
 
 export const TrimmedString = z.string().trim();
 export type TrimmedString = z.infer<typeof TrimmedString>;
@@ -41,3 +42,10 @@ export type EmptyOrOptionalString = z.infer<typeof EmptyOrOptionalString>;
 
 export const OptionalURLString = TrimmedString.url().optional().or(EmptyWhiteSpace);
 export type OptionalURLString = z.infer<typeof OptionalURLString>;
+
+export const RequiredWordCountString = TrimmedString.refine(
+	(value) => value.split(WORDS).length < 100 || value.split(WORDS).length > 200,
+	{
+		params: { i18n: 'words' },
+	},
+);

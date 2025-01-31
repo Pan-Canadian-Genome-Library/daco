@@ -18,7 +18,7 @@
  */
 
 import { z } from 'zod';
-import { EmptyOrOptionalString, NonEmptyString, OptionalString, TrimmedString } from './common/strings.js';
+import { EmptyOrOptionalString, NonEmptyString, OptionalURLString, RequiredWordCountString } from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 // Applicant Information Form Section
@@ -64,12 +64,12 @@ export const institutionalRepSchema = z.object({
 
 export const projectInformationSchema = z.object({
 	projectTitle: NonEmptyString,
-	projectWebsite: OptionalString,
-	projectBackground: TrimmedString.min(100).max(200),
-	projectAims: TrimmedString.min(100).max(200),
-	projectDataUse: TrimmedString.min(100).max(200),
-	projectMethodology: TrimmedString.min(100).max(200),
-	projectLaySummary: TrimmedString.min(100).max(200),
+	projectWebsite: OptionalURLString,
+	projectBackground: RequiredWordCountString,
+	projectAims: RequiredWordCountString,
+	projectDataUse: RequiredWordCountString,
+	projectMethodology: RequiredWordCountString,
+	projectLaySummary: RequiredWordCountString,
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
