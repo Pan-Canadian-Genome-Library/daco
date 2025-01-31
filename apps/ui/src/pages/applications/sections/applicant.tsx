@@ -136,7 +136,7 @@ const Applicant = () => {
 							<InputBox
 								label={translate('applicant-section.form.primaryEmail')}
 								subLabel={translate('applicant-section.form.primaryEmailLabel')}
-								name="applicantInstituteAffiliation"
+								name="applicantInstituteEmail"
 								control={control}
 								rule={rule}
 								required
@@ -176,7 +176,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.country')}
-								name="institutionCountry"
+								name="applicantInstituteCountry"
 								control={control}
 								rule={rule}
 								required
@@ -188,7 +188,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.streetAddress')}
-								name="institutionStreetAddress"
+								name="applicantInstituteStreetAddress"
 								control={control}
 								rule={rule}
 								required
@@ -198,7 +198,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.building')}
-								name="institutionBuilding"
+								name="applicantInstituteBuilding"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -209,7 +209,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.state')}
-								name="institutionState"
+								name="applicantInstituteState"
 								control={control}
 								rule={rule}
 								required
@@ -219,7 +219,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.city')}
-								name="institutionCity"
+								name="applicantInstituteCity"
 								control={control}
 								rule={rule}
 								required
@@ -231,7 +231,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.postalCode')}
-								name="institutionPostalCode"
+								name="applicantInstitutePostalCode"
 								control={control}
 								rule={rule}
 								required
