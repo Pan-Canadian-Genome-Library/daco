@@ -25,18 +25,30 @@ import { applications } from '@/db/schemas/applications.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { applicationActionSvc } from './applicationActionService.js';
 import {
+	ApplicationStates,
+	type ApplicationListResponse,
+	type ApplicationStateValues,
+} from '@pcgl-daco/data-model/src/types.js';
+import {
+	type ApplicationContentModel,
 	type ApplicationContentUpdates,
+	type ApplicationRecord,
 	type ApplicationsColumnName,
+	type ApplicationStateTotals,
 	type ApplicationUpdates,
 	type JoinedApplicationRecord,
 	type OrderBy,
+	type PostgresTransaction,
 } from './types.js';
 
+/**
+ * ApplicationService provides methods for Applications DB access
+ * @param db - Drizzle Postgres DB Instance
+ */
 const applicationSvc = (db: PostgresDb) => ({
-	createApplication: async ({ user_id }: { user_id: string }) => {
+	/** @method createApplication: Create new Application record */
+	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
 			state: ApplicationStates.DRAFT,
@@ -51,18 +63,13 @@ const applicationSvc = (db: PostgresDb) => ({
 				// Create associated ApplicationContents
 				const { id: application_id } = newApplicationRecord[0];
 
-				const newAppContents: typeof applicationContents.$inferInsert = {
+				const newAppContents: Pick<ApplicationContentModel, 'application_id' | 'created_at' | 'updated_at'> = {
 					application_id,
 					created_at: new Date(),
 					updated_at: new Date(),
 				};
 				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
-
-				// Create associated Actions
-				const actionRepo = applicationActionSvc(db);
-				const actionResult = await actionRepo.create(newApplicationRecord[0]);
-				if (!actionResult.success) throw new Error(actionResult.errors);
 
 				// Join records
 				const { id: contents_id } = newAppContentsRecord[0];
@@ -72,9 +79,11 @@ const applicationSvc = (db: PostgresDb) => ({
 					.set({ contents: contents_id })
 					.where(eq(applications.id, application_id))
 					.returning();
+				if (!application[0]) throw new Error('Application record is undefined');
 
 				return application[0];
 			});
+
 			return success(application);
 		} catch (err) {
 			const message = `Error at createApplication with user_id: ${user_id}`;
@@ -85,8 +94,14 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-
-	editApplication: async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
+	/** @method editApplication: Update Application Contents and parent Application record */
+	editApplication: async ({
+		id,
+		update,
+	}: {
+		id: number;
+		update: ApplicationContentUpdates;
+	}): AsyncResult<JoinedApplicationRecord> => {
 		try {
 			const application = await db.transaction(async (transaction) => {
 				// Update Application Contents
@@ -96,6 +111,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					.set(contents)
 					.where(eq(applicationContents.application_id, id))
 					.returning();
+				if (!editedContents[0]) throw new Error('Application contents record is undefined');
 
 				// Update Related Application
 				const applicationUpdates = {
@@ -107,6 +123,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					.set(applicationUpdates)
 					.where(eq(applications.id, id))
 					.returning();
+				if (!editedApplication[0]) throw new Error('Application record is undefined');
 
 				// Returns merged record
 				return {
@@ -123,16 +140,26 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-
-	findOneAndUpdate: async ({ id, update }: { id: number; update: ApplicationUpdates }) => {
+	/** @method findOneAndUpdate: Update a base Application record */
+	findOneAndUpdate: async ({
+		id,
+		update,
+		transaction,
+	}: {
+		id: number;
+		update: ApplicationUpdates;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<ApplicationRecord> => {
 		try {
-			const application = await db
+			const dbTransaction = transaction ? transaction : db;
+			const application = await dbTransaction
 				.update(applications)
 				.set({ ...update, updated_at: sql`NOW()` })
 				.where(eq(applications.id, id))
 				.returning();
+			if (!application[0]) throw new Error('Application record is undefined');
 
-			return success(application);
+			return success(application[0]);
 		} catch (err) {
 			const message = `Error at findOneAndUpdate with id: ${id}`;
 			logger.error(message);
@@ -140,8 +167,8 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-
-	getApplicationById: async ({ id }: { id: number }) => {
+	/** @method getApplicationById: Find a specific Application record */
+	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationRecord> => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
 
@@ -155,7 +182,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-
+	/** @method getApplicationWithContents: Find an Application record with Contents included */
 	getApplicationWithContents: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
 		try {
 			const applicationRecord = await db
@@ -180,7 +207,10 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-
+	/**
+	 * @method listApplications: Find multiple sorted Application records
+	 * Includes ApplicantInformation and PagingMetadata
+	 */
 	listApplications: async ({
 		user_id,
 		state = [],
@@ -193,7 +223,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
-	}) => {
+	}): AsyncResult<ApplicationListResponse> => {
 		try {
 			/**
 			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
@@ -205,14 +235,14 @@ const applicationSvc = (db: PostgresDb) => ({
 				throw Error('Page and/or page size must be non-negative values.');
 			}
 
-			const rawApplicationModel = await db
+			const rawApplicationRecord = await db
 				.select({
 					id: applications.id,
-					user_id: applications.user_id,
+					userId: applications.user_id,
 					state: applications.state,
 					createdAt: applications.created_at,
 					updatedAt: applications.updated_at,
-					applicantInformation: {
+					applicant: {
 						createdAt: applicationContents.created_at,
 						firstName: applicationContents.applicant_first_name,
 						lastName: applicationContents.applicant_last_name,
@@ -241,7 +271,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				),
 			);
 
-			let returnableApplications = rawApplicationModel;
+			let returnableApplications = rawApplicationRecord;
 
 			/**
 			 * Sort DAC_REVIEW records to the top to display on the front end, however...
@@ -281,10 +311,10 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-
-	applicationStateTotals: async ({ user_id }: { user_id?: string }) => {
+	/** @method applicationStateTotals: Obtain count for all Application records with each State */
+	applicationStateTotals: async ({ user_id }: { user_id?: string }): AsyncResult<ApplicationStateTotals> => {
 		try {
-			const rawApplicationModel = await db
+			const rawApplicationRecord = await db
 				.select({
 					APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
 					CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
@@ -303,8 +333,8 @@ const applicationSvc = (db: PostgresDb) => ({
 				.from(applications)
 				.limit(1);
 
-			if (rawApplicationModel && rawApplicationModel.length) {
-				return success(rawApplicationModel[0]);
+			if (rawApplicationRecord[0] && rawApplicationRecord.length) {
+				return success(rawApplicationRecord[0]);
 			} else {
 				return success({
 					APPROVED: 0,
