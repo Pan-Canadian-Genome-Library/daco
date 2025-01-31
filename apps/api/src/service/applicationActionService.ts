@@ -42,10 +42,8 @@ import {
  * @param db - Drizzle Postgres DB Instance
  */
 const applicationActionSvc = (db: PostgresDb) => {
-	/**
-	 * @method addActionRecord: Template method for adding an Action record
-	 * New actions are created on every transition from one state to the next
-	 */
+	/** @method addActionRecord: Template method for adding an Action record */
+	/** New actions are created on every transition from one state to the next */
 	const addActionRecord = async (
 		application: ApplicationRecord,
 		action: ApplicationActionValues,
@@ -74,9 +72,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 	};
 
 	return {
-		/**
-		 * @method: Aliased methods for each state transition
-		 */
+		/** @method: Aliased methods for each state transition */
 		create: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.CREATE, ApplicationStates.DRAFT),
 		close: async (application: ApplicationRecord) =>
@@ -113,9 +109,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
 		withdraw: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
-		/**
-		 * @method getActionById: Find a specific Action record
-		 */
+		/** @method getActionById: Find a specific Action record */
 		getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionRecord> => {
 			try {
 				const actionRecord = await db.select().from(applicationActions).where(eq(applicationActions.id, id));
@@ -129,9 +123,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 				return failure(message, err);
 			}
 		},
-		/**
-		 * @method listActions: Find multiple Actions related to a given User or Application
-		 */
+		/** @method listActions: Find multiple Actions related to a given User or Application */
 		listActions: async ({
 			user_id,
 			application_id,

@@ -41,16 +41,9 @@ import {
 /**
  * ApplicationService provides methods for Applications DB access
  * @param db - Drizzle Postgres DB Instance
- * @method createApplication: Create new Application record
- * @method editApplication: Update Application Contents and parent Application record
- * @method findOneAndUpdate: Update a base Application record
- * @method getApplicationById: Find a specific Application record
- * @method getApplicationWithContents: Find an Application record with Contents included
- * @method listApplications: Find multiple sorted Application records
- * @method applicationStateTotals: Obtain count for all Application records with each State
  */
-
 const applicationSvc = (db: PostgresDb) => ({
+	/** @method createApplication: Create new Application record */
 	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
@@ -102,6 +95,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	/** @method editApplication: Update Application Contents and parent Application record */
 	editApplication: async ({
 		id,
 		update,
@@ -147,6 +141,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	/** @method findOneAndUpdate: Update a base Application record */
 	findOneAndUpdate: async ({
 		id,
 		update,
@@ -170,6 +165,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	/** @method getApplicationById: Find a specific Application record */
 	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationRecord> => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
@@ -184,6 +180,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	/** @method getApplicationWithContents: Find an Application record with Contents included */
 	getApplicationWithContents: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
 		try {
 			const applicationRecord = await db
@@ -208,7 +205,10 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-	// TODO: Explicit Types
+	/**
+	 * @method listApplications: Find multiple sorted Application records
+	 * Includes ApplicantInformation and PagingMetadata
+	 */
 	listApplications: async ({
 		user_id,
 		state = [],
@@ -308,6 +308,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	/** @method applicationStateTotals: Obtain count for all Application records with each State */
 	applicationStateTotals: async ({ user_id }: { user_id?: string }): AsyncResult<ApplicationStateTotals> => {
 		try {
 			const rawApplicationRecord = await db
