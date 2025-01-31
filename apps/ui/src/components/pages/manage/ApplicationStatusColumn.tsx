@@ -17,16 +17,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export {
-	type ApplicantDTO,
-	type ApplicationContentsResponse,
-	type ApplicationResponseData,
-	type CollaboratorDTO,
-	type EthicsDataDTO,
-	type InstitutionDTO,
-	type InstitutionalRepDTO,
-	type ProjectDTO,
-	type RequestedStudiesDTO,
-} from './types.js';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { Flex, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-export { isApplicationStateValue } from './utils.js';
+const { useToken } = theme;
+
+interface StatusColumnProps {
+	value: ApplicationStateValues;
+}
+
+const ApplicationStatusColumn = ({ value }: StatusColumnProps) => {
+	const { token } = useToken();
+	const { t: translate } = useTranslation();
+	return (
+		<Flex gap={token.padding} justify="space-between">
+			{translate(`application.states.${value}`)}
+			{value === ApplicationStates.DAC_REVIEW ? (
+				<ExclamationCircleFilled style={{ color: token.colorPrimary }} />
+			) : null}
+		</Flex>
+	);
+};
+
+export default ApplicationStatusColumn;

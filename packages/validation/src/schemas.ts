@@ -17,16 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export {
-	type ApplicantDTO,
-	type ApplicationContentsResponse,
-	type ApplicationResponseData,
-	type CollaboratorDTO,
-	type EthicsDataDTO,
-	type InstitutionDTO,
-	type InstitutionalRepDTO,
-	type ProjectDTO,
-	type RequestedStudiesDTO,
-} from './types.js';
+import { z } from 'zod';
+import { EmptyOrOptionalString, NonEmptyString } from './common/strings.js';
+import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
-export { isApplicationStateValue } from './utils.js';
+// Applicant Information Form Section
+export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
+export const applicantInformationSchema = z.object({
+	applicantTitle: NonEmptyString,
+	applicantFirstName: NonEmptyString,
+	applicantMiddleName: EmptyOrOptionalString,
+	applicantLastName: NonEmptyString,
+	applicantSuffix: EmptyOrOptionalString,
+	applicantPrimaryAffiliation: NonEmptyString,
+	applicantInstituteEmail: NonEmptyString.email(),
+	applicantProfileUrl: NonEmptyString.url(),
+	applicantPositionTitle: NonEmptyString,
+	applicantInstituteCountry: NonEmptyString,
+	applicantInstituteState: NonEmptyString,
+	applicantInstituteCity: NonEmptyString,
+	applicantInstitutePostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	applicantInstituteStreetAddress: NonEmptyString,
+	applicantInstituteBuilding: EmptyOrOptionalString,
+});
