@@ -23,6 +23,7 @@ import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 // Applicant Information Form Section
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
+export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 
 export const applicantInformationSchema = z.object({
@@ -41,6 +42,24 @@ export const applicantInformationSchema = z.object({
 	applicantInstitutePostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 	applicantInstituteStreetAddress: NonEmptyString,
 	applicantInstituteBuilding: EmptyOrOptionalString,
+});
+
+export const institutionalRepSchema = z.object({
+	institutionalTitle: NonEmptyString,
+	institutionalFirstName: NonEmptyString,
+	institutionalMiddleName: EmptyOrOptionalString,
+	institutionalLastName: NonEmptyString,
+	institutionalSuffix: EmptyOrOptionalString,
+	institutionalPrimaryAffiliation: NonEmptyString,
+	institutionalInstituteAffiliation: NonEmptyString.email(),
+	institutionalProfileUrl: NonEmptyString.url(),
+	institutionalPositionTitle: NonEmptyString,
+	institutionCountry: NonEmptyString,
+	institutionState: NonEmptyString,
+	institutionCity: NonEmptyString,
+	institutionStreetAddress: NonEmptyString,
+	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	institutionBuilding: EmptyOrOptionalString,
 });
 
 export const projectInformationSchema = z.object({
