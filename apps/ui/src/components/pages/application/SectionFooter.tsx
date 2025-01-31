@@ -31,7 +31,7 @@ type SectionFooterProps = {
 	onSubmit?: () => void;
 };
 
-const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
+const SectionFooter = ({ currentRoute, isEditMode, onSubmit }: SectionFooterProps) => {
 	const { token } = useToken();
 	const { t: translate } = useTranslation();
 	const navigate = useNavigate();
@@ -56,6 +56,11 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 	};
 
 	const nextSection = () => {
+		// Temp logic to trigger validation errors on ui edit mode
+		if (!!onSubmit && isEditMode) {
+			onSubmit();
+			return;
+		}
 		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
@@ -71,7 +76,7 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 				</Button>
 			) : null}
 			{nextRoute ? (
-				<Button onClick={nextSection} type="primary">
+				<Button htmlType="submit" onClick={nextSection} type="primary">
 					{translate('button.next')}
 				</Button>
 			) : (

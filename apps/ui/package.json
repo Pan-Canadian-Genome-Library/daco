@@ -13,6 +13,7 @@
 		"@ant-design/icons": "^5.5.1",
 		"@hookform/resolvers": "^3.10.0",
 		"@pcgl-daco/data-model": "workspace:^",
+		"@pcgl-daco/validation": "workspace:^",
 		"@tanstack/react-query": "^5.63.0",
 		"antd": "^5.21.6",
 		"antd-zod": "^6.0.1",
