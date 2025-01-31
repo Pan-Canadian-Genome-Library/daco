@@ -18,7 +18,7 @@
  */
 
 import { ColProps, Form, Input } from 'antd';
-import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
+import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
 import { ReactNode } from 'react';
@@ -33,12 +33,23 @@ interface TextAreaProps extends BasicFormFieldProps {
 }
 
 const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextAreaProps) => {
+	/**
+	 * Renders the TextArea component, helps reduce redefining (and making mistakes with)
+	 * the Input control.
+	 *
+	 * @param field the field attribute from `react-hook-from`
+	 * @returns `ReactNode` with the input component.
+	 */
+	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
+		return <Input.TextArea {...field} disabled={props.disabled} placeholder={props.placeHolder} />;
+	};
+
 	return (
 		<Controller
 			name={props.name}
 			control={props.control}
 			render={({ field }) => {
-				return (
+				return props.subLabel ? (
 					<Item
 						label={props.label}
 						required={props.required}
@@ -54,8 +65,19 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 							labelAlign={props.labelAlign ?? undefined}
 							labelCol={props.labelCol ?? undefined}
 						>
-							<Input.TextArea {...field} disabled={props.disabled} placeholder={props.placeHolder} />
+							{renderControl(field)}
 						</Item>
+					</Item>
+				) : (
+					<Item
+						label={props.label}
+						required={props.required}
+						name={props.subLabel ? undefined : (props.name as string)}
+						rules={props.label ? undefined : [props.rule]}
+						labelAlign={props.labelAlign ?? undefined}
+						labelCol={props.labelCol ?? undefined}
+					>
+						{renderControl(field)}
 					</Item>
 				);
 			}}

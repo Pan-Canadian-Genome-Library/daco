@@ -18,7 +18,7 @@
  */
 
 import { ColProps, Form, Input } from 'antd';
-import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
+import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
 import { FormItemLayout } from 'antd/es/form/Form';
@@ -49,12 +49,33 @@ interface InputBoxProps extends BasicFormFieldProps {
 }
 
 const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBoxProps) => {
+	/**
+	 * Renders the input box component. We currently use two nested labels to display certain information on the
+	 * application form (see Applicant Info). But in the case where only one label is needed, we should only render
+	 * one label to avoid visual and a11y issues.
+	 *
+	 * This function helps reduce redefining the Input field.
+	 * @param field the field attribute from `react-hook-from`
+	 * @returns `ReactNode` with the input component.
+	 */
+	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
+		return (
+			<Input
+				{...field}
+				autoComplete={props.autoComplete ?? ''}
+				type={props.type ?? 'text'}
+				disabled={props.disabled}
+				placeholder={props.placeHolder}
+			/>
+		);
+	};
+
 	return (
 		<Controller
 			name={props.name}
 			control={props.control}
 			render={({ field }) => {
-				return (
+				return props.subLabel ? (
 					<Item
 						label={props.label}
 						required={props.required}
@@ -69,14 +90,19 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 							labelAlign={props.labelAlign ?? undefined}
 							labelCol={props.labelCol ?? undefined}
 						>
-							<Input
-								{...field}
-								autoComplete={props.autoComplete ?? ''}
-								type={props.type ?? 'text'}
-								disabled={props.disabled}
-								placeholder={props.placeHolder}
-							/>
+							{renderControl(field)}
 						</Item>
+					</Item>
+				) : (
+					<Item
+						label={props.label}
+						name={props.name as string}
+						rules={[props.rule]}
+						labelAlign={props.labelAlign ?? undefined}
+						labelCol={props.labelCol ?? undefined}
+						layout={props.layout ?? undefined}
+					>
+						{renderControl(field)}
 					</Item>
 				);
 			}}
