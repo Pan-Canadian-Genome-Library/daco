@@ -173,3 +173,9 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 		return failure(message, error);
 	}
 };
+
+export const rejectApplication = async ({ applicationId }: { applicationId: number }) => {
+	const database = getDbInstance();
+	const service: ApplicationServiceType = applicationSvc(database);
+	return await service.rejectApplication({ applicationId });
+};
