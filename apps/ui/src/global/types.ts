@@ -19,6 +19,7 @@
 
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RuleRender } from 'antd/es/form';
+import { ReactNode } from 'react';
 
 export interface Application {
 	id: string;
@@ -65,7 +66,7 @@ export interface ApplicationOutletContext {
 }
 
 export interface BasicFormFieldProps {
-	label?: string;
+	label?: string | ReactNode;
 	rule: RuleRender;
 	required?: boolean;
 }
