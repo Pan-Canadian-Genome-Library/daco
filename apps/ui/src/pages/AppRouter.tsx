@@ -28,6 +28,7 @@ import Introduction from '@/pages/applications/sections/intro';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
+import Project from './applications/sections/project';
 
 export const ApplicationSectionRoutes = [
 	{
@@ -49,6 +50,11 @@ export const ApplicationSectionRoutes = [
 		route: 'collaborators',
 		path: 'collaborators/edit?',
 		element: <Collaborators />,
+	},
+	{
+		route: 'project',
+		path: 'project/edit?',
+		element: <Project />,
 	},
 ];
 
