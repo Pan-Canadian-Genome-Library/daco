@@ -17,16 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export {
-	type ApplicantDTO,
-	type ApplicationContentsResponse,
-	type ApplicationResponseData,
-	type CollaboratorDTO,
-	type EthicsDataDTO,
-	type InstitutionDTO,
-	type InstitutionalRepDTO,
-	type ProjectDTO,
-	type RequestedStudiesDTO,
-} from './types.js';
+/**
+ * Determines if the page number provided to it would be valid for the DACO API.
+ *
+ * The DACO API starts page counts from 0, and page numbers cannot be negative.
+ * @param page A page number for any paginated API endpoint.
+ * @returns A boolean indicating a `true` if the page number is valid, or `false` if it is not.
+ */
+const isValidPageNumber = (page: number) => {
+	if (!Number.isNaN(page) && page >= 0) {
+		return true;
+	}
+	return false;
+};
 
-export { isApplicationStateValue } from './utils.js';
+export { isValidPageNumber };

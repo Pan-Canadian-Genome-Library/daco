@@ -18,7 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { applicantInformationSchema, ApplicantInformationSchemaType } from '@pcgl-daco/validation';
+import { applicantInformationSchema, type ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -31,7 +31,6 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
@@ -64,9 +63,14 @@ const Applicant = () => {
 								placeholder="Select"
 								control={control}
 								rule={rule}
-								options={PERSONAL_TITLES.map((titles) => {
-									return { value: titles.en, label: titles.en };
-								})}
+								options={[
+									{ value: 'dr', label: 'Dr' },
+									{ value: 'miss', label: 'Miss' },
+									{ value: 'mr', label: 'Mr' },
+									{ value: 'mrs', label: 'Mrs' },
+									{ value: 'ms', label: 'Ms' },
+									{ value: 'prof', label: 'Prof' },
+								]}
 								required
 								disabled={!isEditMode}
 							/>
@@ -132,7 +136,7 @@ const Applicant = () => {
 							<InputBox
 								label={translate('applicant-section.form.primaryEmail')}
 								subLabel={translate('applicant-section.form.primaryEmailLabel')}
-								name="applicantInstituteAffiliation"
+								name="applicantInstituteEmail"
 								control={control}
 								rule={rule}
 								required
@@ -170,15 +174,11 @@ const Applicant = () => {
 				<SectionContent title={translate('applicant-section.section2')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<SelectBox
+							<InputBox
 								label={translate('applicant-section.form.country')}
-								name="institutionCountry"
+								name="applicantInstituteCountry"
 								control={control}
 								rule={rule}
-								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
-									return { value: areas.iso, label: areas.en };
-								})}
-								defaultValue={'CAN'}
 								required
 								disabled={!isEditMode}
 							/>
@@ -188,7 +188,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.streetAddress')}
-								name="institutionStreetAddress"
+								name="applicantInstituteStreetAddress"
 								control={control}
 								rule={rule}
 								required
@@ -198,7 +198,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.building')}
-								name="institutionBuilding"
+								name="applicantInstituteBuilding"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -209,7 +209,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.state')}
-								name="institutionState"
+								name="applicantInstituteState"
 								control={control}
 								rule={rule}
 								required
@@ -219,7 +219,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.city')}
-								name="institutionCity"
+								name="applicantInstituteCity"
 								control={control}
 								rule={rule}
 								required
@@ -231,7 +231,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.postalCode')}
-								name="institutionPostalCode"
+								name="applicantInstitutePostalCode"
 								control={control}
 								rule={rule}
 								required
