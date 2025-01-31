@@ -17,10 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Form, Input } from 'antd';
+import { ColProps, Form, Input } from 'antd';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
+import { FormItemLayout } from 'antd/es/form/Form';
 
 const { Item } = Form;
 
@@ -28,6 +29,9 @@ interface InputBoxProps extends BasicFormFieldProps {
 	subLabel?: string;
 	placeHolder?: string;
 	type?: 'email' | 'password' | 'tel' | 'hidden' | 'text' | 'url';
+	labelAlign?: 'left' | 'right';
+	labelCol?: ColProps;
+	layout?: FormItemLayout;
 	autoComplete?:
 		| 'on'
 		| 'off'
@@ -51,8 +55,20 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 			control={props.control}
 			render={({ field }) => {
 				return (
-					<Item label={props.label} required={props.required}>
-						<Item label={props.subLabel} name={props.name as string} rules={[props.rule]}>
+					<Item
+						label={props.label}
+						required={props.required}
+						labelAlign={props.labelAlign ?? undefined}
+						labelCol={props.labelCol ?? undefined}
+						layout={props.layout ?? undefined}
+					>
+						<Item
+							label={props.subLabel}
+							name={props.name as string}
+							rules={[props.rule]}
+							labelAlign={props.labelAlign ?? undefined}
+							labelCol={props.labelCol ?? undefined}
+						>
 							<Input
 								{...field}
 								autoComplete={props.autoComplete ?? ''}
