@@ -19,3 +19,6 @@
 
 // only alphanumeric values
 export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;
+
+// Captures spaces, splitting by this regex will yield a "word"
+export const WORDS = /\s+/;
