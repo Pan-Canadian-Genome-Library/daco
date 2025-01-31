@@ -30,7 +30,6 @@ import {
 	type ApplicationListResponse,
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { applicationActionSvc } from './applicationActionService.js';
 import {
 	type ApplicationContentModel,
 	type ApplicationContentUpdates,
@@ -70,11 +69,6 @@ const applicationSvc = (db: PostgresDb) => ({
 				};
 				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
 				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
-
-				// Create associated Actions
-				const actionRepo = applicationActionSvc(db);
-				const actionResult = await actionRepo.create(newApplicationRecord[0]);
-				if (!actionResult.success) throw new Error(actionResult.errors);
 
 				// Join records
 				const { id: contents_id } = newAppContentsRecord[0];

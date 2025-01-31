@@ -73,8 +73,6 @@ const applicationActionSvc = (db: PostgresDb) => {
 
 	return {
 		/** @method: Aliased methods for each state transition */
-		create: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.CREATE, ApplicationStates.DRAFT),
 		close: async (application: ApplicationRecord) =>
 			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
 		draftSubmit: async (application: ApplicationRecord) =>

@@ -24,7 +24,6 @@ import { applications } from './applications.js';
 import { revisionRequests } from './revisionRequests.js';
 
 export const applicationActionTypesEnum = pgEnum('application_action_types', [
-	'CREATE',
 	'WITHDRAW',
 	'CLOSE',
 	'SUBMIT_DRAFT',
