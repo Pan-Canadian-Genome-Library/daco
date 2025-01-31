@@ -38,3 +38,6 @@ export type EmptyWhiteSpace = z.infer<typeof EmptyWhiteSpace>;
 
 export const EmptyOrOptionalString = OptionalString.or(EmptyString).or(EmptyWhiteSpace);
 export type EmptyOrOptionalString = z.infer<typeof EmptyOrOptionalString>;
+
+export const OptionalURLString = TrimmedString.url().optional().or(EmptyWhiteSpace);
+export type OptionalURLString = z.infer<typeof OptionalURLString>;
