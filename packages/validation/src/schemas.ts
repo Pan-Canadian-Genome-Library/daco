@@ -40,3 +40,14 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteStreetAddress: NonEmptyString,
 	applicantInstituteBuilding: EmptyOrOptionalString,
 });
+
+// Collaborators Form Section
+export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
+export const collaboratorsSchema = z.object({
+	collabFirstName: NonEmptyString,
+	collabMiddleName: NonEmptyString,
+	collabLastName: NonEmptyString,
+	collabSuffix: NonEmptyString,
+	collabPrimaryEmail: NonEmptyString.email(),
+	collabPositionTitle: NonEmptyString,
+});
