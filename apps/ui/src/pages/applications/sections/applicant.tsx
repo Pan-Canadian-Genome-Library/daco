@@ -18,7 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { applicantInformationSchema, ApplicantInformationSchemaType } from '@pcgl-daco/validation';
+import { applicantInformationSchema, type ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
