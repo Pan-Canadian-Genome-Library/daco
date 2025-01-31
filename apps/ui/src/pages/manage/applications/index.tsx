@@ -26,7 +26,7 @@ import { FilterKeys, isFilterKey } from '@/components/pages/manage/DashboardFilt
 import ManagementDashboard, { FilterState } from '@/components/pages/manage/ManagementDashboard';
 import { ApplicationCountMetadata } from '@/global/types';
 import { isValidPageNumber } from '@/global/utils';
-import { ApplicationResponseData, isApplicationStateValue } from '@pcgl-daco/data-model';
+import { ApplicationListSummary, isApplicationStateValue } from '@pcgl-daco/data-model';
 
 import { Flex, Layout, TablePaginationConfig } from 'antd';
 import { Key, SorterResult } from 'antd/es/table/interface';
@@ -98,7 +98,7 @@ const ManageApplicationsPage = () => {
 		sorter,
 	}: {
 		pagination: TablePaginationConfig;
-		sorter: SorterResult<ApplicationResponseData>[] | SorterResult<ApplicationResponseData>;
+		sorter: SorterResult<ApplicationListSummary>[] | SorterResult<ApplicationListSummary>;
 	}) => {
 		const page = pagination.current;
 		const sortingOpt: ApplicationListSortingOptions[] = [];
