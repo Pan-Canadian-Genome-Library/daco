@@ -25,7 +25,11 @@ import { applications } from '@/db/schemas/applications.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import {
+	ApplicationStates,
+	type ApplicationListResponse,
+	type ApplicationStateValues,
+} from '@pcgl-daco/data-model/src/types.js';
 import { applicationActionSvc } from './applicationActionService.js';
 import {
 	type ApplicationContentModel,
@@ -221,7 +225,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
-	}) => {
+	}): AsyncResult<ApplicationListResponse> => {
 		try {
 			/**
 			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
@@ -236,11 +240,11 @@ const applicationSvc = (db: PostgresDb) => ({
 			const rawApplicationRecord = await db
 				.select({
 					id: applications.id,
-					user_id: applications.user_id,
+					userId: applications.user_id,
 					state: applications.state,
 					createdAt: applications.created_at,
 					updatedAt: applications.updated_at,
-					contents: {
+					applicant: {
 						createdAt: applicationContents.created_at,
 						firstName: applicationContents.applicant_first_name,
 						lastName: applicationContents.applicant_last_name,

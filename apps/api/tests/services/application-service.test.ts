@@ -152,9 +152,9 @@ describe('Application Service', () => {
 			assert.ok(applicationRecords[1]);
 			assert.ok(applicationRecords[2]);
 
-			assert.strictEqual(applicationRecords[0].user_id, user_id);
-			assert.strictEqual(applicationRecords[1].user_id, user_id);
-			assert.strictEqual(applicationRecords[2].user_id, user_id);
+			assert.strictEqual(applicationRecords[0].userId, user_id);
+			assert.strictEqual(applicationRecords[1].userId, user_id);
+			assert.strictEqual(applicationRecords[2].userId, user_id);
 		});
 
 		it('should filter by state', async () => {
