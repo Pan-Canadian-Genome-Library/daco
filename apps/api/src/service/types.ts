@@ -20,8 +20,10 @@
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
+import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -35,11 +37,14 @@ export interface JoinedApplicationRecord extends Omit<ApplicationModel, 'content
 
 export type ApplicationModel = typeof applications.$inferSelect;
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
+export type CollaboratorRecord = typeof collaborators.$inferSelect;
 
 export type ApplicationServiceType = ReturnType<typeof applicationSvc>;
 export type ApplicationActionServiceType = ReturnType<typeof applicationActionSvc>;
+export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
 export type ApplicationUpdates = Partial<typeof applications.$inferInsert>;
+export type CollaboratorModel = typeof collaborators.$inferInsert;
 
 export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';
