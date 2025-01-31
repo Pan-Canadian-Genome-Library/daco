@@ -24,19 +24,33 @@ export interface Application {
 	id: string;
 	userId: string;
 	state: ApplicationStateValues;
-	createdAt: Date;
-	approvedAt: Date;
-	expiresAt: Date;
+	createdAt: string;
+	approvedAt: string;
+	updatedAt: string;
+	expiresAt: string;
 }
-interface ApplicationWithApplicantInformation extends Application {
-	applicantInfo: {
-		createdAt: Date;
+export interface ApplicationWithApplicantInformation extends Application {
+	applicantInformation: {
+		createdAt: string;
 		firstName: string;
 		lastName: string;
 		email: string;
 		country: string;
 		institution: string;
 	};
+}
+
+export interface ApplicationCountMetadata {
+	DRAFT: number;
+	INSTITUTIONAL_REP_REVIEW: number;
+	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
+	DAC_REVIEW: number;
+	DAC_REVISIONS_REQUESTED: number;
+	REJECTED: number;
+	APPROVED: number;
+	CLOSED: number;
+	REVOKED: number;
+	TOTAL: number;
 }
 
 export interface PagingMetadata {

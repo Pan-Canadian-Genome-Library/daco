@@ -17,16 +17,5 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export {
-	type ApplicantDTO,
-	type ApplicationContentsResponse,
-	type ApplicationResponseData,
-	type CollaboratorDTO,
-	type EthicsDataDTO,
-	type InstitutionDTO,
-	type InstitutionalRepDTO,
-	type ProjectDTO,
-	type RequestedStudiesDTO,
-} from './types.js';
-
-export { isApplicationStateValue } from './utils.js';
+// only alphanumeric values
+export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;

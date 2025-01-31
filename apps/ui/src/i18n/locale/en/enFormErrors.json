@@ -1,0 +1,6 @@
+{
+	"requiredField": "Please fill out the required field",
+	"validEmail": "Please enter a valid email address.",
+	"validURL": "Please enter a valid url. Must begin with http:// or https://.",
+	"validPostalCode": "Please enter a valid postal code."
+}
