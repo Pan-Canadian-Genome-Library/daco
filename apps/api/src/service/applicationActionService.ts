@@ -35,6 +35,7 @@ import {
 	type ApplicationActionsColumnName,
 	type ApplicationRecord,
 	type OrderBy,
+	type PostgresTransaction,
 } from './types.js';
 
 /**
@@ -48,6 +49,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 		application: ApplicationRecord,
 		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
+		transaction?: PostgresTransaction,
 	): AsyncResult<ApplicationActionRecord> => {
 		const { id: application_id, user_id, state: state_before } = application;
 		const newAction: typeof applicationActions.$inferInsert = {
@@ -59,7 +61,8 @@ const applicationActionSvc = (db: PostgresDb) => {
 		};
 
 		try {
-			const newActionRecord = await db.insert(applicationActions).values(newAction).returning();
+			const dbTransaction = transaction ? transaction : db;
+			const newActionRecord = await dbTransaction.insert(applicationActions).values(newAction).returning();
 			if (!newActionRecord[0]) throw new Error('Application record is undefined');
 
 			return success(newActionRecord[0]);
@@ -73,40 +76,68 @@ const applicationActionSvc = (db: PostgresDb) => {
 
 	return {
 		/** @method: Aliased methods for each state transition */
-		close: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED),
-		draftSubmit: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.SUBMIT_DRAFT, ApplicationStates.INSTITUTIONAL_REP_REVIEW),
-		dacApproved: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_APPROVED, ApplicationStates.APPROVED),
-		dacRejected: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_REJECTED, ApplicationStates.REJECTED),
-		dacRevision: async (application: ApplicationRecord) =>
+		close: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED, transaction),
+		draftSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.SUBMIT_DRAFT,
+				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+				transaction,
+			),
+		dacApproved: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.DAC_REVIEW_APPROVED,
+				ApplicationStates.APPROVED,
+				transaction,
+			),
+		dacRejected: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.DAC_REVIEW_REJECTED,
+				ApplicationStates.REJECTED,
+				transaction,
+			),
+		dacRevision: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
 				ApplicationStates.DAC_REVISIONS_REQUESTED,
+				transaction,
 			),
-		dacSubmit: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.DAC_REVIEW_SUBMIT, ApplicationStates.DAC_REVIEW),
-		repRevision: async (application: ApplicationRecord) =>
+		dacSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.DAC_REVIEW_SUBMIT,
+				ApplicationStates.DAC_REVIEW,
+				transaction,
+			),
+		repRevision: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
 				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+				transaction,
 			),
-		repSubmit: async (application: ApplicationRecord) =>
+		repSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
 			await addActionRecord(
 				application,
 				ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
 				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+				transaction,
 			),
-		repApproved: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationStates.DAC_REVIEW),
-		revoke: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED),
-		withdraw: async (application: ApplicationRecord) =>
-			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT),
+		repApproved: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(
+				application,
+				ApplicationActions.INSTITUTIONAL_REP_APPROVED,
+				ApplicationStates.DAC_REVIEW,
+				transaction,
+			),
+		revoke: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED, transaction),
+		withdraw: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
+			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT, transaction),
 		/** @method getActionById: Find a specific Action record */
 		getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionRecord> => {
 			try {

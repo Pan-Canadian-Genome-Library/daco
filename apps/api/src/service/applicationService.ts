@@ -39,6 +39,7 @@ import {
 	type ApplicationUpdates,
 	type JoinedApplicationRecord,
 	type OrderBy,
+	type PostgresTransaction,
 } from './types.js';
 
 /**
@@ -143,12 +144,15 @@ const applicationSvc = (db: PostgresDb) => ({
 	findOneAndUpdate: async ({
 		id,
 		update,
+		transaction,
 	}: {
 		id: number;
 		update: ApplicationUpdates;
+		transaction?: PostgresTransaction;
 	}): AsyncResult<ApplicationRecord> => {
 		try {
-			const application = await db
+			const dbTransaction = transaction ? transaction : db;
+			const application = await dbTransaction
 				.update(applications)
 				.set({ ...update, updated_at: sql`NOW()` })
 				.where(eq(applications.id, id))

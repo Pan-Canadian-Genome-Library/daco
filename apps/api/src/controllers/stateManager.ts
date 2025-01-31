@@ -20,7 +20,7 @@
 import { getDbInstance } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type AddActionMethods, type ApplicationRecord } from '@/service/types.js';
+import { type AddActionMethods, type ApplicationRecord, type PostgresTransaction } from '@/service/types.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
@@ -87,9 +87,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		const applicationRepo = applicationSvc(db);
 		const applicationActionRepo = applicationActionSvc(db);
 
-		// TODO: Refactor use of shared transactions https://github.com/Pan-Canadian-Genome-Library/daco/issues/178
 		return await db.transaction(async (tx) => {
-			const actionResult = await applicationActionRepo[method](this._application);
+			// TODO: Solve transaction schema type mismatch
+			const actionResult = await applicationActionRepo[method](this._application, tx as PostgresTransaction);
 			if (!actionResult.success) return actionResult;
 
 			const { state_after } = actionResult.data;
@@ -97,7 +97,12 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			const state = state_after as ApplicationStateValues;
 			const { id } = this._application;
 			const update = { state };
-			const applicationResult = await applicationRepo.findOneAndUpdate({ id, update });
+			const applicationResult = await applicationRepo.findOneAndUpdate({
+				id,
+				update,
+				// TODO: Solve transaction schema type mismatch
+				transaction: tx as PostgresTransaction,
+			});
 
 			if (applicationResult.success && applicationResult.data) {
 				this._application = applicationResult.data;
