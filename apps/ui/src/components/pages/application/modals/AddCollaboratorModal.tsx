@@ -19,12 +19,12 @@
 
 import { ApplicationOutletContext } from '@/global/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
+import { type CollaboratorsSchemaType, collaboratorsSchema } from '@pcgl-daco/validation';
+import { Button, Col, Flex, Form, Modal, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
-import { z } from 'zod';
 
 import InputBox from '@/components/pages/application/form-components/InputBox';
 
@@ -35,28 +35,15 @@ type AddCollaboratorModalProps = {
 	setIsOpen: (val: boolean) => void;
 };
 
-const schema = z.object({
-	firstName: z.string().min(1, { message: 'Required' }),
-	middleName: z.string().min(1, { message: 'Required' }),
-	lastName: z.string().min(1, { message: 'Required' }),
-	suffix: z.string().min(1, { message: 'Required' }),
-	primaryEmail: z.string().min(1, { message: 'Required' }),
-	positionTitle: z.string().min(1, { message: 'Required' }),
-});
-
-const rule = createSchemaFieldRule(schema);
+const rule = createSchemaFieldRule(collaboratorsSchema);
 
 const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<z.infer<typeof schema>>({
-		resolver: zodResolver(schema),
+	const { control } = useForm<CollaboratorsSchemaType>({
+		resolver: zodResolver(collaboratorsSchema),
 	});
-
-	const onSubmit: SubmitHandler<z.infer<typeof schema>> = (data) => {
-		console.log(data);
-	};
 
 	return (
 		<Modal
@@ -66,18 +53,19 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 			open={isOpen}
-			onOk={() => setIsOpen(false)}
 			onCancel={() => setIsOpen(false)}
+			footer={[]}
+			destroyOnClose
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('collab-section.addModalDescription')}</Text>
-				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+				<Form layout="vertical" clearOnDestroy>
 					<Flex vertical>
 						<Row gutter={26}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('collab-section.form.firstName')}
-									name="firstName"
+									name="collabFirstName"
 									control={control}
 									rule={rule}
 									required
@@ -87,7 +75,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('collab-section.form.middleName')}
-									name="middleName"
+									name="collabMiddleName"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -98,7 +86,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('collab-section.form.lastName')}
-									name="lastName"
+									name="collabLastName"
 									control={control}
 									rule={rule}
 									required
@@ -108,7 +96,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('collab-section.form.suffix')}
-									name="suffix"
+									name="collabSuffix"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -119,7 +107,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('collab-section.form.primaryEmail')}
-									name="primaryEmail"
+									name="collabPrimaryEmail"
 									control={control}
 									rule={rule}
 									required
@@ -129,7 +117,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('collab-section.form.positionTitle')}
-									name="positionTitle"
+									name="collabPositionTitle"
 									control={control}
 									rule={rule}
 									required
@@ -137,6 +125,14 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 								/>
 							</Col>
 						</Row>
+					</Flex>
+					<Flex align="center" justify="flex-end" gap={'middle'}>
+						<Button htmlType="button" onClick={() => setIsOpen(false)}>
+							{translate('button.cancel')}
+						</Button>
+						<Button type="primary" htmlType="submit">
+							{translate('button.addCollab')}
+						</Button>
 					</Flex>
 				</Form>
 			</Flex>
