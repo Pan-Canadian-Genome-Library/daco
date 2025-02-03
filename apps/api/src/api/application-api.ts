@@ -23,7 +23,12 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { ApplicationModel, type ApplicationContentUpdates, type ApplicationServiceType } from '@/service/types.js';
+import {
+	ApplicationModel,
+	ReviewApplication,
+	type ApplicationContentUpdates,
+	type ApplicationServiceType,
+} from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationModel } from '@/utils/routes.js';
 import { ApplicationStateManager } from './states.js';
@@ -171,5 +176,48 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 		logger.error(message);
 		logger.error(error);
 		return failure(message, error);
+	}
+};
+
+export const rejectApplication = async ({ applicationId }: { applicationId: number }) => {
+	const database = getDbInstance();
+	const service: ApplicationServiceType = applicationSvc(database);
+	return await service.rejectApplication({ applicationId });
+};
+
+export const requestApplicationRevisions = async ({
+	applicationId,
+	repId,
+	reviewData,
+	comment,
+}: {
+	applicationId: number;
+	repId: string;
+	reviewData: ReviewApplication;
+	comment?: string;
+}): AsyncResult<ApplicationModel> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationServiceType = applicationSvc(database);
+
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		if (application.state !== ApplicationStates.DAC_REVIEW) {
+			return failure('Application is not in the correct status for revisions.');
+		}
+
+		service.createRevisionRequest({ applicationId, reviewData });
+		const updatedResult = await service.requestRevisions(applicationId);
+
+		return updatedResult;
+	} catch (error) {
+		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
+		return failure('An error occurred while processing the request.', error);
 	}
 };

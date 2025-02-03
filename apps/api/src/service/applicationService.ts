@@ -22,12 +22,14 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { applicationActionSvc } from './applicationActionService.js';
 import {
+	ApplicationModel,
 	type ApplicationContentUpdates,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
@@ -257,11 +259,10 @@ const applicationSvc = (db: PostgresDb) => ({
 					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
 				);
 
-				const nonReviewApplications = returnableApplications.filter(
-					(applications) => applications.state !== ApplicationStates.DAC_REVIEW,
-				);
-
-				returnableApplications = [...reviewApplications, ...nonReviewApplications];
+				returnableApplications = [
+					...reviewApplications,
+					...returnableApplications.filter((applications) => applications.state !== ApplicationStates.DAC_REVIEW),
+				];
 			}
 
 			const applicationsList = {
@@ -324,6 +325,94 @@ const applicationSvc = (db: PostgresDb) => ({
 			logger.error(message);
 			logger.error(exception);
 			return failure(message, exception);
+		}
+	},
+
+	rejectApplication: async ({ applicationId }: { applicationId: number }): AsyncResult<ApplicationModel> => {
+		try {
+			const application = await db
+				.update(applications)
+				.set({ state: 'REJECTED', updated_at: sql`NOW()` })
+				.where(eq(applications.id, applicationId))
+				.returning();
+
+			if (!application[0]) throw new Error('Application record is undefined');
+
+			return success(application[0]);
+		} catch (exception) {
+			const message = `Error at rejectApplication with applicationId: ${applicationId}.`;
+			logger.error(message);
+			logger.error(exception);
+			return failure(message, exception);
+		}
+	},
+
+	requestRevisions: async (applicationId: any): AsyncResult<ApplicationModel> => {
+		try {
+			const application = await db
+				.update(applications)
+				.set({ state: 'DAC_REVISIONS_REQUESTED', updated_at: sql`NOW()` })
+				.where(eq(applications.id, applicationId))
+				.returning();
+
+			if (!application[0]) throw new Error('Application record is undefined');
+
+			return success(application[0]);
+		} catch (exception) {
+			const message = `Error at rejectApplication with applicationId: ${applicationId}.`;
+			logger.error(message);
+			logger.error(exception);
+			return failure(message, exception);
+		}
+	},
+
+	createRevisionRequest: async ({ applicationId, reviewData }: { applicationId: number; reviewData: any }) => {
+		try {
+			const {
+				comments,
+				applicantNotes,
+				applicantApproved,
+				institutionRepApproved,
+				institutionRepNotes,
+				collaboratorsApproved,
+				collaboratorsNotes,
+				projectApproved,
+				projectNotes,
+				requestedStudiesApproved,
+				requestedStudiesNotes,
+			} = reviewData;
+
+			const newRevisionRequest: typeof revisionRequests.$inferInsert = {
+				application_id: applicationId,
+				comments: comments || null,
+				applicant_notes: applicantNotes || null,
+				applicant_approved: applicantApproved,
+				institution_rep_approved: institutionRepApproved,
+				institution_rep_notes: institutionRepNotes || null,
+				collaborators_approved: collaboratorsApproved,
+				collaborators_notes: collaboratorsNotes || null,
+				project_approved: projectApproved,
+				project_notes: projectNotes || null,
+				requested_studies_approved: requestedStudiesApproved,
+				requested_studies_notes: requestedStudiesNotes || null,
+			};
+
+			// Using transaction for inserting
+			const result = await db.transaction(async (transaction) => {
+				// Insert into the revision_requests table
+				const revisionRecord = await transaction.insert(revisionRequests).values(newRevisionRequest).returning();
+				if (!revisionRecord[0]) throw new Error('Revision request record is undefined');
+
+				// Returning the inserted revision request
+				return revisionRecord[0];
+			});
+
+			return success(result);
+		} catch (err) {
+			const message = `Error at createRevisionRequest for applicationId: ${applicationId}`;
+			logger.error(message);
+			logger.error(err);
+			return failure(message, err);
 		}
 	},
 });

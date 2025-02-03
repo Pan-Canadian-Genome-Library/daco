@@ -103,7 +103,7 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
         '400':
-          description: 'Occurs when no User ID is provided, an error has occurred while processing JSON provided for the state/sort values, or page and/or page size are negative values.'
+          description: 'Occurs when no User ID is provided, or page and/or page size are negative values.'
           content:
             application/json:
               schema:
@@ -317,7 +317,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+  /applications/reject:
+    post:
+      tags:
+        - Applications
+      summary: Reject an application
+      description: Allows DAC to reject an application. Rejected applications cannot be reopened or changed.
+      requestBody:
+        description: Request body containing rejection details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/RejectApplication'
+      responses:
+        '500':
+          description: 'Cannot reject application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '404':
+          description: 'Invalid request or rejection not allowed'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application successfully rejected'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
 
+  /applications/request-revisions:
+    post:
+      tags:
+        - Applications
+      summary: 'Request revisions for an application'
+      description: 'Allows a rep to request revisions for an application, including approval status and comments on various sections.'
+      operationId: 'requestRevisions'
+      requestBody:
+        description: Request body containing revision request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/RequestRevisions'
+      responses:
+        '200':
+          description: 'Revisions request successfully processed'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'Indicates if the revision request was successful.'
+                  updatedApplication:
+                    type: object
+                    description: 'Details of the updated application after revisions.'
+        '400':
+          description: 'Invalid input, missing required fields.'
+        '500':
+          description: 'Internal server error.'
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -596,6 +660,99 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+    RejectApplication:
+      type: object
+      required:
+        - applicationId
+      properties:
+        applicationId:
+          description: The id of the Application
+          type: number
+    RequestRevisions:
+      type: object
+      required:
+        - applicationId
+        - repId
+        - reviewData
+      properties:
+        applicationId:
+          type: integer
+          description: 'ID of the application for which revisions are being requested.'
+          example: 12345
+        repId:
+          type: integer
+          description: 'ID of the representative requesting the revision.'
+          example: 9876
+        reviewData:
+          type: object
+          description: 'Data containing approval status and notes for various sections of the application.'
+          properties:
+            applicantInfo:
+              type: object
+              properties:
+                applicantApproved:
+                  type: boolean
+                  description: 'Approval status for the applicant information section.'
+                  example: true
+                applicantNotes:
+                  type: string
+                  description: 'Notes related to the applicant information section.'
+                  example: 'Applicant needs to update personal details.'
+            institutionalRep:
+              type: object
+              properties:
+                institutionRepApproved:
+                  type: boolean
+                  description: 'Approval status for the institutional representative section.'
+                  example: false
+                institutionRepNotes:
+                  type: string
+                  description: 'Notes related to the institutional representative section.'
+                  example: 'Institution rep has missing documents.'
+            collaborators:
+              type: object
+              properties:
+                collaboratorsApproved:
+                  type: boolean
+                  description: 'Approval status for the collaborators section.'
+                  example: true
+                collaboratorsNotes:
+                  type: string
+                  description: 'Notes related to the collaborators section.'
+                  example: 'All collaborators have provided necessary details.'
+            projectInfo:
+              type: object
+              properties:
+                projectApproved:
+                  type: boolean
+                  description: 'Approval status for the project information section.'
+                  example: true
+                projectNotes:
+                  type: string
+                  description: 'Notes related to the project information section.'
+                  example: 'Project details are complete.'
+            requestedStudy:
+              type: object
+              properties:
+                requestedStudiesApproved:
+                  type: boolean
+                  description: 'Approval status for the requested study section.'
+                  example: true
+                requestedStudiesNotes:
+                  type: string
+                  description: 'Notes related to the requested study section.'
+                  example: 'Requested studies are well defined.'
+            ethics:
+              type: object
+              properties:
+                ethicsApproved:
+                  type: boolean
+                  description: 'Approval status for the ethics section.'
+                  example: true
+                ethicsNotes:
+                  type: string
+                  description: 'Notes related to the ethics section.'
+                  example: 'Ethics review is pending.'
 
   responses:
     ApplicationResponse:

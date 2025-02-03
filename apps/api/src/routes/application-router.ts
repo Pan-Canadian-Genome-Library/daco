@@ -27,8 +27,11 @@ import {
 	getAllApplications,
 	getApplicationById,
 	getApplicationStateTotals,
+	rejectApplication,
+	requestApplicationRevisions,
 } from '@/api/application-api.js';
 import { isPositiveNumber } from '@/utils/routes.js';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -111,16 +114,9 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 		return;
 	}
 
-	let sort = [];
-	let state = [];
-
-	try {
-		sort = sortQuery ? JSON.parse(sortQuery) : [];
-		state = stateQuery ? JSON.parse(stateQuery) : [];
-	} catch {
-		res.status(400).send({ message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.' });
-		return;
-	}
+	// Check if sort exists and parse it if true
+	const sort = !!sortQuery ? JSON.parse(sortQuery) : [];
+	const state = !!stateQuery ? JSON.parse(stateQuery) : [];
 
 	const result = await getAllApplications({
 		userId,
@@ -232,6 +228,71 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 
 			res.status(status).send({ message, errors });
 		}
+	} catch (error) {
+		res.status(500).send({
+			message: 'Internal server error.',
+			errors: String(error),
+		});
+	}
+});
+
+applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
+	const { applicationId } = req.body;
+
+	if (!applicationId) {
+		res.status(400).json({ message: 'Application ID is required.' });
+	}
+
+	if (typeof applicationId !== 'number' || !applicationId) {
+		res.status(400).send({
+			message: 'Invalid request. ApplicationId must be a valid number and is required.',
+			errors: 'MissingOrInvalidParameters',
+		});
+		return;
+	}
+
+	const result = await getApplicationById({ applicationId });
+
+	if (result.success) {
+		const { state } = result.data;
+
+		if (state !== ApplicationStates.DAC_REVIEW) {
+			res.status(400).json({ message: 'Application must be in DAC Review status to be rejected.' });
+		}
+
+		// Reject the application
+		const rejectedApplication = await rejectApplication({ applicationId });
+
+		if (rejectedApplication.success) {
+			res.status(200).send({
+				message: 'Application rejected successfully.',
+				data: rejectedApplication.data,
+			});
+		} else {
+			let message = rejectedApplication.message || 'An unexpected error occurred.';
+			let errors = rejectedApplication.errors;
+			res.status(500).send({ message, errors });
+		}
+	} else {
+		res.status(404).json({ message: 'Application not found.' });
+	}
+});
+
+// Endpoint for reps to request revisions
+applicationRouter.post('/applications/request-revisions', jsonParser, async (req, res) => {
+	try {
+		const { applicationId } = req.body;
+		const { repId, reviewData, comment } = req.body;
+
+		// Validate input
+		if (!repId || !reviewData) {
+			res.status(400).json({ message: 'Invalid request: repId and reviewData are required' });
+		}
+
+		// Call service method to handle request
+		const updatedApplication = await requestApplicationRevisions({ applicationId, repId, reviewData, comment });
+
+		res.status(200).json(updatedApplication);
 	} catch (error) {
 		res.status(500).send({
 			message: 'Internal server error.',
