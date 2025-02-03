@@ -72,6 +72,15 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 				return { message: i18n.t('validPostalCode') };
 			}
 			break;
+		case z.ZodIssueCode.custom:
+			switch (error.params?.violation) {
+				case 'tooFewWords':
+					return { message: i18n.t('tooFewWords') };
+				case 'tooManyWords':
+					return { message: i18n.t('tooManyWords') };
+			}
+
+			break;
 	}
 	return { message: ctx.defaultError };
 };

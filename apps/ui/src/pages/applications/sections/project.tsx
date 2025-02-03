@@ -18,6 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { projectInformationSchema, type ProjectInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -31,7 +32,6 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
-import { projectInformationSchema, ProjectInformationSchemaType } from '@pcgl-daco/validation';
 import { useOutletContext } from 'react-router';
 
 const rule = createSchemaFieldRule(projectInformationSchema);
