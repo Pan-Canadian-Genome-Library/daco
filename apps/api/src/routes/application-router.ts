@@ -255,10 +255,6 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	if (result.success) {
 		const { state } = result.data;
 
-		if (state === ApplicationStates.REJECTED) {
-			res.status(400).json({ message: 'Application is already rejected and cannot be modified.' });
-		}
-
 		if (state !== ApplicationStates.DAC_REVIEW) {
 			res.status(400).json({ message: 'Application must be in DAC Review status to be rejected.' });
 		}
