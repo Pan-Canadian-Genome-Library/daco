@@ -53,8 +53,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 					<Item
 						label={props.label}
 						required={props.required}
-						name={props.subLabel ? undefined : (props.name as string)}
-						rules={props.label ? undefined : [props.rule]}
+						name={props.name as string}
 						labelAlign={props.labelAlign ?? undefined}
 						labelCol={props.labelCol ?? undefined}
 					>
@@ -70,10 +69,10 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 					</Item>
 				) : (
 					<Item
-						label={props.label}
+						label={props.subLabel}
+						name={props.name as string}
 						required={props.required}
-						name={props.subLabel ? undefined : (props.name as string)}
-						rules={props.label ? undefined : [props.rule]}
+						rules={[props.rule]}
 						labelAlign={props.labelAlign ?? undefined}
 						labelCol={props.labelCol ?? undefined}
 					>

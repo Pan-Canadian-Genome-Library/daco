@@ -79,6 +79,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 					<Item
 						label={props.label}
 						required={props.required}
+						name={props.name as string}
 						labelAlign={props.labelAlign ?? undefined}
 						labelCol={props.labelCol ?? undefined}
 						layout={props.layout ?? undefined}
@@ -97,6 +98,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 					<Item
 						label={props.label}
 						name={props.name as string}
+						required={props.required}
 						rules={[props.rule]}
 						labelAlign={props.labelAlign ?? undefined}
 						labelCol={props.labelCol ?? undefined}
