@@ -33,10 +33,9 @@ interface ValidCollaboratorDTO extends CollaboratorDTO {
 
 /**
  * Creates a new collaborator and returns the created data.
- * @param first_name - Collaborator's first name
- * @param last_name - Collaborator's last name
- * @param position_title - Collaborator's position title
- * @param institutional_email - Collaborator's institutional email address
+ * @param application_id - ID of related application record to associate with Collaborators
+ * @param user_id - ID of Applicant updating the application
+ * @param collaborators - Array of new Collaborators to create
  * @returns Success with Collaborator data array / Failure with Error.
  */
 export const createCollaborators = async ({

@@ -21,16 +21,10 @@ import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
 import { createCollaborators } from '@/api/collaboratorsController.js';
-import { CollaboratorDTO } from '@pcgl-daco/data-model';
+import { CollaboratorRequest } from '@pcgl-daco/data-model';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
-
-type CollaboratorRequest = {
-	applicationId: number;
-	userId: string;
-	collaborators: CollaboratorDTO[];
-};
 
 /**
  * Add Collaborator

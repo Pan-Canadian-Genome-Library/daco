@@ -169,13 +169,6 @@ export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 };
 
-// TODO: Additional Types to be updated
-export interface EthicsDataDTO {
-	ethicsReviewRequired?: boolean | null;
-	ethicsLetter?: number | null;
-	signedPdf?: number | null;
-}
-
 export interface CollaboratorDTO {
 	collaboratorFirstName?: string | null;
 	collaboratorMiddleName?: string | null;
@@ -186,6 +179,19 @@ export interface CollaboratorDTO {
 	collaboratorResearcherProfileURL?: string | null;
 	collaboratorPositionTitle?: string | null;
 	collaboratorType?: string | null;
+}
+
+export type CollaboratorRequest = {
+	applicationId: number;
+	userId: string;
+	collaborators: CollaboratorDTO[];
+};
+
+// TODO: Additional Types to be updated
+export interface EthicsDataDTO {
+	ethicsReviewRequired?: boolean | null;
+	ethicsLetter?: number | null;
+	signedPdf?: number | null;
 }
 
 export type RevisionRequestDTO = {
