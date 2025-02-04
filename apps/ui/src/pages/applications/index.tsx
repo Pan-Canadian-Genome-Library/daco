@@ -75,6 +75,7 @@ const ApplicationViewer = () => {
 							<Col style={{ background: 'white', width: '100%' }}>
 								<Outlet
 									context={{
+										appId: data.id,
 										isEditMode,
 									}}
 								/>
