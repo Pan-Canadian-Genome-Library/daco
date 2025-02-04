@@ -18,11 +18,15 @@
  */
 
 import { z } from 'zod';
-import { EmptyOrOptionalString, NonEmptyString } from './common/strings.js';
+import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 // Applicant Information Form Section
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
+export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
+export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
+export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
 	applicantFirstName: NonEmptyString,
@@ -41,7 +45,37 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteBuilding: EmptyOrOptionalString,
 });
 
-export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+export const institutionalRepSchema = z.object({
+	institutionalTitle: NonEmptyString,
+	institutionalFirstName: NonEmptyString,
+	institutionalMiddleName: EmptyOrOptionalString,
+	institutionalLastName: NonEmptyString,
+	institutionalSuffix: EmptyOrOptionalString,
+	institutionalPrimaryAffiliation: NonEmptyString,
+	institutionalInstituteAffiliation: NonEmptyString.email(),
+	institutionalProfileUrl: NonEmptyString.url(),
+	institutionalPositionTitle: NonEmptyString,
+	institutionCountry: NonEmptyString,
+	institutionState: NonEmptyString,
+	institutionCity: NonEmptyString,
+	institutionStreetAddress: NonEmptyString,
+	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	institutionBuilding: EmptyOrOptionalString,
+});
+
+export const projectInformationSchema = z.object({
+	projectTitle: NonEmptyString,
+	projectWebsite: OptionalURLString,
+	projectBackground: ConciseWordCountString,
+	projectAims: ConciseWordCountString,
+	projectDataUse: ConciseWordCountString,
+	projectMethodology: ConciseWordCountString,
+	projectLaySummary: ConciseWordCountString,
+	relevantPublicationURL1: NonEmptyString.url(),
+	relevantPublicationURL2: NonEmptyString.url(),
+	relevantPublicationURL3: NonEmptyString.url(),
+});
+
 export const requestedStudySchema = z.object({
 	requestedStudy: NonEmptyString,
 });
