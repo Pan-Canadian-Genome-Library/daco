@@ -40,3 +40,8 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteStreetAddress: NonEmptyString,
 	applicantInstituteBuilding: EmptyOrOptionalString,
 });
+
+export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+export const requestedStudySchema = z.object({
+	requestedStudy: NonEmptyString,
+});
