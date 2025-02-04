@@ -18,12 +18,13 @@
  */
 
 import { z } from 'zod';
-import { EmptyOrOptionalString, NonEmptyString } from './common/strings.js';
+import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 // Applicant Information Form Section
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
+export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
@@ -59,4 +60,17 @@ export const institutionalRepSchema = z.object({
 	institutionStreetAddress: NonEmptyString,
 	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 	institutionBuilding: EmptyOrOptionalString,
+});
+
+export const projectInformationSchema = z.object({
+	projectTitle: NonEmptyString,
+	projectWebsite: OptionalURLString,
+	projectBackground: ConciseWordCountString,
+	projectAims: ConciseWordCountString,
+	projectDataUse: ConciseWordCountString,
+	projectMethodology: ConciseWordCountString,
+	projectLaySummary: ConciseWordCountString,
+	relevantPublicationURL1: NonEmptyString.url(),
+	relevantPublicationURL2: NonEmptyString.url(),
+	relevantPublicationURL3: NonEmptyString.url(),
 });
