@@ -62,7 +62,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 		return (
 			<Input
 				{...field}
-				autoComplete={props.autoComplete ?? ''}
+				autoComplete={props.autoComplete ?? 'on'}
 				type={props.type ?? 'text'}
 				disabled={props.disabled}
 				placeholder={props.placeHolder}
@@ -75,36 +75,28 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 			name={props.name}
 			control={props.control}
 			render={({ field }) => {
-				return props.subLabel ? (
+				return (
 					<Item
 						label={props.label}
 						required={props.required}
 						name={props.name as string}
-						labelAlign={props.labelAlign ?? undefined}
-						labelCol={props.labelCol ?? undefined}
-						layout={props.layout ?? undefined}
+						labelAlign={props.labelAlign}
+						labelCol={props.labelCol}
+						layout={props.layout}
 					>
-						<Item
-							label={props.subLabel}
-							name={props.name as string}
-							rules={[props.rule]}
-							labelAlign={props.labelAlign ?? undefined}
-							labelCol={props.labelCol ?? undefined}
-						>
-							{renderControl(field)}
-						</Item>
-					</Item>
-				) : (
-					<Item
-						label={props.label}
-						name={props.name as string}
-						required={props.required}
-						rules={[props.rule]}
-						labelAlign={props.labelAlign ?? undefined}
-						labelCol={props.labelCol ?? undefined}
-						layout={props.layout ?? undefined}
-					>
-						{renderControl(field)}
+						{props.subLabel ? (
+							<Item
+								label={props.subLabel}
+								name={props.name as string}
+								rules={[props.rule]}
+								labelAlign={props.labelAlign}
+								labelCol={props.labelCol}
+							>
+								{renderControl(field)}
+							</Item>
+						) : (
+							renderControl(field)
+						)}
 					</Item>
 				);
 			}}

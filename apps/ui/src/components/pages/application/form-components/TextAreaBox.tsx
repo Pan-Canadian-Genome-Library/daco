@@ -49,34 +49,27 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 			name={props.name}
 			control={props.control}
 			render={({ field }) => {
-				return props.subLabel ? (
+				return (
 					<Item
 						label={props.label}
 						required={props.required}
 						name={props.name as string}
-						labelAlign={props.labelAlign ?? undefined}
-						labelCol={props.labelCol ?? undefined}
+						labelAlign={props.labelAlign}
+						labelCol={props.labelCol}
 					>
-						<Item
-							label={props.subLabel}
-							name={props.name as string}
-							rules={[props.rule]}
-							labelAlign={props.labelAlign ?? undefined}
-							labelCol={props.labelCol ?? undefined}
-						>
-							{renderControl(field)}
-						</Item>
-					</Item>
-				) : (
-					<Item
-						label={props.subLabel}
-						name={props.name as string}
-						required={props.required}
-						rules={[props.rule]}
-						labelAlign={props.labelAlign ?? undefined}
-						labelCol={props.labelCol ?? undefined}
-					>
-						{renderControl(field)}
+						{props.subLabel ? (
+							<Item
+								label={props.subLabel}
+								name={props.name as string}
+								rules={[props.rule]}
+								labelAlign={props.labelAlign}
+								labelCol={props.labelCol}
+							>
+								{renderControl(field)}
+							</Item>
+						) : (
+							renderControl(field)
+						)}
 					</Item>
 				);
 			}}
