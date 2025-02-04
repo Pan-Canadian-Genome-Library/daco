@@ -24,6 +24,7 @@ import { type ApplicationServiceType, type CollaboratorModel, type Collaborators
 import { failure } from '@/utils/results.js';
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
+/* Type to assert Collaborator record has valid required fields */
 interface ValidCollaboratorDTO extends CollaboratorDTO {
 	collaboratorFirstName: string;
 	collaboratorLastName: string;

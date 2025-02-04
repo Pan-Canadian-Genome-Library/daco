@@ -29,13 +29,10 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			const collaboratorRecords = await db.transaction(async (transaction) => {
 				// Create Collaborators
 				const newRecords: CollaboratorRecord[] = [];
+				const newCollaboratorRecords = await transaction.insert(collaborators).values(newCollaborators).returning();
 
-				newCollaborators.forEach(async (collaborator) => {
-					const newCollaboratorRecord = await transaction.insert(collaborators).values(collaborator).returning();
-					if (!newCollaboratorRecord[0]) throw new Error(`Collaborator records are undefined: ${collaborator}`);
-
-					newRecords.push(newCollaboratorRecord[0]);
-				});
+				if (!newCollaboratorRecords.length)
+					throw new Error(`Collaborator records are undefined: ${newCollaboratorRecords}`);
 
 				return newRecords;
 			});

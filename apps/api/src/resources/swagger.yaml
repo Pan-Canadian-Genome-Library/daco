@@ -359,7 +359,7 @@ paths:
             application/json:
               schema:
                 type: object
-                $ref: '#/components/schemas/Collaborators'
+                $ref: '#/components/responses/CollaboratorsListResponse'
 
 components:
   schemas:
@@ -860,6 +860,12 @@ components:
         message:
           type: string
           description: General description of error with parameters and context
+
+    CollaboratorsListResponse:
+      type: array
+      description: Array of Collaborator records
+      items:
+        $ref: '#/components/schemas/Collaborators'
 
     ServerErrors:
       type: object
