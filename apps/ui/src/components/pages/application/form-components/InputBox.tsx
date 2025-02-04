@@ -55,7 +55,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 						<Item label={props.subLabel} name={props.name as string} rules={[props.rule]}>
 							<Input
 								{...field}
-								autoComplete={props.autoComplete ?? ''}
+								autoComplete={props.autoComplete ?? 'on'}
 								type={props.type ?? 'text'}
 								disabled={props.disabled}
 								placeholder={props.placeHolder}

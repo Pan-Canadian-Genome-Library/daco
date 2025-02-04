@@ -17,42 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Form, Select } from 'antd';
-import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
+/**
+ * List of personal titles used in the "Title" field for applicant info
+ * and institutional rep info among others.
+ */
+const PERSONAL_TITLES = [
+	{ en: 'Dr.', fr: '' },
+	{ en: 'Miss.', fr: '' },
+	{ en: 'Mr.', fr: '' },
+	{ en: 'Mrs.', fr: '' },
+	{ en: 'Ms.', fr: '' },
+	{ en: 'Prof.', fr: '' },
+];
 
-import { BasicFormFieldProps } from '@/global/types';
-
-const { Item } = Form;
-
-interface SelectBoxProps extends BasicFormFieldProps {
-	options?: {
-		label: string;
-		value: string;
-	}[];
-	initialValue?: object | string;
-	placeholder?: string;
-}
-
-const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
-	return (
-		<Controller
-			name={props.name}
-			control={props.control}
-			render={({ field }) => {
-				return (
-					<Item
-						label={props.label}
-						name={props.name as string}
-						rules={[props.rule]}
-						required={props.required}
-						initialValue={props.initialValue}
-					>
-						<Select {...field} disabled={props.disabled} options={props.options} placeholder={props.placeholder} />
-					</Item>
-				);
-			}}
-		/>
-	);
-};
-
-export default SelectBox;
+export { PERSONAL_TITLES };
