@@ -33,8 +33,6 @@ type DeleteCollaboratorModalProps = {
 const DeleteCollaboratorModal = ({ appId, deleteState, setIsOpen }: DeleteCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
 
-	console.log(deleteState);
-
 	return (
 		<Modal
 			title={translate('collab-section.deleteModalTitle')}
