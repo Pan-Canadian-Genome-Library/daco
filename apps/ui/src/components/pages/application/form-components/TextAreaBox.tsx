@@ -54,6 +54,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 						label={props.label}
 						required={props.required}
 						name={props.name as string}
+						rules={!props.subLabel ? [props.rule] : undefined}
 						labelAlign={props.labelAlign}
 						labelCol={props.labelCol}
 					>

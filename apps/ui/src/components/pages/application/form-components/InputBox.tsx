@@ -81,6 +81,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 						required={props.required}
 						name={props.name as string}
 						labelAlign={props.labelAlign}
+						rules={!props.subLabel ? [props.rule] : undefined}
 						labelCol={props.labelCol}
 						layout={props.layout}
 					>
