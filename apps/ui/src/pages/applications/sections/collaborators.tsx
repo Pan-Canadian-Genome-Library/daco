@@ -19,10 +19,12 @@
 
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Col, Flex, Row, Space, Table, TableProps, theme } from 'antd';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DeleteCollaboratorModal from '@/components/pages/application/modals/deleteCollaboratorModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -30,17 +32,24 @@ import { ApplicationOutletContext } from '@/global/types';
 
 const { useToken } = theme;
 
-interface CollabTableData {
+export interface CollabTableData {
 	id: number;
 	firstName: string;
 	lastName: string;
 	institutionalEmail: string;
 	title: string;
 }
+
+export interface ModalState {
+	rowData?: CollabTableData;
+	isOpen: boolean;
+}
+
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
+	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
 
 	const columns: TableProps<CollabTableData>['columns'] = [
 		{
@@ -66,12 +75,16 @@ const Collaborators = () => {
 		{
 			key: 'tools',
 			title: 'Tools',
-			render: () => (
+			render: (value) => (
 				<Space size="middle">
 					<Button disabled={!isEditMode} style={{ fontWeight: 400 }}>
 						{translate('button.edit')}
 					</Button>
-					<Button disabled={!isEditMode} style={{ fontWeight: 400 }}>
+					<Button
+						onClick={() => setDeleteModalState({ rowData: value, isOpen: true })}
+						disabled={!isEditMode}
+						style={{ fontWeight: 400 }}
+					>
 						{translate('button.delete')}
 					</Button>
 				</Space>
@@ -99,6 +112,13 @@ const Collaborators = () => {
 								institutionalEmail: 'thy.john.doe@oicr.ca',
 								title: 'PI',
 							},
+							{
+								id: 53,
+								firstName: 'Sunny',
+								lastName: 'ShinShine',
+								institutionalEmail: 'the.sun.is.bright@oicr.ca',
+								title: 'Really good at job',
+							},
 						]}
 						pagination={false}
 					/>
@@ -113,6 +133,7 @@ const Collaborators = () => {
 						</Col>
 					</Row>
 				</SectionContent>
+				<DeleteCollaboratorModal appId={appId} deleteState={deleteModalState} setIsOpen={setDeleteModalState} />
 				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />
 			</>
 		</SectionWrapper>
