@@ -18,12 +18,11 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router';
-import * as z from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import InputBox from '@/components/pages/application/form-components/InputBox';
@@ -31,45 +30,21 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
+import { useOutletContext } from 'react-router';
 
-type FieldType = {
-	institutionalTitle: string;
-	institutionalFirstName: string;
-	institutionalMiddleName: string;
-	institutionalLastName: string;
-	institutionalSuffix: string;
-	institutionalPrimaryAffiliation: string;
-	institutionalInstituteAffiliation: string;
-	institutionalProfileUrl: string;
-	institutionalPositionTitle: string;
-	institutionCountry: string;
-	institutionState: string;
-	institutionCity: string;
-	institutionStreetAddress: string;
-	institutionPostalCode: string;
-	institutionBuilding: string;
-};
-
-const schema = z.object({
-	institutionalTitle: z.string().min(1, { message: 'Required' }),
-	InstitutionalFirstName: z
-		.string()
-		.min(1, { message: 'Required' })
-		.max(15, { message: 'First name should be less than 15 characters' }),
-});
-
-const rule = createSchemaFieldRule(schema);
+const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<FieldType>({
-		resolver: zodResolver(schema),
+	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
+		resolver: zodResolver(institutionalRepSchema),
 	});
 
-	const onSubmit: SubmitHandler<FieldType> = (data) => {
+	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
 		console.log(data);
 	};
 
@@ -89,14 +64,9 @@ const Institutional = () => {
 								placeholder="Select"
 								control={control}
 								rule={rule}
-								options={[
-									{ value: 'dr', label: 'Dr' },
-									{ value: 'miss', label: 'Miss' },
-									{ value: 'mr', label: 'Mr' },
-									{ value: 'mrs', label: 'Mrs' },
-									{ value: 'ms', label: 'Ms' },
-									{ value: 'prof', label: 'Prof' },
-								]}
+								options={PERSONAL_TITLES.map((titles) => {
+									return { value: titles.en, label: titles.en };
+								})}
 								required
 								disabled={!isEditMode}
 							/>
@@ -108,6 +78,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.firstName')}
 								name="institutionalFirstName"
 								control={control}
+								autoComplete="given-name"
 								rule={rule}
 								required
 								disabled={!isEditMode}
@@ -117,6 +88,7 @@ const Institutional = () => {
 							<InputBox
 								label={translate('institutional-section.form.middleName')}
 								name="institutionalMiddleName"
+								autoComplete="additional-name"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -129,6 +101,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.lastName')}
 								name="institutionalLastName"
 								control={control}
+								autoComplete="family-name"
 								rule={rule}
 								required
 								disabled={!isEditMode}
@@ -139,6 +112,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.suffix')}
 								name="institutionalSuffix"
 								control={control}
+								autoComplete="honorific-suffix"
 								rule={rule}
 								disabled={!isEditMode}
 							/>
@@ -176,6 +150,7 @@ const Institutional = () => {
 								label={translate('institutional-section.form.researcherProfile')}
 								subLabel={translate('institutional-section.form.researcherProfileLabel')}
 								name="institutionalProfileUrl"
+								autoComplete="url"
 								placeHolder="https://"
 								control={control}
 								rule={rule}
@@ -200,11 +175,15 @@ const Institutional = () => {
 				<SectionContent title={translate('institutional-section.section2')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<InputBox
+							<SelectBox
 								label={translate('institutional-section.form.country')}
 								name="institutionCountry"
 								control={control}
 								rule={rule}
+								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
+									return { value: areas.iso, label: areas.en };
+								})}
+								initialValue={'CAN'}
 								required
 								disabled={!isEditMode}
 							/>

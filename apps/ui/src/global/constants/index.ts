@@ -17,8 +17,5 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// only alphanumeric values
-export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;
-
-// Captures spaces, splitting by this regex will yield a "word"
-export const WORDS = /\s+/;
+export * from './countriesAndRegions';
+export * from './personalTitles';
