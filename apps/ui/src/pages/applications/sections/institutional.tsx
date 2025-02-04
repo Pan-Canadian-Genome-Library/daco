@@ -18,6 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -31,7 +32,6 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
-import { institutionalRepSchema, InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { useOutletContext } from 'react-router';
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
@@ -183,7 +183,7 @@ const Institutional = () => {
 								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
 									return { value: areas.iso, label: areas.en };
 								})}
-								defaultValue={'CAN'}
+								initialValue={'CAN'}
 								required
 								disabled={!isEditMode}
 							/>
