@@ -17,48 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { RuleRender } from 'antd/es/form';
+import { z } from 'zod';
 
-export interface Application {
-	id: string;
-	userId: string;
-	state: ApplicationStateValues;
-	createdAt: string;
-	approvedAt: string;
-	updatedAt: string;
-	expiresAt: string;
-}
+export const TrimmedString = z.string().trim();
+export type TrimmedString = z.infer<typeof TrimmedString>;
 
-export interface ApplicationCountMetadata {
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	REJECTED: number;
-	APPROVED: number;
-	CLOSED: number;
-	REVOKED: number;
-	TOTAL: number;
-}
+// string with at least 2 non-whitespace character
+export const NonEmptyString = TrimmedString.min(2);
+export type NonEmptyString = z.infer<typeof NonEmptyString>;
 
-export interface ServerError {
-	message: string;
-	errors?: string;
-}
+// string with at least 2 non-whitespace character, or undefined
+export const OptionalString = NonEmptyString.optional().or(z.literal(''));
+export type OptionalString = z.infer<typeof OptionalString>;
 
-export interface FetchError extends ServerError {
-	isError: true;
-	statusCode: number;
-}
+export const EmptyString = z.literal('');
+export type EmptyString = z.infer<typeof EmptyString>;
 
-export interface ApplicationOutletContext {
-	isEditMode: boolean;
-}
+export const EmptyWhiteSpace = TrimmedString.max(0);
+export type EmptyWhiteSpace = z.infer<typeof EmptyWhiteSpace>;
 
-export interface BasicFormFieldProps {
-	label?: string;
-	rule: RuleRender;
-	required?: boolean;
-}
+export const EmptyOrOptionalString = OptionalString.or(EmptyString).or(EmptyWhiteSpace);
+export type EmptyOrOptionalString = z.infer<typeof EmptyOrOptionalString>;

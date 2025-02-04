@@ -17,48 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { RuleRender } from 'antd/es/form';
+import { ApplicationStates, ApplicationStateValues } from './types.js';
 
-export interface Application {
-	id: string;
-	userId: string;
-	state: ApplicationStateValues;
-	createdAt: string;
-	approvedAt: string;
-	updatedAt: string;
-	expiresAt: string;
-}
+/**
+ * Type check to see if a provided string value is a valid Application State value.
+ * @param value A string containing a possible valid Application State value.
+ * @returns A boolean, `true` if valid, `false` if not.
+ */
+const isApplicationStateValue = (value: string): value is ApplicationStateValues => {
+	if (Object.keys(ApplicationStates).includes(value)) {
+		return true;
+	}
+	return false;
+};
 
-export interface ApplicationCountMetadata {
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	REJECTED: number;
-	APPROVED: number;
-	CLOSED: number;
-	REVOKED: number;
-	TOTAL: number;
-}
-
-export interface ServerError {
-	message: string;
-	errors?: string;
-}
-
-export interface FetchError extends ServerError {
-	isError: true;
-	statusCode: number;
-}
-
-export interface ApplicationOutletContext {
-	isEditMode: boolean;
-}
-
-export interface BasicFormFieldProps {
-	label?: string;
-	rule: RuleRender;
-	required?: boolean;
-}
+export { isApplicationStateValue };

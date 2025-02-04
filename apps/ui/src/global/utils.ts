@@ -17,48 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { RuleRender } from 'antd/es/form';
+/**
+ * Determines if the page number provided to it would be valid for the DACO API.
+ *
+ * The DACO API starts page counts from 0, and page numbers cannot be negative.
+ * @param page A page number for any paginated API endpoint.
+ * @returns A boolean indicating a `true` if the page number is valid, or `false` if it is not.
+ */
+const isValidPageNumber = (page: number) => {
+	if (!Number.isNaN(page) && page >= 0) {
+		return true;
+	}
+	return false;
+};
 
-export interface Application {
-	id: string;
-	userId: string;
-	state: ApplicationStateValues;
-	createdAt: string;
-	approvedAt: string;
-	updatedAt: string;
-	expiresAt: string;
-}
-
-export interface ApplicationCountMetadata {
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	REJECTED: number;
-	APPROVED: number;
-	CLOSED: number;
-	REVOKED: number;
-	TOTAL: number;
-}
-
-export interface ServerError {
-	message: string;
-	errors?: string;
-}
-
-export interface FetchError extends ServerError {
-	isError: true;
-	statusCode: number;
-}
-
-export interface ApplicationOutletContext {
-	isEditMode: boolean;
-}
-
-export interface BasicFormFieldProps {
-	label?: string;
-	rule: RuleRender;
-	required?: boolean;
-}
+export { isValidPageNumber };

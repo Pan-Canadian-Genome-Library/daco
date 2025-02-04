@@ -17,48 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { RuleRender } from 'antd/es/form';
+import { z } from 'zod';
+import { EmptyOrOptionalString, NonEmptyString } from './common/strings.js';
+import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
-export interface Application {
-	id: string;
-	userId: string;
-	state: ApplicationStateValues;
-	createdAt: string;
-	approvedAt: string;
-	updatedAt: string;
-	expiresAt: string;
-}
-
-export interface ApplicationCountMetadata {
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	REJECTED: number;
-	APPROVED: number;
-	CLOSED: number;
-	REVOKED: number;
-	TOTAL: number;
-}
-
-export interface ServerError {
-	message: string;
-	errors?: string;
-}
-
-export interface FetchError extends ServerError {
-	isError: true;
-	statusCode: number;
-}
-
-export interface ApplicationOutletContext {
-	isEditMode: boolean;
-}
-
-export interface BasicFormFieldProps {
-	label?: string;
-	rule: RuleRender;
-	required?: boolean;
-}
+// Applicant Information Form Section
+export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
+export const applicantInformationSchema = z.object({
+	applicantTitle: NonEmptyString,
+	applicantFirstName: NonEmptyString,
+	applicantMiddleName: EmptyOrOptionalString,
+	applicantLastName: NonEmptyString,
+	applicantSuffix: EmptyOrOptionalString,
+	applicantPrimaryAffiliation: NonEmptyString,
+	applicantInstituteEmail: NonEmptyString.email(),
+	applicantProfileUrl: NonEmptyString.url(),
+	applicantPositionTitle: NonEmptyString,
+	applicantInstituteCountry: NonEmptyString,
+	applicantInstituteState: NonEmptyString,
+	applicantInstituteCity: NonEmptyString,
+	applicantInstitutePostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	applicantInstituteStreetAddress: NonEmptyString,
+	applicantInstituteBuilding: EmptyOrOptionalString,
+});

@@ -17,48 +17,5 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { RuleRender } from 'antd/es/form';
-
-export interface Application {
-	id: string;
-	userId: string;
-	state: ApplicationStateValues;
-	createdAt: string;
-	approvedAt: string;
-	updatedAt: string;
-	expiresAt: string;
-}
-
-export interface ApplicationCountMetadata {
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	REJECTED: number;
-	APPROVED: number;
-	CLOSED: number;
-	REVOKED: number;
-	TOTAL: number;
-}
-
-export interface ServerError {
-	message: string;
-	errors?: string;
-}
-
-export interface FetchError extends ServerError {
-	isError: true;
-	statusCode: number;
-}
-
-export interface ApplicationOutletContext {
-	isEditMode: boolean;
-}
-
-export interface BasicFormFieldProps {
-	label?: string;
-	rule: RuleRender;
-	required?: boolean;
-}
+// only alphanumeric values
+export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;

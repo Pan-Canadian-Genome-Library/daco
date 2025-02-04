@@ -144,7 +144,7 @@ export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
 
-export type ApplicationResponseData = {
+export type ApplicationDTO = {
 	id: number;
 	userId: string;
 	state: ApplicationStateValues;
@@ -152,8 +152,35 @@ export type ApplicationResponseData = {
 	approvedAt?: Date | null;
 	updatedAt?: Date | null;
 	expiresAt?: Date | null;
-	contents: ApplicationContentsResponse | null;
 };
+
+export interface ApplicationResponseData extends ApplicationDTO {
+	contents: ApplicationContentsResponse | null;
+}
+
+export interface PagingMetadata {
+	totalRecords: number;
+	page: number;
+	pageSize: number;
+}
+
+export interface ApplicantSummary {
+	createdAt: Date;
+	firstName: string | null;
+	lastName: string | null;
+	email: string | null;
+	country: string | null;
+	institution: string | null;
+}
+
+export interface ApplicationListSummary extends ApplicationDTO {
+	applicant: ApplicantSummary | null;
+}
+
+export interface ApplicationListResponse {
+	applications: ApplicationListSummary[];
+	pagingMetadata: PagingMetadata;
+}
 
 export type ApplicationContentsResponse = {
 	applicationId?: number;
