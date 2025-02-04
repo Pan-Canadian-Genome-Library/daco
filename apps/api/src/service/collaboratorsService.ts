@@ -26,16 +26,26 @@ import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
 const collaboratorsSvc = (db: PostgresDb) => ({
 	createCollaborators: async ({ newCollaborators }: { newCollaborators: CollaboratorModel[] }) => {
 		try {
+			// Create Collaborators
 			const collaboratorRecords = await db.transaction(async (transaction) => {
-				// Create Collaborators
 				const newRecords: CollaboratorRecord[] = [];
-				const newCollaboratorRecords = await transaction.insert(collaborators).values(newCollaborators).returning();
 
-				if (!newCollaboratorRecords.length)
-					throw new Error(`Collaborator records are undefined: ${newCollaboratorRecords}`);
+				// TODO: Inserting multiple records as an array is not working despite Drizzle team saying the issue is resolved: https://github.com/drizzle-team/drizzle-orm/issues/2849
+				newCollaborators.forEach(async (collaborator) => {
+					const newCollaboratorRecord = await transaction.insert(collaborators).values(collaborator).returning();
 
+					if (!newCollaboratorRecord[0]) {
+						throw new Error(`Error creating new collaborators: ${collaborator}`);
+					}
+
+					newRecords.push(newCollaboratorRecord[0]);
+				});
 				return newRecords;
 			});
+
+			if (!(collaboratorRecords.length === newCollaborators.length)) {
+				throw new Error(`Error creating new collaborators: ${collaboratorRecords}`);
+			}
 			return success(collaboratorRecords);
 		} catch (err) {
 			const message = `Error at createCollaborators`;
