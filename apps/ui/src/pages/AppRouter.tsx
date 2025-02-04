@@ -25,10 +25,10 @@ import Applicant from '@/pages/applications/sections/applicant';
 import Collaborators from '@/pages/applications/sections/collaborators';
 import Institutional from '@/pages/applications/sections/institutional';
 import Introduction from '@/pages/applications/sections/intro';
+import RequestedStudy from '@/pages/applications/sections/requestedStudy';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
-import RequestedStudy from './applications/sections/requestedStudy';
 
 export const ApplicationSectionRoutes = [
 	{
