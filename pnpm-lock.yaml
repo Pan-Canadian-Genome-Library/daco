@@ -144,13 +144,6 @@ importers:
       zod:
         specifier: ^3.24.1
         version: 3.24.1
-    optionalDependencies:
-      '@rollup/rollup-linux-arm64-musl':
-        specifier: 4.27.0
-        version: 4.27.0
-      '@rollup/rollup-linux-x64-musl':
-        specifier: 4.27.0
-        version: 4.27.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.9.0
@@ -185,6 +178,13 @@ importers:
       vite:
         specifier: ^5.4.1
         version: 5.4.8(@types/node@22.7.4)
+    optionalDependencies:
+      '@rollup/rollup-linux-arm64-musl':
+        specifier: 4.27.0
+        version: 4.27.0
+      '@rollup/rollup-linux-x64-musl':
+        specifier: 4.27.0
+        version: 4.27.0
 
   packages/data-model:
     devDependencies:

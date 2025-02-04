@@ -29,6 +29,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 		label: string;
 		value: string;
 	}[];
+	initialValue?: object | string;
 	placeholder?: string;
 }
 
@@ -39,7 +40,13 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 			control={props.control}
 			render={({ field }) => {
 				return (
-					<Item label={props.label} name={props.name as string} rules={[props.rule]} required={props.required}>
+					<Item
+						label={props.label}
+						name={props.name as string}
+						rules={[props.rule]}
+						required={props.required}
+						initialValue={props.initialValue}
+					>
 						<Select {...field} disabled={props.disabled} options={props.options} placeholder={props.placeholder} />
 					</Item>
 				);
