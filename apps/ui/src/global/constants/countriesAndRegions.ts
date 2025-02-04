@@ -18,19 +18,6 @@
  */
 
 /**
- * List of personal titles used in the "Title" field for applicant info
- * and institutional rep info among others.
- */
-const PERSONAL_TITLES = [
-	{ en: 'Dr.', fr: '' },
-	{ en: 'Miss.', fr: '' },
-	{ en: 'Mr.', fr: '' },
-	{ en: 'Mrs.', fr: '' },
-	{ en: 'Ms.', fr: '' },
-	{ en: 'Prof.', fr: '' },
-];
-
-/**
  * @description A list of countries, territories, and geographic areas derived from The Government of Canada data reference standard.
  * Contains both English and French names, alongside ISO codes.
  *
@@ -301,4 +288,4 @@ const GC_STANDARD_GEOGRAPHIC_AREAS = [
 	{ en: 'Zimbabwe', fr: 'Zimbabwe', iso: 'ZWE' },
 ];
 
-export { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES };
+export { GC_STANDARD_GEOGRAPHIC_AREAS };
