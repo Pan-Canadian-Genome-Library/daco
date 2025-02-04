@@ -17,8 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// only alphanumeric values
-export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;
+/**
+ * List of personal titles used in the "Title" field for applicant info
+ * and institutional rep info among others.
+ */
+const PERSONAL_TITLES = [
+	{ en: 'Dr.', fr: '' },
+	{ en: 'Miss.', fr: '' },
+	{ en: 'Mr.', fr: '' },
+	{ en: 'Mrs.', fr: '' },
+	{ en: 'Ms.', fr: '' },
+	{ en: 'Prof.', fr: '' },
+];
 
-// Captures spaces, splitting by this regex will yield a "word"
-export const WORDS = /\s+/;
+export { PERSONAL_TITLES };
