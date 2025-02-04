@@ -71,7 +71,7 @@ export const createCollaborators = async ({
 	}
 
 	const validCollaborators: ValidCollaboratorDTO[] = collaborators.filter(
-		(data): data is ValidCollaboratorDTO =>
+		(data: CollaboratorDTO): data is ValidCollaboratorDTO =>
 			!!data.collaboratorFirstName &&
 			!!data.collaboratorLastName &&
 			!!data.collaboratorPositionTitle &&
