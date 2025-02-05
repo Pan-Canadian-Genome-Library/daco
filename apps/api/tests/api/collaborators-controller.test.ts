@@ -24,6 +24,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
+import { createApplication } from '@/api/application-api.js';
 import { createCollaborators } from '@/api/collaboratorsController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 
@@ -73,6 +74,90 @@ describe('Collaborators Controller', () => {
 			const newCollaboratorRecord = result.data[0];
 
 			assert.strictEqual(newCollaboratorRecord.application_id, application_id);
+		});
+
+		it('should successfully create multiple collaborators with the provided application id', async () => {
+			const collaborators: CollaboratorDTO[] = [
+				{
+					collaboratorFirstName: 'Test',
+					collaboratorLastName: 'User',
+					collaboratorPositionTitle: 'Bioinformatician',
+					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
+				},
+				{
+					collaboratorFirstName: 'Test',
+					collaboratorLastName: 'User 2',
+					collaboratorPositionTitle: 'Scientist',
+					collaboratorInstitutionalEmail: 'testUser2@oicr.on.ca',
+				},
+				{
+					collaboratorFirstName: 'Test',
+					collaboratorLastName: 'User 3',
+					collaboratorPositionTitle: 'Lab Tech',
+					collaboratorInstitutionalEmail: 'testUser3@oicr.on.ca',
+				},
+			];
+
+			const result = await createCollaborators({ application_id, user_id, collaborators });
+
+			assert.ok(result.success);
+
+			assert.strictEqual(result.data.length, collaborators.length);
+		});
+
+		it('should prevent creating a new collaborator with the wrong user id', async () => {
+			const collaborators: CollaboratorDTO[] = [
+				{
+					collaboratorFirstName: 'Principal',
+					collaboratorLastName: 'Tester',
+					collaboratorPositionTitle: 'Doctor',
+					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
+				},
+			];
+
+			const result = await createCollaborators({ application_id, user_id: 'drTest@oicr.on.ca', collaborators });
+
+			assert.ok(!result.success);
+		});
+
+		it('should prevent creating a new collaborator with the wrong application id', async () => {
+			const applicationResult = await createApplication({ user_id });
+
+			assert.ok(applicationResult.success && applicationResult.data);
+
+			const incorrectId = applicationResult.data?.id + 10;
+
+			const collaborators: CollaboratorDTO[] = [
+				{
+					collaboratorFirstName: 'Principal',
+					collaboratorLastName: 'Tester',
+					collaboratorPositionTitle: 'Doctor',
+					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
+				},
+			];
+
+			const result = await createCollaborators({ application_id: incorrectId, user_id, collaborators });
+
+			assert.ok(!result.success);
+		});
+
+		it('should prevent creating a new collaborator with missing fields', async () => {
+			const collaborators: CollaboratorDTO[] = [
+				{
+					collaboratorFirstName: 'Principal',
+					collaboratorLastName: 'Tester',
+					collaboratorPositionTitle: 'Doctor',
+					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
+				},
+				{
+					collaboratorFirstName: 'Tester',
+					collaboratorInstitutionalEmail: 'testerTester@oicr.on.ca',
+				},
+			];
+
+			const result = await createCollaborators({ application_id, user_id, collaborators });
+
+			assert.ok(!result.success);
 		});
 	});
 
