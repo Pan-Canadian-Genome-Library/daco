@@ -18,10 +18,10 @@
  */
 
 import { ColProps, Form, Input } from 'antd';
+import { ReactNode } from 'react';
 import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
-import { ReactNode } from 'react';
 
 const { Item } = Form;
 
