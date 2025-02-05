@@ -105,7 +105,7 @@ const Collaborators = () => {
 					showDivider={false}
 				/>
 				<SectionContent>
-					<Table<CollabTableData>
+					<Table
 						rowKey={(record: CollabTableData) => `PCGL-${record.id}`}
 						columns={columns}
 						dataSource={[
