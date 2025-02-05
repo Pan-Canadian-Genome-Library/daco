@@ -21,10 +21,10 @@ import { z } from 'zod';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
-// Applicant Information Form Section
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
+export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
 export const applicantInformationSchema = z.object({
@@ -43,6 +43,15 @@ export const applicantInformationSchema = z.object({
 	applicantInstitutePostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 	applicantInstituteStreetAddress: NonEmptyString,
 	applicantInstituteBuilding: EmptyOrOptionalString,
+});
+
+export const collaboratorsSchema = z.object({
+	collabFirstName: NonEmptyString,
+	collabMiddleName: NonEmptyString,
+	collabLastName: NonEmptyString,
+	collabSuffix: NonEmptyString,
+	collabPrimaryEmail: NonEmptyString.email(),
+	collabPositionTitle: NonEmptyString,
 });
 
 export const institutionalRepSchema = z.object({
