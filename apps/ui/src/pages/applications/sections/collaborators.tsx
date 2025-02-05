@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
 import DeleteCollaboratorModal from '@/components/pages/application/modals/deleteCollaboratorModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
@@ -50,6 +51,9 @@ const Collaborators = () => {
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
 	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
+
+	// MODAL STATES
+	const [openAddCollaboratorModal, setOpenAddCollaboratorModal] = useState(false);
 
 	const columns: TableProps<CollabTableData>['columns'] = [
 		{
@@ -124,7 +128,12 @@ const Collaborators = () => {
 					/>
 					<Row justify={'end'}>
 						<Col style={{ paddingTop: token.paddingLG }}>
-							<Button style={{ borderRadius: 100 }} type="primary" disabled={!isEditMode}>
+							<Button
+								onClick={() => setOpenAddCollaboratorModal(true)}
+								style={{ borderRadius: 100 }}
+								type="primary"
+								disabled={!isEditMode}
+							>
 								<Flex align="center" justify="center" gap={'small'}>
 									<PlusCircleOutlined />
 									{translate('button.addCollab')}
@@ -134,6 +143,7 @@ const Collaborators = () => {
 					</Row>
 				</SectionContent>
 				<DeleteCollaboratorModal appId={appId} deleteState={deleteModalState} setIsOpen={setDeleteModalState} />
+				<AddCollaboratorModal isOpen={openAddCollaboratorModal} setIsOpen={setOpenAddCollaboratorModal} />
 				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />
 			</>
 		</SectionWrapper>
