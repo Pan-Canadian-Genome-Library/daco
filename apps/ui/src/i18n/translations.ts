@@ -73,11 +73,10 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			}
 			break;
 		case z.ZodIssueCode.custom:
-			switch (error.params?.violation) {
-				case 'tooFewWords':
-					return { message: i18n.t('tooFewWords') };
-				case 'tooManyWords':
-					return { message: i18n.t('tooManyWords') };
+			if (error.params?.violation) {
+				return { message: i18n.t(error.params?.violation) };
+			} else {
+				return { message: i18n.t('defaultViolationText') };
 			}
 
 			break;

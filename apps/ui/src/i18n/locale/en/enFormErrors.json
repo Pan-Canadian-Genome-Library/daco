@@ -1,4 +1,5 @@
 {
+	"defaultViolationText": "Please ensure that you've filled out this field according to its requirements.",
 	"requiredField": "Please fill out the required field",
 	"validEmail": "Please enter a valid email address.",
 	"validURL": "Please enter a valid url. Must begin with http:// or https://.",
