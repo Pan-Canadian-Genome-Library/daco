@@ -70,6 +70,16 @@
 	"collab-section": {
 		"title": "Collaborators",
 		"description1": "Please include the names of all investigators, collaborators, research staff (including post-docs) and students (including graduate students), who will have access to the PCGL Controlled Data in order to work on the Research Summary as outlined in Section D of this application",
-		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data."
+		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data.",
+		"addModalTitle": "Add A Collaborator",
+		"addModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL and will be the email address associated with PCGL Controlled Data access.",
+		"form": {
+			"firstName": "First Name:",
+			"middleName": "Middle Name:",
+			"lastName": "Last Name:",
+			"suffix": "Suffix:",
+			"primaryEmail": "Institutional Email:",
+			"positionTitle": "Position Title:"
+		}
 	}
 }
