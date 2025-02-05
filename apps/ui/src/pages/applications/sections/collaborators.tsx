@@ -33,7 +33,7 @@ import { ApplicationOutletContext } from '@/global/types';
 
 const { useToken } = theme;
 
-export interface CollabTableData {
+interface CollabTableData {
 	id: number;
 	firstName: string;
 	lastName: string;

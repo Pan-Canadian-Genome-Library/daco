@@ -22,12 +22,12 @@ import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { Application } from '@pcgl-daco/data-model';
+import { type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {
 	const { t: translate } = useTranslation();
 
-	return useQuery<Application, ServerError>({
+	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [id],
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}`);
