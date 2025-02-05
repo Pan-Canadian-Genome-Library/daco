@@ -90,7 +90,7 @@ const RequestedStudy = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="study" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
 			</Form>
 		</SectionWrapper>
 	);
