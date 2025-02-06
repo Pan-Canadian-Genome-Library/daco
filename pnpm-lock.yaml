@@ -38,6 +38,9 @@ importers:
       '@pcgl-daco/logger':
         specifier: workspace:^
         version: link:../../packages/logger
+      '@pcgl-daco/validation':
+        specifier: workspace:^
+        version: link:../../packages/validation
       '@types/body-parser':
         specifier: ^1.19.5
         version: 1.19.5
@@ -65,6 +68,9 @@ importers:
       yamljs:
         specifier: ^0.3.0
         version: 0.3.0
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@testcontainers/postgresql':
         specifier: ^10.14.0
@@ -231,6 +237,9 @@ importers:
 
   packages/validation:
     dependencies:
+      '@pcgl-daco/data-model':
+        specifier: workspace:^
+        version: link:../data-model
       zod:
         specifier: ^3.24.1
         version: 3.24.1

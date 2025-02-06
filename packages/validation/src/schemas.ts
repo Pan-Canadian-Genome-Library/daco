@@ -25,6 +25,7 @@ export type ApplicantInformationSchemaType = z.infer<typeof applicantInformation
 export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
+export type ApplicationEditSchemaType = z.infer<typeof applicationEditSchema>;
 
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
@@ -82,4 +83,43 @@ export const projectInformationSchema = z.object({
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
+});
+
+export const applicationEditSchema = z.object({
+	id: z.number().nonnegative(),
+	update: z
+		.object({
+			applicant_first_name: NonEmptyString,
+			applicant_middle_name: EmptyOrOptionalString,
+			applicant_last_name: NonEmptyString,
+			applicant_title: NonEmptyString,
+			applicant_suffix: EmptyOrOptionalString,
+			applicant_position_title: NonEmptyString,
+			applicant_primary_affiliation: NonEmptyString,
+			applicant_institutional_email: NonEmptyString.email(),
+			applicant_profile_url: NonEmptyString.url(),
+			institutional_rep_title: NonEmptyString,
+			institutional_rep_first_name: NonEmptyString,
+			institutional_rep_middle_name: NonEmptyString,
+			institutional_rep_last_name: NonEmptyString,
+			institutional_rep_suffix: NonEmptyString,
+			institutional_rep_primary_affiliation: NonEmptyString,
+			institutional_rep_email: NonEmptyString.email(),
+			institutional_rep_profile_url: NonEmptyString.url(),
+			institutional_rep_position_title: NonEmptyString,
+			institution_country: NonEmptyString,
+			institution_state: NonEmptyString,
+			institution_city: NonEmptyString,
+			institution_street_address: NonEmptyString,
+			institution_postal_code: NonEmptyString,
+			institution_building: NonEmptyString,
+			project_title: NonEmptyString,
+			project_website: NonEmptyString.url(),
+			project_abstract: NonEmptyString,
+			project_methodology: NonEmptyString,
+			project_summary: NonEmptyString,
+		})
+		.partial()
+		.strict()
+		.refine((updateObj) => Object.keys(updateObj).length !== 0, { message: 'Object cannot be empty' }),
 });
