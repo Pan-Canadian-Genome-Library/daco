@@ -64,7 +64,8 @@
 		"closeApp": "Close Application",
 		"back": "Back",
 		"submitApplication": "Submit Application",
-		"addCollab": "Add Collaborator"
+		"addCollab": "Add Collaborator",
+		"save": "Save Changes"
 	},
 	"label": {
 		"created": "Created",

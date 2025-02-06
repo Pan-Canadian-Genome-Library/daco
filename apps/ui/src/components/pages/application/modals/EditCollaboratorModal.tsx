@@ -161,7 +161,7 @@ const EditCollaboratorModal = memo(({ editState, setIsOpen }: EditCollaboratorMo
 							{translate('button.cancel')}
 						</Button>
 						<Button type="primary" onClick={handleSubmit(onSubmit)}>
-							{translate('button.edit')}
+							{translate('button.save')}
 						</Button>
 					</Flex>
 				</Form>
