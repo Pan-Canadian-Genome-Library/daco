@@ -80,7 +80,7 @@ export const aliasApplicationModel = (data: JoinedApplicationRecord): Applicatio
 				institutionBuilding: applicationContents.institution_building,
 				projectTitle: applicationContents.project_title,
 				projectWebsite: applicationContents.project_website,
-				projectAbstract: applicationContents.project_background,
+				projectBackground: applicationContents.project_background,
 				projectMethodology: applicationContents.project_methodology,
 				projectSummary: applicationContents.project_summary,
 				projectPublicationUrls: applicationContents.project_publication_urls,

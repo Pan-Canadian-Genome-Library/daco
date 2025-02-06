@@ -538,7 +538,7 @@ components:
         project_website:
           type: string
           description: URL of project website
-        project_abstract:
+        project_background:
           type: string
           description: Brief description of project
         project_methodology:
@@ -731,7 +731,7 @@ components:
         projectWebsite:
           type: string
           description: URL of project website
-        projectAbstract:
+        projectBackground:
           type: string
           description: Brief description of project
         projectMethodology:
