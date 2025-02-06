@@ -17,26 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Divider, Flex, Typography } from 'antd';
-import { PropsWithChildren } from 'react';
+import { Typography } from 'antd';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-interface SectionContentProps extends PropsWithChildren {
-	title?: string;
-	showDivider?: boolean;
-	text?: string;
+interface LabelWithExampleProps {
+	text: string;
+	examples?: string[];
 }
 
-const SectionContent = ({ title, showDivider = true, text, children }: SectionContentProps) => {
+const LabelWithExample = ({ text, examples }: LabelWithExampleProps) => {
 	return (
-		<Flex vertical>
-			<Title level={4}>{title}</Title>
-			{text ? <Text style={{ margin: 'auto 0 1.5rem 0' }}>{text}</Text> : null}
-			{children}
-			{showDivider && <Divider />}
-		</Flex>
+		<div style={{ margin: '0 0 0 .5rem' }}>
+			<Text style={{ fontSize: 'small', whiteSpace: 'pre-line' }}>
+				{text}
+				{examples ? (
+					<ul style={{ listStyleType: 'disc' }}>
+						{examples.map((example, key) => (
+							<li style={{ fontSize: 'small' }} key={example.toLowerCase() + key}>
+								{example}
+							</li>
+						))}
+					</ul>
+				) : null}
+			</Text>
+		</div>
 	);
 };
 
-export default SectionContent;
+export default LabelWithExample;

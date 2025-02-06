@@ -93,6 +93,7 @@
 		"institutional": "B. Institutional Representative",
 		"applicant": "A. Applicant Information",
 		"collaborators": "C. Collaborators",
+		"project": "D. Project Information",
 		"study": "E. Requested Study"
 	},
 	"errors": {
