@@ -60,7 +60,7 @@ export const applicationContents = pgTable('application_contents', {
 	// Project
 	project_title: text(),
 	project_website: text(),
-	project_abstract: text(),
+	project_background: text(),
 	project_methodology: text(),
 	project_summary: text(),
 	project_publication_urls: text().array(),
