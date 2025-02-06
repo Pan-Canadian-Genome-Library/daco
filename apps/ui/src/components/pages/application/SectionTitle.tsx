@@ -33,7 +33,7 @@ const SectionTitle = ({
 	title,
 	text = [],
 	showDivider = true,
-	textAbidesNewLines: abideNewLines = false,
+	textAbidesNewLines = false,
 	children,
 }: SectionTitleProps) => {
 	return (
@@ -42,7 +42,7 @@ const SectionTitle = ({
 			<Flex vertical gap={'middle'}>
 				{text.map((text, index) => {
 					return (
-						<Text style={abideNewLines ? { whiteSpace: 'pre-line' } : undefined} key={index}>
+						<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined} key={index}>
 							{text}
 						</Text>
 					);
