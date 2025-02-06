@@ -23,6 +23,7 @@ import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
@@ -30,7 +31,6 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
-import { useOutletContext } from 'react-router';
 
 const { Text } = Typography;
 const rule = createSchemaFieldRule(agreementsSchema);

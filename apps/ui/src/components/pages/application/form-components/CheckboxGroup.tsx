@@ -18,7 +18,6 @@
  */
 
 import { Checkbox, Form, Row, theme } from 'antd';
-
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { pcglColors } from '@/components/providers/ThemeProvider';
