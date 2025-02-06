@@ -24,9 +24,9 @@ import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { FilterKeys, isFilterKey } from '@/components/pages/manage/DashboardFilter';
 import ManagementDashboard, { FilterState } from '@/components/pages/manage/ManagementDashboard';
-import { ApplicationCountMetadata, ApplicationWithApplicantInformation } from '@/global/types';
+import { ApplicationCountMetadata } from '@/global/types';
 import { isValidPageNumber } from '@/global/utils';
-import { isApplicationStateValue } from '@pcgl-daco/data-model';
+import { ApplicationListSummary, isApplicationStateValue } from '@pcgl-daco/data-model';
 
 import { Flex, Layout, TablePaginationConfig } from 'antd';
 import { Key, SorterResult } from 'antd/es/table/interface';
@@ -98,7 +98,7 @@ const ManageApplicationsPage = () => {
 		sorter,
 	}: {
 		pagination: TablePaginationConfig;
-		sorter: SorterResult<ApplicationWithApplicantInformation>[] | SorterResult<ApplicationWithApplicantInformation>;
+		sorter: SorterResult<ApplicationListSummary>[] | SorterResult<ApplicationListSummary>;
 	}) => {
 		const page = pagination.current;
 		const sortingOpt: ApplicationListSortingOptions[] = [];

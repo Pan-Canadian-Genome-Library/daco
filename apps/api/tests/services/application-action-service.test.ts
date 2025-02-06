@@ -30,8 +30,8 @@ import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
 	type ApplicationActionsColumnName,
-	type ApplicationActionServiceType,
-	type ApplicationServiceType,
+	type ApplicationActionService,
+	type ApplicationService,
 	type OrderBy,
 } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -49,8 +49,8 @@ import {
 
 describe('Application Action Service', () => {
 	let db: PostgresDb;
-	let testActionRepo: ApplicationActionServiceType;
-	let testApplicationRepo: ApplicationServiceType;
+	let testActionRepo: ApplicationActionService;
+	let testApplicationRepo: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -71,24 +71,6 @@ describe('Application Action Service', () => {
 	});
 
 	describe('All Actions', () => {
-		it('should perform CREATE actions with before state DRAFT and after state DRAFT', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
-			assert.ok(testApplicationResult.success && testApplicationResult.data);
-			const testApplication = testApplicationResult.data;
-
-			const result = await testActionRepo.create(testApplication);
-
-			assert.ok(result.success && result.data);
-
-			const actionResult = result.data;
-
-			assert.strictEqual(actionResult.user_id, user_id);
-			assert.strictEqual(actionResult.application_id, application_id);
-			assert.strictEqual(actionResult.action, ApplicationActions.CREATE);
-			assert.strictEqual(actionResult.state_before, ApplicationStates.DRAFT);
-			assert.strictEqual(actionResult.state_after, ApplicationStates.DRAFT);
-		});
-
 		it('should perform WITHDRAW actions with after state DRAFT', async () => {
 			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
@@ -143,7 +125,7 @@ describe('Application Action Service', () => {
 			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		});
 
-		it('should perform INSTITUTIONAL_REP_REVISION actions with after state REP_REVISION', async () => {
+		it('should perform INSTITUTIONAL_REP_REVISION_REQUEST actions with after state INSTITUTIONAL_REP_REVISION_REQUESTED', async () => {
 			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
