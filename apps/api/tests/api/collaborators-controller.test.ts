@@ -101,7 +101,6 @@ describe('Collaborators Controller', () => {
 			const result = await createCollaborators({ application_id, user_id, collaborators });
 
 			assert.ok(result.success);
-
 			assert.strictEqual(result.data.length, collaborators.length);
 		});
 
@@ -118,6 +117,7 @@ describe('Collaborators Controller', () => {
 			const result = await createCollaborators({ application_id, user_id: 'drTest@oicr.on.ca', collaborators });
 
 			assert.ok(!result.success);
+			assert.strictEqual(result.message, 'Unauthorized, cannot create Collaborators');
 		});
 
 		it('should prevent creating a new collaborator with the wrong application id', async () => {
@@ -139,6 +139,7 @@ describe('Collaborators Controller', () => {
 			const result = await createCollaborators({ application_id: incorrectId, user_id, collaborators });
 
 			assert.ok(!result.success);
+			assert.strictEqual(result.message, `Error at getApplicationById with id: ${incorrectId}`);
 		});
 
 		it('should prevent creating a new collaborator with missing fields', async () => {
@@ -158,6 +159,7 @@ describe('Collaborators Controller', () => {
 			const result = await createCollaborators({ application_id, user_id, collaborators });
 
 			assert.ok(!result.success);
+			assert.strictEqual(result.message, 'Required Collaborator details are missing.');
 		});
 	});
 
