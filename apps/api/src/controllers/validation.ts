@@ -17,10 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationModel } from '@/service/types.js';
+import { ApplicationRecord } from '@/service/types.js';
 import { AsyncResult, success } from '@/utils/results.js';
 
 // TODO: Add Validation
-export const validateContent = async (application: ApplicationModel): AsyncResult<ApplicationModel> => {
+export const validateContent = async (application: ApplicationRecord): AsyncResult<ApplicationRecord> => {
 	return success(application);
 };

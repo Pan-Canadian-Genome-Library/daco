@@ -1,5 +1,5 @@
 {
-	"id": "c50ed753-4a7e-4262-9283-7aca3b32192b",
+	"id": "cd0b61f5-1f51-474a-b4c4-1e3293a54224",
 	"prevId": "613f24bc-7b49-4c17-9dde-39099f48ae9f",
 	"version": "7",
 	"dialect": "postgresql",
@@ -341,8 +341,8 @@
 					"primaryKey": false,
 					"notNull": false
 				},
-				"project_background": {
-					"name": "project_background",
+				"project_abstract": {
+					"name": "project_abstract",
 					"type": "text",
 					"primaryKey": false,
 					"notNull": false
@@ -759,7 +759,6 @@
 			"name": "application_action_types",
 			"schema": "public",
 			"values": [
-				"CREATE",
 				"WITHDRAW",
 				"CLOSE",
 				"SUBMIT_DRAFT",

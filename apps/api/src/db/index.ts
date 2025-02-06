@@ -18,10 +18,11 @@
  */
 
 import { setStatus, Status } from '@/app-health.js';
+import * as schema from '@/db/schemas/index.js';
 import logger from '@/logger.js';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
-export type PostgresDb = ReturnType<typeof drizzle>;
+export type PostgresDb = ReturnType<typeof drizzle<typeof schema>>;
 
 let pgDatabase: PostgresDb;
 
@@ -32,7 +33,7 @@ export const getDbInstance = (): PostgresDb => {
 
 export const connectToDb = (connectionString: string): PostgresDb => {
 	try {
-		const db = drizzle(connectionString);
+		const db = drizzle<typeof schema>(connectionString);
 		pgDatabase = db;
 
 		setStatus('db', { status: Status.OK });
