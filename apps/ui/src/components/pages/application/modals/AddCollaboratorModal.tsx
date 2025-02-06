@@ -103,7 +103,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 								/>
 							</Col>
 						</Row>
-						<Row gutter={26} align={'bottom'}>
+						<Row gutter={26} align={'middle'}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.primaryEmail')}
@@ -117,6 +117,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
+									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									label={translate('form.positionTitle')}
 									name="collabPositionTitle"
 									control={control}
