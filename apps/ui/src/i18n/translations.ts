@@ -72,6 +72,14 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 				return { message: i18n.t('validPostalCode') };
 			}
 			break;
+		case z.ZodIssueCode.custom:
+			if (error.params?.violation) {
+				return { message: i18n.t(error.params?.violation) };
+			} else {
+				return { message: i18n.t('defaultViolationText') };
+			}
+
+			break;
 	}
 	return { message: ctx.defaultError };
 };

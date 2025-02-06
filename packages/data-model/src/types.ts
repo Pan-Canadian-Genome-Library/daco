@@ -47,10 +47,7 @@ export enum ApplicationReviewOutcomes {
 }
 
 export const ApplicationActions = {
-	CREATE: 'CREATE',
-	WITHDRAW: 'WITHDRAW',
 	CLOSE: 'CLOSE',
-	SUBMIT_DRAFT: 'SUBMIT_DRAFT',
 	INSTITUTIONAL_REP_REVISION_REQUEST: 'INSTITUTIONAL_REP_REVISION_REQUEST',
 	INSTITUTIONAL_REP_SUBMIT: 'INSTITUTIONAL_REP_SUBMIT',
 	INSTITUTIONAL_REP_APPROVED: 'INSTITUTIONAL_REP_APPROVED',
@@ -59,6 +56,8 @@ export const ApplicationActions = {
 	DAC_REVIEW_REJECTED: 'DAC_REVIEW_REJECTED',
 	DAC_REVIEW_REVISION_REQUEST: 'DAC_REVIEW_REVISION_REQUEST',
 	REVOKE: 'REVOKE',
+	SUBMIT_DRAFT: 'SUBMIT_DRAFT',
+	WITHDRAW: 'WITHDRAW',
 } as const;
 
 export type ApplicationActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
@@ -191,6 +190,34 @@ export type ApplicationContentsResponse = {
 	InstitutionalRepDTO &
 	ProjectDTO &
 	RequestedStudiesDTO;
+
+export interface ApplicationResponseData extends ApplicationDTO {
+	contents: ApplicationContentsResponse | null;
+}
+
+export interface PagingMetadata {
+	totalRecords: number;
+	page: number;
+	pageSize: number;
+}
+
+export interface ApplicantSummary {
+	createdAt: Date;
+	firstName: string | null;
+	lastName: string | null;
+	email: string | null;
+	country: string | null;
+	institution: string | null;
+}
+
+export interface ApplicationListSummary extends ApplicationDTO {
+	applicant: ApplicantSummary | null;
+}
+
+export interface ApplicationListResponse {
+	applications: ApplicationListSummary[];
+	pagingMetadata: PagingMetadata;
+}
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved

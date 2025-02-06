@@ -25,9 +25,8 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applications } from '@/db/schemas/applications.js';
-import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationActionServiceType, type ApplicationServiceType } from '@/service/types.js';
+import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -42,8 +41,7 @@ import {
 
 describe('Application Service', () => {
 	let db: PostgresDb;
-	let testApplicationService: ApplicationServiceType;
-	let testActionRepo: ApplicationActionServiceType;
+	let testApplicationService: ApplicationService;
 	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
@@ -60,7 +58,6 @@ describe('Application Service', () => {
 		await addInitialApplications(db);
 
 		testApplicationService = applicationSvc(db);
-		testActionRepo = applicationActionSvc(db);
 	});
 
 	describe('Create Applications', () => {
@@ -73,23 +70,6 @@ describe('Application Service', () => {
 
 			assert.strictEqual(application?.user_id, user_id);
 			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
-		});
-
-		it('should add a CREATE Action to the DB after calling createApplication', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success && applicationRecordsResult.data);
-
-			const records = applicationRecordsResult.data.applications;
-			const application = records[records.length - 1];
-
-			assert.ok(application);
-
-			const { id } = application;
-			const actionsResult = await testActionRepo.listActions({ application_id: id });
-
-			assert.ok(actionsResult.success && actionsResult.data);
-			assert.ok(actionsResult.data.length > 0);
 		});
 	});
 
@@ -152,9 +132,9 @@ describe('Application Service', () => {
 			assert.ok(applicationRecords[1]);
 			assert.ok(applicationRecords[2]);
 
-			assert.strictEqual(applicationRecords[0].user_id, user_id);
-			assert.strictEqual(applicationRecords[1].user_id, user_id);
-			assert.strictEqual(applicationRecords[2].user_id, user_id);
+			assert.strictEqual(applicationRecords[0].userId, user_id);
+			assert.strictEqual(applicationRecords[1].userId, user_id);
+			assert.strictEqual(applicationRecords[2].userId, user_id);
 		});
 
 		it('should filter by state', async () => {

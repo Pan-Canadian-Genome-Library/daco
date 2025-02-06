@@ -17,35 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { setStatus, Status } from '@/app-health.js';
-import * as schema from '@/db/schemas/index.js';
-import logger from '@/logger.js';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { ApplicationRecord } from '@/service/types.js';
+import { AsyncResult, success } from '@/utils/results.js';
 
-export type PostgresDb = ReturnType<typeof drizzle<typeof schema>>;
-
-let pgDatabase: PostgresDb;
-
-export const getDbInstance = (): PostgresDb => {
-	if (!pgDatabase) throw new Error('Not connected to Postgres database');
-	return pgDatabase;
-};
-
-export const connectToDb = (connectionString: string): PostgresDb => {
-	try {
-		const db = drizzle<typeof schema>(connectionString);
-		pgDatabase = db;
-
-		setStatus('db', { status: Status.OK });
-		return db;
-	} catch (err) {
-		logger.error('Error on Database startup: \n', err);
-
-		if (err instanceof Error) {
-			setStatus('db', { status: Status.ERROR, info: { err: err.message } });
-		} else {
-			setStatus('db', { status: Status.ERROR, info: { err: String(err) } });
-		}
-		throw err;
-	}
+// TODO: Add Validation
+export const validateContent = async (application: ApplicationRecord): AsyncResult<ApplicationRecord> => {
+	return success(application);
 };

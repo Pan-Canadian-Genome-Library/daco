@@ -24,8 +24,8 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
-import { createApplication } from '@/api/application-api.js';
-import { createCollaborators } from '@/api/collaboratorsController.js';
+import { createApplication } from '@/controllers/applicationController.js';
+import { createCollaborators } from '@/controllers/collaboratorsController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 
 import {

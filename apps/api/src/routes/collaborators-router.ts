@@ -20,8 +20,8 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createCollaborators } from '@/api/collaboratorsController.js';
-import { CollaboratorRequest } from '@pcgl-daco/data-model';
+import { createCollaborators } from '@/controllers/collaboratorsController.js';
+import { type CollaboratorRequest } from '@pcgl-daco/data-model';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();

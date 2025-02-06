@@ -20,7 +20,7 @@
 import { getDbInstance } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
-import { type ApplicationServiceType, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
+import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
@@ -50,7 +50,7 @@ export const createCollaborators = async ({
 }) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
-	const applicationRepo: ApplicationServiceType = applicationSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
 
 	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
 

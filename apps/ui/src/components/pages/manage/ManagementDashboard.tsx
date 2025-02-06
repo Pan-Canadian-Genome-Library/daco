@@ -19,10 +19,9 @@
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
-import DashboardFilter, { FilterKeys } from '@/components/pages/manage/DashboardFilter';
+import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import { pcglTableTheme } from '@/components/providers/ThemeProvider';
-import { ApplicationWithApplicantInformation } from '@/global/types';
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
 import { FilterValue, SorterResult } from 'antd/es/table/interface';
@@ -50,11 +49,11 @@ interface ManagementDashboardProps {
 	}: {
 		pagination: TablePaginationConfig;
 		filters: Record<string, FilterValue | null>;
-		sorter: SorterResult<ApplicationWithApplicantInformation>[] | SorterResult<ApplicationWithApplicantInformation>;
+		sorter: SorterResult<ApplicationListSummary>[] | SorterResult<ApplicationListSummary>;
 	}) => void;
 	filterCounts: FilterState[];
 	filters: FilterKeys[];
-	data: ApplicationWithApplicantInformation[];
+	data: ApplicationListSummary[];
 	loading: boolean;
 	pagination: TablePaginationConfig;
 }
@@ -72,33 +71,32 @@ const tableColumnConfiguration = [
 	},
 	{
 		title: 'Institution',
-		dataIndex: ['applicantInformation', 'institution'],
+		dataIndex: ['applicant', 'institution'],
 		key: 'institution',
-		render: (value: string, record: ApplicationWithApplicantInformation) =>
-			record.applicantInformation.institution ? record.applicantInformation.institution : '-',
+		render: (value: string, record: ApplicationListSummary) =>
+			record.applicant?.institution ? record.applicant.institution : '-',
 	},
 	{
 		title: 'Country',
-		dataIndex: ['applicantInformation', 'country'],
+		dataIndex: ['applicant', 'country'],
 		key: 'country',
-		render: (value: string, record: ApplicationWithApplicantInformation) =>
-			record.applicantInformation.country ? record.applicantInformation.country : '-',
+		render: (value: string, record: ApplicationListSummary) =>
+			record.applicant?.country ? record.applicant.country : '-',
 	},
 	{
 		title: 'Applicant',
-		dataIndex: ['applicantInformation', 'firstName'],
+		dataIndex: ['applicant', 'firstName'],
 		key: 'applicant',
-		render: (value: string, record: ApplicationWithApplicantInformation) =>
-			record.applicantInformation.firstName && record.applicantInformation.lastName
-				? `${record.applicantInformation.firstName} ${record.applicantInformation.lastName}`
+		render: (value: string, record: ApplicationListSummary) =>
+			record.applicant?.firstName && record.applicant.lastName
+				? `${record.applicant.firstName} ${record.applicant.lastName}`
 				: '-',
 	},
 	{
 		title: 'Email',
-		dataIndex: ['applicantInformation', 'email'],
+		dataIndex: ['applicant', 'email'],
 		key: 'email',
-		render: (value: string, record: ApplicationWithApplicantInformation) =>
-			record.applicantInformation.email ? record.applicantInformation.email : '-',
+		render: (value: string, record: ApplicationListSummary) => (record.applicant?.email ? record.applicant.email : '-'),
 	},
 	{
 		title: 'Updated',
