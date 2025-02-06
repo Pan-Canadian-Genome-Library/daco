@@ -20,7 +20,7 @@
 import { getDbInstance } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type AddActionMethods, type ApplicationRecord, type PostgresTransaction } from '@/service/types.js';
+import { type AddActionMethods, type ApplicationRecord } from '@/service/types.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
@@ -88,8 +88,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		const applicationActionRepo = applicationActionSvc(db);
 
 		return await db.transaction(async (tx) => {
-			// TODO: Solve transaction schema type mismatch
-			const actionResult = await applicationActionRepo[method](this._application, tx as PostgresTransaction);
+			const actionResult = await applicationActionRepo[method](this._application, tx);
 			if (!actionResult.success) return actionResult;
 
 			const { state_after } = actionResult.data;
@@ -100,8 +99,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			const applicationResult = await applicationRepo.findOneAndUpdate({
 				id,
 				update,
-				// TODO: Solve transaction schema type mismatch
-				transaction: tx as PostgresTransaction,
+				transaction: tx,
 			});
 
 			if (applicationResult.success && applicationResult.data) {
