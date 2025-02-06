@@ -76,6 +76,8 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			} else {
 				return { message: i18n.t('defaultViolationText') };
 			}
+		case z.ZodIssueCode.invalid_enum_value:
+			return { message: i18n.t('recievedInvalidEnum') };
 	}
 	return { message: ctx.defaultError };
 };
