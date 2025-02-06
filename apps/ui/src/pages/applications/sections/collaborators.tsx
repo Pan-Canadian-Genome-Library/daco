@@ -25,7 +25,7 @@ import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
-import DeleteCollaboratorModal from '@/components/pages/application/modals/deleteCollaboratorModal';
+import DeleteCollaboratorModal from '@/components/pages/application/modals/DeleteCollaboratorModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
