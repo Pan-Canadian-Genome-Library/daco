@@ -39,6 +39,7 @@ export const pcglColors = {
 	white: '#FFFFFF',
 	black: '#000000',
 	grey: '#D9D9D9',
+	lightGrey: '#FAFAFA',
 };
 
 // General Theme Configurations
@@ -66,6 +67,9 @@ const pcglTheme: ThemeConfig = {
 		colorIcon: pcglColors.primary,
 	},
 	components: {
+		Checkbox: {
+			colorBgContainer: '#fff',
+		},
 		Table: {
 			colorBgContainer: '#fff',
 			headerBg: '#fafafa',

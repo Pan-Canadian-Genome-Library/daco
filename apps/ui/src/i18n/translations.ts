@@ -60,6 +60,8 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 		case z.ZodIssueCode.invalid_type:
 			if (error.expected === 'string') {
 				return { message: i18n.t('requiredField') };
+			} else if (error.expected === 'array') {
+				return { message: i18n.t('requiredNumberOfCheckboxs') };
 			}
 			break;
 		case z.ZodIssueCode.invalid_string:
@@ -70,6 +72,11 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			} else if (error.validation === 'regex') {
 				// right now this only does the postal code, when we expand 'regex' outside of postal code, we need to adjust here
 				return { message: i18n.t('validPostalCode') };
+			}
+			break;
+		case z.ZodIssueCode.too_small:
+			if (error.type === 'array') {
+				return { message: i18n.t('checkboxesNotFilledOut') };
 			}
 			break;
 		case z.ZodIssueCode.custom:

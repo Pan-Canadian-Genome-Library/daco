@@ -93,7 +93,8 @@
 		"institutional": "B. Institutional Representative",
 		"applicant": "A. Applicant Information",
 		"collaborators": "C. Collaborators",
-		"project": "D. Project Information"
+		"project": "D. Project Information",
+		"agreement": "F. Data Access Agreement"
 	},
 	"errors": {
 		"http": {
