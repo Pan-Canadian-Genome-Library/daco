@@ -138,10 +138,16 @@
 		},
 		"section3": {
 			"title": "Relevant Publications",
-			"description": "Please provide at least three links to relevant publications, of which the applicant is an author or a co-author. These should be links (URLs) to publication websites such as pubmed.gov, biorxiv.org, or medrxiv.org.",
+			"description": "Please provide at least three links to relevant publications, of which the applicant is an author or a co-author. These should be links (URLs) to publication websites such as pubmed.gov, biorxiv.org, or medrxiv.org.",
 			"form": {
 				"urlPage": "URL Page"
 			}
 		}
+	},
+	"ethics-section": {
+		"title": "Ethics",
+		"description1": "PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.",
+		"description2": "Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual research projects and bear no responsibility for the applicant's failure to comply with local/national ethical requirements.",
+		"approval": "Ethical Approval"
 	}
 }

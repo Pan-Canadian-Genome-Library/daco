@@ -17,60 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
-
-import SectionWrapper from '@/components/layouts/SectionWrapper';
-import SectionFooter from '@/components/pages/application/SectionFooter';
-import SectionTitle from '@/components/pages/application/SectionTitle';
-import TextList from '@/components/TextList';
-import { ApplicationOutletContext } from '@/global/types';
 import { useOutletContext } from 'react-router';
 
-const { Text } = Typography;
+import SectionWrapper from '@/components/layouts/SectionWrapper';
+import SectionContent from '@/components/pages/application/SectionContent';
+import SectionFooter from '@/components/pages/application/SectionFooter';
+import SectionTitle from '@/components/pages/application/SectionTitle';
+import { ApplicationOutletContext } from '@/global/types';
 
-const Introduction = () => {
+const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-
-	const qualifyData = [
-		translate('intro-section.qualifyPoint1'),
-		translate('intro-section.qualifyPoint2'),
-		translate('intro-section.qualifyPoint3'),
-		translate('intro-section.qualifyPoint4'),
-		translate('intro-section.qualifyPoint5'),
-	];
-
-	const accessData = [
-		translate('intro-section.accessPoint1'),
-		translate('intro-section.accessPoint2'),
-		translate('intro-section.accessPoint3'),
-	];
 
 	return (
 		<SectionWrapper>
 			<>
-				<SectionTitle title={translate('intro-section.title')} showDivider={false}>
-					<Flex vertical>
-						<Text>{translate('intro-section.qualifyAccess')}</Text>
-						<TextList data={qualifyData} />
-					</Flex>
-					<Flex vertical>
-						<Text>{translate('intro-section.receiveAccess')}</Text>
-						<TextList data={accessData} isNumbered />
-					</Flex>
-					<Flex vertical>
-						<Text>{translate('intro-section.description1')}</Text>
-					</Flex>
-					<Flex vertical>
-						<Text>{translate('intro-section.description2')}</Text>
-					</Flex>
-				</SectionTitle>
-
-				<SectionFooter currentRoute="intro" isEditMode={isEditMode} />
+				<SectionTitle
+					title={translate('ethics-section.title')}
+					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
+					showDivider={true}
+				/>
+				<SectionFooter currentRoute="ethics" isEditMode={isEditMode} />
+				<SectionContent></SectionContent>
 			</>
 		</SectionWrapper>
 	);
 };
 
-export default Introduction;
+export default Ethics;
