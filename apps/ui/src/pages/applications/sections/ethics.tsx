@@ -17,18 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { EthicsFileTypes, ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
+import { Button, Form } from 'antd';
+import { createSchemaFieldRule } from 'antd-zod';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 
+const rule = createSchemaFieldRule(ethicsSchema);
+
 const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { control } = useForm<EthicsSchemaType>({});
 
 	return (
 		<SectionWrapper>
@@ -38,8 +46,31 @@ const Ethics = () => {
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}
 				/>
+				<SectionContent title="Ethical Approval">
+					<Form layout="vertical">
+						<BlockRadioBox
+							label={'Please choose one of the following options'}
+							name="ethicsApproval"
+							control={control}
+							rule={rule}
+							required
+							options={[
+								{
+									value: EthicsFileTypes.EXEMPTION,
+									label:
+										'You represent and warrant that your country/region does not require your research project to undergo ethics review.',
+								},
+								{
+									value: EthicsFileTypes.ETHICS_LETTER,
+									label:
+										'Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.',
+								},
+							]}
+						/>
+						<Button htmlType="submit" />
+					</Form>
+				</SectionContent>
 				<SectionFooter currentRoute="ethics" isEditMode={isEditMode} />
-				<SectionContent></SectionContent>
 			</>
 		</SectionWrapper>
 	);
