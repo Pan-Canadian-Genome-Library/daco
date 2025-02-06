@@ -39,16 +39,32 @@ const {
 } = ApplicationStates;
 
 export enum ApplicationStateEvents {
-	submit = 'submit',
+	submit = 'submit', // submit draft
+	submit_rep_revisions = 'submit_rep_revisions', // submit draft
+	submit_dac_revisions = 'submit_dac_revisions', // submit draft
 	close = 'close',
 	edit = 'edit',
-	revision_request = 'revision_request',
-	approve = 'approve',
-	reject = 'reject',
+	rep_approve_review = 'rep_approve_review',
+	rep_revision_request = 'rep_revision_request',
+	dac_approve_review = 'dac_approve_review',
+	dac_reject = 'dac_reject',
+	dac_revision_request = 'dac_revision_request',
 	revoked = 'revoked',
 }
 
-const { submit, close, edit, revision_request, approve, reject, revoked } = ApplicationStateEvents;
+const {
+	submit,
+	submit_rep_revisions,
+	submit_dac_revisions,
+	close,
+	edit,
+	rep_revision_request,
+	rep_approve_review,
+	dac_approve_review,
+	dac_reject,
+	dac_revision_request,
+	revoked,
+} = ApplicationStateEvents;
 
 // TODO: Replace with individual methods
 type ApplicationTransitionCallback = () => AsyncResult<string>;
@@ -64,8 +80,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	private _application: ApplicationRecord;
 	public readonly initState: ApplicationStateValues;
 
-	_canPerformAction(action: ApplicationStateEvents, targetState: ApplicationStateValues) {
-		if (this.can(action) && this._application.state === targetState) {
+	_canPerformAction(action: ApplicationStateEvents) {
+		if (this.can(action)) {
 			return success(true);
 		} else {
 			return failure(`Cannot perform action ${action} on application with state ${this.getState()}`);
@@ -114,7 +130,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// Submit
 	// TODO: Add Validation + Edit Content service methods
 	async submitDraft() {
-		const transitionResult = this._canPerformAction(submit, ApplicationStates.DRAFT);
+		const transitionResult = this._canPerformAction(submit);
 		if (transitionResult.success) {
 			const validationResult = await validateContent(this._application);
 			if (validationResult.success) {
@@ -128,18 +144,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async submitRepRevision() {
-		const transitionResult = this._canPerformAction(submit, ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED);
+		const transitionResult = this._canPerformAction(submit_rep_revisions);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(submit, 'repSubmit');
+			return await this._dispatchAndUpdateAction(submit_rep_revisions, 'repSubmit');
 		} else {
 			return transitionResult;
 		}
 	}
 
 	async submitDacRevision() {
-		const transitionResult = this._canPerformAction(submit, ApplicationStates.DAC_REVISIONS_REQUESTED);
+		const transitionResult = this._canPerformAction(submit_dac_revisions);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(submit, 'dacSubmit');
+			return await this._dispatchAndUpdateAction(submit_dac_revisions, 'dacSubmit');
 		} else {
 			return transitionResult;
 		}
@@ -152,7 +168,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// Edit
 	// TODO: Add Validation + Edit Content service methods
 	async editDraft() {
-		const transitionResult = this._canPerformAction(edit, ApplicationStates.DRAFT);
+		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
 			const validationResult = await validateContent(this._application);
 			return validationResult;
@@ -163,7 +179,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// TODO: Add Validation + Edit Content service methods
 	async editRepReview() {
-		const transitionResult = this._canPerformAction(edit, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
 			const validationResult = await validateContent(this._application);
 			return validationResult;
@@ -174,7 +190,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// TODO: Add Validation + Edit Content service methods
 	async editDacReview() {
-		const transitionResult = this._canPerformAction(edit, ApplicationStates.DAC_REVIEW);
+		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
 			const validationResult = await validateContent(this._application);
 			return validationResult;
@@ -189,18 +205,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Revise
 	async reviseRepReview() {
-		const transitionResult = this._canPerformAction(revision_request, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+		const transitionResult = this._canPerformAction(rep_revision_request);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(revision_request, 'repRevision');
+			return await this._dispatchAndUpdateAction(rep_revision_request, 'repRevision');
 		} else {
 			return transitionResult;
 		}
 	}
 
 	async reviseDacReview() {
-		const transitionResult = this._canPerformAction(revision_request, ApplicationStates.DAC_REVIEW);
+		const transitionResult = this._canPerformAction(dac_revision_request);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(revision_request, 'dacRevision');
+			return await this._dispatchAndUpdateAction(dac_revision_request, 'dacRevision');
 		} else {
 			return transitionResult;
 		}
@@ -234,18 +250,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Approve
 	async approveRepReview() {
-		const transitionResult = this._canPerformAction(approve, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+		const transitionResult = this._canPerformAction(rep_approve_review);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(approve, 'repApproved');
+			return await this._dispatchAndUpdateAction(rep_approve_review, 'repApproved');
 		} else {
 			return transitionResult;
 		}
 	}
 
 	async approveDacReview() {
-		const transitionResult = this._canPerformAction(approve, ApplicationStates.DAC_REVIEW);
+		const transitionResult = this._canPerformAction(dac_approve_review);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(approve, 'dacApproved');
+			return await this._dispatchAndUpdateAction(dac_approve_review, 'dacApproved');
 		} else {
 			return transitionResult;
 		}
@@ -257,9 +273,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Reject
 	async rejectDacReview() {
-		if (this.can(reject)) {
-			await this.dispatch(reject);
-			return success(reject);
+		if (this.can(dac_reject)) {
+			await this.dispatch(dac_reject);
+			return success(dac_reject);
 		} else {
 			return failure(`Cannot reject application with state ${this.getState()}`);
 		}
@@ -283,7 +299,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		return success('post dispatch on revoked');
 	}
 
-	// Transitions
+	/* *********** *
+	 * Transitions *
+	 * *********** */
 	// Draft
 	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
 	private draftEditTransition = transition(DRAFT, edit, DRAFT, this._onEdit);
@@ -294,40 +312,50 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	private repReviewEditTransition = transition(INSTITUTIONAL_REP_REVIEW, edit, INSTITUTIONAL_REP_REVIEW, this._onEdit);
 	private repReviewRevisionTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
-		revision_request,
+		rep_revision_request,
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
 		this._onRevision,
 	);
-	private repReviewApproveTransition = transition(INSTITUTIONAL_REP_REVIEW, approve, DAC_REVIEW, this._onApproved);
+	private repReviewApproveTransition = transition(
+		INSTITUTIONAL_REP_REVIEW,
+		rep_approve_review,
+		DAC_REVIEW,
+		this._onApproved,
+	);
 
 	// Rep Revision
 	private repRevisionSubmitTransition = transition(
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
-		submit,
+		submit_rep_revisions,
 		INSTITUTIONAL_REP_REVIEW,
 		this._onSubmit,
 	);
 
 	// DAC Review
-	private dacReviewApproveTransition = transition(DAC_REVIEW, approve, APPROVED, this._onApproved);
+	private dacReviewApproveTransition = transition(DAC_REVIEW, dac_approve_review, APPROVED, this._onApproved);
 	private dacReviewCloseTransition = transition(DAC_REVIEW, close, CLOSED, this._onClose);
 	private dacReviewEditTransition = transition(DAC_REVIEW, edit, DAC_REVIEW, this._onEdit);
 	private dacReviewRevisionTransition = transition(
 		DAC_REVIEW,
-		revision_request,
+		dac_revision_request,
 		DAC_REVISIONS_REQUESTED,
 		this._onRevision,
 	);
-	private dacReviewRejectTransition = transition(DAC_REVIEW, reject, REJECTED, this._onReject);
+	private dacReviewRejectTransition = transition(DAC_REVIEW, dac_reject, REJECTED, this._onReject);
 
 	// DAC Revision
-	private dacRevisionSubmitTransition = transition(DAC_REVISIONS_REQUESTED, submit, DAC_REVIEW, this._onSubmit);
+	private dacRevisionSubmitTransition = transition(
+		DAC_REVISIONS_REQUESTED,
+		submit_dac_revisions,
+		DAC_REVIEW,
+		this._onSubmit,
+	);
 
 	// Revoke Approval
 	private approvalRevokedTransition = transition(APPROVED, revoked, REVOKED, this._onRevoked);
 
 	// All Transitions
-	private applicationTransitions: ApplicationTransitions[] = [
+	private applicationTransitions = [
 		this.approvalRevokedTransition,
 		this.dacReviewApproveTransition,
 		this.dacReviewCloseTransition,
@@ -343,7 +371,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.repReviewRevisionTransition,
 		this.repReviewApproveTransition,
 		this.repRevisionSubmitTransition,
-	];
+	] as const satisfies ApplicationTransitions[];
 
 	constructor(application: ApplicationRecord) {
 		const { id, state } = application;
