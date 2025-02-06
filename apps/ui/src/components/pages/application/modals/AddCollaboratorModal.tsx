@@ -51,7 +51,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 			okText={translate('button.addCollab')}
 			cancelText={translate('button.cancel')}
 			width={'100%'}
-			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			style={{ top: '20%', maxWidth: '1000px', paddingInline: 10 }}
 			open={isOpen}
 			onCancel={() => setIsOpen(false)}
 			footer={[]}
@@ -103,10 +103,11 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 								/>
 							</Col>
 						</Row>
-						<Row gutter={26}>
+						<Row gutter={26} align={'bottom'}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.primaryEmail')}
+									subLabel={translate('form.primaryEmailLabel')}
 									name="collabPrimaryEmail"
 									control={control}
 									rule={rule}
