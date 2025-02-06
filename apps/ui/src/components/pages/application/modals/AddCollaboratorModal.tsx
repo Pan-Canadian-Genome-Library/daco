@@ -64,7 +64,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 						<Row gutter={26}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									label={translate('collab-section.form.firstName')}
+									label={translate('form.firstName')}
 									name="collabFirstName"
 									control={control}
 									rule={rule}
@@ -74,7 +74,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									label={translate('collab-section.form.middleName')}
+									label={translate('form.middleName')}
 									name="collabMiddleName"
 									control={control}
 									rule={rule}
@@ -85,7 +85,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 						<Row gutter={26}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									label={translate('collab-section.form.lastName')}
+									label={translate('form.lastName')}
 									name="collabLastName"
 									control={control}
 									rule={rule}
@@ -95,7 +95,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									label={translate('collab-section.form.suffix')}
+									label={translate('form.suffix')}
 									name="collabSuffix"
 									control={control}
 									rule={rule}
@@ -106,7 +106,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 						<Row gutter={26}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									label={translate('collab-section.form.primaryEmail')}
+									label={translate('form.primaryEmail')}
 									name="collabPrimaryEmail"
 									control={control}
 									rule={rule}
@@ -116,7 +116,7 @@ const AddCollaboratorModal = ({ isOpen, setIsOpen }: AddCollaboratorModalProps) 
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									label={translate('collab-section.form.positionTitle')}
+									label={translate('form.positionTitle')}
 									name="collabPositionTitle"
 									control={control}
 									rule={rule}

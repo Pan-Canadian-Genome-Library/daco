@@ -19,53 +19,13 @@
 		"description1": "Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to apply for federal research grants, etc.).",
 		"description2": "Please include a valid institutional email address that will be used to log in to PCGL and will be the email address associated with PCGL Controlled Data access.",
 		"section1": "Principal Investigator Information",
-		"section2": "Institution/Company Mailing Address",
-		"form": {
-			"title": "Title:",
-			"firstName": "First Name:",
-			"middleName": "Middle Name:",
-			"lastName": "Last Name:",
-			"suffix": "Suffix:",
-			"primaryAffiliation": "Primary Affiliation:",
-			"primaryAffiliationSubLabel": "The legal entity responsible for this application.",
-			"primaryEmail": "Institutional Email:",
-			"primaryEmailLabel": "Must be the institutional email address of the Principal Investigator.",
-			"researcherProfile": "Researcher Profile:",
-			"researcherProfileLabel": "Please provide a link to your profile on your institution/company website.",
-			"positionTitle": "Position Title:",
-			"country": "Country:",
-			"streetAddress": "Street Address:",
-			"building": "Building:",
-			"state": "Province:",
-			"city": "City:",
-			"postalCode": "Postal/Zip Code:"
-		}
+		"section2": "Institution/Company Mailing Address"
 	},
 	"institutional-section": {
 		"title": "Institutional Representative",
 		"description1": "An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
 		"section1": "Institutional Representative",
-		"section2": "Institution/Company Mailing Address",
-		"form": {
-			"title": "Title:",
-			"firstName": "First Name:",
-			"middleName": "Middle Name:",
-			"lastName": "Last Name:",
-			"suffix": "Suffix:",
-			"primaryAffiliation": "Primary Affiliation:",
-			"primaryAffiliationSubLabel": "The legal entity responsible for this application.",
-			"primaryEmail": "Institutional Email:",
-			"primaryEmailLabel": "Must be the institutional email address of the Principal Investigator.",
-			"researcherProfile": "Researcher Profile:",
-			"researcherProfileLabel": "Please provide a link to your profile on your institution/company website.",
-			"positionTitle": "Position Title:",
-			"country": "Country:",
-			"streetAddress": "Street Address:",
-			"building": "Building:",
-			"state": "Province:",
-			"city": "City:",
-			"postalCode": "Postal/Zip Code:"
-		}
+		"section2": "Institution/Company Mailing Address"
 	},
 	"collab-section": {
 		"title": "Collaborators",
@@ -73,13 +33,27 @@
 		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data.",
 		"addModalTitle": "Add A Collaborator",
 		"addModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL and will be the email address associated with PCGL Controlled Data access.",
-		"form": {
-			"firstName": "First Name:",
-			"middleName": "Middle Name:",
-			"lastName": "Last Name:",
-			"suffix": "Suffix:",
-			"primaryEmail": "Institutional Email:",
-			"positionTitle": "Position Title:"
-		}
+		"editModalTitle": "Edit Collaborator",
+		"editModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL and will be the email address associated with PCGL Controlled Data access."
+	},
+	"form": {
+		"firstName": "First Name:",
+		"middleName": "Middle Name:",
+		"lastName": "Last Name:",
+		"suffix": "Suffix:",
+		"primaryEmail": "Institutional Email:",
+		"primaryEmailLabel": "Must be the institutional email address of the Principal Investigator.",
+		"positionTitle": "Position Title:",
+		"title": "Title:",
+		"primaryAffiliation": "Primary Affiliation:",
+		"primaryAffiliationSubLabel": "The legal entity responsible for this application.",
+		"researcherProfile": "Researcher Profile:",
+		"researcherProfileLabel": "Please provide a link to your profile on your institution/company website.",
+		"country": "Country:",
+		"streetAddress": "Street Address:",
+		"building": "Building:",
+		"state": "Province:",
+		"city": "City:",
+		"postalCode": "Postal/Zip Code:"
 	}
 }
