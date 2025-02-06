@@ -22,7 +22,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { type CollaboratorsSchemaType, collaboratorsSchema } from '@pcgl-daco/validation';
 import { Button, Col, Flex, Form, Modal, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { useForm } from 'react-hook-form';
+import { memo, useEffect } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -38,22 +39,39 @@ type EditCollaboratorModalProps = {
 
 const rule = createSchemaFieldRule(collaboratorsSchema);
 
-const EditCollaboratorModal = ({ editState, setIsOpen }: EditCollaboratorModalProps) => {
+const EditCollaboratorModal = memo(({ editState, setIsOpen }: EditCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { control } = useForm<CollaboratorsSchemaType>({
+	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
 		defaultValues: {
-			collabFirstName: editState.rowData?.firstName,
-			collabMiddleName: editState.rowData?.lastName,
-			collabLastName: editState.rowData?.lastName,
-			collabPrimaryEmail: editState.rowData?.institutionalEmail,
-			collabPositionTitle: editState.rowData?.title,
+			collabFirstName: editState.rowData?.firstName || '',
+			collabMiddleName: editState.rowData?.lastName || '',
+			collabLastName: editState.rowData?.lastName || '',
+			collabPrimaryEmail: editState.rowData?.institutionalEmail || '',
+			collabPositionTitle: editState.rowData?.title || '',
 		},
 		resolver: zodResolver(collaboratorsSchema),
 	});
 
-	console.log(editState);
+	/**
+	 * This is only needed on the modal component specifically because we are utilizing ONE modal component and updating its values via useState (editState).
+	 * Since useState is async, need a useEffect to properly update the fields without delay
+	 */
+	useEffect(() => {
+		reset({
+			collabFirstName: editState.rowData?.firstName || '',
+			collabMiddleName: editState.rowData?.lastName || '',
+			collabLastName: editState.rowData?.lastName || '',
+			collabPrimaryEmail: editState.rowData?.institutionalEmail || '',
+			collabPositionTitle: editState.rowData?.title || '',
+			collabSuffix: editState.rowData?.suffix || '',
+		});
+	}, [editState.rowData, reset]);
+
+	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
+		console.log(data);
+	};
 
 	return (
 		<Modal
@@ -113,10 +131,11 @@ const EditCollaboratorModal = ({ editState, setIsOpen }: EditCollaboratorModalPr
 								/>
 							</Col>
 						</Row>
-						<Row gutter={26}>
+						<Row gutter={26} align={'middle'}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.primaryEmail')}
+									subLabel={translate('form.primaryEmailLabel')}
 									name="collabPrimaryEmail"
 									control={control}
 									rule={rule}
@@ -126,6 +145,7 @@ const EditCollaboratorModal = ({ editState, setIsOpen }: EditCollaboratorModalPr
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
+									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									label={translate('form.positionTitle')}
 									name="collabPositionTitle"
 									control={control}
@@ -140,14 +160,14 @@ const EditCollaboratorModal = ({ editState, setIsOpen }: EditCollaboratorModalPr
 						<Button htmlType="button" onClick={(prev) => setIsOpen({ ...prev, isOpen: false })}>
 							{translate('button.cancel')}
 						</Button>
-						<Button type="primary" htmlType="submit">
-							{translate('button.addCollab')}
+						<Button type="primary" onClick={handleSubmit(onSubmit)}>
+							{translate('button.edit')}
 						</Button>
 					</Flex>
 				</Form>
 			</Flex>
 		</Modal>
 	);
-};
+});
 
 export default EditCollaboratorModal;
