@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export enum EthicsFileTypes {
+export enum EthicsFileEnum {
 	EXEMPTION = 'exemption',
 	ETHICS_LETTER = 'ethicsLetter',
 }

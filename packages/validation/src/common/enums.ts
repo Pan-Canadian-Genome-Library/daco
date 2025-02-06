@@ -18,7 +18,7 @@
  */
 
 import { z } from 'zod';
-import { EthicsFileTypes } from '../types.js';
+import { EthicsFileEnum } from '../types.js';
 
-export const EthicsEnum = z.nativeEnum(EthicsFileTypes);
+export const EthicsEnum = z.nativeEnum(EthicsFileEnum);
 export type TrimmedString = z.infer<typeof EthicsEnum>;

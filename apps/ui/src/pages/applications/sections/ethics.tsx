@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { EthicsFileTypes, ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
+import { EthicsFileEnum, ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
 import { Button, Form } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { useForm } from 'react-hook-form';
@@ -56,12 +56,12 @@ const Ethics = () => {
 							required
 							options={[
 								{
-									value: EthicsFileTypes.EXEMPTION,
+									value: EthicsFileEnum.EXEMPTION,
 									label:
 										'You represent and warrant that your country/region does not require your research project to undergo ethics review.',
 								},
 								{
-									value: EthicsFileTypes.ETHICS_LETTER,
+									value: EthicsFileEnum.ETHICS_LETTER,
 									label:
 										'Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.',
 								},

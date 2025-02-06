@@ -23,13 +23,13 @@ import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProp
 
 import { pcglColors } from '@/components/providers/ThemeProvider';
 import { BasicFormFieldProps } from '@/global/types';
-import { EthicsFileTypes } from '@pcgl-daco/validation';
+import { EthicsFileEnum } from '@pcgl-daco/validation';
 
 const { Item } = Form;
 const { useToken } = theme;
 
 interface CheckboxValues {
-	value: EthicsFileTypes;
+	value: EthicsFileEnum;
 	label: string | React.ReactElement;
 }
 
