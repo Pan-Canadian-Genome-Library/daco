@@ -92,7 +92,8 @@
 		"intro": "Introduction",
 		"institutional": "B. Institutional Representative",
 		"applicant": "A. Applicant Information",
-		"collaborators": "C. Collaborators"
+		"collaborators": "C. Collaborators",
+		"project": "D. Project Information"
 	},
 	"errors": {
 		"http": {
