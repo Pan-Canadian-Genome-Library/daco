@@ -25,6 +25,7 @@ export type ApplicantInformationSchemaType = z.infer<typeof applicantInformation
 export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
+export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
 
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
@@ -82,4 +83,8 @@ export const projectInformationSchema = z.object({
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
+});
+
+export const agreementsSchema = z.object({
+	agreements: z.array(z.string()).min(9).max(9),
 });
