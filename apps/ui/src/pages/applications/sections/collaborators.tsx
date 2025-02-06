@@ -39,6 +39,7 @@ interface CollabTableData {
 	lastName: string;
 	institutionalEmail: string;
 	title: string;
+	suffix?: string;
 }
 
 export interface ModalState {
@@ -115,6 +116,7 @@ const Collaborators = () => {
 								lastName: 'Doe',
 								institutionalEmail: 'thy.john.doe@oicr.ca',
 								title: 'PI',
+								suffix: 'Miss',
 							},
 						]}
 						pagination={false}
