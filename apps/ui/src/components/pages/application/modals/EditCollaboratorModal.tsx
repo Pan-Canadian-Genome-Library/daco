@@ -27,23 +27,33 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import InputBox from '@/components/pages/application/form-components/InputBox';
+import { ModalState } from '@/pages/applications/sections/collaborators';
 
 const { Text } = Typography;
 
 type EditCollaboratorModalProps = {
-	isOpen: boolean;
-	setIsOpen: (val: boolean) => void;
+	editState: ModalState;
+	setIsOpen: (props: ModalState) => void;
 };
 
 const rule = createSchemaFieldRule(collaboratorsSchema);
 
-const EditCollaboratorModal = ({ isOpen, setIsOpen }: EditCollaboratorModalProps) => {
+const EditCollaboratorModal = ({ editState, setIsOpen }: EditCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	const { control } = useForm<CollaboratorsSchemaType>({
+		defaultValues: {
+			collabFirstName: editState.rowData?.firstName,
+			collabMiddleName: editState.rowData?.lastName,
+			collabLastName: editState.rowData?.lastName,
+			collabPrimaryEmail: editState.rowData?.institutionalEmail,
+			collabPositionTitle: editState.rowData?.title,
+		},
 		resolver: zodResolver(collaboratorsSchema),
 	});
+
+	console.log(editState);
 
 	return (
 		<Modal
@@ -52,8 +62,8 @@ const EditCollaboratorModal = ({ isOpen, setIsOpen }: EditCollaboratorModalProps
 			cancelText={translate('button.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '1000px', paddingInline: 10 }}
-			open={isOpen}
-			onCancel={() => setIsOpen(false)}
+			open={editState.isOpen}
+			onCancel={(prev) => setIsOpen({ ...prev, isOpen: false })}
 			footer={[]}
 			destroyOnClose
 		>
@@ -127,7 +137,7 @@ const EditCollaboratorModal = ({ isOpen, setIsOpen }: EditCollaboratorModalProps
 						</Row>
 					</Flex>
 					<Flex align="center" justify="flex-end" gap={'middle'}>
-						<Button htmlType="button" onClick={() => setIsOpen(false)}>
+						<Button htmlType="button" onClick={(prev) => setIsOpen({ ...prev, isOpen: false })}>
 							{translate('button.cancel')}
 						</Button>
 						<Button type="primary" htmlType="submit">
