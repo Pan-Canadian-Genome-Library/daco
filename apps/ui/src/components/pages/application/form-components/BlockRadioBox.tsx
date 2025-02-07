@@ -90,6 +90,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 						rules={!props.subLabel ? [props.rule] : undefined}
 						labelCol={props.labelCol}
 						layout={props.layout}
+						initialValue={!props.subLabel ? field.value : undefined}
 					>
 						{props.subLabel ? (
 							<Item
@@ -98,6 +99,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 								rules={[props.rule]}
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
+								initialValue={field.value}
 							>
 								{renderControl(field)}
 							</Item>
