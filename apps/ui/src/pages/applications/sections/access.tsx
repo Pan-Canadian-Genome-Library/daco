@@ -97,18 +97,14 @@ const AccessAgreement = () => {
 				<SectionContent title={translate('data-access-section.section1.title')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
-							<Text>
-								{processAsRichText(translate('data-access-section.section1.description'), { treatStarAs: 'BULLET' })}
-							</Text>
+							<Text>{processAsRichText(translate('data-access-section.section1.description'))}</Text>
 						</Col>
 					</Row>
 				</SectionContent>
 				<SectionContent title={translate('data-access-section.section2.title')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
-							<Text>
-								{processAsRichText(translate('data-access-section.section2.description'), { treatStarAs: 'BULLET' })}
-							</Text>
+							<Text>{processAsRichText(translate('data-access-section.section2.description'))}</Text>
 						</Col>
 					</Row>
 				</SectionContent>
@@ -135,28 +131,72 @@ const AccessAgreement = () => {
 	);
 };
 
-interface TextReplacementRules {
-	treatStarAs: 'NORMAL' | 'BULLET';
-}
 /**
  * Formats the agreement text as bullet points if prepended with "*" chars.
  *
  * Given that our translation files only allows single line strings, this
  * makes it easier for the copywriter.
+ *
+ * @example If the translation file contained the following:
+ * ```json
+ * {
+ * 	 "text": "In signing this Agreement: *The User and the User Institution(s) agree to use the ICGC Controlled Data in compliance with all ICGC Goals*The Data Access Period of two (2) years is the maximum approval time for any application."
+ * }
+ * ```
+ *
+ * It would be converted to:
+ *
+ * ```html
+ * In signing this agreement:
+ * <ul>
+ * 	<li>The User and the User Institution(s) agree to use the ICGC Controlled Data in compliance with all ICGC Goals</li>
+ * 	<li>The Data Access Period of two (2) years is the maximum approval time for any application.</li>
+ * </ul>
+ * ```
+ *
  * @param text The text from the translation files.
- * @param rules Options regarding how the text should be formatted.
  * @returns A `ReactNode` with the text formatted as a `ul` list or otherwise.
  */
-const processAsRichText = (text: string, rules: TextReplacementRules) => {
-	if (rules.treatStarAs === 'BULLET') {
-		const linesAsList = text.split('*').map((linesWithStars, key) => (
-			<li key={`${key}-${linesWithStars}`} style={{ listStyleType: 'disc' }}>
-				{linesWithStars.trim()}
-			</li>
-		));
-		return <ul>{linesAsList}</ul>;
+const processAsRichText = (text: string) => {
+	const nonListElements = [];
+	const listElements = [];
+
+	const matchAllStars = new RegExp(/(\*)+[^*]*/g);
+	const matchAllNormalText = new RegExp(/^[^*]*/g);
+
+	const allPrecedingText = Array.from(text.matchAll(matchAllNormalText), (capturedText) => capturedText[0]);
+	const linesWithStars = Array.from(text.matchAll(matchAllStars), (capturedText) => capturedText[0]);
+
+	/**
+	 * Some of the copy sometimes can include lines of text before the start of the list which doesn't have *'s
+	 * in this case we want to ensure that we don't convert them into list text
+	 */
+	for (const line of allPrecedingText) {
+		if (line) {
+			nonListElements.push(line);
+		}
 	}
-	return <>{text}</>;
+
+	for (const line of linesWithStars) {
+		if (line) {
+			listElements.push(
+				<li key={`${line}`} style={{ listStyleType: 'disc' }}>
+					{/*
+					 * Note that the captured group from the regex includes the * char still,
+					 * this must be removed, hence the split.
+					 */}
+					{line.trim().split('*')[1]}
+				</li>,
+			);
+		}
+	}
+
+	return (
+		<>
+			{nonListElements}
+			<ul>{listElements}</ul>
+		</>
+	);
 };
 
 export default AccessAgreement;
