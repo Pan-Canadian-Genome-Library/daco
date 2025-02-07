@@ -49,12 +49,18 @@ const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { control, watch, setValue } = useForm<EthicsSchemaType>({});
-	const value = watch('ethicsApproval');
 	const { token } = useToken();
 
+	const showFileUpload = watch('ethicsApproval');
+
+	// File Upload configuration
 	const uploadFile: UploadProps = {
 		action: 'https://www.localhost:3000',
 		maxCount: 1,
+		showUploadList: {
+			showDownloadIcon: true,
+			downloadIcon: 'Download',
+		},
 		beforeUpload: (file) => {
 			const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
 
@@ -80,10 +86,6 @@ const Ethics = () => {
 			} else {
 				setValue('uploadPath', 'failed path');
 			}
-		},
-		showUploadList: {
-			showDownloadIcon: true,
-			downloadIcon: 'Download',
 		},
 	};
 
@@ -114,7 +116,8 @@ const Ethics = () => {
 								},
 							]}
 						/>
-						{value ? (
+						{/* If a radio box has been checked, then display the file upload component */}
+						{showFileUpload ? (
 							<Flex>
 								<Form.Item style={{ fontWeight: 600 }} required label={translate('ethics-section.attach')}>
 									<Flex vertical gap={'large'}>
