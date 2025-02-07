@@ -19,7 +19,7 @@
 
 import { UploadOutlined } from '@ant-design/icons';
 import { EthicsFileEnum, ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Form, Upload, UploadProps, notification } from 'antd';
+import { Button, Flex, Form, notification, theme, Typography, Upload, UploadProps } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +32,9 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 
+const { Text } = Typography;
+const { useToken } = theme;
+
 const rule = createSchemaFieldRule(ethicsSchema);
 
 enum AllowedFilesEnum {
@@ -41,11 +44,13 @@ enum AllowedFilesEnum {
 }
 
 const MAX_FILE_SIZE = 5000000;
+
 const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { control, watch, setValue } = useForm<EthicsSchemaType>({});
 	const value = watch('ethicsApproval');
+	const { token } = useToken();
 
 	const uploadFile: UploadProps = {
 		action: 'https://www.localhost:3000',
@@ -69,7 +74,7 @@ const Ethics = () => {
 			}
 		},
 		onChange: (info) => {
-			// Add file path to the form here
+			// Add file path to the rhf here, once the file upload is complete. Will probably change once fileupload functionality is implemented
 			if (info.file.status === 'done') {
 				setValue('uploadPath', 'successful path');
 			} else {
@@ -81,8 +86,6 @@ const Ethics = () => {
 			downloadIcon: 'Download',
 		},
 	};
-
-	console.log(watch());
 
 	return (
 		<SectionWrapper>
@@ -114,9 +117,24 @@ const Ethics = () => {
 							]}
 						/>
 						{value ? (
-							<Upload {...uploadFile}>
-								<Button icon={<UploadOutlined />}>Upload</Button>
-							</Upload>
+							<Flex>
+								<Form.Item
+									style={{ fontWeight: 600 }}
+									required
+									label={'Please attach an ethics approval letter to this application:'}
+								>
+									<Flex vertical gap={'large'}>
+										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
+											Allowed file types: pdf, doc, docx, | Max file size: 5MB
+										</Text>
+										<Upload {...uploadFile}>
+											<Button type="primary" icon={<UploadOutlined />}>
+												Upload
+											</Button>
+										</Upload>
+									</Flex>
+								</Form.Item>
+							</Flex>
 						) : null}
 					</Form>
 				</SectionContent>
