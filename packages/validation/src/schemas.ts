@@ -88,4 +88,5 @@ export const projectInformationSchema = z.object({
 
 export const ethicsSchema = z.object({
 	ethicsApproval: EthicsEnum,
+	uploadPath: NonEmptyString,
 });

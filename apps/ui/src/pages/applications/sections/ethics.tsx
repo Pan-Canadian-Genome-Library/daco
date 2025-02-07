@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { UploadOutlined } from '@ant-design/icons';
 import { EthicsFileEnum, ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Form } from 'antd';
+import { Button, Form, Upload, UploadProps, notification } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -33,10 +34,55 @@ import { ApplicationOutletContext } from '@/global/types';
 
 const rule = createSchemaFieldRule(ethicsSchema);
 
+enum AllowedFilesEnum {
+	PDF = 'application/pdf',
+	DOC = 'application/msword',
+	DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+}
+
+const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { control } = useForm<EthicsSchemaType>({});
+	const { control, watch, setValue } = useForm<EthicsSchemaType>({});
+	const value = watch('ethicsApproval');
+
+	const uploadFile: UploadProps = {
+		action: 'https://www.localhost:3000',
+		maxCount: 1,
+		beforeUpload: (file) => {
+			const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
+
+			if (!isValidImage) {
+				notification.error({
+					message: 'Invalid File Type',
+				});
+				return isValidImage || Upload.LIST_IGNORE;
+			}
+
+			if (file.size > MAX_FILE_SIZE) {
+				notification.error({
+					message: 'File Size is too big',
+					description: 'Please upload a file less than 5mb',
+				});
+				return false;
+			}
+		},
+		onChange: (info) => {
+			// Add file path to the form here
+			if (info.file.status === 'done') {
+				setValue('uploadPath', 'successful path');
+			} else {
+				setValue('uploadPath', 'failed path');
+			}
+		},
+		showUploadList: {
+			showDownloadIcon: true,
+			downloadIcon: 'Download',
+		},
+	};
+
+	console.log(watch());
 
 	return (
 		<SectionWrapper>
@@ -67,7 +113,11 @@ const Ethics = () => {
 								},
 							]}
 						/>
-						<Button htmlType="submit" />
+						{value ? (
+							<Upload {...uploadFile}>
+								<Button icon={<UploadOutlined />}>Upload</Button>
+							</Upload>
+						) : null}
 					</Form>
 				</SectionContent>
 				<SectionFooter currentRoute="ethics" isEditMode={isEditMode} />
