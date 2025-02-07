@@ -60,15 +60,15 @@ const Ethics = () => {
 
 			if (!isValidImage) {
 				notification.error({
-					message: 'Invalid File Type',
+					message: translate('invalidFileTitle'),
 				});
 				return isValidImage || Upload.LIST_IGNORE;
 			}
 
 			if (file.size > MAX_FILE_SIZE) {
 				notification.error({
-					message: 'File Size is too big',
-					description: 'Please upload a file less than 5mb',
+					message: translate('invalidFileSizeTitle'),
+					description: translate('invalidFileSizeDescription'),
 				});
 				return false;
 			}
@@ -95,10 +95,10 @@ const Ethics = () => {
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}
 				/>
-				<SectionContent title="Ethical Approval">
+				<SectionContent title={translate('ethics-section.approval')}>
 					<Form layout="vertical">
 						<BlockRadioBox
-							label={'Please choose one of the following options'}
+							label={translate('ethics-section.pleaseChose')}
 							name="ethicsApproval"
 							control={control}
 							rule={rule}
@@ -106,30 +106,24 @@ const Ethics = () => {
 							options={[
 								{
 									value: EthicsFileEnum.EXEMPTION,
-									label:
-										'You represent and warrant that your country/region does not require your research project to undergo ethics review.',
+									label: translate('ethics-section.exemptionDescription'),
 								},
 								{
 									value: EthicsFileEnum.ETHICS_LETTER,
-									label:
-										'Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.',
+									label: translate('ethics-section.ethicsLetterDescription'),
 								},
 							]}
 						/>
 						{value ? (
 							<Flex>
-								<Form.Item
-									style={{ fontWeight: 600 }}
-									required
-									label={'Please attach an ethics approval letter to this application:'}
-								>
+								<Form.Item style={{ fontWeight: 600 }} required label={translate('ethics-section.attach')}>
 									<Flex vertical gap={'large'}>
 										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
-											Allowed file types: pdf, doc, docx, | Max file size: 5MB
+											{translate('ethics-section.allowedFileTypes')}
 										</Text>
 										<Upload {...uploadFile}>
 											<Button type="primary" icon={<UploadOutlined />}>
-												Upload
+												{translate('button.upload')}
 											</Button>
 										</Upload>
 									</Flex>
