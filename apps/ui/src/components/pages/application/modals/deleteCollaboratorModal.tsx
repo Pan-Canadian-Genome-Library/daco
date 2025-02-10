@@ -17,40 +17,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { type ApplicationResponseData } from '@pcgl-daco/data-model';
+import { ModalState } from '@/pages/applications/sections/collaborators';
 
-const useGetApplication = (id?: string | number) => {
-	const { t: translate } = useTranslation();
+const { Text } = Typography;
 
-	return useQuery<ApplicationResponseData, ServerError>({
-		queryKey: [id],
-		queryFn: async () => {
-			const response = await fetch(`/applications/${id}`);
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-				}
-
-				throw error;
-			}
-
-			return await response.json();
-		},
-	});
+type DeleteCollaboratorModalProps = {
+	appId: string | number;
+	deleteState: ModalState;
+	setIsOpen: (props: ModalState) => void;
 };
 
-export default useGetApplication;
+const DeleteCollaboratorModal = ({ appId, deleteState, setIsOpen }: DeleteCollaboratorModalProps) => {
+	const { t: translate } = useTranslation();
+
+	return (
+		<Modal
+			title={translate('collab-section.deleteModalTitle')}
+			okText={translate('button.delete')}
+			okButtonProps={{ color: 'danger', variant: 'solid' }}
+			cancelText={translate('button.cancel')}
+			width={'100%'}
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			open={deleteState.isOpen}
+			onCancel={() => setIsOpen({ isOpen: false })}
+			destroyOnClose
+		>
+			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
+				<Text>{translate('collab-section.deleteModalDes', { name: deleteState.rowData?.firstName, appId })}</Text>
+			</Flex>
+		</Modal>
+	);
+};
+
+export default DeleteCollaboratorModal;
