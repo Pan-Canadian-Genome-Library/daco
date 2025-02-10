@@ -1,5 +1,6 @@
 {
 	"name": "@pcgl-daco/logger",
+	"private": "true",
 	"version": "0.1.0",
 	"description": "PCGL-DACO Logger",
 	"exports": "./dist/index.js",
@@ -9,11 +10,9 @@
 		"node": ">=18"
 	},
 	"scripts": {
+		"prebuild": "rimraf ./dist",
 		"build": "tsc"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
 	"dependencies": {
 		"winston": "^3.10.0",
 		"express-requests-logger": "^4.0.0"

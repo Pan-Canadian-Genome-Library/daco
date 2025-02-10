@@ -35,7 +35,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const port = process.env.PORT || 3000;
-
+const API_DOCS_PATH = `api-docs`;
 const startServer = async () => {
 	const app = express();
 
@@ -51,10 +51,14 @@ const startServer = async () => {
 
 	app.use(applicationRouter);
 
-	app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))));
+	app.use(
+		`/${API_DOCS_PATH}`,
+		swaggerUi.serve,
+		swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))),
+	);
 
 	app.get('/', (_req: Request, res: Response) => {
-		res.send('Hello World!');
+		res.json({});
 	});
 
 	app.get('/health', (_req: Request, res: Response) => {
@@ -74,7 +78,10 @@ const startServer = async () => {
 	});
 
 	app.listen(port, () => {
-		logger.info(`Example app listening on port ${port}`);
+		logger.info(`Server started.`);
+		if (process.env.NODE_ENV !== 'production') {
+			logger.info(`API Docs available at: http://localhost:${port}/${API_DOCS_PATH}`);
+		}
 	});
 };
 
