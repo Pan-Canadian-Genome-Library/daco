@@ -20,6 +20,7 @@
 		"@testcontainers/postgresql": "^10.14.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
+		"@types/express-session": "^1.18.1",
 		"@types/node": "^22.7.4",
 		"@types/pg": "^8.11.10",
 		"@types/swagger-ui-express": "^4.1.7",
@@ -37,10 +38,12 @@
 		"cors": "^2.8.5",
 		"drizzle-orm": "^0.38.3",
 		"express": "^4.21.0",
+		"express-session": "^1.18.1",
 		"pg": "^8.13.0",
-		"typescript-fsm": "^1.4.5",
 		"swagger-ui-express": "^5.0.1",
-		"yamljs": "^0.3.0"
+		"typescript-fsm": "^1.4.5",
+		"yamljs": "^0.3.0",
+		"zod": "^3.24.1"
 	},
 	"engines": {
 		"node": "^20.9.0"
