@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, requestedStudySchema, type RequestedStudySchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -37,7 +37,12 @@ const { Text } = Typography;
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
 
-const REQUESTED_STUDY_TEMP_DATA = [
+interface RequestedStudy {
+	studyName: string;
+	studyID: number;
+}
+
+const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 	{
 		studyName: 'OICR Study',
 		studyID: 1,
