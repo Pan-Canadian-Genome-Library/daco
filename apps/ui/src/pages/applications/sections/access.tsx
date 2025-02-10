@@ -44,45 +44,49 @@ const AccessAgreement = () => {
 	});
 
 	const onSubmit: SubmitHandler<AgreementsSchemaType> = (data) => {
-		console.log(data);
+		const submissionData = data.agreements.reduce(
+			(accumulator, currentAgreement) => ({ ...accumulator, [currentAgreement]: true }),
+			{},
+		);
+		console.log(submissionData);
 	};
 
 	const agreementOptions = [
 		{
 			label: translate('data-access-section.section3.agreement1'),
-			value: 'agreement1',
+			value: 'dac_agreement_software_updates',
 		},
 		{
 			label: translate('data-access-section.section3.agreement2'),
-			value: 'agreement2',
+			value: 'dac_agreement_non_disclosure',
 		},
 		{
 			label: translate('data-access-section.section3.agreement3'),
-			value: 'agreement3',
+			value: 'dac_agreement_monitor_individual_access',
 		},
 		{
 			label: translate('data-access-section.section3.agreement4'),
-			value: 'agreement4',
+			value: 'dac_agreement_destroy_data',
 		},
 		{
 			label: translate('data-access-section.section3.agreement5'),
-			value: 'agreement5',
+			value: 'dac_agreement_familiarize_restrictions',
 		},
 		{
 			label: translate('data-access-section.section3.agreement6'),
-			value: 'agreement6',
+			value: 'dac_agreement_provide_it_policy',
 		},
 		{
 			label: translate('data-access-section.section3.agreement7'),
-			value: 'agreement7',
+			value: 'dac_agreement_notify_unauthorized_access',
 		},
 		{
 			label: translate('data-access-section.section3.agreement8'),
-			value: 'agreement8',
+			value: 'dac_agreement_certify_application',
 		},
 		{
 			label: translate('data-access-section.section3.agreement9'),
-			value: 'agreement9',
+			value: 'dac_agreement_read_and_agreed',
 		},
 	];
 
@@ -155,7 +159,7 @@ const AccessAgreement = () => {
  * ```
  *
  * @param text The text from the translation files.
- * @returns A `ReactNode` with the text formatted as a `ul` list or otherwise.
+ * @returns A `ReactNode` with the text formatted as a `ul` list if marked with a *.
  */
 const processAsRichText = (text: string) => {
 	const nonListElements = [];

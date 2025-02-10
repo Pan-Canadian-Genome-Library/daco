@@ -60,8 +60,8 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 		case z.ZodIssueCode.invalid_type:
 			if (error.expected === 'string') {
 				return { message: i18n.t('requiredField') };
-			} else if (error.expected === 'array') {
-				return { message: i18n.t('requiredNumberOfCheckboxs') };
+			} else if (error.expected === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('requiredNumberOfCheckboxes') };
 			}
 			break;
 		case z.ZodIssueCode.invalid_string:
@@ -75,8 +75,13 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			}
 			break;
 		case z.ZodIssueCode.too_small:
-			if (error.type === 'array') {
+			if (error.type === 'array' && error.path[0] === 'agreements') {
 				return { message: i18n.t('checkboxesNotFilledOut') };
+			}
+			break;
+		case z.ZodIssueCode.too_big:
+			if (error.type === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('requiredNumberOfCheckboxes') };
 			}
 			break;
 		case z.ZodIssueCode.custom:
