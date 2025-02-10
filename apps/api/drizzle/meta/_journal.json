@@ -29,6 +29,13 @@
 			"when": 1738866324516,
 			"tag": "0003_rename_project_abstract",
 			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "7",
+			"when": 1739210934649,
+			"tag": "0004_add_project_aims_field",
+			"breakpoints": true
 		}
 	]
 }
