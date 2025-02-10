@@ -24,8 +24,8 @@ The repository is organized with the following directory structure:
 
 | Component                                   | Package Name          | Path                | Description                                                          |
 | ------------------------------------------- | --------------------- | ------------------- | -------------------------------------------------------------------- |
-| [DACO UI](apps/server/README.md)            | @pcgl-daco/ui         | apps/ui             | React SPA website for PCGL Daco.                                     |
-| [DACO API](packages/client/README.md)       | @pcgl-daco/api        | apps/api            | ExpressJS backend-for-frontend server for                            |
+| [DACO UI](apps/ui/README.md)            | @pcgl-daco/ui         | apps/ui             | React SPA website for PCGL Daco.                                     |
+| [DACO API](apps/api/README.md)       | @pcgl-daco/api        | apps/api            | ExpressJS backend-for-frontend server for                            |
 |                                             |                       |                     |                                                                      |
 | [data-model](packages/data-model/README.md) | @pcgl-daco/data-model | packages/data-model | DACO database schemas and generated types.                           |
 | [logger](packages/logger/README.md)         | @pcgl-daco/logger     | packages/logger     | Standardized reusable logger and express middleware request logging. |
