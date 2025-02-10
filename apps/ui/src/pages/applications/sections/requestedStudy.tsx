@@ -18,7 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { institutionalRepSchema, requestedStudySchema, type RequestedStudySchemaType } from '@pcgl-daco/validation';
+import { requestedStudySchema, type RequestedStudySchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { type SubmitHandler, useForm } from 'react-hook-form';
@@ -35,7 +35,7 @@ import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
 
-const rule = createSchemaFieldRule(institutionalRepSchema);
+const rule = createSchemaFieldRule(requestedStudySchema);
 
 interface RequestedStudy {
 	studyName: string;
