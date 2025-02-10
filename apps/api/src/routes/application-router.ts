@@ -28,7 +28,6 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
-	requestApplicationRevisions,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -249,13 +248,9 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	if (!applicationId) {
 		res.status(400).json({ message: 'Application ID is required.' });
 	}
-
-	if (isNaN(parseInt(applicationId))) {
-		res.status(400).send({
-			message: 'Invalid request. ApplicationId must be a valid number and is required.',
-			errors: 'MissingOrInvalidParameters',
-		});
-		return;
+	if (!applicationId || isNaN(parseInt(applicationId))) {
+		res.status(400).json({ message: 'Invalid request. ApplicationId is required and must be a valid number.',
+			errors: 'MissingOrInvalidParameters', });
 	}
 
 	const result = await getApplicationById({ applicationId });
@@ -284,32 +279,4 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 		res.status(404).json({ message: 'Application not found.' });
 	}
 });
-
-// Endpoint for reps to request revisions
-applicationRouter.post('/applications/request-revisions', jsonParser, async (req, res) => {
-	try {
-		const { applicationId } = req.body;
-		const { repId, reviewData, comment, role } = req.body;
-
-		if (!role && (role !== 'REP' || role !== 'DAC')) {
-			res.status(400).json({ message: 'Invalid request: Invalid role' });
-		}
-
-		// Validate input
-		if (!repId || !reviewData) {
-			res.status(400).json({ message: 'Invalid request: repId and reviewData are required' });
-		}
-
-		// Call service method to handle request
-		const updatedApplication = await requestApplicationRevisions({ applicationId, role, repId, reviewData, comment });
-
-		res.status(200).json(updatedApplication);
-	} catch (error) {
-		res.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-});
-
 export default applicationRouter;
