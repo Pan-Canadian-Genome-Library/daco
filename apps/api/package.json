@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "rimraf ./dist && tsc",
 		"dev": "concurrently --names=server,watch \"pnpm dev:server\" \"pnpm dev:watch\"",
-		"dev:server": "tsx watch --env-file=.env ./src/main.ts",
+		"dev:server": "tsx watch --clear-screen=false --env-file=.env ./src/main.ts",
 		"dev:watch": "nx watch --projects=@pcgl-daco/api --includeDependentProjects -- nx run-many -t build \\$NX_PROJECT_NAME --exclude=@pcgl-daco/api",
 		"dbml": "tsx ./src/db/dbml.ts",
 		"setup": "pnpm init:env && pnpm init:db",
