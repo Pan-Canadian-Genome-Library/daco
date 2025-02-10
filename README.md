@@ -56,7 +56,7 @@ Follow these steps to install and run all dependencies, then run all application
 - Install PNPM: `npm i -g pnpm`
 - Install dependencies: `pnpm i`
 - Run dependencies: `docker-compose up -d`
-- Initialize application environment files: `pnpm init:all`
+- Initialize application environment files: `pnpm setup:all`
   - This will fail if you have already made any `.env` files inside any of the `/apps` dirs. If this is the case, try removing these files before retrying the script.
   - This will also run the initial database migration for the DACO API, so make sure the docker dependencies are running.
 - Start all apps in development mode: `pnpm dev:all`
