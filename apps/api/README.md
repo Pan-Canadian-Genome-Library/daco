@@ -13,7 +13,7 @@ To run the DACO API requires a Postgres database connection. The workspace's doc
 Follow these steps to prepare your local machine to run this application from source:
 
 1. Install all npm dependencies: `pnpm i`
-2. Run Docker dependencies. From the root of this workspace: `docker-compose up`
+2. Run Docker dependencies. From the root of this workspace: `docker-compose up -d`
 3. Initialize this repository: `pnpm setup`
    1. Creates a `.env` file with default values. Update the values in this file if you need to change the application configuration.
    2. Runs migrations to setup database
