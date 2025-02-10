@@ -80,7 +80,7 @@
 			"DRAFT": "Draft",
 			"INSTITUTIONAL_REP_REVIEW": "Rep Review",
 			"DAC_REVIEW": "DAC Review",
-			"REP_REVISION": "Rep Revisions",
+			"INSTITUTIONAL_REP_REVISION_REQUESTED": "Rep Revisions",
 			"DAC_REVISIONS_REQUESTED": "DAC Revisions",
 			"REJECTED": "Rejected",
 			"REVOKED": "Revoked",
@@ -92,13 +92,22 @@
 		"intro": "Introduction",
 		"institutional": "B. Institutional Representative",
 		"applicant": "A. Applicant Information",
-		"collaborators": "C. Collaborators"
+		"collaborators": "C. Collaborators",
+		"project": "D. Project Information"
 	},
 	"errors": {
 		"http": {
 			"404": {
 				"title": "The requested resource could not be found.",
-				"message": "Sorry, looks like the resource you're trying to access does not exist"
+				"message": "Sorry, looks like the resource you're trying to access does not exist."
+			},
+			"400": {
+				"title": "That was a bad request.",
+				"message": "Sorry, looks like your browser sent a bad request, please reload the page and try again."
+			},
+			"500": {
+				"title": "Something went wrong.",
+				"message": "Sorry, something went wrong while processing your request on our end, please try again later."
 			}
 		},
 		"applicationNotFound": {

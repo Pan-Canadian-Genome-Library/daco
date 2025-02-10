@@ -20,17 +20,19 @@
 import { Divider, Flex, Typography } from 'antd';
 import { PropsWithChildren } from 'react';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 interface SectionContentProps extends PropsWithChildren {
 	title?: string;
 	showDivider?: boolean;
+	text?: string;
 }
 
-const SectionContent = ({ title, showDivider = true, children }: SectionContentProps) => {
+const SectionContent = ({ title, showDivider = true, text, children }: SectionContentProps) => {
 	return (
 		<Flex vertical>
 			<Title level={4}>{title}</Title>
+			{text ? <Text style={{ margin: 'auto 0 1.5rem 0' }}>{text}</Text> : null}
 			{children}
 			{showDivider && <Divider />}
 		</Flex>

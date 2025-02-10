@@ -18,12 +18,12 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { applicantInformationSchema, type ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
-import * as z from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import InputBox from '@/components/pages/application/form-components/InputBox';
@@ -31,51 +31,26 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
 
-type FieldType = {
-	applicantTitle: string;
-	applicantFirstName: string;
-	applicantMiddleName: string;
-	applicantLastName: string;
-	applicantSuffix: string;
-	applicantPrimaryAffiliation: string;
-	applicantInstituteAffiliation: string;
-	applicantProfileUrl: string;
-	applicantPositionTitle: string;
-	institutionCountry: string;
-	institutionState: string;
-	institutionCity: string;
-	institutionStreetAddress: string;
-	institutionPostalCode: string;
-	institutionBuilding: string;
-};
-
-const schema = z.object({
-	applicantTitle: z.string().min(1, { message: 'Required' }),
-	applicantFirstName: z
-		.string()
-		.min(1, { message: 'Required' })
-		.max(15, { message: 'First name should be less than 15 characters' }),
-});
-
-const rule = createSchemaFieldRule(schema);
+const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<FieldType>({
-		resolver: zodResolver(schema),
+	const { handleSubmit, control } = useForm<ApplicantInformationSchemaType>({
+		resolver: zodResolver(applicantInformationSchema),
 	});
 
-	const onSubmit: SubmitHandler<FieldType> = (data) => {
+	const onSubmit: SubmitHandler<ApplicantInformationSchemaType> = (data) => {
 		console.log(data);
 	};
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form layout="vertical">
 				<SectionTitle
 					title={translate('applicant-section.title')}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
@@ -89,14 +64,9 @@ const Applicant = () => {
 								placeholder="Select"
 								control={control}
 								rule={rule}
-								options={[
-									{ value: 'dr', label: 'Dr' },
-									{ value: 'miss', label: 'Miss' },
-									{ value: 'mr', label: 'Mr' },
-									{ value: 'mrs', label: 'Mrs' },
-									{ value: 'ms', label: 'Ms' },
-									{ value: 'prof', label: 'Prof' },
-								]}
+								options={PERSONAL_TITLES.map((titles) => {
+									return { value: titles.en, label: titles.en };
+								})}
 								required
 								disabled={!isEditMode}
 							/>
@@ -162,7 +132,7 @@ const Applicant = () => {
 							<InputBox
 								label={translate('applicant-section.form.primaryEmail')}
 								subLabel={translate('applicant-section.form.primaryEmailLabel')}
-								name="applicantInstituteAffiliation"
+								name="applicantInstituteEmail"
 								control={control}
 								rule={rule}
 								required
@@ -200,10 +170,14 @@ const Applicant = () => {
 				<SectionContent title={translate('applicant-section.section2')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<InputBox
+							<SelectBox
 								label={translate('applicant-section.form.country')}
-								name="institutionCountry"
+								name="applicantInstituteCountry"
 								control={control}
+								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
+									return { value: areas.iso, label: areas.en };
+								})}
+								initialValue={'CAN'}
 								rule={rule}
 								required
 								disabled={!isEditMode}
@@ -214,7 +188,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.streetAddress')}
-								name="institutionStreetAddress"
+								name="applicantInstituteStreetAddress"
 								control={control}
 								rule={rule}
 								required
@@ -224,7 +198,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.building')}
-								name="institutionBuilding"
+								name="applicantInstituteBuilding"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -235,7 +209,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.state')}
-								name="institutionState"
+								name="applicantInstituteState"
 								control={control}
 								rule={rule}
 								required
@@ -245,7 +219,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.city')}
-								name="institutionCity"
+								name="applicantInstituteCity"
 								control={control}
 								rule={rule}
 								required
@@ -257,7 +231,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('applicant-section.form.postalCode')}
-								name="institutionPostalCode"
+								name="applicantInstitutePostalCode"
 								control={control}
 								rule={rule}
 								required
@@ -266,7 +240,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
 			</Form>
 		</SectionWrapper>
 	);

@@ -29,7 +29,7 @@ import {
 	getApplicationStateTotals,
 	rejectApplication,
 	requestApplicationRevisions,
-} from '@/api/application-api.js';
+} from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
@@ -114,9 +114,16 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
 		return;
 	}
 
-	// Check if sort exists and parse it if true
-	const sort = !!sortQuery ? JSON.parse(sortQuery) : [];
-	const state = !!stateQuery ? JSON.parse(stateQuery) : [];
+	let sort = [];
+	let state = [];
+
+	try {
+		sort = sortQuery ? JSON.parse(sortQuery) : [];
+		state = stateQuery ? JSON.parse(stateQuery) : [];
+	} catch {
+		res.status(400).send({ message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.' });
+		return;
+	}
 
 	const result = await getAllApplications({
 		userId,

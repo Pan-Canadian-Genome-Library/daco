@@ -70,6 +70,80 @@
 	"collab-section": {
 		"title": "Collaborators",
 		"description1": "Please include the names of all investigators, collaborators, research staff (including post-docs) and students (including graduate students), who will have access to the PCGL Controlled Data in order to work on the Research Summary as outlined in Section D of this application",
-		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data."
+		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data.",
+		"deleteModalTitle": "Are you sure you want to delete collaborator?",
+		"deleteModalDescription": "You are about to delete collaborator, {{name}} from application PCGL-{{appId}}",
+		"addModalTitle": "Add A Collaborator",
+		"addModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL and will be the email address associated with PCGL Controlled Data access.",
+		"form": {
+			"firstName": "First Name:",
+			"middleName": "Middle Name:",
+			"lastName": "Last Name:",
+			"suffix": "Suffix:",
+			"primaryEmail": "Institutional Email:",
+			"positionTitle": "Position Title:"
+		}
+	},
+	"project-section": {
+		"title": "Project Information",
+		"description": "Please fill out the following details for your research project, including the website URL if available.",
+		"section0": {
+			"form": {
+				"projectTitle": "Project Title:",
+				"projectWebsite": "Project Website:"
+			}
+		},
+		"section1": {
+			"title": "Research Summary - Scientific Abstract",
+			"description": "This section should describe the background, aims, and methodology of your research project, as well as plans for how you will use the PCGL Controlled Data.",
+			"form": {
+				"background": {
+					"title": "Background:",
+					"example": {
+						"text": "(min. 100 words, max. 200 words)\nProvide a short summary of the background basis of your research. For example,",
+						"exemplar1": "What founding research is your project based on",
+						"exemplar2": "If possible, include any previous research in this area that you have completed that is relevant."
+					}
+				},
+				"methodology": {
+					"title": "Use of Data and Methodology:",
+					"example": {
+						"text": "(min. 100 words, max. 200 words)\nProvide a summary of the methods for your research project and the plans for data usage, including:",
+						"exemplar1": "What major methods and technologies will you use (in-depth methodology is not required)?",
+						"exemplar2": "How exactly will the PCGL Controlled Data be used?",
+						"exemplar3": "Please note: If you are planning on combining PCGL controlled data with other datasets, you agree not to link or combine the PCGL Controlled Data to other data available in a way that could re-identify the donors. Please confirm how the methods you intend to use to combine datasets will minimize the risk for re-identification of the PCGL data donors."
+					}
+				},
+				"aims": {
+					"title": "Aims:",
+					"example": {
+						"text": "(min. 100 words, max. 200 words)\nProvide a summary of what your project hopes to achieve using the PCGL Data. For example:\nHow will your research impact health research or biological understanding?\nWhat are some planned outputs for your research project?"
+					}
+				}
+			}
+		},
+		"section2": {
+			"title": "Project Lay Summary",
+			"form": {
+				"lay-summary": {
+					"title": "Lay Summary:",
+					"example": {
+						"text": "(min. 100 words, max. 250 words)\nProvide a summary of your project targeted towards the general public.\nWhen writing your lay summary:",
+						"exemplar1": "Develop the language in your lay summary as if you are describing the project to someone outside your field.",
+						"exemplar2": "Define any technical terms used.",
+						"exemplar3": "We strongly recommend you use an online readability tool such as www.readabilityformulas.com to assess the reading grade of your text. The reading grade level to be aimed at for the lay summaries is grade 8 or 9.",
+						"exemplar4": "Explain in plain language why you are asking the research question, what you expect to find out and how you plan to use the findings.",
+						"exemplar5": "Consider the 3 key elements when developing your lay summary: structure and content, readability, and language guide. Finding it challenging? Read our lay summary guide, which includes before and after examples of real lay summaries."
+					}
+				}
+			}
+		},
+		"section3": {
+			"title": "Relevant Publications",
+			"description": "Please provide at least three links to relevant publications, of which the applicant is an author or a co-author. These should be links (URLs) to publication websites such as pubmed.gov, biorxiv.org, or medrxiv.org.",
+			"form": {
+				"urlPage": "URL Page"
+			}
+		}
 	}
 }

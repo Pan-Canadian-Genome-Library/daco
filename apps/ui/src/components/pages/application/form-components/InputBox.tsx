@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Form, Input } from 'antd';
-import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
+import { ColProps, Form, Input } from 'antd';
+import { FormItemLayout } from 'antd/es/form/Form';
+import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
 
@@ -27,19 +28,76 @@ const { Item } = Form;
 interface InputBoxProps extends BasicFormFieldProps {
 	subLabel?: string;
 	placeHolder?: string;
+	type?: 'email' | 'password' | 'tel' | 'hidden' | 'text' | 'url';
+	labelAlign?: 'left' | 'right';
+	labelCol?: ColProps;
+	layout?: FormItemLayout;
+	autoComplete?:
+		| 'on'
+		| 'off'
+		| 'tel'
+		| 'email'
+		| 'name'
+		| 'given-name'
+		| 'additional-name'
+		| 'family-name'
+		| 'honorific-suffix'
+		| 'organization'
+		| 'street-address'
+		| 'country-name'
+		| 'url';
 }
 
 const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBoxProps) => {
+	/**
+	 * Renders the input box component. We currently use two nested labels to display certain information on the
+	 * application form (see Applicant Info). But in the case where only one label is needed, we should only render
+	 * one label to avoid visual and a11y issues.
+	 *
+	 * This function helps reduce redefining the Input field.
+	 * @param field the field attribute from `react-hook-from`
+	 * @returns `ReactNode` with the input component.
+	 */
+	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
+		return (
+			<Input
+				{...field}
+				autoComplete={props.autoComplete ?? 'on'}
+				type={props.type ?? 'text'}
+				disabled={props.disabled}
+				placeholder={props.placeHolder}
+			/>
+		);
+	};
+
 	return (
 		<Controller
 			name={props.name}
 			control={props.control}
 			render={({ field }) => {
 				return (
-					<Item label={props.label} required={props.required}>
-						<Item label={props.subLabel} name={props.name as string} rules={[props.rule]}>
-							<Input {...field} disabled={props.disabled} placeholder={props.placeHolder} />
-						</Item>
+					<Item
+						label={props.label}
+						required={props.required}
+						name={props.name as string}
+						labelAlign={props.labelAlign}
+						rules={!props.subLabel ? [props.rule] : undefined}
+						labelCol={props.labelCol}
+						layout={props.layout}
+					>
+						{props.subLabel ? (
+							<Item
+								label={props.subLabel}
+								name={props.name as string}
+								rules={[props.rule]}
+								labelAlign={props.labelAlign}
+								labelCol={props.labelCol}
+							>
+								{renderControl(field)}
+							</Item>
+						) : (
+							renderControl(field)
+						)}
 					</Item>
 				);
 			}}
