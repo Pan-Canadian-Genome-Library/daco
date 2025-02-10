@@ -11,9 +11,7 @@ const serverConfigSchema = z.object({
 const parseResult = serverConfigSchema.safeParse(process.env);
 
 if (!parseResult.success) {
-	throw new EnvironmentConfigError(
-		`Error parsing environment variables for database configuration! ${parseResult.error.message}`,
-	);
+	throw new EnvironmentConfigError(`db`, parseResult.error);
 }
 
 const { PG_USER, PG_PASSWORD, PG_HOST, PG_DATABASE } = parseResult.data;

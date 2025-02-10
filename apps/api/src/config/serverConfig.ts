@@ -10,8 +10,6 @@ const serverConfigSchema = z.object({
 const parseResult = serverConfigSchema.safeParse(process.env);
 
 if (!parseResult.success) {
-	throw new EnvironmentConfigError(
-		`Error parsing environment variables for server configuration! ${parseResult.error.message}`,
-	);
+	throw new EnvironmentConfigError(`server`, parseResult.error);
 }
 export const serverConfig = { ...parseResult.data, isProduction: parseResult.data.NODE_ENV === 'production' };
