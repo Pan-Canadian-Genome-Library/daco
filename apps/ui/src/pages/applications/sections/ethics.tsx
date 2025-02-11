@@ -48,7 +48,7 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { control, watch, setValue } = useForm<EthicsSchemaType>({});
+	const { control, watch } = useForm<EthicsSchemaType>({});
 	const { token } = useToken();
 
 	const showFileUpload = watch('ethicsApproval');
@@ -80,12 +80,7 @@ const Ethics = () => {
 			}
 		},
 		onChange: (info) => {
-			// Add file path to the rhf here, once the file upload is complete. Will probably change once fileupload functionality is implemented
-			if (info.file.status === 'done') {
-				setValue('uploadPath', 'successful path');
-			} else {
-				setValue('uploadPath', 'failed path');
-			}
+			// Add file data to the rhf here, once the file upload is complete.
 		},
 	};
 
