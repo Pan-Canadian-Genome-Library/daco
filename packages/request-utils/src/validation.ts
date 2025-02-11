@@ -33,15 +33,16 @@ import { RequestValidationErrorResponse } from './responses.js';
  * the Zod schema.
  *
  * @param bodySchema Zod Schema which will perform the request body validation
+ * @param zodErrorMapping A `ZodErrorMap` object which can be used to translate or intercept the existing error / message mapping. If you don't have a custom one, you may pass in `defaultErrorMap` from the `zod` package, or `undefined`.
  * @param handler RequestHandler to run once validation passes
- * @param zodErrorMapping Optional `ZodErrorMap` object which can be used to translate or intercept the existing error / message mapping.
  * @returns RequestHandler to be given to express router
  *
  * @example
  * ```
  * import { withSchemaValidation } from '@pcgl-daco/request-utils';
+ * import { defaultErrorMap } from 'zod';
  *
- * router.post('/', withSchemaValidation(ExampleSchema, (request, response, next) => {
+ * router.post('/', withSchemaValidation(ExampleSchema, defaultErrorMap, (request, response, next) => {
  * 	const { body } = request;
  * 	// TS knows the structure of `body` from `ExampleSchema`. It is already validated, you can use it immediately
  * 	const output = doSomethingWithBody(body);
@@ -51,8 +52,8 @@ import { RequestValidationErrorResponse } from './responses.js';
  */
 function withSchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
+	zodErrorMapping: ZodErrorMap | undefined,
 	handler: RequestHandler<ParamsDictionary, any, ReqBody>,
-	zodErrorMapping?: ZodErrorMap,
 ): RequestHandler {
 	return async (request, response, next) => {
 		try {

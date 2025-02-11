@@ -21,14 +21,11 @@ import { z } from 'zod';
 
 const apiZodErrorMapping: z.ZodErrorMap = (issue, ctx) => {
 	if (issue.code === z.ZodIssueCode.invalid_type) {
-		return {
-			message: `Incorrect value for ${issue.path[issue.path.length - 1]}, expected a ${issue.expected}`,
-		};
-	}
-	if (issue.code === z.ZodIssueCode.unrecognized_keys) {
-		return {
-			message: `Invalid keys included in object. Key(s) ${issue.keys.map((key, i) => `"${key}"${i !== issue.keys.length - 1 ? ', ' : ''}`)} are not recognized.`,
-		};
+		if (!issue.expected.includes('undefined') && issue.received.includes('undefined')) {
+			return {
+				message: `Property '${issue.path[issue.path.length - 1]}' is required.`,
+			};
+		}
 	}
 
 	if (issue.code === z.ZodIssueCode.custom) {

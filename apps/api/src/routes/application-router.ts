@@ -69,30 +69,26 @@ applicationRouter.post(
 applicationRouter.post(
 	'/applications/edit',
 	jsonParser,
-	withSchemaValidation(
-		applicationEditSchema,
-		async (req, res) => {
-			// TODO: Add Auth
-			const data = req.body;
+	withSchemaValidation(applicationEditSchema, apiZodErrorMapping, async (req, res) => {
+		// TODO: Add Auth
+		const data = req.body;
 
-			const { id, update } = data;
-			const result = await editApplication({ id, update });
+		const { id, update } = data;
+		const result = await editApplication({ id, update });
 
-			if (result.success) {
-				res.send(result.data);
+		if (result.success) {
+			res.send(result.data);
+		} else {
+			// TODO: System Error Handling
+			if (String(result.errors) === 'Error: Application record is undefined') {
+				res.status(404);
 			} else {
-				// TODO: System Error Handling
-				if (String(result.errors) === 'Error: Application record is undefined') {
-					res.status(404);
-				} else {
-					res.status(500);
-				}
-
-				res.send({ message: result.message, errors: String(result.errors) });
+				res.status(500);
 			}
-		},
-		apiZodErrorMapping,
-	),
+
+			res.send({ message: result.message, errors: String(result.errors) });
+		}
+	}),
 );
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
