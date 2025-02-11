@@ -18,13 +18,13 @@
  */
 
 import { Divider, Flex, Typography } from 'antd';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 const { Title, Text } = Typography;
 
 interface SectionTitleProps extends PropsWithChildren {
 	title: string;
-	text?: string[] | string;
+	text?: string[] | ReactNode;
 	textAbidesNewLines?: boolean;
 	showDivider?: boolean;
 }
@@ -34,17 +34,15 @@ const SectionTitle = ({ title, text, showDivider = true, textAbidesNewLines = fa
 		<Flex vertical>
 			<Title level={2}>{title}</Title>
 			<Flex vertical gap={'middle'}>
-				{text && Array.isArray(text) ? (
-					text.map((text, index) => {
-						return (
-							<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined} key={index}>
-								{text}
-							</Text>
-						);
-					})
-				) : (
-					<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined}>text</Text>
-				)}
+				{text && Array.isArray(text)
+					? text.map((text) => {
+							return (
+								<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined} key={text}>
+									{text}
+								</Text>
+							);
+						})
+					: text}
 			</Flex>
 			{children}
 			{showDivider && <Divider />}
