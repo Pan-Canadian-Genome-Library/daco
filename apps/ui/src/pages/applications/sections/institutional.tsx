@@ -59,7 +59,7 @@ const Institutional = () => {
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
-								label={translate('institutional-section.form.title')}
+								label={translate('form.title')}
 								name="institutionalTitle"
 								placeholder="Select"
 								control={control}
@@ -75,7 +75,7 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.firstName')}
+								label={translate('form.firstName')}
 								name="institutionalFirstName"
 								control={control}
 								autoComplete="given-name"
@@ -86,7 +86,7 @@ const Institutional = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.middleName')}
+								label={translate('form.middleName')}
 								name="institutionalMiddleName"
 								autoComplete="additional-name"
 								control={control}
@@ -98,7 +98,7 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.lastName')}
+								label={translate('form.lastName')}
 								name="institutionalLastName"
 								control={control}
 								autoComplete="family-name"
@@ -109,7 +109,7 @@ const Institutional = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.suffix')}
+								label={translate('form.suffix')}
 								name="institutionalSuffix"
 								control={control}
 								autoComplete="honorific-suffix"
@@ -121,8 +121,8 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.primaryAffiliation')}
-								subLabel={translate('institutional-section.form.primaryAffiliationSubLabel')}
+								label={translate('form.primaryAffiliation')}
+								subLabel={translate('form.primaryAffiliationSubLabel')}
 								name="institutionalPrimaryAffiliation"
 								control={control}
 								rule={rule}
@@ -134,8 +134,8 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.primaryEmail')}
-								subLabel={translate('institutional-section.form.primaryEmailLabel')}
+								label={translate('form.primaryEmail')}
+								subLabel={translate('form.primaryEmailLabel')}
 								name="institutionalInstituteAffiliation"
 								control={control}
 								rule={rule}
@@ -147,8 +147,8 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.researcherProfile')}
-								subLabel={translate('institutional-section.form.researcherProfileLabel')}
+								label={translate('form.researcherProfile')}
+								subLabel={translate('form.researcherProfileLabel')}
 								name="institutionalProfileUrl"
 								autoComplete="url"
 								placeHolder="https://"
@@ -162,7 +162,7 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.positionTitle')}
+								label={translate('form.positionTitle')}
 								name="institutionalPositionTitle"
 								control={control}
 								rule={rule}
@@ -176,7 +176,7 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
-								label={translate('institutional-section.form.country')}
+								label={translate('form.country')}
 								name="institutionCountry"
 								control={control}
 								rule={rule}
@@ -192,7 +192,7 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.streetAddress')}
+								label={translate('form.streetAddress')}
 								name="institutionStreetAddress"
 								control={control}
 								rule={rule}
@@ -202,7 +202,7 @@ const Institutional = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.building')}
+								label={translate('form.building')}
 								name="institutionBuilding"
 								control={control}
 								rule={rule}
@@ -213,7 +213,7 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.state')}
+								label={translate('form.state')}
 								name="institutionState"
 								control={control}
 								rule={rule}
@@ -223,7 +223,7 @@ const Institutional = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.city')}
+								label={translate('form.city')}
 								name="institutionCity"
 								control={control}
 								rule={rule}
@@ -235,7 +235,7 @@ const Institutional = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('institutional-section.form.postalCode')}
+								label={translate('form.postalCode')}
 								name="institutionPostalCode"
 								control={control}
 								rule={rule}
