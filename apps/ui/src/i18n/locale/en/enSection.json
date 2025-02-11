@@ -146,6 +146,16 @@
 			}
 		}
 	},
+	"requested-study": {
+		"title": "Requested Study",
+		"description1": "To help the DAC review your data access request more efficiently, please select the study you are requesting access to. You can view and choose from the available studies on the",
+		"description-link": "PCGL Research Portal - Studies.",
+		"section1": {
+			"form": {
+				"studyName": "Study Name:"
+			}
+		}
+	},
 	"data-access-section": {
 		"title": "Data Access Agreement",
 		"description1": "This application form must be completed by the applicant and the legal entity with which you are affiliated (\"You\") prior to being granted access to International Cancer Genome Consortium (\"PCGL\") controlled data (the \"PCGL Controlled Data\" as further defined in Section F of this application). To receive access, You must complete this entire application form and agree to its terms by signing this application. All sections, as well as Appendices I through III, are integral components of this application. Your Research Project (as defined below) will be checked for conformity with the goals and policies of PCGL ARGO including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the participants and the security of the participants' data. The terms You accept in this application, form an agreement between You and The University Court of the University of Glasgow, incorporated under the Universities (Scotland) Act 1889 and having its principal office at University Avenue, Glasgow G12 8QQ, a registered Scottish charity in terms of Section 13(2) of the Charities and Trustee Investment (Scotland) Act 2005 (Charity Number SC004401, Charity Name 'University of Glasgow Court') (\"University\") which is the legal entity that administrates the ICGC Controlled Data on behalf of PCGL member programs. University includes its employees, officers, directors, contractors, subcontractors and agents (including the DACO, as defined immediately below).\n\nIf the Data Access Compliance Office of the PCGL (the \"DACO\"), approves your application, access to the PCGL Controlled Data will be granted for a two (2) year period starting from the date You are approved for access. You may apply for written approval to extend the term of this agreement by resubmitting your application for renewal.\n\nIf your application is approved, You agree that Your application information will be included in a public registry containing project details and lay summaries of the scientific abstracts of applicants having been granted access to PCGL Controlled Data.\n\nYou agree you have read the DACO Policies and Procedures document prior to completing this application. This agreement governs the terms of access to the PCGL Controlled Data (further defined below). In signing this agreement, you agree to be bound by the terms and conditions of access set out therein.\n\nFor the sake of clarity, the terms of access set out in this agreement apply to the User and to the User Institution(s) (as defined below). The current agreement is limited to the PCGL Controlled Data (as defined below) and does not cover other data generated at the different centres participating in the project.",

@@ -94,6 +94,7 @@
 		"applicant": "A. Applicant Information",
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
+		"study": "E. Requested Study",
 		"agreement": "F. Data Access Agreement"
 	},
 	"errors": {

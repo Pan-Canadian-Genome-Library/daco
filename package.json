@@ -13,13 +13,14 @@
 		"url": "https://github.com/Pan-Canadian-Genome-Library/daco/issues"
 	},
 	"scripts": {
-		"build:all": "pnpm -r build",
-		"build:api": "pnpm --filter pcgl-daco-api build",
-		"build:ui": "pnpm --filter pcgl-daco-ui build",
-		"dev:all": "pnpm --parallel dev",
-		"dev:api": "pnpm --filter pcgl-daco-ui dev",
-		"dev:ui": "pnpm --filter pcgl-daco-ui dev",
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"build:all": "nx run-many --all --target=build",
+		"build:api": "nx run @pcgl-daco/api:build",
+		"build:ui": "nx run @pcgl-daco/ui:build",
+		"dev:all": "concurrently --names=api,ui \"pnpm -w dev:api\" \"pnpm -w dev:ui\"",
+		"dev:api": "nx run @pcgl-daco/api:dev",
+		"dev:ui": "nx run @pcgl-daco/ui:dev",
+		"setup:all": "nx run-many --all --target=init",
+		"test": "nx run-many --all --target=test",
 		"prettier": "npx prettier ./packages ./apps --write",
 		"prepare": "husky"
 	},
@@ -27,13 +28,14 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"concurrently": "^9.1.2",
 		"husky": "^9.1.6",
+		"nx": "^20.4.2",
 		"prettier": "^3.3.3",
 		"prettier-plugin-organize-imports": "^4.1.0",
 		"rimraf": "^6.0.1",
 		"tsx": "^4.19.1",
 		"typescript": "^5.5.3",
 		"vite": "^5.4.1"
-	},
-	"dependencies": {}
+	}
 }

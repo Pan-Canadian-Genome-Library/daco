@@ -24,29 +24,27 @@ const { Title, Text } = Typography;
 
 interface SectionTitleProps extends PropsWithChildren {
 	title: string;
-	text?: string[];
+	text?: string[] | string;
 	textAbidesNewLines?: boolean;
 	showDivider?: boolean;
 }
 
-const SectionTitle = ({
-	title,
-	text = [],
-	showDivider = true,
-	textAbidesNewLines = false,
-	children,
-}: SectionTitleProps) => {
+const SectionTitle = ({ title, text, showDivider = true, textAbidesNewLines = false, children }: SectionTitleProps) => {
 	return (
 		<Flex vertical>
 			<Title level={2}>{title}</Title>
 			<Flex vertical gap={'middle'}>
-				{text.map((text, index) => {
-					return (
-						<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined} key={index}>
-							{text}
-						</Text>
-					);
-				})}
+				{text && Array.isArray(text) ? (
+					text.map((text, index) => {
+						return (
+							<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined} key={index}>
+								{text}
+							</Text>
+						);
+					})
+				) : (
+					<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined}>text</Text>
+				)}
 			</Flex>
 			{children}
 			{showDivider && <Divider />}
