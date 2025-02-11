@@ -79,7 +79,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 				return (
 					<Item
 						style={props.style}
-						name={props.name as string}
+						name={`${props.name}`}
 						label={props.label}
 						labelAlign={props.labelAlign}
 						labelCol={props.labelCol}
@@ -91,7 +91,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 						{props.subLabel ? (
 							<Item
 								label={props.subLabel}
-								name={props.name as string}
+								name={`${props.name}`}
 								rules={[props.rule]}
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
