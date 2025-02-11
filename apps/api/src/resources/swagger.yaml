@@ -544,6 +544,9 @@ components:
         project_methodology:
           type: string
           description: Description of scientific approach used in the project
+        project_aims:
+          type: string
+          description: Goals for the project
         project_summary:
           type: string
           description: In depth text summary of project
@@ -737,6 +740,9 @@ components:
         projectMethodology:
           type: string
           description: Description of scientific approach used in the project
+        projectAims:
+          type: string
+          description: Goals for the project
         projectSummary:
           type: string
           description: In depth text summary of project

@@ -1,0 +1,1 @@
+ALTER TABLE "application_contents" ADD COLUMN "project_aims" text;
