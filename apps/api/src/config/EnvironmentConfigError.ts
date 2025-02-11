@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,9 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { dbConfig } from '@/config/dbConfig.js';
-import { connectToDb } from '@/db/index.js';
-import startServer from '@/server.js';
+import { ZodError } from 'zod';
 
-connectToDb(dbConfig.connectionString);
-startServer();
+class EnvironmentConfigError extends Error {
+	constructor(configName: string, zodError: ZodError) {
+		super();
+		this.message = `Error parsing environment variables for "${configName}" config! ${zodError.message}`;
+		this.name = 'EnvironmentConfigError';
+	}
+}
+export default EnvironmentConfigError;

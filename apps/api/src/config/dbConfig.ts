@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,9 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { dbConfig } from '@/config/dbConfig.js';
-import { connectToDb } from '@/db/index.js';
-import startServer from '@/server.js';
+import { z } from 'zod';
+import EnvironmentConfigError from './EnvironmentConfigError.js';
 
-connectToDb(dbConfig.connectionString);
-startServer();
+const serverConfigSchema = z.object({
+	PG_USER: z.string(),
+	PG_PASSWORD: z.string(),
+	PG_HOST: z.string(),
+	PG_DATABASE: z.string(),
+});
+
+const parseResult = serverConfigSchema.safeParse(process.env);
+
+if (!parseResult.success) {
+	throw new EnvironmentConfigError(`db`, parseResult.error);
+}
+
+const { PG_USER, PG_PASSWORD, PG_HOST, PG_DATABASE } = parseResult.data;
+const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
+
+export const dbConfig = { ...parseResult.data, connectionString };
