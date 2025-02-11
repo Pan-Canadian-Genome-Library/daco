@@ -28,17 +28,13 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import InputBox from '@/components/pages/application/form-components/InputBox';
+import { ModalStateProps } from '@/pages/applications/sections/collaborators';
 
 const { Text } = Typography;
 
-type AddCollaboratorModalProps = {
-	isOpen: boolean;
-	setIsOpen: (val: boolean) => void;
-};
-
 const rule = createSchemaFieldRule(collaboratorsSchema);
 
-const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: AddCollaboratorModalProps) => {
+const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
@@ -54,7 +50,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: AddCollaboratorModalPr
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '1000px', paddingInline: 10 }}
 			open={isOpen}
-			onCancel={() => setIsOpen(false)}
+			onCancel={() => setIsOpen({ isOpen: false })}
 			footer={[]}
 			destroyOnClose
 		>
@@ -130,7 +126,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: AddCollaboratorModalPr
 						</Row>
 					</Flex>
 					<Flex align="center" justify="flex-end" gap={'middle'}>
-						<Button htmlType="button" onClick={() => setIsOpen(false)}>
+						<Button htmlType="button" onClick={() => setIsOpen({ isOpen: false })}>
 							{translate('button.cancel')}
 						</Button>
 						<Button type="primary" htmlType="submit">

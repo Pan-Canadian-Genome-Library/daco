@@ -48,19 +48,18 @@ export interface ModalState {
 	isOpen: boolean;
 }
 
-export interface ModalState {
-	rowData?: CollabTableData;
-	isOpen: boolean;
+export interface ModalStateProps extends ModalState {
+	setIsOpen: (props: ModalState) => void;
 }
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
-	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
 
 	// MODAL STATES
-	const [openAddCollaboratorModal, setOpenAddCollaboratorModal] = useState(false);
+	const [addModalState, setAddModalState] = useState<ModalState>({ isOpen: false });
+	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
 	const [editModalState, setEditModalState] = useState<ModalState>({ isOpen: false });
 
 	const columns: TableProps<CollabTableData>['columns'] = [
@@ -87,24 +86,26 @@ const Collaborators = () => {
 		{
 			key: 'tools',
 			title: 'Tools',
-			render: (value) => (
-				<Space size="middle">
-					<Button
-						onClick={() => setEditModalState({ rowData: value, isOpen: true })}
-						disabled={!isEditMode}
-						style={{ fontWeight: 400 }}
-					>
-						{translate('button.edit')}
-					</Button>
-					<Button
-						onClick={() => setDeleteModalState({ rowData: value, isOpen: true })}
-						disabled={!isEditMode}
-						style={{ fontWeight: 400 }}
-					>
-						{translate('button.delete')}
-					</Button>
-				</Space>
-			),
+			render: (value) => {
+				return (
+					<Space size="middle">
+						<Button
+							onClick={() => setEditModalState({ rowData: value, isOpen: true })}
+							disabled={!isEditMode}
+							style={{ fontWeight: 400 }}
+						>
+							{translate('button.edit')}
+						</Button>
+						<Button
+							onClick={() => setDeleteModalState({ rowData: value, isOpen: true })}
+							disabled={!isEditMode}
+							style={{ fontWeight: 400 }}
+						>
+							{translate('button.delete')}
+						</Button>
+					</Space>
+				);
+			},
 		},
 	];
 
@@ -142,7 +143,7 @@ const Collaborators = () => {
 					<Row justify={'end'}>
 						<Col style={{ paddingTop: token.paddingLG }}>
 							<Button
-								onClick={() => setOpenAddCollaboratorModal(true)}
+								onClick={() => setAddModalState({ isOpen: true })}
 								style={{ borderRadius: 100 }}
 								type="primary"
 								disabled={!isEditMode}
@@ -155,9 +156,18 @@ const Collaborators = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<DeleteCollaboratorModal appId={appId} deleteState={deleteModalState} setIsOpen={setDeleteModalState} />
-				<AddCollaboratorModal isOpen={openAddCollaboratorModal} setIsOpen={setOpenAddCollaboratorModal} />
-				<EditCollaboratorModal editState={editModalState} setIsOpen={setEditModalState} />
+				<AddCollaboratorModal isOpen={addModalState.isOpen} setIsOpen={setAddModalState} />
+				<DeleteCollaboratorModal
+					appId={appId}
+					isOpen={deleteModalState.isOpen}
+					rowData={deleteModalState.rowData}
+					setIsOpen={setDeleteModalState}
+				/>
+				<EditCollaboratorModal
+					rowData={editModalState.rowData}
+					setIsOpen={setEditModalState}
+					isOpen={editModalState.isOpen}
+				/>
 				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />
 			</>
 		</SectionWrapper>

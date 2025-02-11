@@ -28,28 +28,23 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import InputBox from '@/components/pages/application/form-components/InputBox';
-import { ModalState } from '@/pages/applications/sections/collaborators';
+import { ModalStateProps } from '@/pages/applications/sections/collaborators';
 
 const { Text } = Typography;
 
-type EditCollaboratorModalProps = {
-	editState: ModalState;
-	setIsOpen: (props: ModalState) => void;
-};
-
 const rule = createSchemaFieldRule(collaboratorsSchema);
 
-const EditCollaboratorModal = memo(({ editState, setIsOpen }: EditCollaboratorModalProps) => {
+const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
 		defaultValues: {
-			collabFirstName: editState.rowData?.firstName || '',
-			collabMiddleName: editState.rowData?.lastName || '',
-			collabLastName: editState.rowData?.lastName || '',
-			collabPrimaryEmail: editState.rowData?.institutionalEmail || '',
-			collabPositionTitle: editState.rowData?.title || '',
+			collabFirstName: rowData?.firstName || '',
+			collabMiddleName: rowData?.lastName || '',
+			collabLastName: rowData?.lastName || '',
+			collabPrimaryEmail: rowData?.institutionalEmail || '',
+			collabPositionTitle: rowData?.title || '',
 		},
 		resolver: zodResolver(collaboratorsSchema),
 	});
@@ -60,14 +55,14 @@ const EditCollaboratorModal = memo(({ editState, setIsOpen }: EditCollaboratorMo
 	 */
 	useEffect(() => {
 		reset({
-			collabFirstName: editState.rowData?.firstName || '',
-			collabMiddleName: editState.rowData?.lastName || '',
-			collabLastName: editState.rowData?.lastName || '',
-			collabPrimaryEmail: editState.rowData?.institutionalEmail || '',
-			collabPositionTitle: editState.rowData?.title || '',
-			collabSuffix: editState.rowData?.suffix || '',
+			collabFirstName: rowData?.firstName || '',
+			collabMiddleName: rowData?.lastName || '',
+			collabLastName: rowData?.lastName || '',
+			collabPrimaryEmail: rowData?.institutionalEmail || '',
+			collabPositionTitle: rowData?.title || '',
+			collabSuffix: rowData?.suffix || '',
 		});
-	}, [editState.rowData, reset]);
+	}, [rowData, reset]);
 
 	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
 		console.log(data);
@@ -80,7 +75,7 @@ const EditCollaboratorModal = memo(({ editState, setIsOpen }: EditCollaboratorMo
 			cancelText={translate('button.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '1000px', paddingInline: 10 }}
-			open={editState.isOpen}
+			open={isOpen}
 			onCancel={(prev) => setIsOpen({ ...prev, isOpen: false })}
 			footer={[]}
 			destroyOnClose
