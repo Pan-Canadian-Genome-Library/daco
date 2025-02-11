@@ -63,8 +63,8 @@ export const createCollaborators = async ({
 		return failure(`Can only add Collaborators when Application is in state DRAFT`);
 	}
 
-	const validCollaborators: CollaboratorsSchemaType[] = collaborators.map((data: CollaboratorDTO) =>
-		collaboratorsSchema.parse(data),
+	const validCollaborators = collaborators.filter(
+		(data: CollaboratorDTO): data is CollaboratorsSchemaType => collaboratorsSchema.safeParse(data).success,
 	);
 
 	if (!(validCollaborators.length === collaborators.length)) {

@@ -47,9 +47,9 @@ export const applicantInformationSchema = z.object({
 
 export const collaboratorsSchema = z.object({
 	collaboratorFirstName: NonEmptyString,
-	collaboratorMiddleName: NonEmptyString,
+	collaboratorMiddleName: EmptyOrOptionalString,
 	collaboratorLastName: NonEmptyString,
-	collaboratorSuffix: NonEmptyString,
+	collaboratorSuffix: EmptyOrOptionalString,
 	collaboratorInstitutionalEmail: NonEmptyString.email(),
 	collaboratorPositionTitle: NonEmptyString,
 });
