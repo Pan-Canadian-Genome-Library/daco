@@ -38,7 +38,7 @@ import { RequestValidationErrorResponse } from './responses.js';
  *
  * @example
  * ```
- * import withSchemaValidation from 'express-request-validation';
+ * import { withSchemaValidation } from '@pcgl-daco/request-utils';
  *
  * router.post('/', withSchemaValidation(ExampleSchema, (request, response, next) => {
  * 	const { body } = request;

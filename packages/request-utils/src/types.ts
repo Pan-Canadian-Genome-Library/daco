@@ -23,16 +23,16 @@ export const ErrorName = {
 	BAD_REQUEST_ERROR: 'BadRequestError',
 	CONFLICT_ERROR: 'ConflictError',
 	NOT_FOUND_ERROR: 'NotFoundError',
-	RECAPTCHA_ERROR: 'RecaptchaError',
 	REQUEST_VALIDATION_ERROR: 'RequestValidationError',
 	SERVER_ERROR: 'ServerError',
 	UNAUTHORIZED: 'Unauthorized',
+	NOT_IMPLEMENTED: 'NotImplemented',
 } as const;
 
 export type ErrorNames = (typeof ErrorName)[keyof typeof ErrorName];
 
 export type ErrorResponse = {
-	error: ErrorNames | 'NOT_IMPLEMENTED'; // TODO: remove once all routes are implemented
+	error: ErrorNames;
 	message: string;
 };
 
