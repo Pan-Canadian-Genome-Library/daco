@@ -46,12 +46,12 @@ export const applicantInformationSchema = z.object({
 });
 
 export const collaboratorsSchema = z.object({
-	collabFirstName: NonEmptyString,
-	collabMiddleName: NonEmptyString,
-	collabLastName: NonEmptyString,
-	collabSuffix: NonEmptyString,
-	collabPrimaryEmail: NonEmptyString.email(),
-	collabPositionTitle: NonEmptyString,
+	collaboratorFirstName: NonEmptyString,
+	collaboratorMiddleName: NonEmptyString,
+	collaboratorLastName: NonEmptyString,
+	collaboratorSuffix: NonEmptyString,
+	collaboratorInstitutionalEmail: NonEmptyString.email(),
+	collaboratorPositionTitle: NonEmptyString,
 });
 
 export const institutionalRepSchema = z.object({

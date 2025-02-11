@@ -20,6 +20,10 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+
+zodResolver;
+
 import { createCollaborators } from '@/controllers/collaboratorsController.js';
 import { type CollaboratorRequest } from '@pcgl-daco/data-model';
 

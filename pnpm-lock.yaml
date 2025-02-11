@@ -38,12 +38,18 @@ importers:
 
   apps/api:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.10.0
+        version: 3.10.0(react-hook-form@7.54.2(react@18.3.1))
       '@pcgl-daco/data-model':
         specifier: workspace:^
         version: link:../../packages/data-model
       '@pcgl-daco/logger':
         specifier: workspace:^
         version: link:../../packages/logger
+      '@pcgl-daco/validation':
+        specifier: workspace:^
+        version: link:../../packages/validation
       '@types/body-parser':
         specifier: ^1.19.5
         version: 1.19.5
