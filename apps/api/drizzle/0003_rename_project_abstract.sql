@@ -1,0 +1,1 @@
+ALTER TABLE "application_contents" RENAME COLUMN "project_abstract" TO "project_background";

@@ -27,6 +27,7 @@ export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
+export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
@@ -89,4 +90,8 @@ export const projectInformationSchema = z.object({
 export const ethicsSchema = z.object({
 	ethicsApproval: EthicsEnum,
 	uploadPath: NonEmptyString,
+});
+
+export const requestedStudySchema = z.object({
+	requestedStudy: NonEmptyString,
 });
