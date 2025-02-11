@@ -26,6 +26,7 @@ import Collaborators from '@/pages/applications/sections/collaborators';
 import Institutional from '@/pages/applications/sections/institutional';
 import Introduction from '@/pages/applications/sections/intro';
 import Project from '@/pages/applications/sections/project';
+import RequestedStudy from '@/pages/applications/sections/requestedStudy';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
@@ -55,6 +56,11 @@ export const ApplicationSectionRoutes = [
 		route: 'project',
 		path: 'project/edit?',
 		element: <Project />,
+	},
+	{
+		route: 'study',
+		path: 'study/edit?',
+		element: <RequestedStudy />,
 	},
 ];
 

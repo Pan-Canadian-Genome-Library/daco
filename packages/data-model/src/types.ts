@@ -133,7 +133,7 @@ export type InstitutionDTO = {
 export type ProjectDTO = {
 	projectTitle?: string | null;
 	projectWebsite?: string | null;
-	projectAbstract?: string | null;
+	projectBackground?: string | null;
 	projectMethodology?: string | null;
 	projectSummary?: string | null;
 	projectPublicationUrls?: string[] | null;

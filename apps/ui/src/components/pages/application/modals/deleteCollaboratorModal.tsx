@@ -17,50 +17,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { RuleRender } from 'antd/es/form';
-import { ReactNode } from 'react';
+import { Flex, Modal, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-export interface Application {
-	id: string;
-	userId: string;
-	state: ApplicationStateValues;
-	createdAt: string;
-	approvedAt: string;
-	updatedAt: string;
-	expiresAt: string;
-}
+import { ModalState } from '@/pages/applications/sections/collaborators';
 
-export interface ApplicationCountMetadata {
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	REJECTED: number;
-	APPROVED: number;
-	CLOSED: number;
-	REVOKED: number;
-	TOTAL: number;
-}
+const { Text } = Typography;
 
-export interface ServerError {
-	message: string;
-	errors?: string;
-}
-
-export interface FetchError extends ServerError {
-	isError: true;
-	statusCode: number;
-}
-
-export interface ApplicationOutletContext {
+type DeleteCollaboratorModalProps = {
 	appId: string | number;
-	isEditMode: boolean;
-}
+	deleteState: ModalState;
+	setIsOpen: (props: ModalState) => void;
+};
 
-export interface BasicFormFieldProps {
-	label?: string | ReactNode;
-	rule: RuleRender;
-	required?: boolean;
-}
+const DeleteCollaboratorModal = ({ appId, deleteState, setIsOpen }: DeleteCollaboratorModalProps) => {
+	const { t: translate } = useTranslation();
+
+	return (
+		<Modal
+			title={translate('collab-section.deleteModalTitle')}
+			okText={translate('button.delete')}
+			okButtonProps={{ color: 'danger', variant: 'solid' }}
+			cancelText={translate('button.cancel')}
+			width={'100%'}
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			open={deleteState.isOpen}
+			onCancel={() => setIsOpen({ isOpen: false })}
+			destroyOnClose
+		>
+			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
+				<Text>{translate('collab-section.deleteModalDes', { name: deleteState.rowData?.firstName, appId })}</Text>
+			</Flex>
+		</Modal>
+	);
+};
+
+export default DeleteCollaboratorModal;
