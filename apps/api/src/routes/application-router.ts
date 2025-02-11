@@ -249,8 +249,12 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 		res.status(400).json({ message: 'Application ID is required.' });
 	}
 	if (!applicationId || isNaN(parseInt(applicationId))) {
-		res.status(400).json({ message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			errors: 'MissingOrInvalidParameters', });
+		res
+			.status(400)
+			.json({
+				message: 'Invalid request. ApplicationId is required and must be a valid number.',
+				errors: 'MissingOrInvalidParameters',
+			});
 	}
 
 	const result = await getApplicationById({ applicationId });

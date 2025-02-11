@@ -32,8 +32,8 @@ import {
 } from '@pcgl-daco/data-model/src/types.js';
 import {
 	type ApplicationContentModel,
-	type ApplicationModel,
 	type ApplicationContentUpdates,
+	type ApplicationModel,
 	type ApplicationRecord,
 	type ApplicationsColumnName,
 	type ApplicationStateTotals,
