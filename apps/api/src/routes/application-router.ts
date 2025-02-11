@@ -26,7 +26,7 @@ import {
 	getApplicationStateTotals,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
-import { withSchemaValidation } from '@pcgl-daco/request-validation';
+import { withSchemaValidation } from '@pcgl-daco/request-utils';
 import { applicationEditSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
