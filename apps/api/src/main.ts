@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { dbConfig } from '@/config/dbConfig.js';
 import { connectToDb } from '@/db/index.js';
 import startServer from '@/server.js';
-import { connectionString } from '../drizzle.config.js';
 
-connectToDb(connectionString);
+connectToDb(dbConfig.connectionString);
 startServer();

@@ -82,6 +82,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				projectWebsite: applicationContents.project_website,
 				projectBackground: applicationContents.project_background,
 				projectMethodology: applicationContents.project_methodology,
+				projectAims: applicationContents.project_aims,
 				projectSummary: applicationContents.project_summary,
 				projectPublicationUrls: applicationContents.project_publication_urls,
 				requestedStudies: applicationContents.requested_studies,

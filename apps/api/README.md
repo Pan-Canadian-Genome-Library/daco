@@ -23,14 +23,13 @@ Follow these steps to prepare your local machine to run this application from so
 
 The following environment variables can be set to configure the DACO API. If the property is listed as required, the app will fail to run without a value being provided to the server's runtime environment.
 
-| Name          | Description                                               | Type      | Required | Default          |
-| ------------- | --------------------------------------------------------- | --------- | -------- | ---------------- |
-| `PORT`        | Port number this service will listen to.                  | `number`  | Optional | `3000`           |
-| `PG_USER`     | Postgres Database User name.                              | `string`  | Optional | `postgres`       |
-| `PG_PASSWORD` | Postgres Database password.                               | `string`  | Optional | `mypassword`     |
-| `PG_HOST`     | URL for the Postgres DB service.                          | `string`  | Optional | `localhost:5432` |
-| `PG_DATABASE` | Postgres Database name.                                   | `string`  | Optional | `postgres`       |
-| `IS_PROD`     | Determines if application is deployed in production mode. | `boolean` | Optional | `false`          |
+| Name          | Description                              | Type     | Required | Default |
+| ------------- | ---------------------------------------- | -------- | -------- | ------- |
+| `PORT`        | Port number this service will listen to. | `number` | Optional | `3000`  |
+| `PG_DATABASE` | Postgres database name.                  | `string` | Required |         |
+| `PG_HOST`     | Postgres database host address.          | `string` | Required |         |
+| `PG_PASSWORD` | Postgres database password.              | `string` | Required |         |
+| `PG_USER`     | Postgres database user name.             | `string` | Required |         |
 
 ## Unit Testing
 
