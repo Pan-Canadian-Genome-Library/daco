@@ -65,6 +65,7 @@
 		"back": "Back",
 		"submitApplication": "Submit Application",
 		"addCollab": "Add Collaborator",
+		"upload": "Upload",
 		"save": "Save Changes"
 	},
 	"label": {
@@ -95,6 +96,7 @@
 		"applicant": "A. Applicant Information",
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
+		"ethics": "F. Ethics",
 		"study": "E. Requested Study"
 	},
 	"errors": {
