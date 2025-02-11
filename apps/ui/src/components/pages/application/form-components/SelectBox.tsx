@@ -42,7 +42,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 				return (
 					<Item
 						label={props.label}
-						name={props.name as string}
+						name={`${props.name}`}
 						rules={[props.rule]}
 						required={props.required}
 						initialValue={props.initialValue}

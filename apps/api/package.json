@@ -1,20 +1,26 @@
 {
-	"name": "pcgl-daco-api",
+	"name": "@pcgl-daco/api",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
 		"build": "rimraf ./dist && tsc",
-		"dev": "tsx watch --env-file=.env ./src/main.ts",
+		"dev": "concurrently --names=server,watch \"pnpm dev:server\" \"pnpm dev:watch\"",
+		"dev:server": "tsx watch --clear-screen=false --env-file=.env ./src/main.ts",
+		"dev:watch": "nx watch --projects=@pcgl-daco/api --includeDependentProjects -- nx run-many -t build \\$NX_PROJECT_NAME --exclude=@pcgl-daco/api",
 		"dbml": "tsx ./src/db/dbml.ts",
-		"test": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/**/*.test.ts",
+		"setup": "pnpm setup:env && pnpm setup:db",
+		"setup:db": "pnpm migrate",
+		"setup:env": "cp -n .env.schema .env",
 		"migrate": "pnpm drizzle-kit migrate",
-		"start:prod": "pnpm migrate && tsx ./src/main.js"
+		"start:prod": "pnpm migrate && tsx ./src/main.js",
+		"test": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/**/*.test.ts"
 	},
 	"devDependencies": {
 		"@testcontainers/postgresql": "^10.14.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
+		"@types/express-session": "^1.18.1",
 		"@types/node": "^22.7.4",
 		"@types/pg": "^8.11.10",
 		"@types/swagger-ui-express": "^4.1.7",
@@ -32,10 +38,12 @@
 		"cors": "^2.8.5",
 		"drizzle-orm": "^0.38.3",
 		"express": "^4.21.0",
+		"express-session": "^1.18.1",
 		"pg": "^8.13.0",
-		"typescript-fsm": "^1.4.5",
 		"swagger-ui-express": "^5.0.1",
-		"yamljs": "^0.3.0"
+		"typescript-fsm": "^1.4.5",
+		"yamljs": "^0.3.0",
+		"zod": "^3.24.1"
 	},
 	"engines": {
 		"node": "^20.9.0"

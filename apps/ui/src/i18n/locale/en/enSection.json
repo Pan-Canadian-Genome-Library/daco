@@ -19,53 +19,13 @@
 		"description1": "Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to apply for federal research grants, etc.).",
 		"description2": "Please include a valid institutional email address that will be used to log in to PCGL and will be the email address associated with PCGL Controlled Data access.",
 		"section1": "Principal Investigator Information",
-		"section2": "Institution/Company Mailing Address",
-		"form": {
-			"title": "Title:",
-			"firstName": "First Name:",
-			"middleName": "Middle Name:",
-			"lastName": "Last Name:",
-			"suffix": "Suffix:",
-			"primaryAffiliation": "Primary Affiliation:",
-			"primaryAffiliationSubLabel": "The legal entity responsible for this application.",
-			"primaryEmail": "Institutional Email:",
-			"primaryEmailLabel": "Must be the institutional email address of the Principal Investigator.",
-			"researcherProfile": "Researcher Profile:",
-			"researcherProfileLabel": "Please provide a link to your profile on your institution/company website.",
-			"positionTitle": "Position Title:",
-			"country": "Country:",
-			"streetAddress": "Street Address:",
-			"building": "Building:",
-			"state": "Province:",
-			"city": "City:",
-			"postalCode": "Postal/Zip Code:"
-		}
+		"section2": "Institution/Company Mailing Address"
 	},
 	"institutional-section": {
 		"title": "Institutional Representative",
 		"description1": "An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
 		"section1": "Institutional Representative",
-		"section2": "Institution/Company Mailing Address",
-		"form": {
-			"title": "Title:",
-			"firstName": "First Name:",
-			"middleName": "Middle Name:",
-			"lastName": "Last Name:",
-			"suffix": "Suffix:",
-			"primaryAffiliation": "Primary Affiliation:",
-			"primaryAffiliationSubLabel": "The legal entity responsible for this application.",
-			"primaryEmail": "Institutional Email:",
-			"primaryEmailLabel": "Must be the institutional email address of the Principal Investigator.",
-			"researcherProfile": "Researcher Profile:",
-			"researcherProfileLabel": "Please provide a link to your profile on your institution/company website.",
-			"positionTitle": "Position Title:",
-			"country": "Country:",
-			"streetAddress": "Street Address:",
-			"building": "Building:",
-			"state": "Province:",
-			"city": "City:",
-			"postalCode": "Postal/Zip Code:"
-		}
+		"section2": "Institution/Company Mailing Address"
 	},
 	"collab-section": {
 		"title": "Collaborators",
@@ -75,14 +35,28 @@
 		"deleteModalDescription": "You are about to delete collaborator, {{name}} from application PCGL-{{appId}}",
 		"addModalTitle": "Add A Collaborator",
 		"addModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL and will be the email address associated with PCGL Controlled Data access.",
-		"form": {
-			"firstName": "First Name:",
-			"middleName": "Middle Name:",
-			"lastName": "Last Name:",
-			"suffix": "Suffix:",
-			"primaryEmail": "Institutional Email:",
-			"positionTitle": "Position Title:"
-		}
+		"editModalTitle": "Edit Collaborator",
+		"editModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL and will be the email address associated with PCGL Controlled Data access."
+	},
+	"form": {
+		"firstName": "First Name:",
+		"middleName": "Middle Name:",
+		"lastName": "Last Name:",
+		"suffix": "Suffix:",
+		"primaryEmail": "Institutional Email:",
+		"primaryEmailLabel": "Must be the institutional email address of the Principal Investigator.",
+		"positionTitle": "Position Title:",
+		"title": "Title:",
+		"primaryAffiliation": "Primary Affiliation:",
+		"primaryAffiliationSubLabel": "The legal entity responsible for this application.",
+		"researcherProfile": "Researcher Profile:",
+		"researcherProfileLabel": "Please provide a link to your profile on your institution/company website.",
+		"country": "Country:",
+		"streetAddress": "Street Address:",
+		"building": "Building:",
+		"state": "Province:",
+		"city": "City:",
+		"postalCode": "Postal/Zip Code:"
 	},
 	"project-section": {
 		"title": "Project Information",
@@ -140,9 +114,30 @@
 		},
 		"section3": {
 			"title": "Relevant Publications",
-			"description": "Please provide at least three links to relevant publications, of which the applicant is an author or a co-author. These should be links (URLs) to publication websites such as pubmed.gov, biorxiv.org, or medrxiv.org.",
+			"description": "Please provide at least three links to relevant publications, of which the applicant is an author or a co-author. These should be links (URLs) to publication websites such as pubmed.gov, biorxiv.org, or medrxiv.org.",
 			"form": {
 				"urlPage": "URL Page"
+			}
+		}
+	},
+	"ethics-section": {
+		"title": "Ethics",
+		"description1": "PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.",
+		"description2": "Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual research projects and bear no responsibility for the applicant's failure to comply with local/national ethical requirements.",
+		"approval": "Ethical Approval",
+		"pleaseChose": "Please choose one of the following options",
+		"ethicsLetterDescription": "Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.",
+		"exemptionDescription": "You represent and warrant thexemptionDescriptionat your country/region does not require your research project to undergo ethics review.",
+		"attach": "Please attach an ethics approval letter to this application:",
+		"allowedFileTypes": "Allowed file types: pdf, doc, docx, | Max file size: 5MB"
+	},
+	"requested-study": {
+		"title": "Requested Study",
+		"description1": "To help the DAC review your data access request more efficiently, please select the study you are requesting access to. You can view and choose from the available studies on the",
+		"description-link": "PCGL Research Portal - Studies.",
+		"section1": {
+			"form": {
+				"studyName": "Study Name:"
 			}
 		}
 	}
