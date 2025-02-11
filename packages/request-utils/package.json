@@ -1,5 +1,5 @@
 {
-	"name": "@pcgl-daco/request-validation",
+	"name": "@pcgl-daco/request-utils",
 	"version": "0.0.1",
 	"description": "PCGL DACO Middleware Error Handler",
 	"exports": "./dist/index.js",
