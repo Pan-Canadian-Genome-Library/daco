@@ -48,7 +48,7 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 								<Row
 									key={`checkbox-${checkbox.value}`}
 									style={{
-										backgroundColor: pcglColors.lightGrey,
+										backgroundColor: pcglColors.greyLight,
 										padding: token.padding,
 										borderRadius: token.borderRadius,
 										width: '100%',
