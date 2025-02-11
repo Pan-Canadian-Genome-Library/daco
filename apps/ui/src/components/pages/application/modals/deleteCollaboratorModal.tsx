@@ -17,6 +17,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './types.js';
+import { Flex, Modal, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-export { isApplicationStateValue } from './utils.js';
+import { ModalState } from '@/pages/applications/sections/collaborators';
+
+const { Text } = Typography;
+
+type DeleteCollaboratorModalProps = {
+	appId: string | number;
+	deleteState: ModalState;
+	setIsOpen: (props: ModalState) => void;
+};
+
+const DeleteCollaboratorModal = ({ appId, deleteState, setIsOpen }: DeleteCollaboratorModalProps) => {
+	const { t: translate } = useTranslation();
+
+	return (
+		<Modal
+			title={translate('collab-section.deleteModalTitle')}
+			okText={translate('button.delete')}
+			okButtonProps={{ color: 'danger', variant: 'solid' }}
+			cancelText={translate('button.cancel')}
+			width={'100%'}
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			open={deleteState.isOpen}
+			onCancel={() => setIsOpen({ isOpen: false })}
+			destroyOnClose
+		>
+			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
+				<Text>{translate('collab-section.deleteModalDes', { name: deleteState.rowData?.firstName, appId })}</Text>
+			</Flex>
+		</Modal>
+	);
+};
+
+export default DeleteCollaboratorModal;

@@ -25,6 +25,7 @@ import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
+import DeleteCollaboratorModal from '@/components/pages/application/modals/DeleteCollaboratorModal';
 import EditCollaboratorModal from '@/components/pages/application/modals/EditCollaboratorModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
@@ -47,10 +48,16 @@ export interface ModalState {
 	isOpen: boolean;
 }
 
+export interface ModalState {
+	rowData?: CollabTableData;
+	isOpen: boolean;
+}
+
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
+	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
 
 	// MODAL STATES
 	const [openAddCollaboratorModal, setOpenAddCollaboratorModal] = useState(false);
@@ -89,7 +96,11 @@ const Collaborators = () => {
 					>
 						{translate('button.edit')}
 					</Button>
-					<Button disabled={!isEditMode} style={{ fontWeight: 400 }}>
+					<Button
+						onClick={() => setDeleteModalState({ rowData: value, isOpen: true })}
+						disabled={!isEditMode}
+						style={{ fontWeight: 400 }}
+					>
 						{translate('button.delete')}
 					</Button>
 				</Space>
@@ -106,7 +117,7 @@ const Collaborators = () => {
 					showDivider={false}
 				/>
 				<SectionContent>
-					<Table<CollabTableData>
+					<Table
 						rowKey={(record: CollabTableData) => `PCGL-${record.id}`}
 						columns={columns}
 						dataSource={[
@@ -117,6 +128,13 @@ const Collaborators = () => {
 								institutionalEmail: 'thy.john.doe@oicr.ca',
 								title: 'PI',
 								suffix: 'Miss',
+							},
+							{
+								id: 53,
+								firstName: 'Sunny',
+								lastName: 'ShinShine',
+								institutionalEmail: 'the.sun.is.bright@oicr.ca',
+								title: 'Really good at job',
 							},
 						]}
 						pagination={false}
@@ -137,6 +155,7 @@ const Collaborators = () => {
 						</Col>
 					</Row>
 				</SectionContent>
+				<DeleteCollaboratorModal appId={appId} deleteState={deleteModalState} setIsOpen={setDeleteModalState} />
 				<AddCollaboratorModal isOpen={openAddCollaboratorModal} setIsOpen={setOpenAddCollaboratorModal} />
 				<EditCollaboratorModal editState={editModalState} setIsOpen={setEditModalState} />
 				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />

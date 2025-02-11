@@ -363,7 +363,7 @@ components:
           format: date-time
           nullable: true
           description: When the application expires. Can be NULL.
-        applicantInformation:
+        contents:
           type: object
           description: Information about the applicant who applied in the application.
           properties:
@@ -538,7 +538,7 @@ components:
         project_website:
           type: string
           description: URL of project website
-        project_abstract:
+        project_background:
           type: string
           description: Brief description of project
         project_methodology:
@@ -731,7 +731,7 @@ components:
         projectWebsite:
           type: string
           description: URL of project website
-        projectAbstract:
+        projectBackground:
           type: string
           description: Brief description of project
         projectMethodology:

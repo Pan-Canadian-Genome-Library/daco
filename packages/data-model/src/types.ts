@@ -47,10 +47,7 @@ export enum ApplicationReviewOutcomes {
 }
 
 export const ApplicationActions = {
-	CREATE: 'CREATE',
-	WITHDRAW: 'WITHDRAW',
 	CLOSE: 'CLOSE',
-	SUBMIT_DRAFT: 'SUBMIT_DRAFT',
 	INSTITUTIONAL_REP_REVISION_REQUEST: 'INSTITUTIONAL_REP_REVISION_REQUEST',
 	INSTITUTIONAL_REP_SUBMIT: 'INSTITUTIONAL_REP_SUBMIT',
 	INSTITUTIONAL_REP_APPROVED: 'INSTITUTIONAL_REP_APPROVED',
@@ -59,6 +56,8 @@ export const ApplicationActions = {
 	DAC_REVIEW_REJECTED: 'DAC_REVIEW_REJECTED',
 	DAC_REVIEW_REVISION_REQUEST: 'DAC_REVIEW_REVISION_REQUEST',
 	REVOKE: 'REVOKE',
+	SUBMIT_DRAFT: 'SUBMIT_DRAFT',
+	WITHDRAW: 'WITHDRAW',
 } as const;
 
 export type ApplicationActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
@@ -134,7 +133,7 @@ export type InstitutionDTO = {
 export type ProjectDTO = {
 	projectTitle?: string | null;
 	projectWebsite?: string | null;
-	projectAbstract?: string | null;
+	projectBackground?: string | null;
 	projectMethodology?: string | null;
 	projectSummary?: string | null;
 	projectPublicationUrls?: string[] | null;
@@ -144,7 +143,7 @@ export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
 
-export type ApplicationResponseData = {
+export type ApplicationDTO = {
 	id: number;
 	userId: string;
 	state: ApplicationStateValues;
@@ -152,7 +151,6 @@ export type ApplicationResponseData = {
 	approvedAt?: Date | null;
 	updatedAt?: Date | null;
 	expiresAt?: Date | null;
-	contents: ApplicationContentsResponse | null;
 };
 
 export type ApplicationContentsResponse = {
@@ -164,6 +162,34 @@ export type ApplicationContentsResponse = {
 	InstitutionalRepDTO &
 	ProjectDTO &
 	RequestedStudiesDTO;
+
+export interface ApplicationResponseData extends ApplicationDTO {
+	contents: ApplicationContentsResponse | null;
+}
+
+export interface PagingMetadata {
+	totalRecords: number;
+	page: number;
+	pageSize: number;
+}
+
+export interface ApplicantSummary {
+	createdAt: Date;
+	firstName: string | null;
+	lastName: string | null;
+	email: string | null;
+	country: string | null;
+	institution: string | null;
+}
+
+export interface ApplicationListSummary extends ApplicationDTO {
+	applicant: ApplicantSummary | null;
+}
+
+export interface ApplicationListResponse {
+	applications: ApplicationListSummary[];
+	pagingMetadata: PagingMetadata;
+}
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved

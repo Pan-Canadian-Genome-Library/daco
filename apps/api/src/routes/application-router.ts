@@ -27,7 +27,7 @@ import {
 	getAllApplications,
 	getApplicationById,
 	getApplicationStateTotals,
-} from '@/api/application-api.js';
+} from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 
 const applicationRouter = express.Router();
