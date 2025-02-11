@@ -38,9 +38,9 @@ import { RequestValidationErrorResponse } from './types.js';
  *
  * @example
  * ```
- * import withRequestValidation from 'express-request-validation';
+ * import withSchemaValidation from 'express-request-validation';
  *
- * router.post('/', withRequestValidation(ExampleSchema, (request, response, next) => {
+ * router.post('/', withSchemaValidation(ExampleSchema, (request, response, next) => {
  * 	const { body } = request;
  * 	// TS knows the structure of `body` from `ExampleSchema`. It is already validated, you can use it immediately
  * 	const output = doSomethingWithBody(body);
@@ -48,7 +48,7 @@ import { RequestValidationErrorResponse } from './types.js';
  * });
  * ```
  */
-function withRequestValidation<ReqBody>(
+function withSchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
 	handler: RequestHandler<ParamsDictionary, any, ReqBody>,
 ): RequestHandler {
@@ -67,4 +67,4 @@ function withRequestValidation<ReqBody>(
 	};
 }
 
-export { withRequestValidation };
+export { withSchemaValidation };

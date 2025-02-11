@@ -26,7 +26,7 @@ import {
 	getApplicationStateTotals,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
-import { withRequestValidation } from '@pcgl-daco/request-validation';
+import { withSchemaValidation } from '@pcgl-daco/request-validation';
 import { applicationEditSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
@@ -67,8 +67,8 @@ applicationRouter.post(
 applicationRouter.post(
 	'/applications/edit',
 	jsonParser,
-	withRequestValidation(applicationEditSchema, async (req, res) => {
-		// TODO: Add Auth & Zod validation
+	withSchemaValidation(applicationEditSchema, async (req, res) => {
+		// TODO: Add Auth
 		const data = req.body;
 
 		const { id, update } = data;
