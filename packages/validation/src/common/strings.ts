@@ -24,7 +24,7 @@ export const TrimmedString = z.string().trim();
 export type TrimmedString = z.infer<typeof TrimmedString>;
 
 // string with at least 2 non-whitespace character
-export const NonEmptyString = TrimmedString.min(2);
+export const NonEmptyString = TrimmedString.min(2).max(200);
 export type NonEmptyString = z.infer<typeof NonEmptyString>;
 
 // string with at least 2 non-whitespace character, or undefined

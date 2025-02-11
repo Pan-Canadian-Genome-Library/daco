@@ -17,7 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './utils/regex.js';
+import { ZodError } from 'zod';
+
+class EnvironmentConfigError extends Error {
+	constructor(configName: string, zodError: ZodError) {
+		super();
+		this.message = `Error parsing environment variables for "${configName}" config! ${zodError.message}`;
+		this.name = 'EnvironmentConfigError';
+	}
+}
+export default EnvironmentConfigError;

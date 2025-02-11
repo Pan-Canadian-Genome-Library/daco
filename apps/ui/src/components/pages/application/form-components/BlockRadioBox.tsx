@@ -17,31 +17,63 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ColProps, Form, Input } from 'antd';
-import { ReactNode } from 'react';
+import { ColProps, Flex, Form, Radio, Row, theme } from 'antd';
+import { FormItemLayout } from 'antd/es/form/Form';
 import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
+import { pcglColors } from '@/components/providers/ThemeProvider';
 import { BasicFormFieldProps } from '@/global/types';
+import { EthicsFileEnum } from '@pcgl-daco/validation';
 
 const { Item } = Form;
+const { useToken } = theme;
 
-interface TextAreaProps extends BasicFormFieldProps {
-	subLabel?: string | ReactNode;
+interface CheckboxValues {
+	value: EthicsFileEnum;
+	label: string | React.ReactElement;
+}
+
+interface InputBoxProps extends BasicFormFieldProps {
+	subLabel?: string;
 	placeHolder?: string;
 	labelAlign?: 'left' | 'right';
 	labelCol?: ColProps;
+	layout?: FormItemLayout;
+	options: CheckboxValues[];
 }
 
-const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextAreaProps) => {
+const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBoxProps) => {
+	const { token } = useToken();
 	/**
-	 * Renders the TextArea component, helps reduce redefining (and making mistakes with)
-	 * the Input control.
+	 * Renders the input box component. We currently use two nested labels to display certain information on the
+	 * application form (see Applicant Info). But in the case where only one label is needed, we should only render
+	 * one label to avoid visual and a11y issues.
 	 *
+	 * This function helps reduce redefining the Input field.
 	 * @param field the field attribute from `react-hook-from`
 	 * @returns `ReactNode` with the input component.
 	 */
 	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
-		return <Input.TextArea {...field} disabled={props.disabled} placeholder={props.placeHolder} />;
+		return (
+			<Radio.Group {...field} disabled={props.disabled}>
+				<Row justify="start" gutter={[0, 10]}>
+					{props.options.map((item) => {
+						return (
+							<Flex
+								key={item.value}
+								style={{
+									backgroundColor: pcglColors.greyLight,
+									width: '100%',
+									padding: token.padding,
+								}}
+							>
+								<Radio value={item.value}>{item.label}</Radio>
+							</Flex>
+						);
+					})}
+				</Row>
+			</Radio.Group>
+		);
 	};
 
 	return (
@@ -54,9 +86,10 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 						label={props.label}
 						required={props.required}
 						name={`${props.name}`}
-						rules={!props.subLabel ? [props.rule] : undefined}
 						labelAlign={props.labelAlign}
+						rules={!props.subLabel ? [props.rule] : undefined}
 						labelCol={props.labelCol}
+						layout={props.layout}
 						initialValue={!props.subLabel ? field.value : undefined}
 					>
 						{props.subLabel ? (
@@ -80,4 +113,4 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 	);
 };
 
-export default TextAreaBox;
+export default BlockRadioBox;

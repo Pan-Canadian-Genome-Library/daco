@@ -20,17 +20,15 @@
 import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { ModalState } from '@/pages/applications/sections/collaborators';
+import { ModalStateProps } from '@/pages/applications/sections/collaborators';
 
 const { Text } = Typography;
 
-type DeleteCollaboratorModalProps = {
+interface DeleteCollaboratorModalProps extends ModalStateProps {
 	appId: string | number;
-	deleteState: ModalState;
-	setIsOpen: (props: ModalState) => void;
-};
+}
 
-const DeleteCollaboratorModal = ({ appId, deleteState, setIsOpen }: DeleteCollaboratorModalProps) => {
+const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
 
 	return (
@@ -41,12 +39,12 @@ const DeleteCollaboratorModal = ({ appId, deleteState, setIsOpen }: DeleteCollab
 			cancelText={translate('button.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-			open={deleteState.isOpen}
+			open={isOpen}
 			onCancel={() => setIsOpen({ isOpen: false })}
 			destroyOnClose
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
-				<Text>{translate('collab-section.deleteModalDes', { name: deleteState.rowData?.firstName, appId })}</Text>
+				<Text>{translate('collab-section.deleteModalDescription', { name: rowData?.firstName, appId })}</Text>
 			</Flex>
 		</Modal>
 	);

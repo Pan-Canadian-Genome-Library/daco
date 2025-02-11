@@ -19,6 +19,7 @@
 
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
 import { z } from 'zod';
+import { EthicsEnum } from './common/enums.js';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
@@ -27,6 +28,7 @@ export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
+export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
 export const applicantInformationSchema = z.object({
@@ -49,9 +51,9 @@ export const applicantInformationSchema = z.object({
 
 export const collaboratorsSchema = z.object({
 	collabFirstName: NonEmptyString,
-	collabMiddleName: NonEmptyString,
+	collabMiddleName: EmptyOrOptionalString,
 	collabLastName: NonEmptyString,
-	collabSuffix: NonEmptyString,
+	collabSuffix: EmptyOrOptionalString,
 	collabPrimaryEmail: NonEmptyString.email(),
 	collabPositionTitle: NonEmptyString,
 });
@@ -85,6 +87,10 @@ export const projectInformationSchema = z.object({
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
+});
+
+export const ethicsSchema = z.object({
+	ethicsApproval: EthicsEnum,
 });
 
 export const requestedStudySchema = z.object({

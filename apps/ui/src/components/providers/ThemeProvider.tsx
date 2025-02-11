@@ -37,9 +37,10 @@ export const pcglColors = {
 	successSecondary: '#D9F7BE',
 
 	white: '#FFFFFF',
+	offWhite: '#f0f0f0',
 	black: '#000000',
 	grey: '#D9D9D9',
-	lightGrey: '#FAFAFA',
+	greyLight: '#FAFAFA',
 };
 
 // General Theme Configurations
@@ -71,10 +72,10 @@ const pcglTheme: ThemeConfig = {
 			colorBgContainer: '#fff',
 		},
 		Table: {
-			colorBgContainer: '#fff',
-			headerBg: '#fafafa',
-			headerSortActiveBg: '#f0f0f0',
-			headerSortHoverBg: '#f0f0f0',
+			colorBgContainer: pcglColors.white,
+			headerBg: pcglColors.greyLight,
+			headerSortActiveBg: pcglColors.offWhite,
+			headerSortHoverBg: pcglColors.offWhite,
 			rowHoverBg: 'rgba(0, 0, 0, 0.02)',
 		},
 		Button: {
@@ -113,6 +114,9 @@ const pcglTheme: ThemeConfig = {
 			colorBgContainer: pcglColors.white,
 		},
 		Input: {
+			colorBgContainer: pcglColors.white,
+		},
+		Radio: {
 			colorBgContainer: pcglColors.white,
 		},
 	},

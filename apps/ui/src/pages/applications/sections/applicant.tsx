@@ -59,7 +59,7 @@ const Applicant = () => {
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
-								label={translate('applicant-section.form.title')}
+								label={translate('form.title')}
 								name="applicantTitle"
 								placeholder="Select"
 								control={control}
@@ -75,7 +75,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.firstName')}
+								label={translate('form.firstName')}
 								name="applicantFirstName"
 								control={control}
 								rule={rule}
@@ -85,7 +85,7 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.middleName')}
+								label={translate('form.middleName')}
 								name="applicantMiddleName"
 								control={control}
 								rule={rule}
@@ -96,7 +96,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.lastName')}
+								label={translate('form.lastName')}
 								name="applicantLastName"
 								control={control}
 								rule={rule}
@@ -106,7 +106,7 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.suffix')}
+								label={translate('form.suffix')}
 								name="applicantSuffix"
 								control={control}
 								rule={rule}
@@ -117,8 +117,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.primaryAffiliation')}
-								subLabel={translate('applicant-section.form.primaryAffiliationSubLabel')}
+								label={translate('form.primaryAffiliation')}
+								subLabel={translate('form.primaryAffiliationSubLabel')}
 								name="applicantPrimaryAffiliation"
 								control={control}
 								rule={rule}
@@ -130,8 +130,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.primaryEmail')}
-								subLabel={translate('applicant-section.form.primaryEmailLabel')}
+								label={translate('form.primaryEmail')}
+								subLabel={translate('form.primaryEmailLabel')}
 								name="applicantInstituteEmail"
 								control={control}
 								rule={rule}
@@ -143,8 +143,8 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.researcherProfile')}
-								subLabel={translate('applicant-section.form.researcherProfileLabel')}
+								label={translate('form.researcherProfile')}
+								subLabel={translate('form.researcherProfileLabel')}
 								name="applicantProfileUrl"
 								placeHolder="https://"
 								control={control}
@@ -157,7 +157,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.positionTitle')}
+								label={translate('form.positionTitle')}
 								name="applicantPositionTitle"
 								control={control}
 								rule={rule}
@@ -171,7 +171,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
-								label={translate('applicant-section.form.country')}
+								label={translate('form.country')}
 								name="applicantInstituteCountry"
 								control={control}
 								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
@@ -187,7 +187,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.streetAddress')}
+								label={translate('form.streetAddress')}
 								name="applicantInstituteStreetAddress"
 								control={control}
 								rule={rule}
@@ -197,7 +197,7 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.building')}
+								label={translate('form.building')}
 								name="applicantInstituteBuilding"
 								control={control}
 								rule={rule}
@@ -208,7 +208,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.state')}
+								label={translate('form.state')}
 								name="applicantInstituteState"
 								control={control}
 								rule={rule}
@@ -218,7 +218,7 @@ const Applicant = () => {
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.city')}
+								label={translate('form.city')}
 								name="applicantInstituteCity"
 								control={control}
 								rule={rule}
@@ -230,7 +230,7 @@ const Applicant = () => {
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
-								label={translate('applicant-section.form.postalCode')}
+								label={translate('form.postalCode')}
 								name="applicantInstitutePostalCode"
 								control={control}
 								rule={rule}

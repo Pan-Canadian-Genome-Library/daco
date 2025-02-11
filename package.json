@@ -19,8 +19,8 @@
 		"dev:all": "concurrently --names=api,ui \"pnpm -w dev:api\" \"pnpm -w dev:ui\"",
 		"dev:api": "nx run @pcgl-daco/api:dev",
 		"dev:ui": "nx run @pcgl-daco/ui:dev",
-		"setup:all": "nx run-many --all --target=init",
-		"test": "nx run-many --all --target=test",
+		"setup:all": "nx run-many --all --target=setup",
+		"test:all": "nx run-many --all --target=test",
 		"prettier": "npx prettier ./packages ./apps --write",
 		"prepare": "husky"
 	},

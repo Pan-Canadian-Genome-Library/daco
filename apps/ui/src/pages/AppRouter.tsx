@@ -24,6 +24,7 @@ import ApplicationViewer from '@/pages/applications';
 import AccessAgreement from '@/pages/applications/sections/access';
 import Applicant from '@/pages/applications/sections/applicant';
 import Collaborators from '@/pages/applications/sections/collaborators';
+import Ethics from '@/pages/applications/sections/ethics';
 import Institutional from '@/pages/applications/sections/institutional';
 import Introduction from '@/pages/applications/sections/intro';
 import Project from '@/pages/applications/sections/project';
@@ -57,6 +58,11 @@ export const ApplicationSectionRoutes = [
 		route: 'project',
 		path: 'project/edit?',
 		element: <Project />,
+	},
+	{
+		route: 'ethics',
+		path: 'ethics/edit?',
+		element: <Ethics />,
 	},
 	{
 		route: 'study',

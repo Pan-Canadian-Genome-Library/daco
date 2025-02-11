@@ -64,7 +64,9 @@
 		"closeApp": "Close Application",
 		"back": "Back",
 		"submitApplication": "Submit Application",
-		"addCollab": "Add Collaborator"
+		"addCollab": "Add Collaborator",
+		"upload": "Upload",
+		"save": "Save Changes"
 	},
 	"label": {
 		"created": "Created",
@@ -95,7 +97,8 @@
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
 		"study": "E. Requested Study",
-		"agreement": "F. Data Access Agreement"
+		"ethics": "F. Ethics",
+		"agreement": "G. Data Access Agreement"
 	},
 	"errors": {
 		"http": {
