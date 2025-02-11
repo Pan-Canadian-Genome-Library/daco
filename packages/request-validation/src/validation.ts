@@ -20,7 +20,7 @@
 import { RequestHandler } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ZodSchema } from 'zod';
-import { RequestValidationErrorResponse } from './types.js';
+import { RequestValidationErrorResponse } from './responses.js';
 
 /**
  * Wrapper for express RequestHandler to provide request body validation using a Zod Schema.
