@@ -20,7 +20,7 @@
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import ApplicationWrapper from '@/components/layouts/SectionWrapper';
+import SectionWrapper from '@/components/layouts/SectionWrapper';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import TextList from '@/components/TextList';
@@ -48,7 +48,7 @@ const Introduction = () => {
 	];
 
 	return (
-		<ApplicationWrapper>
+		<SectionWrapper>
 			<>
 				<SectionTitle title={translate('intro-section.title')} showDivider={false}>
 					<Flex vertical>
@@ -69,7 +69,7 @@ const Introduction = () => {
 
 				<SectionFooter currentRoute="intro" isEditMode={isEditMode} />
 			</>
-		</ApplicationWrapper>
+		</SectionWrapper>
 	);
 };
 

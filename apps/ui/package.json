@@ -1,11 +1,13 @@
 {
-	"name": "pcgl-daco-ui",
+	"name": "@pcgl-daco/ui",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
 		"build": "vite build --emptyOutDir",
+		"dev": "concurrently --names=server,watch \"pnpm dev:server\" \"pnpm dev:watch\"",
+		"dev:server": "vite",
+		"dev:watch": "nx watch --projects=@pcgl-daco/ui --includeDependentProjects -- nx run-many -t build \\$NX_PROJECT_NAME --exclude=@pcgl-daco/ui",
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},

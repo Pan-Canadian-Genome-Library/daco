@@ -76,6 +76,7 @@ export interface FetchError extends ServerError {
 }
 
 export interface ApplicationOutletContext {
+	appId: string | number;
 	isEditMode: boolean;
 }
 

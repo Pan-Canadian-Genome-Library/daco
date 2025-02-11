@@ -16,8 +16,21 @@ The repository is organized with the following directory structure:
 │   ├── ui
 │   └── api
 └── packages/
-    └── types
+    ├── data-model
+    ├── logger
+    └── validation
 ```
+
+
+| Component                                   | Package Name          | Path                | Description                                                          |
+| ------------------------------------------- | --------------------- | ------------------- | -------------------------------------------------------------------- |
+| [DACO UI](apps/ui/README.md)                | @pcgl-daco/ui         | apps/ui             | React SPA website for PCGL Daco.                                     |
+| [DACO API](apps/api/README.md)           | @pcgl-daco/api        | apps/api            | ExpressJS backend-for-frontend server for                            |
+|                                             |                       |                     |                                                                      |
+| [data-model](packages/data-model/README.md) | @pcgl-daco/data-model | packages/data-model | DACO database schemas and generated types.                           |
+| [logger](packages/logger/README.md)         | @pcgl-daco/logger     | packages/logger     | Standardized reusable logger and express middleware request logging. |
+| [validation](packages/validation/README.md) | @pcgl-daco/validation | packages/validation | Shared type schemas for API and UI.                                  |
+
 
 The modules in the monorepo are organized into two categories:
 
@@ -38,39 +51,17 @@ The modules in the monorepo are organized into two categories:
 
 ### Setup
 
+Follow these steps to install and run all dependencies, then run all applications locally. The applications will run in development mode, monitoring the code base to rebuild and restart the applications when the code is updated.
+
 - Install PNPM: `npm i -g pnpm`
-
 - Install dependencies: `pnpm i`
-
-- Build all packages and apps: `pnpm -w build:all`
-
-- Start API:
-  
-  `cd apps/api`
-
-  Create .env file: `cp .env.schema .env`
-
-  Start Postgres DB: 
-  
-  `docker compose up --detach`
-
-  `pnpm drizzle-kit migrate`
-
-  Start Server: 
-  
-  `pnpm run dev`
-  
-  The server is now listening for requests at `http://localhost:3000`
-
-- Start UI:
-
-  `cd apps/ui`
-
-  `cp .env.schema .env`
-
-  `pnpm run dev`
-
-  Visit `http://localhost:5173/` in the browser to get started
+- Run dependencies: `docker-compose up -d`
+- Initialize application environment files: `pnpm setup:all`
+  - This will fail if you have already made any `.env` files inside any of the `/apps` dirs. If this is the case, try removing these files before retrying the script.
+  - This will also run the initial database migration for the DACO API, so make sure the docker dependencies are running.
+- Start all apps in development mode: `pnpm dev:all`
+	- The DACO API server will run at `http://localhost:3000`. Visit `http://localhost:3000/api-docs` for interactive swagger.
+	- The UI will be running at `http://localhost:5173`
 
 ## Support & Contributions
 

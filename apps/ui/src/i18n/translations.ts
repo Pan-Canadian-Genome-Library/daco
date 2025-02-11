@@ -53,15 +53,13 @@ i18n.use(initReactI18next).init({
  * NOTE: If the zod schema has a {message:...} contained in one of the fields, it will not trigger the translation mapping and will prioritize the {message:...} object
  */
 const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
-	/**
-	 * Add translations through here
-	 */
 	switch (error.code) {
 		case z.ZodIssueCode.invalid_type:
 			if (error.expected === 'string') {
 				return { message: i18n.t('requiredField') };
 			}
-			break;
+
+			return { message: i18n.t('defaultViolationText') };
 		case z.ZodIssueCode.invalid_string:
 			if (error.validation === 'email') {
 				return { message: i18n.t('validEmail') };
@@ -78,8 +76,8 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			} else {
 				return { message: i18n.t('defaultViolationText') };
 			}
-
-			break;
+		case z.ZodIssueCode.invalid_enum_value:
+			return { message: i18n.t('recievedInvalidEnum') };
 	}
 	return { message: ctx.defaultError };
 };

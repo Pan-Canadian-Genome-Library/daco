@@ -26,6 +26,7 @@ import { BasicFormFieldProps } from '@/global/types';
 const { Item } = Form;
 
 interface InputBoxProps extends BasicFormFieldProps {
+	style?: React.CSSProperties;
 	subLabel?: string;
 	placeHolder?: string;
 	type?: 'email' | 'password' | 'tel' | 'hidden' | 'text' | 'url';
@@ -77,21 +78,24 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 			render={({ field }) => {
 				return (
 					<Item
+						style={props.style}
+						name={`${props.name}`}
 						label={props.label}
-						required={props.required}
-						name={props.name as string}
 						labelAlign={props.labelAlign}
-						rules={!props.subLabel ? [props.rule] : undefined}
 						labelCol={props.labelCol}
+						required={props.required}
+						rules={!props.subLabel ? [props.rule] : undefined}
 						layout={props.layout}
+						initialValue={!props.subLabel ? field.value : undefined}
 					>
 						{props.subLabel ? (
 							<Item
 								label={props.subLabel}
-								name={props.name as string}
+								name={`${props.name}`}
 								rules={[props.rule]}
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
+								initialValue={field.value}
 							>
 								{renderControl(field)}
 							</Item>

@@ -25,6 +25,8 @@ import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
+import DeleteCollaboratorModal from '@/components/pages/application/modals/DeleteCollaboratorModal';
+import EditCollaboratorModal from '@/components/pages/application/modals/EditCollaboratorModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -38,15 +40,27 @@ interface CollabTableData {
 	lastName: string;
 	institutionalEmail: string;
 	title: string;
+	suffix?: string;
+}
+
+export interface ModalState {
+	rowData?: CollabTableData;
+	isOpen: boolean;
+}
+
+export interface ModalStateProps extends ModalState {
+	setIsOpen: (props: ModalState) => void;
 }
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
 
 	// MODAL STATES
-	const [openAddCollaboratorModal, setOpenAddCollaboratorModal] = useState(false);
+	const [addModalState, setAddModalState] = useState<ModalState>({ isOpen: false });
+	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
+	const [editModalState, setEditModalState] = useState<ModalState>({ isOpen: false });
 
 	const columns: TableProps<CollabTableData>['columns'] = [
 		{
@@ -72,16 +86,26 @@ const Collaborators = () => {
 		{
 			key: 'tools',
 			title: 'Tools',
-			render: () => (
-				<Space size="middle">
-					<Button disabled={!isEditMode} style={{ fontWeight: 400 }}>
-						{translate('button.edit')}
-					</Button>
-					<Button disabled={!isEditMode} style={{ fontWeight: 400 }}>
-						{translate('button.delete')}
-					</Button>
-				</Space>
-			),
+			render: (value) => {
+				return (
+					<Space size="middle">
+						<Button
+							onClick={() => setEditModalState({ rowData: value, isOpen: true })}
+							disabled={!isEditMode}
+							style={{ fontWeight: 400 }}
+						>
+							{translate('button.edit')}
+						</Button>
+						<Button
+							onClick={() => setDeleteModalState({ rowData: value, isOpen: true })}
+							disabled={!isEditMode}
+							style={{ fontWeight: 400 }}
+						>
+							{translate('button.delete')}
+						</Button>
+					</Space>
+				);
+			},
 		},
 	];
 
@@ -94,7 +118,7 @@ const Collaborators = () => {
 					showDivider={false}
 				/>
 				<SectionContent>
-					<Table<CollabTableData>
+					<Table
 						rowKey={(record: CollabTableData) => `PCGL-${record.id}`}
 						columns={columns}
 						dataSource={[
@@ -104,6 +128,14 @@ const Collaborators = () => {
 								lastName: 'Doe',
 								institutionalEmail: 'thy.john.doe@oicr.ca',
 								title: 'PI',
+								suffix: 'Miss',
+							},
+							{
+								id: 53,
+								firstName: 'Sunny',
+								lastName: 'ShinShine',
+								institutionalEmail: 'the.sun.is.bright@oicr.ca',
+								title: 'Really good at job',
 							},
 						]}
 						pagination={false}
@@ -111,7 +143,7 @@ const Collaborators = () => {
 					<Row justify={'end'}>
 						<Col style={{ paddingTop: token.paddingLG }}>
 							<Button
-								onClick={() => setOpenAddCollaboratorModal(true)}
+								onClick={() => setAddModalState({ isOpen: true })}
 								style={{ borderRadius: 100 }}
 								type="primary"
 								disabled={!isEditMode}
@@ -124,7 +156,18 @@ const Collaborators = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<AddCollaboratorModal isOpen={openAddCollaboratorModal} setIsOpen={setOpenAddCollaboratorModal} />
+				<AddCollaboratorModal isOpen={addModalState.isOpen} setIsOpen={setAddModalState} />
+				<DeleteCollaboratorModal
+					appId={appId}
+					isOpen={deleteModalState.isOpen}
+					rowData={deleteModalState.rowData}
+					setIsOpen={setDeleteModalState}
+				/>
+				<EditCollaboratorModal
+					rowData={editModalState.rowData}
+					setIsOpen={setEditModalState}
+					isOpen={editModalState.isOpen}
+				/>
 				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />
 			</>
 		</SectionWrapper>

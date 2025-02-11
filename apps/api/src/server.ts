@@ -18,9 +18,7 @@
  */
 
 import { ExpressLogger } from '@pcgl-daco/logger';
-import cors from 'cors';
 import express, { Request, Response } from 'express';
-
 import path, { dirname } from 'path';
 import * as swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from 'url';
@@ -28,40 +26,37 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/application-router.js';
+
+import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
 
-const { npm_package_version } = process.env;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const port = process.env.PORT || 3000;
+const API_DOCS_PATH = `api-docs`;
 
 const startServer = async () => {
 	const app = express();
-
-	if (process.env.IS_PROD === 'false') {
-		app.use(
-			cors({
-				origin: 'http://localhost:5173',
-			}),
-		);
-	}
 
 	app.use(ExpressLogger({ logger }));
 
 	app.use(applicationRouter);
 
-	app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))));
+	app.use(
+		`/${API_DOCS_PATH}`,
+		swaggerUi.serve,
+		swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))),
+	);
 
 	app.get('/', (_req: Request, res: Response) => {
-		res.send('Hello World!');
+		res.json({});
 	});
 
 	app.get('/health', (_req: Request, res: Response) => {
 		const health = getHealth();
 
 		const resBody = {
-			version: `PCGL-${npm_package_version}`,
+			version: serverConfig.npm_package_version,
 			health,
 		};
 
@@ -73,8 +68,11 @@ const startServer = async () => {
 		res.status(200).send(resBody);
 	});
 
-	app.listen(port, () => {
-		logger.info(`Example app listening on port ${port}`);
+	app.listen(serverConfig.PORT, () => {
+		logger.info(`Server started - listening on port ${serverConfig.PORT}.`);
+		if (!serverConfig.isProduction) {
+			logger.info(`API Docs available at: http://localhost:${serverConfig.PORT}/${API_DOCS_PATH}`);
+		}
 	});
 };
 

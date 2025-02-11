@@ -22,8 +22,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { type CollaboratorsSchemaType, collaboratorsSchema } from '@pcgl-daco/validation';
 import { Button, Col, Flex, Form, Modal, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { memo } from 'react';
-import { useForm } from 'react-hook-form';
+import { memo, useEffect } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -34,28 +34,54 @@ const { Text } = Typography;
 
 const rule = createSchemaFieldRule(collaboratorsSchema);
 
-const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
+const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { control } = useForm<CollaboratorsSchemaType>({
+	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
+		defaultValues: {
+			collabFirstName: rowData?.firstName || '',
+			collabMiddleName: rowData?.lastName || '',
+			collabLastName: rowData?.lastName || '',
+			collabPrimaryEmail: rowData?.institutionalEmail || '',
+			collabPositionTitle: rowData?.title || '',
+		},
 		resolver: zodResolver(collaboratorsSchema),
 	});
 
+	/**
+	 * This is only needed on the modal component specifically because we are utilizing ONE modal component and updating its values via useState (editState).
+	 * Since useState is async, need a useEffect to properly update the fields without delay
+	 */
+	useEffect(() => {
+		reset({
+			collabFirstName: rowData?.firstName || '',
+			collabMiddleName: rowData?.lastName || '',
+			collabLastName: rowData?.lastName || '',
+			collabPrimaryEmail: rowData?.institutionalEmail || '',
+			collabPositionTitle: rowData?.title || '',
+			collabSuffix: rowData?.suffix || '',
+		});
+	}, [rowData, reset]);
+
+	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
+		console.log(data);
+	};
+
 	return (
 		<Modal
-			title={translate('collab-section.addModalTitle')}
+			title={translate('collab-section.editModalTitle')}
 			okText={translate('button.addCollab')}
 			cancelText={translate('button.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '1000px', paddingInline: 10 }}
 			open={isOpen}
-			onCancel={() => setIsOpen({ isOpen: false })}
+			onCancel={(prev) => setIsOpen({ ...prev, isOpen: false })}
 			footer={[]}
 			destroyOnClose
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
-				<Text>{translate('collab-section.addModalDescription')}</Text>
+				<Text>{translate('collab-section.editModalDescription')}</Text>
 				<Form layout="vertical" clearOnDestroy>
 					<Flex vertical>
 						<Row gutter={26}>
@@ -126,11 +152,11 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 						</Row>
 					</Flex>
 					<Flex align="center" justify="flex-end" gap={'middle'}>
-						<Button htmlType="button" onClick={() => setIsOpen({ isOpen: false })}>
+						<Button htmlType="button" onClick={(prev) => setIsOpen({ ...prev, isOpen: false })}>
 							{translate('button.cancel')}
 						</Button>
-						<Button type="primary" htmlType="submit">
-							{translate('button.addCollab')}
+						<Button type="primary" onClick={handleSubmit(onSubmit)}>
+							{translate('button.save')}
 						</Button>
 					</Flex>
 				</Form>
@@ -139,4 +165,4 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 	);
 });
 
-export default AddCollaboratorModal;
+export default EditCollaboratorModal;
