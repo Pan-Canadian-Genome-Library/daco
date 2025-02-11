@@ -57,6 +57,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 						rules={!props.subLabel ? [props.rule] : undefined}
 						labelAlign={props.labelAlign}
 						labelCol={props.labelCol}
+						initialValue={!props.subLabel ? field.value : undefined}
 					>
 						{props.subLabel ? (
 							<Item
@@ -65,6 +66,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 								rules={[props.rule]}
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
+								initialValue={field.value}
 							>
 								{renderControl(field)}
 							</Item>
