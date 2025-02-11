@@ -17,10 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import bodyParser from 'body-parser';
-import express, { Request } from 'express';
-import { z } from 'zod';
-
 import {
 	approveApplication,
 	createApplication,
@@ -30,7 +26,10 @@ import {
 	getApplicationStateTotals,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
+import { withRequestValidation } from '@pcgl-daco/request-validation';
 import { applicationEditSchema } from '@pcgl-daco/validation';
+import bodyParser from 'body-parser';
+import express, { Request } from 'express';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -65,74 +64,30 @@ applicationRouter.post(
 	},
 );
 
-applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
-	// TODO: Add Auth & Zod validation
-	const data = req.body;
+applicationRouter.post(
+	'/applications/edit',
+	jsonParser,
+	withRequestValidation(applicationEditSchema, async (req, res) => {
+		// TODO: Add Auth & Zod validation
+		const data = req.body;
 
-	try {
-		applicationEditSchema.parse(data);
-	} catch (exception: z.ZodError | unknown) {
-		if (exception instanceof z.ZodError) {
-			//Get the top most issue.
-			const mostImportantIssue = exception.issues[0];
+		const { id, update } = data;
+		const result = await editApplication({ id, update });
 
-			switch (mostImportantIssue?.code) {
-				case z.ZodIssueCode.invalid_type:
-					if (mostImportantIssue.path.length === 1 && mostImportantIssue.path.includes('id')) {
-						res.status(400).send({ message: 'Application ID must be included and a non-negative value.' });
-						return;
-					} else if (mostImportantIssue.path.length === 1 && mostImportantIssue.path.includes('update')) {
-						res.status(400).send({ message: 'Update object must be included in JSON body.' });
-						return;
-					}
-					res.status(400).send({
-						message: `Incorrect value for ${mostImportantIssue.path[mostImportantIssue.path.length - 1]}, ${mostImportantIssue.message}`,
-					});
-					return;
-				case z.ZodIssueCode.invalid_string:
-					res.status(400).send({
-						message: `Incorrect value for ${mostImportantIssue.path[mostImportantIssue.path.length - 1]}, ${mostImportantIssue.message}`,
-					});
-					return;
-				case z.ZodIssueCode.unrecognized_keys:
-					res.status(400).send({
-						message: `Invalid keys included in update object. ${mostImportantIssue.keys[0]} is not recognized.`,
-					});
-					return;
-				case z.ZodIssueCode.too_small || z.ZodIssueCode.too_big:
-					res.status(400).send({
-						message: `Incorrect value for ${mostImportantIssue.path[mostImportantIssue.path.length - 1]}, ${mostImportantIssue.message}`,
-					});
-					return;
-				case z.ZodIssueCode.custom:
-					res.status(400).send({ message: 'Update object may not be empty.' });
-					return;
-				default:
-					res.status(400).send({ message: 'An error occurred validating your response.' });
-					return;
-			}
-		}
-
-		res.status(500).send({ message: 'Something went wrong.', errors: 'Something went wrong.' });
-		return;
-	}
-
-	const { id, update } = data;
-	const result = await editApplication({ id, update });
-
-	if (result.success) {
-		res.send(result.data);
-	} else {
-		// TODO: System Error Handling
-		if (String(result.errors) === 'Error: Application record is undefined') {
-			res.status(404);
+		if (result.success) {
+			res.send(result.data);
 		} else {
-			res.status(500);
-		}
+			// TODO: System Error Handling
+			if (String(result.errors) === 'Error: Application record is undefined') {
+				res.status(404);
+			} else {
+				res.status(500);
+			}
 
-		res.send({ message: result.message, errors: String(result.errors) });
-	}
-});
+			res.send({ message: result.message, errors: String(result.errors) });
+		}
+	}),
+);
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
 //       - verify if user can access applications
