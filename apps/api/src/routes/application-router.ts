@@ -26,6 +26,7 @@ import {
 	getApplicationStateTotals,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
+import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
 import { applicationEditSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
@@ -67,26 +68,30 @@ applicationRouter.post(
 applicationRouter.post(
 	'/applications/edit',
 	jsonParser,
-	withSchemaValidation(applicationEditSchema, async (req, res) => {
-		// TODO: Add Auth
-		const data = req.body;
+	withSchemaValidation(
+		applicationEditSchema,
+		async (req, res) => {
+			// TODO: Add Auth
+			const data = req.body;
 
-		const { id, update } = data;
-		const result = await editApplication({ id, update });
+			const { id, update } = data;
+			const result = await editApplication({ id, update });
 
-		if (result.success) {
-			res.send(result.data);
-		} else {
-			// TODO: System Error Handling
-			if (String(result.errors) === 'Error: Application record is undefined') {
-				res.status(404);
+			if (result.success) {
+				res.send(result.data);
 			} else {
-				res.status(500);
-			}
+				// TODO: System Error Handling
+				if (String(result.errors) === 'Error: Application record is undefined') {
+					res.status(404);
+				} else {
+					res.status(500);
+				}
 
-			res.send({ message: result.message, errors: String(result.errors) });
-		}
-	}),
+				res.send({ message: result.message, errors: String(result.errors) });
+			}
+		},
+		apiZodErrorMapping,
+	),
 );
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place

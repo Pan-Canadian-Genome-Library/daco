@@ -19,7 +19,7 @@
 
 import { RequestHandler } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { ZodSchema } from 'zod';
+import { ZodErrorMap, ZodSchema } from 'zod';
 import { RequestValidationErrorResponse } from './responses.js';
 
 /**
@@ -34,6 +34,7 @@ import { RequestValidationErrorResponse } from './responses.js';
  *
  * @param bodySchema Zod Schema which will perform the request body validation
  * @param handler RequestHandler to run once validation passes
+ * @param zodErrorMapping Optional `ZodErrorMap` object which can be used to translate or intercept the existing error / message mapping.
  * @returns RequestHandler to be given to express router
  *
  * @example
@@ -51,10 +52,11 @@ import { RequestValidationErrorResponse } from './responses.js';
 function withSchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
 	handler: RequestHandler<ParamsDictionary, any, ReqBody>,
+	zodErrorMapping?: ZodErrorMap,
 ): RequestHandler {
 	return async (request, response, next) => {
 		try {
-			const validationResult = bodySchema.safeParse(request.body);
+			const validationResult = bodySchema.safeParse(request.body, { errorMap: zodErrorMapping });
 			if (validationResult.success) {
 				return await handler(request, response, next);
 			}

@@ -121,5 +121,7 @@ export const applicationEditSchema = z.object({
 		})
 		.partial()
 		.strict()
-		.refine((updateObj) => Object.keys(updateObj).length !== 0, { message: 'Object cannot be empty' }),
+		.refine((updateObj) => Object.keys(updateObj).length !== 0, {
+			params: { violation: 'noEmptyObject' },
+		}),
 });
