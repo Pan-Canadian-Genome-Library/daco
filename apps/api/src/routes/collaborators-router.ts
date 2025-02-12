@@ -51,7 +51,7 @@ collaboratorsRouter.post(
 			} else {
 				const { message, errors } = result;
 
-				if (errors === 'InvalidState') {
+				if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
 					response.status(400);
 				} else if (errors === 'Unauthorized') {
 					response.status(401);

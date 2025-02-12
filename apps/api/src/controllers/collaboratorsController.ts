@@ -62,6 +62,23 @@ export const createCollaborators = async ({
 		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
 	}
 
+	const hasDuplicateRecords = collaborators.some((collaborator, index) => {
+		const matchingRecordIndex = collaborators.findIndex(
+			(record, searchIndex) =>
+				searchIndex !== index &&
+				record.collaboratorFirstName === collaborator.collaboratorFirstName &&
+				record.collaboratorLastName === collaborator.collaboratorLastName &&
+				record.collaboratorInstitutionalEmail === collaborator.collaboratorInstitutionalEmail &&
+				record.collaboratorPositionTitle === collaborator.collaboratorPositionTitle,
+		);
+
+		return matchingRecordIndex !== -1;
+	});
+
+	if (hasDuplicateRecords) {
+		return failure(`Cannot create duplicate collaborator records`, 'DuplicateRecords');
+	}
+
 	const newCollaborators: CollaboratorModel[] = collaborators.map((data) => ({
 		first_name: data.collaboratorFirstName,
 		middle_name: data.collaboratorMiddleName,
