@@ -225,14 +225,14 @@ export type ApproveApplication = {
 };
 
 export interface CollaboratorDTO {
-	collaboratorFirstName?: string | null;
+	collaboratorFirstName: string;
 	collaboratorMiddleName?: string | null;
-	collaboratorLastName?: string | null;
+	collaboratorLastName: string;
 	collaboratorSuffix?: string | null;
 	collaboratorPrimaryAffiliation?: string | null;
-	collaboratorInstitutionalEmail?: string | null;
+	collaboratorInstitutionalEmail: string;
 	collaboratorResearcherProfileURL?: string | null;
-	collaboratorPositionTitle?: string | null;
+	collaboratorPositionTitle: string;
 	collaboratorType?: string | null;
 }
 

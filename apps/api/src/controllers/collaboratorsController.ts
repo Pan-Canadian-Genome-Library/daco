@@ -23,7 +23,6 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
-import { type CollaboratorsSchemaType, collaboratorsSchema } from '@pcgl-daco/validation';
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -63,15 +62,7 @@ export const createCollaborators = async ({
 		return failure(`Can only add Collaborators when Application is in state DRAFT`);
 	}
 
-	const validCollaborators = collaborators.filter(
-		(data: CollaboratorDTO): data is CollaboratorsSchemaType => collaboratorsSchema.safeParse(data).success,
-	);
-
-	if (!(validCollaborators.length === collaborators.length)) {
-		return failure('Required Collaborator details are missing.');
-	}
-
-	const newCollaborators: CollaboratorModel[] = validCollaborators.map((data) => ({
+	const newCollaborators: CollaboratorModel[] = collaborators.map((data) => ({
 		first_name: data.collaboratorFirstName,
 		middle_name: data.collaboratorMiddleName,
 		last_name: data.collaboratorLastName,

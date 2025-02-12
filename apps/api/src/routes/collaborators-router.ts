@@ -20,12 +20,9 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-
-zodResolver;
-
 import { createCollaborators } from '@/controllers/collaboratorsController.js';
 import { type CollaboratorRequest } from '@pcgl-daco/data-model';
+import { collaboratorsRequestSchema } from '@pcgl-daco/validation';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -37,41 +34,53 @@ collaboratorsRouter.post(
 	'/collaborators/create',
 	jsonParser,
 	async (request: Request<{}, {}, CollaboratorRequest, any>, response) => {
-		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
+		const validatedPayload = collaboratorsRequestSchema.safeParse(request.body);
 
-		// TODO: Add Real Auth
-		if (!user_id) {
-			response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
-			return;
-		}
+		if (validatedPayload.success) {
+			const { applicationId: application_id, userId: user_id, collaborators } = validatedPayload.data;
 
-		if (!application_id) {
-			response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
-			return;
-		}
+			const result = await createCollaborators({
+				application_id,
+				user_id,
+				collaborators,
+			});
 
-		const result = await createCollaborators({
-			application_id,
-			user_id,
-			collaborators,
-		});
-
-		if (result.success) {
-			response.status(201).send(result.data);
-			return;
-		} else {
-			if (
-				result.message === 'Required Collaborator details are missing.' ||
-				result.message === 'Can only add Collaborators when Application is in state DRAFT'
-			) {
-				response.status(400);
-			} else if (result.message === 'Unauthorized, cannot create Collaborators') {
-				response.status(401);
+			if (result.success) {
+				response.status(201).send(result.data);
+				return;
 			} else {
-				response.status(500);
+				if (
+					result.message === 'Required Collaborator details are missing.' ||
+					result.message === 'Can only add Collaborators when Application is in state DRAFT'
+				) {
+					response.status(400);
+				} else if (result.message === 'Unauthorized, cannot create Collaborators') {
+					response.status(401);
+				} else {
+					response.status(500);
+				}
+				response.send({ message: result.message, errors: String(result.errors) });
+				return;
 			}
-			response.send({ message: result.message, errors: String(result.errors) });
-			return;
+		} else {
+			const { issues } = validatedPayload.error;
+
+			console.log(issues);
+			const path = issues[0]?.path[0];
+			if (path === 'collaborators') {
+				response.status(400).send({ message: 'Required Collaborator details are missing.' });
+			}
+
+			if (path === 'userId') {
+				// TODO: Add Real Auth
+				response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
+				return;
+			}
+
+			if (path === 'applicationId') {
+				response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
+				return;
+			}
 		}
 	},
 );

@@ -141,26 +141,6 @@ describe('Collaborators Controller', () => {
 			assert.ok(!result.success);
 			assert.strictEqual(result.message, `Error at getApplicationById with id: ${incorrectId}`);
 		});
-
-		it('should prevent creating a new collaborator with missing fields', async () => {
-			const collaborators: CollaboratorDTO[] = [
-				{
-					collaboratorFirstName: 'Principal',
-					collaboratorLastName: 'Tester',
-					collaboratorPositionTitle: 'Doctor',
-					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
-				},
-				{
-					collaboratorFirstName: 'Tester',
-					collaboratorInstitutionalEmail: 'testerTester@oicr.on.ca',
-				},
-			];
-
-			const result = await createCollaborators({ application_id, user_id, collaborators });
-
-			assert.ok(!result.success);
-			assert.strictEqual(result.message, 'Required Collaborator details are missing.');
-		});
 	});
 
 	after(async () => {

@@ -25,7 +25,8 @@ import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
-export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
+export type CollaboratorsSchema = z.infer<typeof collaboratorsSchema>;
+export type CollaboratorsRequestSchema = z.infer<typeof collaboratorsRequestSchema>;
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
@@ -54,6 +55,15 @@ export const collaboratorsSchema = z.object({
 	collaboratorSuffix: EmptyOrOptionalString,
 	collaboratorInstitutionalEmail: NonEmptyString.email(),
 	collaboratorPositionTitle: NonEmptyString,
+	collaboratorPrimaryAffiliation: EmptyOrOptionalString,
+	collaboratorResearcherProfileURL: EmptyOrOptionalString,
+	collaboratorType: EmptyOrOptionalString,
+});
+
+export const collaboratorsRequestSchema = z.object({
+	applicationId: z.number(),
+	userId: NonEmptyString,
+	collaborators: z.array(collaboratorsSchema).nonempty(),
 });
 
 export const institutionalRepSchema = z.object({
