@@ -227,13 +227,13 @@ export type ApproveApplication = {
 
 export interface CollaboratorDTO {
 	collaboratorFirstName: string;
-	collaboratorMiddleName?: string | null;
-	collaboratorLastName: string;
-	collaboratorSuffix?: string | null;
-	collaboratorPrimaryAffiliation?: string | null;
 	collaboratorInstitutionalEmail: string;
-	collaboratorResearcherProfileURL?: string | null;
+	collaboratorLastName: string;
+	collaboratorMiddleName?: string | null;
 	collaboratorPositionTitle: string;
+	collaboratorPrimaryAffiliation?: string | null;
+	collaboratorResearcherProfileURL?: string | null;
+	collaboratorSuffix?: string | null;
 	collaboratorType?: string | null;
 }
 
