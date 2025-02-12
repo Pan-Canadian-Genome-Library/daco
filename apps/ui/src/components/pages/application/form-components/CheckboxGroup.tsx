@@ -26,11 +26,12 @@ import { BasicFormFieldProps } from '@/global/types';
 const { Item } = Form;
 const { useToken } = theme;
 
+export interface CheckboxGroupOptions {
+	label: string;
+	value: string;
+}
 interface CheckboxGroup extends BasicFormFieldProps {
-	options: {
-		label: string;
-		value: string;
-	}[];
+	options: CheckboxGroupOptions[];
 }
 
 const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & CheckboxGroup) => {

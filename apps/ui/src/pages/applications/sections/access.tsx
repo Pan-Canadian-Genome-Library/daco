@@ -18,19 +18,20 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { agreementsSchema, AgreementsSchemaType } from '@pcgl-daco/validation';
+import { agreementsSchema, type AgreementsSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
-import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
+import CheckboxGroup, { type CheckboxGroupOptions } from '@/components/pages/application/form-components/CheckboxGroup';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
+import { type ApplicationOutletContext } from '@/global/types';
+import { ApplicationAgreements } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
 const rule = createSchemaFieldRule(agreementsSchema);
@@ -51,44 +52,12 @@ const AccessAgreement = () => {
 		console.log(submissionData);
 	};
 
-	const agreementOptions = [
-		{
-			label: translate('data-access-section.section3.agreement1'),
-			value: 'dac_agreement_software_updates',
-		},
-		{
-			label: translate('data-access-section.section3.agreement2'),
-			value: 'dac_agreement_non_disclosure',
-		},
-		{
-			label: translate('data-access-section.section3.agreement3'),
-			value: 'dac_agreement_monitor_individual_access',
-		},
-		{
-			label: translate('data-access-section.section3.agreement4'),
-			value: 'dac_agreement_destroy_data',
-		},
-		{
-			label: translate('data-access-section.section3.agreement5'),
-			value: 'dac_agreement_familiarize_restrictions',
-		},
-		{
-			label: translate('data-access-section.section3.agreement6'),
-			value: 'dac_agreement_provide_it_policy',
-		},
-		{
-			label: translate('data-access-section.section3.agreement7'),
-			value: 'dac_agreement_notify_unauthorized_access',
-		},
-		{
-			label: translate('data-access-section.section3.agreement8'),
-			value: 'dac_agreement_certify_application',
-		},
-		{
-			label: translate('data-access-section.section3.agreement9'),
-			value: 'dac_agreement_read_and_agreed',
-		},
-	];
+	const agreementOptions: CheckboxGroupOptions[] = Object.keys(ApplicationAgreements).map((agreement, i) => {
+		return {
+			label: translate(`data-access-section.section3.agreement${i + 1}`),
+			value: agreement.toString(),
+		};
+	});
 
 	return (
 		<SectionWrapper>
