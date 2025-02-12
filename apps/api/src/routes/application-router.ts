@@ -30,7 +30,6 @@ import {
 	rejectApplication,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -249,38 +248,43 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 		res.status(400).json({ message: 'Application ID is required.' });
 	}
 	if (!applicationId || isNaN(parseInt(applicationId))) {
-		res
-			.status(400)
-			.json({
-				message: 'Invalid request. ApplicationId is required and must be a valid number.',
-				errors: 'MissingOrInvalidParameters',
-			});
+		res.status(400).json({
+			message: 'Invalid request. ApplicationId is required and must be a valid number.',
+			errors: 'MissingOrInvalidParameters',
+		});
 	}
 
-	const result = await getApplicationById({ applicationId });
+	try {
+		const result = await rejectApplication({ applicationId });
 
-	if (result.success) {
-		const { state } = result.data;
-
-		if (state !== ApplicationStates.DAC_REVIEW) {
-			res.status(400).json({ message: 'Application must be in DAC Review status to be rejected.' });
-		}
-
-		// Reject the application
-		const rejectedApplication = await rejectApplication({ applicationId });
-
-		if (rejectedApplication.success) {
+		if (result.success) {
 			res.status(200).send({
 				message: 'Application rejected successfully.',
-				data: rejectedApplication.data,
+				data: result.data,
 			});
 		} else {
-			const message = rejectedApplication.message || 'An unexpected error occurred.';
-			const errors = rejectedApplication.errors;
-			res.status(500).send({ message, errors });
+			let status = 500;
+			let message = result.message || 'An unexpected error occurred.';
+			let errors = result.errors;
+
+			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+				status = 404;
+				message = 'Application not found.';
+			} else if (errors === 'RejectionConflict') {
+				status = 409;
+				message = 'Rejection conflict detected.';
+			} else if (errors === 'InvalidState') {
+				status = 400;
+				message = 'Invalid application state.';
+			}
+
+			res.status(status).send({ message, errors });
 		}
-	} else {
-		res.status(404).json({ message: 'Application not found.' });
+	} catch (error) {
+		res.status(500).send({
+			message: 'Internal server error.',
+			errors: String(error),
+		});
 	}
 });
 export default applicationRouter;

@@ -175,7 +175,38 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 };
 
 export const rejectApplication = async ({ applicationId }: { applicationId: number }) => {
-	const database = getDbInstance();
-	const service: ApplicationService = applicationSvc(database);
-	return await service.rejectApplication({ applicationId });
+	try {
+		// Fetch application
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (appStateManager.state === ApplicationStates.REJECTED) {
+			return failure('Application is already rejected.', 'RejectionConflict');
+		}
+
+		const rejectResult = await appStateManager.rejectDacReview();
+
+		if (!rejectResult.success) {
+			return failure(rejectResult.message || 'Failed to reject application.', 'StateTransitionError');
+		}
+
+		const update = { state: appStateManager.state, updated_at: new Date() };
+		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		return updatedResult;
+	} catch (error) {
+		const message = `Unable to reject application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
 };
