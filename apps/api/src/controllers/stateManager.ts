@@ -273,9 +273,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Reject
 	async rejectDacReview() {
-		if (this.can(dac_reject)) {
-			await this.dispatch(dac_reject);
-			return success(dac_reject);
+		const transitionResult = this._canPerformAction(dac_reject);
+		if (transitionResult.success) {
+			return await this._dispatchAndUpdateAction(dac_reject, 'dacRejected');
 		} else {
 			return failure(`Cannot reject application with state ${this.getState()}`);
 		}

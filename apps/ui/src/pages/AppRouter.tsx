@@ -21,6 +21,7 @@ import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
 import ApplicationViewer from '@/pages/applications';
+import AccessAgreement from '@/pages/applications/sections/access';
 import Applicant from '@/pages/applications/sections/applicant';
 import Collaborators from '@/pages/applications/sections/collaborators';
 import Ethics from '@/pages/applications/sections/ethics';
@@ -67,6 +68,11 @@ export const ApplicationSectionRoutes = [
 		route: 'study',
 		path: 'study/edit?',
 		element: <RequestedStudy />,
+	},
+	{
+		route: 'agreement',
+		path: 'agreement/edit?',
+		element: <AccessAgreement />,
 	},
 ];
 

@@ -187,7 +187,7 @@ describe('Application Service', () => {
 				sort: [
 					{
 						direction: 'asc',
-						column: 'created_at',
+						column: 'updated_at',
 					},
 				],
 			});
