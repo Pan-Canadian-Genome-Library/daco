@@ -42,7 +42,7 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 			control={props.control}
 			render={({ field }) => {
 				return (
-					<Item label={props.label} name={props.name as string} rules={[props.rule]} required={props.required}>
+					<Item label={props.label} name={`${props.name}`} rules={[props.rule]} required={props.required}>
 						<Checkbox.Group {...field} style={{ width: '100%' }}>
 							{props.options.map((checkbox) => (
 								<Row
