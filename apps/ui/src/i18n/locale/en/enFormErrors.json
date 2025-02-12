@@ -4,7 +4,7 @@
 	"validEmail": "Please enter a valid email address.",
 	"validURL": "Please enter a valid url. Must begin with http:// or https://.",
 	"validPostalCode": "Please enter a valid postal code.",
-	"tooFewWords": "Please enter at least {{length}}  words.",
+	"tooFewWords": "Please enter at least {{length}} words.",
 	"tooManyWords": "Please enter {{length}} words or less.",
 	"recievedInvalidEnum": "Input recieved does match any of the required values",
 	"invalidFileTitle": "Invalid File Type",
