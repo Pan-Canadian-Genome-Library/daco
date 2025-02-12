@@ -64,20 +64,19 @@ collaboratorsRouter.post(
 			}
 		} else {
 			const { issues } = validatedPayload.error;
+			const errorField = issues[0]?.path[0];
 
-			console.log(issues);
-			const path = issues[0]?.path[0];
-			if (path === 'collaborators') {
+			if (errorField === 'collaborators') {
 				response.status(400).send({ message: 'Required Collaborator details are missing.' });
 			}
 
-			if (path === 'userId') {
+			if (errorField === 'userId') {
 				// TODO: Add Real Auth
 				response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
 				return;
 			}
 
-			if (path === 'applicationId') {
+			if (errorField === 'applicationId') {
 				response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
 				return;
 			}
