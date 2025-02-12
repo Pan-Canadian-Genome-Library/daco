@@ -55,11 +55,11 @@ export const createCollaborators = async ({
 	// TODO: Add Real Auth
 	// Validate User is Applicant
 	if (!(user_id === application.user_id)) {
-		return failure('Unauthorized, cannot create Collaborators');
+		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
 	}
 
 	if (!(application.state === 'DRAFT')) {
-		return failure(`Can only add Collaborators when Application is in state DRAFT`);
+		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
 	}
 
 	const newCollaborators: CollaboratorModel[] = collaborators.map((data) => ({

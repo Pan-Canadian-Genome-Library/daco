@@ -49,17 +49,17 @@ collaboratorsRouter.post(
 				response.status(201).send(result.data);
 				return;
 			} else {
-				if (
-					result.message === 'Required Collaborator details are missing.' ||
-					result.message === 'Can only add Collaborators when Application is in state DRAFT'
-				) {
+				const { message, errors } = result;
+
+				if (errors === 'InvalidState') {
 					response.status(400);
-				} else if (result.message === 'Unauthorized, cannot create Collaborators') {
+				} else if (errors === 'Unauthorized') {
 					response.status(401);
 				} else {
 					response.status(500);
 				}
-				response.send({ message: result.message, errors: String(result.errors) });
+
+				response.send({ message, errors });
 				return;
 			}
 		} else {
