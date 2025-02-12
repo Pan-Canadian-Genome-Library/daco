@@ -96,8 +96,9 @@
 		"applicant": "A. Applicant Information",
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
+		"study": "E. Requested Study",
 		"ethics": "F. Ethics",
-		"study": "E. Requested Study"
+		"agreement": "G. Data Access Agreement"
 	},
 	"errors": {
 		"http": {

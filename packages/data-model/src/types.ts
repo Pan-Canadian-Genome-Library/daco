@@ -62,17 +62,18 @@ export const ApplicationActions = {
 
 export type ApplicationActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
 
-export enum ApplicationAgreements {
-	'dac_agreement_software_updates',
-	'dac_agreement_non_disclosure',
-	'dac_agreement_monitor_individual_access',
-	'dac_agreement_destroy_data',
-	'dac_agreement_familiarize_restrictions',
-	'dac_agreement_provide_it_policy',
-	'dac_agreement_notify_unauthorized_access',
-	'dac_agreement_certify_application',
-	'dac_agreement_read_and_agreed',
-}
+export const ApplicationAgreements = {
+	dac_agreement_software_updates: 'dac_agreement_software_updates',
+	dac_agreement_non_disclosure: 'dac_agreement_non_disclosure',
+	dac_agreement_monitor_individual_access: 'dac_agreement_monitor_individual_access',
+	dac_agreement_destroy_data: 'dac_agreement_destroy_data',
+	dac_agreement_familiarize_restrictions: 'dac_agreement_familiarize_restrictions',
+	dac_agreement_provide_it_policy: 'dac_agreement_provide_it_policy',
+	dac_agreement_notify_unauthorized_access: 'dac_agreement_notify_unauthorized_access',
+	dac_agreement_certify_application: 'dac_agreement_certify_application',
+	dac_agreement_read_and_agreed: 'dac_agreement_read_and_agreed',
+} as const;
+
 // TODO: dedupe keys
 export const ApplicationMessages = {
 	dac_agreement_software_updates:
