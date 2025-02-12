@@ -140,5 +140,9 @@
 				"studyName": "Study Name:"
 			}
 		}
+	},
+	"appendices": {
+		"title": "Appendices",
+		"description": "Please review and agree to the following Appendices."
 	}
 }

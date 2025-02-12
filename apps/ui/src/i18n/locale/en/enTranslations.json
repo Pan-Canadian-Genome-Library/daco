@@ -97,7 +97,8 @@
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
 		"ethics": "F. Ethics",
-		"study": "E. Requested Study"
+		"study": "E. Requested Study",
+		"appendices": "H. Appendices"
 	},
 	"errors": {
 		"http": {
