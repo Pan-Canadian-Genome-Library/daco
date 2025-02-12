@@ -317,7 +317,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
-
+  /applications/reject:
+    post:
+      tags:
+        - Applications
+      summary: Reject an application
+      description: Allows DAC to reject an application. Rejected applications cannot be reopened or changed.
+      requestBody:
+        description: Request body containing rejection details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/RejectApplication'
+      responses:
+        '500':
+          description: 'Cannot reject application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '404':
+          description: 'Invalid request or rejection not allowed'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application successfully rejected'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -592,6 +623,14 @@ components:
           $ref: '#/components/schemas/ApplicationContents'
 
     ApproveApplication:
+      type: object
+      required:
+        - applicationId
+      properties:
+        applicationId:
+          description: The id of the Application
+          type: number
+    RejectApplication:
       type: object
       required:
         - applicationId

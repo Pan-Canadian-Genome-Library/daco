@@ -27,6 +27,7 @@ import {
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
+	rejectApplication,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -208,6 +209,26 @@ describe('Application API', () => {
 			assert.strictEqual(application.user_id, user_id);
 
 			assert.ok(application.contents);
+		});
+	});
+
+	describe('Reject Application', () => {
+		it('should successfully reject an application in DAC_REVIEW state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
+
+			const result = await rejectApplication({ applicationId: id });
+			assert.ok(result.success);
+
+			const rejectedApplication = await getApplicationById({ applicationId: id });
+			assert.ok(rejectedApplication.success);
+			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
 		});
 	});
 

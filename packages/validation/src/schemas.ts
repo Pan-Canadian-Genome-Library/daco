@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationAgreements } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { EthicsEnum } from './common/enums.js';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
@@ -26,6 +27,7 @@ export type ApplicantInformationSchemaType = z.infer<typeof applicantInformation
 export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
+export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
@@ -93,4 +95,40 @@ export const ethicsSchema = z.object({
 
 export const requestedStudySchema = z.object({
 	requestedStudy: NonEmptyString,
+});
+
+export const agreementsSchema = z.object({
+	agreements: z.array(z.string()).superRefine((allAgreements, context) => {
+		if (allAgreements.length > 9) {
+			context.addIssue({
+				code: z.ZodIssueCode.too_big,
+				maximum: 9,
+				type: 'array',
+				inclusive: true,
+			});
+		}
+
+		if (allAgreements.length < 9) {
+			context.addIssue({
+				code: z.ZodIssueCode.too_small,
+				minimum: 9,
+				type: 'array',
+				inclusive: true,
+			});
+		}
+
+		if (allAgreements.length !== new Set(allAgreements).size) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'duplicateAgreementItems' },
+			});
+		}
+
+		if (allAgreements.filter((agreement) => !Object.keys(ApplicationAgreements).includes(agreement)).length !== 0) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'invalidAgreementItem' },
+			});
+		}
+	}),
 });

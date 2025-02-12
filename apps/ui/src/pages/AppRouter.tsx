@@ -21,6 +21,7 @@ import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
 import ApplicationViewer from '@/pages/applications';
+import AccessAgreement from '@/pages/applications/sections/access';
 import Appendices from '@/pages/applications/sections/appendices';
 import Applicant from '@/pages/applications/sections/applicant';
 import Collaborators from '@/pages/applications/sections/collaborators';
@@ -37,7 +38,7 @@ export const ApplicationSectionRoutes = [
 	{
 		route: 'intro',
 		path: 'intro/edit?',
-		element: <Introduction />,	
+		element: <Introduction />,
 	},
 	{
 		route: 'applicant',
@@ -73,6 +74,11 @@ export const ApplicationSectionRoutes = [
 		route: 'appendices',
 		path: 'appendices/edit?',
 		element: <Appendices />,
+	},
+	{
+		route: 'agreement',
+		path: 'agreement/edit?',
+		element: <AccessAgreement />,
 	},
 ];
 
