@@ -48,7 +48,7 @@ const Appendices = () => {
 					showDivider={true}
 					text={[translate('appendices.description')]}
 				/>
-				<SectionContent title="PCGL Policies" showDivider={false}>
+				<SectionContent title={translate('appendices.section1')} showDivider={false}>
 					<Form>
 						<CheckboxGroup
 							control={control}
@@ -59,31 +59,31 @@ const Appendices = () => {
 								{
 									description: (
 										<LabelWithLink
-											label="APPENDIX I - PCGL ARGO Goals and Policies"
-											link={{ label: 'READ THE APPENDIX', href: '#' }}
+											label={translate('appendices.appendix1')}
+											link={{ label: translate('appendices.readAppendix'), href: '#' }}
 										/>
 									),
-									label: 'You have read APPENDIX I',
+									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX I' }),
 									value: 'appendix-1',
 								},
 								{
 									description: (
 										<LabelWithLink
-											label="APPENDIX II - Data Access and Data Use Policies and Guidelines"
-											link={{ label: 'READ THE APPENDIX', href: '#' }}
+											label={translate('appendices.appendix2')}
+											link={{ label: translate('appendices.readAppendix'), href: '#' }}
 										/>
 									),
-									label: 'You have read APPENDIX II',
+									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX II' }),
 									value: 'appendix-2',
 								},
 								{
 									description: (
 										<LabelWithLink
-											label="APPENDIX III - Intellectual Property Policy"
-											link={{ label: 'READ THE APPENDIX', href: '#' }}
+											label={translate('appendices.appendix3')}
+											link={{ label: translate('appendices.readAppendix'), href: '#' }}
 										/>
 									),
-									label: 'You have read APPENDIX III',
+									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX III' }),
 									value: 'appendix-3',
 								},
 							]}
