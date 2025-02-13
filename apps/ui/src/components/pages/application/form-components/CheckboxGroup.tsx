@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Checkbox, Form, Row, theme } from 'antd';
+import { Checkbox, Form, Row, theme, Typography } from 'antd';
 import { ReactNode } from 'react';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
@@ -26,6 +26,7 @@ import { BasicFormFieldProps } from '@/global/types';
 
 const { Item } = Form;
 const { useToken } = theme;
+const { Text } = Typography;
 
 export interface CheckboxGroupOptions {
 	description?: string | ReactNode;
@@ -56,7 +57,7 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 										minWidth: '100%',
 									}}
 								>
-									{checkbox.description}
+									<Text>{checkbox.description}</Text>
 									<Checkbox
 										value={checkbox.value}
 										disabled={props.disabled}
