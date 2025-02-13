@@ -246,8 +246,37 @@ describe('State Machine', () => {
 			assert.ok(applicationResult.data.state === ApplicationStates.DAC_REVIEW);
 		});
 
+		it('should change from DAC_REVIEW to DRAFT on withdraw', async () => {
+			const result = await createApplicationStateManager({ id: 1 });
+			assert.ok(result.success);
+			assert.ok(result.data.state === 'DAC_REVIEW');
+
+			const dacReviewManager = result.data;
+			await dacReviewManager.withdrawDacReview();
+			stateValue = dacReviewManager.getState();
+			assert.strictEqual(stateValue, DRAFT);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.WITHDRAW &&
+						record.state_before === ApplicationStates.DAC_REVIEW &&
+						record.state_after === ApplicationStates.DRAFT,
+				),
+			);
+		});
+
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
 			stateValue = testStateManager.getState();
+
+			await testStateManager.submitDraft();
+			await testStateManager.submitRepRevision();
+			await testStateManager.approveRepReview();
+			stateValue = testStateManager.getState();
+			assert.strictEqual(stateValue, DAC_REVIEW);
+
 			await testStateManager.reviseDacReview();
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);

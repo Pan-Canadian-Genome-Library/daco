@@ -44,12 +44,13 @@ export enum ApplicationStateEvents {
 	submit_dac_revisions = 'submit_dac_revisions',
 	close = 'close',
 	edit = 'edit',
-	withdraw = 'withdraw',
+	rep_review_withdraw = 'rep_review_withdraw',
 	rep_approve_review = 'rep_approve_review',
 	rep_revision_request = 'rep_revision_request',
 	dac_approve_review = 'dac_approve_review',
 	dac_reject = 'dac_reject',
 	dac_revision_request = 'dac_revision_request',
+	dac_review_withdraw = 'dac_review_withdraw',
 	revoked = 'revoked',
 }
 
@@ -59,12 +60,13 @@ const {
 	submit_dac_revisions,
 	close,
 	edit,
-	withdraw,
 	rep_revision_request,
 	rep_approve_review,
+	rep_review_withdraw,
 	dac_approve_review,
 	dac_reject,
 	dac_revision_request,
+	dac_review_withdraw,
 	revoked,
 } = ApplicationStateEvents;
 
@@ -303,9 +305,18 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Withdraw
 	async withdrawRepReview() {
-		const transitionResult = this._canPerformAction(withdraw);
+		const transitionResult = this._canPerformAction(rep_review_withdraw);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(withdraw, 'withdraw');
+			return await this._dispatchAndUpdateAction(rep_review_withdraw, 'withdraw');
+		} else {
+			return transitionResult;
+		}
+	}
+
+	async withdrawDacReview() {
+		const transitionResult = this._canPerformAction(dac_review_withdraw);
+		if (transitionResult.success) {
+			return await this._dispatchAndUpdateAction(dac_review_withdraw, 'withdraw');
 		} else {
 			return transitionResult;
 		}
@@ -338,7 +349,12 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVIEW,
 		this._onApproved,
 	);
-	private repReviewWithdrawTransition = transition(INSTITUTIONAL_REP_REVIEW, withdraw, DRAFT, this._onWithdrawal);
+	private repReviewWithdrawTransition = transition(
+		INSTITUTIONAL_REP_REVIEW,
+		rep_review_withdraw,
+		DRAFT,
+		this._onWithdrawal,
+	);
 
 	// Rep Revision
 	private repRevisionSubmitTransition = transition(
@@ -359,6 +375,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this._onRevision,
 	);
 	private dacReviewRejectTransition = transition(DAC_REVIEW, dac_reject, REJECTED, this._onReject);
+	private dacReviewWithdrawTransition = transition(DAC_REVIEW, dac_review_withdraw, DRAFT, this._onWithdrawal);
 
 	// DAC Revision
 	private dacRevisionSubmitTransition = transition(
@@ -380,6 +397,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.dacReviewRevisionTransition,
 		this.dacReviewRejectTransition,
 		this.dacRevisionSubmitTransition,
+		this.dacReviewWithdrawTransition,
 		this.draftCloseTransition,
 		this.draftEditTransition,
 		this.draftSubmitTransition,
