@@ -38,9 +38,7 @@ const rule = createSchemaFieldRule(appendicesSchema);
 const Appendices = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { watch, control } = useForm<AppendicesSchemaType>({ resolver: zodResolver(appendicesSchema) });
-
-	console.log(watch());
+	const { control } = useForm<AppendicesSchemaType>({ resolver: zodResolver(appendicesSchema) });
 
 	return (
 		<SectionWrapper>
