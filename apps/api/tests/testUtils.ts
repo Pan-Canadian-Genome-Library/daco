@@ -49,14 +49,19 @@ export const initTestMigration = async (db: PostgresDb) => {
 	}
 };
 
+// Sets Number of Db Records to Seed @ start of test run using addInitialApplications
+export const numTestApplications = 20;
+// Used to bypass pagination impacting test results
+export const allRecordsPageSize = 2 * numTestApplications;
+
 export const addInitialApplications = async (db: PostgresDb) => {
 	const newApplication: typeof applications.$inferInsert = {
 		user_id: testUserId,
 		state: ApplicationStates.DRAFT,
 	};
 
-	// Create 3 Initial Applications w/ Contents
-	for (let i = 0; i < 3; i++) {
+	// Create 20 Initial Applications w/ Contents
+	for (let i = 0; i < numTestApplications; i++) {
 		const newRecord = await db.insert(applications).values(newApplication).returning();
 		if (!newRecord[0]) throw new Error('Error creating test application records');
 

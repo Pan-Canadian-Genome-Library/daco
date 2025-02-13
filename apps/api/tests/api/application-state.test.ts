@@ -191,24 +191,22 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to REJECTED on rejected', async () => {
-			const result = await createApplicationStateManager({ id: 2 });
+			const result = await createApplicationStateManager({ id: 3 });
 			assert.ok(result.success);
 
 			const dacReviewManager = result.data;
 			await dacReviewManager.submitDraft();
 			await dacReviewManager.approveRepReview();
-
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
 			await dacReviewManager.rejectDacReview();
-
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, REJECTED);
 		});
 
 		it('should allow edit on DAC_REVIEW', async () => {
-			const result = await createApplicationStateManager({ id: 3 });
+			const result = await createApplicationStateManager({ id: 4 });
 			assert.ok(result.success);
 
 			const draftReviewManager = result.data;
@@ -222,7 +220,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to CLOSED on close', async () => {
-			const result = await createApplicationStateManager({ id: 3 });
+			const result = await createApplicationStateManager({ id: 4 });
 			assert.ok(result.success);
 
 			const dacStateManager = result.data;

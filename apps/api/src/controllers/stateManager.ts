@@ -228,9 +228,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Close
 	async closeDraft() {
-		if (this.can(close)) {
-			await this.dispatch(close);
-			return success(close);
+		const transitionResult = this._canPerformAction(close);
+		if (transitionResult.success) {
+			return await this._dispatchAndUpdateAction(close, 'close');
 		} else {
 			return failure(`Cannot close application with state ${this.getState()}`);
 		}
@@ -287,9 +287,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Revoke
 	async revokeApproval() {
-		if (this.can(revoked)) {
-			await this.dispatch(revoked);
-			return success(revoked);
+		const transitionResult = this._canPerformAction(revoked);
+		if (transitionResult.success) {
+			return await this._dispatchAndUpdateAction(revoked, 'revoke');
 		} else {
 			return failure(`Cannot revoke application with state ${this.getState()}`);
 		}
