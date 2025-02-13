@@ -21,6 +21,7 @@ import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import * as schema from '@/db/schemas/index.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { ExtractTablesWithRelations } from 'drizzle-orm';
@@ -73,3 +74,5 @@ export type PostgresTransaction = PgTransaction<
 	typeof schema,
 	ExtractTablesWithRelations<typeof schema>
 >;
+
+export type ReviewApplication = keyof typeof revisionRequests.$inferSelect;

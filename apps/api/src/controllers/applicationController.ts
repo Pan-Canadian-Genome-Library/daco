@@ -23,7 +23,13 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationContentUpdates, type ApplicationRecord, type ApplicationService } from '@/service/types.js';
+import {
+	ApplicationModel,
+	ReviewApplication,
+	type ApplicationContentUpdates,
+	type ApplicationRecord,
+	type ApplicationService,
+} from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
 import { ApplicationStateManager } from './stateManager.js';
@@ -208,5 +214,53 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
 		logger.error(message);
 		logger.error(error);
 		return failure(message, error);
+	}
+};
+
+export const requestApplicationRevisions = async ({
+	applicationId,
+	role,
+	repId,
+	reviewData,
+	comments,
+}: {
+	applicationId: number;
+	role: string;
+	repId: string;
+	reviewData: ReviewApplication;
+	comments?: string;
+}): AsyncResult<ApplicationModel> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (
+			(role === 'DAC' && application.state !== ApplicationStates.DAC_REVIEW) ||
+			(role === 'REP' && application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW)
+		) {
+			return failure('Application is not in the correct status for revisions.');
+		}
+
+		const revisionResult = await appStateManager.reviseRepReview();
+
+		if (!revisionResult.success) {
+			return failure(revisionResult.message || 'Failed to reject application.', 'StateTransitionError');
+		}
+
+		service.createRevisionRequest({ applicationId, reviewData, comments_str: comments });
+
+		return service.getApplicationById({ id: applicationId });
+	} catch (error) {
+		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
+		return failure('An error occurred while processing the request.', error);
 	}
 };
