@@ -130,6 +130,17 @@ describe('State Machine', () => {
 			await dacReviewManager.withdrawRepReview();
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, DRAFT);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.WITHDRAW &&
+						record.state_before === ApplicationStates.INSTITUTIONAL_REP_REVIEW &&
+						record.state_after === ApplicationStates.DRAFT,
+				),
+			);
 		});
 
 		it('should allow edit on INSTITUTIONAL_REP_REVIEW', async () => {
@@ -140,14 +151,29 @@ describe('State Machine', () => {
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to CLOSED on close', async () => {
-			const result = await createApplicationStateManager({ id: 2 });
+			const result = await createApplicationStateManager({ id: 3 });
 			assert.ok(result.success);
 
 			const dacReviewManager = result.data;
 			await dacReviewManager.submitDraft();
+			stateValue = dacReviewManager.getState();
+			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
+
 			await dacReviewManager.closeRepReview();
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 3 });
+			assert.ok(actionResult.success && actionResult.data);
+
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.CLOSE &&
+						record.state_before === ApplicationStates.INSTITUTIONAL_REP_REVIEW &&
+						record.state_after === ApplicationStates.CLOSED,
+				),
+			);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVIEW to INSTITUTIONAL_REP_REVISION_REQUESTED on revision_request', async () => {
@@ -202,7 +228,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to REJECTED on rejected', async () => {
-			const result = await createApplicationStateManager({ id: 3 });
+			const result = await createApplicationStateManager({ id: 4 });
 			assert.ok(result.success);
 
 			const dacReviewManager = result.data;
@@ -214,10 +240,22 @@ describe('State Machine', () => {
 			await dacReviewManager.rejectDacReview();
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, REJECTED);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 4 });
+			assert.ok(actionResult.success && actionResult.data);
+
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.DAC_REVIEW_REJECTED &&
+						record.state_before === ApplicationStates.DAC_REVIEW &&
+						record.state_after === ApplicationStates.REJECTED,
+				),
+			);
 		});
 
 		it('should allow edit on DAC_REVIEW', async () => {
-			const result = await createApplicationStateManager({ id: 4 });
+			const result = await createApplicationStateManager({ id: 5 });
 			assert.ok(result.success);
 
 			const draftReviewManager = result.data;
@@ -231,7 +269,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DAC_REVIEW to CLOSED on close', async () => {
-			const result = await createApplicationStateManager({ id: 4 });
+			const result = await createApplicationStateManager({ id: 5 });
 			assert.ok(result.success);
 
 			const dacStateManager = result.data;
@@ -245,6 +283,17 @@ describe('State Machine', () => {
 
 			stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
+
+			const actionResult = await testActionRepo.listActions({ application_id: 5 });
+			assert.ok(actionResult.success && actionResult.data);
+			assert.ok(
+				actionResult.data.find(
+					(record) =>
+						record.action === ApplicationActions.CLOSE &&
+						record.state_before === ApplicationStates.DAC_REVIEW &&
+						record.state_after === ApplicationStates.CLOSED,
+				),
+			);
 		});
 
 		it('should change from DAC_REVIEW to APPROVED on approval', async () => {
