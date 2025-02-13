@@ -18,6 +18,7 @@
  */
 
 import { Checkbox, Form, Row, theme } from 'antd';
+import { ReactNode } from 'react';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { pcglColors } from '@/components/providers/ThemeProvider';
@@ -27,6 +28,7 @@ const { Item } = Form;
 const { useToken } = theme;
 
 export interface CheckboxGroupOptions {
+	description?: string | ReactNode;
 	label: string;
 	value: string;
 }
@@ -44,20 +46,22 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 			render={({ field }) => {
 				return (
 					<Item label={props.label} name={`${props.name}`} rules={[props.rule]} required={props.required}>
-						<Checkbox.Group {...field} style={{ width: '100%' }}>
+						<Checkbox.Group {...field} style={{ width: '100%', gap: '20px' }}>
 							{props.options.map((checkbox) => (
 								<Row
 									key={`checkbox-${checkbox.value}`}
 									style={{
-										backgroundColor: pcglColors.greyLight,
-										padding: token.padding,
 										borderRadius: token.borderRadius,
 										width: '100%',
 										minWidth: '100%',
-										margin: `${token.marginXS}px 0`,
 									}}
 								>
-									<Checkbox value={checkbox.value} disabled={props.disabled} style={{ width: '100%' }}>
+									{checkbox.description}
+									<Checkbox
+										value={checkbox.value}
+										disabled={props.disabled}
+										style={{ width: '100%', backgroundColor: pcglColors.greyLight, padding: token.padding }}
+									>
 										{checkbox.label}
 									</Checkbox>
 								</Row>

@@ -17,17 +17,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form } from 'antd';
+import { createSchemaFieldRule } from 'antd-zod';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
+import { z } from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
+import { LabelWithLink } from '@/components/pages/application/form-components/labels/LabelWithLink';
+import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 
+const testSchema = z.object({
+	policies: z.object({
+		policy1: z.string(),
+		policy2: z.string(),
+		policy3: z.string(),
+	}),
+});
+
+const rule = createSchemaFieldRule(testSchema);
+
 const Appendices = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { control } = useForm<z.infer<typeof testSchema>>({ resolver: zodResolver(testSchema) });
 
 	return (
 		<SectionWrapper>
@@ -37,6 +56,48 @@ const Appendices = () => {
 					showDivider={true}
 					text={[translate('appendices.description')]}
 				/>
+				<SectionContent title="PCGL Policies" showDivider={false}>
+					<Form>
+						<CheckboxGroup
+							control={control}
+							rule={rule}
+							name="policies"
+							disabled={!isEditMode}
+							options={[
+								{
+									description: (
+										<LabelWithLink
+											label="APPENDIX I - PCGL ARGO Goals and Policies"
+											link={{ label: 'READ THE APPENDIX', href: '#' }}
+										/>
+									),
+									label: 'You have read APPENDIX I',
+									value: 'policy-1',
+								},
+								{
+									description: (
+										<LabelWithLink
+											label="APPENDIX II - Data Access and Data Use Policies and Guidelines"
+											link={{ label: 'READ THE APPENDIX', href: '#' }}
+										/>
+									),
+									label: 'You have read APPENDIX II',
+									value: 'policy-2',
+								},
+								{
+									description: (
+										<LabelWithLink
+											label="APPENDIX III - Intellectual Property Policy"
+											link={{ label: 'READ THE APPENDIX', href: '#' }}
+										/>
+									),
+									label: 'You have read APPENDIX III',
+									value: 'policy-3',
+								},
+							]}
+						/>
+					</Form>
+				</SectionContent>
 
 				<SectionFooter currentRoute="appendices" isEditMode={isEditMode} />
 			</>
