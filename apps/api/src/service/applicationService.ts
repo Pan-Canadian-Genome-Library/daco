@@ -22,6 +22,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
@@ -354,6 +355,64 @@ const applicationSvc = (db: PostgresDb) => ({
 			logger.error(message);
 			logger.error(exception);
 			return failure(message, exception);
+		}
+	},
+
+	createRevisionRequest: async ({
+		applicationId,
+		reviewData,
+		comments_str,
+	}: {
+		applicationId: number;
+		reviewData: any;
+		comments_str?: string;
+	}) => {
+		try {
+			const {
+				comments,
+				applicantNotes,
+				applicantApproved,
+				institutionRepApproved,
+				institutionRepNotes,
+				collaboratorsApproved,
+				collaboratorsNotes,
+				projectApproved,
+				projectNotes,
+				requestedStudiesApproved,
+				requestedStudiesNotes,
+			} = reviewData;
+
+			const newRevisionRequest: typeof revisionRequests.$inferInsert = {
+				application_id: applicationId,
+				comments: comments || comments_str || null,
+				applicant_notes: applicantNotes || null,
+				applicant_approved: applicantApproved,
+				institution_rep_approved: institutionRepApproved,
+				institution_rep_notes: institutionRepNotes || null,
+				collaborators_approved: collaboratorsApproved,
+				collaborators_notes: collaboratorsNotes || null,
+				project_approved: projectApproved,
+				project_notes: projectNotes || null,
+				requested_studies_approved: requestedStudiesApproved,
+				requested_studies_notes: requestedStudiesNotes || null,
+			};
+
+			// Using transaction for inserting
+			const result = await db.transaction(async (transaction) => {
+				// Insert into the revision_requests table
+				const revisionRecord = await transaction.insert(revisionRequests).values(newRevisionRequest).returning();
+				if (!revisionRecord[0]) throw new Error('Revision request record is undefined');
+
+				// Returning the inserted revision request
+				return revisionRecord[0];
+			});
+
+			return success(result);
+		} catch (err) {
+			const message = `Error at createRevisionRequest for applicationId: ${applicationId}`;
+			logger.error(message);
+			logger.error(err);
+			return failure(message, err);
 		}
 	},
 });
