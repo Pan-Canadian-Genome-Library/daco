@@ -23,7 +23,6 @@ import { createSchemaFieldRule } from 'antd-zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
-import { z } from 'zod';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
@@ -32,21 +31,16 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
+import { appendicesSchema, type AppendicesSchemaType } from '@pcgl-daco/validation';
 
-const testSchema = z.object({
-	policies: z.object({
-		policy1: z.string(),
-		policy2: z.string(),
-		policy3: z.string(),
-	}),
-});
-
-const rule = createSchemaFieldRule(testSchema);
+const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { control } = useForm<z.infer<typeof testSchema>>({ resolver: zodResolver(testSchema) });
+	const { watch, control } = useForm<AppendicesSchemaType>({ resolver: zodResolver(appendicesSchema) });
+
+	console.log(watch());
 
 	return (
 		<SectionWrapper>
@@ -61,7 +55,7 @@ const Appendices = () => {
 						<CheckboxGroup
 							control={control}
 							rule={rule}
-							name="policies"
+							name="appendices"
 							disabled={!isEditMode}
 							options={[
 								{
@@ -72,7 +66,7 @@ const Appendices = () => {
 										/>
 									),
 									label: 'You have read APPENDIX I',
-									value: 'policy-1',
+									value: 'appendix-1',
 								},
 								{
 									description: (
@@ -82,7 +76,7 @@ const Appendices = () => {
 										/>
 									),
 									label: 'You have read APPENDIX II',
-									value: 'policy-2',
+									value: 'appendix-2',
 								},
 								{
 									description: (
@@ -92,7 +86,7 @@ const Appendices = () => {
 										/>
 									),
 									label: 'You have read APPENDIX III',
-									value: 'policy-3',
+									value: 'appendix-3',
 								},
 							]}
 						/>
