@@ -57,6 +57,8 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 		case z.ZodIssueCode.invalid_type:
 			if (error.expected === 'string') {
 				return { message: i18n.t('requiredField') };
+			} else if (error.expected === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('requiredNumberOfCheckboxes') };
 			}
 
 			return { message: i18n.t('defaultViolationText') };
@@ -68,6 +70,16 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			} else if (error.validation === 'regex') {
 				// right now this only does the postal code, when we expand 'regex' outside of postal code, we need to adjust here
 				return { message: i18n.t('validPostalCode') };
+			}
+			break;
+		case z.ZodIssueCode.too_small:
+			if (error.type === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('checkboxesNotFilledOut') };
+			}
+			break;
+		case z.ZodIssueCode.too_big:
+			if (error.type === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('requiredNumberOfCheckboxes') };
 			}
 			break;
 		// Custom zod errors using refine / super refine
@@ -87,7 +99,7 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			}
 			return { message: i18n.t('defaultViolationText') };
 		case z.ZodIssueCode.invalid_enum_value:
-			return { message: i18n.t('recievedInvalidEnum') };
+			return { message: i18n.t('receivedInvalidEnum') };
 	}
 	return { message: ctx.defaultError };
 };

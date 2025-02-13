@@ -1,13 +1,18 @@
 {
 	"defaultViolationText": "Please ensure that you've filled out this field according to its requirements.",
-	"requiredField": "Please fill out the required field",
+	"requiredField": "Please fill out the required field.",
 	"validEmail": "Please enter a valid email address.",
 	"validURL": "Please enter a valid url. Must begin with http:// or https://.",
 	"validPostalCode": "Please enter a valid postal code.",
-	"tooFewWords": "Please enter at least {{length}} words.",
-	"tooManyWords": "Please enter {{length}} words or less.",
 	"recievedInvalidEnum": "Input recieved does match any of the required values",
-	"invalidFileTitle": "Invalid File Type",
-	"invalidFileSizeTitle": "File Size is too big",
-	"invalidFileSizeDescription": "Please upload a file less than 5mb"
+	"tooFewWords": "Please enter at least 100 words.",
+	"tooManyWords": "Please enter 200 words or less.",
+	"receivedInvalidEnum": "Input received does not match any of the required values.",
+	"invalidFileTitle": "Invalid File Type.",
+	"invalidFileSizeTitle": "File Size is too big.",
+	"invalidFileSizeDescription": "Please upload a file less than 5mb.",
+	"requiredNumberOfCheckboxes": "Please select all required checkboxes.",
+	"checkboxesNotFilledOut": "All checkboxes must be checked to go to next page.",
+	"duplicateAgreementItems": "There are duplicate items checked, please uncheck any duplicate checkboxes.",
+	"invalidAgreementItem": "There is an invalid checkbox checked, please uncheck this checkbox before proceeding."
 }
