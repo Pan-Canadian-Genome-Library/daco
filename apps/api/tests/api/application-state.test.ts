@@ -121,6 +121,17 @@ describe('State Machine', () => {
 			assert.ok(applicationResult.data.state === 'INSTITUTIONAL_REP_REVIEW');
 		});
 
+		it('should change from INSTITUTIONAL_REP_REVIEW to DRAFT on withdraw', async () => {
+			const result = await createApplicationStateManager({ id: 1 });
+			assert.ok(result.success);
+			assert.ok(result.data.state === 'INSTITUTIONAL_REP_REVIEW');
+
+			const dacReviewManager = result.data;
+			await dacReviewManager.withdrawRepReview();
+			stateValue = dacReviewManager.getState();
+			assert.strictEqual(stateValue, DRAFT);
+		});
+
 		it('should allow edit on INSTITUTIONAL_REP_REVIEW', async () => {
 			const editResult = await testStateManager.editRepReview();
 			stateValue = testStateManager.getState();

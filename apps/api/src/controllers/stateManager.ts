@@ -39,11 +39,12 @@ const {
 } = ApplicationStates;
 
 export enum ApplicationStateEvents {
-	submit = 'submit', // submit draft
-	submit_rep_revisions = 'submit_rep_revisions', // submit draft
-	submit_dac_revisions = 'submit_dac_revisions', // submit draft
+	submit = 'submit',
+	submit_rep_revisions = 'submit_rep_revisions',
+	submit_dac_revisions = 'submit_dac_revisions',
 	close = 'close',
 	edit = 'edit',
+	withdraw = 'withdraw',
 	rep_approve_review = 'rep_approve_review',
 	rep_revision_request = 'rep_revision_request',
 	dac_approve_review = 'dac_approve_review',
@@ -58,6 +59,7 @@ const {
 	submit_dac_revisions,
 	close,
 	edit,
+	withdraw,
 	rep_revision_request,
 	rep_approve_review,
 	dac_approve_review,
@@ -299,6 +301,20 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		return success('post dispatch on revoked');
 	}
 
+	// Withdraw
+	async withdrawRepReview() {
+		const transitionResult = this._canPerformAction(withdraw);
+		if (transitionResult.success) {
+			return await this._dispatchAndUpdateAction(withdraw, 'withdraw');
+		} else {
+			return transitionResult;
+		}
+	}
+
+	private async _onWithdrawal() {
+		return success('post dispatch on withdraw');
+	}
+
 	/* *********** *
 	 * Transitions *
 	 * *********** */
@@ -322,6 +338,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVIEW,
 		this._onApproved,
 	);
+	private repReviewWithdrawTransition = transition(INSTITUTIONAL_REP_REVIEW, withdraw, DRAFT, this._onWithdrawal);
 
 	// Rep Revision
 	private repRevisionSubmitTransition = transition(
@@ -371,6 +388,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		this.repReviewRevisionTransition,
 		this.repReviewApproveTransition,
 		this.repRevisionSubmitTransition,
+		this.repReviewWithdrawTransition,
 	] as const satisfies ApplicationTransitions[];
 
 	constructor(application: ApplicationRecord) {
