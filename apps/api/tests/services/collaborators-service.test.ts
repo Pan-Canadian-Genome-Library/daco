@@ -66,12 +66,14 @@ describe('Application Service', () => {
 					last_name: 'User',
 					position_title: 'Bioinformatician',
 					institutional_email: 'testUser01@oicr.on.ca',
+					application_id,
 				},
 				{
 					first_name: 'Test',
 					last_name: 'User',
 					position_title: 'Developer',
 					institutional_email: 'testUser02@oicr.on.ca',
+					application_id,
 				},
 			];
 
@@ -82,6 +84,23 @@ describe('Application Service', () => {
 			const newCollaborators = collaboratorResult.data;
 
 			assert.strictEqual(newCollaborators?.length, collaborators.length);
+		});
+
+		it('should prevent creating a duplicate Collaborator', async () => {
+			const collaborators: CollaboratorModel[] = [
+				{
+					first_name: 'Test',
+					last_name: 'User',
+					position_title: 'Bioinformatician',
+					institutional_email: 'testUser01@oicr.on.ca',
+					application_id,
+				},
+			];
+
+			const collaboratorResult = await testCollaboratorsRepo.createCollaborators({ newCollaborators: collaborators });
+
+			assert.ok(!collaboratorResult.success);
+			assert.strictEqual(collaboratorResult.errors, 'DuplicateRecords');
 		});
 	});
 

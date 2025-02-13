@@ -21,17 +21,42 @@ import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import logger from '@/logger.js';
 import { failure, success } from '@/utils/results.js';
+import { and, eq } from 'drizzle-orm';
 import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
 
 const collaboratorsSvc = (db: PostgresDb) => ({
 	createCollaborators: async ({ newCollaborators }: { newCollaborators: CollaboratorModel[] }) => {
 		try {
+			// Check for Duplicates
+			let hasDuplicateCollaborators = false;
+
+			for await (const collaborator of newCollaborators) {
+				const existingCollaborator = await db
+					.select()
+					.from(collaborators)
+					.where(
+						and(
+							eq(collaborators.first_name, collaborator.first_name),
+							eq(collaborators.last_name, collaborator.last_name),
+							eq(collaborators.institutional_email, collaborator.institutional_email),
+							eq(collaborators.position_title, collaborator.position_title),
+							eq(collaborators.application_id, collaborator.application_id),
+						),
+					);
+
+				if (existingCollaborator.length > 0) hasDuplicateCollaborators = true;
+			}
+
+			if (hasDuplicateCollaborators) {
+				return failure(`Cannot create duplicate collaborator records`, 'DuplicateRecords');
+			}
+
 			// Create Collaborators
 			const collaboratorRecords = await db.transaction(async (transaction) => {
 				const newRecords: CollaboratorRecord[] = [];
 
-				// TODO: Inserting multiple records as an array is not working despite Drizzle team saying the issue is resolved: https://github.com/drizzle-team/drizzle-orm/issues/2849
 				newCollaborators.forEach(async (collaborator) => {
+					// TODO: Inserting multiple records as an array is not working despite Drizzle team saying the issue is resolved: https://github.com/drizzle-team/drizzle-orm/issues/2849
 					const newCollaboratorRecord = await transaction.insert(collaborators).values(collaborator).returning();
 
 					if (!newCollaboratorRecord[0]) {
@@ -40,12 +65,14 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 
 					newRecords.push(newCollaboratorRecord[0]);
 				});
+
 				return newRecords;
 			});
 
 			if (!(collaboratorRecords.length === newCollaborators.length)) {
 				throw new Error(`Error creating new collaborators: ${collaboratorRecords}`);
 			}
+
 			return success(collaboratorRecords);
 		} catch (err) {
 			const message = `Error at createCollaborators`;

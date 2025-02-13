@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
@@ -27,6 +28,7 @@ import { CollaboratorDTO } from '@pcgl-daco/data-model';
 import { createApplication } from '@/controllers/applicationController.js';
 import { createCollaborators } from '@/controllers/collaboratorsController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
+import { collaborators } from '@/db/schemas/collaborators.js';
 
 import {
 	addInitialApplications,
@@ -80,21 +82,21 @@ describe('Collaborators Controller', () => {
 			const collaborators: CollaboratorDTO[] = [
 				{
 					collaboratorFirstName: 'Test',
-					collaboratorLastName: 'User',
-					collaboratorPositionTitle: 'Bioinformatician',
-					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
-				},
-				{
-					collaboratorFirstName: 'Test',
 					collaboratorLastName: 'User 2',
-					collaboratorPositionTitle: 'Scientist',
+					collaboratorPositionTitle: 'Principal Investigator',
 					collaboratorInstitutionalEmail: 'testUser2@oicr.on.ca',
 				},
 				{
 					collaboratorFirstName: 'Test',
 					collaboratorLastName: 'User 3',
-					collaboratorPositionTitle: 'Lab Tech',
+					collaboratorPositionTitle: 'Scientist',
 					collaboratorInstitutionalEmail: 'testUser3@oicr.on.ca',
+				},
+				{
+					collaboratorFirstName: 'Test',
+					collaboratorLastName: 'User 4',
+					collaboratorPositionTitle: 'Lab Tech',
+					collaboratorInstitutionalEmail: 'testUser4@oicr.on.ca',
 				},
 			];
 
@@ -141,9 +143,36 @@ describe('Collaborators Controller', () => {
 			assert.ok(!result.success);
 			assert.strictEqual(result.message, `Error at getApplicationById with id: ${incorrectId}`);
 		});
+
+		it('should prevent creating duplicate records', async () => {
+			const applicationResult = await createApplication({ user_id });
+
+			assert.ok(applicationResult.success && applicationResult.data);
+
+			const collaborators: CollaboratorDTO[] = [
+				{
+					collaboratorFirstName: 'Principal',
+					collaboratorLastName: 'Tester',
+					collaboratorPositionTitle: 'Doctor',
+					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
+				},
+				{
+					collaboratorFirstName: 'Principal',
+					collaboratorLastName: 'Tester',
+					collaboratorPositionTitle: 'Doctor',
+					collaboratorInstitutionalEmail: 'testUser@oicr.on.ca',
+				},
+			];
+
+			const result = await createCollaborators({ application_id, user_id, collaborators });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.errors, `DuplicateRecords`);
+		});
 	});
 
 	after(async () => {
+		await db.delete(collaborators).where(eq(collaborators.application_id, application_id));
 		await container.stop();
 		process.exit(0);
 	});
