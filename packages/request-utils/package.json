@@ -1,7 +1,7 @@
 {
 	"name": "@pcgl-daco/request-utils",
 	"version": "0.0.1",
-	"description": "PCGL DACO Middleware Error Handler",
+	"description": "PCGL DACO Middleware Request Utilities",
 	"exports": "./dist/index.js",
 	"types": "dist/index.d.ts",
 	"type": "module",
