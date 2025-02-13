@@ -18,7 +18,7 @@
  */
 
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { applicationEditSchema } from '@pcgl-daco/validation';
+import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
@@ -69,7 +69,7 @@ applicationRouter.post(
 applicationRouter.post(
 	'/applications/edit',
 	jsonParser,
-	withSchemaValidation(applicationEditSchema, apiZodErrorMapping, async (req, res) => {
+	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 		// TODO: Add Auth
 		const data = req.body;
 
