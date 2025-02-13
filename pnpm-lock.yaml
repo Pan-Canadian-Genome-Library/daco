@@ -268,6 +268,9 @@ importers:
 
   packages/validation:
     dependencies:
+      '@pcgl-daco/data-model':
+        specifier: workspace:^
+        version: link:../data-model
       zod:
         specifier: ^3.24.1
         version: 3.24.1

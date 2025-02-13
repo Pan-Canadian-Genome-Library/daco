@@ -68,6 +68,9 @@ const pcglTheme: ThemeConfig = {
 		colorIcon: pcglColors.primary,
 	},
 	components: {
+		Checkbox: {
+			colorBgContainer: '#fff',
+		},
 		Table: {
 			colorBgContainer: pcglColors.white,
 			headerBg: pcglColors.greyLight,
