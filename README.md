@@ -30,7 +30,7 @@ The repository is organized with the following directory structure:
 | [data-model](packages/data-model/README.md) | @pcgl-daco/data-model | packages/data-model | DACO database schemas and generated types.                           |
 | [logger](packages/logger/README.md)         | @pcgl-daco/logger     | packages/logger     | Standardized reusable logger and express middleware request logging. |
 | [validation](packages/validation/README.md) | @pcgl-daco/validation | packages/validation | Shared type schemas for API and UI.                                  |
-| [request-utils](packages/request-utils/README.md) | @pcgl-daco/request-utils | packages/request-utils |A package containing utilities useful for processing express requests, including Zod validation, and centralized error handling. |
+| [request-utils](packages/request-utils/README.md) | @pcgl-daco/request-utils | packages/request-utils | A package containing utilities useful for processing express requests, including Zod validation, and centralized error handling. |
 
 
 The modules in the monorepo are organized into two categories:
