@@ -28,6 +28,7 @@ export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
+export type AppendicesSchemaType = z.infer<typeof appendicesSchema>;
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
@@ -128,6 +129,17 @@ export const agreementsSchema = z.object({
 			context.addIssue({
 				code: z.ZodIssueCode.custom,
 				params: { violation: 'invalidAgreementItem' },
+			});
+		}
+	}),
+});
+
+export const appendicesSchema = z.object({
+	appendices: z.array(z.string()).superRefine((policies, context) => {
+		if (policies.length !== 3) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'checkboxesNotFilledOut' },
 			});
 		}
 	}),
