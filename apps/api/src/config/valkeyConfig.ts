@@ -14,4 +14,4 @@ if (!parseResult.success) {
 	throw new EnvironmentConfigError(`valkey`, parseResult.error);
 }
 
-export const valkeyConfig = { ...parseResult.data };
+export const valkeyConfig = parseResult.data;
