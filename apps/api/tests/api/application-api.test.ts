@@ -28,6 +28,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	requestApplicationRevisions,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -43,6 +44,34 @@ import {
 	testApplicationId,
 	testUserId as user_id,
 } from '../testUtils.js';
+
+// Sample revision request data
+const revisionRequestData = {
+	applicantInfo: {
+		applicantApproved: false,
+		applicantNotes: 'Needs more details',
+	},
+	institutionalRep: {
+		institutionRepApproved: false,
+		institutionRepNotes: 'Incomplete information',
+	},
+	collaborators: {
+		collaboratorsApproved: false,
+		collaboratorsNotes: 'Requires additional clarification',
+	},
+	projectInfo: {
+		projectApproved: false,
+		projectNotes: 'Not sufficient justification',
+	},
+	requestedStudy: {
+		requestedStudiesApproved: false,
+		requestedStudiesNotes: 'Unclear scope',
+	},
+	ethics: {
+		ethicsApproved: false,
+		ethicsNotes: 'Ethics review is pending.',
+	},
+};
 
 describe('Application API', () => {
 	let db: PostgresDb;
@@ -229,6 +258,76 @@ describe('Application API', () => {
 			const rejectedApplication = await getApplicationById({ applicationId: id });
 			assert.ok(rejectedApplication.success);
 			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
+		});
+	});
+
+	describe('Request Application Revisions', () => {
+		it('should request revisions when application is in DAC_REVIEW state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
+			const role = 'DAC';
+			const repId = '12345';
+			const comments = 'Please provide additional documentation.';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisions({
+				applicationId: id,
+				role,
+				repId,
+				reviewData: JSON.stringify(revisionRequestData),
+				comments,
+			});
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail if application is not in the correct state', async () => {
+			// Arrange: Set up test data
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
+			const role = 'DAC';
+			const repId = '12345';
+			const comments = 'State not valid for revision request.';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisions({
+				applicationId: id,
+				role,
+				repId,
+				reviewData: JSON.stringify(revisionRequestData),
+				comments,
+			});
+
+			// Assert: Should return a failure message
+			assert.strictEqual(result.success, false, 'Function should return failure when state is incorrect');
+		});
+
+		it('should handle errors gracefully', async () => {
+			// Arrange: Force an error
+			const invalidApplicationId = -1;
+			const role = 'DAC';
+			const repId = '12345';
+			const comments = 'Invalid application ID';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisions({
+				applicationId: invalidApplicationId,
+				role,
+				repId,
+				reviewData: JSON.stringify(revisionRequestData),
+				comments,
+			});
+
+			// Assert: Should return an error message
+			assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
 		});
 	});
 
