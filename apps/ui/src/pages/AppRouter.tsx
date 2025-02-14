@@ -71,14 +71,14 @@ export const ApplicationSectionRoutes = [
 		element: <RequestedStudy />,
 	},
 	{
-		route: 'appendices',
-		path: 'appendices/edit?',
-		element: <Appendices />,
-	},
-	{
 		route: 'agreement',
 		path: 'agreement/edit?',
 		element: <AccessAgreement />,
+	},
+	{
+		route: 'appendices',
+		path: 'appendices/edit?',
+		element: <Appendices />,
 	},
 ];
 

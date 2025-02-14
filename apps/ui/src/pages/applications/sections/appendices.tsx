@@ -55,6 +55,7 @@ const Appendices = () => {
 							rule={rule}
 							name="appendices"
 							disabled={!isEditMode}
+							gap={50}
 							options={[
 								{
 									description: (

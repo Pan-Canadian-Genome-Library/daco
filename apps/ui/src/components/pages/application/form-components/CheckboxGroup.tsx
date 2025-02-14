@@ -34,6 +34,7 @@ export interface CheckboxGroupOptions {
 	value: string;
 }
 interface CheckboxGroup extends BasicFormFieldProps {
+	gap?: number;
 	options: CheckboxGroupOptions[];
 }
 
@@ -47,7 +48,7 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 			render={({ field }) => {
 				return (
 					<Item label={props.label} name={`${props.name}`} rules={[props.rule]} required={props.required}>
-						<Checkbox.Group {...field} style={{ width: '100%', gap: token.marginSM }}>
+						<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
 							{props.options.map((checkbox) => (
 								<Row
 									key={`checkbox-${checkbox.value}`}

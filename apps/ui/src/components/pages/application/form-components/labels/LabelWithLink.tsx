@@ -28,10 +28,9 @@ interface LabelWithLinkProps {
 
 export const LabelWithLink = ({ label, link }: LabelWithLinkProps) => {
 	return (
-		<Flex vertical align="start" justify="center">
-			<Text>
-				{label} <Link href={link.href}>{`${link.label} ›`}</Link>
-			</Text>
+		<Flex align="start" justify="center" gap={'middle'}>
+			<Text>{label}</Text>
+			<Link href={link.href}>{`${link.label} ›`}</Link>
 		</Flex>
 	);
 };
