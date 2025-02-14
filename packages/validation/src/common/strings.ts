@@ -44,12 +44,12 @@ export const OptionalURLString = TrimmedString.url().optional().or(EmptyWhiteSpa
 export type OptionalURLString = z.infer<typeof OptionalURLString>;
 
 export const MinimumWordCountString = TrimmedString.refine((value) => value.split(WORDS).length >= 100, {
-	params: { violation: 'tooFewWords' },
+	params: { violation: 'tooFewWords', length: 100 },
 });
 export type MinimumWordCountString = z.infer<typeof MinimumWordCountString>;
 
 export const MaximumWordCountString = TrimmedString.refine((value) => value.split(WORDS).length <= 200, {
-	params: { violation: 'tooManyWords' },
+	params: { violation: 'tooManyWords', length: 200 },
 });
 export type MaximumWordCountString = z.infer<typeof MaximumWordCountString>;
 

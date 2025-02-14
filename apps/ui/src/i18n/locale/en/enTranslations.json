@@ -98,7 +98,8 @@
 		"project": "D. Project Information",
 		"study": "E. Requested Study",
 		"ethics": "F. Ethics",
-		"agreement": "G. Data Access Agreement"
+		"agreement": "G. Data Access Agreement",
+		"appendices": "H. Appendices"
 	},
 	"errors": {
 		"http": {

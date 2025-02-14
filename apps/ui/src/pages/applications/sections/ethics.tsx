@@ -79,7 +79,7 @@ const Ethics = () => {
 				return false;
 			}
 		},
-		onChange: (info) => {
+		onChange: () => {
 			// Add file data to the rhf here, once the file upload is complete.
 		},
 	};
