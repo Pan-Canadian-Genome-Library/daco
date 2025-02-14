@@ -20,12 +20,16 @@
 import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import logger from '@/logger.js';
-import { failure, success } from '@/utils/results.js';
+import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { and, eq } from 'drizzle-orm';
 import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
 
 const collaboratorsSvc = (db: PostgresDb) => ({
-	createCollaborators: async ({ newCollaborators }: { newCollaborators: CollaboratorModel[] }) => {
+	createCollaborators: async ({
+		newCollaborators,
+	}: {
+		newCollaborators: CollaboratorModel[];
+	}): AsyncResult<CollaboratorRecord[]> => {
 		try {
 			// Check for Duplicates
 			let hasDuplicateCollaborators = false;
