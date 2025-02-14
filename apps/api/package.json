@@ -34,9 +34,9 @@
 		"@pcgl-daco/data-model": "workspace:^",
 		"@pcgl-daco/logger": "workspace:^",
 		"@types/body-parser": "^1.19.5",
+		"axios": "^1.7.9",
 		"body-parser": "^1.20.3",
 		"connect-redis": "^8.0.1",
-		"cors": "^2.8.5",
 		"drizzle-orm": "^0.38.3",
 		"express": "^4.21.0",
 		"express-session": "^1.18.1",
@@ -44,6 +44,7 @@
 		"pg": "^8.13.0",
 		"swagger-ui-express": "^5.0.1",
 		"typescript-fsm": "^1.4.5",
+		"url-join": "^5.0.0",
 		"yamljs": "^0.3.0",
 		"zod": "^3.24.1"
 	},
