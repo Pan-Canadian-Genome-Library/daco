@@ -20,9 +20,9 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createCollaborators } from '@/controllers/collaboratorsController.js';
+import { createCollaborators, listCollaborators } from '@/controllers/collaboratorsController.js';
 import { type CollaboratorRequest } from '@pcgl-daco/data-model';
-import { collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { collaboratorsQuerySchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -83,5 +83,51 @@ collaboratorsRouter.post(
 		}
 	},
 );
+
+/**
+ * List Collaborators
+ */
+collaboratorsRouter.get('/collaborators', jsonParser, async (request, response) => {
+	const validatedQuery = collaboratorsQuerySchema.safeParse(request.query);
+
+	if (validatedQuery.success) {
+		const { userId: user_id, applicationId: application_id } = validatedQuery.data;
+
+		const result = await listCollaborators({
+			application_id,
+			user_id,
+		});
+
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'Unauthorized') {
+				response.status(401);
+			} else {
+				response.status(500);
+			}
+
+			response.send({ message, errors });
+			return;
+		}
+	} else {
+		const { issues } = validatedQuery.error;
+		const errorField = issues[0]?.path[0];
+
+		if (errorField === 'userId') {
+			// TODO: Add Real Auth
+			response.status(401).send({ message: 'Unauthorized, cannot list Collaborators' });
+			return;
+		}
+
+		if (errorField === 'applicationId') {
+			response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
+			return;
+		}
+	}
+});
 
 export default collaboratorsRouter;

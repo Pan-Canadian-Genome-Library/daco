@@ -83,6 +83,23 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	listCollaborators: async (application_id: number) => {
+		try {
+			const collaboratorRecords = await db
+				.select()
+				.from(collaborators)
+				.where(eq(collaborators.application_id, application_id));
+
+			return success(collaboratorRecords);
+		} catch (err) {
+			const message = `Error at listCollaborators`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
 });
 
 export { collaboratorsSvc };

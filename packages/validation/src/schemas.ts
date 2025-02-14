@@ -63,6 +63,11 @@ export const collaboratorsSchema = z.object({
 	collaboratorType: EmptyOrOptionalString,
 });
 
+export const collaboratorsQuerySchema = z.object({
+	applicationId: z.number(),
+	userId: NonEmptyString,
+});
+
 export const collaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
 	userId: NonEmptyString,
