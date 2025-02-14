@@ -18,7 +18,8 @@
  */
 
 import { z } from 'zod';
-import { EmptyOrOptionalString, NonEmptyString } from '../common/strings.js';
+import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from '../common/strings.js';
+import { ONLY_ALPHANUMERIC } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export const editApplicationRequestSchema = z.object({
@@ -36,9 +37,9 @@ export const editApplicationRequestSchema = z.object({
 			applicant_profile_url: NonEmptyString.url(),
 			institutional_rep_title: NonEmptyString,
 			institutional_rep_first_name: NonEmptyString,
-			institutional_rep_middle_name: NonEmptyString,
+			institutional_rep_middle_name: EmptyOrOptionalString,
 			institutional_rep_last_name: NonEmptyString,
-			institutional_rep_suffix: NonEmptyString,
+			institutional_rep_suffix: EmptyOrOptionalString,
 			institutional_rep_primary_affiliation: NonEmptyString,
 			institutional_rep_email: NonEmptyString.email(),
 			institutional_rep_profile_url: NonEmptyString.url(),
@@ -47,13 +48,13 @@ export const editApplicationRequestSchema = z.object({
 			institution_state: NonEmptyString,
 			institution_city: NonEmptyString,
 			institution_street_address: NonEmptyString,
-			institution_postal_code: NonEmptyString,
+			institution_postal_code: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 			institution_building: NonEmptyString,
 			project_title: NonEmptyString,
-			project_website: NonEmptyString.url(),
-			project_abstract: NonEmptyString,
-			project_methodology: NonEmptyString,
-			project_summary: NonEmptyString,
+			project_website: OptionalURLString,
+			project_abstract: ConciseWordCountString,
+			project_methodology: ConciseWordCountString,
+			project_summary: ConciseWordCountString,
 		})
 		.partial()
 		.strict()
