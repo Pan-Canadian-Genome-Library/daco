@@ -82,12 +82,22 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 				return { message: i18n.t('requiredNumberOfCheckboxes') };
 			}
 			break;
+		// Custom zod errors using refine / super refine
 		case z.ZodIssueCode.custom:
 			if (error.params?.violation) {
-				return { message: i18n.t(error.params?.violation) };
-			} else {
-				return { message: i18n.t('defaultViolationText') };
+				const violation = error.params.violation;
+				const params = error.params;
+
+				switch (violation) {
+					case 'tooFewWords':
+						return { message: i18n.t(violation, { length: params.length }) };
+					case 'tooManyWords':
+						return { message: i18n.t(violation, { length: params.length }) };
+					default:
+						return { message: i18n.t(violation) };
+				}
 			}
+			return { message: i18n.t('defaultViolationText') };
 		case z.ZodIssueCode.invalid_enum_value:
 			return { message: i18n.t('receivedInvalidEnum') };
 	}

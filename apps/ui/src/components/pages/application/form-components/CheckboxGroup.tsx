@@ -17,7 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Checkbox, Form, Row, theme } from 'antd';
+import { Checkbox, Form, Row, theme, Typography } from 'antd';
+import { ReactNode } from 'react';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { pcglColors } from '@/components/providers/ThemeProvider';
@@ -25,12 +26,15 @@ import { BasicFormFieldProps } from '@/global/types';
 
 const { Item } = Form;
 const { useToken } = theme;
+const { Text } = Typography;
 
 export interface CheckboxGroupOptions {
+	description?: string | ReactNode;
 	label: string;
 	value: string;
 }
 interface CheckboxGroup extends BasicFormFieldProps {
+	gap?: number;
 	options: CheckboxGroupOptions[];
 }
 
@@ -44,20 +48,22 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 			render={({ field }) => {
 				return (
 					<Item label={props.label} name={`${props.name}`} rules={[props.rule]} required={props.required}>
-						<Checkbox.Group {...field} style={{ width: '100%' }}>
+						<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
 							{props.options.map((checkbox) => (
 								<Row
 									key={`checkbox-${checkbox.value}`}
 									style={{
-										backgroundColor: pcglColors.greyLight,
-										padding: token.padding,
 										borderRadius: token.borderRadius,
 										width: '100%',
 										minWidth: '100%',
-										margin: `${token.marginXS}px 0`,
 									}}
 								>
-									<Checkbox value={checkbox.value} disabled={props.disabled} style={{ width: '100%' }}>
+									<Text>{checkbox.description}</Text>
+									<Checkbox
+										value={checkbox.value}
+										disabled={props.disabled}
+										style={{ width: '100%', backgroundColor: pcglColors.greyLight, padding: token.padding }}
+									>
 										{checkbox.label}
 									</Checkbox>
 								</Row>
