@@ -61,14 +61,14 @@ export const ApplicationSectionRoutes = [
 		element: <Project />,
 	},
 	{
-		route: 'ethics',
-		path: 'ethics/edit?',
-		element: <Ethics />,
-	},
-	{
 		route: 'study',
 		path: 'study/edit?',
 		element: <RequestedStudy />,
+	},
+	{
+		route: 'ethics',
+		path: 'ethics/edit?',
+		element: <Ethics />,
 	},
 	{
 		route: 'agreement',
