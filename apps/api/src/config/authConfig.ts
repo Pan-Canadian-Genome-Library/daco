@@ -41,7 +41,6 @@ function getAuthConfig() {
 		AUTH_PROVIDER_HOST: z.string().url(),
 		AUTH_CLIENT_ID: z.string(),
 		AUTH_CLIENT_SECRET: z.string(),
-		AUTH_UI_HOST: z.string().url(),
 		AUTH_UI_REDIRECT_PATH: z.string(),
 	});
 
