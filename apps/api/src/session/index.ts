@@ -17,24 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RedisStore } from 'connect-redis';
-import session from 'express-session';
+import { type Request } from 'express';
 
-import { serverConfig } from '@/config/serverConfig.js';
-import valkeyClient from './valkeyClient.js';
+export { default as sessionMiddleware } from './sessionMiddleware.js';
 
-const sessionStore = new RedisStore({
-	client: valkeyClient,
-	prefix: 'daco-api:',
-});
+export type SessionUser = {
+	userId: string;
+	givenName?: string;
+	familyName?: string;
+};
 
-export const sessionMiddleware = session({
-	store: sessionStore,
+export type SessionAccount = {
+	idToken: string;
+	accessToken: string;
+	refreshToken: string;
+	refreshTokenIat: number;
+};
 
-	secret: serverConfig.sessionKeys,
-	resave: false,
-	saveUninitialized: false,
-	cookie: { maxAge: serverConfig.SESSION_MAX_AGE },
-});
+declare module 'express-session' {
+	interface SessionData {
+		user: SessionUser;
+		account: SessionAccount;
+	}
+}
 
-export default sessionMiddleware;
+export function resetSession(session: Request['session']) {
+	session.user = undefined;
+	session.account = undefined;
+	session.save();
+}
