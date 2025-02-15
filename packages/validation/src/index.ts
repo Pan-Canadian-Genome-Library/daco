@@ -18,6 +18,7 @@
  */
 
 export * from './common/strings.js';
+export * from './routes/index.js';
 export * from './schemas.js';
 export * from './types.js';
 export * from './utils/regex.js';

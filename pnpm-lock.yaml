@@ -44,6 +44,9 @@ importers:
       '@pcgl-daco/logger':
         specifier: workspace:^
         version: link:../../packages/logger
+      '@pcgl-daco/validation':
+        specifier: workspace:^
+        version: link:../../packages/validation
       '@types/body-parser':
         specifier: ^1.19.5
         version: 1.19.5

@@ -17,15 +17,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Redis } from 'ioredis';
+import { z as zod } from 'zod';
 
-import { valkeyConfig } from '@/config/valkeyConfig.js';
+export const errorResponseSchema = <TEnum extends readonly [string, ...string[]]>(errorCodes: TEnum) =>
+	zod.object({ error: zod.enum(errorCodes), message: zod.string() });
 
-const valkeyClient = new Redis({
-	port: valkeyConfig.VALKEY_PORT,
-	host: valkeyConfig.VALKEY_HOST,
-	username: valkeyConfig.VALKEY_USER,
-	password: valkeyConfig.VALKEY_PASSWORD,
-});
-
-export default valkeyClient;
+/**
+ * This is a standardized object defining the response body for error cases.
+ *
+ * Errors are structured as:
+ * ```ts
+ * {
+ *   "error": string;
+ *   "message": string;
+ * }
+ * ```
+ * The `error` property should be a short string, typically in upper snake case.
+ * This can be used by the UI to determine which error case has occurred, and to
+ * map the error to a translatable error message.
+ *
+ * The `message` property is meant to explain the error for troubleshooting purposes.
+ * It is not meant to be presented in the UI to a user, and so does not need to be translatable.
+ *
+ * @example
+ * type SomeResponseErrors = ErrorResponse<['FORBIDDEN', 'SYSTEM_ERROR']>;
+ * // {
+ * //   error: "FORBIDDEN" | "SYSTEM_ERROR";
+ * //   message: string;
+ * // }
+ */
+export type ErrorResponse<ErrorCodes extends readonly [string, ...string[]]> = zod.infer<
+	ReturnType<typeof errorResponseSchema<ErrorCodes>>
+>;

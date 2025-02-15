@@ -17,15 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Redis } from 'ioredis';
+import { z as zod } from 'zod';
 
-import { valkeyConfig } from '@/config/valkeyConfig.js';
-
-const valkeyClient = new Redis({
-	port: valkeyConfig.VALKEY_PORT,
-	host: valkeyConfig.VALKEY_HOST,
-	username: valkeyConfig.VALKEY_USER,
-	password: valkeyConfig.VALKEY_PASSWORD,
-});
-
-export default valkeyClient;
+export const userRoleSchema = zod.enum(['DAC_MEMBER', 'INSTITUTIONAL_REP', 'APPLICANT', 'ANONYMOUS']);
+export type UserRole = zod.infer<typeof userRoleSchema>;
