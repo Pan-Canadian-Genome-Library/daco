@@ -17,15 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Redis } from 'ioredis';
+import { z as zod } from 'zod';
+import { userRoleSchema } from '../user.js';
 
-import { valkeyConfig } from '@/config/valkeyConfig.js';
-
-const valkeyClient = new Redis({
-	port: valkeyConfig.VALKEY_PORT,
-	host: valkeyConfig.VALKEY_HOST,
-	username: valkeyConfig.VALKEY_USER,
-	password: valkeyConfig.VALKEY_PASSWORD,
+export const userResponseSchema = zod.object({
+	user: zod
+		.object({
+			userId: zod.string(),
+			givenName: zod.string().optional(),
+			familyName: zod.string().optional(),
+		})
+		.optional(),
+	role: userRoleSchema,
 });
-
-export default valkeyClient;
+export type UserResponse = zod.infer<typeof userResponseSchema>;
