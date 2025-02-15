@@ -27,6 +27,7 @@ import { useLocation } from 'react-router';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { useUserContext } from './providers/UserProvider';
 
 const { Link } = Typography;
 const { Header } = Layout;
@@ -38,8 +39,8 @@ interface MenuItem {
 }
 
 interface MenuButton extends MenuItem {
-	buttonProps?: ButtonProps;
-	onClickAction: VoidFunction;
+	buttonProps: ButtonProps;
+	onClickAction?: VoidFunction;
 }
 
 interface MenuLink extends MenuItem {
@@ -56,6 +57,8 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
+
+	const { isLoggedIn } = useUserContext();
 
 	const isResponsiveMode = minWidth <= token.screenXL;
 
@@ -76,15 +79,47 @@ const HeaderComponent = () => {
 		buttonAction();
 	};
 
-	const onLoginClick = () => {
-		// TODO: Handle the transition over to the the login page
-	};
+	/**
+	 * Default action when a button in the menu is clicked, used particularly for the mobile menu which should close after click.
+	 * @param buttonAction The function for the action needed to be performed.
+	 */
+	// const onMenuButtonClick = (buttonAction: VoidFunction) => {
+	// 	if (isResponsiveMode) {
+	// 		setResponsiveMenuOpen(false);
+	// 	}
+	// 	buttonAction();
+	// };
 
 	// Temporary logic
 	// Once we have the authorization setup, we can remove isHome and location
 	// This is purely temp UI logic
 	const location = useLocation();
 	const isHome = location.pathname === '/';
+
+	const loginButton: MenuButton = {
+		name: translate(`button.login`),
+		buttonProps: {
+			type: `${isHome ? 'default' : 'text'}`,
+			color: `${isHome ? 'primary' : 'default'}`,
+			variant: `${isHome ? 'solid' : 'text'}`,
+			icon: !isHome ? <LogoutOutlined /> : null,
+			iconPosition: 'end',
+			href: `${__API_PROXY_PATH__}/auth/login`,
+		},
+		position: 'right',
+	};
+	const logoutButton: MenuButton = {
+		name: translate(`button.logout`),
+		buttonProps: {
+			type: `${isHome ? 'default' : 'text'}`,
+			color: `${isHome ? 'primary' : 'default'}`,
+			variant: `${isHome ? 'solid' : 'text'}`,
+			icon: !isHome ? <LogoutOutlined /> : null,
+			iconPosition: 'end',
+			href: `${__API_PROXY_PATH__}/auth/logout`,
+		},
+		position: 'right',
+	};
 
 	const menuItems: (MenuLink | MenuButton)[] = [
 		{
@@ -107,18 +142,7 @@ const HeaderComponent = () => {
 			href: '#',
 			position: 'right',
 		},
-		{
-			name: translate(`button.${isHome ? 'login' : 'logout'}`),
-			onClickAction: onLoginClick,
-			buttonProps: {
-				type: `${isHome ? 'default' : 'text'}`,
-				color: `${isHome ? 'primary' : 'default'}`,
-				variant: `${isHome ? 'solid' : 'text'}`,
-				icon: !isHome ? <LogoutOutlined /> : null,
-				iconPosition: 'end',
-			},
-			position: 'right',
-		},
+		isLoggedIn ? logoutButton : loginButton,
 	];
 
 	/**
@@ -134,13 +158,14 @@ const HeaderComponent = () => {
 		return menuItems
 			.filter((menuItem) => (position !== 'both' ? menuItem.position === position : menuItem.position))
 			.map((menuItem, key) => {
-				if ('onClickAction' in menuItem) {
+				if ('buttonProps' in menuItem) {
+					const clickAction = menuItem.onClickAction;
 					return (
 						<Button
 							key={`menuItem-${key}`}
 							{...(menuItem.buttonProps ?? null)}
 							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
-							onClick={() => onMenuButtonClick(menuItem.onClickAction)}
+							onClick={clickAction ? () => onMenuButtonClick(clickAction) : undefined}
 						>
 							{menuItem.name}
 						</Button>
@@ -150,7 +175,7 @@ const HeaderComponent = () => {
 						<Link
 							key={`menuItem-${key}`}
 							style={linkStyle}
-							target={menuItem.target ?? '_blank'}
+							// target={menuItem.target ?? '_blank'}
 							href={menuItem.href ?? '#'}
 						>
 							{menuItem.name}
