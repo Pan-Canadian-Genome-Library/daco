@@ -99,10 +99,9 @@ const HeaderComponent = () => {
 	const loginButton: MenuButton = {
 		name: translate(`button.login`),
 		buttonProps: {
-			type: `${isHome ? 'default' : 'text'}`,
-			color: `${isHome ? 'primary' : 'default'}`,
-			variant: `${isHome ? 'solid' : 'text'}`,
-			icon: !isHome ? <LogoutOutlined /> : null,
+			type: 'default',
+			color: 'primary',
+			variant: 'solid',
 			iconPosition: 'end',
 			href: `${__API_PROXY_PATH__}/auth/login`,
 		},
