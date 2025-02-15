@@ -1,13 +1,14 @@
 import axios, { AxiosError } from 'axios';
 import { Router } from 'express';
-// import querystring from 'qs';
 import urlJoin from 'url-join';
 import { z as zod } from 'zod';
+
+import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import baseLogger from '@/logger.js';
 import { buildQueryParams } from '@/utils/buildQueryParams.js';
-import { type UserResponse } from '@pcgl-daco/validation';
+import { serverConfig } from '../config/serverConfig.js';
 import { resetSession } from '../session/index.js';
 import type { ResponseWithData } from './types.js';
 
@@ -17,9 +18,6 @@ const getOauthRedirectUri = (host: string) => urlJoin(host, `/api/auth/token`);
 
 const authRouter = Router();
 
-// ##############
-//   GET /login
-// ##############
 /**
  * Initiate login process.
  *
@@ -38,7 +36,7 @@ authRouter.get('/login', (req, res) => {
 		client_id: authConfig.AUTH_CLIENT_ID,
 		response_type: `code`,
 		scope: `openid profile email org.cilogon.userinfo`,
-		redirect_uri: getOauthRedirectUri(authConfig.AUTH_UI_HOST),
+		redirect_uri: getOauthRedirectUri(serverConfig.UI_HOST),
 	};
 	const redirectUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize`, buildQueryParams(params));
 
@@ -61,7 +59,7 @@ authRouter.get('/logout', async (req, res) => {
 		res.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
 		return;
 	}
-	const logoutSuccessRedirectUrl = urlJoin(authConfig.AUTH_UI_HOST, '/');
+	const logoutSuccessRedirectUrl = urlJoin(serverConfig.UI_HOST, '/');
 
 	const { account } = req.session;
 	if (!account) {
@@ -156,7 +154,7 @@ authRouter.get('/token', async (req, res) => {
 			client_id: authConfig.AUTH_CLIENT_ID,
 			client_secret: authConfig.AUTH_CLIENT_SECRET,
 			grant_type: 'authorization_code',
-			redirect_uri: getOauthRedirectUri(authConfig.AUTH_UI_HOST),
+			redirect_uri: getOauthRedirectUri(serverConfig.UI_HOST),
 		};
 
 		const tokenResponse = await axios.get(oauth2TokenUrl, { params });
@@ -208,12 +206,12 @@ authRouter.get('/token', async (req, res) => {
 		// There should be communication to the user that an error occurred during the
 		//  login process. An error page, or error code in query parameter that can
 		//  trigger an error message are possible solutions.
-		res.redirect(urlJoin(authConfig.AUTH_UI_HOST, '/'));
+		res.redirect(urlJoin(serverConfig.UI_HOST, '/'));
 		return;
 	}
 
 	// Auth success! User info saved to session!
-	res.redirect(urlJoin(authConfig.AUTH_UI_HOST, authConfig.AUTH_UI_REDIRECT_PATH));
+	res.redirect(urlJoin(serverConfig.UI_HOST, authConfig.AUTH_UI_REDIRECT_PATH));
 	return;
 });
 

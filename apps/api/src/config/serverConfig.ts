@@ -32,6 +32,7 @@ const serverConfigSchema = z.object({
 		.int()
 		.optional()
 		.default(1000 * 60 * 30), // default 30 minutes
+	UI_HOST: z.string().url(),
 });
 
 const parseResult = serverConfigSchema.safeParse(process.env);
