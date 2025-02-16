@@ -17,9 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
+import { z as zod } from 'zod';
+
 import EnvironmentConfigError from './EnvironmentConfigError.js';
 import { serverConfig } from './serverConfig.js';
+
+const authConfigSchema = zod.object({
+	AUTH_PROVIDER_HOST: zod.string().url(),
+	AUTH_CLIENT_ID: zod.string(),
+	AUTH_CLIENT_SECRET: zod.string(),
+	AUTH_UI_REDIRECT_PATH: zod.string(),
+});
+export type AuthConfig = zod.infer<typeof authConfigSchema>;
 
 function getAuthConfig() {
 	const flag = process.env.ENABLE_AUTH;
@@ -36,13 +45,6 @@ function getAuthConfig() {
 		// Running with auth disabled may be useful for developers.
 		return { enabled };
 	}
-
-	const authConfigSchema = z.object({
-		AUTH_PROVIDER_HOST: z.string().url(),
-		AUTH_CLIENT_ID: z.string(),
-		AUTH_CLIENT_SECRET: z.string(),
-		AUTH_UI_REDIRECT_PATH: z.string(),
-	});
 
 	const parseResult = authConfigSchema.safeParse(process.env);
 
