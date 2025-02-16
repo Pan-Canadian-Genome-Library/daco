@@ -27,6 +27,7 @@ import { useLocation } from 'react-router';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
 import { useUserContext } from './providers/UserProvider';
 
 const { Link } = Typography;
@@ -103,7 +104,7 @@ const HeaderComponent = () => {
 			color: 'primary',
 			variant: 'solid',
 			iconPosition: 'end',
-			href: `${__API_PROXY_PATH__}/auth/login`,
+			href: API_PATH_LOGIN,
 		},
 		position: 'right',
 	};
@@ -115,7 +116,7 @@ const HeaderComponent = () => {
 			variant: `${isHome ? 'solid' : 'text'}`,
 			icon: !isHome ? <LogoutOutlined /> : null,
 			iconPosition: 'end',
-			href: `${__API_PROXY_PATH__}/auth/logout`,
+			href: API_PATH_LOGOUT,
 		},
 		position: 'right',
 	};
@@ -136,11 +137,17 @@ const HeaderComponent = () => {
 			href: '#',
 			position: 'left',
 		},
-		{
-			name: isHome ? translate('links.apply') : translate('links.applications'),
-			href: '#',
-			position: 'right',
-		},
+		isLoggedIn
+			? {
+					name: translate('links.applications'),
+					href: `/dashboard`,
+					position: 'right',
+				}
+			: {
+					name: translate('links.apply'),
+					href: `#`,
+					position: 'right',
+				},
 		isLoggedIn ? logoutButton : loginButton,
 	];
 
