@@ -19,14 +19,22 @@
 
 // types
 export type Success<T> = { success: true; data: T };
-export type Failure = { success: false; message: string; errors?: any };
-export type Result<T> = Success<T> | Failure;
-export type AsyncResult<T> = Promise<Result<T>>;
+export type Failure<TErrorCode extends string = string> = {
+	success: false;
+	error: TErrorCode;
+	message: string;
+};
+export type Result<TSuccessData, TFailureCodes extends string = string> =
+	| Success<TSuccessData>
+	| Failure<TFailureCodes>;
+export type AsyncResult<TSuccessData, TFailureCodes extends string = string> = Promise<
+	Result<TSuccessData, TFailureCodes>
+>;
 
 // helpers
 export const success = <T>(data: T): Success<T> => ({ success: true, data });
-export const failure = (message: string, errors?: any): Failure => ({
+export const failure = <TErrorCode extends string>(error: TErrorCode, message: string): Failure<TErrorCode> => ({
 	success: false,
+	error,
 	message,
-	errors,
 });

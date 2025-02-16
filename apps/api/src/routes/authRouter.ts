@@ -1,20 +1,19 @@
 import axios, { AxiosError } from 'axios';
 import { Router } from 'express';
 import urlJoin from 'url-join';
-import { z as zod } from 'zod';
 
 import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import baseLogger from '@/logger.js';
-import { buildQueryParams } from '@/utils/buildQueryParams.js';
 import { serverConfig } from '../config/serverConfig.js';
+import * as oidcClient from '../external/oidcAuthClient.js';
 import { resetSession } from '../session/index.js';
 import type { ResponseWithData } from './types.js';
 
 const logger = baseLogger.forModule(`authRouter`);
 
-const getOauthRedirectUri = (host: string) => urlJoin(host, `/api/auth/token`);
+const authorizeRedirectUri = urlJoin(serverConfig.UI_HOST, `/api/auth/token`);
 
 const authRouter = Router();
 
@@ -29,18 +28,9 @@ authRouter.get('/login', (req, res) => {
 		return;
 	}
 
-	// Ensure the user has an active session.
-	req.session.save();
+	const oidcAuthorizeUrl = oidcClient.getOidcAuthorizeUrl(authConfig, authorizeRedirectUri);
 
-	const params = {
-		client_id: authConfig.AUTH_CLIENT_ID,
-		response_type: `code`,
-		scope: `openid profile email org.cilogon.userinfo`,
-		redirect_uri: getOauthRedirectUri(serverConfig.UI_HOST),
-	};
-	const redirectUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize`, buildQueryParams(params));
-
-	res.redirect(redirectUrl);
+	res.redirect(oidcAuthorizeUrl);
 	return;
 });
 
@@ -101,19 +91,6 @@ authRouter.get('/logout', async (req, res) => {
 // ##############
 //   GET /token
 // ##############
-const oidcTokenResponseSchema = zod.object({
-	access_token: zod.string(),
-	refresh_token: zod.string(),
-	refresh_token_iat: zod.number(),
-	id_token: zod.string(),
-});
-
-const oidcUserinfoResponseSchema = zod.object({
-	sub: zod.string(),
-	given_name: zod.string().optional(),
-	family_name: zod.string().optional(),
-	email: zod.string().optional(),
-});
 
 /**
  * This is the callback that the OIDC Provider will redirect the user agent to after
@@ -144,24 +121,24 @@ authRouter.get('/token', async (req, res) => {
 		return;
 	}
 
+	// TODO: seperate page to redirect to on failure
+	const errorRedirectUrl = serverConfig.UI_HOST;
+
 	const { code } = req.query;
+	if (typeof code !== 'string') {
+		res.redirect(errorRedirectUrl);
+		return;
+	}
 
 	try {
 		// Fetch user tokens using authorization code
-		const oauth2TokenUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/oauth2/token`);
-		const params = {
+		const oidcTokenResult = await oidcClient.exchangeCodeForTokens(authConfig, {
 			code,
-			client_id: authConfig.AUTH_CLIENT_ID,
-			client_secret: authConfig.AUTH_CLIENT_SECRET,
-			grant_type: 'authorization_code',
-			redirect_uri: getOauthRedirectUri(serverConfig.UI_HOST),
-		};
-
-		const tokenResponse = await axios.get(oauth2TokenUrl, { params });
-		const parsedTokenResponse = oidcTokenResponseSchema.safeParse(tokenResponse.data);
-		if (!parsedTokenResponse.success) {
-			logger.debug(`Token response has unexpected format.`, parsedTokenResponse.error);
-			throw new Error(`Token response has unexpected format.`);
+			redirectUrl: authorizeRedirectUri,
+		});
+		if (!oidcTokenResult.success) {
+			res.redirect(errorRedirectUrl);
+			return;
 		}
 
 		const {
@@ -169,18 +146,17 @@ authRouter.get('/token', async (req, res) => {
 			id_token: idToken,
 			refresh_token: refreshToken,
 			refresh_token_iat: refreshTokenIat,
-		} = parsedTokenResponse.data;
+		} = oidcTokenResult.data;
 
-		const userResponse = await axios.get(urlJoin(authConfig.AUTH_PROVIDER_HOST, `/oauth2/userinfo`), {
-			headers: { Authorization: `Bearer ${accessToken}` },
-		});
-		const parsedUserinfoResponse = oidcUserinfoResponseSchema.safeParse(userResponse.data);
-		if (!parsedUserinfoResponse.success) {
-			logger.debug(`Userinfo response has unexpected format.`, parsedUserinfoResponse.error);
-			throw new Error(`Userinfo response has unexpected format.`);
+		// Fetch user info using access token
+		const userInfoResult = await oidcClient.getUserInfo(authConfig, accessToken);
+		if (!userInfoResult.success) {
+			res.redirect(errorRedirectUrl);
+			return;
 		}
 
-		const { sub, family_name: familyName, given_name: givenName } = parsedUserinfoResponse.data;
+		const { sub, family_name: familyName, given_name: givenName } = userInfoResult.data;
+
 		// Update session with all user information retrieved from OIDC Provider
 		req.session.account = {
 			accessToken,
