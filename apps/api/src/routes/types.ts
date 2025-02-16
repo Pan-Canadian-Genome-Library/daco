@@ -17,8 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { type Response } from 'express';
+
 import { type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
 import { type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import type { ErrorResponse } from '@pcgl-daco/validation';
 
 export type ApplicationListRequest = {
 	userId: string;
@@ -27,3 +30,32 @@ export type ApplicationListRequest = {
 	page?: number;
 	pageSize?: number;
 };
+
+/**
+ * Express Response type with response body data types specified. Use this in a route
+ * handler to cause TS to validate that the data sent in responses match the data type
+ * declared.
+ *
+ * This also accepts a list of error codes that the endpoint could return. This type will
+ * specify a standard error format as defined by the `ErrorResponse` type. If you do not
+ * specify any error codes, then by default the only acceptable error code is `SYSTEM_ERROR`.
+ * You can provide an array of string literals that declare the error codes that this endpoint
+ * could return.
+ *
+ * @example
+ * someRouter.get('/example', async (req, res: ResponseWithData<ExampleResponse, ['INVALID_PARAMETERS']>) => {
+ * 	if(!req.params.check) {
+ * 		// TS will also allow an error message in this format, but only with an error code
+ * 		//  specified in the ResponseWithData type.
+ * 		res.status(400).json({
+ * 			error: 'INVALID_PARAMETERS',
+ * 			message: 'Missing some required parameter'
+ * 		});
+ * 	}
+ * 	res.json({example: true}); // TS will validate this object matches the `ExampleResponse` type.
+ * }
+ */
+export type ResponseWithData<
+	TSuccessData,
+	TErrorCodes extends readonly [string, ...string[]] = ['SYSTEM_ERROR'],
+> = Response<TSuccessData | ErrorResponse<TErrorCodes>>;
