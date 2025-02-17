@@ -34,7 +34,7 @@ import type { ApplicationListResponse, ApplicationResponseData } from '@pcgl-dac
 import { userRoles } from '@pcgl-daco/validation';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { getUserRole } from '../service/authService.js';
-import type { ApplicationRecord, ApplicationStateTotals } from '../service/types.js';
+import type { ApplicationRecord, ApplicationStateTotals, JoinedApplicationRecord } from '../service/types.js';
 import type { ResponseWithData } from './types.js';
 
 const logger = baseLogger.forModule('applicationRouter');
@@ -69,33 +69,69 @@ applicationRouter.post(
 	},
 );
 
-applicationRouter.post('/applications/edit', authMiddleware(), async (req, res) => {
-	// TODO: Add Auth & Zod validation
-	const data = req.body;
-	const { id, update } = data;
+applicationRouter.post(
+	'/applications/edit',
+	authMiddleware(),
+	async (
+		req,
+		res: ResponseWithData<
+			JoinedApplicationRecord,
+			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+		>,
+	) => {
+		// TODO: Add Auth & Zod validation
+		const data = req.body;
+		const { id, update } = data;
 
-	// TODO: Check if the user is allowed to edit this application before
-	const result = await editApplication({ id, update });
+		const { user } = req.session;
+		const { userId } = user || {};
 
-	if (result.success) {
-		res.send(result.data);
-		return;
-	}
-	switch (result.error) {
-		case 'SYSTEM_ERROR': {
-			res.status(500).json({ error: result.error, message: result.message });
+		if (!userId) {
+			res.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 			return;
 		}
-		case 'INVALID_STATE_TRANSITION': {
-			res.status(400).json({ error: result.error, message: result.message });
+
+		const applicationResult = await getApplicationById({ applicationId: id });
+		if (!applicationResult.success) {
+			switch (applicationResult.error) {
+				case 'SYSTEM_ERROR': {
+					res.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+					return;
+				}
+				case 'NOT_FOUND': {
+					res.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+					return;
+				}
+			}
+		}
+
+		if (applicationResult.data.userId !== userId) {
+			res.status(403).json({ error: 'FORBIDDEN', message: 'User cannot edit this application.' });
+		}
+
+		// TODO: Check if the user is allowed to edit this application before
+		const result = await editApplication({ id, update });
+
+		if (result.success) {
+			res.send(result.data);
 			return;
 		}
-		case 'NOT_FOUND': {
-			res.status(404).json({ error: result.error, message: result.message });
-			return;
+		switch (result.error) {
+			case 'SYSTEM_ERROR': {
+				res.status(500).json({ error: result.error, message: result.message });
+				return;
+			}
+			case 'INVALID_STATE_TRANSITION': {
+				res.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+				return;
+			}
+			case 'NOT_FOUND': {
+				res.status(404).json({ error: result.error, message: result.message });
+				return;
+			}
 		}
-	}
-});
+	},
+);
 
 // TODO: validate queryParam options using zod
 applicationRouter.get(
@@ -105,7 +141,7 @@ applicationRouter.get(
 		const { userId } = req.session.user || {};
 
 		if (!userId) {
-			res.status(400).send({ error: 'UNAUTHORIZED', message: 'User Id is required' });
+			res.status(400).send({ error: 'UNAUTHORIZED', message: 'User ID is required' });
 			return;
 		}
 
