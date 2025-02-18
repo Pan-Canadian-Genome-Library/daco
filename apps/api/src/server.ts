@@ -39,6 +39,7 @@ const API_DOCS_PATH = `api-docs`;
 const startServer = async () => {
 	const app = express();
 
+	// @ts-ignore
 	app.use(ExpressLogger({ logger }));
 
 	app.use(applicationRouter);

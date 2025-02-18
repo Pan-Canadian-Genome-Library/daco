@@ -44,7 +44,9 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 						),
 					);
 
-				if (existingCollaborator.length > 0) hasDuplicateCollaborators = true;
+				if (existingCollaborator.length > 0) {
+					hasDuplicateCollaborators = true;
+				}
 			}
 
 			if (hasDuplicateCollaborators) {
