@@ -17,5 +17,4 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withSchemaValidation } from './validation.js';
-export { withSchemaValidation };
+export * from './validation.js';
