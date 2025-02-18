@@ -17,8 +17,4 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './routes/applicationRoutes.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './utils/regex.js';
+export * from './validation.js';
