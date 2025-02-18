@@ -30,29 +30,67 @@ import {
 	rejectApplication,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
+import { apiZodErrorMapping } from '@/utils/validation.js';
+import { withSchemaValidation } from '@pcgl-daco/request-utils';
+import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
 
-applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
-	// TODO: Add Auth & Zod validation
-	const data = req.body;
-	const { id, update } = data;
-	const result = await editApplication({ id, update });
+/**
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ * 	- Validate request params using Zod.
+ */
+applicationRouter.post(
+	'/applications/create',
+	jsonParser,
+	async (request: Request<{}, {}, { userId: string }, any>, response) => {
+		const { userId } = request.body;
 
-	if (result.success) {
-		res.send(result.data);
-	} else {
-		// TODO: System Error Handling
-		if (String(result.errors) === 'Error: Application record is undefined') {
-			res.status(404);
-		} else {
-			res.status(500);
+		/**
+		 * TODO: Temporary userId check until validation/dto flow is confirmed.
+		 * Reflect changes in swagger once refactored.
+		 **/
+		if (!userId) {
+			response.status(400).send({ message: 'User ID is required.' });
+			return;
 		}
 
-		res.send({ message: result.message, errors: String(result.errors) });
-	}
-});
+		const result = await createApplication({ user_id: userId });
+
+		if (result.success) {
+			response.status(201).send(result.data);
+		} else {
+			response.status(500).send({ message: result.message, errors: String(result.errors) });
+		}
+	},
+);
+
+applicationRouter.post(
+	'/applications/edit',
+	jsonParser,
+	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
+		// TODO: Add Auth
+		const data = req.body;
+
+		const { id, update } = data;
+		const result = await editApplication({ id, update });
+
+		if (result.success) {
+			res.send(result.data);
+		} else {
+			// TODO: System Error Handling
+			if (String(result.errors) === 'Error: Application record is undefined') {
+				res.status(404);
+			} else {
+				res.status(500);
+			}
+
+			res.send({ message: result.message, errors: String(result.errors) });
+		}
+	}),
+);
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
 //       - verify if user can access applications
@@ -211,36 +249,6 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 		});
 	}
 });
-
-/**
- * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
- * 	- Validate request params using Zod.
- */
-applicationRouter.post(
-	'/applications/create',
-	jsonParser,
-	async (request: Request<{}, {}, { userId: string }, any>, response) => {
-		const { userId } = request.body;
-
-		/**
-		 * TODO: Temporary userId check until validation/dto flow is confirmed.
-		 * Reflect changes in swagger once refactored.
-		 **/
-		if (!userId) {
-			response.status(400).send({ message: 'User ID is required.' });
-			return;
-		}
-
-		const result = await createApplication({ user_id: userId });
-
-		if (result.success) {
-			response.status(201).send(result.data);
-		} else {
-			response.status(500).send({ message: result.message, errors: String(result.errors) });
-		}
-	},
-);
 
 applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
