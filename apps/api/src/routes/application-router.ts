@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { withSchemaValidation } from '@pcgl-daco/request-utils';
+import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
@@ -31,8 +33,6 @@ import {
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
