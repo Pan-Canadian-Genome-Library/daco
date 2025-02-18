@@ -23,6 +23,7 @@ import express, { Request } from 'express';
 import { createCollaborators, listCollaborators } from '@/controllers/collaboratorsController.js';
 import { type CollaboratorRequest } from '@pcgl-daco/data-model';
 import { collaboratorsQuerySchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { testUserId } from '../../tests/testUtils.js';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -87,11 +88,12 @@ collaboratorsRouter.post(
 /**
  * List Collaborators
  */
-collaboratorsRouter.get('/collaborators', jsonParser, async (request, response) => {
-	const validatedQuery = collaboratorsQuerySchema.safeParse(request.query);
+collaboratorsRouter.get('/collaborators/:applicationId', jsonParser, async (request, response) => {
+	const validatedQuery = collaboratorsQuerySchema.safeParse(parseInt(request.params.applicationId));
 
 	if (validatedQuery.success) {
-		const { userId: user_id, applicationId: application_id } = validatedQuery.data;
+		const application_id = validatedQuery.data;
+		const user_id = testUserId;
 
 		const result = await listCollaborators({
 			application_id,
@@ -114,19 +116,7 @@ collaboratorsRouter.get('/collaborators', jsonParser, async (request, response) 
 			return;
 		}
 	} else {
-		const { issues } = validatedQuery.error;
-		const errorField = issues[0]?.path[0];
-
-		if (errorField === 'userId') {
-			// TODO: Add Real Auth
-			response.status(401).send({ message: 'Unauthorized, cannot list Collaborators' });
-			return;
-		}
-
-		if (errorField === 'applicationId') {
-			response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
-			return;
-		}
+		response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
 	}
 });
 
