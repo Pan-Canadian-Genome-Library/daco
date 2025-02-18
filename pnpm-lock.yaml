@@ -44,6 +44,9 @@ importers:
       '@pcgl-daco/logger':
         specifier: workspace:^
         version: link:../../packages/logger
+      '@pcgl-daco/request-utils':
+        specifier: workspace:^
+        version: link:../../packages/request-utils
       '@pcgl-daco/validation':
         specifier: workspace:^
         version: link:../../packages/validation
@@ -246,6 +249,22 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.0.0
         version: 5.2.3(eslint-config-prettier@8.10.0(eslint@8.40.0))(eslint@8.40.0)(prettier@3.5.1)
+
+  packages/request-utils:
+    dependencies:
+      express:
+        specifier: ^4.18.2
+        version: 4.21.2
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.2
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.17
+        version: 4.17.21
+      '@types/express-serve-static-core':
+        specifier: ^4.17.41
+        version: 4.19.6
 
   packages/validation:
     dependencies:
