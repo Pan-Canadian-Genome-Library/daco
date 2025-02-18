@@ -23,16 +23,6 @@ import { EthicsEnum } from './common/enums.js';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
-export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
-export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
-export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
-export type CollaboratorsSchema = z.infer<typeof collaboratorsSchema>;
-export type CollaboratorsRequestSchema = z.infer<typeof collaboratorsRequestSchema>;
-export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
-export type AppendicesSchemaType = z.infer<typeof appendicesSchema>;
-export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
-export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
-
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
 	applicantFirstName: NonEmptyString,
@@ -50,6 +40,7 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteStreetAddress: NonEmptyString,
 	applicantInstituteBuilding: EmptyOrOptionalString,
 });
+export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 
 export const collaboratorsSchema = z.object({
 	collaboratorFirstName: NonEmptyString,
@@ -68,6 +59,7 @@ export const collaboratorsRequestSchema = z.object({
 	userId: NonEmptyString,
 	collaborators: z.array(collaboratorsSchema).nonempty(),
 });
+export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const institutionalRepSchema = z.object({
 	institutionalTitle: NonEmptyString,
@@ -86,6 +78,7 @@ export const institutionalRepSchema = z.object({
 	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 	institutionBuilding: EmptyOrOptionalString,
 });
+export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 
 export const projectInformationSchema = z.object({
 	projectTitle: NonEmptyString,
@@ -99,14 +92,17 @@ export const projectInformationSchema = z.object({
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
 });
+export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 
 export const ethicsSchema = z.object({
 	ethicsApproval: EthicsEnum,
 });
+export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
 export const requestedStudySchema = z.object({
 	requestedStudy: NonEmptyString,
 });
+export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
 export const agreementsSchema = z.object({
 	agreements: z.array(z.string()).superRefine((allAgreements, context) => {
@@ -143,6 +139,7 @@ export const agreementsSchema = z.object({
 		}
 	}),
 });
+export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
 
 export const appendicesSchema = z.object({
 	appendices: z.array(z.string()).superRefine((policies, context) => {
@@ -154,3 +151,4 @@ export const appendicesSchema = z.object({
 		}
 	}),
 });
+export type AppendicesSchemaType = z.infer<typeof appendicesSchema>;

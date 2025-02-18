@@ -38,15 +38,15 @@ importers:
 
   apps/api:
     dependencies:
-      '@hookform/resolvers':
-        specifier: ^3.10.0
-        version: 3.10.0(react-hook-form@7.54.2(react@18.3.1))
       '@pcgl-daco/data-model':
         specifier: workspace:^
         version: link:../../packages/data-model
       '@pcgl-daco/logger':
         specifier: workspace:^
         version: link:../../packages/logger
+      '@pcgl-daco/request-utils':
+        specifier: workspace:^
+        version: link:../../packages/request-utils
       '@pcgl-daco/validation':
         specifier: workspace:^
         version: link:../../packages/validation
@@ -249,6 +249,22 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.0.0
         version: 5.2.1(eslint-config-prettier@8.10.0(eslint@8.40.0))(eslint@8.40.0)(prettier@3.3.3)
+
+  packages/request-utils:
+    dependencies:
+      express:
+        specifier: ^4.18.2
+        version: 4.21.0
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.17
+        version: 4.17.21
+      '@types/express-serve-static-core':
+        specifier: ^4.17.41
+        version: 4.19.6
 
   packages/validation:
     dependencies:
