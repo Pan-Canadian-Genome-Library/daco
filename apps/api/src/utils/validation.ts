@@ -17,8 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './routes/applicationRoutes.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './utils/regex.js';
+import { z } from 'zod';
+
+const apiZodErrorMapping: z.ZodErrorMap = (issue, ctx) => {
+	if (issue.code === z.ZodIssueCode.invalid_type) {
+		if (!issue.expected.includes('undefined') && issue.received.includes('undefined')) {
+			return {
+				message: `Property '${issue.path[issue.path.length - 1]}' is required.`,
+			};
+		}
+	}
+
+	if (issue.code === z.ZodIssueCode.custom) {
+		if (issue.params?.violation === 'noEmptyObject') {
+			return {
+				message: `Object is empty or only contains unrecognized keys. Object may not be empty.`,
+			};
+		}
+	}
+	return { message: ctx.defaultError };
+};
+
+export { apiZodErrorMapping };

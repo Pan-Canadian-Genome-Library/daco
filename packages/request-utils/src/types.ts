@@ -17,8 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './routes/applicationRoutes.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './utils/regex.js';
+import { ZodIssue } from 'zod';
+
+export const ErrorName = {
+	BAD_REQUEST_ERROR: 'BadRequestError',
+	CONFLICT_ERROR: 'ConflictError',
+	NOT_FOUND_ERROR: 'NotFoundError',
+	REQUEST_VALIDATION_ERROR: 'RequestValidationError',
+	SERVER_ERROR: 'ServerError',
+	UNAUTHORIZED: 'Unauthorized',
+	NOT_IMPLEMENTED: 'NotImplemented',
+} as const;
+
+export type ErrorNames = (typeof ErrorName)[keyof typeof ErrorName];
+
+export type ErrorResponse = {
+	error: ErrorNames;
+	message: string;
+};
+
+export type RequestValidationError = ErrorResponse & {
+	details: ZodIssue[];
+};
