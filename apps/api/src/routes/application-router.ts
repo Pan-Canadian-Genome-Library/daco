@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { withSchemaValidation } from '@pcgl-daco/request-utils';
+import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
@@ -30,6 +32,7 @@ import {
 	rejectApplication,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
+import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -64,25 +67,30 @@ applicationRouter.post(
 	},
 );
 
-applicationRouter.post('/applications/edit', jsonParser, async (req, res) => {
-	// TODO: Add Auth & Zod validation
-	const data = req.body;
-	const { id, update } = data;
-	const result = await editApplication({ id, update });
+applicationRouter.post(
+	'/applications/edit',
+	jsonParser,
+	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
+		// TODO: Add Auth
+		const data = req.body;
 
-	if (result.success) {
-		res.send(result.data);
-	} else {
-		// TODO: System Error Handling
-		if (String(result.errors) === 'Error: Application record is undefined') {
-			res.status(404);
+		const { id, update } = data;
+		const result = await editApplication({ id, update });
+
+		if (result.success) {
+			res.send(result.data);
 		} else {
-			res.status(500);
-		}
+			// TODO: System Error Handling
+			if (String(result.errors) === 'Error: Application record is undefined') {
+				res.status(404);
+			} else {
+				res.status(500);
+			}
 
-		res.send({ message: result.message, errors: String(result.errors) });
-	}
-});
+			res.send({ message: result.message, errors: String(result.errors) });
+		}
+	}),
+);
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
 //       - verify if user can access applications
