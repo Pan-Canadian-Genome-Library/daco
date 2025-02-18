@@ -31,7 +31,6 @@
 		"typescript": "^5.7.3"
 	},
 	"dependencies": {
-		"@hookform/resolvers": "^3.10.0",
 		"@pcgl-daco/data-model": "workspace:^",
 		"@pcgl-daco/logger": "workspace:^",
 		"@pcgl-daco/validation": "workspace:^",
