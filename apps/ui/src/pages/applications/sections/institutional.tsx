@@ -19,10 +19,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
-import { Col, Form, Row } from 'antd';
+import { Button, Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import InputBox from '@/components/pages/application/form-components/InputBox';
@@ -30,15 +31,16 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
-import { useOutletContext } from 'react-router';
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { state, dispatch } = useApplicationContext();
 
 	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
 		resolver: zodResolver(institutionalRepSchema),
@@ -46,6 +48,13 @@ const Institutional = () => {
 
 	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
 		console.log(data);
+	};
+
+	const testDispatch = () => {
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: { ...state, applicantFirstName: 'test' },
+		});
 	};
 
 	return (
@@ -56,6 +65,9 @@ const Institutional = () => {
 					text={[translate('institutional-section.description1')]}
 				/>
 				<SectionContent title={translate('institutional-section.section1')}>
+					<Button htmlType="button" onClick={testDispatch}>
+						Test dispatch
+					</Button>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox

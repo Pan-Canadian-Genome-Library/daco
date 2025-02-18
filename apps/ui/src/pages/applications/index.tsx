@@ -27,6 +27,7 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
+import { ApplicationContextProvider } from '@/components/providers/context/application/ApplicationContextProvider';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Content } = Layout;
@@ -73,12 +74,14 @@ const ApplicationViewer = () => {
 						</Row>
 						<Row style={{ width: '75%' }}>
 							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet
-									context={{
-										appId: data.id,
-										isEditMode,
-									}}
-								/>
+								<ApplicationContextProvider>
+									<Outlet
+										context={{
+											appId: data.id,
+											isEditMode,
+										}}
+									/>
+								</ApplicationContextProvider>
 							</Col>
 						</Row>
 					</>
