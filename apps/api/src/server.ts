@@ -26,6 +26,7 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/applicationRouter.js';
+import urlJoin from 'url-join';
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
 import authRouter from './routes/authRouter.js';
@@ -34,21 +35,20 @@ import sessionMiddleware from './session/sessionMiddleware.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const API_DOCS_PATH = `api-docs`;
+const API_PATH_DOCS = `/api-docs`;
 
 const startServer = async () => {
 	const app = express();
 
-	// app.use(ExpressLogger({ logger, excludeURLs: ['/auth/token'] }));
-	app.use(ExpressLogger({ logger }));
-
+	app.use(express.json());
 	app.use(sessionMiddleware);
+	app.use(ExpressLogger({ logger, excludeURLs: ['/auth/token'] }));
 
-	app.use(applicationRouter);
+	app.use('/application/', applicationRouter);
 	app.use('/auth', authRouter);
 
 	app.use(
-		`/${API_DOCS_PATH}`,
+		`${API_PATH_DOCS}`,
 		swaggerUi.serve,
 		swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))),
 	);
@@ -76,7 +76,7 @@ const startServer = async () => {
 	app.listen(serverConfig.PORT, () => {
 		logger.info(`Server started - listening on port ${serverConfig.PORT}.`);
 		if (!serverConfig.isProduction) {
-			logger.info(`API Docs available at: http://localhost:${serverConfig.PORT}/${API_DOCS_PATH}`);
+			logger.info(`API Docs available at: ${urlJoin([`http://localhost:${serverConfig.PORT}`, API_PATH_DOCS])}`);
 		}
 	});
 };

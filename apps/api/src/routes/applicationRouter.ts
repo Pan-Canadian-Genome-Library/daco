@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
 import {
@@ -40,15 +39,13 @@ import type { ResponseWithData } from './types.js';
 const logger = baseLogger.forModule('applicationRouter');
 
 const applicationRouter = express.Router();
-const jsonParser = bodyParser.json();
-applicationRouter.use(jsonParser);
 
 /**
  * TODO:
  * 	- Validate request params using Zod.
  */
 applicationRouter.post(
-	'/applications/create',
+	'/create',
 	authMiddleware(),
 	async (request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
@@ -70,7 +67,7 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/applications/edit',
+	'/edit',
 	authMiddleware(),
 	async (
 		req,
@@ -83,6 +80,7 @@ applicationRouter.post(
 		const data = req.body;
 		const { id, update } = data;
 
+		// Need user ID to validate the user has access to this app.
 		const { user } = req.session;
 		const { userId } = user || {};
 
@@ -91,6 +89,7 @@ applicationRouter.post(
 			return;
 		}
 
+		// We need to get the application to validate that this user can edit it
 		const applicationResult = await getApplicationById({ applicationId: id });
 		if (!applicationResult.success) {
 			switch (applicationResult.error) {
@@ -135,7 +134,7 @@ applicationRouter.post(
 
 // TODO: validate queryParam options using zod
 applicationRouter.get(
-	'/applications',
+	'/',
 	authMiddleware(),
 	async (req, res: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { userId } = req.session.user || {};
@@ -209,7 +208,7 @@ applicationRouter.get(
  *   - Ideally we should also standardize errors eventually, so that we're not comparing strings.
  */
 applicationRouter.get(
-	'/applications/:applicationId',
+	'/:applicationId',
 	authMiddleware(),
 	async (
 		request,
@@ -270,7 +269,7 @@ applicationRouter.get(
  * 	- Validate request params using Zod.
  */
 applicationRouter.get(
-	'/applications/metadata/counts',
+	'/metadata/counts',
 	authMiddleware(),
 	async (
 		req: Request<{}, {}, {}, any>,
@@ -294,7 +293,7 @@ applicationRouter.get(
 		}
 	},
 );
-applicationRouter.post('/applications/approve', authMiddleware({ requiredRoles: ['DAC_MEMBER'] }), async (req, res) => {
+applicationRouter.post('/approve', authMiddleware({ requiredRoles: ['DAC_MEMBER'] }), async (req, res) => {
 	const { applicationId }: { applicationId?: number } = req.body;
 
 	if (typeof applicationId !== 'number' || !applicationId) {
