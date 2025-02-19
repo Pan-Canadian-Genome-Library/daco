@@ -9,6 +9,7 @@
 !pnpm-workspace.yaml
 !tsconfig.base.json
 !tsconfig.json
+!nx.json
 
 # Ignore hidden files from sub-directories
 **/.*
