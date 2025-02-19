@@ -32,7 +32,7 @@ import {
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService } from '@/service/types.js';
+import { ReviewApplication, type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -46,7 +46,7 @@ import {
 } from '../testUtils.js';
 
 // Sample revision request data
-const revisionRequestData = {
+const revisionRequestData: ReviewApplication = {
 	applicantInfo: {
 		applicantApproved: false,
 		applicantNotes: 'Needs more details',
@@ -278,7 +278,7 @@ describe('Application API', () => {
 				applicationId: id,
 				role,
 				repId,
-				reviewData: JSON.stringify(revisionRequestData),
+				reviewData: revisionRequestData,
 				comments,
 			});
 
@@ -302,7 +302,7 @@ describe('Application API', () => {
 				applicationId: id,
 				role,
 				repId,
-				reviewData: JSON.stringify(revisionRequestData),
+				reviewData: revisionRequestData,
 				comments,
 			});
 
@@ -322,7 +322,7 @@ describe('Application API', () => {
 				applicationId: invalidApplicationId,
 				role,
 				repId,
-				reviewData: JSON.stringify(revisionRequestData),
+				reviewData: revisionRequestData,
 				comments,
 			});
 

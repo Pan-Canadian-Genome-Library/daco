@@ -24,11 +24,11 @@ import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
-	ApplicationModel,
-	ReviewApplication,
 	type ApplicationContentUpdates,
+	type ApplicationModel,
 	type ApplicationRecord,
 	type ApplicationService,
+	type ReviewApplication,
 } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
@@ -220,13 +220,11 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
 export const requestApplicationRevisions = async ({
 	applicationId,
 	role,
-	repId,
 	reviewData,
 	comments,
 }: {
 	applicationId: number;
 	role: string;
-	repId: string;
 	reviewData: ReviewApplication;
 	comments?: string;
 }): AsyncResult<ApplicationModel> => {
