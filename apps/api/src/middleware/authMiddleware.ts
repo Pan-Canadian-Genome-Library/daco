@@ -25,6 +25,28 @@ export type AuthMiddlewareConfig = {
 	requiredRoles?: [UserRole, ...UserRole[]];
 };
 
+/**
+ * Auth Middleware will check that the request is being made by an authenticated user.
+ *
+ * This will check that the request session has authenticated user information.
+ *
+ * Optionally, you can provide a list of required roles. This will require that the user
+ * has one of the required roles to access the endpoint. If this config is omitted, any role
+ * other than 'ANONYMOUS' is accepted.
+ *
+ * If a request is rejected by this middleware it will return a response of:
+ *   - http 401 (session has no authenticated user)
+ *   - http 403 (missing required role)
+ *
+ * @example
+ * router.get(
+ * 	'/path',
+ * 	authMiddleware({requiredRoles: ['DAC_MEMBER']}),
+ * 	(req, res) => {
+ * 		// Only DAC_MEMBERS will get here.
+ * 	}
+ * )
+ */
 export const authMiddleware =
 	(config: AuthMiddlewareConfig = {}): RequestHandler =>
 	(req, res, next) => {
