@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { Dispatch } from 'react';
 
 export type ApplicationFieldsType = {
@@ -53,8 +54,8 @@ export type ApplicationFieldsType = {
 };
 
 export type ApplicationContextType = {
-	state: ApplicationFieldsType;
+	state: ApplicationContentsResponse | null;
 	dispatch: Dispatch<ApplicationAction>;
 };
 
-export type ApplicationAction = { type: 'UPDATE_APPLICATION'; payload: ApplicationFieldsType };
+export type ApplicationAction = { type: 'UPDATE_APPLICATION'; payload: ApplicationContentsResponse | null };

@@ -17,9 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationAction, ApplicationFieldsType } from '@/components/providers/context/application/types';
+import { ApplicationAction } from '@/components/providers/context/application/types';
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
-function ApplicationReducer(state: ApplicationFieldsType, action: ApplicationAction) {
+function ApplicationReducer(state: ApplicationContentsResponse | null, action: ApplicationAction) {
 	switch (action.type) {
 		case 'UPDATE_APPLICATION': {
 			return { ...state, ...action.payload };

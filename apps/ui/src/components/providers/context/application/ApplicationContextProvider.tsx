@@ -17,12 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { createContext, useReducer } from 'react';
 
 import ApplicationReducer from '@/components/providers/context/application/ApplicationReducer';
-import { ApplicationContextType, ApplicationFieldsType } from '@/components/providers/context/application/types';
+import { ApplicationContextType } from '@/components/providers/context/application/types';
 
-const initialState: ApplicationFieldsType = {
+const initialState: ApplicationContentsResponse | null = {
 	applicantFirstName: null,
 	applicantMiddleName: null,
 	applicantLastName: null,
