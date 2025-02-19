@@ -20,6 +20,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
+import { ApplicationContextProvider } from '@/components/providers/context/application/ApplicationContextProvider';
 import ApplicationViewer from '@/pages/applications';
 import AccessAgreement from '@/pages/applications/sections/access';
 import Appendices from '@/pages/applications/sections/appendices';
@@ -88,7 +89,14 @@ function AppRouter() {
 			<Route element={<PageLayout />}>
 				<Route index element={<HomePage />} />
 				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationViewer />}>
+				<Route
+					path="application/:id"
+					element={
+						<ApplicationContextProvider>
+							<ApplicationViewer />
+						</ApplicationContextProvider>
+					}
+				>
 					<Route index element={<Navigate to="intro" replace={true} />} />
 					{/* Application Section Routes */}
 					{ApplicationSectionRoutes.map((item) => (

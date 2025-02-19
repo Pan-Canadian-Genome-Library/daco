@@ -24,10 +24,10 @@ import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import AppHeader from '@/components/pages/application/AppHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
+import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 
 import useGetApplication from '@/api/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
-import { ApplicationContextProvider } from '@/components/providers/context/application/ApplicationContextProvider';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Content } = Layout;
@@ -42,6 +42,7 @@ const ApplicationViewer = () => {
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
 
 	const { data, isError, error, isLoading } = useGetApplication(params.id);
+	const { dispatch } = useApplicationContext();
 
 	useEffect(() => {
 		if (data && !('isError' in data)) {
@@ -57,6 +58,14 @@ const ApplicationViewer = () => {
 			}
 		}
 	}, [data, isEditMode, navigation]);
+
+	// Populate store with data.contents from API
+	useEffect(() => {
+		if (data && !isLoading && !isError) {
+			dispatch({ type: 'UPDATE_APPLICATION', payload: data.contents });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isLoading]);
 
 	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
@@ -74,14 +83,12 @@ const ApplicationViewer = () => {
 						</Row>
 						<Row style={{ width: '75%' }}>
 							<Col style={{ background: 'white', width: '100%' }}>
-								<ApplicationContextProvider>
-									<Outlet
-										context={{
-											appId: data.id,
-											isEditMode,
-										}}
-									/>
-								</ApplicationContextProvider>
+								<Outlet
+									context={{
+										appId: data.id,
+										isEditMode,
+									}}
+								/>
 							</Col>
 						</Row>
 					</>
