@@ -20,12 +20,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
+import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {
 	const { t: translate } = useTranslation();
+	const { dispatch } = useApplicationContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [id],
@@ -48,7 +50,10 @@ const useGetApplication = (id?: string | number) => {
 				throw error;
 			}
 
-			return await response.json();
+			return await response.json().then((data) => {
+				dispatch({ type: 'UPDATE_APPLICATION', payload: data.contents });
+				return data;
+			});
 		},
 	});
 };

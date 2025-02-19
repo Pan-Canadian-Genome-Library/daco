@@ -24,7 +24,6 @@ import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import AppHeader from '@/components/pages/application/AppHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
-import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 
 import useGetApplication from '@/api/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
@@ -42,7 +41,6 @@ const ApplicationViewer = () => {
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
 
 	const { data, isError, error, isLoading } = useGetApplication(params.id);
-	const { dispatch } = useApplicationContext();
 
 	useEffect(() => {
 		if (data && !('isError' in data)) {
@@ -58,14 +56,6 @@ const ApplicationViewer = () => {
 			}
 		}
 	}, [data, isEditMode, navigation]);
-
-	// Populate store with data.contents from API
-	useEffect(() => {
-		if (data && !isLoading && !isError) {
-			dispatch({ type: 'UPDATE_APPLICATION', payload: data.contents });
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isLoading]);
 
 	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
