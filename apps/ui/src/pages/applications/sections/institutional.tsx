@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -42,12 +42,29 @@ const Institutional = () => {
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 
-	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
+	const { getValues, control } = useForm<InstitutionalRepSchemaType>({
+		defaultValues: {
+			institutionalFirstName: state?.institutionalRepFirstName || undefined,
+			institutionalMiddleName: state?.institutionalRepMiddleName || undefined,
+			institutionalLastName: state?.institutionalRepLastName || undefined,
+			institutionalInstituteAffiliation: state?.institutionalRepEmail || undefined,
+			institutionalPositionTitle: state?.institutionalRepTitle || undefined,
+			institutionalPrimaryAffiliation: state?.institutionalRepPrimaryAffiliation || undefined,
+			institutionalProfileUrl: state?.institutionalRepProfileUrl || undefined,
+			institutionalSuffix: state?.institutionalRepSuffix || undefined,
+			institutionalTitle: state?.institutionalRepTitle || undefined,
+			institutionBuilding: state?.institutionBuilding || undefined,
+			institutionCity: state?.institutionCity || undefined,
+			institutionCountry: state?.institutionCountry || undefined,
+			institutionPostalCode: state?.institutionPostalCode || undefined,
+			institutionState: state?.institutionState || undefined,
+			institutionStreetAddress: state?.institutionStreetAddress || undefined,
+		},
 		resolver: zodResolver(institutionalRepSchema),
 	});
 
-	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
-		console.log(data);
+	const onSubmit = () => {
+		const data = getValues();
 
 		dispatch({
 			type: 'UPDATE_APPLICATION',
@@ -74,7 +91,14 @@ const Institutional = () => {
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle
 					title={translate('institutional-section.title')}
 					text={[translate('institutional-section.description1')]}
@@ -269,7 +293,7 @@ const Institutional = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
+				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);
