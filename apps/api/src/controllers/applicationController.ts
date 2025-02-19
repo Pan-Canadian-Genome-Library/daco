@@ -210,3 +210,44 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
 		return failure(message, error);
 	}
 };
+
+export const submitApplication = async ({ applicationId }: { applicationId: number }) => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		// Fetch the application
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		// Ensure the application can be submitted
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (appStateManager.state !== ApplicationStates.DRAFT) {
+			return failure(`Application cannot be submitted from state ${appStateManager.state}`, 'SubmissionError');
+		}
+
+		// Transition application to the next state (e.g., under review)
+		const submissionResult = await appStateManager.submitDraft();
+
+		if (!submissionResult.success) {
+			return failure(submissionResult.message || 'Failed to submit application.', 'StateTransitionError');
+		}
+
+		// Save the application with its new state
+		const update = { state: appStateManager.state, submitted_at: new Date() };
+		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		return updatedResult;
+	} catch (error) {
+		const message = `Unable to submit application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
