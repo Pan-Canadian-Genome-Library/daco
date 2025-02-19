@@ -30,16 +30,6 @@ export interface Application {
 	updatedAt: string;
 	expiresAt: string;
 }
-export interface ApplicationWithApplicantInformation extends Application {
-	applicantInformation: {
-		createdAt: string;
-		firstName: string;
-		lastName: string;
-		email: string;
-		country: string;
-		institution: string;
-	};
-}
 
 export interface ApplicationCountMetadata {
 	DRAFT: number;
@@ -52,17 +42,6 @@ export interface ApplicationCountMetadata {
 	CLOSED: number;
 	REVOKED: number;
 	TOTAL: number;
-}
-
-export interface PagingMetadata {
-	totalRecords: number;
-	page: number;
-	pageSize: number;
-}
-
-export interface ApplicationList {
-	applications: ApplicationWithApplicantInformation[];
-	pagingMetadata: PagingMetadata;
 }
 
 export interface ServerError {

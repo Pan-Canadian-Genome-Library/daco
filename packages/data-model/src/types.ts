@@ -155,6 +155,34 @@ export type ApplicationDTO = {
 	expiresAt?: Date | null;
 };
 
+export interface ApplicationResponseData extends ApplicationDTO {
+	contents: ApplicationContentsResponse | null;
+}
+
+export interface PagingMetadata {
+	totalRecords: number;
+	page: number;
+	pageSize: number;
+}
+
+export interface ApplicantSummary {
+	createdAt: Date;
+	firstName: string | null;
+	lastName: string | null;
+	email: string | null;
+	country: string | null;
+	institution: string | null;
+}
+
+export interface ApplicationListSummary extends ApplicationDTO {
+	applicant: ApplicantSummary | null;
+}
+
+export interface ApplicationListResponse {
+	applications: ApplicationListSummary[];
+	pagingMetadata: PagingMetadata;
+}
+
 export type ApplicationContentsResponse = {
 	applicationId?: number;
 	createdAt?: Date;
@@ -197,23 +225,29 @@ export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 };
 
+export interface CollaboratorDTO {
+	collaboratorFirstName: string;
+	collaboratorInstitutionalEmail: string;
+	collaboratorLastName: string;
+	collaboratorMiddleName?: string | null;
+	collaboratorPositionTitle: string;
+	collaboratorPrimaryAffiliation?: string | null;
+	collaboratorResearcherProfileURL?: string | null;
+	collaboratorSuffix?: string | null;
+	collaboratorType?: string | null;
+}
+
+export type CollaboratorRequest = {
+	applicationId: number;
+	userId: string;
+	collaborators: CollaboratorDTO[];
+};
+
 // TODO: Additional Types to be updated
 export interface EthicsDataDTO {
 	ethicsReviewRequired?: boolean | null;
 	ethicsLetter?: number | null;
 	signedPdf?: number | null;
-}
-
-export interface CollaboratorDTO {
-	collaboratorFirstName?: string | null;
-	collaboratorMiddleName?: string | null;
-	collaboratorLastName?: string | null;
-	collaboratorSuffix?: string | null;
-	collaboratorPrimaryAffiliation?: string | null;
-	collaboratorInstitutionalEmail?: string | null;
-	collaboratorResearcherProfileURL?: string | null;
-	collaboratorPositionTitle?: string | null;
-	collaboratorType?: string | null;
 }
 
 export type RevisionRequestDTO = {

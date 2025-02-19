@@ -17,8 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
@@ -32,7 +30,6 @@ import {
 	rejectApplication,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
-import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -70,7 +67,8 @@ applicationRouter.post(
 applicationRouter.post(
 	'/applications/edit',
 	jsonParser,
-	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
+	// withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping,
+	async (req, res) => {
 		// TODO: Add Auth
 		const data = req.body;
 
@@ -89,8 +87,9 @@ applicationRouter.post(
 
 			res.send({ message: result.message, errors: String(result.errors) });
 		}
-	}),
+	},
 );
+// );
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
 //       - verify if user can access applications
@@ -204,6 +203,7 @@ applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {
 		res.status(500).send({ message: result.message, errors: String(result.errors) });
 	}
 });
+
 applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
 	const { applicationId }: { applicationId?: number } = req.body;
 
@@ -248,6 +248,36 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 		});
 	}
 });
+
+/**
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ * 	- Validate request params using Zod.
+ */
+applicationRouter.post(
+	'/applications/create',
+	jsonParser,
+	async (request: Request<{}, {}, { userId: string }, any>, response) => {
+		const { userId } = request.body;
+
+		/**
+		 * TODO: Temporary userId check until validation/dto flow is confirmed.
+		 * Reflect changes in swagger once refactored.
+		 **/
+		if (!userId) {
+			response.status(400).send({ message: 'User ID is required.' });
+			return;
+		}
+
+		const result = await createApplication({ user_id: userId });
+
+		if (result.success) {
+			response.status(201).send(result.data);
+		} else {
+			response.status(500).send({ message: result.message, errors: String(result.errors) });
+		}
+	},
+);
 
 applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
@@ -295,4 +325,5 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 		});
 	}
 });
+
 export default applicationRouter;
