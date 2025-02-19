@@ -17,8 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './routes/applicationRoutes.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './utils/regex.js';
+import { Flex, Typography } from 'antd';
+
+const { Text, Link } = Typography;
+
+interface LabelWithLinkProps {
+	label: string;
+	link: { label: string; href: string };
+}
+
+export const LabelWithLink = ({ label, link }: LabelWithLinkProps) => {
+	return (
+		<Flex align="start" justify="center" gap={'middle'}>
+			<Text>{label}</Text>
+			<Link href={link.href}>{`${link.label} ›`}</Link>
+		</Flex>
+	);
+};
