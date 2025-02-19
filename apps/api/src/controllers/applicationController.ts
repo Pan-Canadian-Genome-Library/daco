@@ -23,9 +23,15 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationContentUpdates, type ApplicationRecord, type ApplicationService } from '@/service/types.js';
-import { failure, success, type AsyncResult } from '@/utils/results.js';
+import {
+	type ApplicationContentUpdates,
+	type ApplicationRecord,
+	type ApplicationService,
+	type JoinedApplicationRecord,
+} from '@/service/types.js';
+import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
+import type { ApplicationResponseData } from '@pcgl-daco/data-model';
 import { ApplicationStateManager } from './stateManager.js';
 
 /**
@@ -33,7 +39,7 @@ import { ApplicationStateManager } from './stateManager.js';
  * @param user_id - The ID of the user requesting the creation of the application.
  * @returns Success with Application data / Failure with Error.
  */
-export const createApplication = async ({ user_id }: { user_id: string }) => {
+export const createApplication = async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -49,7 +55,13 @@ export const createApplication = async ({ user_id }: { user_id: string }) => {
  * @param update - Application Contents details to update
  * @returns Success with Application data / Failure with Error
  */
-export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
+export const editApplication = async ({
+	id,
+	update,
+}: {
+	id: number;
+	update: ApplicationContentUpdates;
+}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -73,7 +85,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 	} else {
 		const message = `Cannot update application with state ${state}`;
 		logger.error(message);
-		return failure(message);
+		return failure('INVALID_STATE_TRANSITION', message);
 	}
 };
 
@@ -100,7 +112,11 @@ export const getAllApplications = async ({ userId, state, sort, page, pageSize }
  * @param applicationId - The ID of the application within the database.
  * @returns Success with the details of the application / Failure with Error.
  */
-export const getApplicationById = async ({ applicationId }: { applicationId: number }) => {
+export const getApplicationById = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): Promise<Result<ApplicationResponseData, 'NOT_FOUND' | 'SYSTEM_ERROR'>> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -137,7 +153,9 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
  * 	data?: any;
  * }>}
  */
-export const approveApplication = async ({ applicationId }: ApproveApplication): AsyncResult<ApplicationRecord> => {
+export const approveApplication = async ({
+	applicationId,
+}: ApproveApplication): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -153,13 +171,14 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (appStateManager.state === ApplicationStates.APPROVED) {
-			return failure('Application is already approved.', 'ApprovalConflict');
+			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
 		}
 
 		const approvalResult = await appStateManager.approveDacReview();
 
 		if (!approvalResult.success) {
-			return failure(approvalResult.message || 'Failed to approve application.', 'StateTransitionError');
+			logger.error();
+			return failure('SYSTEM_ERROR', approvalResult.message);
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
@@ -167,9 +186,7 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 
 		return updatedResult;
 	} catch (error) {
-		const message = `Unable to approve application with id: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(`Unable to approve application with id: ${applicationId}`, error);
+		return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to approve application.');
 	}
 };

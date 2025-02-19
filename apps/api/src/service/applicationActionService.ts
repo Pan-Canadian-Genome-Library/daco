@@ -50,7 +50,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
 		transaction?: PostgresTransaction,
-	): AsyncResult<ApplicationActionRecord> => {
+	): AsyncResult<ApplicationActionRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		const { id: application_id, user_id, state: state_before } = application;
 		const newAction: typeof applicationActions.$inferInsert = {
 			application_id,
@@ -63,14 +63,15 @@ const applicationActionSvc = (db: PostgresDb) => {
 		try {
 			const dbTransaction = transaction ? transaction : db;
 			const newActionRecord = await dbTransaction.insert(applicationActions).values(newAction).returning();
-			if (!newActionRecord[0]) throw new Error('Application record is undefined');
+			if (!newActionRecord[0]) {
+				return failure('NOT_FOUND', 'Application record is undefined');
+			}
 
 			return success(newActionRecord[0]);
 		} catch (err) {
 			const message = `Error creating action with user_id: ${user_id} & application_id: ${application_id}`;
-			logger.error(message);
-			logger.error(err);
-			return failure(message, err);
+			logger.error(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	};
 
@@ -139,17 +140,22 @@ const applicationActionSvc = (db: PostgresDb) => {
 		withdraw: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
 			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT, transaction),
 		/** @method getActionById: Find a specific Action record */
-		getActionById: async ({ id }: { id: number }): AsyncResult<ApplicationActionRecord> => {
+		getActionById: async ({
+			id,
+		}: {
+			id: number;
+		}): AsyncResult<ApplicationActionRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 			try {
 				const actionRecord = await db.select().from(applicationActions).where(eq(applicationActions.id, id));
-				if (!actionRecord[0]) throw new Error('Action record is undefined');
+				if (!actionRecord[0]) {
+					return failure('NOT_FOUND', 'Action record not found.');
+				}
 
 				return success(actionRecord[0]);
 			} catch (err) {
 				const message = `Error at getActionById with id: ${id}`;
-				logger.error(message);
-				logger.error(err);
-				return failure(message, err);
+				logger.error(message, err);
+				return failure('SYSTEM_ERROR', message);
 			}
 		},
 		/** @method listActions: Find multiple Actions related to a given User or Application */
@@ -165,7 +171,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 			sort?: Array<OrderBy<ApplicationActionsColumnName>>;
 			page?: number;
 			pageSize?: number;
-		}): AsyncResult<ApplicationActionRecord[]> => {
+		}): AsyncResult<ApplicationActionRecord[], 'SYSTEM_ERROR'> => {
 			try {
 				const allActions = await db
 					.select()
@@ -183,9 +189,8 @@ const applicationActionSvc = (db: PostgresDb) => {
 				return success(allActions);
 			} catch (err) {
 				const message = `Error at listActions with user_id: ${user_id}`;
-				logger.error(message);
-				logger.error(err);
-				return failure(message, err);
+				logger.error(message, err);
+				return failure('SYSTEM_ERROR', message);
 			}
 		},
 	};

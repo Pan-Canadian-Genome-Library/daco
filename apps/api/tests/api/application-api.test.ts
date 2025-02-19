@@ -166,10 +166,7 @@ describe('Application API', () => {
 			const result = await getApplicationById({ applicationId: last_id.id + 1 });
 
 			assert.ok(!result.success);
-
-			const error_message = String(result.errors);
-
-			assert.strictEqual(error_message, 'Error: Application record is undefined');
+			assert.strictEqual(result.error, 'NOT_FOUND');
 		});
 	});
 

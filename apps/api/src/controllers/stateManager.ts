@@ -21,10 +21,12 @@ import { getDbInstance } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type AddActionMethods, type ApplicationRecord } from '@/service/types.js';
-import { type AsyncResult, failure, success } from '@/utils/results.js';
+import { type AsyncResult, failure, type Result, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
+import baseLogger from '../logger.js';
 import { validateContent } from './validation.js';
+const logger = baseLogger.forModule('stateManager');
 
 const {
 	DRAFT,
@@ -80,49 +82,71 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	private _application: ApplicationRecord;
 	public readonly initState: ApplicationStateValues;
 
-	_canPerformAction(action: ApplicationStateEvents) {
+	_stateTransitionFailure(action: ApplicationStateEvents) {
+		return failure(
+			'INVALID_STATE_TRANSITION',
+			`Cannot perform action "${action}" on application with state "${this.getState()}"`,
+		);
+	}
+
+	_canPerformAction(action: ApplicationStateEvents): Result<true, 'INVALID_STATE_TRANSITION'> {
 		if (this.can(action)) {
 			return success(true);
 		} else {
-			return failure(`Cannot perform action ${action} on application with state ${this.getState()}`);
+			return this._stateTransitionFailure(action);
 		}
 	}
 
-	async _dispatchAndUpdateAction(action: ApplicationStateEvents, actionMethod: AddActionMethods) {
+	async _dispatchAndUpdateAction(
+		action: ApplicationStateEvents,
+		actionMethod: AddActionMethods,
+	): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		try {
 			await this.dispatch(action);
 			const updateResult = await this._updateRecords(actionMethod);
 			return updateResult;
 		} catch (error) {
-			return failure(`Error performing action ${actionMethod} on application with id ${this._application.id}`, error);
+			const message = `Unexpected error performing action "${actionMethod}" on application with id "${this._application.id}"`;
+			logger.error(message);
+			return failure('SYSTEM_ERROR', message);
 		}
 	}
 
-	async _updateRecords(method: AddActionMethods) {
+	async _updateRecords(method: AddActionMethods): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		const db = getDbInstance();
 		const applicationRepo = applicationSvc(db);
 		const applicationActionRepo = applicationActionSvc(db);
 
 		return await db.transaction(async (tx) => {
-			const actionResult = await applicationActionRepo[method](this._application, tx);
-			if (!actionResult.success) return actionResult;
+			try {
+				const actionResult = await applicationActionRepo[method](this._application, tx);
+				if (!actionResult.success) {
+					return actionResult;
+				}
 
-			const { state_after } = actionResult.data;
-			// TODO: Drizzle pgEnum will not accept ApplicationStates as an argument
-			const state = state_after as ApplicationStateValues;
-			const { id } = this._application;
-			const update = { state };
-			const applicationResult = await applicationRepo.findOneAndUpdate({
-				id,
-				update,
-				transaction: tx,
-			});
+				const { state_after } = actionResult.data;
+				// TODO: Drizzle pgEnum will not accept ApplicationStates as an argument
+				const state = state_after as ApplicationStateValues;
+				const { id } = this._application;
+				const update = { state };
+				const applicationResult = await applicationRepo.findOneAndUpdate({
+					id,
+					update,
+					transaction: tx,
+				});
 
-			if (applicationResult.success && applicationResult.data) {
-				this._application = applicationResult.data;
+				if (applicationResult.success && applicationResult.data) {
+					this._application = applicationResult.data;
+				}
+
+				return applicationResult;
+			} catch (error) {
+				logger.error(`Unexpected error updating an application in the database.`, error);
+				return failure(
+					'SYSTEM_ERROR',
+					'Unexpected error occurred interacting with database. No updates were performed.',
+				);
 			}
-
-			return applicationResult;
 		});
 	}
 
@@ -131,15 +155,15 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// TODO: Add Validation + Edit Content service methods
 	async submitDraft() {
 		const transitionResult = this._canPerformAction(submit);
-		if (transitionResult.success) {
-			const validationResult = await validateContent(this._application);
-			if (validationResult.success) {
-				return await this._dispatchAndUpdateAction(submit, 'draftSubmit');
-			} else {
-				return validationResult;
-			}
-		} else {
+		if (!transitionResult.success) {
 			return transitionResult;
+		}
+
+		const validationResult = await validateContent(this._application);
+		if (validationResult.success) {
+			return await this._dispatchAndUpdateAction(submit, 'draftSubmit');
+		} else {
+			return validationResult;
 		}
 	}
 
@@ -232,7 +256,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			await this.dispatch(close);
 			return success(close);
 		} else {
-			return failure(`Cannot close application with state ${this.getState()}`);
+			return this._stateTransitionFailure(close);
 		}
 	}
 
@@ -277,7 +301,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			await this.dispatch(dac_reject);
 			return success(dac_reject);
 		} else {
-			return failure(`Cannot reject application with state ${this.getState()}`);
+			return this._stateTransitionFailure(dac_reject);
 		}
 	}
 
@@ -291,7 +315,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			await this.dispatch(revoked);
 			return success(revoked);
 		} else {
-			return failure(`Cannot revoke application with state ${this.getState()}`);
+			return this._stateTransitionFailure(revoked);
 		}
 	}
 

@@ -48,7 +48,7 @@ import {
  */
 const applicationSvc = (db: PostgresDb) => ({
 	/** @method createApplication: Create new Application record */
-	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
+	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR'> => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
 			state: ApplicationStates.DRAFT,
@@ -58,7 +58,9 @@ const applicationSvc = (db: PostgresDb) => ({
 			const application = await db.transaction(async (transaction) => {
 				// Create Application
 				const newApplicationRecord = await transaction.insert(applications).values(newApplication).returning();
-				if (!newApplicationRecord[0]) throw new Error('Application record is undefined');
+				if (!newApplicationRecord[0]) {
+					throw new Error('Application record is undefined');
+				}
 
 				// Create associated ApplicationContents
 				const { id: application_id } = newApplicationRecord[0];
@@ -69,7 +71,9 @@ const applicationSvc = (db: PostgresDb) => ({
 					updated_at: new Date(),
 				};
 				const newAppContentsRecord = await transaction.insert(applicationContents).values(newAppContents).returning();
-				if (!newAppContentsRecord[0]) throw new Error('Application contents record is undefined');
+				if (!newAppContentsRecord[0]) {
+					throw new Error('Application contents record is undefined');
+				}
 
 				// Join records
 				const { id: contents_id } = newAppContentsRecord[0];
@@ -79,19 +83,17 @@ const applicationSvc = (db: PostgresDb) => ({
 					.set({ contents: contents_id })
 					.where(eq(applications.id, application_id))
 					.returning();
-				if (!application[0]) throw new Error('Application record is undefined');
+				if (!application[0]) {
+					throw new Error('Application record is undefined');
+				}
 
 				return application[0];
 			});
 
 			return success(application);
 		} catch (err) {
-			const message = `Error at createApplication with user_id: ${user_id}`;
-
-			logger.error(message);
-			logger.error(err);
-
-			return failure(message, err);
+			logger.error(`Error at createApplication with user_id: ${user_id}`);
+			return failure('SYSTEM_ERROR', 'An unexpected database failure occurred, application was not created.');
 		}
 	},
 	/** @method editApplication: Update Application Contents and parent Application record */
@@ -101,9 +103,9 @@ const applicationSvc = (db: PostgresDb) => ({
 	}: {
 		id: number;
 		update: ApplicationContentUpdates;
-	}): AsyncResult<JoinedApplicationRecord> => {
+	}): AsyncResult<JoinedApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
-			const application = await db.transaction(async (transaction) => {
+			const result = await db.transaction(async (transaction) => {
 				// Update Application Contents
 				const contents = { ...update, updated_at: sql`NOW()` };
 				const editedContents = await transaction
@@ -111,7 +113,9 @@ const applicationSvc = (db: PostgresDb) => ({
 					.set(contents)
 					.where(eq(applicationContents.application_id, id))
 					.returning();
-				if (!editedContents[0]) throw new Error('Application contents record is undefined');
+				if (!editedContents[0]) {
+					return failure('NOT_FOUND', `Could not find application with the ID: ${id}`);
+				}
 
 				// Update Related Application
 				const applicationUpdates = {
@@ -123,21 +127,21 @@ const applicationSvc = (db: PostgresDb) => ({
 					.set(applicationUpdates)
 					.where(eq(applications.id, id))
 					.returning();
-				if (!editedApplication[0]) throw new Error('Application record is undefined');
+				if (!editedApplication[0]) {
+					return failure('SYSTEM_ERROR', 'An unexpected database failure occurred, no updates were applied.');
+				}
 
 				// Returns merged record
-				return {
+				return success({
 					...editedApplication[0],
 					contents: editedContents[0],
-				};
+				});
 			});
 
-			return success(application);
+			return result;
 		} catch (err) {
-			const message = `Error at editApplication with id: ${id}`;
-			logger.error(message);
-			logger.error(err);
-			return failure(message, err);
+			logger.error(`Error at editApplication with id: ${id}`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to edit application.');
 		}
 	},
 	/** @method findOneAndUpdate: Update a base Application record */
@@ -149,7 +153,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		id: number;
 		update: ApplicationUpdates;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<ApplicationRecord> => {
+	}): AsyncResult<ApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const dbTransaction = transaction ? transaction : db;
 			const application = await dbTransaction
@@ -161,29 +165,31 @@ const applicationSvc = (db: PostgresDb) => ({
 
 			return success(application[0]);
 		} catch (err) {
-			const message = `Error at findOneAndUpdate with id: ${id}`;
-			logger.error(message);
-			logger.error(err);
-			return failure(message, err);
+			logger.error(`Error at findOneAndUpdate with id: ${id}`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to update application record.');
 		}
 	},
 	/** @method getApplicationById: Find a specific Application record */
-	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationRecord> => {
+	getApplicationById: async ({ id }: { id: number }): AsyncResult<ApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const applicationRecord = await db.select().from(applications).where(eq(applications.id, id));
 
-			if (!applicationRecord[0]) throw new Error('Application record is undefined');
+			if (!applicationRecord[0]) {
+				return failure('NOT_FOUND', `No application found with the ID: ${id}`);
+			}
 
 			return success(applicationRecord[0]);
 		} catch (err) {
-			const message = `Error at getApplicationById with id: ${id}`;
-			logger.error(message);
-			logger.error(err);
-			return failure(message, err);
+			logger.error(`Error at getApplicationById with id: ${id}`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred retrieving the application from the database.');
 		}
 	},
 	/** @method getApplicationWithContents: Find an Application record with Contents included */
-	getApplicationWithContents: async ({ id }: { id: number }): AsyncResult<JoinedApplicationRecord> => {
+	getApplicationWithContents: async ({
+		id,
+	}: {
+		id: number;
+	}): AsyncResult<JoinedApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const applicationRecord = await db
 				.select()
@@ -191,7 +197,9 @@ const applicationSvc = (db: PostgresDb) => ({
 				.where(eq(applications.id, id))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
-			if (!applicationRecord[0]) throw new Error('Application record is undefined');
+			if (!applicationRecord[0]) {
+				return failure('NOT_FOUND', `No application found with the ID: ${id}`);
+			}
 
 			const application = {
 				...applicationRecord[0].applications,
@@ -200,11 +208,8 @@ const applicationSvc = (db: PostgresDb) => ({
 
 			return success(application);
 		} catch (err) {
-			const message = `Error at getApplicationById with id: ${id}`;
-			logger.error(message);
-			logger.error(err);
-
-			return failure(message, err);
+			logger.error(`Error at getApplicationById with id: ${id}`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to get application record.');
 		}
 	},
 	/**
@@ -223,7 +228,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
-	}): AsyncResult<ApplicationListResponse> => {
+	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			/**
 			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
@@ -305,14 +310,16 @@ const applicationSvc = (db: PostgresDb) => ({
 
 			return success(applicationsList);
 		} catch (err) {
-			const message = `Error at listApplications with user_id: ${user_id} state: ${state}`;
-			logger.error(message);
-			logger.error(err);
-			return failure(message, err);
+			logger.error(`Error at listApplications with with user_id: ${user_id} and state: ${state}`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to list applications.');
 		}
 	},
 	/** @method applicationStateTotals: Obtain count for all Application records with each State */
-	applicationStateTotals: async ({ user_id }: { user_id?: string }): AsyncResult<ApplicationStateTotals> => {
+	applicationStateTotals: async ({
+		user_id,
+	}: {
+		user_id?: string;
+	}): AsyncResult<ApplicationStateTotals, 'SYSTEM_ERROR'> => {
 		try {
 			const rawApplicationRecord = await db
 				.select({
@@ -349,11 +356,9 @@ const applicationSvc = (db: PostgresDb) => ({
 					TOTAL: 0,
 				});
 			}
-		} catch (exception) {
-			const message = `Error at applicationStateTotals with user_id: ${user_id}.`;
-			logger.error(message);
-			logger.error(exception);
-			return failure(message, exception);
+		} catch (err) {
+			logger.error(`Error at applicationStateTotals with with user_id: ${user_id}`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to retrieve application counts.');
 		}
 	},
 });
