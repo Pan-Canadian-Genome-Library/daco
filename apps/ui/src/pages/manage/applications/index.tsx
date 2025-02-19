@@ -22,7 +22,7 @@ import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/useG
 import { mockUserID } from '@/components/mock/applicationMockData';
 import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
-import { FilterKeys, isFilterKey } from '@/components/pages/manage/DashboardFilter';
+import { isFilterKey, type FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import ManagementDashboard, { FilterState } from '@/components/pages/manage/ManagementDashboard';
 import { ApplicationCountMetadata } from '@/global/types';
 import { isValidPageNumber } from '@/global/utils';

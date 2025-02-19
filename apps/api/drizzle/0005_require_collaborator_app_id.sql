@@ -1,0 +1,1 @@
+ALTER TABLE "collaborators" ALTER COLUMN "application_id" SET NOT NULL;

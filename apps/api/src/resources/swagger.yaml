@@ -280,6 +280,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationRecord'
+
   /applications/approve:
     post:
       tags:
@@ -317,6 +318,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
   /applications/reject:
     post:
       tags:
@@ -349,6 +351,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
+
+  /collaborators/create:
+    post:
+      tags:
+        - Collaborators
+      summary: Create new Collaborators for an application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                applicationId:
+                  type: number
+                  description: ID of the related Application record that new Collaborators are associated with
+                userId:
+                  type: string
+                  description: Temporary, Applicant's User Id, required for authorization
+                collaborators:
+                  $ref: '#/components/requests/CreateCollaborators'
+      responses:
+        '500':
+          description: 'Error creating collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error creating Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '201':
+          description: 'Collaborators created'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -598,6 +643,34 @@ components:
           type: object
           $ref: '#/components/schemas/ApplicationContents'
 
+    Collaborators:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the collaborator in the database.
+        application_id:
+          type: number
+          description: The Application ID associated with the Collaborator.
+        first_name:
+          type: string
+          description: The collaborator's first name
+        middle_name:
+          type: string
+          description: The collaborator's middle name
+        last_name:
+          type: string
+          description: The collaborator's last name
+        suffix:
+          type: string
+          description: The collaborator's additional name suffix
+        position_title:
+          type: string
+          description: The collaborator's job title
+        institutional_email:
+          type: string
+          description: The collaborator's contact email
+
   requests:
     ApplicationCreation:
       type: object
@@ -638,6 +711,39 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+
+    CreateCollaborators:
+      type: array
+      description: Array of new Collaborators to create
+      items:
+        $ref: '#/components/requests/NewCollaborator'
+
+    NewCollaborator:
+      type: object
+      required:
+        - collaboratorFirstName
+        - collaboratorLastName
+        - collaboratorPositionTitle
+        - collaboratorInstitutionalEmail
+      properties:
+        collaboratorFirstName:
+          type: string
+          description: The collaborator's first name
+        collaboratorMiddleName:
+          type: string
+          description: The collaborator's middle name
+        collaboratorLastName:
+          type: string
+          description: The collaborator's last name
+        collaboratorSuffix:
+          type: string
+          description: The collaborator's additional name suffix
+        collaboratorPositionTitle:
+          type: string
+          description: The collaborator's job title
+        collaboratorInstitutionalEmail:
+          type: string
+          description: The collaborator's contact email
 
   responses:
     ApplicationResponse:
@@ -801,6 +907,12 @@ components:
         message:
           type: string
           description: General description of error with parameters and context
+
+    CollaboratorsListResponse:
+      type: array
+      description: Array of Collaborator records
+      items:
+        $ref: '#/components/schemas/Collaborators'
 
     ServerErrors:
       type: object
