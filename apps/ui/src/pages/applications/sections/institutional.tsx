@@ -19,7 +19,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
-import { Button, Col, Form, Row } from 'antd';
+import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -48,12 +48,27 @@ const Institutional = () => {
 
 	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
 		console.log(data);
-	};
 
-	const testDispatch = () => {
 		dispatch({
 			type: 'UPDATE_APPLICATION',
-			payload: { ...state, applicantFirstName: 'test' },
+			payload: {
+				...state,
+				institutionalRepFirstName: data.institutionalFirstName,
+				institutionalRepMiddleName: data.institutionalMiddleName,
+				institutionalRepLastName: data.institutionalLastName,
+				institutionalRepEmail: data.institutionalInstituteAffiliation,
+				institutionalRepPositionTitle: data.institutionalPositionTitle,
+				institutionalRepPrimaryAffiliation: data.institutionalPrimaryAffiliation,
+				institutionalRepProfileUrl: data.institutionalProfileUrl,
+				institutionalRepSuffix: data.institutionalSuffix,
+				institutionalRepTitle: data.institutionalTitle,
+				institutionBuilding: data.institutionBuilding,
+				institutionCity: data.institutionCity,
+				institutionCountry: data.institutionCountry,
+				institutionPostalCode: data.institutionPostalCode,
+				institutionState: data.institutionState,
+				institutionStreetAddress: data.institutionStreetAddress,
+			},
 		});
 	};
 
@@ -65,9 +80,6 @@ const Institutional = () => {
 					text={[translate('institutional-section.description1')]}
 				/>
 				<SectionContent title={translate('institutional-section.section1')}>
-					<Button htmlType="button" onClick={testDispatch}>
-						Test dispatch
-					</Button>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
@@ -257,7 +269,7 @@ const Institutional = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
 			</Form>
 		</SectionWrapper>
 	);
