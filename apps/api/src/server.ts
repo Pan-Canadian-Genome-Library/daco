@@ -26,6 +26,7 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/application-router.js';
+import collaboratorsRouter from '@/routes/collaborators-router.js';
 
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
@@ -41,6 +42,7 @@ const startServer = async () => {
 	app.use(ExpressLogger({ logger }));
 
 	app.use(applicationRouter);
+	app.use(collaboratorsRouter);
 
 	app.use(
 		`/${API_DOCS_PATH}`,
