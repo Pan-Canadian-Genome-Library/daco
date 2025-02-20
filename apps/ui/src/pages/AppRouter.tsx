@@ -30,6 +30,7 @@ import Institutional from '@/pages/applications/sections/institutional';
 import Introduction from '@/pages/applications/sections/intro';
 import Project from '@/pages/applications/sections/project';
 import RequestedStudy from '@/pages/applications/sections/requestedStudy';
+import SignAndSubmit from '@/pages/applications/sections/sign';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
@@ -79,6 +80,11 @@ export const ApplicationSectionRoutes = [
 		route: 'appendices',
 		path: 'appendices/edit?',
 		element: <Appendices />,
+	},
+	{
+		route: 'sign',
+		path: 'sign/edit?',
+		element: <SignAndSubmit />,
 	},
 ];
 

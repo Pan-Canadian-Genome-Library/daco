@@ -21,7 +21,7 @@ import { ApplicationAgreements } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { EthicsEnum } from './common/enums.js';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
-import { ONLY_ALPHANUMERIC } from './utils/regex.js';
+import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
@@ -143,3 +143,9 @@ export const appendicesSchema = z.object({
 	}),
 });
 export type AppendicesSchemaType = z.infer<typeof appendicesSchema>;
+
+export const esignatureSchema = z.object({
+	createdAt: z.string().datetime(),
+	signature: z.string().regex(BASE64_IMAGE).nullable(),
+});
+export type eSignatureSchemaType = z.infer<typeof esignatureSchema>;
