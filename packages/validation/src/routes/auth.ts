@@ -17,15 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { z as zod } from 'zod';
+import { userRoleSchema } from '../user.js';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
-
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
-}
-export default EnvironmentConfigError;
+export const userResponseSchema = zod.object({
+	user: zod
+		.object({
+			userId: zod.string(),
+			givenName: zod.string().optional(),
+			familyName: zod.string().optional(),
+		})
+		.optional(),
+	role: userRoleSchema,
+});
+export type UserResponse = zod.infer<typeof userResponseSchema>;

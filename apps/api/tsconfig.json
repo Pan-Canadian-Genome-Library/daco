@@ -5,6 +5,7 @@
 		"target": "ESNext",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
+		"noEmit": true,
 		"paths": {
 			"@/*": ["./src/*"]
 		}

@@ -17,15 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { Redis } from 'ioredis';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+import { valkeyConfig } from '@/config/valkeyConfig.js';
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
-}
-export default EnvironmentConfigError;
+const valkeyClient = new Redis({
+	port: valkeyConfig.VALKEY_PORT,
+	host: valkeyConfig.VALKEY_HOST,
+	username: valkeyConfig.VALKEY_USER,
+	password: valkeyConfig.VALKEY_PASSWORD,
+});
+
+export default valkeyClient;

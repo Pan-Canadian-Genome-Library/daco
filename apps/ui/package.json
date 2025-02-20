@@ -8,6 +8,8 @@
 		"dev": "concurrently --names=server,watch \"pnpm dev:server\" \"pnpm dev:watch\"",
 		"dev:server": "vite",
 		"dev:watch": "nx watch --projects=@pcgl-daco/ui --includeDependentProjects -- nx run-many -t build \\$NX_PROJECT_NAME --exclude=@pcgl-daco/ui",
+		"setup": "pnpm setup:env",
+		"setup:env": "cp -n .env.schema .env",
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},

@@ -17,15 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { z as zod } from 'zod';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
-
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
-}
-export default EnvironmentConfigError;
+export const userRoleSchema = zod.enum(['DAC_MEMBER', 'INSTITUTIONAL_REP', 'APPLICANT', 'ANONYMOUS']);
+export type UserRole = zod.infer<typeof userRoleSchema>;

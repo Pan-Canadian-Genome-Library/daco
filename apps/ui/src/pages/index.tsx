@@ -22,9 +22,10 @@ import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
+import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { API_PATH_LOGIN } from '../api/paths';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -48,6 +49,7 @@ const HomePage = () => {
 	// TODO: Handle the transition over to the the login page
 	const handleLoginButton = () => {
 		setOpenModal(false);
+		window.location.href = API_PATH_LOGIN;
 	};
 
 	return (
@@ -119,8 +121,8 @@ const HomePage = () => {
 				</Col>
 			</Row>
 			<Modal
-				title={`Apply for Access`}
-				okText={'Login'}
+				title={translate('links.apply')}
+				okText={translate('button.login')}
 				width={'100%'}
 				style={{
 					top: '20%',

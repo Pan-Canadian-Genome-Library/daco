@@ -17,15 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { RedisStore } from 'connect-redis';
+import session from 'express-session';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+import { serverConfig } from '@/config/serverConfig.js';
+import valkeyClient from './valkeyClient.js';
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
-}
-export default EnvironmentConfigError;
+const sessionStore = new RedisStore({
+	client: valkeyClient,
+	prefix: 'daco-api:',
+});
+
+export const sessionMiddleware = session({
+	store: sessionStore,
+
+	secret: serverConfig.sessionKeys,
+	resave: false,
+	saveUninitialized: false,
+	cookie: { maxAge: serverConfig.SESSION_MAX_AGE },
+});
+
+export default sessionMiddleware;
