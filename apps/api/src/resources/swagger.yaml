@@ -349,6 +349,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
+  /applications/{applicationId}/submit-revisions:
+    post:
+      summary: Submit revisions for an application
+      description: Allows applicants to submit requested revisions for DAC or Rep review.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '500':
+          description: 'Cannot reject application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '404':
+          description: 'Invalid request or rejection not allowed'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application successfully rejected'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
 components:
   schemas:
     ApplicationWithApplicantInfo:
