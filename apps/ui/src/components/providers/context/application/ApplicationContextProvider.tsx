@@ -23,38 +23,7 @@ import { createContext, useReducer } from 'react';
 import ApplicationReducer from '@/components/providers/context/application/ApplicationReducer';
 import { ApplicationContextType } from '@/components/providers/context/application/types';
 
-const initialState: ApplicationContentsResponse | null = {
-	applicantFirstName: null,
-	applicantMiddleName: null,
-	applicantLastName: null,
-	applicantTitle: null,
-	applicantSuffix: null,
-	applicantPositionTitle: null,
-	applicantPrimaryAffiliation: null,
-	applicantInstitutionalEmail: null,
-	applicantProfileUrl: null,
-	institutionalRepTitle: null,
-	institutionalRepFirstName: null,
-	institutionalRepMiddleName: null,
-	institutionalRepLastName: null,
-	institutionalRepSuffix: null,
-	institutionalRepPrimaryAffiliation: null,
-	institutionalRepEmail: null,
-	institutionalRepProfileUrl: null,
-	institutionalRepPositionTitle: null,
-	institutionCountry: null,
-	institutionState: null,
-	institutionCity: null,
-	institutionStreetAddress: null,
-	institutionPostalCode: null,
-	institutionBuilding: null,
-	projectTitle: null,
-	projectWebsite: null,
-	projectBackground: null,
-	projectMethodology: null,
-	projectAims: null,
-	projectSummary: null,
-};
+const initialState: ApplicationContentsResponse = {};
 
 export const ApplicationContext = createContext<ApplicationContextType | null>(null);
 
