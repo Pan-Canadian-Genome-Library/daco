@@ -30,6 +30,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	submitRevision,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
@@ -268,6 +269,55 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 		if (result.success) {
 			res.status(200).send({
 				message: 'Application rejected successfully.',
+				data: result.data,
+			});
+		} else {
+			let status = 500;
+			let message = result.message || 'An unexpected error occurred.';
+			let errors = result.errors;
+
+			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+				status = 404;
+				message = 'Application not found.';
+			} else if (errors === 'RejectionConflict') {
+				status = 409;
+				message = 'Rejection conflict detected.';
+			} else if (errors === 'InvalidState') {
+				status = 400;
+				message = 'Invalid application state.';
+			}
+
+			res.status(status).send({ message, errors });
+		}
+	} catch (error) {
+		res.status(500).send({
+			message: 'Internal server error.',
+			errors: String(error),
+		});
+	}
+});
+
+// POST: Submit revisions
+applicationRouter.post('/applications/:applicationId/submit-revision', jsonParser, async (req, res) => {
+	const { applicationId } = req.params;
+
+	if (!applicationId) {
+		res.status(400).json({ message: 'Application ID is required.' });
+	}
+	if (!applicationId || isNaN(parseInt(applicationId))) {
+		res.status(400).json({
+			message: 'Invalid request. ApplicationId is required and must be a valid number.',
+			errors: 'MissingOrInvalidParameters',
+		});
+	}
+
+	try {
+		const applicationIdNum = Number(applicationId);
+		const result = await submitRevision({ applicationId: applicationIdNum });
+
+		if (result.success) {
+			res.status(200).send({
+				message: 'Application review submitted successfully.',
 				data: result.data,
 			});
 		} else {
