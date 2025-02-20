@@ -24,7 +24,7 @@ const { Text } = Typography;
 const { useToken } = theme;
 
 interface ErrorLabelProps {
-	text?: string | FieldError | null;
+	text?: string | FieldError;
 }
 
 const ErrorLabel = ({ text }: ErrorLabelProps) => {

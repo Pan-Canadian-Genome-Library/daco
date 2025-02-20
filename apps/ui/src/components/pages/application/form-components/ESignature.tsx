@@ -125,7 +125,7 @@ const ESignature = <T extends FieldValues>(
 			/>
 
 			{(createdAtError || signatureError) && (
-				<ErrorLabel text={createdAtError ? createdAtError.message : (signatureError ?? null)} />
+				<ErrorLabel text={createdAtError ? createdAtError.message : (signatureError ?? undefined)} />
 			)}
 		</div>
 	);
