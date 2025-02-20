@@ -20,6 +20,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { esignatureSchema, type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
+import { useRef, useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -29,8 +30,7 @@ import ESignature from '@/components/pages/application/form-components/ESignatur
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
-import { useRef, useState } from 'react';
+import { type ApplicationOutletContext } from '@/global/types';
 
 const { Text } = Typography;
 

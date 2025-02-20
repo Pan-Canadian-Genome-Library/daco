@@ -18,21 +18,22 @@
  */
 
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
-import { eSignatureSchemaType } from '@pcgl-daco/validation';
+import { type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Row, theme } from 'antd';
-import { RefObject } from 'react';
+import { type RefObject } from 'react';
 import {
 	Controller,
-	FieldValues,
-	FormState,
-	UseControllerProps,
-	UseFormClearErrors,
-	UseFormReset,
-	UseFormSetValue,
-	UseFormWatch,
+	type FieldValues,
+	type FormState,
+	type UseControllerProps,
+	type UseFormClearErrors,
+	type UseFormReset,
+	type UseFormSetValue,
+	type UseFormWatch,
 } from 'react-hook-form';
 import SignatureCanvas from 'react-signature-canvas';
-import ErrorLabel from './labels/ErrorLabel';
+
+import ErrorLabel from '@/components/pages/application/form-components/labels/ErrorLabel';
 
 interface eSignatureFormProps<T extends FieldValues> {
 	setValue: UseFormSetValue<T>;
