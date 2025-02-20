@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// import useEditApplication from '@/api/useEditApplication';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { Button, Flex, theme } from 'antd';
 import { useMemo } from 'react';
@@ -28,14 +29,14 @@ const { useToken } = theme;
 type SectionFooterProps = {
 	currentRoute: string;
 	isEditMode: boolean;
-	onSubmit?: () => void;
 };
 
-const SectionFooter = ({ currentRoute, isEditMode, onSubmit }: SectionFooterProps) => {
+const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 	const { token } = useToken();
 	const { t: translate } = useTranslation();
 	const navigate = useNavigate();
 	const { id } = useParams();
+	// const { mutate } = useEditApplication();
 
 	// Determine the next and previous route
 	const { previousRoute, nextRoute } = useMemo(() => {
@@ -56,11 +57,6 @@ const SectionFooter = ({ currentRoute, isEditMode, onSubmit }: SectionFooterProp
 	};
 
 	const nextSection = () => {
-		// Temp logic to trigger validation errors on ui edit mode
-		if (!!onSubmit && isEditMode) {
-			onSubmit();
-			return;
-		}
 		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 

@@ -216,7 +216,7 @@ const Project = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="project" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
+				<SectionFooter currentRoute="project" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);
