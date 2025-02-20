@@ -145,7 +145,7 @@ export const appendicesSchema = z.object({
 export type AppendicesSchemaType = z.infer<typeof appendicesSchema>;
 
 export const esignatureSchema = z.object({
-	createdAt: z.string().datetime().or(z.null()),
-	signature: z.string().regex(BASE64_IMAGE).or(z.null()),
+	createdAt: z.string().datetime(),
+	signature: z.string().regex(BASE64_IMAGE).nullable(),
 });
 export type eSignatureSchemaType = z.infer<typeof esignatureSchema>;

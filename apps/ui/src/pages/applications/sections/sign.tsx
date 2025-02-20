@@ -37,7 +37,7 @@ const SignAndSubmit = () => {
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const signatureRef = useRef(null);
 
-	const { handleSubmit, control, setValue, formState, watch, clearErrors } = useForm<eSignatureSchemaType>({
+	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),
 	});
 
@@ -61,15 +61,16 @@ const SignAndSubmit = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 							<input disabled type="hidden" name="createdAt" />
 							<ESignature
-								setValue={setValue}
-								control={control}
+								signatureRef={signatureRef}
 								name="signature"
+								control={control}
+								watch={watch}
 								formState={formState}
+								setValue={setValue}
+								reset={reset}
 								clearErrors={clearErrors}
 								disableSaveButton={!watchSignature || !!(watchSignature && watchCreatedAt)}
 								disablePreviewButton={!watchSignature}
-								watch={watch}
-								signatureRef={signatureRef}
 								downloadButton={translate('sign-and-submit-section.section1.buttons.download')}
 								saveButton={translate('sign-and-submit-section.section1.buttons.save')}
 								clearButton={translate('sign-and-submit-section.section1.buttons.clear')}

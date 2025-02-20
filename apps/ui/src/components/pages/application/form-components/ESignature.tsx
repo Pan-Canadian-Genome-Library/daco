@@ -27,6 +27,7 @@ import {
 	FormState,
 	UseControllerProps,
 	UseFormClearErrors,
+	UseFormReset,
 	UseFormSetValue,
 	UseFormWatch,
 } from 'react-hook-form';
@@ -38,6 +39,7 @@ interface eSignatureFormProps<T extends FieldValues> {
 	formState: FormState<T>;
 	clearErrors: UseFormClearErrors<T>;
 	watch: UseFormWatch<T>;
+	reset: UseFormReset<T>;
 }
 interface eSignatureProps {
 	signatureRef: RefObject<SignatureCanvas>;
@@ -54,8 +56,7 @@ const ESignature = <T extends FieldValues>(
 ) => {
 	const { token } = theme.useToken();
 	const clearSignature = () => {
-		props.setValue('createdAt', null);
-		props.setValue('signature', null);
+		props.reset();
 		props.signatureRef.current?.clear();
 	};
 
@@ -77,11 +78,12 @@ const ESignature = <T extends FieldValues>(
 	};
 
 	const onBegin = () => {
-		props.setValue('createdAt', null);
+		props.reset();
 		props.clearErrors(['signature']);
 	};
 
 	const { signature: signatureError, createdAt: createdAtError } = props.formState.errors;
+
 	return (
 		<div>
 			<Controller
@@ -91,7 +93,7 @@ const ESignature = <T extends FieldValues>(
 					<Row>
 						<SignatureCanvas
 							ref={props.signatureRef}
-							onBegin={() => field.onChange(onBegin())}
+							onBegin={onBegin}
 							onEnd={() => field.onChange(formatIntoBase64())}
 							canvasProps={{
 								style: {

@@ -18,21 +18,22 @@
  */
 
 import { Typography, theme } from 'antd';
+import { FieldError } from 'react-hook-form';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
 interface ErrorLabelProps {
-	text: string;
+	text?: string | FieldError | null;
 }
 
 const ErrorLabel = ({ text }: ErrorLabelProps) => {
 	const { token } = useToken();
-	return (
+	return text ? (
 		<div style={{ margin: '1rem 0 0 0' }}>
-			<Text style={{ color: token.colorError, fontSize: 'small', whiteSpace: 'pre-line' }}>{text}</Text>
+			<Text style={{ color: token.colorError, fontSize: 'small', whiteSpace: 'pre-line' }}>{text.toString()}</Text>
 		</div>
-	);
+	) : null;
 };
 
 export default ErrorLabel;
