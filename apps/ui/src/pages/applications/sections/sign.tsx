@@ -18,9 +18,8 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { requestedStudySchema, type RequestedStudySchemaType } from '@pcgl-daco/validation';
-import { Col, Form, Row, Typography } from 'antd';
-import { createSchemaFieldRule } from 'antd-zod';
+import { esignatureSchema, eSignatureSchemaType } from '@pcgl-daco/validation';
+import { Col, Form, Row } from 'antd';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -33,21 +32,21 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 import { useRef } from 'react';
 
-const { Text } = Typography;
-
-const rule = createSchemaFieldRule(requestedStudySchema);
-
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const signatureRef = useRef(null);
-	const { handleSubmit, control, setValue, getValues, formState } = useForm<RequestedStudySchemaType>({
-		resolver: zodResolver(requestedStudySchema),
+
+	const { handleSubmit, control, setValue, formState, watch, clearErrors } = useForm<eSignatureSchemaType>({
+		resolver: zodResolver(esignatureSchema),
 	});
 
-	const onSubmit: SubmitHandler<RequestedStudySchemaType> = (data) => {
+	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
 		console.log(data);
 	};
+
+	const watchSignature = watch('signature');
+	const watchCreatedAt = watch('createdAt');
 
 	return (
 		<SectionWrapper>
@@ -60,29 +59,21 @@ const SignAndSubmit = () => {
 				>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
-							{/* <SelectBox
-								label={translate('requested-study.section1.form.studyName')}
-								name="requestedStudy"
-								placeholder="Select"
-								control={control}
-								rule={rule}
-								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyID.toString(), label: study.studyName };
-								})}
-								required
-								disabled={!isEditMode}
-							/> */}
+							<input disabled type="hidden" name="createdAt" />
 							<ESignature
-								rules={rule}
-								values={[getValues, setValue]}
+								setValue={setValue}
 								control={control}
+								name="signature"
 								formState={formState}
+								clearErrors={clearErrors}
+								disableSaveButton={!watchSignature || !!(watchSignature && watchCreatedAt)}
+								disablePreviewButton={!watchSignature}
+								watch={watch}
 								signatureRef={signatureRef}
-								name="eSig"
 								downloadButton={translate('sign-and-submit-section.section1.buttons.download')}
 								saveButton={translate('sign-and-submit-section.section1.buttons.save')}
 								clearButton={translate('sign-and-submit-section.section1.buttons.clear')}
-								previewButton={translate('sign-and-submit-section.section1.buttons.preview')}
+								previewButton={translate('sign-and-submit-section.section1.buttons.view')}
 							/>
 						</Col>
 					</Row>

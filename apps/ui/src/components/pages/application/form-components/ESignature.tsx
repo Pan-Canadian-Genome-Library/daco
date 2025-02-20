@@ -18,81 +18,80 @@
  */
 
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Row, theme } from 'antd';
 import { RefObject } from 'react';
-import { Control, Controller } from 'react-hook-form';
+import {
+	Controller,
+	FieldValues,
+	FormState,
+	UseControllerProps,
+	UseFormClearErrors,
+	UseFormSetValue,
+	UseFormWatch,
+} from 'react-hook-form';
 import SignatureCanvas from 'react-signature-canvas';
-import { z } from 'zod';
+import ErrorLabel from './labels/ErrorLabel';
 
-const E_SIGNATURE_BOX_COLORS = ['GREEN', 'GREY'] as const;
-
-export const ESignatureCardColor = z.enum(E_SIGNATURE_BOX_COLORS);
-
-interface eSignatureButtons {}
+interface eSignatureFormProps<T extends FieldValues> {
+	setValue: UseFormSetValue<T>;
+	formState: FormState<T>;
+	clearErrors: UseFormClearErrors<T>;
+	watch: UseFormWatch<T>;
+}
 interface eSignatureProps {
 	signatureRef: RefObject<SignatureCanvas>;
-	name: string;
-	control: Control;
 	downloadButton: string;
 	previewButton: string;
 	clearButton: string;
 	saveButton: string;
-	rules: any;
-	formState: any;
-	values: [Function, Function];
+	disableSaveButton?: boolean;
+	disablePreviewButton?: boolean;
 }
 
-const ESignature = ({
-	signatureRef,
-	name,
-	control,
-	rules,
-	values,
-	formState,
-	downloadButton,
-	previewButton,
-	clearButton,
-	saveButton,
-}: eSignatureProps) => {
-	// const { control, formState, setValue, watch, clearErrors } = useFormContext();
-
+const ESignature = <T extends FieldValues>(
+	props: UseControllerProps<T> & eSignatureFormProps<eSignatureSchemaType> & eSignatureProps,
+) => {
 	const { token } = theme.useToken();
-	const [getValue, setValue] = values;
 	const clearSignature = () => {
-		signatureRef.current?.clear();
+		props.setValue('createdAt', null);
+		props.setValue('signature', null);
+		props.signatureRef.current?.clear();
 	};
 
 	const formatIntoBase64 = () => {
-		if (signatureRef.current) {
-			const dataURL = signatureRef.current.toDataURL();
+		if (props.signatureRef.current) {
+			const dataURL = props.signatureRef.current.toDataURL();
 			return dataURL;
+		} else {
+			//Something went wrong and we can't find the signature field, but this should likely never happen.
+			return null;
 		}
 	};
 
 	const saveSignature = () => {
 		const currentDate = new Date();
-		setValue('createdAt', currentDate.toISOString());
-		setValue('signature', formatIntoBase64());
-		clearErrors(['signature', 'createdAt']);
+		props.setValue('createdAt', currentDate.toISOString());
+		props.setValue('signature', formatIntoBase64());
+		props.clearErrors(['signature', 'createdAt']);
 	};
 
-	// const watchCreatedAt = watch('createdAt');
+	const onBegin = () => {
+		props.setValue('createdAt', null);
+		props.clearErrors(['signature']);
+	};
 
-	const onBegin = () => setValue('createdAt', undefined);
-
-	console.log(formState.errors);
-
+	const { signature: signatureError, createdAt: createdAtError } = props.formState.errors;
 	return (
 		<div>
 			<Controller
-				control={control}
-				name={name}
-				rules={rules}
+				control={props.control}
+				name={props.name}
 				render={({ field }) => (
 					<Row>
 						<SignatureCanvas
-							ref={signatureRef}
-							onBegin={onBegin}
+							ref={props.signatureRef}
+							onBegin={() => field.onChange(onBegin())}
 							onEnd={() => field.onChange(formatIntoBase64())}
 							canvasProps={{
 								style: {
@@ -106,33 +105,25 @@ const ESignature = ({
 						/>
 						<Flex justify="space-between" style={{ width: '100%', margin: '1rem 0 0 0' }}>
 							<Flex gap={token.margin}>
-								<Button icon={<EyeOutlined />}>View Preview</Button>
-								<Button icon={<DownloadOutlined />}>Download PDF</Button>
+								<Button disabled={props.disablePreviewButton} icon={<EyeOutlined />}>
+									{props.previewButton}
+								</Button>
+								<Button icon={<DownloadOutlined />}>{props.downloadButton}</Button>
 							</Flex>
 							<Flex gap={token.margin}>
 								<Button onClick={clearSignature}>Clear</Button>
-								<Button type={'primary'}>Save</Button>
+								<Button disabled={props.disableSaveButton} onClick={saveSignature} type={'primary'}>
+									{props.saveButton}
+								</Button>
 							</Flex>
 						</Flex>
 					</Row>
 				)}
 			/>
 
-			{/* <div className={styles.nameDate}>
-				<div>{signeeName}</div>
-				{watchCreatedAt && <div>{new Date(watchCreatedAt).toLocaleDateString('en-US')}</div>}
-			</div>
-
-			<div className={styles.buttons}>
-				<Button variant={'secondary'} onClick={clearSignature}>
-					{clearText}
-				</Button>
-				<Button disabled={disableSaveButton} variant={'primary'} onClick={saveSignature}>
-					{saveText}
-				</Button>
-			</div> */}
-
-			{/* {(createdAtError || signatureError) && <div>Error</div>} */}
+			{(createdAtError || signatureError) && (
+				<ErrorLabel text={createdAtError ? createdAtError.message : (signatureError ?? null)} />
+			)}
 		</div>
 	);
 };
