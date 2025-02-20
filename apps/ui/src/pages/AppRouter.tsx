@@ -77,14 +77,14 @@ export const ApplicationSectionRoutes = [
 		element: <AccessAgreement />,
 	},
 	{
-		route: 'sign',
-		path: 'sign/edit?',
-		element: <SignAndSubmit />,
-	},
-	{
 		route: 'appendices',
 		path: 'appendices/edit?',
 		element: <Appendices />,
+	},
+	{
+		route: 'sign',
+		path: 'sign/edit?',
+		element: <SignAndSubmit />,
 	},
 ];
 

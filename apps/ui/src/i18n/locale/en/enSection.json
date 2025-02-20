@@ -187,6 +187,12 @@
 				"clear": "Clear",
 				"save": "Save"
 			}
+		},
+		"modal": {
+			"title": "Are you sure you want to submit this application? ",
+			"description": "Are you sure you want to submit Application: PCGL-{{id}}? If so, the application will be locked for editing and the institutional Representative will be notified to begin the review process.",
+			"submit": "I understand, proceed with submission",
+			"cancel": "Cancel"
 		}
 	}
 }

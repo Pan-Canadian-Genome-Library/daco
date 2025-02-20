@@ -18,8 +18,8 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { esignatureSchema, eSignatureSchemaType } from '@pcgl-daco/validation';
-import { Col, Form, Row } from 'antd';
+import { esignatureSchema, type eSignatureSchemaType } from '@pcgl-daco/validation';
+import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -30,11 +30,15 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+
+const { Text } = Typography;
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
+	const [openModal, setOpenModal] = useState(false);
+	const [validatedData, setValidatedData] = useState<eSignatureSchemaType | undefined>(undefined);
 	const signatureRef = useRef(null);
 
 	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
@@ -42,47 +46,69 @@ const SignAndSubmit = () => {
 	});
 
 	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
-		console.log(data);
+		setOpenModal(true);
+		setValidatedData(data);
+	};
+
+	const modalSubmission = () => {
+		console.log('Submit Clicked!');
+		console.log(validatedData);
 	};
 
 	const watchSignature = watch('signature');
 	const watchCreatedAt = watch('createdAt');
 
 	return (
-		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-				<SectionTitle title={translate('sign-and-submit-section.title')} showDivider={false} />
-				<SectionContent
-					showDivider={false}
-					title={translate('sign-and-submit-section.section1.title')}
-					text={translate('sign-and-submit-section.section1.description')}
-				>
-					<Row>
-						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
-							<input disabled type="hidden" name="createdAt" />
-							<ESignature
-								signatureRef={signatureRef}
-								name="signature"
-								control={control}
-								watch={watch}
-								formState={formState}
-								setValue={setValue}
-								reset={reset}
-								clearErrors={clearErrors}
-								disableSaveButton={!watchSignature || !!(watchSignature && watchCreatedAt)}
-								disablePreviewButton={!watchSignature}
-								downloadButton={translate('sign-and-submit-section.section1.buttons.download')}
-								saveButton={translate('sign-and-submit-section.section1.buttons.save')}
-								clearButton={translate('sign-and-submit-section.section1.buttons.clear')}
-								previewButton={translate('sign-and-submit-section.section1.buttons.view')}
-							/>
-						</Col>
-					</Row>
-					<Row style={{ minHeight: '40vh' }} />
-				</SectionContent>
-				<SectionFooter currentRoute="sign" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
-			</Form>
-		</SectionWrapper>
+		<>
+			<SectionWrapper>
+				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+					<SectionTitle title={translate('sign-and-submit-section.title')} showDivider={false} />
+					<SectionContent
+						showDivider={false}
+						title={translate('sign-and-submit-section.section1.title')}
+						text={translate('sign-and-submit-section.section1.description')}
+					>
+						<Row>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
+								<input disabled type="hidden" name="createdAt" />
+								<ESignature
+									signatureRef={signatureRef}
+									name="signature"
+									control={control}
+									watch={watch}
+									formState={formState}
+									setValue={setValue}
+									reset={reset}
+									clearErrors={clearErrors}
+									disableSaveButton={!watchSignature || !!(watchSignature && watchCreatedAt)}
+									disablePreviewButton={!watchSignature}
+									downloadButton={translate('sign-and-submit-section.section1.buttons.download')}
+									saveButton={translate('sign-and-submit-section.section1.buttons.save')}
+									clearButton={translate('sign-and-submit-section.section1.buttons.clear')}
+									previewButton={translate('sign-and-submit-section.section1.buttons.view')}
+								/>
+							</Col>
+						</Row>
+						<Row style={{ minHeight: '40vh' }} />
+					</SectionContent>
+					<SectionFooter currentRoute="sign" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
+				</Form>
+			</SectionWrapper>
+			<Modal
+				title={translate('sign-and-submit-section.modal.title')}
+				okText={translate('sign-and-submit-section.modal.submit')}
+				cancelText={translate('sign-and-submit-section.modal.cancel')}
+				width={'100%'}
+				style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+				open={openModal}
+				onOk={modalSubmission}
+				onCancel={() => setOpenModal(false)}
+			>
+				<Flex style={{ height: '100%', marginTop: 20 }}>
+					<Text>{translate('sign-and-submit-section.modal.description', { id: appId })}</Text>
+				</Flex>
+			</Modal>
+		</>
 	);
 };
 
