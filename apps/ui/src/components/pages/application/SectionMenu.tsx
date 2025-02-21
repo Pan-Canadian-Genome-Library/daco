@@ -20,7 +20,9 @@
 import { Menu, MenuProps } from 'antd';
 import { useNavigate } from 'react-router';
 
+import useEditApplication from '@/api/useEditApplication';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
+import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 
 type SectionMenuProps = {
@@ -30,8 +32,11 @@ type SectionMenuProps = {
 
 const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 	const navigate = useNavigate();
+	const { state } = useApplicationContext();
+	const { mutate: editApplication } = useEditApplication();
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
+		editApplication(state);
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};
 

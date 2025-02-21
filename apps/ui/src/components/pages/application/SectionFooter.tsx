@@ -17,7 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// import useEditApplication from '@/api/useEditApplication';
+import useEditApplication from '@/api/useEditApplication';
+import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { Button, Flex, theme } from 'antd';
 import { useMemo } from 'react';
@@ -36,7 +37,8 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 	const { t: translate } = useTranslation();
 	const navigate = useNavigate();
 	const { id } = useParams();
-	// const { mutate } = useEditApplication();
+	const { mutate: editApplication } = useEditApplication();
+	const { state } = useApplicationContext();
 
 	// Determine the next and previous route
 	const { previousRoute, nextRoute } = useMemo(() => {
@@ -51,12 +53,13 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 		return { previousRoute: undefined, nextRoute: undefined };
 	}, [currentRoute]);
 
-	// TODO: add logic to save data to store and send current data to backend
 	const goBack = () => {
+		editApplication(state);
 		navigate(`/application/${id}/${previousRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const nextSection = () => {
+		editApplication(state);
 		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
