@@ -270,14 +270,12 @@ describe('Application API', () => {
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
 			const role = 'DAC';
-			const repId = '12345';
 			const comments = 'Please provide additional documentation.';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisions({
 				applicationId: id,
 				role,
-				repId,
 				reviewData: revisionRequestData,
 				comments,
 			});
@@ -294,14 +292,12 @@ describe('Application API', () => {
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
 			const role = 'DAC';
-			const repId = '12345';
 			const comments = 'State not valid for revision request.';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisions({
 				applicationId: id,
 				role,
-				repId,
 				reviewData: revisionRequestData,
 				comments,
 			});
@@ -314,14 +310,12 @@ describe('Application API', () => {
 			// Arrange: Force an error
 			const invalidApplicationId = -1;
 			const role = 'DAC';
-			const repId = '12345';
 			const comments = 'Invalid application ID';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisions({
 				applicationId: invalidApplicationId,
 				role,
-				repId,
 				reviewData: revisionRequestData,
 				comments,
 			});
