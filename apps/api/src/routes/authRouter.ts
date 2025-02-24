@@ -7,7 +7,6 @@ import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import baseLogger from '@/logger.js';
-import { buildQueryParams } from '@/utils/buildQueryParams.js';
 import { serverConfig } from '../config/serverConfig.js';
 import { resetSession } from '../session/index.js';
 import { type ResponseWithData } from './types.js';
@@ -32,13 +31,13 @@ authRouter.get('/login', (req, res) => {
 	// Ensure the user has an active session.
 	req.session.save();
 
-	const params = {
+	const params = new URLSearchParams({
 		client_id: authConfig.AUTH_CLIENT_ID,
 		response_type: `code`,
 		scope: `openid profile email org.cilogon.userinfo`,
 		redirect_uri: getOauthRedirectUri(serverConfig.UI_HOST),
-	};
-	const redirectUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize`, buildQueryParams(params));
+	});
+	const redirectUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize`, `?${params.toString()}`);
 
 	res.redirect(redirectUrl);
 	return;
