@@ -17,15 +17,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { createContext, useReducer } from 'react';
 
 import ApplicationReducer from '@/components/providers/context/application/ApplicationReducer';
-import { ApplicationContextType } from '@/components/providers/context/application/types';
+import {
+	type ApplicationContextType,
+	type ApplicationFormState,
+} from '@/components/providers/context/application/types';
 
-const initialState: ApplicationContentsResponse = {};
+const initialState: ApplicationFormState = {
+	formState: {
+		isDirty: false,
+	},
+};
 
-export const ApplicationContext = createContext<ApplicationContextType | null>(null);
+export const ApplicationContext = createContext<ApplicationContextType | undefined>(undefined);
 
 export const ApplicationContextProvider = ({ children }: { children: React.ReactNode }) => {
 	const [state, dispatch] = useReducer(ApplicationReducer, initialState);

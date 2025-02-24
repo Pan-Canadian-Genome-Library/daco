@@ -54,12 +54,16 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 	}, [currentRoute]);
 
 	const goBack = () => {
-		editApplication(state);
+		if (state?.formState?.isDirty) {
+			editApplication();
+		}
 		navigate(`/application/${id}/${previousRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const nextSection = () => {
-		editApplication(state);
+		if (state?.formState?.isDirty) {
+			editApplication();
+		}
 		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 

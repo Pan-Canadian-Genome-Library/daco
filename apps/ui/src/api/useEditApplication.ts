@@ -20,6 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
@@ -69,7 +70,7 @@ interface UpdateObject {
  * @param storeState  current store form values
  * @returns an object compatible with api fields
  */
-const GenerateUpdateObjectMap = (storeState: ApplicationContentsResponse | null) => {
+const GenerateUpdateObjectMap = (storeState?: ApplicationContentsResponse) => {
 	if (!storeState) {
 		return;
 	}
@@ -87,9 +88,10 @@ const GenerateUpdateObjectMap = (storeState: ApplicationContentsResponse | null)
 
 const useEditApplication = () => {
 	const { t: translate } = useTranslation();
+	const { state, dispatch } = useApplicationContext();
 
-	return useMutation<ApplicationResponseData, ServerError, ApplicationContentsResponse | null>({
-		mutationFn: async (state) => {
+	return useMutation<ApplicationResponseData, ServerError>({
+		mutationFn: async () => {
 			const update = GenerateUpdateObjectMap(state);
 
 			const response = await fetch('/applications/edit', {
@@ -123,7 +125,9 @@ const useEditApplication = () => {
 				message: error.message,
 			});
 		},
-		onSuccess: () => {},
+		onSuccess: () => {
+			dispatch({ type: 'UPDATE_DIRTY_STATE', payload: false });
+		},
 	});
 };
 

@@ -17,13 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationAction } from '@/components/providers/context/application/types';
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
+import { type ApplicationAction, type ApplicationFormState } from '@/components/providers/context/application/types';
 
-function ApplicationReducer(state: ApplicationContentsResponse | null, action: ApplicationAction) {
+function ApplicationReducer(state: ApplicationFormState | null, action: ApplicationAction) {
 	switch (action.type) {
 		case 'UPDATE_APPLICATION': {
 			return { ...state, ...action.payload };
+		}
+		case 'UPDATE_DIRTY_STATE': {
+			return { ...state, formState: { isDirty: action.payload } };
 		}
 		default:
 			return { ...state };

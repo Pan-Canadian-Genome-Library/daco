@@ -42,7 +42,11 @@ const Institutional = () => {
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 
-	const { getValues, control } = useForm<InstitutionalRepSchemaType>({
+	const {
+		formState: { isDirty },
+		getValues,
+		control,
+	} = useForm<InstitutionalRepSchemaType>({
 		defaultValues: {
 			institutionalFirstName: state?.institutionalRepFirstName || undefined,
 			institutionalMiddleName: state?.institutionalRepMiddleName || undefined,
@@ -85,6 +89,9 @@ const Institutional = () => {
 				institutionPostalCode: data.institutionPostalCode,
 				institutionState: data.institutionState,
 				institutionStreetAddress: data.institutionStreetAddress,
+				formState: {
+					isDirty,
+				},
 			},
 		});
 	};
