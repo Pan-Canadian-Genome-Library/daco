@@ -95,3 +95,48 @@ export const createCollaborators = async ({
 
 	return result;
 };
+
+/**
+ * Creates a new collaborator and returns the created data.
+ * @param application_id - ID of related application record to associate with Collaborators
+ * @param user_id - ID of Applicant updating the application
+ * @param collaborator_id - ID of Collaborator to delete
+ * @returns Success with Collaborator data array / Failure with Error.
+ */
+export const deleteCollaborator = async ({
+	application_id,
+	user_id,
+	collaborator_id,
+}: {
+	application_id: number;
+	user_id: string;
+	collaborator_id: number;
+}) => {
+	const database = getDbInstance();
+	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+
+	if (!applicationResult.success) {
+		return applicationResult;
+	}
+
+	const application = applicationResult.data;
+
+	// TODO: Add Real Auth
+	// Validate User is Applicant
+	if (!(user_id === application.user_id)) {
+		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
+	}
+
+	if (!(application.state === 'DRAFT')) {
+		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
+	}
+
+	const result = await collaboratorsRepo.deleteCollaborator({
+		id: collaborator_id,
+	});
+
+	return result;
+};
