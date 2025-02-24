@@ -75,7 +75,7 @@ authRouter.get('/logout', async (req, res) => {
 		res.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
 		return;
 	}
-	const logoutSuccessRedirectUrl = urlJoin(serverConfig.UI_HOST, '/');
+	const logoutSuccessRedirectUrl = urlJoin(serverConfig.UI_HOST, authConfig.logoutRedirectPath);
 
 	const { account } = req.session;
 	if (!account) {
@@ -229,7 +229,7 @@ authRouter.get('/token', async (req, res) => {
 	}
 
 	// Auth success! User info saved to session!
-	res.redirect(urlJoin(serverConfig.UI_HOST, authConfig.AUTH_UI_REDIRECT_PATH));
+	res.redirect(urlJoin(serverConfig.UI_HOST, authConfig.loginRedirectPath));
 	return;
 });
 

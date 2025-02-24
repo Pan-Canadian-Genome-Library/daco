@@ -22,8 +22,8 @@ import EnvironmentConfigError from './EnvironmentConfigError.js';
 import { serverConfig } from './serverConfig.js';
 
 function getAuthConfig() {
-	const flag = process.env.ENABLE_AUTH;
-	const enabled = flag === 'true';
+	const flag = process.env.DISABLE_AUTH;
+	const enabled = flag !== 'true';
 
 	// Enforce enabling auth when running in production
 	if (serverConfig.isProduction && !enabled) {
@@ -41,7 +41,6 @@ function getAuthConfig() {
 		AUTH_PROVIDER_HOST: z.string().url(),
 		AUTH_CLIENT_ID: z.string(),
 		AUTH_CLIENT_SECRET: z.string(),
-		AUTH_UI_REDIRECT_PATH: z.string(),
 	});
 
 	const parseResult = authConfigSchema.safeParse(process.env);
@@ -51,7 +50,7 @@ function getAuthConfig() {
 		throw new EnvironmentConfigError(`db`, parseResult.error);
 	}
 
-	return { enabled, ...parseResult.data };
+	return { enabled, ...parseResult.data, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
 }
 
 export const authConfig = getAuthConfig();
