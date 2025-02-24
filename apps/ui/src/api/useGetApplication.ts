@@ -51,7 +51,7 @@ const useGetApplication = (id?: string | number) => {
 			}
 
 			return await response.json().then((data) => {
-				dispatch({ type: 'UPDATE_APPLICATION', payload: data.contents });
+				dispatch({ type: 'UPDATE_APPLICATION', payload: { fields: data.contents } });
 				return data;
 			});
 		},

@@ -92,12 +92,12 @@ const useEditApplication = () => {
 
 	return useMutation<ApplicationResponseData, ServerError>({
 		mutationFn: async () => {
-			const update = GenerateUpdateObjectMap(state);
+			const update = GenerateUpdateObjectMap(state?.fields);
 
 			const response = await fetch('/applications/edit', {
 				method: 'POST',
 				body: JSON.stringify({
-					id: state?.applicationId,
+					id: state?.fields?.applicationId,
 					update,
 				}),
 			});

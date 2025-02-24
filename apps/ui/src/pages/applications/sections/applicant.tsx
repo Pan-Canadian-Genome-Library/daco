@@ -48,15 +48,15 @@ const Applicant = () => {
 		control,
 	} = useForm<ApplicantInformationSchemaType>({
 		defaultValues: {
-			applicantTitle: state?.applicantTitle || undefined,
-			applicantFirstName: state?.applicantFirstName || undefined,
-			applicantMiddleName: state?.applicantMiddleName || undefined,
-			applicantLastName: state?.applicantLastName || undefined,
-			applicantSuffix: state?.applicantSuffix || undefined,
-			applicantPrimaryAffiliation: state?.applicantPrimaryAffiliation || undefined,
-			applicantInstituteEmail: state?.applicantInstitutionalEmail || undefined,
-			applicantProfileUrl: state?.applicantProfileUrl || undefined,
-			applicantPositionTitle: state?.applicantPositionTitle || undefined,
+			applicantTitle: state?.fields?.applicantTitle || undefined,
+			applicantFirstName: state?.fields?.applicantFirstName || undefined,
+			applicantMiddleName: state?.fields?.applicantMiddleName || undefined,
+			applicantLastName: state?.fields?.applicantLastName || undefined,
+			applicantSuffix: state?.fields?.applicantSuffix || undefined,
+			applicantPrimaryAffiliation: state?.fields?.applicantPrimaryAffiliation || undefined,
+			applicantInstituteEmail: state?.fields?.applicantInstitutionalEmail || undefined,
+			applicantProfileUrl: state?.fields?.applicantProfileUrl || undefined,
+			applicantPositionTitle: state?.fields?.applicantPositionTitle || undefined,
 		},
 		resolver: zodResolver(applicantInformationSchema),
 	});
@@ -67,17 +67,19 @@ const Applicant = () => {
 		dispatch({
 			type: 'UPDATE_APPLICATION',
 			payload: {
-				...state,
-				applicantTitle: data.applicantTitle,
-				applicantFirstName: data.applicantFirstName,
-				applicantMiddleName: data.applicantMiddleName,
-				applicantLastName: data.applicantLastName,
-				applicantSuffix: data.applicantSuffix,
-				applicantPrimaryAffiliation: data.applicantPrimaryAffiliation,
-				applicantInstitutionalEmail: data.applicantInstituteEmail,
-				applicantProfileUrl: data.applicantProfileUrl,
-				applicantPositionTitle: data.applicantPositionTitle,
-				// TODO: currently database does not have mailing address for applicant section, once fields are migrated into db, add the fields here
+				fields: {
+					...state?.fields,
+					applicantTitle: data.applicantTitle,
+					applicantFirstName: data.applicantFirstName,
+					applicantMiddleName: data.applicantMiddleName,
+					applicantLastName: data.applicantLastName,
+					applicantSuffix: data.applicantSuffix,
+					applicantPrimaryAffiliation: data.applicantPrimaryAffiliation,
+					applicantInstitutionalEmail: data.applicantInstituteEmail,
+					applicantProfileUrl: data.applicantProfileUrl,
+					applicantPositionTitle: data.applicantPositionTitle,
+					// TODO: currently database does not have mailing address for applicant section, once fields are migrated into db, add the fields here
+				},
 				formState: {
 					isDirty,
 				},
