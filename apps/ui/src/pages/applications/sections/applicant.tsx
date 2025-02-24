@@ -31,6 +31,7 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
 
@@ -39,14 +40,61 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { state, dispatch } = useApplicationContext();
 
-	const { control } = useForm<ApplicantInformationSchemaType>({
+	const {
+		formState: { isDirty },
+		getValues,
+		control,
+	} = useForm<ApplicantInformationSchemaType>({
+		defaultValues: {
+			applicantTitle: state?.applicantTitle || undefined,
+			applicantFirstName: state?.applicantFirstName || undefined,
+			applicantMiddleName: state?.applicantMiddleName || undefined,
+			applicantLastName: state?.applicantLastName || undefined,
+			applicantSuffix: state?.applicantSuffix || undefined,
+			applicantPrimaryAffiliation: state?.applicantPrimaryAffiliation || undefined,
+			applicantInstituteEmail: state?.applicantInstitutionalEmail || undefined,
+			applicantProfileUrl: state?.applicantProfileUrl || undefined,
+			applicantPositionTitle: state?.applicantPositionTitle || undefined,
+		},
 		resolver: zodResolver(applicantInformationSchema),
 	});
 
+	const onSubmit = () => {
+		const data = getValues();
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				...state,
+				applicantTitle: data.applicantTitle,
+				applicantFirstName: data.applicantFirstName,
+				applicantMiddleName: data.applicantMiddleName,
+				applicantLastName: data.applicantLastName,
+				applicantSuffix: data.applicantSuffix,
+				applicantPrimaryAffiliation: data.applicantPrimaryAffiliation,
+				applicantInstitutionalEmail: data.applicantInstituteEmail,
+				applicantProfileUrl: data.applicantProfileUrl,
+				applicantPositionTitle: data.applicantPositionTitle,
+				// TODO: currently database does not have mailing address for applicant section, once fields are migrated into db, add the fields here
+				formState: {
+					isDirty,
+				},
+			},
+		});
+	};
+
 	return (
 		<SectionWrapper>
-			<Form layout="vertical">
+			<Form
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle
 					title={translate('applicant-section.title')}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
