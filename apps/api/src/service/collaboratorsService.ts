@@ -87,15 +87,15 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord[]> => {
+	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord> => {
 		try {
 			const deletedRecord = await db.delete(collaborators).where(eq(collaborators.id, id)).returning();
 
-			if (!deletedRecord.length) {
+			if (!deletedRecord[0]) {
 				throw new Error(`Error deleting collaborator with ${id}, no record deleted`);
 			}
 
-			return success(deletedRecord);
+			return success(deletedRecord[0]);
 		} catch (err) {
 			const message = `Error at deleteCollaborators`;
 

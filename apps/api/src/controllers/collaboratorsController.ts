@@ -97,11 +97,11 @@ export const createCollaborators = async ({
 };
 
 /**
- * Creates a new collaborator and returns the created data.
+ * Delete a selected collaborator by ID
  * @param application_id - ID of related application record to associate with Collaborators
  * @param user_id - ID of Applicant updating the application
  * @param collaborator_id - ID of Collaborator to delete
- * @returns Success with Collaborator data array / Failure with Error.
+ * @returns Success with Collaborator data record / Failure with Error.
  */
 export const deleteCollaborator = async ({
 	application_id,
