@@ -349,8 +349,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
-  /applications/{applicationId}/submit-revisions:
+  /applications/{applicationId}/submit-revision:
     post:
+      tags:
+        - Applications
       summary: Submit revisions for an application
       description: Allows applicants to submit requested revisions for DAC or Rep review.
       parameters:
