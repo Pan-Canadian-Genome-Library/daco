@@ -39,9 +39,9 @@ const useGetUser = () => {
 				};
 
 				switch (response.status) {
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
+					case 400:
+						error.message = translate('errors.http.400.title');
+						error.errors = translate('errors.http.400.message');
 						break;
 				}
 
