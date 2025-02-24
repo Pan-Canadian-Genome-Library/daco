@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 /*
  * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *

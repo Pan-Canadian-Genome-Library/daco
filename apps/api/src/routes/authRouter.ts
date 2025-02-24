@@ -10,7 +10,7 @@ import baseLogger from '@/logger.js';
 import { buildQueryParams } from '@/utils/buildQueryParams.js';
 import { serverConfig } from '../config/serverConfig.js';
 import { resetSession } from '../session/index.js';
-import type { ResponseWithData } from './types.js';
+import { type ResponseWithData } from './types.js';
 
 const logger = baseLogger.forModule(`authRouter`);
 
@@ -51,8 +51,6 @@ authRouter.get('/login', (req, res) => {
  * remove account and user information from the current session.
  *
  * On success it will redirect the user agent to the root path for the UI.
- *
- * TODO: Where to redirect on logout failure.
  */
 authRouter.get('/logout', async (req, res) => {
 	if (!authConfig.enabled) {
@@ -64,6 +62,8 @@ authRouter.get('/logout', async (req, res) => {
 	const { account } = req.session;
 	if (!account) {
 		logger.warn(`User with no valid session attempted to logout.`);
+
+		// TODO: Where to redirect on logout failure.
 		res.redirect(logoutSuccessRedirectUrl);
 		return;
 	}
@@ -127,7 +127,7 @@ const oidcUserinfoResponseSchema = zod.object({
  * Then, the access token will be used to call the OIDC User Info endpoint to retrieve
  * the available information for this user.
  *
- * ALl of this information will be stored in the user session.
+ * All of this information will be stored in the user session.
  *
  * Finally, if everything is successful, the response will redirect the user agent to
  * the correct UI page for their role:

@@ -17,10 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RequestHandler } from 'express';
+import type { NextFunction } from 'express';
 import ExpressRequestLogger from 'express-requests-logger';
-import { LogLevel, LogLevels, LoggerType } from '../client/index.js';
 
+import { type LogLevel, LogLevels, type LoggerType } from '@/client/index.js';
 import { MiddlewareData } from './dependencyDataTypes.js';
 
 export type ExpressLoggerConfig = {
@@ -118,7 +118,7 @@ const swaggerUiPaths = ['api-docs', 'swagger-ui', 'favicon'];
  *
  * @param config
  */
-export const ExpressLogger = (config: ExpressLoggerConfig): RequestHandler => {
+export const ExpressLogger = (config: ExpressLoggerConfig): NextFunction => {
 	const { logger } = config;
 
 	return ExpressRequestLogger({

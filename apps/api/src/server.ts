@@ -39,8 +39,7 @@ const API_DOCS_PATH = `api-docs`;
 const startServer = async () => {
 	const app = express();
 
-	// app.use(ExpressLogger({ logger, excludeURLs: ['/auth/token'] }));
-	app.use(ExpressLogger({ logger }));
+	app.use(ExpressLogger({ logger, excludeURLs: ['/auth/token'] }));
 
 	app.use(sessionMiddleware);
 
