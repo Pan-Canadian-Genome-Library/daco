@@ -17,15 +17,40 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { z } from 'zod';
+import EnvironmentConfigError from './EnvironmentConfigError.js';
+import { serverConfig } from './serverConfig.js';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+function getAuthConfig() {
+	const flag = process.env.DISABLE_AUTH;
+	const enabled = flag !== 'true';
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
+	// Enforce enabling auth when running in production
+	if (serverConfig.isProduction && !enabled) {
+		throw new EnvironmentConfigError(
+			`The application "NODE_ENV" is set to "production" while "ENABLE_AUTH" is not "true". Auth must be enabled to run in production.`,
+		);
 	}
+
+	if (!enabled) {
+		// Running with auth disabled may be useful for developers.
+		return { enabled };
+	}
+
+	const authConfigSchema = z.object({
+		AUTH_PROVIDER_HOST: z.string().url(),
+		AUTH_CLIENT_ID: z.string(),
+		AUTH_CLIENT_SECRET: z.string(),
+	});
+
+	const parseResult = authConfigSchema.safeParse(process.env);
+
+	if (!parseResult.success) {
+		// Only require auth config if auth is enabled
+		throw new EnvironmentConfigError(`db`, parseResult.error);
+	}
+
+	return { enabled, ...parseResult.data, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
 }
-export default EnvironmentConfigError;
+
+export const authConfig = getAuthConfig();
