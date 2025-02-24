@@ -64,7 +64,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 					const newCollaboratorRecord = await transaction.insert(collaborators).values(collaborator).returning();
 
 					if (!newCollaboratorRecord[0]) {
-						throw new Error(`Error creating new collaborators: ${collaborator}`);
+						throw new Error(`Error creating new collaborators: ${collaborator}, no record created`);
 					}
 
 					newRecords.push(newCollaboratorRecord[0]);
@@ -80,6 +80,24 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return success(collaboratorRecords);
 		} catch (err) {
 			const message = `Error at createCollaborators`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
+	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord[]> => {
+		try {
+			const deletedRecord = await db.delete(collaborators).where(eq(collaborators.id, id)).returning();
+
+			if (!deletedRecord.length) {
+				throw new Error(`Error deleting collaborator with ${id}, no record deleted`);
+			}
+
+			return success(deletedRecord);
+		} catch (err) {
+			const message = `Error at deleteCollaborators`;
 
 			logger.error(message);
 			logger.error(err);

@@ -104,6 +104,24 @@ describe('Application Service', () => {
 		});
 	});
 
+	describe('Delete Collaborators', () => {
+		it('should successfully delete a Collaborator', async () => {
+			const testCollaborators = await db
+				.select()
+				.from(collaborators)
+				.where(eq(collaborators.application_id, application_id));
+
+			assert.ok(testCollaborators.length && testCollaborators[0]);
+
+			const { id } = testCollaborators[0];
+
+			const collaboratorResult = await testCollaboratorsRepo.deleteCollaborator({ id });
+
+			assert.ok(collaboratorResult.success);
+			assert.strictEqual(collaboratorResult.data[0]?.id, id);
+		});
+	});
+
 	after(async () => {
 		await db.delete(collaborators).where(eq(collaborators.application_id, application_id));
 		await container.stop();
