@@ -4,10 +4,7 @@
 		"outDir": "dist",
 		"rootDir": "src",
 		"baseUrl": ".",
-		"declaration": true,
-		"paths": {
-			"@/*": ["./src/*"]
-		}
+		"declaration": true
 	},
 	"include": ["src"],
 	"exclude": ["node_modules"]

@@ -20,7 +20,7 @@
 import type { NextFunction } from 'express';
 import ExpressRequestLogger from 'express-requests-logger';
 
-import { type LogLevel, LogLevels, type LoggerType } from '@/client/index.js';
+import { type LogLevel, LogLevels, type LoggerType } from '../client/index.js';
 import { MiddlewareData } from './dependencyDataTypes.js';
 
 export type ExpressLoggerConfig = {
