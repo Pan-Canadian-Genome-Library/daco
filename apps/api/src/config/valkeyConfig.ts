@@ -17,15 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { z } from 'zod';
+import EnvironmentConfigError from './EnvironmentConfigError.js';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+const serverConfigSchema = z.object({
+	VALKEY_HOST: z.string(),
+	VALKEY_PORT: z.coerce.number().int(),
+	VALKEY_USER: z.string(),
+	VALKEY_PASSWORD: z.string(),
+});
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
+const parseResult = serverConfigSchema.safeParse(process.env);
+
+if (!parseResult.success) {
+	throw new EnvironmentConfigError(`valkey`, parseResult.error);
 }
-export default EnvironmentConfigError;
+
+export const valkeyConfig = parseResult.data;
