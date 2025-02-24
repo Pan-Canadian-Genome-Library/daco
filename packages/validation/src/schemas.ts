@@ -17,8 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationAgreements } from '@pcgl-daco/data-model';
 import { z } from 'zod';
+
+import { ApplicationAgreements } from '@pcgl-daco/data-model';
+
 import { EthicsEnum } from './common/enums.js';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
 import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';

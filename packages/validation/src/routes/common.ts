@@ -17,15 +17,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { z as zod } from 'zod';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+export const errorResponseSchema = <TEnum extends readonly [string, ...string[]]>(errorCodes: TEnum) =>
+	zod.object({ error: zod.enum(errorCodes), message: zod.string() });
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
-}
-export default EnvironmentConfigError;
+/**
+ * This is a standardized object defining the response body for error cases.
+ *
+ * Errors are structured as:
+ * ```ts
+ * {
+ *   "error": string;
+ *   "message": string;
+ * }
+ * ```
+ * The `error` property should be a short string, typically in upper snake case.
+ * This can be used by the UI to determine which error case has occurred, and to
+ * map the error to a translatable error message.
+ *
+ * The `message` property is meant to explain the error for troubleshooting purposes.
+ * It is not meant to be presented in the UI to a user, and so does not need to be translatable.
+ *
+ * @example
+ * type SomeResponseErrors = ErrorResponse<['FORBIDDEN', 'SYSTEM_ERROR']>;
+ * // {
+ * //   error: "FORBIDDEN" | "SYSTEM_ERROR";
+ * //   message: string;
+ * // }
+ */
+export type ErrorResponse<ErrorCodes extends readonly [string, ...string[]]> = zod.infer<
+	ReturnType<typeof errorResponseSchema<ErrorCodes>>
+>;
