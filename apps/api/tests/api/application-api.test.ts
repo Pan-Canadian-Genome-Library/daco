@@ -47,30 +47,20 @@ import {
 
 // Sample revision request data
 const revisionRequestData: ReviewApplication = {
-	applicantInfo: {
-		applicantApproved: false,
-		applicantNotes: 'Needs more details',
-	},
-	institutionalRep: {
-		institutionRepApproved: false,
-		institutionRepNotes: 'Incomplete information',
-	},
-	collaborators: {
-		collaboratorsApproved: false,
-		collaboratorsNotes: 'Requires additional clarification',
-	},
-	projectInfo: {
-		projectApproved: false,
-		projectNotes: 'Not sufficient justification',
-	},
-	requestedStudy: {
-		requestedStudiesApproved: false,
-		requestedStudiesNotes: 'Unclear scope',
-	},
-	ethics: {
-		ethicsApproved: false,
-		ethicsNotes: 'Ethics review is pending.',
-	},
+	id: 1,
+	application_id: testApplicationId,
+	created_at: new Date(),
+	comments: null,
+	applicant_notes: 'Needs more details',
+	applicant_approved: false,
+	institution_rep_approved: false,
+	institution_rep_notes: 'Incomplete information',
+	collaborators_approved: false,
+	collaborators_notes: 'Requires additional clarification',
+	project_approved: false,
+	project_notes: 'Not sufficient justification',
+	requested_studies_approved: false,
+	requested_studies_notes: 'Unclear scope',
 };
 
 describe('Application API', () => {
