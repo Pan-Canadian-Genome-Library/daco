@@ -26,7 +26,7 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/application-router.js';
-import collaboratorsRouter from '@/routes/collaborators-router.js';
+import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
