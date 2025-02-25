@@ -18,12 +18,14 @@
  */
 
 import { Menu, MenuProps } from 'antd';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/useEditApplication';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
+import { VerifyFormSections, VerifySectionsTouched } from './utils';
 
 type SectionMenuProps = {
 	currentSection: string;
@@ -42,6 +44,16 @@ const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};
 
+	// Check if the form on each section is valid
+	const SectionValidator = useMemo(() => {
+		return VerifyFormSections(state?.fields);
+	}, [state]);
+
+	// Check if the form has beed dirtied at all
+	const SectionTouched = useMemo(() => {
+		return VerifySectionsTouched(state?.fields);
+	}, [state]);
+
 	return (
 		<Menu
 			style={{ width: '100%', height: '100%' }}
@@ -50,7 +62,14 @@ const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 			items={ApplicationSectionRoutes.map((item) => {
 				return {
 					key: item.route,
-					label: <SectionMenuItem label={item.route} isEditMode={isEditMode} />,
+					label: (
+						<SectionMenuItem
+							isSectionTouched={SectionTouched[item.route as keyof typeof SectionTouched]}
+							isSectionValid={SectionValidator[item.route as keyof typeof SectionValidator]}
+							label={item.route}
+							isEditMode={isEditMode}
+						/>
+					),
 				};
 			})}
 			onClick={handleNavigation}
