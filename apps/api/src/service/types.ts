@@ -75,4 +75,5 @@ export type PostgresTransaction = PgTransaction<
 	ExtractTablesWithRelations<typeof schema>
 >;
 
-export type ReviewApplication = typeof revisionRequests.$inferSelect;
+export type RevisionRequestModel = typeof revisionRequests.$inferInsert;
+export type RevisionRequestRecord = typeof revisionRequests.$inferSelect;

@@ -25,10 +25,10 @@ import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
 	type ApplicationContentUpdates,
-	type ApplicationModel,
 	type ApplicationRecord,
 	type ApplicationService,
-	type ReviewApplication,
+	type RevisionRequestModel,
+	type RevisionRequestRecord,
 } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
@@ -221,13 +221,11 @@ export const requestApplicationRevisions = async ({
 	applicationId,
 	role,
 	reviewData,
-	comments,
 }: {
 	applicationId: number;
 	role: string;
-	reviewData: ReviewApplication;
-	comments?: string;
-}): AsyncResult<ApplicationModel> => {
+	reviewData: RevisionRequestModel;
+}): AsyncResult<RevisionRequestRecord> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -254,9 +252,7 @@ export const requestApplicationRevisions = async ({
 			return failure(revisionResult.message || 'Failed to reject application.', 'StateTransitionError');
 		}
 
-		service.createRevisionRequest({ applicationId, reviewData, comments_str: comments });
-
-		return service.getApplicationById({ id: applicationId });
+		return await service.createRevisionRequest({ applicationId, reviewData });
 	} catch (error) {
 		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
 		return failure('An error occurred while processing the request.', error);

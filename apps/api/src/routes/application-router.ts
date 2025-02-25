@@ -300,9 +300,9 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 // Endpoint for reps to request revisions
 applicationRouter.post('/applications/request-revisions', jsonParser, async (req, res) => {
 	try {
-		const { applicationId, reviewData, comments, role } = req.body;
+		const { applicationId, reviewData, role } = req.body;
 
-		if (!role && (role !== 'REP' || role !== 'DAC')) {
+		if (!role || role !== 'INSTITUTIONAL_REP' || role !== 'DAC_MEMBER') {
 			res.status(400).json({ message: 'Invalid request: Invalid role' });
 		}
 
@@ -312,7 +312,7 @@ applicationRouter.post('/applications/request-revisions', jsonParser, async (req
 		}
 
 		// Call service method to handle request
-		const updatedApplication = await requestApplicationRevisions({ applicationId, role, reviewData, comments });
+		const updatedApplication = await requestApplicationRevisions({ applicationId, role, reviewData });
 
 		res.status(200).json(updatedApplication);
 	} catch (error) {

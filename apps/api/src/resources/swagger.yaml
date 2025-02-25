@@ -676,7 +676,6 @@ components:
         - applicationId
         - role
         - reviewData
-        - comments
       properties:
         applicationId:
           type: integer
@@ -686,9 +685,6 @@ components:
           type: string
           description: 'Role of the reviewer'
           example: DAC
-        comments:
-          type: string
-          description: 'additional comments'
         reviewData:
           type: object
           description: 'Data containing approval status and notes for various sections of the application.'
@@ -759,6 +755,9 @@ components:
                   type: string
                   description: 'Notes related to the ethics section.'
                   example: 'Ethics review is pending.'
+            comments:
+              type: string
+              description: 'Additional comments'
 
   responses:
     ApplicationResponse:
