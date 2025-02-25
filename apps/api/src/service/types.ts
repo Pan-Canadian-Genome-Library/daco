@@ -34,8 +34,8 @@ export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 export type ApplicationModel = typeof applications.$inferInsert;
 export type ApplicationUpdates = Partial<ApplicationModel>;
 export type ApplicationContentModel = typeof applicationContents.$inferInsert;
-export type ApplicationContentUpdates = Partial<ApplicationContentModel>;
-
+export type ApplicationContentUpdates = Omit<Partial<ApplicationContentModel>, 'signature' | 'signature_signed_at'>;
+export type ApplicationSignatureUpdate = Pick<ApplicationContentModel, 'signature' | 'signature_signed_at'>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }

@@ -18,7 +18,7 @@
  */
 
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { editApplicationRequestSchema, editSignatureRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
@@ -30,6 +30,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	updateApplicationSignature,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
@@ -89,6 +90,39 @@ applicationRouter.post(
 
 			res.send({ message: result.message, errors: String(result.errors) });
 		}
+	}),
+);
+
+/**
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ */
+applicationRouter.post(
+	'/applications/edit/sign',
+	jsonParser,
+	withSchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
+		const data = req.body;
+
+		const { id, signature, signature_signed_at } = data;
+
+		const result = await updateApplicationSignature({
+			id,
+			signature,
+			signature_signed_at: new Date(signature_signed_at),
+		});
+
+		if (result.success) {
+			res.send(result.data);
+			return;
+		}
+
+		if (String(result.errors) === 'Error: Application contents record is undefined') {
+			res.status(404);
+		} else {
+			res.status(500);
+		}
+
+		res.send({ message: result.message, errors: String(result.errors) });
 	}),
 );
 
