@@ -44,10 +44,10 @@ interface eSignatureFormProps<T extends FieldValues> {
 }
 interface eSignatureProps {
 	signatureRef: RefObject<SignatureCanvas>;
-	downloadButton: string;
-	previewButton: string;
-	clearButton: string;
-	saveButton: string;
+	downloadButtonText: string;
+	previewButtonText: string;
+	clearButtonText: string;
+	saveButtonText: string;
 	disableSaveButton?: boolean;
 	disablePreviewButton?: boolean;
 }
@@ -55,15 +55,30 @@ interface eSignatureProps {
 const ESignature = <T extends FieldValues>(
 	props: UseControllerProps<T> & eSignatureFormProps<eSignatureSchemaType> & eSignatureProps,
 ) => {
+	const {
+		control,
+		name,
+		signatureRef,
+		reset,
+		setValue,
+		clearErrors,
+		disablePreviewButton,
+		disableSaveButton,
+		clearButtonText,
+		previewButtonText,
+		downloadButtonText,
+		saveButtonText,
+	} = props;
+
 	const { token } = theme.useToken();
 	const clearSignature = () => {
-		props.reset();
-		props.signatureRef.current?.clear();
+		reset();
+		signatureRef.current?.clear();
 	};
 
 	const formatIntoBase64 = () => {
-		if (props.signatureRef.current) {
-			const dataURL = props.signatureRef.current.toDataURL();
+		if (signatureRef.current) {
+			const dataURL = signatureRef.current.toDataURL();
 			return dataURL;
 		} else {
 			//Something went wrong and we can't find the signature field, but this should likely never happen.
@@ -73,14 +88,14 @@ const ESignature = <T extends FieldValues>(
 
 	const saveSignature = () => {
 		const currentDate = new Date();
-		props.setValue('createdAt', currentDate.toISOString());
-		props.setValue('signature', formatIntoBase64());
-		props.clearErrors(['signature', 'createdAt']);
+		setValue('createdAt', currentDate.toISOString());
+		setValue('signature', formatIntoBase64());
+		clearErrors(['signature', 'createdAt']);
 	};
 
 	const onBegin = () => {
-		props.reset();
-		props.clearErrors(['signature']);
+		reset();
+		clearErrors(['signature']);
 	};
 
 	const { signature: signatureError, createdAt: createdAtError } = props.formState.errors;
@@ -88,12 +103,12 @@ const ESignature = <T extends FieldValues>(
 	return (
 		<div>
 			<Controller
-				control={props.control}
-				name={props.name}
+				control={control}
+				name={name}
 				render={({ field }) => (
 					<Row>
 						<SignatureCanvas
-							ref={props.signatureRef}
+							ref={signatureRef}
 							onBegin={onBegin}
 							onEnd={() => field.onChange(formatIntoBase64())}
 							canvasProps={{
@@ -108,15 +123,15 @@ const ESignature = <T extends FieldValues>(
 						/>
 						<Flex justify="space-between" style={{ width: '100%', margin: '1rem 0 0 0' }}>
 							<Flex gap={token.margin}>
-								<Button disabled={props.disablePreviewButton} icon={<EyeOutlined />}>
-									{props.previewButton}
+								<Button disabled={disablePreviewButton} icon={<EyeOutlined />}>
+									{previewButtonText}
 								</Button>
-								<Button icon={<DownloadOutlined />}>{props.downloadButton}</Button>
+								<Button icon={<DownloadOutlined />}>{downloadButtonText}</Button>
 							</Flex>
 							<Flex gap={token.margin}>
-								<Button onClick={clearSignature}>Clear</Button>
-								<Button disabled={props.disableSaveButton} onClick={saveSignature} type={'primary'}>
-									{props.saveButton}
+								<Button onClick={clearSignature}>{clearButtonText}</Button>
+								<Button disabled={disableSaveButton} onClick={saveSignature} type={'primary'}>
+									{saveButtonText}
 								</Button>
 							</Flex>
 						</Flex>

@@ -82,10 +82,10 @@ const SignAndSubmit = () => {
 									clearErrors={clearErrors}
 									disableSaveButton={!watchSignature || !!(watchSignature && watchCreatedAt)}
 									disablePreviewButton={!watchSignature}
-									downloadButton={translate('sign-and-submit-section.section1.buttons.download')}
-									saveButton={translate('sign-and-submit-section.section1.buttons.save')}
-									clearButton={translate('sign-and-submit-section.section1.buttons.clear')}
-									previewButton={translate('sign-and-submit-section.section1.buttons.view')}
+									downloadButtonText={translate('sign-and-submit-section.section1.buttons.download')}
+									saveButtonText={translate('sign-and-submit-section.section1.buttons.save')}
+									clearButtonText={translate('sign-and-submit-section.section1.buttons.clear')}
+									previewButtonText={translate('sign-and-submit-section.section1.buttons.view')}
 								/>
 							</Col>
 						</Row>
