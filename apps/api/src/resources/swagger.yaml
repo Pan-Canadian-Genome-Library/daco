@@ -675,7 +675,6 @@ components:
       required:
         - applicationId
         - role
-        - repId
         - reviewData
         - comments
       properties:
@@ -687,10 +686,6 @@ components:
           type: string
           description: 'Role of the reviewer'
           example: DAC
-        repId:
-          type: integer
-          description: 'ID of the representative requesting the revision.'
-          example: 9876
         comments:
           type: string
           description: 'additional comments'

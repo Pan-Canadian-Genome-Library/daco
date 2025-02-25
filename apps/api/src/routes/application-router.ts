@@ -308,7 +308,7 @@ applicationRouter.post('/applications/request-revisions', jsonParser, async (req
 
 		// Validate input
 		if (!reviewData) {
-			res.status(400).json({ message: 'Invalid request: repId and reviewData are required' });
+			res.status(400).json({ message: 'Invalid request: reviewData are required' });
 		}
 
 		// Call service method to handle request
