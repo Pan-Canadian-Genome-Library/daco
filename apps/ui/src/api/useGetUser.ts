@@ -17,15 +17,40 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import type { UserResponse } from '@pcgl-daco/validation';
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
-}
-export default EnvironmentConfigError;
+const useGetUser = () => {
+	const { t: translate } = useTranslation();
+
+	return useQuery<UserResponse, ServerError>({
+		queryKey: ['user'],
+		queryFn: async () => {
+			const response = await fetch(`/auth/user`);
+
+			if (!response.ok) {
+				const error = {
+					message: translate('errors.generic.title'),
+					errors: translate('errors.generic.message'),
+				};
+
+				switch (response.status) {
+					case 400:
+						error.message = translate('errors.http.400.title');
+						error.errors = translate('errors.http.400.message');
+						break;
+				}
+
+				throw error;
+			}
+
+			return await response.json();
+		},
+	});
+};
+
+export default useGetUser;

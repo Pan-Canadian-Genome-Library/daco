@@ -27,6 +27,7 @@ import { BrowserRouter } from 'react-router';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import AppRouter from '@/pages/AppRouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { UserProvider } from './components/providers/UserProvider';
 
 const queryClient = new QueryClient();
 
@@ -34,9 +35,11 @@ createRoot(document.getElementById('root')!).render(
 	<StrictMode>
 		<QueryClientProvider client={queryClient}>
 			<ThemeProvider>
-				<BrowserRouter>
-					<AppRouter />
-				</BrowserRouter>
+				<UserProvider>
+					<BrowserRouter>
+						<AppRouter />
+					</BrowserRouter>
+				</UserProvider>
 			</ThemeProvider>
 		</QueryClientProvider>
 	</StrictMode>,
