@@ -34,6 +34,7 @@ import SignAndSubmit from '@/pages/applications/sections/sign';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 export const ApplicationSectionRoutes = [
 	{
@@ -93,15 +94,36 @@ function AppRouter() {
 		<Routes>
 			<Route element={<PageLayout />}>
 				<Route index element={<HomePage />} />
-				<Route path="dashboard" element={<DashboardPage />} />
-				<Route path="application/:id" element={<ApplicationViewer />}>
-					<Route index element={<Navigate to="intro" replace={true} />} />
+				<Route
+					path="dashboard"
+					element={
+						<ProtectedRoute>
+							<DashboardPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="application/:id"
+					element={
+						<ProtectedRoute>
+							<ApplicationViewer />
+						</ProtectedRoute>
+					}
+				>
+					<Route index element={<Navigate to="intro" replace />} />
 					{/* Application Section Routes */}
 					{ApplicationSectionRoutes.map((item) => (
 						<Route key={item.route} path={item.path} element={item.element} />
 					))}
 				</Route>
-				<Route path="manage/applications" element={<ManageApplicationsPage />} />
+				<Route
+					path="manage/applications"
+					element={
+						<ProtectedRoute requiredRoles={['DAC_MEMBER']}>
+							<ManageApplicationsPage />
+						</ProtectedRoute>
+					}
+				/>
 			</Route>
 		</Routes>
 	);

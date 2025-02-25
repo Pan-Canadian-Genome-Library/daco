@@ -17,15 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+import { type Request } from 'express';
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+export { default as sessionMiddleware } from './sessionMiddleware.js';
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
+export type SessionUser = {
+	userId: string;
+	givenName?: string;
+	familyName?: string;
+};
+
+export type SessionAccount = {
+	idToken: string;
+	accessToken: string;
+	refreshToken: string;
+	refreshTokenIat: number;
+};
+
+declare module 'express-session' {
+	interface SessionData {
+		user: SessionUser;
+		account: SessionAccount;
 	}
 }
-export default EnvironmentConfigError;
+
+export function resetSession(session: Request['session']) {
+	session.user = undefined;
+	session.account = undefined;
+	session.save();
+}
