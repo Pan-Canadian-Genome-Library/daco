@@ -106,11 +106,11 @@ export const createCollaborators = async ({
 export const deleteCollaborator = async ({
 	application_id,
 	user_id,
-	collaborator_id,
+	id,
 }: {
 	application_id: number;
 	user_id: string;
-	collaborator_id: number;
+	id: number;
 }) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
@@ -135,7 +135,7 @@ export const deleteCollaborator = async ({
 	}
 
 	const result = await collaboratorsRepo.deleteCollaborator({
-		id: collaborator_id,
+		id,
 	});
 
 	return result;

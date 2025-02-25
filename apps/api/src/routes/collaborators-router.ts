@@ -20,9 +20,9 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createCollaborators } from '@/controllers/collaboratorsController.js';
-import { type CollaboratorRequest } from '@pcgl-daco/data-model';
-import { collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { createCollaborators, deleteCollaborator } from '@/controllers/collaboratorsController.js';
+import { type CollaboratorRequest, DeleteCollaboratorRequest } from '@pcgl-daco/data-model';
+import { collaboratorsEditRequestSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -52,6 +52,64 @@ collaboratorsRouter.post(
 				const { message, errors } = result;
 
 				if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
+					response.status(400);
+				} else if (errors === 'Unauthorized') {
+					response.status(401);
+				} else {
+					response.status(500);
+				}
+
+				response.send({ message, errors });
+				return;
+			}
+		} else {
+			const { issues } = validatedPayload.error;
+			const errorField = issues[0]?.path[0];
+
+			if (errorField === 'collaborators') {
+				response.status(400).send({ message: 'Required Collaborator details are missing.' });
+			}
+
+			if (errorField === 'userId') {
+				// TODO: Add Real Auth
+				response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
+				return;
+			}
+
+			if (errorField === 'applicationId') {
+				response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
+				return;
+			}
+		}
+	},
+);
+
+/**
+ * Delete Collaborator
+ */
+collaboratorsRouter.post(
+	'/collaborators/delete',
+	jsonParser,
+	async (request: Request<{}, {}, DeleteCollaboratorRequest, any>, response) => {
+		const validatedPayload = collaboratorsEditRequestSchema.safeParse(request.body);
+
+		if (validatedPayload.success) {
+			const { applicationId: application_id, userId: user_id, collaborators } = validatedPayload.data;
+			const { id } = collaborators[0];
+
+			const result = await deleteCollaborator({
+				application_id,
+				user_id,
+				id,
+			});
+
+			if (result.success) {
+				response.status(201).send(result.data);
+				return;
+			} else {
+				const { message, errors } = result;
+
+				if (errors === 'InvalidState') {
 					response.status(400);
 				} else if (errors === 'Unauthorized') {
 					response.status(401);

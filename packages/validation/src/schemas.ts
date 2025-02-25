@@ -61,6 +61,15 @@ export const collaboratorsRequestSchema = z.object({
 	userId: NonEmptyString,
 	collaborators: z.array(collaboratorsSchema).nonempty(),
 });
+
+export const collaboratorsRecordSchema = collaboratorsSchema.extend({
+	id: z.number(),
+});
+
+export const collaboratorsDeleteRequestSchema = collaboratorsRequestSchema.extend({
+	collaborators: z.array(collaboratorsRecordSchema).nonempty(),
+});
+
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const institutionalRepSchema = z.object({
