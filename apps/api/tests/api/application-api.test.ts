@@ -32,7 +32,7 @@ import {
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { ReviewApplication, type ApplicationService } from '@/service/types.js';
+import { type ApplicationService, type RevisionRequestModel } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -46,11 +46,10 @@ import {
 } from '../testUtils.js';
 
 // Sample revision request data
-const revisionRequestData: ReviewApplication = {
-	id: 1,
+const revisionRequestData: RevisionRequestModel = {
 	application_id: testApplicationId,
 	created_at: new Date(),
-	comments: null,
+	comments: 'Please provide additional documentation.',
 	applicant_notes: 'Needs more details',
 	applicant_approved: false,
 	institution_rep_approved: false,
@@ -260,14 +259,12 @@ describe('Application API', () => {
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
 			const role = 'DAC';
-			const comments = 'Please provide additional documentation.';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisions({
 				applicationId: id,
 				role,
 				reviewData: revisionRequestData,
-				comments,
 			});
 
 			assert.ok(!result.success);
@@ -282,14 +279,12 @@ describe('Application API', () => {
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
 			const role = 'DAC';
-			const comments = 'State not valid for revision request.';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisions({
 				applicationId: id,
 				role,
 				reviewData: revisionRequestData,
-				comments,
 			});
 
 			// Assert: Should return a failure message
@@ -300,14 +295,12 @@ describe('Application API', () => {
 			// Arrange: Force an error
 			const invalidApplicationId = -1;
 			const role = 'DAC';
-			const comments = 'Invalid application ID';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisions({
 				applicationId: invalidApplicationId,
 				role,
 				reviewData: revisionRequestData,
-				comments,
 			});
 
 			// Assert: Should return an error message
