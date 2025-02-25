@@ -66,7 +66,7 @@ export const collaboratorsRecordSchema = collaboratorsSchema.extend({
 	id: z.number(),
 });
 
-export const collaboratorsDeleteRequestSchema = collaboratorsRequestSchema.extend({
+export const collaboratorsEditRequestSchema = collaboratorsRequestSchema.extend({
 	collaborators: z.array(collaboratorsRecordSchema).nonempty(),
 });
 
