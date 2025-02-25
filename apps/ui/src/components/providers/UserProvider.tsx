@@ -17,15 +17,43 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodError } from 'zod';
+/* eslint-disable react-refresh/only-export-components */
 
-class EnvironmentConfigError extends Error {
-	constructor(configName: string, zodError?: ZodError) {
-		super();
-		const standardMessage = `Error parsing environment variables for "${configName}" config!`;
+import type { UserResponse } from '@pcgl-daco/validation';
+import { createContext, useContext, type PropsWithChildren } from 'react';
+import useGetUser from '../../api/useGetUser';
 
-		this.message = zodError ? `${standardMessage} ${zodError.message}` : standardMessage;
-		this.name = 'EnvironmentConfigError';
-	}
+type UserState = {
+	isLoading: boolean;
+	isLoggedIn: boolean;
+	refresh: () => void;
+} & Partial<UserResponse>;
+
+const UserContext = createContext<UserState>({ isLoading: true, isLoggedIn: false, refresh: () => {} });
+
+export function UserProvider({ children }: PropsWithChildren) {
+	const { data, isLoading, refetch } = useGetUser();
+
+	// TODO: update local storage
+
+	const refresh = () => {
+		// TODO: update local storage
+		refetch();
+	};
+
+	const value: UserState = {
+		...data,
+		isLoading,
+		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : false,
+		refresh,
+	};
+	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
-export default EnvironmentConfigError;
+
+export function useUserContext() {
+	const context = useContext(UserContext);
+	if (context === undefined) {
+		throw new Error('useCount must be used within a CountProvider');
+	}
+	return context;
+}
