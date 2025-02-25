@@ -65,6 +65,9 @@ export const applicationContents = pgTable('application_contents', {
 	project_aims: text(),
 	project_summary: text(),
 	project_publication_urls: text().array(),
+	// Signature for Sign & Submit
+	signature: text(),
+	signature_signed_at: timestamp(),
 	// Studies
 	// TODO: requested study information
 	requested_studies: text().array(),
