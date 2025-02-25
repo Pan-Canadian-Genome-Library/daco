@@ -57,6 +57,11 @@ const ApplicationViewer = () => {
 		}
 	}, [data, isEditMode, navigation]);
 
+	// scroll to top on page change
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [match]);
+
 	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
 	return (
