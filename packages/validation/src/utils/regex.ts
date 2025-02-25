@@ -25,4 +25,4 @@ export const WORDS = /\s+/;
 
 //Based off Zod's base64 validation regex, but includes validation for images at the start of the group:
 export const BASE64_IMAGE =
-	/^(?:data:image\/png;base64,)?([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+	/^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
