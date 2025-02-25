@@ -39,8 +39,6 @@ const SectionMenuItem = ({ isSectionTouched, isSectionValid, label, isEditMode }
 	const { t: translate } = useTranslation();
 
 	const renderIcon = () => {
-		if (label === 'institutional') console.log(label, isSectionTouched, isSectionValid);
-
 		if (!isEditMode) return <LockOutlined />;
 		if (!isSectionTouched) return;
 		if (isSectionValid) return <CheckCircleOutlined />;
