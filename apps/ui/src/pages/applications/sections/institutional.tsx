@@ -41,6 +41,9 @@ const Institutional = () => {
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
+		defaultValues: {
+			institutionCountry: 'CAN',
+		},
 		resolver: zodResolver(institutionalRepSchema),
 	});
 
