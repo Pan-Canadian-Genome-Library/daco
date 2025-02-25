@@ -104,8 +104,9 @@ const HeaderComponent = () => {
 		},
 		{
 			name: isHome ? translate('links.apply') : translate('links.applications'),
-			href: '#',
+			href: '/dashboard',
 			position: 'right',
+			target: '_self',
 		},
 		{
 			name: translate(`button.${isHome ? 'login' : 'logout'}`),
