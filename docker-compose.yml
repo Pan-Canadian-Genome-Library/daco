@@ -10,8 +10,19 @@ services:
       - daco-api-db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: mypassword
+  valkey:
+    image: valkey/valkey:8-alpine
+    command: valkey-server --requirepass valkeypass
+    container_name: valkey
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'valkey:/bitnami/valkey/data'
 
 volumes:
   daco-api-db:
     name: daco-api-db
+    driver: local
+  valkey:
+    name: daco-api-valkey
     driver: local
