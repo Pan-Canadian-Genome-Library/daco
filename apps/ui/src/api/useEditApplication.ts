@@ -20,9 +20,9 @@ import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
 
 export const ApiFormat = {

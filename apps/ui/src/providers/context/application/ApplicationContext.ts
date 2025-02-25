@@ -17,19 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationAction, type ApplicationFormState } from '@/components/providers/context/application/types';
+import { ApplicationContext } from '@/providers/context/application/ApplicationContextProvider';
+import { useContext } from 'react';
 
-function ApplicationReducer(state: ApplicationFormState | null, action: ApplicationAction) {
-	switch (action.type) {
-		case 'UPDATE_APPLICATION': {
-			return { ...state, ...action.payload };
-		}
-		case 'UPDATE_DIRTY_STATE': {
-			return { ...state, formState: { isDirty: action.payload } };
-		}
-		default:
-			return { ...state };
+export const useApplicationContext = () => {
+	const context = useContext(ApplicationContext);
+
+	if (!context) {
+		throw new Error('useApplicationContext must be used within a ApplicationProvider');
 	}
-}
 
-export default ApplicationReducer;
+	return context;
+};

@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { pcglSkeletonTheme } from '@/providers/ThemeProvider';
 import { ConfigProvider, Skeleton } from 'antd';
-import { pcglSkeletonTheme } from './providers/ThemeProvider';
 
 const SkeletonLoader = () => {
 	return (

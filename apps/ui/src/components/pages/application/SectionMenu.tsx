@@ -23,8 +23,8 @@ import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/useEditApplication';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
-import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { VerifyFormSections, VerifySectionsTouched } from './utils';
 
 type SectionMenuProps = {

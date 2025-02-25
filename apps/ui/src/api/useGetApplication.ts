@@ -20,9 +20,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {

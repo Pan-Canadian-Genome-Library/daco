@@ -18,8 +18,8 @@
  */
 
 import useEditApplication from '@/api/useEditApplication';
-import { useApplicationContext } from '@/components/providers/context/application/ApplicationContext';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { Button, Flex, theme } from 'antd';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

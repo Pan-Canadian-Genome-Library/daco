@@ -17,24 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createContext, useReducer } from 'react';
+import { type ApplicationAction, type ApplicationFormState } from '@/providers/context/application/types';
 
-import ApplicationReducer from '@/components/providers/context/application/ApplicationReducer';
-import {
-	type ApplicationContextType,
-	type ApplicationFormState,
-} from '@/components/providers/context/application/types';
+function ApplicationReducer(state: ApplicationFormState | null, action: ApplicationAction) {
+	switch (action.type) {
+		case 'UPDATE_APPLICATION': {
+			return { ...state, ...action.payload };
+		}
+		case 'UPDATE_DIRTY_STATE': {
+			return { ...state, formState: { isDirty: action.payload } };
+		}
+		default:
+			return { ...state };
+	}
+}
 
-const initialState: ApplicationFormState = {
-	formState: {
-		isDirty: false,
-	},
-};
-
-export const ApplicationContext = createContext<ApplicationContextType | undefined>(undefined);
-
-export const ApplicationContextProvider = ({ children }: { children: React.ReactNode }) => {
-	const [state, dispatch] = useReducer(ApplicationReducer, initialState);
-
-	return <ApplicationContext.Provider value={{ state, dispatch }}>{children}</ApplicationContext.Provider>;
-};
+export default ApplicationReducer;

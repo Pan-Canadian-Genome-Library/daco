@@ -21,8 +21,8 @@ import { Checkbox, Form, Row, theme, Typography } from 'antd';
 import { ReactNode } from 'react';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
-import { pcglColors } from '@/components/providers/ThemeProvider';
 import { BasicFormFieldProps } from '@/global/types';
+import { pcglColors } from '@/providers/ThemeProvider';
 
 const { Item } = Form;
 const { useToken } = theme;
