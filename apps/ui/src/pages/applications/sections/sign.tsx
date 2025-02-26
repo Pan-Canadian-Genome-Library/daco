@@ -53,6 +53,7 @@ const SignAndSubmit = () => {
 	const modalSubmission = () => {
 		console.log('Submit Clicked!');
 		console.log(validatedData);
+		setOpenModal(false);
 	};
 
 	const watchSignature = watch('signature');
