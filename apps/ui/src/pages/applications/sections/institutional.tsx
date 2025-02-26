@@ -124,6 +124,7 @@ const Institutional = () => {
 								options={PERSONAL_TITLES.map((titles) => {
 									return { value: titles.en, label: titles.en };
 								})}
+								initialValue={getValues('institutionalTitle')}
 								required
 								disabled={!isEditMode}
 							/>

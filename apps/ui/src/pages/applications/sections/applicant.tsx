@@ -114,6 +114,7 @@ const Applicant = () => {
 									return { value: titles.en, label: titles.en };
 								})}
 								required
+								initialValue={getValues('applicantTitle')}
 								disabled={!isEditMode}
 							/>
 						</Col>
