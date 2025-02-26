@@ -243,12 +243,14 @@ export type CollaboratorRequest = {
 	collaborators: CollaboratorDTO[];
 };
 
-export interface CollaboratorRecord extends CollaboratorDTO {
+export interface CollaboratorUpdateRecord extends CollaboratorDTO {
 	id: number;
 }
 
-export interface DeleteCollaboratorRequest extends CollaboratorRequest {
-	collaborators: CollaboratorRecord[];
+export interface DeleteCollaboratorRequest {
+	applicationId: number;
+	userId: string;
+	collaboratorId: number;
 }
 
 // TODO: Additional Types to be updated

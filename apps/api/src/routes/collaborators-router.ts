@@ -22,7 +22,7 @@ import express, { Request } from 'express';
 
 import { createCollaborators, deleteCollaborator } from '@/controllers/collaboratorsController.js';
 import { type CollaboratorRequest, DeleteCollaboratorRequest } from '@pcgl-daco/data-model';
-import { collaboratorsEditRequestSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { collaboratorsDeleteRequestSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -65,9 +65,10 @@ collaboratorsRouter.post(
 		} else {
 			const { issues } = validatedPayload.error;
 			const errorField = issues[0]?.path[0];
+			const errorMessage = issues[0]?.message;
 
 			if (errorField === 'collaborators') {
-				response.status(400).send({ message: 'Required Collaborator details are missing.' });
+				response.status(400).send({ message: `Required Collaborator details are missing. Error: ${errorMessage}` });
 			}
 
 			if (errorField === 'userId') {
@@ -91,16 +92,15 @@ collaboratorsRouter.post(
 	'/collaborators/delete',
 	jsonParser,
 	async (request: Request<{}, {}, DeleteCollaboratorRequest, any>, response) => {
-		const validatedPayload = collaboratorsEditRequestSchema.safeParse(request.body);
+		const validatedPayload = collaboratorsDeleteRequestSchema.safeParse(request.body);
 
 		if (validatedPayload.success) {
-			const { applicationId: application_id, userId: user_id, collaborators } = validatedPayload.data;
-			const { id } = collaborators[0];
+			const { applicationId: application_id, userId: user_id, collaboratorId } = validatedPayload.data;
 
 			const result = await deleteCollaborator({
 				application_id,
 				user_id,
-				id,
+				id: collaboratorId,
 			});
 
 			if (result.success) {
@@ -123,9 +123,10 @@ collaboratorsRouter.post(
 		} else {
 			const { issues } = validatedPayload.error;
 			const errorField = issues[0]?.path[0];
+			const errorMessage = issues[0]?.message;
 
 			if (errorField === 'collaborators') {
-				response.status(400).send({ message: 'Required Collaborator details are missing.' });
+				response.status(400).send({ message: `Required Collaborator details are missing. Error: ${errorMessage}` });
 			}
 
 			if (errorField === 'userId') {

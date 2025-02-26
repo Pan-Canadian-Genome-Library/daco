@@ -394,6 +394,40 @@ paths:
                 type: object
                 $ref: '#/components/responses/CollaboratorsListResponse'
 
+  /collaborators/delete:
+    post:
+      tags:
+        - Collaborators
+      summary: Create new Collaborators for an application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/requests/DeleteCollaborators'
+      responses:
+        '500':
+          description: 'Error deleting collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error deleting Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '201':
+          description: 'Collaborator deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -744,6 +778,23 @@ components:
         collaboratorInstitutionalEmail:
           type: string
           description: The collaborator's contact email
+
+    DeleteCollaborators:
+      type: object
+      required:
+        - applicationId
+        - userId
+        - collaboratorId
+      properties:
+        applicationId:
+          type: number
+          description: The id of the relevant Application record
+        userId:
+          type: string
+          description: The user ID belonging to the currently signed in user.
+        collaboratorId:
+          type: number
+          description: The ID of the Collaborator to delete.
 
   responses:
     ApplicationResponse:
