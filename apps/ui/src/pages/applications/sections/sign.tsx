@@ -72,6 +72,7 @@ const SignAndSubmit = () => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 								<input disabled type="hidden" name="createdAt" />
 								<ESignature
+									disabled={!isEditMode}
 									signatureRef={signatureRef}
 									name="signature"
 									control={control}

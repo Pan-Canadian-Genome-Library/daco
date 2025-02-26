@@ -20,7 +20,7 @@
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Row, theme } from 'antd';
-import { type RefObject } from 'react';
+import React, { type RefObject } from 'react';
 import {
 	Controller,
 	type FieldValues,
@@ -52,12 +52,40 @@ interface eSignatureProps {
 	disablePreviewButton?: boolean;
 }
 
+const SignatureFieldCover = ({ style }: { style: React.CSSProperties }) => {
+	const { token } = theme.useToken();
+	return (
+		<div
+			aria-hidden
+			style={{
+				...style,
+				position: 'absolute',
+				borderColor: 'transparent',
+				borderRadius: style.borderRadius ? 0 : 0,
+				background: token.colorTextDisabled,
+				opacity: 0.1,
+			}}
+		/>
+	);
+};
+
 const ESignature = <T extends FieldValues>(
 	props: UseControllerProps<T> & eSignatureFormProps<eSignatureSchemaType> & eSignatureProps,
 ) => {
+	const { token } = theme.useToken();
+
+	const SignatureFieldStyle: React.CSSProperties = {
+		height: '10rem',
+		width: '100%',
+		border: 'solid 2px',
+		borderColor: token.colorBorder,
+		borderRadius: token.borderRadius,
+	};
+
 	const {
 		control,
 		name,
+		disabled,
 		signatureRef,
 		reset,
 		setValue,
@@ -70,7 +98,6 @@ const ESignature = <T extends FieldValues>(
 		saveButtonText,
 	} = props;
 
-	const { token } = theme.useToken();
 	const clearSignature = () => {
 		reset();
 		signatureRef.current?.clear();
@@ -107,18 +134,13 @@ const ESignature = <T extends FieldValues>(
 				name={name}
 				render={({ field }) => (
 					<Row>
+						{disabled ? <SignatureFieldCover style={SignatureFieldStyle} /> : null}
 						<SignatureCanvas
 							ref={signatureRef}
 							onBegin={onBegin}
 							onEnd={() => field.onChange(formatIntoBase64())}
 							canvasProps={{
-								style: {
-									height: '10rem',
-									width: '100%',
-									border: 'solid 2px',
-									borderColor: token.colorBorder,
-									borderRadius: token.borderRadius,
-								},
+								style: SignatureFieldStyle,
 							}}
 						/>
 						<Flex justify="space-between" style={{ width: '100%', margin: '1rem 0 0 0' }}>
@@ -129,7 +151,9 @@ const ESignature = <T extends FieldValues>(
 								<Button icon={<DownloadOutlined />}>{downloadButtonText}</Button>
 							</Flex>
 							<Flex gap={token.margin}>
-								<Button onClick={clearSignature}>{clearButtonText}</Button>
+								<Button onClick={clearSignature} disabled={disabled}>
+									{clearButtonText}
+								</Button>
 								<Button disabled={disableSaveButton} onClick={saveSignature} type={'primary'}>
 									{saveButtonText}
 								</Button>
