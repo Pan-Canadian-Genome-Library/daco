@@ -17,10 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './agreements.js';
-export * from './applicationActions.js';
-export * from './applicationContents.js';
-export * from './applications.js';
-export * from './collaborators.js';
-export * from './files.js';
-export * from './revisionRequests.js';
+export * from './agreements.ts';
+export * from './applicationActions.ts';
+export * from './applicationContents.ts';
+export * from './applications.ts';
+export * from './collaborators.ts';
+export * from './files.ts';
+export * from './revisionRequests.ts';

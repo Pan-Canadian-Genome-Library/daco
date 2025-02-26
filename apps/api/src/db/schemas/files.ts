@@ -20,7 +20,7 @@
 import { relations } from 'drizzle-orm';
 import { bigint, customType, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
-import { applications } from './applications.js';
+import { applications } from './applications.ts';
 
 export const fileTypesEnum = pgEnum('file_types', ['SIGNED_APPLICATION', 'ETHICS_LETTER']);
 
