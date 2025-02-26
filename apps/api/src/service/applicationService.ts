@@ -362,16 +362,16 @@ const applicationSvc = (db: PostgresDb) => ({
 
 	createRevisionRequest: async ({
 		applicationId,
-		reviewData,
+		revisionData,
 	}: {
 		applicationId: number;
-		reviewData: RevisionRequestModel;
+		revisionData: RevisionRequestModel;
 	}): AsyncResult<RevisionRequestRecord> => {
 		try {
 			// Using transaction for inserting
 			const result = await db.transaction(async (transaction) => {
 				// Insert into the revision_requests table
-				const revisionRecord = await transaction.insert(revisionRequests).values(reviewData).returning();
+				const revisionRecord = await transaction.insert(revisionRequests).values(revisionData).returning();
 				if (!revisionRecord[0]) throw new Error('Revision request record is undefined');
 
 				// Returning the inserted revision request

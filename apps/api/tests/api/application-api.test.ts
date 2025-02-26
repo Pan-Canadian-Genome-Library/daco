@@ -264,7 +264,7 @@ describe('Application API', () => {
 			const result = await requestApplicationRevisions({
 				applicationId: id,
 				role,
-				reviewData: revisionRequestData,
+				revisionData: revisionRequestData,
 			});
 
 			assert.ok(!result.success);
@@ -284,7 +284,7 @@ describe('Application API', () => {
 			const result = await requestApplicationRevisions({
 				applicationId: id,
 				role,
-				reviewData: revisionRequestData,
+				revisionData: revisionRequestData,
 			});
 
 			// Assert: Should return a failure message
@@ -300,7 +300,7 @@ describe('Application API', () => {
 			const result = await requestApplicationRevisions({
 				applicationId: invalidApplicationId,
 				role,
-				reviewData: revisionRequestData,
+				revisionData: revisionRequestData,
 			});
 
 			// Assert: Should return an error message
