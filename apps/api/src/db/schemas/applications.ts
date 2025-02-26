@@ -19,8 +19,8 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applicationActions } from './applicationActions.js';
-import { applicationContents } from './applicationContents.js';
+import { applicationActions } from './applicationActions.ts';
+import { applicationContents } from './applicationContents.ts';
 
 export const applicationStatesEnum = pgEnum('application_states', [
 	'DRAFT',

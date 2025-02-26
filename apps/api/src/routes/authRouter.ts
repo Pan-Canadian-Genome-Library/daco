@@ -247,7 +247,7 @@ authRouter.get('/user', async (req, res: ResponseWithData<UserResponse, ['AUTH_D
 	const { user } = req.session;
 
 	const output: UserResponse = {
-		role: user ? 'APPLICANT' : 'ANONYMOUS',
+		role: user ? 'DAC_MEMBER' : 'ANONYMOUS',
 		user,
 	};
 
