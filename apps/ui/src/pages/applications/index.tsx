@@ -27,6 +27,8 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Content } = Layout;
@@ -34,6 +36,7 @@ const { Content } = Layout;
 const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
+	const { dispatch } = useApplicationContext();
 
 	// grab current route and its relevant information
 	const match = useMatch('application/:id/:section/:edit?');
@@ -56,6 +59,20 @@ const ApplicationViewer = () => {
 			}
 		}
 	}, [data, isEditMode, navigation]);
+
+	useEffect(() => {
+		// Filter out data if they contain null values
+		if (data && data.contents) {
+			console.log('ja', data && data.contents);
+			const fields = Object.entries(data.contents).reduce((acc, [key, value]) => {
+				if (value !== null) {
+					acc[key as keyof ApplicationContentsResponse] = value;
+				}
+				return acc;
+			}, {} as Partial<ApplicationContentsResponse>);
+			dispatch({ type: 'UPDATE_APPLICATION', payload: { fields } });
+		}
+	}, [data, dispatch]);
 
 	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
