@@ -18,11 +18,29 @@
  */
 
 import { ApplicantDTO, ApplicationContentsResponse, InstitutionalRepDTO, InstitutionDTO } from '@pcgl-daco/data-model';
-import { institutionalRepSchema } from '@pcgl-daco/validation';
+import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
 
 // Verify each section with zod if there are errors on their fields
 export const VerifyFormSections = (fields?: ApplicationContentsResponse) => {
+	// TODO: currently no columns for applicant mailing information, so replace "test" when it is implemented
 	const sections = {
+		applicant: applicantInformationSchema.safeParse({
+			applicantTitle: fields?.applicantTitle,
+			applicantFirstName: fields?.applicantFirstName,
+			applicantMiddleName: fields?.applicantMiddleName,
+			applicantLastName: fields?.applicantLastName,
+			applicantSuffix: fields?.applicantSuffix,
+			applicantPrimaryAffiliation: fields?.applicantPrimaryAffiliation,
+			applicantInstituteEmail: fields?.applicantInstitutionalEmail,
+			applicantProfileUrl: fields?.applicantProfileUrl,
+			applicantPositionTitle: fields?.applicantPositionTitle,
+			applicantInstituteCountry: 'test',
+			applicantInstituteState: 'test',
+			applicantInstituteCity: 'test',
+			applicantInstitutePostalCode: 'test',
+			applicantInstituteStreetAddress: 'test',
+			applicantInstituteBuilding: 'test',
+		}).success,
 		institutional: institutionalRepSchema.safeParse({
 			institutionalTitle: fields?.institutionalRepTitle,
 			institutionalFirstName: fields?.institutionalRepFirstName,
@@ -85,7 +103,6 @@ function isApplicantKey(value: string): value is keyof ApplicantDTO {
 
 	return value in APPLICANT_SHAPE;
 }
-
 function isInstitutionalKey(value: string): value is keyof ApplicantDTO {
 	const INSTITUTIONAL_KEY: InstitutionalRepDTO & InstitutionDTO = {
 		institutionalRepTitle: '',
