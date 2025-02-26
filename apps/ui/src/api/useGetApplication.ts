@@ -22,10 +22,12 @@ import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type ApplicationResponseData } from '@pcgl-daco/data-model';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {
 	const { t: translate } = useTranslation();
+	const { dispatch } = useApplicationContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [id],
@@ -48,7 +50,19 @@ const useGetApplication = (id?: string | number) => {
 				throw error;
 			}
 
-			return await response.json();
+			return await response.json().then((data: ApplicationResponseData) => {
+				// Filter out data if they contain null values
+				if (data.contents) {
+					const fields = Object.entries(data.contents).reduce((acc, [key, value]) => {
+						if (value !== null) {
+							acc[key as keyof ApplicationContentsResponse] = value;
+						}
+						return acc;
+					}, {} as Partial<ApplicationContentsResponse>);
+					dispatch({ type: 'UPDATE_APPLICATION', payload: { fields } });
+				}
+				return data;
+			});
 		},
 	});
 };
