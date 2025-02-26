@@ -19,7 +19,7 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, pgTable, text, varchar } from 'drizzle-orm/pg-core';
-import { applicationContents } from './applicationContents.js';
+import { applicationContents } from './applicationContents.ts';
 
 export const collaborators = pgTable('collaborators', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
