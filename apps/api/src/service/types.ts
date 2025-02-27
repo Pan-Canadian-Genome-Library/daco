@@ -26,6 +26,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
+import { signatureService } from './signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -34,8 +35,14 @@ export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 export type ApplicationModel = typeof applications.$inferInsert;
 export type ApplicationUpdates = Partial<ApplicationModel>;
 export type ApplicationContentModel = typeof applicationContents.$inferInsert;
-export type ApplicationContentUpdates = Omit<Partial<ApplicationContentModel>, 'signature' | 'signature_signed_at'>;
-export type ApplicationSignatureUpdate = Pick<ApplicationContentModel, 'signature' | 'signature_signed_at'>;
+export type ApplicationContentUpdates = Omit<
+	Partial<ApplicationContentModel>,
+	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
+>;
+export type ApplicationSignatureUpdate = Pick<
+	ApplicationContentModel,
+	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
+>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
@@ -47,6 +54,7 @@ export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'conten
 	contents: ApplicationContentUpdates | null;
 }
 export type ApplicationService = ReturnType<typeof applicationSvc>;
+export type SignatureService = ReturnType<typeof signatureService>;
 export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 

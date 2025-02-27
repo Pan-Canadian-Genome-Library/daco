@@ -31,7 +31,6 @@ import {
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
 import {
-	ApplicationSignatureUpdate,
 	type ApplicationContentModel,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
@@ -355,36 +354,6 @@ const applicationSvc = (db: PostgresDb) => ({
 			logger.error(message);
 			logger.error(exception);
 			return failure(message, exception);
-		}
-	},
-
-	updateApplicationSignature: async ({
-		id,
-		signature,
-		signature_signed_at,
-	}: { id: number } & ApplicationSignatureUpdate): AsyncResult<ApplicationSignatureUpdate> => {
-		try {
-			const updatedSignature = await db.transaction(async (transaction) => {
-				const signature_fields = { signature: signature, signature_signed_at: signature_signed_at };
-				const editedContents = await transaction
-					.update(applicationContents)
-					.set(signature_fields)
-					.where(eq(applicationContents.application_id, id))
-					.returning();
-				if (!editedContents[0]) {
-					throw new Error('Error: Application contents record is undefined');
-				}
-
-				return { signature: editedContents[0].signature, signature_signed_at: editedContents[0].signature_signed_at };
-			});
-			return success(updatedSignature);
-		} catch (err) {
-			const message = `Error at updateApplicationSignature with id: ${id}`;
-
-			logger.error(message);
-			logger.error(err);
-
-			return failure(message, err);
 		}
 	},
 });

@@ -23,12 +23,7 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import {
-	ApplicationSignatureUpdate,
-	type ApplicationContentUpdates,
-	type ApplicationRecord,
-	type ApplicationService,
-} from '@/service/types.js';
+import { type ApplicationContentUpdates, type ApplicationRecord, type ApplicationService } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
 import { ApplicationStateManager } from './stateManager.js';
@@ -80,26 +75,6 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		logger.error(message);
 		return failure(message);
 	}
-};
-
-/**
- * Adds or updates a signature to an application.
- * @param id - The Application ID
- * @param signature - The base64-encoded image containing the signature for the Application.
- * @param signature_signed_at - The datetime when the signature was signed at.
- * @returns Success with the signature and signed at time / Failure with Error
- */
-export const updateApplicationSignature = async ({
-	id,
-	signature,
-	signature_signed_at,
-}: { id: number } & ApplicationSignatureUpdate) => {
-	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
-
-	const result = await applicationRepo.updateApplicationSignature({ id, signature, signature_signed_at });
-
-	return result;
 };
 
 /**

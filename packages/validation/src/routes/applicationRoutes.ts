@@ -65,7 +65,9 @@ export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema
 
 export const editSignatureRequestSchema = z.object({
 	id: z.number().nonnegative(),
-	signature: z.string().regex(BASE64_IMAGE),
-	signature_signed_at: z.string().datetime(),
+	applicant_signature: z.string().regex(BASE64_IMAGE).nullable(),
+	applicant_signed_at: z.string().datetime().nullable(),
+	institutional_rep_signature: z.string().regex(BASE64_IMAGE).nullable(),
+	institutional_rep_signed_at: z.string().datetime().nullable(),
 });
 export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;
