@@ -66,7 +66,7 @@ export const createCollaborators = async ({
 	}
 
 	const hasDuplicateRecords = collaborators.some((collaborator, index) => {
-		const matchingRecordIndex = collaborators.findIndex(
+		const matchingRecord = collaborators.find(
 			(record, searchIndex) =>
 				searchIndex !== index &&
 				record.collaboratorFirstName === collaborator.collaboratorFirstName &&
@@ -75,7 +75,7 @@ export const createCollaborators = async ({
 				record.collaboratorPositionTitle === collaborator.collaboratorPositionTitle,
 		);
 
-		return matchingRecordIndex !== -1;
+		return matchingRecord;
 	});
 
 	if (hasDuplicateRecords) {
