@@ -281,44 +281,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApplicationRecord'
 
-  /applications/edit/sign:
-    post:
-      tags:
-        - Applications
-      summary: Sign an application with a signature.
-      requestBody:
-        description: The ID of the application you wish to add the signature to, the signature (encoded in base64) and the time the signature took place.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requests/ApplicationSignature'
-      responses:
-        '200':
-          description: Application has been successfully signed. It will return the same data to you as what you sent in with a status `200 OK`.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/requests/ApplicationSignature'
-        '400':
-          description: Body parameters incorrect / validation failed. Likely due to missing params, or a non-base64 string.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/RequestValidationError'
-        '404':
-          description: Application not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
-        '500':
-          description: Something went wrong while processing your request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-
   /applications/approve:
     post:
       tags:
@@ -388,6 +350,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
+
+  /signature/sign:
+    post:
+      tags:
+        - Signature
+      summary: Sign an application with a signature.
+      requestBody:
+        description: The ID of the application you wish to add the signature to, the signature (encoded in base64) and the time the signature took place.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/SignatureSign'
+      responses:
+        '200':
+          description: Application has been successfully signed. It will return the same data to you as what you sent in with a status `200 OK`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/SignatureSign'
+        '400':
+          description: Body parameters incorrect / validation failed. Likely due to missing params, or a non-base64 string.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -647,23 +648,6 @@ components:
           type: string
           description: The user ID belonging to the currently signed in user.
 
-    ApplicationSignature:
-      type: object
-      description: The contents of the signature details in an application.
-      properties:
-        id:
-          type: number
-          description: The ID of the application you want to add/modify the signature on.
-        signature:
-          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
-          type: string
-          description: |
-            The Base64 encoded PNG image containing the signature.
-        signature_signed_at:
-          type: string
-          format: date-time
-          description: The date and time the application was signed at.
-
     ApplicationUpdates:
       type: object
       required:
@@ -686,6 +670,7 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+
     RejectApplication:
       type: object
       required:
@@ -694,6 +679,27 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+
+    SignatureSign:
+      type: object
+      description: The contents of the signature details in an application.
+      properties:
+        id:
+          type: number
+          description: The ID of the application you want to add/modify the signature on.
+        signature:
+          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
+          type: string
+          description: |
+            The Base64 encoded PNG image containing the signature of the Applicant or Institutional Representative.
+        signed_at:
+          type: string
+          format: date-time
+          description: The date and time the application was signed at by the Applicant or Institutional Representative.
+        signee:
+          type: string
+          enum: [APPLICANT, INSTITUTIONAL_REP]
+          description: Whether the signature is being performed by an applicant or a Institutional Representative.
 
   responses:
     ApplicationResponse:

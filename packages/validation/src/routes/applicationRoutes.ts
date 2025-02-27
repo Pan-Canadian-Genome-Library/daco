@@ -19,7 +19,7 @@
 
 import { z } from 'zod';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from '../common/strings.js';
-import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from '../utils/regex.js';
+import { ONLY_ALPHANUMERIC } from '../utils/regex.js';
 
 export const editApplicationRequestSchema = z.object({
 	id: z.number().nonnegative(),
@@ -62,12 +62,3 @@ export const editApplicationRequestSchema = z.object({
 		}),
 });
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
-
-export const editSignatureRequestSchema = z.object({
-	id: z.number().nonnegative(),
-	applicant_signature: z.string().regex(BASE64_IMAGE).nullable(),
-	applicant_signed_at: z.string().datetime().nullable(),
-	institutional_rep_signature: z.string().regex(BASE64_IMAGE).nullable(),
-	institutional_rep_signed_at: z.string().datetime().nullable(),
-});
-export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;

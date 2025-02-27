@@ -40,10 +40,10 @@ const signatureService = (db: PostgresDb) => ({
 		try {
 			const updatedSignature = await db.transaction(async (transaction) => {
 				const signature_fields = {
-					applicant_signature: applicant_signature ?? null,
-					applicant_signed_at: applicant_signed_at ?? null,
-					institutional_rep_signature: institutional_rep_signature ?? null,
-					institutional_rep_signed_at: institutional_rep_signed_at ?? null,
+					applicant_signature: applicant_signature,
+					applicant_signed_at: applicant_signed_at,
+					institutional_rep_signature: institutional_rep_signature,
+					institutional_rep_signed_at: institutional_rep_signed_at,
 				};
 				const editedContents = await transaction
 					.update(applicationContents)

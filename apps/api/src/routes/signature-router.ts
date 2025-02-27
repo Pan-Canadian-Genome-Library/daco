@@ -22,7 +22,8 @@ import { editSignatureRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express from 'express';
 
-import { updateApplicationSignature } from '@/controllers/applicationController.js';
+import { updateApplicationSignature } from '@/controllers/signatureController.ts';
+import { ApplicationSignatureUpdate } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const signatureRouter = express.Router();
@@ -38,19 +39,33 @@ signatureRouter.post(
 	withSchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const data = req.body;
 
-		const { id, applicant_signature, applicant_signed_at, institutional_rep_signature, institutional_rep_signed_at } =
-			data;
+		const { id, signature, signee, signed_at } = data;
+
+		const update: ApplicationSignatureUpdate = {};
+
+		if (signee === 'APPLICANT') {
+			(update.applicant_signature = signature), (update.applicant_signed_at = new Date(signed_at));
+		} else {
+			(update.institutional_rep_signature = signature), (update.institutional_rep_signed_at = new Date(signed_at));
+		}
 
 		const result = await updateApplicationSignature({
 			id,
-			applicant_signature,
-			applicant_signed_at: applicant_signed_at ? new Date(applicant_signed_at) : null,
-			institutional_rep_signature,
-			institutional_rep_signed_at: institutional_rep_signed_at ? new Date(institutional_rep_signed_at) : null,
+			...update,
 		});
 
 		if (result.success) {
-			res.send(result.data);
+			if (signee === 'APPLICANT') {
+				res.send({
+					signature: result.data.applicant_signature,
+					signed_at: result.data.applicant_signed_at,
+				});
+			} else {
+				res.send({
+					signature: result.data.institutional_rep_signature,
+					signed_at: result.data.institutional_rep_signed_at,
+				});
+			}
 			return;
 		}
 
