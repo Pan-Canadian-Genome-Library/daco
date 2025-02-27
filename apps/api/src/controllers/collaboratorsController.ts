@@ -23,6 +23,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
+import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -51,6 +52,8 @@ export const createCollaborators = async ({
 	}
 
 	const application = applicationResult.data;
+	const { edit } = ApplicationStateEvents;
+	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
 	// TODO: Add Real Auth
 	// Validate User is Applicant
@@ -58,8 +61,8 @@ export const createCollaborators = async ({
 		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
 	}
 
-	if (!(application.state === 'DRAFT')) {
-		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
+	if (!canEditResult.success) {
+		return canEditResult;
 	}
 
 	const hasDuplicateRecords = collaborators.some((collaborator, index) => {
