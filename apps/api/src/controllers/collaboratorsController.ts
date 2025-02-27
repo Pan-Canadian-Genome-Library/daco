@@ -22,7 +22,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
-import { CollaboratorDTO } from '@pcgl-daco/data-model';
+import { CollaboratorDTO, CollaboratorUpdateRecord } from '@pcgl-daco/data-model';
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -136,6 +136,66 @@ export const deleteCollaborator = async ({
 
 	const result = await collaboratorsRepo.deleteCollaborator({
 		id,
+	});
+
+	return result;
+};
+
+/**
+ * Delete a selected collaborator by ID
+ * @param application_id - ID of related application record to associate with Collaborators
+ * @param user_id - ID of Applicant updating the application
+ * @param collaboratorUpdate - Collaborator record with updated properties
+ * @returns Success with Collaborator data record / Failure with Error.
+ */
+export const updateCollaborator = async ({
+	application_id,
+	user_id,
+	collaboratorUpdate,
+}: {
+	application_id: number;
+	user_id: string;
+	collaboratorUpdate: CollaboratorUpdateRecord;
+}) => {
+	const database = getDbInstance();
+	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+
+	if (!applicationResult.success) {
+		return applicationResult;
+	}
+
+	const application = applicationResult.data;
+
+	// TODO: Add Real Auth
+	// Validate User is Applicant
+	if (!(user_id === application.user_id)) {
+		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
+	}
+
+	if (!(application.state === 'DRAFT')) {
+		return failure(`Can only edit Collaborators when Application is in state DRAFT`, 'InvalidState');
+	}
+
+	const { id } = collaboratorUpdate;
+
+	const collaborator: CollaboratorModel = {
+		first_name: collaboratorUpdate.collaboratorFirstName,
+		middle_name: collaboratorUpdate.collaboratorMiddleName,
+		last_name: collaboratorUpdate.collaboratorLastName,
+		suffix: collaboratorUpdate.collaboratorSuffix,
+		position_title: collaboratorUpdate.collaboratorPositionTitle,
+		institutional_email: collaboratorUpdate.collaboratorInstitutionalEmail,
+		profile_url: collaboratorUpdate.collaboratorResearcherProfileURL,
+		collaborator_type: collaboratorUpdate.collaboratorType,
+		application_id,
+	};
+
+	const result = await collaboratorsRepo.updateCollaborator({
+		id,
+		collaborator,
 	});
 
 	return result;

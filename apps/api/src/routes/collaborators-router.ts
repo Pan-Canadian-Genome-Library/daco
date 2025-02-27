@@ -20,9 +20,13 @@
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
-import { createCollaborators, deleteCollaborator } from '@/controllers/collaboratorsController.js';
-import { type CollaboratorRequest, DeleteCollaboratorRequest } from '@pcgl-daco/data-model';
-import { collaboratorsDeleteRequestSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { createCollaborators, deleteCollaborator, updateCollaborator } from '@/controllers/collaboratorsController.js';
+import { DeleteCollaboratorRequest, ListCollaboratorRequest, UpdateCollaboratorRequest } from '@pcgl-daco/data-model';
+import {
+	collaboratorsDeleteRequestSchema,
+	collaboratorsListRequestSchema,
+	collaboratorsUpdateRequestSchema,
+} from '@pcgl-daco/validation';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -33,8 +37,8 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/collaborators/create',
 	jsonParser,
-	async (request: Request<{}, {}, CollaboratorRequest, any>, response) => {
-		const validatedPayload = collaboratorsRequestSchema.safeParse(request.body);
+	async (request: Request<{}, {}, ListCollaboratorRequest, any>, response) => {
+		const validatedPayload = collaboratorsListRequestSchema.safeParse(request.body);
 
 		if (validatedPayload.success) {
 			const { applicationId: application_id, userId: user_id, collaborators } = validatedPayload.data;
@@ -137,6 +141,64 @@ collaboratorsRouter.post(
 
 			if (errorField === 'applicationId') {
 				response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
+				return;
+			}
+		}
+	},
+);
+
+/**
+ * Update Collaborator
+ */
+collaboratorsRouter.post(
+	'/collaborators/update',
+	jsonParser,
+	async (request: Request<{}, {}, UpdateCollaboratorRequest, any>, response) => {
+		const validatedPayload = collaboratorsUpdateRequestSchema.safeParse(request.body);
+
+		if (validatedPayload.success) {
+			const { applicationId: application_id, userId: user_id, collaboratorUpdate } = validatedPayload.data;
+
+			const result = await updateCollaborator({
+				application_id,
+				user_id,
+				collaboratorUpdate,
+			});
+
+			if (result.success) {
+				response.status(201).send(result.data);
+				return;
+			} else {
+				const { message, errors } = result;
+
+				if (errors === 'InvalidState') {
+					response.status(400);
+				} else if (errors === 'Unauthorized') {
+					response.status(401);
+				} else {
+					response.status(500);
+				}
+
+				response.send({ message, errors });
+				return;
+			}
+		} else {
+			const { issues } = validatedPayload.error;
+			const errorField = issues[0]?.path[0];
+			const errorMessage = issues[0]?.message;
+
+			if (errorField === 'collaborators') {
+				response.status(400).send({ message: `Required Collaborator details are missing. Error: ${errorMessage}` });
+			}
+
+			if (errorField === 'userId') {
+				// TODO: Add Real Auth
+				response.status(401).send({ message: 'Unauthorized, cannot update Collaborators' });
+				return;
+			}
+
+			if (errorField === 'applicationId') {
+				response.status(404).send({ message: 'applicationId is missing, cannot update Collaborators' });
 				return;
 			}
 		}

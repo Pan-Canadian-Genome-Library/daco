@@ -56,20 +56,25 @@ export const collaboratorsSchema = z.object({
 	collaboratorType: EmptyOrOptionalString,
 });
 
-export const collaboratorsRequestSchema = z.object({
-	applicationId: z.number(),
-	userId: NonEmptyString,
-	collaborators: z.array(collaboratorsSchema).nonempty(),
-});
-
 export const collaboratorsRecordSchema = collaboratorsSchema.extend({
 	id: z.number(),
 });
 
-export const collaboratorsDeleteRequestSchema = z.object({
+export const baseCollaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
 	userId: NonEmptyString,
+});
+
+export const collaboratorsListRequestSchema = baseCollaboratorsRequestSchema.extend({
+	collaborators: z.array(collaboratorsSchema).nonempty(),
+});
+
+export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.extend({
 	collaboratorId: z.number(),
+});
+
+export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
+	collaboratorUpdate: collaboratorsRecordSchema,
 });
 
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
