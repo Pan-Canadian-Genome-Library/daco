@@ -18,10 +18,11 @@
  */
 
 import bodyParser from 'body-parser';
-import express, { Request } from 'express';
+import express from 'express';
 
 import { createCollaborators } from '@/controllers/collaboratorsController.js';
-import { type CollaboratorRequest } from '@pcgl-daco/data-model';
+import { apiZodErrorMapping } from '@/utils/validation.js';
+import { withSchemaValidation } from '@pcgl-daco/request-utils';
 import { collaboratorsRequestSchema } from '@pcgl-daco/validation';
 
 const collaboratorsRouter = express.Router();
@@ -33,55 +34,33 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/collaborators/create',
 	jsonParser,
-	async (request: Request<{}, {}, CollaboratorRequest, any>, response) => {
-		const validatedPayload = collaboratorsRequestSchema.safeParse(request.body);
+	withSchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
-		if (validatedPayload.success) {
-			const { applicationId: application_id, userId: user_id, collaborators } = validatedPayload.data;
+		const result = await createCollaborators({
+			application_id,
+			user_id,
+			collaborators,
+		});
 
-			const result = await createCollaborators({
-				application_id,
-				user_id,
-				collaborators,
-			});
-
-			if (result.success) {
-				response.status(201).send(result.data);
-				return;
-			} else {
-				const { message, errors } = result;
-
-				if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
-					response.status(400);
-				} else if (errors === 'Unauthorized') {
-					response.status(401);
-				} else {
-					response.status(500);
-				}
-
-				response.send({ message, errors });
-				return;
-			}
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
 		} else {
-			const { issues } = validatedPayload.error;
-			const errorField = issues[0]?.path[0];
+			const { message, errors } = result;
 
-			if (errorField === 'collaborators') {
-				response.status(400).send({ message: 'Required Collaborator details are missing.' });
+			if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
+				response.status(400);
+			} else if (errors === 'Unauthorized') {
+				response.status(401);
+			} else {
+				response.status(500);
 			}
 
-			if (errorField === 'userId') {
-				// TODO: Add Real Auth
-				response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
-				return;
-			}
-
-			if (errorField === 'applicationId') {
-				response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
-				return;
-			}
+			response.send({ message, errors });
+			return;
 		}
-	},
+	}),
 );
 
 export default collaboratorsRouter;
