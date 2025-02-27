@@ -125,6 +125,24 @@ describe('Application Action Service', () => {
 			assert.strictEqual(actionResult.state_after, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 		});
 
+		it('should perform WITHDRAW actions with after state DRAFT', async () => {
+			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			assert.ok(testApplicationResult.success && testApplicationResult.data);
+			const testApplication = testApplicationResult.data;
+
+			const result = await testActionRepo.withdraw(testApplication);
+
+			assert.ok(result.success && result.data);
+
+			const actionResult = result.data;
+
+			assert.strictEqual(actionResult.user_id, user_id);
+			assert.strictEqual(actionResult.application_id, application_id);
+			assert.strictEqual(actionResult.action, ApplicationActions.WITHDRAW);
+			assert.strictEqual(actionResult.state_before, testApplication.state);
+			assert.strictEqual(actionResult.state_after, ApplicationStates.DRAFT);
+		});
+
 		it('should perform INSTITUTIONAL_REP_REVISION_REQUEST actions with after state INSTITUTIONAL_REP_REVISION_REQUESTED', async () => {
 			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
