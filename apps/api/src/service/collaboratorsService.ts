@@ -59,7 +59,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			const collaboratorRecords = await db.transaction(async (transaction) => {
 				const newRecords: CollaboratorRecord[] = [];
 
-				newCollaborators.forEach(async (collaborator) => {
+				for await (const collaborator of newCollaborators) {
 					// TODO: Inserting multiple records as an array is not working despite Drizzle team saying the issue is resolved: https://github.com/drizzle-team/drizzle-orm/issues/2849
 					const newCollaboratorRecord = await transaction.insert(collaborators).values(collaborator).returning();
 
@@ -68,7 +68,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 					}
 
 					newRecords.push(newCollaboratorRecord[0]);
-				});
+				}
 
 				return newRecords;
 			});
