@@ -18,12 +18,23 @@
  */
 
 import { z } from 'zod';
+
 import EnvironmentConfigError from './EnvironmentConfigError.js';
 
 const serverConfigSchema = z.object({
-	PORT: z.coerce.number().optional().default(3000),
+	// Node built in env variables
 	NODE_ENV: z.string().optional().default('development'),
 	npm_package_version: z.string().optional().default('unknown'),
+
+	// Custom env variables
+	PORT: z.coerce.number().optional().default(3000),
+	SESSION_KEYS: z.string(),
+	SESSION_MAX_AGE: z.coerce
+		.number()
+		.int()
+		.optional()
+		.default(1000 * 60 * 30), // default 30 minutes
+	UI_HOST: z.string().url(),
 });
 
 const parseResult = serverConfigSchema.safeParse(process.env);
@@ -31,4 +42,8 @@ const parseResult = serverConfigSchema.safeParse(process.env);
 if (!parseResult.success) {
 	throw new EnvironmentConfigError(`server`, parseResult.error);
 }
-export const serverConfig = { ...parseResult.data, isProduction: parseResult.data.NODE_ENV === 'production' };
+export const serverConfig = {
+	...parseResult.data,
+	isProduction: parseResult.data.NODE_ENV === 'production',
+	sessionKeys: parseResult.data.SESSION_KEYS.split(','),
+};

@@ -26,10 +26,12 @@ import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/application-router.js';
-import collaboratorsRouter from '@/routes/collaborators-router.js';
+import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
+import authRouter from './routes/authRouter.js';
+import sessionMiddleware from './session/sessionMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,11 +41,13 @@ const API_DOCS_PATH = `api-docs`;
 const startServer = async () => {
 	const app = express();
 
-	// @ts-ignore
-	app.use(ExpressLogger({ logger }));
+	app.use(ExpressLogger({ logger, excludeURLs: ['/auth/token'] }));
+
+	app.use(sessionMiddleware);
 
 	app.use(applicationRouter);
-	app.use(collaboratorsRouter);
+	app.use('/collaborators', collaboratorsRouter);
+	app.use('/auth', authRouter);
 
 	app.use(
 		`/${API_DOCS_PATH}`,
@@ -51,7 +55,7 @@ const startServer = async () => {
 		swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))),
 	);
 
-	app.get('/', (_req: Request, res: Response) => {
+	app.get('/', async (req: Request, res: Response) => {
 		res.json({});
 	});
 

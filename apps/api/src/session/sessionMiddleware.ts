@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,21 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { defineConfig } from 'drizzle-kit';
+import { RedisStore } from 'connect-redis';
+import session from 'express-session';
 
-const PG_DATABASE = process.env.PG_DATABASE;
-const PG_USER = process.env.PG_USER;
-const PG_PASSWORD = process.env.PG_PASSWORD;
-const PG_HOST = process.env.PG_HOST;
+import { serverConfig } from '@/config/serverConfig.js';
+import valkeyClient from './valkeyClient.js';
 
-// PG Connection String: postgres://postgres:mypassword@localhost:5432/postgres
-export const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
-
-export default defineConfig({
-	out: './drizzle',
-	schema: './src/db/schemas/index.ts',
-	dialect: 'postgresql',
-	dbCredentials: {
-		url: connectionString!,
-	},
+const sessionStore = new RedisStore({
+	client: valkeyClient,
+	prefix: 'daco-api:',
 });
+
+export const sessionMiddleware = session({
+	store: sessionStore,
+
+	secret: serverConfig.sessionKeys,
+	resave: false,
+	saveUninitialized: false,
+	cookie: { maxAge: serverConfig.SESSION_MAX_AGE },
+});
+
+export default sessionMiddleware;

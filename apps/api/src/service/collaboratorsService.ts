@@ -20,12 +20,16 @@
 import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import logger from '@/logger.js';
-import { failure, success } from '@/utils/results.js';
+import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { and, eq } from 'drizzle-orm';
 import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
 
 const collaboratorsSvc = (db: PostgresDb) => ({
-	createCollaborators: async ({ newCollaborators }: { newCollaborators: CollaboratorModel[] }) => {
+	createCollaborators: async ({
+		newCollaborators,
+	}: {
+		newCollaborators: CollaboratorModel[];
+	}): AsyncResult<CollaboratorRecord[]> => {
 		try {
 			// Check for Duplicates
 			let hasDuplicateCollaborators = false;
@@ -57,7 +61,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			const collaboratorRecords = await db.transaction(async (transaction) => {
 				const newRecords: CollaboratorRecord[] = [];
 
-				newCollaborators.forEach(async (collaborator) => {
+				for await (const collaborator of newCollaborators) {
 					// TODO: Inserting multiple records as an array is not working despite Drizzle team saying the issue is resolved: https://github.com/drizzle-team/drizzle-orm/issues/2849
 					const newCollaboratorRecord = await transaction.insert(collaborators).values(collaborator).returning();
 
@@ -66,7 +70,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 					}
 
 					newRecords.push(newCollaboratorRecord[0]);
-				});
+				}
 
 				return newRecords;
 			});

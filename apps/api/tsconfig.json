@@ -1,10 +1,12 @@
 {
 	"extends": "../tsconfig.apps.json",
 	"compilerOptions": {
+		"allowImportingTsExtensions": true,
 		"lib": ["ESNext"],
 		"target": "ESNext",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
+		"noEmit": true,
 		"paths": {
 			"@/*": ["./src/*"]
 		}

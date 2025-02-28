@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,21 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { defineConfig } from 'drizzle-kit';
+import { type Request } from 'express';
 
-const PG_DATABASE = process.env.PG_DATABASE;
-const PG_USER = process.env.PG_USER;
-const PG_PASSWORD = process.env.PG_PASSWORD;
-const PG_HOST = process.env.PG_HOST;
+export { default as sessionMiddleware } from './sessionMiddleware.js';
 
-// PG Connection String: postgres://postgres:mypassword@localhost:5432/postgres
-export const connectionString = `postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}/${PG_DATABASE}`;
+export type SessionUser = {
+	userId: string;
+	givenName?: string;
+	familyName?: string;
+};
 
-export default defineConfig({
-	out: './drizzle',
-	schema: './src/db/schemas/index.ts',
-	dialect: 'postgresql',
-	dbCredentials: {
-		url: connectionString!,
-	},
-});
+export type SessionAccount = {
+	idToken: string;
+	accessToken: string;
+	refreshToken: string;
+	refreshTokenIat: number;
+};
+
+declare module 'express-session' {
+	interface SessionData {
+		user: SessionUser;
+		account: SessionAccount;
+	}
+}
+
+export function resetSession(session: Request['session']) {
+	session.user = undefined;
+	session.account = undefined;
+	session.save();
+}
