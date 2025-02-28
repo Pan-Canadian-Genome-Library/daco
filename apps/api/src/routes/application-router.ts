@@ -18,7 +18,7 @@
  */
 
 import bodyParser from 'body-parser';
-import express, { Request } from 'express';
+import express, { Request, Response } from 'express';
 
 import {
 	approveApplication,
@@ -30,6 +30,9 @@ import {
 	rejectApplication,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
+import { apiZodErrorMapping } from '@/utils/validation.js';
+import { withSchemaValidation } from '@pcgl-daco/request-utils';
+import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -67,8 +70,7 @@ applicationRouter.post(
 applicationRouter.post(
 	'/applications/edit',
 	jsonParser,
-	// withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping,
-	async (req, res) => {
+	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
 		// TODO: Add Auth
 		const data = req.body;
 
@@ -87,9 +89,8 @@ applicationRouter.post(
 
 			res.send({ message: result.message, errors: String(result.errors) });
 		}
-	},
+	}),
 );
-// );
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
 //       - verify if user can access applications

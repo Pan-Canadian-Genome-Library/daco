@@ -18,7 +18,7 @@
  */
 
 import bodyParser from 'body-parser';
-import express from 'express';
+import express, { Request, Response } from 'express';
 
 import { createCollaborators } from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
@@ -32,9 +32,9 @@ const jsonParser = bodyParser.json();
  * Add Collaborator
  */
 collaboratorsRouter.post(
-	'/collaborators/create',
+	'/create',
 	jsonParser,
-	withSchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request, response) => {
+	withSchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request: Request, response: Response) => {
 		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
 		const result = await createCollaborators({
@@ -45,7 +45,6 @@ collaboratorsRouter.post(
 
 		if (result.success) {
 			response.status(201).send(result.data);
-			return;
 		} else {
 			const { message, errors } = result;
 
@@ -58,7 +57,6 @@ collaboratorsRouter.post(
 			}
 
 			response.send({ message, errors });
-			return;
 		}
 	}),
 );
