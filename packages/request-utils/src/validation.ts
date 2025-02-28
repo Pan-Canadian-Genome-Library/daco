@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RequestHandler } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ZodErrorMap, ZodSchema } from 'zod';
 import { RequestValidationErrorResponse } from './responses.js';
@@ -53,9 +53,9 @@ import { RequestValidationErrorResponse } from './responses.js';
 function withSchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
 	zodErrorMapping: ZodErrorMap | undefined,
-	handler: RequestHandler<ParamsDictionary, any, ReqBody>,
+	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
 ): RequestHandler {
-	return async (request, response, next) => {
+	return async (request: Request, response: Response, next: NextFunction) => {
 		try {
 			const validationResult = bodySchema.safeParse(request.body, { errorMap: zodErrorMapping });
 			if (validationResult.success) {
@@ -63,7 +63,8 @@ function withSchemaValidation<ReqBody>(
 			}
 
 			// Request body failed validation
-			return response.status(400).json(RequestValidationErrorResponse(validationResult.error));
+			response.status(400).json(RequestValidationErrorResponse(validationResult.error));
+			return;
 		} catch (err: unknown) {
 			next(err);
 		}

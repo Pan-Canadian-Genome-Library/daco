@@ -18,12 +18,12 @@
  */
 
 import bodyParser from 'body-parser';
-import express from 'express';
+import express, { Request, Response } from 'express';
 
-import { createCollaborators } from '@/controllers/collaboratorsController.js';
+import { createCollaborators, deleteCollaborator } from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { collaboratorsDeleteRequestSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -34,7 +34,7 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/collaborators/create',
 	jsonParser,
-	withSchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request, response) => {
+	withSchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request: Request, response: Response) => {
 		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
 		const result = await createCollaborators({
@@ -50,6 +50,41 @@ collaboratorsRouter.post(
 			const { message, errors } = result;
 
 			if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
+				response.status(400);
+			} else if (errors === 'Unauthorized') {
+				response.status(401);
+			} else {
+				response.status(500);
+			}
+
+			response.send({ message, errors });
+			return;
+		}
+	}),
+);
+
+/**
+ * Delete Collaborator
+ */
+collaboratorsRouter.post(
+	'/collaborators/delete',
+	jsonParser,
+	withSchemaValidation(collaboratorsDeleteRequestSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId: application_id, userId: user_id, collaboratorId } = request.body;
+
+		const result = await deleteCollaborator({
+			application_id,
+			user_id,
+			id: collaboratorId,
+		});
+
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'InvalidState') {
 				response.status(400);
 			} else if (errors === 'Unauthorized') {
 				response.status(401);

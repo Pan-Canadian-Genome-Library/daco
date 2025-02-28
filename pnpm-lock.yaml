@@ -272,11 +272,11 @@ importers:
         version: 3.24.1
     devDependencies:
       '@types/express':
-        specifier: ^4.17.17
-        version: 4.17.21
+        specifier: ^5.0.0
+        version: 5.0.0
       '@types/express-serve-static-core':
-        specifier: ^4.17.41
-        version: 4.19.6
+        specifier: ^5.0.0
+        version: 5.0.0
 
   packages/validation:
     dependencies:
