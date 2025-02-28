@@ -29,6 +29,7 @@ import applicationRouter from '@/routes/application-router.js';
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
 import authRouter from './routes/authRouter.js';
+import uploadRouter from './routes/uploadRouter.js';
 import sessionMiddleware from './session/sessionMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -45,6 +46,7 @@ const startServer = async () => {
 
 	app.use(applicationRouter);
 	app.use('/auth', authRouter);
+	app.use('/upload', uploadRouter);
 
 	app.use(
 		`/${API_DOCS_PATH}`,
