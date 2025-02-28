@@ -20,6 +20,7 @@
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
 import { ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
+import { type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
  * Adds or updates a signature to an application.
@@ -28,22 +29,29 @@ import { ApplicationSignatureUpdate, type SignatureService } from '@/service/typ
  * @param signature_signed_at - The datetime when the signature was signed at.
  * @returns Success with the signature and signed at time / Failure with Error
  */
-export const updateApplicationSignature = async ({
-	id,
-	applicant_signature,
-	applicant_signed_at,
-	institutional_rep_signature,
-	institutional_rep_signed_at,
-}: { id: number } & ApplicationSignatureUpdate) => {
+export const updateApplicationSignature = async ({ id, signature, signedAt, signee }: EditSignatureRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: SignatureService = signatureService(database);
 
+	let update: ApplicationSignatureUpdate = {};
+
+	if (signee === 'APPLICANT')
+		update = {
+			applicant_signature: signature,
+			applicant_signed_at: new Date(signedAt),
+		};
+	else if (signee === 'INSTITUTIONAL_REP') {
+		update = {
+			institutional_rep_signature: signature,
+			institutional_rep_signed_at: new Date(signedAt),
+		};
+	} else {
+		throw new Error('Error: Invalid Signee type. Signee can only be an applicant or a institutional rep.');
+	}
+
 	const result = await applicationRepo.updateApplicationSignature({
 		id,
-		applicant_signature,
-		applicant_signed_at,
-		institutional_rep_signature,
-		institutional_rep_signed_at,
+		...update,
 	});
 
 	return result;

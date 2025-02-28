@@ -17,13 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
+import { applications } from '@/db/schemas/applications.ts';
 import logger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { ApplicationSignatureUpdate } from './types.js';
+import { ApplicationStates } from '@pcgl-daco/data-model';
+import { type ApplicationSignatureUpdate } from './types.js';
 
 /**
  * ApplicationService provides methods for Applications DB access
@@ -45,6 +47,7 @@ const signatureService = (db: PostgresDb) => ({
 					institutional_rep_signature: institutional_rep_signature,
 					institutional_rep_signed_at: institutional_rep_signed_at,
 				};
+
 				const editedContents = await transaction
 					.update(applicationContents)
 					.set(signature_fields)
@@ -54,6 +57,22 @@ const signatureService = (db: PostgresDb) => ({
 					throw new Error('Error: Application contents record is undefined');
 				}
 
+				// Update Related Application
+				const applicationUpdates = {
+					updated_at: sql`NOW()`,
+					state: ApplicationStates.DRAFT,
+				};
+
+				const editedApplication = await transaction
+					.update(applications)
+					.set(applicationUpdates)
+					.where(eq(applications.id, id))
+					.returning();
+				
+					if (!editedApplication[0]) {
+					throw new Error('Application record is undefined');
+				}
+
 				return {
 					applicant_signature: editedContents[0].applicant_signature,
 					applicant_signed_at: editedContents[0].applicant_signed_at,
@@ -61,6 +80,7 @@ const signatureService = (db: PostgresDb) => ({
 					institutional_rep_signed_at: editedContents[0].institutional_rep_signed_at,
 				};
 			});
+
 			return success(updatedSignature);
 		} catch (err) {
 			const message = `Error at updateApplicationSignature with id: ${id}`;

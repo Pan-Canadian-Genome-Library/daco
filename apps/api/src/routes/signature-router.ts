@@ -23,7 +23,6 @@ import bodyParser from 'body-parser';
 import express from 'express';
 
 import { updateApplicationSignature } from '@/controllers/signatureController.ts';
-import { ApplicationSignatureUpdate } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const signatureRouter = express.Router();
@@ -38,34 +37,29 @@ signatureRouter.post(
 	jsonParser,
 	withSchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const data = req.body;
-
-		const { id, signature, signee, signed_at } = data;
-
-		const update: ApplicationSignatureUpdate = {};
-
-		if (signee === 'APPLICANT') {
-			(update.applicant_signature = signature), (update.applicant_signed_at = new Date(signed_at));
-		} else {
-			(update.institutional_rep_signature = signature), (update.institutional_rep_signed_at = new Date(signed_at));
-		}
+		const { id, signature, signee, signedAt } = data;
 
 		const result = await updateApplicationSignature({
 			id,
-			...update,
+			signature,
+			signee,
+			signedAt,
 		});
 
 		if (result.success) {
 			if (signee === 'APPLICANT') {
 				res.send({
 					signature: result.data.applicant_signature,
-					signed_at: result.data.applicant_signed_at,
+					signedAt: result.data.applicant_signed_at,
 				});
-			} else {
-				res.send({
-					signature: result.data.institutional_rep_signature,
-					signed_at: result.data.institutional_rep_signed_at,
-				});
+				return;
 			}
+
+			res.send({
+				signature: result.data.institutional_rep_signature,
+				signedAt: result.data.institutional_rep_signed_at,
+			});
+
 			return;
 		}
 
