@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
-import applicationRouter from '@/routes/application-router.js';
+import applicationRouter from '@/routes/applicationRouter.js';
 import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
 import { serverConfig } from './config/serverConfig.js';
