@@ -20,10 +20,11 @@
 import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
-import { createCollaborators } from '@/controllers/collaboratorsController.js';
+import { createCollaborators, listCollaborators } from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { collaboratorsListParamsSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import { testUserId } from '../../tests/testUtils.ts';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -62,5 +63,41 @@ collaboratorsRouter.post(
 		}
 	}),
 );
+
+/**
+ * List Collaborators
+ */
+collaboratorsRouter.get('/collaborators/:applicationId', jsonParser, async (request: Request, response: Response) => {
+	const validatedParams = await collaboratorsListParamsSchema.safeParse(request.params);
+	if (validatedParams.success) {
+		const { applicationId: application_id } = validatedParams.data;
+
+		const user_id = testUserId;
+
+		const result = await listCollaborators({
+			application_id,
+			user_id,
+		});
+
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'Unauthorized') {
+				response.status(401);
+			} else {
+				response.status(500);
+			}
+
+			response.send({ message, errors });
+			return;
+		}
+	} else {
+		response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
+		return;
+	}
+});
 
 export default collaboratorsRouter;
