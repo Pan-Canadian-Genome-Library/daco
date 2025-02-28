@@ -21,6 +21,7 @@ import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
 import { createCollaborators, listCollaborators } from '@/controllers/collaboratorsController.js';
+import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
 import { collaboratorsListParamsSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
@@ -67,11 +68,11 @@ collaboratorsRouter.post(
 /**
  * List Collaborators
  */
-collaboratorsRouter.get('/collaborators/:applicationId', jsonParser, async (request: Request, response: Response) => {
-	const validatedParams = await collaboratorsListParamsSchema.safeParse(request.params);
-	if (validatedParams.success) {
-		const { applicationId: application_id } = validatedParams.data;
+collaboratorsRouter.get('/:applicationId', jsonParser, async (request: Request, response: Response) => {
+	const application_id = request.params.applicationId ? parseInt(request.params.applicationId) : -1;
+	const validatedParams = collaboratorsListParamsSchema.safeParse(application_id);
 
+	if (validatedParams.success && isPositiveNumber(application_id)) {
 		const user_id = testUserId;
 
 		const result = await listCollaborators({
