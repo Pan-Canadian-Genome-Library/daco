@@ -45,6 +45,7 @@ collaboratorsRouter.post(
 
 		if (result.success) {
 			response.status(201).send(result.data);
+			return;
 		} else {
 			const { message, errors } = result;
 
@@ -57,6 +58,7 @@ collaboratorsRouter.post(
 			}
 
 			response.send({ message, errors });
+			return;
 		}
 	}),
 );

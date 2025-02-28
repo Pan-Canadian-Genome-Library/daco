@@ -250,36 +250,6 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 	}
 });
 
-/**
- * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
- * 	- Validate request params using Zod.
- */
-applicationRouter.post(
-	'/applications/create',
-	jsonParser,
-	async (request: Request<{}, {}, { userId: string }, any>, response) => {
-		const { userId } = request.body;
-
-		/**
-		 * TODO: Temporary userId check until validation/dto flow is confirmed.
-		 * Reflect changes in swagger once refactored.
-		 **/
-		if (!userId) {
-			response.status(400).send({ message: 'User ID is required.' });
-			return;
-		}
-
-		const result = await createApplication({ user_id: userId });
-
-		if (result.success) {
-			response.status(201).send(result.data);
-		} else {
-			response.status(500).send({ message: result.message, errors: String(result.errors) });
-		}
-	},
-);
-
 applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
 
