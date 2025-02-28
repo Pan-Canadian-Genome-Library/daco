@@ -1,5 +1,5 @@
 {
-	"id": "b344b213-412f-45f8-9759-de249d316344",
+	"id": "018ea141-90ca-4036-9ef7-467dd71ceff8",
 	"prevId": "442847e8-5201-49ff-9f90-f49a52d02021",
 	"version": "7",
 	"dialect": "postgresql",
@@ -14,15 +14,15 @@
 					"primaryKey": true,
 					"notNull": true,
 					"identity": {
+						"type": "always",
 						"name": "agreements_id_seq",
+						"schema": "public",
 						"increment": "1",
+						"startWith": "1",
 						"minValue": "1",
 						"maxValue": "9223372036854775807",
-						"startWith": "1",
 						"cache": "1",
-						"cycle": false,
-						"schema": "public",
-						"type": "always"
+						"cycle": false
 					}
 				},
 				"application_id": {
@@ -81,15 +81,15 @@
 					"primaryKey": true,
 					"notNull": true,
 					"identity": {
+						"type": "always",
 						"name": "application_actions_id_seq",
+						"schema": "public",
 						"increment": "1",
+						"startWith": "1",
 						"minValue": "1",
 						"maxValue": "9223372036854775807",
-						"startWith": "1",
 						"cache": "1",
-						"cycle": false,
-						"schema": "public",
-						"type": "always"
+						"cycle": false
 					}
 				},
 				"application_id": {
@@ -155,15 +155,15 @@
 					"primaryKey": true,
 					"notNull": true,
 					"identity": {
+						"type": "always",
 						"name": "application_contents_id_seq",
+						"schema": "public",
 						"increment": "1",
+						"startWith": "1",
 						"minValue": "1",
 						"maxValue": "9223372036854775807",
-						"startWith": "1",
 						"cache": "1",
-						"cycle": false,
-						"schema": "public",
-						"type": "always"
+						"cycle": false
 					}
 				},
 				"application_id": {
@@ -414,15 +414,15 @@
 					"primaryKey": true,
 					"notNull": true,
 					"identity": {
+						"type": "always",
 						"name": "applications_id_seq",
+						"schema": "public",
 						"increment": "1",
+						"startWith": "1",
 						"minValue": "1",
 						"maxValue": "9223372036854775807",
-						"startWith": "1",
 						"cache": "1",
-						"cycle": false,
-						"schema": "public",
-						"type": "always"
+						"cycle": false
 					}
 				},
 				"user_id": {
@@ -488,22 +488,22 @@
 					"primaryKey": true,
 					"notNull": true,
 					"identity": {
+						"type": "always",
 						"name": "collaborators_id_seq",
+						"schema": "public",
 						"increment": "1",
+						"startWith": "1",
 						"minValue": "1",
 						"maxValue": "9223372036854775807",
-						"startWith": "1",
 						"cache": "1",
-						"cycle": false,
-						"schema": "public",
-						"type": "always"
+						"cycle": false
 					}
 				},
 				"application_id": {
 					"name": "application_id",
 					"type": "bigint",
 					"primaryKey": false,
-					"notNull": false
+					"notNull": true
 				},
 				"first_name": {
 					"name": "first_name",
@@ -578,15 +578,15 @@
 					"primaryKey": true,
 					"notNull": true,
 					"identity": {
+						"type": "always",
 						"name": "files_id_seq",
+						"schema": "public",
 						"increment": "1",
+						"startWith": "1",
 						"minValue": "1",
 						"maxValue": "9223372036854775807",
-						"startWith": "1",
 						"cache": "1",
-						"cycle": false,
-						"schema": "public",
-						"type": "always"
+						"cycle": false
 					}
 				},
 				"application_id": {
@@ -645,15 +645,15 @@
 					"primaryKey": true,
 					"notNull": true,
 					"identity": {
+						"type": "always",
 						"name": "revision_requests_id_seq",
+						"schema": "public",
 						"increment": "1",
+						"startWith": "1",
 						"minValue": "1",
 						"maxValue": "9223372036854775807",
-						"startWith": "1",
 						"cache": "1",
-						"cycle": false,
-						"schema": "public",
-						"type": "always"
+						"cycle": false
 					}
 				},
 				"application_id": {
@@ -800,10 +800,10 @@
 		}
 	},
 	"schemas": {},
-	"views": {},
 	"sequences": {},
 	"roles": {},
 	"policies": {},
+	"views": {},
 	"_meta": {
 		"columns": {},
 		"schemas": {},
