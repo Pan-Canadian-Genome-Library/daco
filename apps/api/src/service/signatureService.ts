@@ -68,8 +68,8 @@ const signatureService = (db: PostgresDb) => ({
 					.set(applicationUpdates)
 					.where(eq(applications.id, id))
 					.returning();
-				
-					if (!editedApplication[0]) {
+
+				if (!editedApplication[0]) {
 					throw new Error('Application record is undefined');
 				}
 
