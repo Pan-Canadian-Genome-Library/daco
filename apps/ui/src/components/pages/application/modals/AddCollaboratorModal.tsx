@@ -62,7 +62,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.firstName')}
-									name="collabFirstName"
+									name="collaboratorFirstName"
 									control={control}
 									rule={rule}
 									required
@@ -71,8 +71,8 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
+									name="collaboratorMiddleName"
 									label={translate('form.middleName')}
-									name="collabMiddleName"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -83,7 +83,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.lastName')}
-									name="collabLastName"
+									name="collaboratorLastName"
 									control={control}
 									rule={rule}
 									required
@@ -93,7 +93,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.suffix')}
-									name="collabSuffix"
+									name="collaboratorSuffix"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -104,8 +104,8 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.primaryEmail')}
+									name="collaboratorInstitutionalEmail"
 									subLabel={translate('form.primaryEmailLabel')}
-									name="collabPrimaryEmail"
 									control={control}
 									rule={rule}
 									required
@@ -114,9 +114,9 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									label={translate('form.positionTitle')}
-									name="collabPositionTitle"
+									name="collaboratorPositionTitle"
+									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									control={control}
 									rule={rule}
 									required

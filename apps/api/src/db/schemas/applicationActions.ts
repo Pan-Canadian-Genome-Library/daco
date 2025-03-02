@@ -20,8 +20,8 @@
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
-import { applications } from './applications.js';
-import { revisionRequests } from './revisionRequests.js';
+import { applications } from './applications.ts';
+import { revisionRequests } from './revisionRequests.ts';
 
 export const applicationActionTypesEnum = pgEnum('application_action_types', [
 	'WITHDRAW',

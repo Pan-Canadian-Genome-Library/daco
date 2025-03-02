@@ -204,6 +204,7 @@ applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {
 		res.status(500).send({ message: result.message, errors: String(result.errors) });
 	}
 });
+
 applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
 	const { applicationId }: { applicationId?: number } = req.body;
 
@@ -295,4 +296,5 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 		});
 	}
 });
+
 export default applicationRouter;
