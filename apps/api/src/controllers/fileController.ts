@@ -17,23 +17,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Router } from 'express';
+import { getDbInstance } from '@/db/index.js';
+import { filesSvc } from '@/service/fileService.js';
+import { FilesService } from '@/service/types.js';
 import formidable from 'formidable';
 
-const uploadRouter = Router();
+/**
+ * Upload a file with an associated application
+ * @param applicationId - The target applicationId to associate the uploaded file
+ * @param file - File blob
+ * @returns Success with file data / Failure with Error.
+ */
+export const uploadEthicsFile = async ({ applicationId, file }: { applicationId: number; file: formidable.File }) => {
+	const database = getDbInstance();
+	const filesService: FilesService = filesSvc(database);
+	const result = await filesService.uploadEthicsFile({ application_id: applicationId, file });
 
-uploadRouter.post('/upload-ethics/:applicationId', async (req, res, next) => {
-	const { applicationId } = req.params;
-	const form = formidable({});
-
-	form.parse(req, (err, fields, files) => {
-		if (err) {
-			next(err);
-			return;
-		}
-		console.log(fields, files, applicationId);
-
-		res.json({ fields, files });
-	});
-});
-export default uploadRouter;
+	return result;
+};
