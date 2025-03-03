@@ -50,6 +50,10 @@ const SignAndSubmit = () => {
 		setValidatedData(data);
 	};
 
+	const onSaveClicked = () => {
+		console.log('saved');
+	};
+
 	const modalSubmission = () => {
 		console.log('Submit Clicked!');
 		console.log(validatedData);
@@ -57,7 +61,6 @@ const SignAndSubmit = () => {
 	};
 
 	const watchSignature = watch('signature');
-	const watchCreatedAt = watch('createdAt');
 
 	return (
 		<>
@@ -66,8 +69,8 @@ const SignAndSubmit = () => {
 					<SectionTitle title={translate('sign-and-submit-section.title')} showDivider={false} />
 					<SectionContent
 						showDivider={false}
-						title={translate('sign-and-submit-section.section1.title')}
-						text={translate('sign-and-submit-section.section1.description')}
+						title={translate('sign-and-submit-section.section.title')}
+						text={translate('sign-and-submit-section.section.description')}
 					>
 						<Row>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
@@ -82,12 +85,13 @@ const SignAndSubmit = () => {
 									setValue={setValue}
 									reset={reset}
 									clearErrors={clearErrors}
-									disableSaveButton={!watchSignature || !!(watchSignature && watchCreatedAt)}
+									disableSaveButton={!watchSignature}
+									onSaveClicked={onSaveClicked}
 									disablePreviewButton={!watchSignature}
-									downloadButtonText={translate('sign-and-submit-section.section1.buttons.download')}
-									saveButtonText={translate('sign-and-submit-section.section1.buttons.save')}
-									clearButtonText={translate('sign-and-submit-section.section1.buttons.clear')}
-									previewButtonText={translate('sign-and-submit-section.section1.buttons.view')}
+									downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
+									saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
+									clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
+									previewButtonText={translate('sign-and-submit-section.section.buttons.view')}
 								/>
 							</Col>
 						</Row>

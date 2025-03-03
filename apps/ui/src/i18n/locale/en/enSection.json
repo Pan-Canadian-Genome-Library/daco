@@ -178,7 +178,7 @@
 	},
 	"sign-and-submit-section": {
 		"title": "Sign & Submit",
-		"section1": {
+		"section": {
 			"title": "E-Signature",
 			"description": "Please use your mouse to sign within the box below. Once you’re happy with the signature click save.",
 			"buttons": {

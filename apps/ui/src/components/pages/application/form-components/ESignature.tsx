@@ -20,7 +20,7 @@
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Row, theme } from 'antd';
-import React, { type RefObject } from 'react';
+import React, { useState, type RefObject } from 'react';
 import {
 	Controller,
 	type FieldValues,
@@ -35,14 +35,14 @@ import SignatureCanvas from 'react-signature-canvas';
 
 import ErrorLabel from '@/components/pages/application/form-components/labels/ErrorLabel';
 
-interface eSignatureFormProps<T extends FieldValues> {
+interface ESignatureFormProps<T extends FieldValues> {
 	setValue: UseFormSetValue<T>;
 	formState: FormState<T>;
 	clearErrors: UseFormClearErrors<T>;
 	watch: UseFormWatch<T>;
 	reset: UseFormReset<T>;
 }
-interface eSignatureProps {
+interface ESignatureProps {
 	signatureRef: RefObject<SignatureCanvas>;
 	downloadButtonText: string;
 	previewButtonText: string;
@@ -50,6 +50,7 @@ interface eSignatureProps {
 	saveButtonText: string;
 	disableSaveButton?: boolean;
 	disablePreviewButton?: boolean;
+	onSaveClicked: () => void;
 }
 
 const SignatureFieldCover = ({ style }: { style: React.CSSProperties }) => {
@@ -70,10 +71,11 @@ const SignatureFieldCover = ({ style }: { style: React.CSSProperties }) => {
 };
 
 const ESignature = <T extends FieldValues>(
-	props: UseControllerProps<T> & eSignatureFormProps<eSignatureSchemaType> & eSignatureProps,
+	props: UseControllerProps<T> & ESignatureFormProps<eSignatureSchemaType> & ESignatureProps,
 ) => {
 	const { token } = theme.useToken();
 
+	const [signatureSaved, setSignatureSaved] = useState(false);
 	const SignatureFieldStyle: React.CSSProperties = {
 		height: '10rem',
 		width: '100%',
@@ -114,18 +116,19 @@ const ESignature = <T extends FieldValues>(
 	};
 
 	const saveSignature = () => {
-		const currentDate = new Date();
-		setValue('createdAt', currentDate.toISOString());
 		setValue('signature', formatIntoBase64());
-		clearErrors(['signature', 'createdAt']);
+		clearErrors(['signature']);
+		setSignatureSaved(true);
+		props.onSaveClicked();
 	};
 
 	const onBegin = () => {
 		reset();
+		setSignatureSaved(false);
 		clearErrors(['signature']);
 	};
 
-	const { signature: signatureError, createdAt: createdAtError } = props.formState.errors;
+	const { signature: signatureError } = props.formState.errors;
 
 	return (
 		<div>
@@ -154,7 +157,7 @@ const ESignature = <T extends FieldValues>(
 								<Button onClick={clearSignature} disabled={disabled}>
 									{clearButtonText}
 								</Button>
-								<Button disabled={disableSaveButton} onClick={saveSignature} type={'primary'}>
+								<Button disabled={disableSaveButton || !!signatureSaved} onClick={saveSignature} type={'primary'}>
 									{saveButtonText}
 								</Button>
 							</Flex>
@@ -163,9 +166,7 @@ const ESignature = <T extends FieldValues>(
 				)}
 			/>
 
-			{(createdAtError || signatureError) && (
-				<ErrorLabel text={createdAtError ? createdAtError.message : (signatureError ?? undefined)} />
-			)}
+			{signatureError && <ErrorLabel text={signatureError ? signatureError.message : undefined} />}
 		</div>
 	);
 };
