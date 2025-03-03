@@ -18,10 +18,13 @@
  */
 
 import bodyParser from 'body-parser';
-import express, { Request } from 'express';
+import express, { Request, Response } from 'express';
 
 import { createCollaborators, deleteCollaborator, updateCollaborator } from '@/controllers/collaboratorsController.js';
-import { DeleteCollaboratorRequest, ListCollaboratorRequest, UpdateCollaboratorRequest } from '@pcgl-daco/data-model';
+import { apiZodErrorMapping } from '@/utils/validation.js';
+
+import { DeleteCollaboratorRequest, ListCollaboratorRequest } from '@pcgl-daco/data-model';
+import { withSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	collaboratorsDeleteRequestSchema,
 	collaboratorsListRequestSchema,
@@ -35,7 +38,7 @@ const jsonParser = bodyParser.json();
  * Add Collaborator
  */
 collaboratorsRouter.post(
-	'/collaborators/create',
+	'/create',
 	jsonParser,
 	async (request: Request<{}, {}, ListCollaboratorRequest, any>, response) => {
 		const validatedPayload = collaboratorsListRequestSchema.safeParse(request.body);
@@ -93,7 +96,7 @@ collaboratorsRouter.post(
  * Delete Collaborator
  */
 collaboratorsRouter.post(
-	'/collaborators/delete',
+	'/delete',
 	jsonParser,
 	async (request: Request<{}, {}, DeleteCollaboratorRequest, any>, response) => {
 		const validatedPayload = collaboratorsDeleteRequestSchema.safeParse(request.body);
@@ -151,18 +154,18 @@ collaboratorsRouter.post(
  * Update Collaborator
  */
 collaboratorsRouter.post(
-	'/collaborators/update',
+	'/update',
 	jsonParser,
-	async (request: Request<{}, {}, UpdateCollaboratorRequest, any>, response) => {
-		const validatedPayload = collaboratorsUpdateRequestSchema.safeParse(request.body);
-
-		if (validatedPayload.success) {
-			const { applicationId: application_id, userId: user_id, collaboratorUpdate } = validatedPayload.data;
+	withSchemaValidation(
+		collaboratorsUpdateRequestSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
 			const result = await updateCollaborator({
 				application_id,
 				user_id,
-				collaboratorUpdate,
+				collaborators,
 			});
 
 			if (result.success) {
@@ -182,27 +185,8 @@ collaboratorsRouter.post(
 				response.send({ message, errors });
 				return;
 			}
-		} else {
-			const { issues } = validatedPayload.error;
-			const errorField = issues[0]?.path[0];
-			const errorMessage = issues[0]?.message;
-
-			if (errorField === 'collaborators') {
-				response.status(400).send({ message: `Required Collaborator details are missing. Error: ${errorMessage}` });
-			}
-
-			if (errorField === 'userId') {
-				// TODO: Add Real Auth
-				response.status(401).send({ message: 'Unauthorized, cannot update Collaborators' });
-				return;
-			}
-
-			if (errorField === 'applicationId') {
-				response.status(404).send({ message: 'applicationId is missing, cannot update Collaborators' });
-				return;
-			}
-		}
-	},
+		},
+	),
 );
 
 export default collaboratorsRouter;

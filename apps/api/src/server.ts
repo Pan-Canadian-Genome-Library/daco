@@ -46,7 +46,7 @@ const startServer = async () => {
 	app.use(sessionMiddleware);
 
 	app.use(applicationRouter);
-	app.use(collaboratorsRouter);
+	app.use('/collaborators', collaboratorsRouter);
 	app.use('/auth', authRouter);
 
 	app.use(

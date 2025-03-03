@@ -250,7 +250,7 @@ export interface ListCollaboratorRequest extends BaseCollaboratorRequest {
 }
 
 export interface UpdateCollaboratorRequest extends BaseCollaboratorRequest {
-	collaboratorUpdate: CollaboratorUpdateRecord;
+	collaborators: CollaboratorUpdateRecord;
 }
 
 export interface DeleteCollaboratorRequest extends BaseCollaboratorRequest {

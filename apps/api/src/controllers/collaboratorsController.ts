@@ -148,17 +148,17 @@ export const deleteCollaborator = async ({
  * Delete a selected collaborator by ID
  * @param application_id - ID of related application record to associate with Collaborators
  * @param user_id - ID of Applicant updating the application
- * @param collaboratorUpdate - Collaborator record with updated properties
+ * @param collaborators - Collaborator record with updated properties
  * @returns Success with Collaborator data record / Failure with Error.
  */
 export const updateCollaborator = async ({
 	application_id,
 	user_id,
-	collaboratorUpdate,
+	collaborators,
 }: {
 	application_id: number;
 	user_id: string;
-	collaboratorUpdate: CollaboratorUpdateRecord;
+	collaborators: CollaboratorUpdateRecord;
 }) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
@@ -182,17 +182,17 @@ export const updateCollaborator = async ({
 		return failure(`Can only edit Collaborators when Application is in state DRAFT`, 'InvalidState');
 	}
 
-	const { id } = collaboratorUpdate;
+	const { id } = collaborators;
 
 	const collaborator: CollaboratorModel = {
-		first_name: collaboratorUpdate.collaboratorFirstName,
-		middle_name: collaboratorUpdate.collaboratorMiddleName,
-		last_name: collaboratorUpdate.collaboratorLastName,
-		suffix: collaboratorUpdate.collaboratorSuffix,
-		position_title: collaboratorUpdate.collaboratorPositionTitle,
-		institutional_email: collaboratorUpdate.collaboratorInstitutionalEmail,
-		profile_url: collaboratorUpdate.collaboratorResearcherProfileURL,
-		collaborator_type: collaboratorUpdate.collaboratorType,
+		first_name: collaborators.collaboratorFirstName,
+		middle_name: collaborators.collaboratorMiddleName,
+		last_name: collaborators.collaboratorLastName,
+		suffix: collaborators.collaboratorSuffix,
+		position_title: collaborators.collaboratorPositionTitle,
+		institutional_email: collaborators.collaboratorInstitutionalEmail,
+		profile_url: collaborators.collaboratorResearcherProfileURL,
+		collaborator_type: collaborators.collaboratorType,
 		application_id,
 	};
 

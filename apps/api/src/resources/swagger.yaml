@@ -448,7 +448,7 @@ paths:
                   type: string
                   description: Temporary, Applicant's User Id, required for authorization
                 collaborators:
-                  $ref: '#/components/requests/UpdateCollaborators'
+                  $ref: '#/components/requests/UpdatedCollaborators'
       responses:
         '500':
           description: 'Error updating collaborators'
@@ -821,13 +821,7 @@ components:
           type: string
           description: The collaborator's contact email
 
-    UpdateCollaborators:
-      type: array
-      description: Array of new Collaborators to create
-      items:
-        $ref: '#/components/requests/UpdatedCollaborator'
-
-    UpdatedCollaborator:
+    UpdatedCollaborators:
       type: object
       properties:
         collaboratorFirstName:
