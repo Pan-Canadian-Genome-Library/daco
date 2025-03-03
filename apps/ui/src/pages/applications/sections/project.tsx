@@ -173,6 +173,7 @@ const Project = () => {
 				<SectionContent
 					title={translate('project-section.section3.title')}
 					text={translate('project-section.section3.description')}
+					showDivider={false}
 				>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
@@ -189,7 +190,7 @@ const Project = () => {
 							/>
 						</Col>
 					</Row>
-					<Row style={{ margin: '1rem 0' }}>
+					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 								<InputBox
