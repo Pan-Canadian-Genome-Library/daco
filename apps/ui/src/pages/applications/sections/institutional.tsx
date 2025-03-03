@@ -92,6 +92,7 @@ const Institutional = () => {
 					institutionStreetAddress: data.institutionStreetAddress,
 				},
 				formState: {
+					...state?.formState,
 					isDirty,
 				},
 			},

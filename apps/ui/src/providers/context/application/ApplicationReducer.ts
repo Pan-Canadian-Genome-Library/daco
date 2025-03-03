@@ -19,13 +19,13 @@
 
 import { type ApplicationAction, type ApplicationFormState } from '@/providers/context/application/types';
 
-function ApplicationReducer(state: ApplicationFormState | null, action: ApplicationAction) {
+function ApplicationReducer(state: ApplicationFormState, action: ApplicationAction) {
 	switch (action.type) {
 		case 'UPDATE_APPLICATION': {
 			return { ...state, ...action.payload };
 		}
 		case 'UPDATE_DIRTY_STATE': {
-			return { ...state, formState: { isDirty: action.payload } };
+			return { ...state, formState: { ...state?.formState, isDirty: action.payload } };
 		}
 		default:
 			return { ...state };

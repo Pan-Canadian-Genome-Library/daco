@@ -20,44 +20,14 @@
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { Dispatch } from 'react';
 
-export type ApplicationFieldsType = {
-	applicantFirstName: string | null;
-	applicantMiddleName: string | null;
-	applicantLastName: string | null;
-	applicantTitle: string | null;
-	applicantSuffix: string | null;
-	applicantPositionTitle: string | null;
-	applicantPrimaryAffiliation: string | null;
-	applicantInstitutionalEmail: string | null;
-	applicantProfileUrl: string | null;
-	institutionalRepTitle: string | null;
-	institutionalRepFirstName: string | null;
-	institutionalRepMiddleName: string | null;
-	institutionalRepLastName: string | null;
-	institutionalRepSuffix: string | null;
-	institutionalRepPrimaryAffiliation: string | null;
-	institutionalRepEmail: string | null;
-	institutionalRepProfileUrl: string | null;
-	institutionalRepPositionTitle: string | null;
-	institutionCountry: string | null;
-	institutionState: string | null;
-	institutionCity: string | null;
-	institutionStreetAddress: string | null;
-	institutionPostalCode: string | null;
-	institutionBuilding: string | null;
-	projectTitle: string | null;
-	projectWebsite: string | null;
-	projectBackground: string | null;
-	projectMethodology: string | null;
-	projectAims: string | null;
-	projectSummary: string | null;
-};
+export interface FormState {
+	isFormCompleted?: boolean;
+	isDirty: boolean;
+}
 
 export interface ApplicationFormState {
 	fields?: ApplicationContentsResponse;
-	formState?: {
-		isDirty: boolean;
-	};
+	formState: FormState;
 }
 
 export type ApplicationContextType = {

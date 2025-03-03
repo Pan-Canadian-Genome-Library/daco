@@ -24,8 +24,7 @@ import { type ApplicationContextType, type ApplicationFormState } from '@/provid
 
 const initialState: ApplicationFormState = {
 	formState: {
-		// ? touchedSections:[applicant,institution...etc]
-		// isFormCompleted:false
+		isFormCompleted: false,
 		isDirty: false,
 	},
 };
