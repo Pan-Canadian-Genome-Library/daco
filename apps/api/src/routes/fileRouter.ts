@@ -20,7 +20,6 @@
 import { uploadEthicsFile } from '@/controllers/fileController.js';
 import { Router } from 'express';
 import formidable from 'formidable';
-
 const fileRouter = Router();
 
 const validFileTypes = [
@@ -33,22 +32,24 @@ const validFileTypes = [
  * TODO: NO current Auth rules implemented
  *  -
  */
-fileRouter.post('/upload-ethics/:applicationId', async (req, res, next) => {
+fileRouter.post('/upload-ethics/:applicationId', async (req, res) => {
 	const { applicationId } = req.params;
 
 	const form = formidable({
 		keepExtensions: true,
 		maxFileSize: 5 * 1024 * 1024, // 5MB limit
+		maxFiles: 1,
+		allowEmptyFiles: false,
 	});
 
 	form.parse(req, async (err, _, files) => {
 		if (err) {
-			next(err);
+			res.status(400).send({ message: 'Invalid file upload' });
 			return;
 		}
 
 		if (!files.file || !files.file[0]) {
-			res.status(400).send({ message: 'There is an issue with the file' });
+			res.status(400).send({ message: 'File does not exist' });
 			return;
 		}
 
