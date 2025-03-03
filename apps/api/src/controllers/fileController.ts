@@ -50,7 +50,7 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 		return failure('Invalid action, must be in a draft state', 'Invalid action');
 	}
 
-	const result = await filesService.uploadEthicsFile({ application_id: applicationId, file });
+	const result = await filesService.uploadEthicsFile({ application_id: applicationId, file, application });
 
 	return result;
 };

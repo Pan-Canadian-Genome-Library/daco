@@ -24,6 +24,7 @@ import { type PostgresDb } from '@/db/index.js';
 import { files } from '@/db/schemas/files.js';
 import logger from '@/logger.ts';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
+import { ApplicationRecord } from './types.ts';
 
 /**
  * Upload service provides methods for file DB access
@@ -33,9 +34,11 @@ const filesSvc = (db: PostgresDb) => ({
 	uploadEthicsFile: async ({
 		application_id,
 		file,
+		application,
 	}: {
 		application_id: number;
 		file: formidable.File;
+		application: ApplicationRecord;
 	}): AsyncResult<string> => {
 		try {
 			await db.transaction(async (transaction) => {
@@ -46,7 +49,7 @@ const filesSvc = (db: PostgresDb) => ({
 					filename: file.originalFilename,
 					type: 'ETHICS_LETTER', // TODO: do make a db call to grab the current applications ethics letter
 					submitted_at: new Date(),
-					submitter_user_id: '1', // TODO: when sessions are in, grab its token
+					submitter_user_id: application.user_id, // TODO: when sessions are in, grab its token
 					content: buffer,
 				};
 
