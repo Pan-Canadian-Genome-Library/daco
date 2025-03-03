@@ -82,6 +82,8 @@ const Project = () => {
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 							<TextAreaBox
+								showCount
+								maxWordCount={200}
 								label={translate('project-section.section1.form.background.title')}
 								subLabel={
 									<LabelWithExample
@@ -103,6 +105,8 @@ const Project = () => {
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 							<TextAreaBox
+								showCount
+								maxWordCount={200}
 								label={translate('project-section.section1.form.methodology.title')}
 								subLabel={
 									<LabelWithExample
@@ -125,6 +129,8 @@ const Project = () => {
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 							<TextAreaBox
+								showCount
+								maxWordCount={200}
 								label={translate('project-section.section1.form.aims.title')}
 								subLabel={<LabelWithExample text={translate('project-section.section1.form.aims.example.text')} />}
 								name="projectAims"
@@ -139,6 +145,8 @@ const Project = () => {
 						<Row>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 								<TextAreaBox
+									showCount
+									maxWordCount={250}
 									label={translate('project-section.section2.form.lay-summary.title')}
 									subLabel={
 										<LabelWithExample
