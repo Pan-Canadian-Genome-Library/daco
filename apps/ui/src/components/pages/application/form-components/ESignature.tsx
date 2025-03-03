@@ -20,7 +20,7 @@
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Row, theme } from 'antd';
-import { type RefObject } from 'react';
+import React, { useState, type RefObject } from 'react';
 import {
 	Controller,
 	type FieldValues,
@@ -35,35 +35,79 @@ import SignatureCanvas from 'react-signature-canvas';
 
 import ErrorLabel from '@/components/pages/application/form-components/labels/ErrorLabel';
 
-interface eSignatureFormProps<T extends FieldValues> {
+interface ESignatureFormProps<T extends FieldValues> {
 	setValue: UseFormSetValue<T>;
 	formState: FormState<T>;
 	clearErrors: UseFormClearErrors<T>;
 	watch: UseFormWatch<T>;
 	reset: UseFormReset<T>;
 }
-interface eSignatureProps {
+interface ESignatureProps {
 	signatureRef: RefObject<SignatureCanvas>;
-	downloadButton: string;
-	previewButton: string;
-	clearButton: string;
-	saveButton: string;
+	downloadButtonText: string;
+	previewButtonText: string;
+	clearButtonText: string;
+	saveButtonText: string;
 	disableSaveButton?: boolean;
 	disablePreviewButton?: boolean;
+	onSaveClicked: () => void;
 }
 
+const SignatureFieldCover = ({ style }: { style: React.CSSProperties }) => {
+	const { token } = theme.useToken();
+	return (
+		<div
+			aria-hidden
+			style={{
+				...style,
+				position: 'absolute',
+				borderColor: 'transparent',
+				borderRadius: style.borderRadius ? 0 : 0,
+				background: token.colorTextDisabled,
+				opacity: 0.1,
+			}}
+		/>
+	);
+};
+
 const ESignature = <T extends FieldValues>(
-	props: UseControllerProps<T> & eSignatureFormProps<eSignatureSchemaType> & eSignatureProps,
+	props: UseControllerProps<T> & ESignatureFormProps<eSignatureSchemaType> & ESignatureProps,
 ) => {
 	const { token } = theme.useToken();
+
+	const [signatureSaved, setSignatureSaved] = useState(false);
+	const SignatureFieldStyle: React.CSSProperties = {
+		height: '10rem',
+		width: '100%',
+		border: 'solid 2px',
+		borderColor: token.colorBorder,
+		borderRadius: token.borderRadius,
+	};
+
+	const {
+		control,
+		name,
+		disabled,
+		signatureRef,
+		reset,
+		setValue,
+		clearErrors,
+		disablePreviewButton,
+		disableSaveButton,
+		clearButtonText,
+		previewButtonText,
+		downloadButtonText,
+		saveButtonText,
+	} = props;
+
 	const clearSignature = () => {
-		props.reset();
-		props.signatureRef.current?.clear();
+		reset();
+		signatureRef.current?.clear();
 	};
 
 	const formatIntoBase64 = () => {
-		if (props.signatureRef.current) {
-			const dataURL = props.signatureRef.current.toDataURL();
+		if (signatureRef.current) {
+			const dataURL = signatureRef.current.toDataURL();
 			return dataURL;
 		} else {
 			//Something went wrong and we can't find the signature field, but this should likely never happen.
@@ -72,51 +116,49 @@ const ESignature = <T extends FieldValues>(
 	};
 
 	const saveSignature = () => {
-		const currentDate = new Date();
-		props.setValue('createdAt', currentDate.toISOString());
-		props.setValue('signature', formatIntoBase64());
-		props.clearErrors(['signature', 'createdAt']);
+		setValue('signature', formatIntoBase64());
+		clearErrors(['signature']);
+		setSignatureSaved(true);
+		props.onSaveClicked();
 	};
 
 	const onBegin = () => {
-		props.reset();
-		props.clearErrors(['signature']);
+		reset();
+		setSignatureSaved(false);
+		clearErrors(['signature']);
 	};
 
-	const { signature: signatureError, createdAt: createdAtError } = props.formState.errors;
+	const { signature: signatureError } = props.formState.errors;
 
 	return (
 		<div>
 			<Controller
-				control={props.control}
-				name={props.name}
+				control={control}
+				name={name}
 				render={({ field }) => (
 					<Row>
+						{disabled ? <SignatureFieldCover style={SignatureFieldStyle} /> : null}
 						<SignatureCanvas
-							ref={props.signatureRef}
+							ref={signatureRef}
 							onBegin={onBegin}
 							onEnd={() => field.onChange(formatIntoBase64())}
 							canvasProps={{
-								style: {
-									height: '10rem',
-									width: '100%',
-									border: 'solid 2px',
-									borderColor: token.colorBorder,
-									borderRadius: token.borderRadius,
-								},
+								style: SignatureFieldStyle,
 							}}
 						/>
 						<Flex justify="space-between" style={{ width: '100%', margin: '1rem 0 0 0' }}>
 							<Flex gap={token.margin}>
-								<Button disabled={props.disablePreviewButton} icon={<EyeOutlined />}>
-									{props.previewButton}
+								<Button disabled={disablePreviewButton} icon={<EyeOutlined />}>
+									{previewButtonText}
 								</Button>
-								<Button icon={<DownloadOutlined />}>{props.downloadButton}</Button>
+								<Button icon={<DownloadOutlined />}>{downloadButtonText}</Button>
 							</Flex>
 							<Flex gap={token.margin}>
-								<Button onClick={clearSignature}>Clear</Button>
-								<Button disabled={props.disableSaveButton} onClick={saveSignature} type={'primary'}>
-									{props.saveButton}
+								<Button onClick={clearSignature} disabled={disabled}>
+									{clearButtonText}
+								</Button>
+								<Button disabled={disableSaveButton || !!signatureSaved} onClick={saveSignature} type={'primary'}>
+									{saveButtonText}
 								</Button>
 							</Flex>
 						</Flex>
@@ -124,9 +166,7 @@ const ESignature = <T extends FieldValues>(
 				)}
 			/>
 
-			{(createdAtError || signatureError) && (
-				<ErrorLabel text={createdAtError ? createdAtError.message : (signatureError ?? undefined)} />
-			)}
+			{signatureError && <ErrorLabel text={signatureError ? signatureError.message : undefined} />}
 		</div>
 	);
 };
