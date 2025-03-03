@@ -52,5 +52,14 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 
 	const result = await filesService.uploadEthicsFile({ application_id: applicationId, file, application });
 
+	if (!result.success) {
+		return result;
+	}
+
+	await applicationRepo.editApplication({
+		id: applicationId,
+		update: { ethics_letter: result.data.id },
+	});
+
 	return result;
 };
