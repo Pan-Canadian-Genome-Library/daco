@@ -35,18 +35,18 @@ export const updateApplicationSignature = async ({ id, signature, signedAt, sign
 
 	let update: ApplicationSignatureUpdate = {};
 
-	if (signee === 'APPLICANT')
+	if (signee === 'APPLICANT') {
 		update = {
 			applicant_signature: signature,
 			applicant_signed_at: new Date(signedAt),
 		};
-	else if (signee === 'INSTITUTIONAL_REP') {
+	} else if (signee === 'INSTITUTIONAL_REP') {
 		update = {
 			institutional_rep_signature: signature,
 			institutional_rep_signed_at: new Date(signedAt),
 		};
 	} else {
-		throw new Error('Error: Invalid Signee type. Signee can only be an applicant or a institutional rep.');
+		throw new Error('Error: Invalid Signee type. Signee can only be an Applicant or a Institutional Rep.');
 	}
 
 	const result = await applicationRepo.updateApplicationSignature({
