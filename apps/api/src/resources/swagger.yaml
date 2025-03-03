@@ -428,6 +428,48 @@ paths:
                 type: object
                 $ref: '#/components/responses/CollaboratorsListResponse'
 
+  /collaborators/update:
+    post:
+      tags:
+        - Collaborators
+      summary: Edit existing Collaborator records
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                applicationId:
+                  type: number
+                  description: ID of the related Application record that Collaborator records are associated with
+                userId:
+                  type: string
+                  description: Temporary, Applicant's User Id, required for authorization
+                collaborators:
+                  $ref: '#/components/requests/UpdateCollaborators'
+      responses:
+        '500':
+          description: 'Error updating collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error updating Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '201':
+          description: 'Collaborators updated'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -759,6 +801,34 @@ components:
         - collaboratorLastName
         - collaboratorPositionTitle
         - collaboratorInstitutionalEmail
+      properties:
+        collaboratorFirstName:
+          type: string
+          description: The collaborator's first name
+        collaboratorMiddleName:
+          type: string
+          description: The collaborator's middle name
+        collaboratorLastName:
+          type: string
+          description: The collaborator's last name
+        collaboratorSuffix:
+          type: string
+          description: The collaborator's additional name suffix
+        collaboratorPositionTitle:
+          type: string
+          description: The collaborator's job title
+        collaboratorInstitutionalEmail:
+          type: string
+          description: The collaborator's contact email
+
+    UpdateCollaborators:
+      type: array
+      description: Array of new Collaborators to create
+      items:
+        $ref: '#/components/requests/UpdatedCollaborator'
+
+    UpdatedCollaborator:
+      type: object
       properties:
         collaboratorFirstName:
           type: string
