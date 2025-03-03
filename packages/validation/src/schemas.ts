@@ -22,7 +22,13 @@ import { z } from 'zod';
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
 
 import { EthicsEnum } from './common/enums.js';
-import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
+import {
+	Concise200WordCountString,
+	Concise250WordCountString,
+	EmptyOrOptionalString,
+	NonEmptyString,
+	OptionalURLString,
+} from './common/strings.js';
 import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
@@ -85,11 +91,11 @@ export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 export const projectInformationSchema = z.object({
 	projectTitle: NonEmptyString,
 	projectWebsite: OptionalURLString,
-	projectBackground: ConciseWordCountString,
-	projectAims: ConciseWordCountString,
-	projectDataUse: ConciseWordCountString,
-	projectMethodology: ConciseWordCountString,
-	projectLaySummary: ConciseWordCountString,
+	projectBackground: Concise200WordCountString,
+	projectAims: Concise200WordCountString,
+	projectDataUse: Concise200WordCountString,
+	projectMethodology: Concise200WordCountString,
+	projectLaySummary: Concise250WordCountString,
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
