@@ -18,9 +18,12 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
+import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.js';
-import { FilesService } from '@/service/types.js';
+import { ApplicationService, FilesService } from '@/service/types.js';
+import { failure } from '@/utils/results.ts';
 import formidable from 'formidable';
+import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
 /**
  * Upload a file with an associated application
@@ -31,6 +34,22 @@ import formidable from 'formidable';
 export const uploadEthicsFile = async ({ applicationId, file }: { applicationId: number; file: formidable.File }) => {
 	const database = getDbInstance();
 	const filesService: FilesService = filesSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	const applicationResult = await applicationRepo.getApplicationById({ id: applicationId });
+
+	if (!applicationResult.success) {
+		return failure('Failed getting application information');
+	}
+
+	const application = applicationResult.data;
+	const { edit } = ApplicationStateEvents;
+	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
+
+	if (!canEditResult) {
+		return failure('Invalid action, must be in a draft state', 'Invalid action');
+	}
+
 	const result = await filesService.uploadEthicsFile({ application_id: applicationId, file });
 
 	return result;
