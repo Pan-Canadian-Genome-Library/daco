@@ -48,7 +48,7 @@ signatureRouter.post(
 		if (result.success) {
 			if (signee === 'APPLICANT') {
 				res.send({
-					id: id,
+					id: result.data.application_id,
 					signature: result.data.applicant_signature,
 					signedAt: result.data.applicant_signed_at,
 				});
@@ -56,7 +56,7 @@ signatureRouter.post(
 			}
 
 			res.send({
-				id: id,
+				id: result.data.application_id,
 				signature: result.data.institutional_rep_signature,
 				signedAt: result.data.institutional_rep_signed_at,
 			});

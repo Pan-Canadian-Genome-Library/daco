@@ -985,7 +985,7 @@ components:
       properties:
         id:
           type: number
-          description: The ID of the application you want to add/modify the signature on.
+          description: The ID of the application that you modified the signature on.
         signature:
           pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
           type: string
@@ -994,7 +994,7 @@ components:
         signedAt:
           type: string
           format: date-time
-          description: When the signature was signed at
+          description: The the signature was signed.
 
     RequestValidationError:
       type: object
