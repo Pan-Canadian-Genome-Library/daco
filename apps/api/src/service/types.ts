@@ -28,6 +28,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
+import { signatureService } from './signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -59,6 +60,8 @@ export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
 export type CollaboratorModel = typeof collaborators.$inferInsert;
 export type CollaboratorRecord = typeof collaborators.$inferSelect;
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
+
+export type SignatureService = ReturnType<typeof signatureService>;
 
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
