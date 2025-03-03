@@ -17,14 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicantDTO, ApplicationContentsResponse, InstitutionalRepDTO, InstitutionDTO } from '@pcgl-daco/data-model';
+import { SectionRoutes } from '@/pages/AppRouter';
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import { isApplicantKey, isInstitutionalKey } from './validatorFunctions';
+
+export interface VerifyPageSectionsType {
+	[SectionRoutes.APPLICANT]: boolean;
+	[SectionRoutes.INSTITUTIONAL]: boolean;
+}
 
 // Verify each section with zod if there are errors on their fields
-export const VerifyFormSections = (fields?: ApplicationContentsResponse) => {
-	// TODO: currently no columns for applicant mailing information, so replace "test" when it is implemented
-	const sections = {
-		applicant: applicantInformationSchema.safeParse({
+export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType => {
+	const sections: VerifyPageSectionsType = {
+		[SectionRoutes.APPLICANT]: applicantInformationSchema.safeParse({
 			applicantTitle: fields?.applicantTitle,
 			applicantFirstName: fields?.applicantFirstName,
 			applicantMiddleName: fields?.applicantMiddleName,
@@ -34,14 +40,14 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse) => {
 			applicantInstituteEmail: fields?.applicantInstitutionalEmail,
 			applicantProfileUrl: fields?.applicantProfileUrl,
 			applicantPositionTitle: fields?.applicantPositionTitle,
-			applicantInstituteCountry: 'test',
-			applicantInstituteState: 'test',
-			applicantInstituteCity: 'test',
-			applicantInstitutePostalCode: 'test',
-			applicantInstituteStreetAddress: 'test',
-			applicantInstituteBuilding: 'test',
+			applicantInstituteCountry: 'test', // NO mailing field in db
+			applicantInstituteState: 'test', // NO mailing field in db
+			applicantInstituteCity: 'test', // NO mailing field in db
+			applicantInstitutePostalCode: 'test', // NO mailing field in db
+			applicantInstituteStreetAddress: 'test', // NO mailing field in db
+			applicantInstituteBuilding: 'test', // NO mailing field in db
 		}).success,
-		institutional: institutionalRepSchema.safeParse({
+		[SectionRoutes.INSTITUTIONAL]: institutionalRepSchema.safeParse({
 			institutionalTitle: fields?.institutionalRepTitle,
 			institutionalFirstName: fields?.institutionalRepFirstName,
 			institutionalLastName: fields?.institutionalRepLastName,
@@ -63,13 +69,13 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse) => {
 	return sections;
 };
 
-export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
-	if (!fields) return {};
-
-	let sectionTouched = {
-		applicant: false,
-		institutional: false,
+export const VerifySectionsTouched = (fields?: ApplicationContentsResponse): VerifyPageSectionsType => {
+	let sectionTouched: VerifyPageSectionsType = {
+		[SectionRoutes.APPLICANT]: false,
+		[SectionRoutes.INSTITUTIONAL]: false,
 	};
+
+	if (!fields) return sectionTouched;
 
 	Object.entries(fields).forEach(([key, value]) => {
 		if (isApplicantKey(key) && value !== null) {
@@ -87,40 +93,3 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 
 	return sectionTouched;
 };
-
-function isApplicantKey(value: string): value is keyof ApplicantDTO {
-	const APPLICANT_SHAPE: ApplicantDTO = {
-		applicantFirstName: '',
-		applicantLastName: '',
-		applicantMiddleName: '',
-		applicantTitle: '',
-		applicantSuffix: '',
-		applicantPrimaryAffiliation: '',
-		applicantInstitutionalEmail: '',
-		applicantProfileUrl: '',
-		applicantPositionTitle: '',
-	};
-
-	return value in APPLICANT_SHAPE;
-}
-function isInstitutionalKey(value: string): value is keyof ApplicantDTO {
-	const INSTITUTIONAL_KEY: InstitutionalRepDTO & InstitutionDTO = {
-		institutionalRepTitle: '',
-		institutionalRepFirstName: '',
-		institutionalRepMiddleName: '',
-		institutionalRepLastName: '',
-		institutionalRepPrimaryAffiliation: '',
-		institutionalRepEmail: '',
-		institutionalRepProfileUrl: '',
-		institutionalRepPositionTitle: '',
-		institutionCountry: '',
-		institutionState: '',
-		institutionCity: '',
-		institutionStreetAddress: '',
-		institutionPostalCode: '',
-		institutionalRepSuffix: '',
-		institutionBuilding: '',
-	};
-
-	return value in INSTITUTIONAL_KEY;
-}

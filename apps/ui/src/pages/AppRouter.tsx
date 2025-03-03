@@ -36,50 +36,62 @@ import ManageApplicationsPage from '@/pages/manage/applications';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
 import ProtectedRoute from '../components/ProtectedRoute';
 
+export enum SectionRoutes {
+	INTRO = 'intro',
+	APPLICANT = 'applicant',
+	INSTITUTIONAL = 'institutional',
+	COLLABORATORS = 'collaborators',
+	PROJECT = 'project',
+	STUDY = 'study',
+	ETHICS = 'ethics',
+	AGREEMENT = 'agreement',
+	APPENDICES = 'appendices',
+}
+
 export const ApplicationSectionRoutes = [
 	{
-		route: 'intro',
-		path: 'intro/edit?',
+		route: SectionRoutes.INTRO,
+		path: `${SectionRoutes.INTRO}/edit?`,
 		element: <Introduction />,
 	},
 	{
-		route: 'applicant',
-		path: 'applicant/edit?',
+		route: SectionRoutes.APPLICANT,
+		path: `${SectionRoutes.APPLICANT}/edit?`,
 		element: <Applicant />,
 	},
 	{
-		route: 'institutional',
-		path: 'institutional/edit?',
+		route: SectionRoutes.INSTITUTIONAL,
+		path: `${SectionRoutes.INSTITUTIONAL}/edit?`,
 		element: <Institutional />,
 	},
 	{
-		route: 'collaborators',
-		path: 'collaborators/edit?',
+		route: SectionRoutes.COLLABORATORS,
+		path: `${SectionRoutes.COLLABORATORS}/edit?`,
 		element: <Collaborators />,
 	},
 	{
-		route: 'project',
-		path: 'project/edit?',
+		route: SectionRoutes.PROJECT,
+		path: `${SectionRoutes.PROJECT}/edit?`,
 		element: <Project />,
 	},
 	{
-		route: 'study',
-		path: 'study/edit?',
+		route: SectionRoutes.STUDY,
+		path: `${SectionRoutes.STUDY}/edit?`,
 		element: <RequestedStudy />,
 	},
 	{
-		route: 'ethics',
-		path: 'ethics/edit?',
+		route: SectionRoutes.ETHICS,
+		path: `${SectionRoutes.ETHICS}/edit?`,
 		element: <Ethics />,
 	},
 	{
-		route: 'agreement',
-		path: 'agreement/edit?',
+		route: SectionRoutes.AGREEMENT,
+		path: `${SectionRoutes.AGREEMENT}/edit?`,
 		element: <AccessAgreement />,
 	},
 	{
-		route: 'appendices',
-		path: 'appendices/edit?',
+		route: SectionRoutes.APPENDICES,
+		path: `${SectionRoutes.APPENDICES}/edit?`,
 		element: <Appendices />,
 	},
 ];
