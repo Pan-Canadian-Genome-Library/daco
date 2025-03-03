@@ -47,9 +47,9 @@ const filesSvc = (db: PostgresDb) => ({
 				const newFiles: typeof files.$inferInsert = {
 					application_id: application_id,
 					filename: file.originalFilename,
-					type: application.contents?.ethics_review_required ? 'ETHICS_LETTER' : 'SIGNED_APPLICATION', // TODO: do make a db call to grab the current applications ethics letter
+					type: application.contents?.ethics_review_required ? 'ETHICS_LETTER' : 'SIGNED_APPLICATION',
 					submitted_at: new Date(),
-					submitter_user_id: application.user_id, // TODO: when sessions are in, grab its token
+					submitter_user_id: application.user_id,
 					content: buffer,
 				};
 
