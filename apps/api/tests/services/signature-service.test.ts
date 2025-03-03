@@ -46,7 +46,6 @@ describe('Signature Service', () => {
 
 	const validBase64Signature =
 		'data:image/png;base64,0ZxJm5HcCop3TCvbnvoHxseg4L0XM5WqylNBdkHKeEmIe4s5s4A7CZYs8TrPUzIuIA0bxD+Ei6764LcM2sPsmxKBuY3REWQ/uEe1j85hUHoiTbQqwln6Kfsd8cGC8sfjrNQD02oZ';
-	const validDate = new Date('2012-12-12T12:12:12.1212Z');
 
 	before(async () => {
 		container = await new PostgreSqlContainer()
@@ -79,9 +78,8 @@ describe('Signature Service', () => {
 			const { id } = applicationRecords[0];
 
 			const applicationResult = await testSignatureService.updateApplicationSignature({
-				id,
+				application_id: id,
 				applicant_signature: validBase64Signature,
-				applicant_signed_at: validDate,
 			});
 
 			assert.ok(applicationResult.success && applicationResult.data);
@@ -89,7 +87,7 @@ describe('Signature Service', () => {
 			const application = applicationResult.data;
 
 			assert.strictEqual(application.applicant_signature, validBase64Signature);
-			assert.equal(application.applicant_signed_at?.toISOString(), validDate.toISOString());
+			assert.strictEqual(application.application_id, id);
 			assert.strictEqual(application.institutional_rep_signature, null);
 			assert.equal(application.institutional_rep_signed_at, null);
 		});
@@ -109,9 +107,8 @@ describe('Signature Service', () => {
 			const { id } = applicationRecords[0];
 
 			const applicationResult = await testSignatureService.updateApplicationSignature({
-				id,
+				application_id: id,
 				institutional_rep_signature: validBase64Signature,
-				institutional_rep_signed_at: validDate,
 			});
 
 			assert.ok(applicationResult.success && applicationResult.data);
@@ -119,7 +116,7 @@ describe('Signature Service', () => {
 			const application = applicationResult.data;
 
 			assert.strictEqual(application?.institutional_rep_signature, validBase64Signature);
-			assert.strictEqual(application?.institutional_rep_signed_at?.toISOString(), validDate.toISOString());
+			assert.strictEqual(application.application_id, id);
 		});
 	});
 

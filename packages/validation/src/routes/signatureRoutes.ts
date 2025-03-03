@@ -23,7 +23,6 @@ import { BASE64_IMAGE } from '../utils/regex.js';
 export const editSignatureRequestSchema = z.object({
 	id: z.number().nonnegative(),
 	signature: z.string().regex(BASE64_IMAGE),
-	signedAt: z.string().datetime(),
 	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
 });
 

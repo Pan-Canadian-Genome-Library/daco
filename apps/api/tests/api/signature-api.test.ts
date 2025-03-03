@@ -43,7 +43,6 @@ describe('Signature API', () => {
 
 	const validBase64Signature =
 		'data:image/png;base64,0ZxJm5HcCop3TCvbnvoHxseg4L0XM5WqylNBdkHKeEmIe4s5s4A7CZYs8TrPUzIuIA0bxD+Ei6764LcM2sPsmxKBuY3REWQ/uEe1j85hUHoiTbQqwln6Kfsd8cGC8sfjrNQD02oZ';
-	const validDate = new Date('2012-12-12T12:12:12.1212Z');
 
 	before(async () => {
 		container = await new PostgreSqlContainer()
@@ -73,12 +72,9 @@ describe('Signature API', () => {
 
 			const { id } = applicationRecordsResult.data.applications[0];
 
-			const signedAt = validDate.toISOString();
-
 			const result = await updateApplicationSignature({
 				id,
 				signature: validBase64Signature,
-				signedAt: signedAt,
 				signee: 'APPLICANT',
 			});
 
@@ -86,7 +82,6 @@ describe('Signature API', () => {
 
 			const editedSignature = result.data;
 			assert.strictEqual(editedSignature.applicant_signature, validBase64Signature);
-			assert.equal(editedSignature.applicant_signed_at?.toISOString(), signedAt);
 		});
 
 		it('Should allow signing an application as an Institutional Rep', async () => {
@@ -100,12 +95,9 @@ describe('Signature API', () => {
 
 			const { id } = applicationRecordsResult.data.applications[0];
 
-			const signedAt = validDate.toISOString();
-
 			const result = await updateApplicationSignature({
 				id,
 				signature: validBase64Signature,
-				signedAt: signedAt,
 				signee: 'INSTITUTIONAL_REP',
 			});
 
@@ -114,7 +106,6 @@ describe('Signature API', () => {
 			const editedSignature = result.data;
 
 			assert.strictEqual(editedSignature.institutional_rep_signature, validBase64Signature);
-			assert.equal(editedSignature.institutional_rep_signed_at?.toISOString(), signedAt);
 		});
 	});
 

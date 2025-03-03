@@ -45,7 +45,11 @@ export type ApplicationContentUpdates = Omit<
 >;
 export type ApplicationSignatureUpdate = Pick<
 	ApplicationContentModel,
-	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
+	| 'application_id'
+	| 'applicant_signature'
+	| 'applicant_signed_at'
+	| 'institutional_rep_signature'
+	| 'institutional_rep_signed_at'
 >;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;

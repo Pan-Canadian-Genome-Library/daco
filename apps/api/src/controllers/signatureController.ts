@@ -26,33 +26,31 @@ import { type EditSignatureRequest } from '@pcgl-daco/validation';
  * Adds or updates a signature to an application.
  * @param id - The Application ID
  * @param signature - The base64-encoded image containing the signature for the Application.
- * @param signature_signed_at - The datetime when the signature was signed at.
  * @returns Success with the signature and signed at time / Failure with Error
  */
-export const updateApplicationSignature = async ({ id, signature, signedAt, signee }: EditSignatureRequest) => {
+export const updateApplicationSignature = async ({ id, signature, signee }: EditSignatureRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: SignatureService = signatureService(database);
 
-	let update: ApplicationSignatureUpdate = {};
+	let update: ApplicationSignatureUpdate = {
+		application_id: id,
+	};
 
 	if (signee === 'APPLICANT') {
 		update = {
+			...update,
 			applicant_signature: signature,
-			applicant_signed_at: new Date(signedAt),
 		};
 	} else if (signee === 'INSTITUTIONAL_REP') {
 		update = {
+			...update,
 			institutional_rep_signature: signature,
-			institutional_rep_signed_at: new Date(signedAt),
 		};
 	} else {
 		throw new Error('Error: Invalid Signee type. Signee can only be an Applicant or a Institutional Rep.');
 	}
 
-	const result = await applicationRepo.updateApplicationSignature({
-		id,
-		...update,
-	});
+	const result = await applicationRepo.updateApplicationSignature(update);
 
 	return result;
 };

@@ -28,30 +28,31 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 import { type ApplicationSignatureUpdate } from './types.js';
 
 /**
- * ApplicationService provides methods for Applications DB access
+ * SignatureService provides methods for DB access for the signature columns in Application Contents
  * @param db - Drizzle Postgres DB Instance
  */
 const signatureService = (db: PostgresDb) => ({
 	updateApplicationSignature: async ({
-		id,
+		application_id,
 		applicant_signature,
-		applicant_signed_at,
 		institutional_rep_signature,
-		institutional_rep_signed_at,
-	}: { id: number } & ApplicationSignatureUpdate): AsyncResult<ApplicationSignatureUpdate> => {
+	}: Omit<
+		ApplicationSignatureUpdate,
+		'applicant_signed_at' | 'institutional_rep_signed_at'
+	>): AsyncResult<ApplicationSignatureUpdate> => {
 		try {
 			const updatedSignature = await db.transaction(async (transaction) => {
 				const signature_fields = {
-					applicant_signature: applicant_signature,
-					applicant_signed_at: applicant_signed_at,
-					institutional_rep_signature: institutional_rep_signature,
-					institutional_rep_signed_at: institutional_rep_signed_at,
+					applicant_signature,
+					applicant_signed_at: applicant_signature ? sql`NOW()` : undefined,
+					institutional_rep_signature,
+					institutional_rep_signed_at: institutional_rep_signature ? sql`NOW()` : undefined,
 				};
 
 				const editedContents = await transaction
 					.update(applicationContents)
 					.set(signature_fields)
-					.where(eq(applicationContents.application_id, id))
+					.where(eq(applicationContents.application_id, application_id))
 					.returning();
 				if (!editedContents[0]) {
 					throw new Error('Error: Application contents record is undefined');
@@ -66,7 +67,7 @@ const signatureService = (db: PostgresDb) => ({
 				const editedApplication = await transaction
 					.update(applications)
 					.set(applicationUpdates)
-					.where(eq(applications.id, id))
+					.where(eq(applications.id, application_id))
 					.returning();
 
 				if (!editedApplication[0]) {
@@ -74,6 +75,7 @@ const signatureService = (db: PostgresDb) => ({
 				}
 
 				return {
+					application_id: editedContents[0].application_id,
 					applicant_signature: editedContents[0].applicant_signature,
 					applicant_signed_at: editedContents[0].applicant_signed_at,
 					institutional_rep_signature: editedContents[0].institutional_rep_signature,
@@ -83,7 +85,7 @@ const signatureService = (db: PostgresDb) => ({
 
 			return success(updatedSignature);
 		} catch (err) {
-			const message = `Error at updateApplicationSignature with id: ${id}`;
+			const message = `Error at updateApplicationSignature with id: ${application_id}`;
 
 			logger.error(message);
 			logger.error(err);

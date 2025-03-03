@@ -37,18 +37,18 @@ signatureRouter.post(
 	jsonParser,
 	withSchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const data = req.body;
-		const { id, signature, signee, signedAt } = data;
+		const { id, signature, signee } = data;
 
 		const result = await updateApplicationSignature({
 			id,
 			signature,
 			signee,
-			signedAt,
 		});
 
 		if (result.success) {
 			if (signee === 'APPLICANT') {
 				res.send({
+					id: id,
 					signature: result.data.applicant_signature,
 					signedAt: result.data.applicant_signed_at,
 				});
@@ -56,6 +56,7 @@ signatureRouter.post(
 			}
 
 			res.send({
+				id: id,
 				signature: result.data.institutional_rep_signature,
 				signedAt: result.data.institutional_rep_signed_at,
 			});
