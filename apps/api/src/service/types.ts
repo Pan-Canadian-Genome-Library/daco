@@ -25,10 +25,10 @@ import * as schema from '@/db/schemas/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import { signatureService } from '@/service/signatureService.ts';
 import { type ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
-import { signatureService } from './signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
