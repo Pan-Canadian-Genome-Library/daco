@@ -18,47 +18,47 @@
  */
 
 import { z } from 'zod';
-import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from '../common/strings.js';
-import { ONLY_ALPHANUMERIC } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
+export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
+
+export const updateEditApplicationRequestSchema = z
+	.object({
+		applicantFirstname: z.string(),
+		applicantMiddlename: z.string(),
+		applicantLastname: z.string(),
+		applicantTitle: z.string(),
+		applicantSuffix: z.string(),
+		applicantPositionTitle: z.string(),
+		applicantPrimaryAffiliation: z.string(),
+		applicantInstitutionalEmail: z.string(),
+		applicantProfileUrl: z.string(),
+		institutionalRepTitle: z.string(),
+		institutionalRepFirstname: z.string(),
+		institutionalRepMiddlename: z.string(),
+		institutionalRepLastname: z.string(),
+		institutionalRepSuffix: z.string(),
+		institutionalRepPrimaryAffiliation: z.string(),
+		institutionalRepEmail: z.string(),
+		institutionalRepProfileUrl: z.string(),
+		institutionalRepPositionTitle: z.string(),
+		institutionCountry: z.string(),
+		institutionState: z.string(),
+		institutionCity: z.string(),
+		institutionStreetAddress: z.string(),
+		institutionPostalCode: z.string(),
+		institutionBuilding: z.string(),
+		projectTitle: z.string(),
+		projectWebsite: z.string(),
+		projectAims: z.string(),
+		projectMethodology: z.string(),
+		projectSummary: z.string(),
+	})
+	.partial();
+
 export const editApplicationRequestSchema = z.object({
 	id: z.number().nonnegative(),
-	update: z
-		.object({
-			applicantFirstname: NonEmptyString,
-			applicantMiddlename: EmptyOrOptionalString,
-			applicantLastname: NonEmptyString,
-			applicantTitle: NonEmptyString,
-			applicantSuffix: EmptyOrOptionalString,
-			applicantPositionTitle: NonEmptyString,
-			applicantPrimaryAffiliation: NonEmptyString,
-			applicantInstitutionalEmail: NonEmptyString.email(),
-			applicantProfileUrl: NonEmptyString.url(),
-			institutionalRepTitle: NonEmptyString,
-			institutionalRepFirstname: NonEmptyString,
-			institutionalRepMiddlename: EmptyOrOptionalString,
-			institutionalRepLastname: NonEmptyString,
-			institutionalRepSuffix: EmptyOrOptionalString,
-			institutionalRepPrimaryAffiliation: NonEmptyString,
-			institutionalRepEmail: NonEmptyString.email(),
-			institutionalRepProfileUrl: NonEmptyString.url(),
-			institutionalRepPositionTitle: NonEmptyString,
-			institutionCountry: NonEmptyString,
-			institutionState: NonEmptyString,
-			institutionCity: NonEmptyString,
-			institutionStreetAddress: NonEmptyString,
-			institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
-			institutionBuilding: NonEmptyString,
-			projectTitle: NonEmptyString,
-			projectWebsite: OptionalURLString,
-			projectAims: ConciseWordCountString,
-			projectMethodology: ConciseWordCountString,
-			projectSummary: ConciseWordCountString,
-		})
-		.partial()
-		.strict()
-		.refine((updateObj) => Object.keys(updateObj).length !== 0, {
-			params: { violation: 'noEmptyObject' },
-		}),
+	update: updateEditApplicationRequestSchema.strict().refine((updateObj) => Object.keys(updateObj).length !== 0, {
+		params: { violation: 'noEmptyObject' },
+	}),
 });
