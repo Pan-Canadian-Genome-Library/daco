@@ -33,7 +33,7 @@ const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
 
 export const files = pgTable('files', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull().unique(),
+	application_id: bigint({ mode: 'number' }).notNull(),
 	type: fileTypesEnum().notNull(),
 	submitter_user_id: varchar({ length: 100 }).notNull(),
 	submitted_at: timestamp().notNull(),
