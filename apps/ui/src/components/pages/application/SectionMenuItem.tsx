@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 const { Text } = Typography;
 
 type SectionMenuItemProps = {
+	isCurrentSection: boolean;
 	isSectionTouched?: boolean;
 	isSectionValid?: boolean;
 	label: string;
@@ -35,10 +36,17 @@ type SectionMenuItemProps = {
  *   - what would the endpoint response look like?
  */
 
-const SectionMenuItem = ({ isSectionTouched, isSectionValid, label, isEditMode }: SectionMenuItemProps) => {
+const SectionMenuItem = ({
+	isCurrentSection,
+	isSectionTouched,
+	isSectionValid,
+	label,
+	isEditMode,
+}: SectionMenuItemProps) => {
 	const { t: translate } = useTranslation();
 
 	const renderIcon = () => {
+		if (isCurrentSection && isEditMode && !isSectionValid) return;
 		if (!isEditMode) return <LockOutlined />;
 		if (!isSectionTouched) return;
 		if (isSectionValid) return <CheckCircleOutlined />;

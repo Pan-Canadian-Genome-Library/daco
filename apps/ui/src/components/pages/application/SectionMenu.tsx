@@ -66,6 +66,7 @@ const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 					key: item.route,
 					label: (
 						<SectionMenuItem
+							isCurrentSection={currentSection === route}
 							isSectionTouched={SectionTouched[route]}
 							isSectionValid={SectionValidator[route]}
 							label={item.route}
