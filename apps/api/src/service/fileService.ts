@@ -42,16 +42,23 @@ const filesSvc = (db: PostgresDb) => ({
 				const buffer = await fs.readFileSync(file.filepath);
 
 				const newFiles: typeof files.$inferInsert = {
-					application_id,
+					application_id: application_id,
 					filename: file.originalFilename,
-					type: 'ETHICS_LETTER', // should be file type
+					type: 'ETHICS_LETTER', // TODO: do make a db call to grab the current applications ethics letter
 					submitted_at: new Date(),
-					submitter_user_id: '1', // todo: when sessions are in, grab its token
+					submitter_user_id: '1', // TODO: when sessions are in, grab its token
 					content: buffer,
 				};
 
 				// Create New File
-				const newFileRecord = await transaction.insert(files).values(newFiles).returning();
+				const newFileRecord = await transaction
+					.insert(files)
+					.values(newFiles)
+					.onConflictDoUpdate({
+						target: files.application_id,
+						set: newFiles,
+					})
+					.returning();
 				if (!newFileRecord[0]) throw new Error('File record is undefined');
 
 				return newFileRecord[0];
