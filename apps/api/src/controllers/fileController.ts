@@ -20,7 +20,7 @@
 import { getDbInstance } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.js';
-import { ApplicationService, FilesService } from '@/service/types.js';
+import { ApplicationRecord, ApplicationService, FilesService } from '@/service/types.js';
 import { failure } from '@/utils/results.ts';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
@@ -36,7 +36,7 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 	const filesService: FilesService = filesSvc(database);
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const applicationResult = await applicationRepo.getApplicationById({ id: applicationId });
+	const applicationResult = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
 	if (!applicationResult.success) {
 		return failure('Failed getting application information');
@@ -44,7 +44,9 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 
 	const application = applicationResult.data;
 	const { edit } = ApplicationStateEvents;
-	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
+
+	const app: ApplicationRecord = { ...application, contents: null };
+	const canEditResult = new ApplicationStateManager(app)._canPerformAction(edit);
 
 	if (!canEditResult) {
 		return failure('Invalid action, must be in a draft state', 'Invalid action');
