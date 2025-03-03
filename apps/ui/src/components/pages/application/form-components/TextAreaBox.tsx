@@ -76,6 +76,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 						labelAlign={props.labelAlign}
 						labelCol={props.labelCol}
 						initialValue={!props.subLabel ? field.value : undefined}
+						validateTrigger="onBlur"
 					>
 						{props.subLabel ? (
 							<Item
@@ -85,6 +86,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
 								initialValue={field.value}
+								validateTrigger="onBlur"
 							>
 								{renderControl(field)}
 							</Item>

@@ -19,6 +19,7 @@
 		"@pcgl-daco/data-model": "workspace:^",
 		"@pcgl-daco/validation": "workspace:^",
 		"@tanstack/react-query": "^5.63.0",
+		"@types/react-signature-canvas": "^1.0.7",
 		"antd": "^5.21.6",
 		"antd-zod": "^6.0.1",
 		"i18next": "^24.1.0",
@@ -27,6 +28,7 @@
 		"react-hook-form": "^7.54.2",
 		"react-i18next": "^15.2.0",
 		"react-router": "^7.0.1",
+		"react-signature-canvas": "^1.0.7",
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {

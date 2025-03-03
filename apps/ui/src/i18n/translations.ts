@@ -80,6 +80,9 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 			} else {
 				return { message: i18n.t('nonPositiveNumber') };
 			}
+			if (error.code === 'too_small') {
+				return { message: i18n.t('tooSmall', { value: error.minimum }) };
+			}
 			break;
 		case z.ZodIssueCode.too_big:
 			if (error.type === 'array' && error.path[0] === 'agreements') {
