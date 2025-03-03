@@ -45,8 +45,8 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 	const application = applicationResult.data;
 	const { edit } = ApplicationStateEvents;
 
-	const app: ApplicationRecord = { ...application, contents: null };
-	const canEditResult = new ApplicationStateManager(app)._canPerformAction(edit);
+	const applicationRecord: ApplicationRecord = { ...application, contents: null };
+	const canEditResult = new ApplicationStateManager(applicationRecord)._canPerformAction(edit);
 
 	if (!canEditResult) {
 		return failure('Invalid action, must be in a draft state', 'Invalid action');

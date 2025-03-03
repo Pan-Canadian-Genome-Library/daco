@@ -24,6 +24,7 @@ import { type PostgresDb } from '@/db/index.js';
 import { files } from '@/db/schemas/files.js';
 import logger from '@/logger.ts';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
+import { eq } from 'drizzle-orm';
 import { type FilesModel, type JoinedApplicationRecord } from './types.ts';
 
 /**
@@ -47,21 +48,22 @@ const filesSvc = (db: PostgresDb) => ({
 				const newFiles: typeof files.$inferInsert = {
 					application_id: application_id,
 					filename: file.originalFilename,
-					type: application.contents?.ethics_review_required ? 'ETHICS_LETTER' : 'SIGNED_APPLICATION',
+					type: 'ETHICS_LETTER',
 					submitted_at: new Date(),
 					submitter_user_id: application.user_id,
 					content: buffer,
 				};
 
 				// Create New File
-				const newFileRecord = await transaction
-					.insert(files)
-					.values(newFiles)
-					.onConflictDoUpdate({
-						target: files.application_id,
-						set: newFiles,
-					})
-					.returning();
+				let newFileRecord;
+				const ethicsLetterId = application.contents?.ethics_letter;
+
+				if (ethicsLetterId && ethicsLetterId !== null) {
+					newFileRecord = await transaction.update(files).set(newFiles).where(eq(files.id, ethicsLetterId)).returning();
+				} else {
+					newFileRecord = await transaction.insert(files).values(newFiles).returning();
+				}
+
 				if (!newFileRecord[0]) throw new Error('File record is undefined');
 
 				return newFileRecord[0];
