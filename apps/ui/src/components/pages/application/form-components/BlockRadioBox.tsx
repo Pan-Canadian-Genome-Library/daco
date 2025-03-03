@@ -91,6 +91,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 						labelCol={props.labelCol}
 						layout={props.layout}
 						initialValue={!props.subLabel ? field.value : undefined}
+						validateTrigger="onBlur"
 					>
 						{props.subLabel ? (
 							<Item
@@ -100,6 +101,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
 								initialValue={field.value}
+								validateTrigger="onBlur"
 							>
 								{renderControl(field)}
 							</Item>
