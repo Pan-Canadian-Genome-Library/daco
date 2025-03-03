@@ -24,10 +24,9 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { SignatureService, type ApplicationService } from '@/service/types.js';
+import { type ApplicationService } from '@/service/types.js';
 
 import { updateApplicationSignature } from '@/controllers/signatureController.ts';
-import { signatureService } from '@/service/signatureService.ts';
 import {
 	addInitialApplications,
 	initTestMigration,
@@ -40,7 +39,6 @@ import {
 describe('Signature API', () => {
 	let db: PostgresDb;
 	let testApplicationRepo: ApplicationService;
-	let testSignatureRepo: SignatureService;
 	let container: StartedPostgreSqlContainer;
 
 	const validBase64Signature =
@@ -61,7 +59,6 @@ describe('Signature API', () => {
 		await addInitialApplications(db);
 
 		testApplicationRepo = applicationSvc(db);
-		testSignatureRepo = signatureService(db);
 	});
 
 	describe('Sign Application', () => {
