@@ -24,7 +24,8 @@ import { type PostgresDb } from '@/db/index.js';
 import { files } from '@/db/schemas/files.js';
 import logger from '@/logger.ts';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
-import { ApplicationRecord } from './types.ts';
+import { applicationSvc } from './applicationService.ts';
+import { ApplicationRecord, ApplicationService } from './types.ts';
 
 /**
  * Upload service provides methods for file DB access
@@ -43,6 +44,7 @@ const filesSvc = (db: PostgresDb) => ({
 		try {
 			await db.transaction(async (transaction) => {
 				const buffer = await fs.readFileSync(file.filepath);
+				const applicationService: ApplicationService = applicationSvc(db);
 
 				const newFiles: typeof files.$inferInsert = {
 					application_id: application_id,
@@ -63,6 +65,11 @@ const filesSvc = (db: PostgresDb) => ({
 					})
 					.returning();
 				if (!newFileRecord[0]) throw new Error('File record is undefined');
+
+				await applicationService.editApplication({
+					id: application_id,
+					update: { ethics_letter: newFileRecord[0].id },
+				});
 
 				return newFileRecord[0];
 			});
