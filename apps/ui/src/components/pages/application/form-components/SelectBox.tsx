@@ -27,7 +27,7 @@ const { Item } = Form;
 interface SelectBoxProps extends BasicFormFieldProps {
 	options?: {
 		label: string;
-		value: string;
+		value: string | number;
 	}[];
 	initialValue?: object | string;
 	placeholder?: string;

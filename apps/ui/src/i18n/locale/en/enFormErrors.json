@@ -13,5 +13,7 @@
 	"requiredNumberOfCheckboxes": "Please select all required checkboxes.",
 	"checkboxesNotFilledOut": "All checkboxes must be checked to go to next page.",
 	"duplicateAgreementItems": "There are duplicate items checked, please uncheck any duplicate checkboxes.",
-	"invalidAgreementItem": "There is an invalid checkbox checked, please uncheck this checkbox before proceeding."
+	"invalidAgreementItem": "There is an invalid checkbox checked, please uncheck this checkbox before proceeding.",
+	"nonPositiveNumber": "Number must be greater than or equal to 0.",
+	"invalidIdNumber": "Study ID must be greater than or equal to 0."
 }
