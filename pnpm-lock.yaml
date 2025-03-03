@@ -62,9 +62,12 @@ importers:
       connect-redis:
         specifier: ^8.0.1
         version: 8.0.1(express-session@1.18.1)
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.5
       drizzle-orm:
-        specifier: ^0.38.3
-        version: 0.38.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)
+        specifier: ^0.39.1
+        version: 0.39.1(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)
       express:
         specifier: ^4.21.0
         version: 4.21.0
@@ -119,7 +122,7 @@ importers:
         version: 0.2.34
       drizzle-dbml-generator:
         specifier: ^0.9.0
-        version: 0.9.0(drizzle-orm@0.38.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1))
+        version: 0.9.0(drizzle-orm@0.39.1(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1))
       drizzle-kit:
         specifier: ^0.30.1
         version: 0.30.1
@@ -1975,6 +1978,10 @@ packages:
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
+  cors@2.8.5:
+    resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
+    engines: {node: '>= 0.10'}
+
   cpu-features@0.0.10:
     resolution: {integrity: sha512-9IkYqtX3YHPCzoVg1Py+o9057a3i0fp7S530UWokCSaFVTc7CwXPRiOjRjBQQ18ZCNafx78YfnG+HALxtVmOGA==}
     engines: {node: '>=10.0.0'}
@@ -2114,8 +2121,8 @@ packages:
     resolution: {integrity: sha512-HmA/NeewvHywhJ2ENXD3KvOuM/+K2dGLJfxVfIHsGwaqKICJnS+Ke2L6UcSrSrtMJLJaT0Im1Qv4TFXfaZShyw==}
     hasBin: true
 
-  drizzle-orm@0.38.3:
-    resolution: {integrity: sha512-w41Y+PquMpSff/QDRGdItG0/aWca+/J3Sda9PPGkTxBtjWQvgU1jxlFBXdjog5tYvTu58uvi3PwR1NuCx0KeZg==}
+  drizzle-orm@0.39.1:
+    resolution: {integrity: sha512-2bDHlzTY31IDmrYn8i+ZZrxK8IyBD4mPZ7JmZdVDQj2tpBZXs/gxB/1kK5pSvkjxPUMNOVsTnoGkSltgjuJwcA==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -6022,6 +6029,11 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
+  cors@2.8.5:
+    dependencies:
+      object-assign: 4.1.1
+      vary: 1.1.2
+
   cpu-features@0.0.10:
     dependencies:
       buildcheck: 0.0.6
@@ -6144,9 +6156,9 @@ snapshots:
 
   dotenv@16.4.7: {}
 
-  drizzle-dbml-generator@0.9.0(drizzle-orm@0.38.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)):
+  drizzle-dbml-generator@0.9.0(drizzle-orm@0.39.1(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)):
     dependencies:
-      drizzle-orm: 0.38.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)
+      drizzle-orm: 0.39.1(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1)
 
   drizzle-kit@0.30.1:
     dependencies:
@@ -6157,7 +6169,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.38.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1):
+  drizzle-orm@0.39.1(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(@types/react@18.3.10)(pg@8.13.0)(react@18.3.1):
     optionalDependencies:
       '@libsql/client-wasm': 0.14.0
       '@types/pg': 8.11.10

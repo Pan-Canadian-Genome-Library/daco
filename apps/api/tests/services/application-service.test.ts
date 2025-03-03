@@ -32,6 +32,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import {
 	addInitialApplications,
 	addPaginationDonors,
+	allRecordsPageSize,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
@@ -249,16 +250,17 @@ describe('Application Service', () => {
 						column: 'state',
 					},
 				],
+				pageSize: allRecordsPageSize,
 			});
 			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data.applications;
+			const { applications, pagingMetadata } = applicationRecordsResult.data;
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords.length >= 3);
+			assert.ok(Array.isArray(applications));
+			assert.ok((applications.length = pagingMetadata.pageSize));
 
-			const draftRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.DRAFT);
-			const rejectedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.REJECTED);
-			const approvedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.APPROVED);
+			const draftRecordIndex = applications.findIndex((record) => record.state === ApplicationStates.DRAFT);
+			const rejectedRecordIndex = applications.findIndex((record) => record.state === ApplicationStates.REJECTED);
+			const approvedRecordIndex = applications.findIndex((record) => record.state === ApplicationStates.APPROVED);
 
 			assert.ok(draftRecordIndex < rejectedRecordIndex);
 			assert.ok(rejectedRecordIndex < approvedRecordIndex);
@@ -345,13 +347,15 @@ describe('Application Service', () => {
 
 			const allStates = appStateTotals.data;
 
-			const allApplications = await testApplicationService.listApplications({ user_id });
+			const allApplications = await testApplicationService.listApplications({
+				user_id,
+				pageSize: allRecordsPageSize,
+			});
 			assert.ok(allApplications.success);
 
 			const applicationRecords = allApplications.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
-
 			assert.ok(allStates);
 
 			const allDraftRecords = applicationRecords.filter((records) => records.state === 'DRAFT');
