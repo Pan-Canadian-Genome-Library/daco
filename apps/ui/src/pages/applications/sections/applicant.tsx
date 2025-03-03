@@ -48,6 +48,7 @@ const Applicant = () => {
 		control,
 	} = useForm<ApplicantInformationSchemaType>({
 		defaultValues: {
+			applicantInstituteCountry: 'CAN',
 			applicantTitle: state?.fields?.applicantTitle || undefined,
 			applicantFirstName: state?.fields?.applicantFirstName || undefined,
 			applicantMiddleName: state?.fields?.applicantMiddleName || undefined,
@@ -214,7 +215,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title={translate('applicant-section.section2')}>
+				<SectionContent title={translate('applicant-section.section2')} showDivider={false}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox

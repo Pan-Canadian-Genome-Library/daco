@@ -59,7 +59,7 @@ const Institutional = () => {
 			institutionalTitle: state?.fields?.institutionalRepTitle || undefined,
 			institutionBuilding: state?.fields?.institutionBuilding || undefined,
 			institutionCity: state?.fields?.institutionCity || undefined,
-			institutionCountry: state?.fields?.institutionCountry || undefined,
+			institutionCountry: state?.fields?.institutionCountry || 'CAN',
 			institutionPostalCode: state?.fields?.institutionPostalCode || undefined,
 			institutionState: state?.fields?.institutionState || undefined,
 			institutionStreetAddress: state?.fields?.institutionStreetAddress || undefined,
@@ -231,7 +231,7 @@ const Institutional = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title={translate('institutional-section.section2')}>
+				<SectionContent title={translate('institutional-section.section2')} showDivider={false}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox

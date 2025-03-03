@@ -68,6 +68,11 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 	};
 
 	const submitApplication = () => {
+		// Temp logic to trigger validation errors on ui edit mode
+		if (!!onSubmit && isEditMode) {
+			onSubmit();
+			return;
+		}
 		console.log('Submit application');
 	};
 
@@ -83,7 +88,7 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 					{translate('button.next')}
 				</Button>
 			) : (
-				<Button onClick={submitApplication} type="primary" disabled>
+				<Button onClick={submitApplication} type="primary">
 					{translate('button.submitApplication')}
 				</Button>
 			)}
