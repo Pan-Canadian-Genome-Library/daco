@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type PostgresDb } from '@/db/index.js';
-import { files } from '@/db/schemas/files.js';
-import { type AsyncResult, success } from '@/utils/results.js';
 import formidable from 'formidable';
 import fs from 'fs';
+
+import { type PostgresDb } from '@/db/index.js';
+import { files } from '@/db/schemas/files.js';
+import logger from '@/logger.ts';
+import { type AsyncResult, failure, success } from '@/utils/results.js';
 
 /**
  * Upload service provides methods for file DB access
@@ -34,25 +36,36 @@ const filesSvc = (db: PostgresDb) => ({
 	}: {
 		application_id: number;
 		file: formidable.File;
-	}): AsyncResult<any> => {
-		const responseFile = await db.transaction(async (transaction) => {
-			const buffer = await fs.readFileSync(file.filepath);
+	}): AsyncResult<string> => {
+		try {
+			await db.transaction(async (transaction) => {
+				const buffer = await fs.readFileSync(file.filepath);
 
-			const newFiles: typeof files.$inferInsert = {
-				application_id,
-				filename: file.originalFilename,
-				type: 'ETHICS_LETTER', // should be file type
-				submitted_at: new Date(),
-				submitter_user_id: '1',
-				content: buffer,
-			};
+				const newFiles: typeof files.$inferInsert = {
+					application_id,
+					filename: file.originalFilename,
+					type: 'ETHICS_LETTER', // should be file type
+					submitted_at: new Date(),
+					submitter_user_id: '1', // todo: when sessions are in, grab its token
+					content: buffer,
+				};
 
-			// Create New File
-			const newFileRecord = await transaction.insert(files).values(newFiles).returning();
-			if (!newFileRecord[0]) throw new Error('newFileRecord record is undefined');
-			return newFileRecord;
-		});
-		return success(responseFile);
+				// Create New File
+				const newFileRecord = await transaction.insert(files).values(newFiles).returning();
+				if (!newFileRecord[0]) throw new Error('File record is undefined');
+
+				return newFileRecord[0];
+			});
+
+			return success('Upload was successful');
+		} catch (err) {
+			const message = `Error uploading file`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
 	},
 });
 

@@ -23,30 +23,57 @@ import formidable from 'formidable';
 
 const fileRouter = Router();
 
+const validFileTypes = [
+	'application/pdf',
+	'application/msword',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+
+/**
+ * TODO: NO current Auth rules implemented
+ *  -
+ */
 fileRouter.post('/upload-ethics/:applicationId', async (req, res, next) => {
 	const { applicationId } = req.params;
+
 	const form = formidable({
 		keepExtensions: true,
 		maxFileSize: 5 * 1024 * 1024, // 5MB limit
 	});
 
-	form.parse(req, async (err, fields, files) => {
+	form.parse(req, async (err, _, files) => {
 		if (err) {
 			next(err);
 			return;
 		}
-		if (!files.file) {
-			console.log('file does not exist');
+
+		if (!files.file || !files.file[0]) {
+			res.status(400).send({ message: 'There is an issue with the file' });
 			return;
 		}
+
 		const file = files.file[0];
 
-		if (!file) {
-			return;
+		if (!file.mimetype) {
+			res.status(400).send({ message: 'File type was not specified' });
+			return false;
 		}
 
-		await uploadEthicsFile({ applicationId: parseInt(applicationId), file });
-		res.json({ fields, files });
+		if (!validFileTypes.includes(`${file.mimetype}`)) {
+			res.status(400).send({ message: 'Invalid file type' });
+			return false;
+		}
+
+		const result = await uploadEthicsFile({ applicationId: parseInt(applicationId), file });
+
+		if (result.success) {
+			res.status(200).send(result.data);
+			return;
+		} else {
+			const errorReturn = { message: result.message, errors: String(result.errors) };
+			res.status(500).send(errorReturn);
+			return;
+		}
 	});
 });
 export default fileRouter;
