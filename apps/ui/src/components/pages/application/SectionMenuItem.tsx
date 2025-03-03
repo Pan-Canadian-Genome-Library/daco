@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { SectionRoutes } from '@/pages/AppRouter';
 import { CheckCircleOutlined, ExclamationCircleOutlined, LockOutlined } from '@ant-design/icons';
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -46,6 +47,7 @@ const SectionMenuItem = ({
 	const { t: translate } = useTranslation();
 
 	const renderIcon = () => {
+		if (label === SectionRoutes.INTRO) return;
 		if (isCurrentSection && isEditMode && !isSectionValid) return;
 		if (!isEditMode) return <LockOutlined />;
 		if (!isSectionTouched) return;
