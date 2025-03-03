@@ -27,7 +27,7 @@ import { type ApplicationContentUpdates, type ApplicationRecord, type Applicatio
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
-import { ApplicationStateManager } from './stateManager.js';
+import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
 /**
  * Creates a new application and returns the created data.
@@ -60,53 +60,49 @@ export const editApplication = async ({ id, update }: { id: number; update: Upda
 		return result;
 	}
 
-	const { state } = result.data;
+	const application = result.data;
 
-	// TODO: Replace w/ state machine https://github.com/Pan-Canadian-Genome-Library/daco/issues/58
-	const isEditState =
-		state === ApplicationStates.DRAFT ||
-		state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
-		state === ApplicationStates.DAC_REVIEW;
+	const { edit } = ApplicationStateEvents;
+	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
-	if (isEditState) {
-		const fomratedUpdate: ApplicationContentUpdates = {
-			applicant_first_name: update.applicantFirstname,
-			applicant_middle_name: update.applicantMiddlename,
-			applicant_last_name: update.applicantLastname,
-			applicant_institutional_email: update.applicantInstitutionalEmail,
-			applicant_position_title: update.applicantPositionTitle,
-			applicant_primary_affiliation: update.applicantPrimaryAffiliation,
-			applicant_profile_url: update.applicantProfileUrl,
-			applicant_suffix: update.applicantSuffix,
-			applicant_title: update.applicantTitle,
-			institutional_rep_first_name: update.institutionalRepFirstname,
-			institutional_rep_middle_name: update.institutionalRepMiddlename,
-			institutional_rep_last_name: update.institutionalRepLastname,
-			institutional_rep_title: update.institutionalRepTitle,
-			institutional_rep_position_title: update.institutionalRepPositionTitle,
-			institutional_rep_suffix: update.institutionalRepSuffix,
-			institutional_rep_email: update.institutionalRepEmail,
-			institutional_rep_primary_affiliation: update.institutionalRepPrimaryAffiliation,
-			institutional_rep_profile_url: update.institutionalRepProfileUrl,
-			institution_building: update.institutionBuilding,
-			institution_city: update.institutionCity,
-			institution_country: update.institutionCountry,
-			institution_postal_code: update.institutionPostalCode,
-			institution_state: update.institutionState,
-			institution_street_address: update.institutionStreetAddress,
-			project_aims: update.projectAims,
-			project_methodology: update.projectMethodology,
-			project_summary: update.projectSummary,
-			project_title: update.projectTitle,
-			project_website: update.projectWebsite,
-		};
-		const result = await applicationRepo.editApplication({ id, update: fomratedUpdate });
-		return result;
-	} else {
-		const message = `Cannot update application with state ${state}`;
+	if (!canEditResult.success) {
+		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
 		return failure(message);
 	}
+
+	const formatedUpdate: ApplicationContentUpdates = {
+		applicant_first_name: update.applicantFirstname,
+		applicant_middle_name: update.applicantMiddlename,
+		applicant_last_name: update.applicantLastname,
+		applicant_institutional_email: update.applicantInstitutionalEmail,
+		applicant_position_title: update.applicantPositionTitle,
+		applicant_primary_affiliation: update.applicantPrimaryAffiliation,
+		applicant_profile_url: update.applicantProfileUrl,
+		applicant_suffix: update.applicantSuffix,
+		applicant_title: update.applicantTitle,
+		institutional_rep_first_name: update.institutionalRepFirstname,
+		institutional_rep_middle_name: update.institutionalRepMiddlename,
+		institutional_rep_last_name: update.institutionalRepLastname,
+		institutional_rep_title: update.institutionalRepTitle,
+		institutional_rep_position_title: update.institutionalRepPositionTitle,
+		institutional_rep_suffix: update.institutionalRepSuffix,
+		institutional_rep_email: update.institutionalRepEmail,
+		institutional_rep_primary_affiliation: update.institutionalRepPrimaryAffiliation,
+		institutional_rep_profile_url: update.institutionalRepProfileUrl,
+		institution_building: update.institutionBuilding,
+		institution_city: update.institutionCity,
+		institution_country: update.institutionCountry,
+		institution_postal_code: update.institutionPostalCode,
+		institution_state: update.institutionState,
+		institution_street_address: update.institutionStreetAddress,
+		project_aims: update.projectAims,
+		project_methodology: update.projectMethodology,
+		project_summary: update.projectSummary,
+		project_title: update.projectTitle,
+		project_website: update.projectWebsite,
+	};
+	return await applicationRepo.editApplication({ id, update: formatedUpdate });
 };
 
 /**
