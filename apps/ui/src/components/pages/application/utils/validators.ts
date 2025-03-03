@@ -27,9 +27,48 @@ export interface VerifyPageSectionsType {
 	[SectionRoutes.INSTITUTIONAL]: boolean;
 }
 
-// Verify each section with zod if there are errors on their fields
+/**
+ *
+ * @param fields fields retrived from the store
+ * @returns VerifyPageSectionsType object sections determining if the section is touched
+ *
+ * This is needed for a users first time visit, there should not be an icon present if the user hasnt started any of the sections
+ *
+ */
+export const VerifySectionsTouched = (fields?: ApplicationContentsResponse): VerifyPageSectionsType => {
+	let sectionTouched: VerifyPageSectionsType = {
+		[SectionRoutes.APPLICANT]: false,
+		[SectionRoutes.INSTITUTIONAL]: false,
+	};
+
+	if (!fields) return sectionTouched;
+
+	Object.entries(fields).forEach(([key, value]) => {
+		if (isApplicantKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				applicant: true,
+			};
+		} else if (isInstitutionalKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				institutional: true,
+			};
+		}
+	});
+
+	return sectionTouched;
+};
+
+/**
+ *
+ * @param fields
+ * @returns VerifyPageSectionsType object sections determining if the section is valid
+ *
+ *  Verify each section with zod if there are errors on their fields using
+ */
 export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType => {
-	const sections: VerifyPageSectionsType = {
+	return {
 		[SectionRoutes.APPLICANT]: applicantInformationSchema.safeParse({
 			applicantTitle: fields?.applicantTitle,
 			applicantFirstName: fields?.applicantFirstName,
@@ -65,31 +104,4 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse): Verify
 			institutionBuilding: fields?.institutionBuilding,
 		}).success,
 	};
-
-	return sections;
-};
-
-export const VerifySectionsTouched = (fields?: ApplicationContentsResponse): VerifyPageSectionsType => {
-	let sectionTouched: VerifyPageSectionsType = {
-		[SectionRoutes.APPLICANT]: false,
-		[SectionRoutes.INSTITUTIONAL]: false,
-	};
-
-	if (!fields) return sectionTouched;
-
-	Object.entries(fields).forEach(([key, value]) => {
-		if (isApplicantKey(key) && value !== null) {
-			sectionTouched = {
-				...sectionTouched,
-				applicant: true,
-			};
-		} else if (isInstitutionalKey(key) && value !== null) {
-			sectionTouched = {
-				...sectionTouched,
-				institutional: true,
-			};
-		}
-	});
-
-	return sectionTouched;
 };
