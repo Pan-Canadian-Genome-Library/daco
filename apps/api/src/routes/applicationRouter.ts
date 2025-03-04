@@ -18,7 +18,7 @@
  */
 
 import bodyParser from 'body-parser';
-import express, { Request, Response } from 'express';
+import express, { type Request } from 'express';
 
 import {
 	approveApplication,
@@ -66,7 +66,7 @@ applicationRouter.post('/create', jsonParser, async (request: Request<{}, {}, { 
 applicationRouter.post(
 	'/edit',
 	jsonParser,
-	withBodySchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
+	withBodySchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 		// TODO: Add Auth
 		const data = req.body;
 		const { id, update } = data;
