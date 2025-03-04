@@ -20,6 +20,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import ApplicationViewer from '@/pages/applications';
 import AccessAgreement from '@/pages/applications/sections/access';
 import Appendices from '@/pages/applications/sections/appendices';
@@ -35,7 +36,6 @@ import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
-import ProtectedRoute from '../components/ProtectedRoute';
 
 export enum SectionRoutes {
 	INTRO = 'intro',

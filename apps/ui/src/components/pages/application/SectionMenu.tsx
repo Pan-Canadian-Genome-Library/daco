@@ -23,9 +23,9 @@ import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/useEditApplication';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
+import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { VerifyFormSections, VerifySectionsTouched } from './utils/validators';
 
 type SectionMenuProps = {
 	currentSection: string;

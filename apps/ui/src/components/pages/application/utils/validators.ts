@@ -17,10 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { isApplicantKey, isInstitutionalKey } from '@/components/pages/application/utils/validatorFunctions';
 import { SectionRoutes } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
-import { isApplicantKey, isInstitutionalKey } from './validatorFunctions';
 
 export type VerifyPageSectionsType<T extends string> = {
 	[section in T]: boolean;
