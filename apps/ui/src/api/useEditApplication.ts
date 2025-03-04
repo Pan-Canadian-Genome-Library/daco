@@ -26,8 +26,8 @@ import { useApplicationContext } from '@/providers/context/application/Applicati
 import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
 
 // TO be removed once editApplication endpoint is merged into main
-// This  GenerateUpdateObjectMap Api format functionality is too be ignore during PR review if someone manages to get to it before the update editApplication endpoint is merged in.
-//
+// This GenerateUpdateObjectMa functionality is too be ignore during PR review if someone manages to get to it before the update editApplication endpoint is merged in.
+// This is just to make the endpoint work for testing locally :)
 export const ApiFormat = {
 	applicantFirstName: 'applicant_first_name',
 	applicantMiddleName: 'applicant_middle_name',
