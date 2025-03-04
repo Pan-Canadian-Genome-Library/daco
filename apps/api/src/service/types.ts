@@ -26,6 +26,7 @@ import { files } from '@/db/schemas/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import { signatureService } from '@/service/signatureService.ts';
 import { type ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
@@ -36,12 +37,27 @@ export type ApplicationActionsColumnName = keyof typeof applicationActions.$infe
 export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
 export type ApplicationModel = typeof applications.$inferInsert;
-export type ApplicationRecord = typeof applications.$inferSelect;
 export type ApplicationUpdates = Partial<ApplicationModel>;
 export type ApplicationService = ReturnType<typeof applicationSvc>;
 
 export type ApplicationContentModel = typeof applicationContents.$inferInsert;
-export type ApplicationContentUpdates = Partial<ApplicationContentModel>;
+export type ApplicationContentUpdates = Omit<
+	Partial<ApplicationContentModel>,
+	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
+>;
+export type ApplicationSignatureUpdate = Pick<
+	ApplicationContentModel,
+	| 'application_id'
+	| 'applicant_signature'
+	| 'applicant_signed_at'
+	| 'institutional_rep_signature'
+	| 'institutional_rep_signed_at'
+>;
+export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
+	contents: ApplicationContentUpdates | null;
+}
+
+export type ApplicationRecord = typeof applications.$inferSelect;
 
 export type FilesModel = typeof files.$inferInsert;
 export type FilesUpdate = Partial<FilesModel>;
@@ -59,6 +75,8 @@ export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
 export type CollaboratorModel = typeof collaborators.$inferInsert;
 export type CollaboratorRecord = typeof collaborators.$inferSelect;
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
+
+export type SignatureService = ReturnType<typeof signatureService>;
 
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {

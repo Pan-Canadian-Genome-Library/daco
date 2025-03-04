@@ -18,10 +18,15 @@
  */
 
 import { z } from 'zod';
-import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from '../common/strings.js';
+import {
+	Concise200WordCountString,
+	Concise250WordCountString,
+	EmptyOrOptionalString,
+	NonEmptyString,
+	OptionalURLString,
+} from '../common/strings.js';
 import { ONLY_ALPHANUMERIC } from '../utils/regex.js';
 
-export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export const editApplicationRequestSchema = z.object({
 	id: z.number().nonnegative(),
 	update: z
@@ -52,9 +57,9 @@ export const editApplicationRequestSchema = z.object({
 			institution_building: NonEmptyString,
 			project_title: NonEmptyString,
 			project_website: OptionalURLString,
-			project_abstract: ConciseWordCountString,
-			project_methodology: ConciseWordCountString,
-			project_summary: ConciseWordCountString,
+			project_abstract: Concise200WordCountString,
+			project_methodology: Concise200WordCountString,
+			project_summary: Concise250WordCountString,
 		})
 		.partial()
 		.strict()
@@ -62,3 +67,4 @@ export const editApplicationRequestSchema = z.object({
 			params: { violation: 'noEmptyObject' },
 		}),
 });
+export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
