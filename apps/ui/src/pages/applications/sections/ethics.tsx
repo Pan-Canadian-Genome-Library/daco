@@ -48,7 +48,7 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { control, watch } = useForm<EthicsSchemaType>({});
+	const { control, watch, getValues } = useForm<EthicsSchemaType>({});
 	const { token } = useToken();
 
 	const showFileUpload = watch('ethicsApproval');
@@ -114,7 +114,13 @@ const Ethics = () => {
 						{/* If a radio box has been checked, then display the file upload component */}
 						{showFileUpload ? (
 							<Flex>
-								<Form.Item style={{ fontWeight: 600 }} required label={translate('ethics-section.attach')}>
+								<Form.Item
+									style={{ fontWeight: 600 }}
+									required
+									label={translate('ethics-section.attach', {
+										letter: getValues('ethicsApproval') === 'exemption' ? 'exemption' : 'approval',
+									})}
+								>
 									<Flex vertical gap={'large'}>
 										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
 											{translate('ethics-section.allowedFileTypes')}
