@@ -42,30 +42,26 @@ const jsonParser = bodyParser.json();
  * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
  * 	- Validate request params using Zod.
  */
-applicationRouter.post(
-	'/create',
-	jsonParser,
-	async (request: Request<{}, {}, { userId: string }, any>, response) => {
-		const { userId } = request.body;
+applicationRouter.post('/create', jsonParser, async (request: Request<{}, {}, { userId: string }, any>, response) => {
+	const { userId } = request.body;
 
-		/**
-		 * TODO: Temporary userId check until validation/dto flow is confirmed.
-		 * Reflect changes in swagger once refactored.
-		 **/
-		if (!userId) {
-			response.status(400).send({ message: 'User ID is required.' });
-			return;
-		}
+	/**
+	 * TODO: Temporary userId check until validation/dto flow is confirmed.
+	 * Reflect changes in swagger once refactored.
+	 **/
+	if (!userId) {
+		response.status(400).send({ message: 'User ID is required.' });
+		return;
+	}
 
-		const result = await createApplication({ user_id: userId });
+	const result = await createApplication({ user_id: userId });
 
-		if (result.success) {
-			response.status(201).send(result.data);
-		} else {
-			response.status(500).send({ message: result.message, errors: String(result.errors) });
-		}
-	},
-);
+	if (result.success) {
+		response.status(201).send(result.data);
+	} else {
+		response.status(500).send({ message: result.message, errors: String(result.errors) });
+	}
+});
 
 applicationRouter.post(
 	'/edit',
@@ -155,28 +151,25 @@ applicationRouter.get('/', async (req: Request<{}, {}, {}, any>, res) => {
  * 	- Validate request params using Zod.
  * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
  */
-applicationRouter.get(
-	'/:applicationId',
-	async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {
-		const { applicationId } = request.params;
+applicationRouter.get('/:applicationId', async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {
+	const { applicationId } = request.params;
 
-		const result = await getApplicationById({ applicationId });
+	const result = await getApplicationById({ applicationId });
 
-		if (result.success) {
-			response.status(200).send(result.data);
+	if (result.success) {
+		response.status(200).send(result.data);
+	} else {
+		const resultErrors = String(result.errors);
+
+		if (resultErrors === 'Error: Application record is undefined') {
+			response.status(404);
 		} else {
-			const resultErrors = String(result.errors);
-
-			if (resultErrors === 'Error: Application record is undefined') {
-				response.status(404);
-			} else {
-				response.status(500);
-			}
-
-			response.send({ message: result.message, errors: resultErrors });
+			response.status(500);
 		}
-	},
-);
+
+		response.send({ message: result.message, errors: resultErrors });
+	}
+});
 
 /**
  * Gets the total of how many applications are in each state type (APPROVED, REJECTED, etc...),
