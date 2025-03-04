@@ -43,7 +43,7 @@ const jsonParser = bodyParser.json();
  * 	- Validate request params using Zod.
  */
 applicationRouter.post(
-	'/applications/create',
+	'/create',
 	jsonParser,
 	async (request: Request<{}, {}, { userId: string }, any>, response) => {
 		const { userId } = request.body;
@@ -68,7 +68,7 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/applications/edit',
+	'/edit',
 	jsonParser,
 	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 		// TODO: Add Auth
@@ -95,7 +95,7 @@ applicationRouter.post(
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
 //       - verify if user can access applications
 //       - validate queryParam options using zod
-applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res) => {
+applicationRouter.get('/', async (req: Request<{}, {}, {}, any>, res) => {
 	const { userId, state: stateQuery, sort: sortQuery, page, pageSize } = req.query;
 
 	//  Temporary userId check until validation/dto flow is confirmed
@@ -156,7 +156,7 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
  * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
  */
 applicationRouter.get(
-	'/applications/:applicationId',
+	'/:applicationId',
 	async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {
 		const { applicationId } = request.params;
 
@@ -186,7 +186,7 @@ applicationRouter.get(
  * 	- Currently no validation is done to ensure that the current logged in user can access the specified application. This should be done and refactored.
  * 	- Validate request params using Zod.
  */
-applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {}, {}, any>, res) => {
+applicationRouter.get('/metadata/counts', async (req: Request<{}, {}, {}, any>, res) => {
 	const { userId } = req.query;
 
 	if (!userId) {
@@ -205,7 +205,7 @@ applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {
 	}
 });
 
-applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
+applicationRouter.post('/approve', jsonParser, async (req, res) => {
 	const { applicationId }: { applicationId?: number } = req.body;
 
 	if (typeof applicationId !== 'number' || !applicationId) {
@@ -250,7 +250,7 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 	}
 });
 
-applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
+applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
 
 	if (!applicationId) {
