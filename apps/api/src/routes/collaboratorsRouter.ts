@@ -21,9 +21,8 @@ import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
 import { createCollaborators, listCollaborators } from '@/controllers/collaboratorsController.js';
-import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { withSchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import { collaboratorsListParamsSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
 import { testUserId } from '../../tests/testUtils.ts';
 
@@ -36,69 +35,81 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/create',
 	jsonParser,
-	withSchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request: Request, response: Response) => {
-		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
+	withBodySchemaValidation(
+		collaboratorsRequestSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
-		const result = await createCollaborators({
-			application_id,
-			user_id,
-			collaborators,
-		});
+			const result = await createCollaborators({
+				application_id,
+				user_id,
+				collaborators,
+			});
 
-		if (result.success) {
-			response.status(201).send(result.data);
-			return;
-		} else {
-			const { message, errors } = result;
-
-			if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
-				response.status(400);
-			} else if (errors === 'Unauthorized') {
-				response.status(401);
+			if (result.success) {
+				response.status(201).send(result.data);
+				return;
 			} else {
-				response.status(500);
-			}
+				const { message, errors } = result;
 
-			response.send({ message, errors });
-			return;
-		}
-	}),
+				if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
+					response.status(400);
+				} else if (errors === 'Unauthorized') {
+					response.status(401);
+				} else {
+					response.status(500);
+				}
+
+				response.send({ message, errors });
+				return;
+			}
+		},
+	),
 );
 
 /**
  * List Collaborators
  */
-collaboratorsRouter.get('/:applicationId', jsonParser, async (request: Request, response: Response) => {
-	const application_id = request.params.applicationId ? parseInt(request.params.applicationId) : -1;
-	const validatedParams = collaboratorsListParamsSchema.safeParse(application_id);
-
-	if (validatedParams.success && isPositiveNumber(application_id)) {
-		const user_id = testUserId;
-
-		const result = await listCollaborators({
-			application_id,
-			user_id,
-		});
-
-		if (result.success) {
-			response.status(201).send(result.data);
-			return;
-		} else {
-			const { message, errors } = result;
-
-			if (errors === 'Unauthorized') {
-				response.status(401);
-			} else {
-				response.status(500);
+collaboratorsRouter.get(
+	'/:applicationId',
+	jsonParser,
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+			console.log(applicationId);
+			if (!applicationId) {
+				response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
+				return;
 			}
 
-			response.send({ message, errors });
-			return;
-		}
-	} else {
-		response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
-		return;
-	}
-});
+			const application_id = parseInt(applicationId);
+			const user_id = testUserId;
+
+			const result = await listCollaborators({
+				application_id,
+				user_id,
+			});
+
+			if (result.success) {
+				response.status(201).send(result.data);
+				return;
+			} else {
+				const { message, errors } = result;
+
+				if (errors === 'Unauthorized') {
+					response.status(401);
+				} else {
+					response.status(500);
+				}
+
+				response.send({ message, errors });
+				return;
+			}
+		},
+	),
+);
 
 export default collaboratorsRouter;

@@ -62,7 +62,7 @@ export const collaboratorsSchema = z.object({
 	collaboratorType: EmptyOrOptionalString,
 });
 
-export const collaboratorsListParamsSchema = z.number();
+export const collaboratorsListParamsSchema = z.object({ applicationId: z.coerce.number() }).required();
 
 export const collaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
