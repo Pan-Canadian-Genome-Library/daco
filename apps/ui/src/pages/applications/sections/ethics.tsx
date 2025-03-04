@@ -92,7 +92,7 @@ const Ethics = () => {
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}
 				/>
-				<SectionContent title={translate('ethics-section.approval')}>
+				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>
 					<Form layout="vertical">
 						<BlockRadioBox
 							label={translate('ethics-section.pleaseChose')}
