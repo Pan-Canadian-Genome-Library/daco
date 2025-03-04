@@ -26,7 +26,6 @@ export function isApplicantKey(value: string): value is keyof ApplicantDTO {
 }
 // InstitutionalKey
 interface InstitutionalKey extends InstitutionalRepDTO, InstitutionDTO {}
-
 export function isInstitutionalKey(value: string): value is keyof InstitutionalKey {
 	return value in institutionalRepSchema.keyof().Values;
 }

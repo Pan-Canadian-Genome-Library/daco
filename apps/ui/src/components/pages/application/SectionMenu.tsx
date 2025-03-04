@@ -25,7 +25,7 @@ import useEditApplication from '@/api/useEditApplication';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { VerifyFormSections, VerifyPageSectionsType, VerifySectionsTouched } from './utils/validators';
+import { VerifyFormSections, VerifySectionsTouched } from './utils/validators';
 
 type SectionMenuProps = {
 	currentSection: string;
@@ -60,7 +60,7 @@ const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 			selectedKeys={[currentSection]}
 			mode="inline"
 			items={ApplicationSectionRoutes.map((item) => {
-				const route = item.route as keyof VerifyPageSectionsType;
+				const route = item.route;
 
 				return {
 					key: item.route,

@@ -22,10 +22,9 @@ import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
 import { isApplicantKey, isInstitutionalKey } from './validatorFunctions';
 
-export interface VerifyPageSectionsType {
-	[SectionRoutes.APPLICANT]: boolean;
-	[SectionRoutes.INSTITUTIONAL]: boolean;
-}
+export type VerifyPageSectionsType<T extends string> = {
+	[section in T]: boolean;
+};
 
 /**
  *
@@ -35,10 +34,18 @@ export interface VerifyPageSectionsType {
  * This is needed for a users first time visit, there should not be an icon present if the user hasnt started any of the sections
  *
  */
-export const VerifySectionsTouched = (fields?: ApplicationContentsResponse): VerifyPageSectionsType => {
-	let sectionTouched: VerifyPageSectionsType = {
+export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
+	let sectionTouched: VerifyPageSectionsType<SectionRoutes> = {
 		[SectionRoutes.APPLICANT]: false,
 		[SectionRoutes.INSTITUTIONAL]: false,
+		[SectionRoutes.INTRO]: false,
+		[SectionRoutes.COLLABORATORS]: false,
+		[SectionRoutes.PROJECT]: false,
+		[SectionRoutes.STUDY]: false,
+		[SectionRoutes.ETHICS]: false,
+		[SectionRoutes.AGREEMENT]: false,
+		[SectionRoutes.APPENDICES]: false,
+		[SectionRoutes.SIGN]: false,
 	};
 
 	if (!fields) return sectionTouched;
@@ -67,8 +74,8 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse): Ver
  *
  *  Verify each section with zod if there are errors on their fields using
  */
-export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType => {
-	return {
+export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutes> => {
+	const sectionVerified: VerifyPageSectionsType<SectionRoutes> = {
 		[SectionRoutes.APPLICANT]: applicantInformationSchema.safeParse({
 			applicantTitle: fields?.applicantTitle,
 			applicantFirstName: fields?.applicantFirstName,
@@ -103,5 +110,15 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse): Verify
 			institutionalSuffix: fields?.institutionalRepSuffix,
 			institutionBuilding: fields?.institutionBuilding,
 		}).success,
+		[SectionRoutes.INTRO]: false,
+		[SectionRoutes.COLLABORATORS]: false,
+		[SectionRoutes.PROJECT]: false,
+		[SectionRoutes.STUDY]: false,
+		[SectionRoutes.ETHICS]: false,
+		[SectionRoutes.AGREEMENT]: false,
+		[SectionRoutes.APPENDICES]: false,
+		[SectionRoutes.SIGN]: false,
 	};
+
+	return sectionVerified;
 };

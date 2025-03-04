@@ -47,9 +47,16 @@ export enum SectionRoutes {
 	ETHICS = 'ethics',
 	AGREEMENT = 'agreement',
 	APPENDICES = 'appendices',
+	SIGN = 'route',
 }
 
-export const ApplicationSectionRoutes = [
+export interface ApplicationSectionRouteTypes {
+	route: SectionRoutes;
+	path: string;
+	element: React.ReactElement;
+}
+
+export const ApplicationSectionRoutes: ApplicationSectionRouteTypes[] = [
 	{
 		route: SectionRoutes.INTRO,
 		path: `${SectionRoutes.INTRO}/edit?`,
@@ -96,8 +103,8 @@ export const ApplicationSectionRoutes = [
 		element: <Appendices />,
 	},
 	{
-		route: 'sign',
-		path: 'sign/edit?',
+		route: SectionRoutes.SIGN,
+		path: `${SectionRoutes.SIGN}/edit?`,
 		element: <SignAndSubmit />,
 	},
 ];
