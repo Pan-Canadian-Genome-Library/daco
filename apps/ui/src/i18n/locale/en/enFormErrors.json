@@ -5,7 +5,7 @@
 	"validURL": "Please enter a valid url. Must begin with http:// or https://.",
 	"validPostalCode": "Please enter a valid postal code.",
 	"tooFewWords": "Please enter at least 100 words.",
-	"tooManyWords": "Please enter 200 words or less.",
+	"tooManyWords": "Please enter 250 words or less.",
 	"receivedInvalidEnum": "Input received does not match any of the required values.",
 	"invalidFileTitle": "Invalid File Type.",
 	"invalidFileSizeTitle": "File Size is too big.",
@@ -14,5 +14,6 @@
 	"checkboxesNotFilledOut": "All checkboxes must be checked to go to next page.",
 	"duplicateAgreementItems": "There are duplicate items checked, please uncheck any duplicate checkboxes.",
 	"invalidAgreementItem": "There is an invalid checkbox checked, please uncheck this checkbox before proceeding.",
+	"invalidIdNumber": "Study ID must be greater than or equal to 0.",
 	"tooSmall": "Field must contain at least {{value}} characters"
 }
