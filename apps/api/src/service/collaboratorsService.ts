@@ -97,7 +97,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 
 			return success(deletedRecord[0]);
 		} catch (err) {
-			const message = `Error at deleteCollaborators`;
+			const message = `Error at deleteCollaborators with id ${id}`;
 
 			logger.error(message);
 			logger.error(err);
