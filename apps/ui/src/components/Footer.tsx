@@ -97,6 +97,10 @@ const FooterComponent = () => {
 			if (breakpoints.xl) return '0 -8rem 0 0';
 			return '1rem auto';
 		})(),
+		position: (() => {
+			if (breakpoints.xl) return 'absolute';
+			return 'relative';
+		})(),
 	};
 
 	return (
