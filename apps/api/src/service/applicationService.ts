@@ -41,6 +41,8 @@ import {
 	type JoinedApplicationRecord,
 	type OrderBy,
 	type PostgresTransaction,
+	type RevisionRequestModel,
+	type RevisionRequestRecord,
 } from './types.js';
 
 /**
@@ -360,47 +362,16 @@ const applicationSvc = (db: PostgresDb) => ({
 
 	createRevisionRequest: async ({
 		applicationId,
-		reviewData,
-		comments_str,
+		revisionData,
 	}: {
 		applicationId: number;
-		reviewData: any;
-		comments_str?: string;
-	}) => {
+		revisionData: RevisionRequestModel;
+	}): AsyncResult<RevisionRequestRecord> => {
 		try {
-			const {
-				comments,
-				applicantNotes,
-				applicantApproved,
-				institutionRepApproved,
-				institutionRepNotes,
-				collaboratorsApproved,
-				collaboratorsNotes,
-				projectApproved,
-				projectNotes,
-				requestedStudiesApproved,
-				requestedStudiesNotes,
-			} = reviewData;
-
-			const newRevisionRequest: typeof revisionRequests.$inferInsert = {
-				application_id: applicationId,
-				comments: comments || comments_str || null,
-				applicant_notes: applicantNotes || null,
-				applicant_approved: applicantApproved,
-				institution_rep_approved: institutionRepApproved,
-				institution_rep_notes: institutionRepNotes || null,
-				collaborators_approved: collaboratorsApproved,
-				collaborators_notes: collaboratorsNotes || null,
-				project_approved: projectApproved,
-				project_notes: projectNotes || null,
-				requested_studies_approved: requestedStudiesApproved,
-				requested_studies_notes: requestedStudiesNotes || null,
-			};
-
 			// Using transaction for inserting
 			const result = await db.transaction(async (transaction) => {
 				// Insert into the revision_requests table
-				const revisionRecord = await transaction.insert(revisionRequests).values(newRevisionRequest).returning();
+				const revisionRecord = await transaction.insert(revisionRequests).values(revisionData).returning();
 				if (!revisionRecord[0]) throw new Error('Revision request record is undefined');
 
 				// Returning the inserted revision request

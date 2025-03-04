@@ -300,19 +300,19 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 // Endpoint for reps to request revisions
 applicationRouter.post('/applications/request-revisions', jsonParser, async (req, res) => {
 	try {
-		const { applicationId, reviewData, comments, role } = req.body;
+		const { applicationId, revisionData, role } = req.body;
 
-		if (!role && (role !== 'REP' || role !== 'DAC')) {
+		if (!role || role !== 'INSTITUTIONAL_REP' || role !== 'DAC_MEMBER') {
 			res.status(400).json({ message: 'Invalid request: Invalid role' });
 		}
 
 		// Validate input
-		if (!reviewData) {
-			res.status(400).json({ message: 'Invalid request: reviewData are required' });
+		if (!revisionData) {
+			res.status(400).json({ message: 'Invalid request: revisionData are required' });
 		}
 
 		// Call service method to handle request
-		const updatedApplication = await requestApplicationRevisions({ applicationId, role, reviewData, comments });
+		const updatedApplication = await requestApplicationRevisions({ applicationId, role, revisionData });
 
 		res.status(200).json(updatedApplication);
 	} catch (error) {

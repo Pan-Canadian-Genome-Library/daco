@@ -24,11 +24,11 @@ import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
+	JoinedApplicationRecord,
 	type ApplicationContentUpdates,
-	type ApplicationModel,
 	type ApplicationRecord,
 	type ApplicationService,
-	type ReviewApplication,
+	type RevisionRequestModel,
 } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
@@ -220,14 +220,12 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
 export const requestApplicationRevisions = async ({
 	applicationId,
 	role,
-	reviewData,
-	comments,
+	revisionData,
 }: {
 	applicationId: number;
 	role: string;
-	reviewData: ReviewApplication;
-	comments?: string;
-}): AsyncResult<ApplicationModel> => {
+	revisionData: RevisionRequestModel;
+}): AsyncResult<JoinedApplicationRecord> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -254,9 +252,13 @@ export const requestApplicationRevisions = async ({
 			return failure(revisionResult.message || 'Failed to reject application.', 'StateTransitionError');
 		}
 
-		service.createRevisionRequest({ applicationId, reviewData, comments_str: comments });
+		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
 
-		return service.getApplicationById({ id: applicationId });
+		if (!revisionRequestResult.success) {
+			return failure(revisionRequestResult.message || 'Failed to reject application.', 'StateTransitionError');
+		}
+
+		return service.getApplicationWithContents({ id: applicationId });
 	} catch (error) {
 		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
 		return failure('An error occurred while processing the request.', error);
