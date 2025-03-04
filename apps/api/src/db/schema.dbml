@@ -98,6 +98,8 @@ table application_contents {
   project_aims text
   project_summary text
   project_publication_urls text[]
+  signature text
+  signature_signed_at timestamp
   requested_studies text[]
   ethics_review_required boolean
   ethics_letter bigint
