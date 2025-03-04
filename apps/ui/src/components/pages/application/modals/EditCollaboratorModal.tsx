@@ -40,11 +40,11 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 
 	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
 		defaultValues: {
-			collabFirstName: rowData?.firstName || '',
-			collabMiddleName: rowData?.lastName || '',
-			collabLastName: rowData?.lastName || '',
-			collabPrimaryEmail: rowData?.institutionalEmail || '',
-			collabPositionTitle: rowData?.title || '',
+			collaboratorFirstName: rowData?.firstName || '',
+			collaboratorMiddleName: rowData?.lastName || '',
+			collaboratorLastName: rowData?.lastName || '',
+			collaboratorInstitutionalEmail: rowData?.institutionalEmail || '',
+			collaboratorPositionTitle: rowData?.title || '',
 		},
 		resolver: zodResolver(collaboratorsSchema),
 	});
@@ -55,12 +55,12 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 	 */
 	useEffect(() => {
 		reset({
-			collabFirstName: rowData?.firstName || '',
-			collabMiddleName: rowData?.lastName || '',
-			collabLastName: rowData?.lastName || '',
-			collabPrimaryEmail: rowData?.institutionalEmail || '',
-			collabPositionTitle: rowData?.title || '',
-			collabSuffix: rowData?.suffix || '',
+			collaboratorFirstName: rowData?.firstName || '',
+			collaboratorMiddleName: rowData?.lastName || '',
+			collaboratorLastName: rowData?.lastName || '',
+			collaboratorInstitutionalEmail: rowData?.institutionalEmail || '',
+			collaboratorPositionTitle: rowData?.title || '',
+			collaboratorSuffix: rowData?.suffix || '',
 		});
 	}, [rowData, reset]);
 
@@ -88,7 +88,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.firstName')}
-									name="collabFirstName"
+									name="collaboratorFirstName"
 									control={control}
 									rule={rule}
 									required
@@ -98,7 +98,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.middleName')}
-									name="collabMiddleName"
+									name="collaboratorMiddleName"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -109,7 +109,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.lastName')}
-									name="collabLastName"
+									name="collaboratorLastName"
 									control={control}
 									rule={rule}
 									required
@@ -119,7 +119,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.suffix')}
-									name="collabSuffix"
+									name="collaboratorSuffix"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -131,7 +131,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 								<InputBox
 									label={translate('form.primaryEmail')}
 									subLabel={translate('form.primaryEmailLabel')}
-									name="collabPrimaryEmail"
+									name="collaboratorInstitutionalEmail"
 									control={control}
 									rule={rule}
 									required
@@ -142,7 +142,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 								<InputBox
 									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									label={translate('form.positionTitle')}
-									name="collabPositionTitle"
+									name="collaboratorPositionTitle"
 									control={control}
 									rule={rule}
 									required

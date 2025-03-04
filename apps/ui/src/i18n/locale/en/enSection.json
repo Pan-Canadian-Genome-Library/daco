@@ -127,8 +127,8 @@
 		"approval": "Ethical Approval",
 		"pleaseChose": "Please choose one of the following options",
 		"ethicsLetterDescription": "Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.",
-		"exemptionDescription": "You represent and warrant thexemptionDescriptionat your country/region does not require your research project to undergo ethics review.",
-		"attach": "Please attach an ethics approval letter to this application:",
+		"exemptionDescription": "You represent and warrant that your country/region does not require your research project to undergo ethics review.",
+		"attach": "Please attach an ethics {{letter}} letter to this application:",
 		"allowedFileTypes": "Allowed file types: pdf, doc, docx, | Max file size: 5MB"
 	},
 	"requested-study": {
