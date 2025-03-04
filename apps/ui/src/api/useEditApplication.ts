@@ -23,84 +23,20 @@ import { useTranslation } from 'react-i18next';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
-
-// TO be removed once editApplication endpoint is merged into main
-// This GenerateUpdateObjectMa functionality is too be ignore during PR review if someone manages to get to it before the update editApplication endpoint is merged in.
-// This is just to make the endpoint work for testing locally :)
-export const ApiFormat = {
-	applicantFirstName: 'applicant_first_name',
-	applicantMiddleName: 'applicant_middle_name',
-	applicantLastName: 'applicant_last_name',
-	applicantTitle: 'applicant_title',
-	applicantSuffix: 'applicant_suffix',
-	applicantPositionTitle: 'applicant_position_title',
-	applicantPrimaryAffiliation: 'applicant_primary_affiliation',
-	applicantInstitutionalEmail: 'applicant_institutional_email',
-	applicantProfileUrl: 'applicant_profile_url',
-	institutionalRepTitle: 'institutional_rep_title',
-	institutionalRepFirstName: 'institutional_rep_first_name',
-	institutionalRepMiddleName: 'institutional_rep_middle_name',
-	institutionalRepLastName: 'institutional_rep_last_name',
-	institutionalRepSuffix: 'institutional_rep_suffix',
-	institutionalRepPrimaryAffiliation: 'institutional_rep_primary_affiliation',
-	institutionalRepEmail: 'institutional_rep_email',
-	institutionalRepProfileUrl: 'institutional_rep_profile_url',
-	institutionalRepPositionTitle: 'institutional_rep_position_title',
-	institutionCountry: 'institution_country',
-	institutionState: 'institution_state',
-	institutionCity: 'institution_city',
-	institutionStreetAddress: 'institution_street_address',
-	institutionPostalCode: 'institution_postal_code',
-	institutionBuilding: 'institution_building',
-	projectTitle: 'project_title',
-	projectWebsite: 'project_website',
-	projectBackground: 'project_background',
-	projectMethodology: 'project_methodology',
-	projectAims: 'project_aims',
-	projectSummary: 'project_summary',
-} as const;
-
-type ApiFormatKeys = keyof typeof ApiFormat;
-
-interface UpdateObject {
-	[key: string]: string | null;
-}
-
-/**
- *	Converts form fields from camelCase to snake_case for api compatibility
- *
- * @param storeState  current store form values
- * @returns an object compatible with api fields
- */
-const GenerateUpdateObjectMap = (storeState?: ApplicationContentsResponse) => {
-	if (!storeState) {
-		return;
-	}
-	const response = Object.entries(storeState).reduce<UpdateObject>((acu, [key, value]) => {
-		// if the value is null, that means its hasn't been dirtied, so skip adding it UpdateObject
-		if (value !== null && key in ApiFormat) {
-			const apiKey = ApiFormat[key as ApiFormatKeys];
-			acu[apiKey] = value;
-		}
-		return acu;
-	}, {});
-
-	return response;
-};
+import { ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useEditApplication = () => {
 	const { t: translate } = useTranslation();
 	const { state, dispatch } = useApplicationContext();
 
-	return useMutation<ApplicationResponseData, ServerError>({
-		mutationFn: async () => {
-			const update = GenerateUpdateObjectMap(state?.fields);
+	return useMutation<ApplicationResponseData, ServerError, { id: number | string }>({
+		mutationFn: async ({ id }) => {
+			const update = state?.fields;
 
 			const response = await fetch('/applications/edit', {
 				method: 'POST',
 				body: JSON.stringify({
-					id: state?.fields?.applicationId,
+					id,
 					update,
 				}),
 			});
