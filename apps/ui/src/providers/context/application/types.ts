@@ -26,12 +26,12 @@ export interface FormState {
 }
 
 export interface ApplicationFormState {
-	fields?: ApplicationContentsResponse;
+	fields?: Partial<ApplicationContentsResponse>;
 	formState: FormState;
 }
 
 export type ApplicationContextType = {
-	state?: ApplicationFormState;
+	state: ApplicationFormState;
 	dispatch: Dispatch<ApplicationAction>;
 };
 

@@ -30,16 +30,17 @@ import { useApplicationContext } from '@/providers/context/application/Applicati
 type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
+	appId: string | number;
 };
 
-const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
+const SectionMenu = ({ currentSection, isEditMode, appId }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		if (state?.formState?.isDirty) {
-			editApplication();
+			editApplication({ id: appId });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};

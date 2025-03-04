@@ -27,7 +27,7 @@ import { type ApplicationContentsResponse, type ApplicationResponseData } from '
 
 const useGetApplication = (id?: string | number) => {
 	const { t: translate } = useTranslation();
-	const { dispatch } = useApplicationContext();
+	const { state, dispatch } = useApplicationContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [id],
@@ -51,15 +51,15 @@ const useGetApplication = (id?: string | number) => {
 			}
 
 			return await response.json().then((data: ApplicationResponseData) => {
-				// Filter out data if they contain null values
+				// Filter out data if they contain null values and application meta data
 				if (data.contents) {
 					const fields = Object.entries(data.contents).reduce((acc, [key, value]) => {
-						if (value !== null) {
+						if (value !== null && key !== 'applicationId' && key !== 'createdAt' && key !== 'updatedAt') {
 							acc[key as keyof ApplicationContentsResponse] = value;
 						}
 						return acc;
 					}, {} as Partial<ApplicationContentsResponse>);
-					dispatch({ type: 'UPDATE_APPLICATION', payload: { fields } });
+					dispatch({ type: 'UPDATE_APPLICATION', payload: { ...state, fields } });
 				}
 				return data;
 			});

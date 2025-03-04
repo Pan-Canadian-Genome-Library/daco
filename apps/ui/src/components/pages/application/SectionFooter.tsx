@@ -18,12 +18,13 @@
  */
 
 import useEditApplication from '@/api/useEditApplication';
+import { ApplicationOutletContext } from '@/global/types';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { Button, Flex, theme } from 'antd';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useOutletContext, useParams } from 'react-router';
 
 const { useToken } = theme;
 
@@ -39,6 +40,7 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 	const { id } = useParams();
 	const { mutate: editApplication } = useEditApplication();
 	const { state } = useApplicationContext();
+	const { appId } = useOutletContext<ApplicationOutletContext>();
 
 	// Determine the next and previous route
 	const { previousRoute, nextRoute } = useMemo(() => {
@@ -55,24 +57,21 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 
 	const goBack = () => {
 		if (state?.formState?.isDirty) {
-			editApplication();
+			editApplication({ id: appId });
 		}
 		navigate(`/application/${id}/${previousRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const nextSection = () => {
 		if (state?.formState?.isDirty) {
-			editApplication();
+			editApplication({ id: appId });
 		}
 		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const submitApplication = () => {
 		// Temp logic to trigger validation errors on ui edit mode
-		if (!!onSubmit && isEditMode) {
-			onSubmit();
-			return;
-		}
+
 		console.log('Submit application');
 	};
 
