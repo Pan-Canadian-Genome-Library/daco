@@ -23,10 +23,17 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationContentUpdates, type ApplicationRecord, type ApplicationService } from '@/service/types.js';
+import { filesSvc } from '@/service/fileService.ts';
+import {
+	FilesService,
+	type ApplicationContentUpdates,
+	type ApplicationRecord,
+	type ApplicationService,
+} from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationRecord } from '@/utils/routes.js';
-import { ApplicationStateManager } from './stateManager.js';
+import formidable from 'formidable';
+import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
 /**
  * Creates a new application and returns the created data.
@@ -209,4 +216,45 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
 		logger.error(error);
 		return failure(message, error);
 	}
+};
+
+/**
+ * Upload a file with an associated application
+ * @param applicationId - The target applicationId to associate the uploaded file
+ * @param file - File blob
+ * @returns Success with file data / Failure with Error.
+ */
+export const uploadFile = async ({ applicationId, file }: { applicationId: number; file: formidable.File }) => {
+	const database = getDbInstance();
+	const filesService: FilesService = filesSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	const applicationResult = await applicationRepo.getApplicationWithContents({ id: applicationId });
+
+	if (!applicationResult.success) {
+		return failure('Failed getting application information');
+	}
+
+	const application = applicationResult.data;
+	const { edit } = ApplicationStateEvents;
+
+	const applicationRecord: ApplicationRecord = { ...application, contents: null };
+	const canEditResult = new ApplicationStateManager(applicationRecord)._canPerformAction(edit);
+
+	if (!canEditResult) {
+		return failure('Invalid action, must be in a draft state', 'Invalid action');
+	}
+
+	const result = await filesService.uploadEthicsFile({ application_id: applicationId, file, application });
+
+	if (!result.success) {
+		return result;
+	}
+
+	await applicationRepo.editApplication({
+		id: applicationId,
+		update: { ethics_letter: result.data.id },
+	});
+
+	return result;
 };

@@ -30,9 +30,11 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	uploadFile,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
+import formidable from 'formidable';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -295,6 +297,67 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 			errors: String(error),
 		});
 	}
+});
+
+const validFileTypes = [
+	'application/pdf',
+	'application/msword',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+
+/**
+ * TODO: NO current Auth rules implemented
+ */
+applicationRouter.post('/applications/file/ethics/:applicationId', async (req, res) => {
+	const { applicationId } = req.params;
+	const id = parseInt(applicationId) ?? -1;
+
+	if (!isPositiveNumber(id)) {
+		res.status(400).send({ message: 'Invalid applicationId' });
+		return;
+	}
+
+	const form = formidable({
+		keepExtensions: true,
+		maxFileSize: 5 * 1024 * 1024, // 5MB limit
+		maxFiles: 1,
+		allowEmptyFiles: false,
+	});
+
+	form.parse(req, async (err, _, files) => {
+		if (err) {
+			res.status(400).send({ message: 'Invalid file upload' });
+			return;
+		}
+
+		if (!files.file || !files.file[0]) {
+			res.status(400).send({ message: 'File does not exist' });
+			return;
+		}
+
+		const file = files.file[0];
+
+		if (!file.mimetype) {
+			res.status(400).send({ message: 'File type was not specified' });
+			return false;
+		}
+
+		if (!validFileTypes.includes(`${file.mimetype}`)) {
+			res.status(400).send({ message: 'Invalid file type' });
+			return false;
+		}
+
+		const result = await uploadFile({ applicationId: parseInt(applicationId), file });
+
+		if (result.success) {
+			res.status(200).send(result.data);
+			return;
+		} else {
+			const errorReturn = { message: result.message, errors: String(result.errors) };
+			res.status(500).send(errorReturn);
+			return;
+		}
+	});
 });
 
 export default applicationRouter;
