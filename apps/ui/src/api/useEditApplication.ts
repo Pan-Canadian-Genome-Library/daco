@@ -25,6 +25,7 @@ import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
 
+// TO be removed once editApplication endpoint is merged into main
 export const ApiFormat = {
 	applicantFirstName: 'applicant_first_name',
 	applicantMiddleName: 'applicant_middle_name',
