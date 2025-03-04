@@ -74,7 +74,7 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 });
 
 export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaborators: collaboratorsRecordSchema.partial(),
+	collaboratorUpdates: collaboratorsRecordSchema.partial(),
 });
 
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;

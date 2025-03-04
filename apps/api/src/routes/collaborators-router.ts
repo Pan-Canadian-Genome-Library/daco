@@ -160,12 +160,12 @@ collaboratorsRouter.post(
 		collaboratorsUpdateRequestSchema,
 		apiZodErrorMapping,
 		async (request: Request, response: Response) => {
-			const { applicationId: application_id, userId: user_id, collaborators } = request.body;
+			const { applicationId: application_id, userId: user_id, collaboratorUpdates } = request.body;
 
 			const result = await updateCollaborator({
 				application_id,
 				user_id,
-				collaborators,
+				collaboratorUpdates,
 			});
 
 			if (result.success) {

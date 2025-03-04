@@ -447,7 +447,7 @@ paths:
                 userId:
                   type: string
                   description: Temporary, Applicant's User Id, required for authorization
-                collaborators:
+                collaboratorUpdates:
                   $ref: '#/components/requests/UpdatedCollaborators'
       responses:
         '500':
@@ -823,7 +823,12 @@ components:
 
     UpdatedCollaborators:
       type: object
+      required:
+        - id
       properties:
+        id:
+          type: number
+          description: ID of the Collaborator record to update
         collaboratorFirstName:
           type: string
           description: The collaborator's first name

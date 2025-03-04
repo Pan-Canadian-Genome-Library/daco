@@ -154,11 +154,11 @@ export const deleteCollaborator = async ({
 export const updateCollaborator = async ({
 	application_id,
 	user_id,
-	collaborators,
+	collaboratorUpdates,
 }: {
 	application_id: number;
 	user_id: string;
-	collaborators: CollaboratorUpdateRecord;
+	collaboratorUpdates: CollaboratorUpdateRecord;
 }) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
@@ -182,17 +182,17 @@ export const updateCollaborator = async ({
 		return failure(`Can only edit Collaborators when Application is in state DRAFT`, 'InvalidState');
 	}
 
-	const { id } = collaborators;
+	const { id } = collaboratorUpdates;
 
 	const collaborator: CollaboratorModel = {
-		first_name: collaborators.collaboratorFirstName,
-		middle_name: collaborators.collaboratorMiddleName,
-		last_name: collaborators.collaboratorLastName,
-		suffix: collaborators.collaboratorSuffix,
-		position_title: collaborators.collaboratorPositionTitle,
-		institutional_email: collaborators.collaboratorInstitutionalEmail,
-		profile_url: collaborators.collaboratorResearcherProfileURL,
-		collaborator_type: collaborators.collaboratorType,
+		first_name: collaboratorUpdates.collaboratorFirstName,
+		middle_name: collaboratorUpdates.collaboratorMiddleName,
+		last_name: collaboratorUpdates.collaboratorLastName,
+		suffix: collaboratorUpdates.collaboratorSuffix,
+		position_title: collaboratorUpdates.collaboratorPositionTitle,
+		institutional_email: collaboratorUpdates.collaboratorInstitutionalEmail,
+		profile_url: collaboratorUpdates.collaboratorResearcherProfileURL,
+		collaborator_type: collaboratorUpdates.collaboratorType,
 		application_id,
 	};
 
