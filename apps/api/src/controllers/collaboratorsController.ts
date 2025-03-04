@@ -137,9 +137,7 @@ export const deleteCollaborator = async ({
 		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
 	}
 
-	const result = await collaboratorsRepo.deleteCollaborator({
-		id,
-	});
+	const result = await collaboratorsRepo.deleteCollaborator({ id });
 
 	return result;
 };
