@@ -77,10 +77,7 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 				return { message: i18n.t('checkboxesNotFilledOut') };
 			} else if (error.type === 'number' && error.path[0] === 'requestedStudy') {
 				return { message: i18n.t('invalidIdNumber') };
-			} else {
-				return { message: i18n.t('nonPositiveNumber') };
-			}
-			if (error.code === 'too_small') {
+			} else if (error.code === 'too_small') {
 				return { message: i18n.t('tooSmall', { value: error.minimum }) };
 			}
 			break;
