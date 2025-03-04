@@ -175,5 +175,24 @@
 		"appendix1": "APPENDIX I - PCGL ARGO Goals and Policies",
 		"appendix2": "APPENDIX II - Data Access and Data Use Policies and Guidelines",
 		"appendix3": "APPENDIX III - Intellectual Property Policy"
+	},
+	"sign-and-submit-section": {
+		"title": "Sign & Submit",
+		"section": {
+			"title": "E-Signature",
+			"description": "Please use your mouse to sign within the box below. Once you’re happy with the signature click save.",
+			"buttons": {
+				"view": "View Preview",
+				"download": "Download PDF",
+				"clear": "Clear",
+				"save": "Save"
+			}
+		},
+		"modal": {
+			"title": "Are you sure you want to submit this application? ",
+			"description": "Are you sure you want to submit Application: PCGL-{{id}}? If so, the application will be locked for editing and the institutional Representative will be notified to begin the review process.",
+			"submit": "I understand, proceed with submission",
+			"cancel": "Cancel"
+		}
 	}
 }

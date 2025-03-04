@@ -87,6 +87,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 						rules={!props.subLabel ? [props.rule] : undefined}
 						layout={props.layout}
 						initialValue={!props.subLabel ? field.value : undefined}
+						validateTrigger="onBlur"
 					>
 						{props.subLabel ? (
 							<Item
@@ -96,6 +97,7 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
 								initialValue={field.value}
+								validateTrigger="onBlur"
 							>
 								{renderControl(field)}
 							</Item>

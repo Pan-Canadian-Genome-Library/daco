@@ -98,7 +98,7 @@ const AccessAgreement = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}></Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="agreement" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
+				<SectionFooter currentRoute="agreement" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);

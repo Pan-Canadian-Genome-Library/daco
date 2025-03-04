@@ -17,12 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// only alphanumeric values
-export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;
+import { Typography, theme } from 'antd';
+import { FieldError } from 'react-hook-form';
 
-// Captures spaces, splitting by this regex will yield a "word"
-export const WORDS = /\s+/;
+const { Text } = Typography;
+const { useToken } = theme;
 
-//Based off Zod's base64 validation regex, but includes validation for images at the start of the group:
-export const BASE64_IMAGE =
-	/^(?:data:image\/png;base64,)?([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+interface ErrorLabelProps {
+	text?: string | FieldError;
+}
+
+const ErrorLabel = ({ text }: ErrorLabelProps) => {
+	const { token } = useToken();
+	return text ? (
+		<div style={{ margin: '1rem 0 0 0' }}>
+			<Text style={{ color: token.colorError, fontSize: 'small', whiteSpace: 'pre-line' }}>{text.toString()}</Text>
+		</div>
+	) : null;
+};
+
+export default ErrorLabel;
