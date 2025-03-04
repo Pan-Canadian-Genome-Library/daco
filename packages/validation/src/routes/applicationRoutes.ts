@@ -21,7 +21,6 @@ import { z } from 'zod';
 import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from '../common/strings.js';
 import { ONLY_ALPHANUMERIC } from '../utils/regex.js';
 
-export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export const editApplicationRequestSchema = z.object({
 	id: z.number().nonnegative(),
 	update: z
@@ -62,3 +61,4 @@ export const editApplicationRequestSchema = z.object({
 			params: { violation: 'noEmptyObject' },
 		}),
 });
+export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;

@@ -17,12 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// only alphanumeric values
-export const ONLY_ALPHANUMERIC = /^[A-Za-z0-9\- ]+$/;
+import { z } from 'zod';
+import { BASE64_IMAGE } from '../utils/regex.js';
 
-// Captures spaces, splitting by this regex will yield a "word"
-export const WORDS = /\s+/;
+export const editSignatureRequestSchema = z.object({
+	id: z.number().nonnegative(),
+	signature: z.string().regex(BASE64_IMAGE),
+	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+});
 
-//Based off Zod's base64 validation regex, but includes validation for images at the start of the group:
-export const BASE64_IMAGE =
-	/^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;
