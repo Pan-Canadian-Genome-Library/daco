@@ -77,25 +77,9 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
  *  Verify each section with zod if there are errors on their fields using
  */
 export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutes> => {
-	//  If there is no fields, dont bother running zod validation
-	if (!fields) {
-		return {
-			[SectionRoutes.INTRO]: false,
-			[SectionRoutes.COLLABORATORS]: false,
-			[SectionRoutes.PROJECT]: false,
-			[SectionRoutes.STUDY]: false,
-			[SectionRoutes.ETHICS]: false,
-			[SectionRoutes.AGREEMENT]: false,
-			[SectionRoutes.APPENDICES]: false,
-			[SectionRoutes.SIGN]: false,
-			[SectionRoutes.APPLICANT]: false,
-			[SectionRoutes.INSTITUTIONAL]: false,
-		};
-	}
-
 	return {
-		[SectionRoutes.APPLICANT]: ValidatorApplicant(fields),
-		[SectionRoutes.INSTITUTIONAL]: ValidatorInstitution(fields),
+		[SectionRoutes.APPLICANT]: fields ? ValidatorApplicant(fields) : false,
+		[SectionRoutes.INSTITUTIONAL]: fields ? ValidatorInstitution(fields) : false,
 		[SectionRoutes.INTRO]: false,
 		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: false,
