@@ -301,12 +301,12 @@ applicationRouter.post('/applications/:applicationId/submit-revision', jsonParse
 	if (!applicationId) {
 		res.status(400).json({ message: 'Application ID is required.' });
 	}
-	if (!applicationId || isNaN(parseInt(applicationId))) {
+	
 		res.status(400).json({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
 		});
-	}
+		return;
 
 	try {
 		const applicationIdNum = Number(applicationId);
@@ -327,7 +327,7 @@ applicationRouter.post('/applications/:applicationId/submit-revision', jsonParse
 				message = 'Application not found.';
 			} else if (errors === 'RevisionConflict') {
 				status = 409;
-				message = 'Rejection conflict detected.';
+				message = 'Revision conflict detected.';
 			} else if (errors === 'InvalidState') {
 				status = 400;
 				message = 'Invalid application state.';
