@@ -18,7 +18,8 @@
  */
 
 import { SectionRoutes } from '@/pages/AppRouter';
-import { CheckCircleOutlined, ExclamationCircleOutlined, LockOutlined } from '@ant-design/icons';
+import { pcglColors } from '@/providers/ThemeProvider';
+import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
@@ -62,7 +63,7 @@ const SectionMenuItem = ({
 			return <CheckCircleOutlined />;
 		} else if (!isSectionValid) {
 			// display exlamation if section is invalid and needs revisions
-			return <ExclamationCircleOutlined />;
+			return <ExclamationCircleFilled />;
 		}
 
 		return;
@@ -74,7 +75,7 @@ const SectionMenuItem = ({
 				{translate(`menu.${label}`)}
 			</Text>
 
-			<Flex>{renderIcon()}</Flex>
+			<Flex style={{ color: !isEditMode ? 'inherit' : pcglColors.primary }}>{renderIcon()}</Flex>
 		</Flex>
 	);
 };
