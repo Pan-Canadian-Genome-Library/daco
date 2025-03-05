@@ -36,6 +36,20 @@
 			"when": 1739210934649,
 			"tag": "0004_add_project_aims_field",
 			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1739460666408,
+			"tag": "0005_require_collaborator_app_id",
+			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1740780078583,
+			"tag": "0006_add_signature_fields",
+			"breakpoints": true
 		}
 	]
 }

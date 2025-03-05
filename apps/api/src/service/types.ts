@@ -20,11 +20,14 @@
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { ExtractTablesWithRelations } from 'drizzle-orm';
+import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import { signatureService } from '@/service/signatureService.ts';
+import { type ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
 
@@ -34,22 +37,41 @@ export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
 export type ApplicationModel = typeof applications.$inferInsert;
 export type ApplicationUpdates = Partial<ApplicationModel>;
-export type ApplicationContentModel = typeof applicationContents.$inferInsert;
-export type ApplicationContentUpdates = Partial<ApplicationContentModel>;
+export type ApplicationService = ReturnType<typeof applicationSvc>;
 
+export type ApplicationContentModel = typeof applicationContents.$inferInsert;
+export type ApplicationContentUpdates = Omit<
+	Partial<ApplicationContentModel>,
+	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
+>;
+export type ApplicationSignatureUpdate = Pick<
+	ApplicationContentModel,
+	| 'application_id'
+	| 'applicant_signature'
+	| 'applicant_signed_at'
+	| 'institutional_rep_signature'
+	| 'institutional_rep_signed_at'
+>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
 
 export type ApplicationRecord = typeof applications.$inferSelect;
-export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
 
+export type ApplicationActionModel = typeof applicationActions.$inferSelect;
+export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
+export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
+
+export type CollaboratorModel = typeof collaborators.$inferInsert;
+export type CollaboratorRecord = typeof collaborators.$inferSelect;
+export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
+
+export type SignatureService = ReturnType<typeof signatureService>;
+
+export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
-export type ApplicationService = ReturnType<typeof applicationSvc>;
-export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
-export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 
 export type ApplicationStateTotals = {
 	APPROVED: number;

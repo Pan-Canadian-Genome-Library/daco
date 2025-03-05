@@ -99,7 +99,8 @@
 		"study": "E. Requested Study",
 		"ethics": "F. Ethics",
 		"agreement": "G. Data Access Agreement",
-		"appendices": "H. Appendices"
+		"appendices": "H. Appendices",
+		"sign": "Sign & Submit"
 	},
 	"errors": {
 		"http": {
