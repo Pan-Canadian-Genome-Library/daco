@@ -56,7 +56,7 @@ const Institutional = () => {
 			institutionalPrimaryAffiliation: state?.fields?.institutionalRepPrimaryAffiliation || undefined,
 			institutionalProfileUrl: state?.fields?.institutionalRepProfileUrl || undefined,
 			institutionalSuffix: state?.fields?.institutionalRepSuffix || undefined,
-			institutionalTitle: state?.fields?.institutionalRepTitle || undefined,
+			institutionalTitle: state?.fields?.institutionalRepPositionTitle || undefined,
 			institutionBuilding: state?.fields?.institutionBuilding || undefined,
 			institutionCity: state?.fields?.institutionCity || undefined,
 			institutionCountry: state?.fields?.institutionCountry || 'CAN',
