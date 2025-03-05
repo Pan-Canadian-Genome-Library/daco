@@ -28,6 +28,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	submitApplication,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -229,6 +230,49 @@ describe('Application API', () => {
 			const rejectedApplication = await getApplicationById({ applicationId: id });
 			assert.ok(rejectedApplication.success);
 			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
+		});
+	});
+
+	describe('Submit Application', () => {
+		it('should successfully submit an application in DRAFT state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DRAFT } });
+
+			// Act
+			const result = await submitApplication({ applicationId: id });
+
+			// Assert
+			assert.ok(result.success);
+			assert.ok(result.data);
+
+			// Verify state transition
+			const updatedApplication = await testApplicationRepo.getApplicationById({ id });
+			assert.ok(updatedApplication.success);
+		});
+
+		it('should fail to submit an application not in DRAFT state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
+
+			// Act
+			const result = await submitApplication({ applicationId: id });
+
+			// Assert
+			assert.ok(!result.success);
+			assert.strictEqual(result.errors, 'SubmissionError');
+			assert.match(result.message || '', /Application cannot be submitted from state/);
 		});
 	});
 

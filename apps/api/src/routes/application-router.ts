@@ -18,7 +18,7 @@
  */
 
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { editApplicationRequestSchema, submitApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
@@ -297,14 +297,15 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	}
 });
 
-applicationRouter.post('/applications/submit', jsonParser, async (req, res) => {
+applicationRouter.post('/applications/submit', jsonParser , 
+	withSchemaValidation(submitApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 	const { applicationId, role, signature } = req.body;
 
 	if (!applicationId || !role || !signature) {
 		res.status(400).json({ message: 'Missing required fields.' });
 	}
 
-	if (!applicationId || isNaN(parseInt(applicationId))) {
+	if (!isPositiveNumber(parseInt(applicationId))) {
 		res.status(400).json({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
@@ -316,12 +317,7 @@ applicationRouter.post('/applications/submit', jsonParser, async (req, res) => {
 		res.status(400).json({ message: 'Invalid signature.' });
 	}
 
-	let newStatus = '';
-	if (role === 'APPLICANT') {
-		newStatus = 'Rep Review';
-	} else if (role === 'REP') {
-		newStatus = 'DAC Review';
-	} else {
+	if (role !== 'APPLICANT' || role !== 'REP') {
 		res.status(400).json({ message: 'Invalid role. Must be APPLICANT or REP.' });
 	}
 
@@ -357,5 +353,5 @@ applicationRouter.post('/applications/submit', jsonParser, async (req, res) => {
 			errors: String(error),
 		});
 	}
-});
+}));
 export default applicationRouter;

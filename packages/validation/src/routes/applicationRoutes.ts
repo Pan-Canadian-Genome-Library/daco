@@ -62,3 +62,11 @@ export const editApplicationRequestSchema = z.object({
 			params: { violation: 'noEmptyObject' },
 		}),
 });
+
+export const submitApplicationRequestSchema = z
+	.object({
+		applicationId: z.number().positive(),
+		role: z.enum(['APPLICANT', 'REP']),
+		signature: z.string().min(1),
+	})
+	.strict();
