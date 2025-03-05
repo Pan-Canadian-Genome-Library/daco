@@ -55,14 +55,17 @@ const useGetApplication = (id?: string | number) => {
 			}
 
 			return await response.json().then((data: ApplicationResponseData) => {
-				// Filter out data if they contain null values and application meta data
+				// Filter out data if they contain null values and application metadata
 				if (data.contents) {
-					const fields = Object.entries(data.contents).reduce((acc, [key, value]) => {
-						if (value !== null && key !== 'applicationId' && key !== 'createdAt' && key !== 'updatedAt') {
-							acc[key as keyof ApplicationContentsResponse] = value;
+					const fields = Object.entries(data.contents).reduce((acc, item) => {
+						const [key, value] = item;
+						if (value !== null && isRestrictedApplicationContentsKey(key)) {
+							acc[key] = value;
 						}
+
 						return acc;
 					}, {} as Partial<ApplicationContentsResponse>);
+
 					dispatch({ type: 'UPDATE_APPLICATION', payload: { ...state, fields } });
 				}
 				return data;
@@ -72,3 +75,7 @@ const useGetApplication = (id?: string | number) => {
 };
 
 export default useGetApplication;
+
+export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
+	return value !== 'applicationId' && value !== 'createdAt' && value !== 'updatedAt';
+}
