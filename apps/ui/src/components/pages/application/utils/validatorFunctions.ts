@@ -17,15 +17,45 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicantDTO, InstitutionalRepDTO, InstitutionDTO } from '@pcgl-daco/data-model';
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
 
-// ApplicantKey
-export function isApplicantKey(value: string): value is keyof ApplicantDTO {
-	return value in applicantInformationSchema.keyof().Values;
-}
-// InstitutionalKey
-interface InstitutionalKey extends InstitutionalRepDTO, InstitutionDTO {}
-export function isInstitutionalKey(value: string): value is keyof InstitutionalKey {
-	return value in institutionalRepSchema.keyof().Values;
-}
+export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
+	return applicantInformationSchema.safeParse({
+		applicantTitle: fields?.applicantTitle,
+		applicantFirstName: fields?.applicantFirstName,
+		applicantMiddleName: fields?.applicantMiddleName,
+		applicantLastName: fields?.applicantLastName,
+		applicantSuffix: fields?.applicantSuffix,
+		applicantPrimaryAffiliation: fields?.applicantPrimaryAffiliation,
+		applicantInstituteEmail: fields?.applicantInstitutionalEmail,
+		applicantProfileUrl: fields?.applicantProfileUrl,
+		applicantPositionTitle: fields?.applicantPositionTitle,
+		applicantInstituteCountry: 'test', // NO mailing field in db
+		applicantInstituteState: 'test', // NO mailing field in db
+		applicantInstituteCity: 'test', // NO mailing field in db
+		applicantInstitutePostalCode: 'test', // NO mailing field in db
+		applicantInstituteStreetAddress: 'test', // NO mailing field in db
+		applicantInstituteBuilding: 'test', // NO mailing field in db
+	}).success;
+};
+
+export const ValidatorInstitution = (fields: ApplicationContentsResponse): boolean => {
+	return institutionalRepSchema.safeParse({
+		institutionalTitle: fields?.institutionalRepTitle,
+		institutionalFirstName: fields?.institutionalRepFirstName,
+		institutionalLastName: fields?.institutionalRepLastName,
+		institutionalPrimaryAffiliation: fields?.institutionalRepPrimaryAffiliation,
+		institutionalInstituteAffiliation: fields?.institutionalRepEmail,
+		institutionalProfileUrl: fields?.institutionalRepProfileUrl,
+		institutionalPositionTitle: fields?.institutionalRepPositionTitle,
+		institutionCountry: fields?.institutionCountry,
+		institutionState: fields?.institutionState,
+		institutionCity: fields?.institutionCity,
+		institutionStreetAddress: fields?.institutionStreetAddress,
+		institutionPostalCode: fields?.institutionPostalCode,
+		institutionalMiddleName: fields?.institutionalRepMiddleName,
+		institutionalSuffix: fields?.institutionalRepSuffix,
+		institutionBuilding: fields?.institutionBuilding,
+	}).success;
+};

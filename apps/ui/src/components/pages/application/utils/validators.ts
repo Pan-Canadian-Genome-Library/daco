@@ -17,10 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { isApplicantKey, isInstitutionalKey } from '@/components/pages/application/utils/validatorFunctions';
+import { ValidatorApplicant, ValidatorInstitution } from '@/components/pages/application/utils/validatorFunctions';
+import { isApplicantKey, isInstitutionalKey } from '@/components/pages/application/utils/validatorKeys';
 import { SectionRoutes } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
 
 export type VerifyPageSectionsType<T extends string> = {
 	[section in T]: boolean;
@@ -31,7 +31,7 @@ export type VerifyPageSectionsType<T extends string> = {
  * @param fields fields retrived from the store
  * @returns VerifyPageSectionsType object sections determining if the section is touched
  *
- * This is needed for a users first time visit, there should not be an icon present if the user hasnt started any of the sections
+ * This is needed for a users first time visit, there should not be an icon present if the user hasn't started any of the sections
  *
  */
 export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
@@ -48,7 +48,9 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 		[SectionRoutes.SIGN]: false,
 	};
 
-	if (!fields) return sectionTouched;
+	if (!fields) {
+		return sectionTouched;
+	}
 
 	Object.entries(fields).forEach(([key, value]) => {
 		if (isApplicantKey(key) && value !== null) {
@@ -69,47 +71,31 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 
 /**
  *
- * @param fields
+ * @param fields fields retrived from the store
  * @returns VerifyPageSectionsType object sections determining if the section is valid
  *
  *  Verify each section with zod if there are errors on their fields using
  */
 export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutes> => {
-	const sectionVerified: VerifyPageSectionsType<SectionRoutes> = {
-		[SectionRoutes.APPLICANT]: applicantInformationSchema.safeParse({
-			applicantTitle: fields?.applicantTitle,
-			applicantFirstName: fields?.applicantFirstName,
-			applicantMiddleName: fields?.applicantMiddleName,
-			applicantLastName: fields?.applicantLastName,
-			applicantSuffix: fields?.applicantSuffix,
-			applicantPrimaryAffiliation: fields?.applicantPrimaryAffiliation,
-			applicantInstituteEmail: fields?.applicantInstitutionalEmail,
-			applicantProfileUrl: fields?.applicantProfileUrl,
-			applicantPositionTitle: fields?.applicantPositionTitle,
-			applicantInstituteCountry: 'test', // NO mailing field in db
-			applicantInstituteState: 'test', // NO mailing field in db
-			applicantInstituteCity: 'test', // NO mailing field in db
-			applicantInstitutePostalCode: 'test', // NO mailing field in db
-			applicantInstituteStreetAddress: 'test', // NO mailing field in db
-			applicantInstituteBuilding: 'test', // NO mailing field in db
-		}).success,
-		[SectionRoutes.INSTITUTIONAL]: institutionalRepSchema.safeParse({
-			institutionalTitle: fields?.institutionalRepTitle,
-			institutionalFirstName: fields?.institutionalRepFirstName,
-			institutionalLastName: fields?.institutionalRepLastName,
-			institutionalPrimaryAffiliation: fields?.institutionalRepPrimaryAffiliation,
-			institutionalInstituteAffiliation: fields?.institutionalRepEmail,
-			institutionalProfileUrl: fields?.institutionalRepProfileUrl,
-			institutionalPositionTitle: fields?.institutionalRepPositionTitle,
-			institutionCountry: fields?.institutionCountry,
-			institutionState: fields?.institutionState,
-			institutionCity: fields?.institutionCity,
-			institutionStreetAddress: fields?.institutionStreetAddress,
-			institutionPostalCode: fields?.institutionPostalCode,
-			institutionalMiddleName: fields?.institutionalRepMiddleName,
-			institutionalSuffix: fields?.institutionalRepSuffix,
-			institutionBuilding: fields?.institutionBuilding,
-		}).success,
+	//  If there is no fields, dont bother running zod validation
+	if (!fields) {
+		return {
+			[SectionRoutes.INTRO]: false,
+			[SectionRoutes.COLLABORATORS]: false,
+			[SectionRoutes.PROJECT]: false,
+			[SectionRoutes.STUDY]: false,
+			[SectionRoutes.ETHICS]: false,
+			[SectionRoutes.AGREEMENT]: false,
+			[SectionRoutes.APPENDICES]: false,
+			[SectionRoutes.SIGN]: false,
+			[SectionRoutes.APPLICANT]: false,
+			[SectionRoutes.INSTITUTIONAL]: false,
+		};
+	}
+
+	return {
+		[SectionRoutes.APPLICANT]: ValidatorApplicant(fields),
+		[SectionRoutes.INSTITUTIONAL]: ValidatorInstitution(fields),
 		[SectionRoutes.INTRO]: false,
 		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: false,
@@ -119,6 +105,4 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse): Verify
 		[SectionRoutes.APPENDICES]: false,
 		[SectionRoutes.SIGN]: false,
 	};
-
-	return sectionVerified;
 };
