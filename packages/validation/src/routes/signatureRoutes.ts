@@ -17,43 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Form, Select } from 'antd';
-import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
+import { z } from 'zod';
+import { BASE64_IMAGE } from '../utils/regex.js';
 
-import { BasicFormFieldProps } from '@/global/types';
+export const editSignatureRequestSchema = z.object({
+	id: z.number().nonnegative(),
+	signature: z.string().regex(BASE64_IMAGE),
+	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+});
 
-const { Item } = Form;
-
-interface SelectBoxProps extends BasicFormFieldProps {
-	options?: {
-		label: string;
-		value: string | number;
-	}[];
-	initialValue?: object | string;
-	placeholder?: string;
-}
-
-const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
-	return (
-		<Controller
-			name={props.name}
-			control={props.control}
-			render={({ field }) => {
-				return (
-					<Item
-						label={props.label}
-						name={`${props.name}`}
-						rules={[props.rule]}
-						required={props.required}
-						initialValue={props.initialValue}
-						validateTrigger="onBlur"
-					>
-						<Select {...field} disabled={props.disabled} options={props.options} placeholder={props.placeholder} />
-					</Item>
-				);
-			}}
-		/>
-	);
-};
-
-export default SelectBox;
+export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;

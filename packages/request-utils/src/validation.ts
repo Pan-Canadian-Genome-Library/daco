@@ -39,10 +39,10 @@ import { RequestValidationErrorResponse } from './responses.js';
  *
  * @example
  * ```
- * import { withSchemaValidation } from '@pcgl-daco/request-utils';
+ * import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
  * import { defaultErrorMap } from 'zod';
  *
- * router.post('/', withSchemaValidation(ExampleSchema, defaultErrorMap, (request, response, next) => {
+ * router.post('/', withBodySchemaValidation(ExampleSchema, defaultErrorMap, (request, response, next) => {
  * 	const { body } = request;
  * 	// TS knows the structure of `body` from `ExampleSchema`. It is already validated, you can use it immediately
  * 	const output = doSomethingWithBody(body);
@@ -50,7 +50,7 @@ import { RequestValidationErrorResponse } from './responses.js';
  * });
  * ```
  */
-function withSchemaValidation<ReqBody>(
+function withBodySchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
 	zodErrorMapping: ZodErrorMap | undefined,
 	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
@@ -71,4 +71,34 @@ function withSchemaValidation<ReqBody>(
 	};
 }
 
-export { withSchemaValidation };
+/**
+ * Wrapper for express RequestHandler to provide request parameter validation using a Zod Schema.
+ *
+ * @param paramsSchema Zod Schema which will perform the request parameter validation
+ * @param zodErrorMapping A `ZodErrorMap` object which can be used to translate or intercept the existing error / message mapping. If you don't have a custom one, you may pass in `defaultErrorMap` from the `zod` package, or `undefined`.
+ * @param handler RequestHandler to run once validation passes
+ * @returns RequestHandler to be given to express router
+ *
+ */
+function withParamsSchemaValidation<ReqParams>(
+	paramsSchema: ZodSchema<ReqParams>,
+	zodErrorMapping: ZodErrorMap | undefined,
+	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
+): RequestHandler {
+	return async (request: Request, response: Response, next: NextFunction) => {
+		try {
+			const validationResult = paramsSchema.safeParse(request.params, { errorMap: zodErrorMapping });
+			if (validationResult.success) {
+				return await handler(request, response, next);
+			}
+
+			// Request params failed validation
+			response.status(400).json(RequestValidationErrorResponse(validationResult.error));
+			return;
+		} catch (err: unknown) {
+			next(err);
+		}
+	};
+}
+
+export { withBodySchemaValidation, withParamsSchemaValidation };
