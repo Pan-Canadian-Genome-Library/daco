@@ -24,7 +24,7 @@ import { createCollaborators, deleteCollaborator, listCollaborators } from '@/co
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
-	collaboratorsDeleteRequestSchema,
+	collaboratorsDeleteParamsSchema,
 	collaboratorsListParamsSchema,
 	collaboratorsRequestSchema,
 } from '@pcgl-daco/validation';
@@ -119,16 +119,26 @@ collaboratorsRouter.get(
 /**
  * Delete Collaborator
  */
-collaboratorsRouter.post(
-	'/delete',
+collaboratorsRouter.delete(
+	'/:applicationId/:collaboratorId',
 	jsonParser,
-	withBodySchemaValidation(collaboratorsDeleteRequestSchema, apiZodErrorMapping, async (request, response) => {
-		const { applicationId: application_id, userId: user_id, collaboratorId } = request.body;
+	withParamsSchemaValidation(collaboratorsDeleteParamsSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId, collaboratorId } = request.params;
+
+		if (typeof applicationId === 'undefined' || typeof collaboratorId === 'undefined') {
+			response.status(400).send({ message: 'Missing Request Params' });
+			return;
+		}
+
+		const user_id = testUserId;
+
+		const application_id = parseInt(applicationId);
+		const id = parseInt(collaboratorId);
 
 		const result = await deleteCollaborator({
 			application_id,
 			user_id,
-			id: collaboratorId,
+			id,
 		});
 
 		if (result.success) {

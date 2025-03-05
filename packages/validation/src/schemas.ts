@@ -62,8 +62,6 @@ export const collaboratorsSchema = z.object({
 	collaboratorType: EmptyOrOptionalString,
 });
 
-export const collaboratorsListParamsSchema = z.object({ applicationId: z.coerce.number() }).required();
-
 export const collaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
 	userId: NonEmptyString,
@@ -74,11 +72,14 @@ export const collaboratorsRecordSchema = collaboratorsSchema.extend({
 	id: z.number(),
 });
 
-export const collaboratorsDeleteRequestSchema = z.object({
-	applicationId: z.number(),
-	userId: NonEmptyString,
-	collaboratorId: z.number(),
-});
+export const collaboratorsListParamsSchema = z.object({ applicationId: z.coerce.number() }).required();
+
+export const collaboratorsDeleteParamsSchema = z
+	.object({
+		applicationId: z.coerce.number(),
+		collaboratorId: z.coerce.number(),
+	})
+	.required();
 
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
