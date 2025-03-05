@@ -20,9 +20,9 @@
 import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
-import { createCollaborators, listCollaborators } from '@/controllers/collaboratorsController.js';
+import { createCollaborators, deleteCollaborator, listCollaborators } from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { withBodySchemaValidation, withParamsSchemaValidation, withSchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	collaboratorsDeleteRequestSchema,
 	collaboratorsListParamsSchema,
@@ -122,7 +122,7 @@ collaboratorsRouter.get(
 collaboratorsRouter.post(
 	'/collaborators/delete',
 	jsonParser,
-	withSchemaValidation(collaboratorsDeleteRequestSchema, apiZodErrorMapping, async (request, response) => {
+	withBodySchemaValidation(collaboratorsDeleteRequestSchema, apiZodErrorMapping, async (request, response) => {
 		const { applicationId: application_id, userId: user_id, collaboratorId } = request.body;
 
 		const result = await deleteCollaborator({
