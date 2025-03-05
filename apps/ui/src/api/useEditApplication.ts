@@ -52,6 +52,14 @@ const useEditApplication = () => {
 						error.message = translate('errors.fetchError.title');
 						error.errors = translate('errors.fetchError.message');
 						break;
+					case 404:
+						error.message = translate('errors.http.404.title');
+						error.errors = translate('errors.http.404.message');
+						break;
+					case 500:
+						error.message = translate('errors.http.500.title');
+						error.errors = translate('errors.http.500.message');
+						break;
 				}
 
 				throw error;
