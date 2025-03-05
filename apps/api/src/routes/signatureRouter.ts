@@ -20,13 +20,37 @@
 import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
 import { editSignatureRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 
-import { updateApplicationSignature } from '@/controllers/signatureController.ts';
+import { getApplicationSignature, updateApplicationSignature } from '@/controllers/signatureController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const signatureRouter = express.Router();
 const jsonParser = bodyParser.json();
+
+signatureRouter.get('/', async (request: Request<{}, {}, {}, { applicationId: string }>, response: Response) => {
+	const { applicationId } = request.query;
+
+	if (!applicationId) {
+		response.status(400).send({ message: 'Application ID is required' });
+		return;
+	}
+
+	const result = await getApplicationSignature({ applicationId: Number(applicationId) });
+
+	if (result.success) {
+		response.send(result);
+		return;
+	}
+
+	if (String(result.errors) === 'Error: Application contents record is undefined') {
+		response.status(404);
+	} else {
+		response.status(500);
+	}
+
+	response.send({ message: result.message, errors: String(result.errors) });
+});
 
 /**
  * TODO:

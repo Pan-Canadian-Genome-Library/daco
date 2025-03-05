@@ -22,6 +22,19 @@ import { signatureService } from '@/service/signatureService.ts';
 import { ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
 import { type EditSignatureRequest } from '@pcgl-daco/validation';
 
+export const getApplicationSignature = async ({ applicationId }: { applicationId: number }) => {
+	if (applicationId < 0) {
+		throw new Error('Error: Application ID must be a positive number.');
+	}
+
+	const database = getDbInstance();
+	const signatureRepo: SignatureService = signatureService(database);
+
+	const result = await signatureRepo.getApplicationSignature({ application_id: applicationId });
+
+	return result;
+};
+
 /**
  * Adds or updates a signature to an application.
  * @param id - The Application ID
@@ -30,7 +43,7 @@ import { type EditSignatureRequest } from '@pcgl-daco/validation';
  */
 export const updateApplicationSignature = async ({ id, signature, signee }: EditSignatureRequest) => {
 	const database = getDbInstance();
-	const applicationRepo: SignatureService = signatureService(database);
+	const signatureRepo: SignatureService = signatureService(database);
 
 	let update: ApplicationSignatureUpdate = {
 		application_id: id,
@@ -50,7 +63,7 @@ export const updateApplicationSignature = async ({ id, signature, signee }: Edit
 		throw new Error('Error: Invalid Signee type. Signee can only be an Applicant or a Institutional Rep.');
 	}
 
-	const result = await applicationRepo.updateApplicationSignature(update);
+	const result = await signatureRepo.updateApplicationSignature(update);
 
 	return result;
 };
