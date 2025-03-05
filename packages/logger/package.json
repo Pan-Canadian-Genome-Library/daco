@@ -25,7 +25,7 @@
 		"eslint-import-resolver-typescript": "^3.6.1",
 		"eslint-plugin-import": "^2.29.1",
 		"eslint-plugin-prettier": "^5.0.0",
-		"@types/express": "^4.17.17",
-		"@types/express-requests-logger": "^3.0.4"
+		"@types/express": "^5.0.0",
+		"@types/express-requests-logger": "^4.0.0"
 	}
 }

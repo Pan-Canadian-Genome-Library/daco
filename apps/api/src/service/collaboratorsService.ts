@@ -35,20 +35,20 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			let hasDuplicateCollaborators = false;
 
 			for await (const collaborator of newCollaborators) {
-				const existingCollaborator = await db
-					.select()
-					.from(collaborators)
-					.where(
-						and(
-							eq(collaborators.first_name, collaborator.first_name),
-							eq(collaborators.last_name, collaborator.last_name),
-							eq(collaborators.institutional_email, collaborator.institutional_email),
-							eq(collaborators.position_title, collaborator.position_title),
-							eq(collaborators.application_id, collaborator.application_id),
-						),
-					);
+				const countExistingCollaborator = await db.$count(
+					collaborators,
+					and(
+						eq(collaborators.first_name, collaborator.first_name),
+						eq(collaborators.last_name, collaborator.last_name),
+						eq(collaborators.institutional_email, collaborator.institutional_email),
+						eq(collaborators.position_title, collaborator.position_title),
+						eq(collaborators.application_id, collaborator.application_id),
+					),
+				);
 
-				if (existingCollaborator.length > 0) hasDuplicateCollaborators = true;
+				if (countExistingCollaborator > 0) {
+					hasDuplicateCollaborators = true;
+				}
 			}
 
 			if (hasDuplicateCollaborators) {
@@ -80,6 +80,23 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return success(collaboratorRecords);
 		} catch (err) {
 			const message = `Error at createCollaborators`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
+	listCollaborators: async (application_id: number) => {
+		try {
+			const collaboratorRecords = await db
+				.select()
+				.from(collaborators)
+				.where(eq(collaborators.application_id, application_id));
+
+			return success(collaboratorRecords);
+		} catch (err) {
+			const message = `Error at listCollaborators`;
 
 			logger.error(message);
 			logger.error(err);

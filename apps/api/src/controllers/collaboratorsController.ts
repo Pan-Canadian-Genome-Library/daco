@@ -98,3 +98,34 @@ export const createCollaborators = async ({
 
 	return result;
 };
+
+/**
+ * Lists all Collaborators for a given application
+ * @param application_id - ID of related application record to associate with Collaborators
+ * @param collaborators - Array of new Collaborators to create
+ * @returns Success with Collaborator data array / Failure with Error.
+ */
+export const listCollaborators = async ({ application_id, user_id }: { application_id: number; user_id: string }) => {
+	const database = getDbInstance();
+	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+
+	if (!applicationResult.success) {
+		return applicationResult;
+	}
+
+	const application = applicationResult.data;
+
+	// TODO: Add Real Auth
+	// Validate User is Applicant
+	if (!(user_id === application.user_id)) {
+		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
+	}
+
+	const applicationId = application.id;
+	const collaboratorsResult = await collaboratorsRepo.listCollaborators(applicationId);
+
+	return collaboratorsResult;
+};
