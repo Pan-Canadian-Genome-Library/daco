@@ -24,14 +24,11 @@ import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { filesSvc } from '@/service/fileService.ts';
-import {
-	FilesService,
-	type ApplicationContentUpdates,
-	type ApplicationRecord,
-	type ApplicationService,
-} from '@/service/types.js';
+import { FilesService, type ApplicationRecord, type ApplicationService } from '@/service/types.js';
+
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { aliasApplicationRecord } from '@/utils/routes.js';
+import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/routes.js';
+import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
@@ -56,7 +53,7 @@ export const createApplication = async ({ user_id }: { user_id: string }) => {
  * @param update - Application Contents details to update
  * @returns Success with Application data / Failure with Error
  */
-export const editApplication = async ({ id, update }: { id: number; update: ApplicationContentUpdates }) => {
+export const editApplication = async ({ id, update }: { id: number; update: UpdateEditApplicationRequest }) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -66,22 +63,20 @@ export const editApplication = async ({ id, update }: { id: number; update: Appl
 		return result;
 	}
 
-	const { state } = result.data;
+	const application = result.data;
 
-	// TODO: Replace w/ state machine https://github.com/Pan-Canadian-Genome-Library/daco/issues/58
-	const isEditState =
-		state === ApplicationStates.DRAFT ||
-		state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
-		state === ApplicationStates.DAC_REVIEW;
+	const { edit } = ApplicationStateEvents;
+	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
-	if (isEditState) {
-		const result = await applicationRepo.editApplication({ id, update });
-		return result;
-	} else {
-		const message = `Cannot update application with state ${state}`;
+	if (!canEditResult.success) {
+		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
 		return failure(message);
 	}
+
+	const data = aliasApplicationContentsRecord(update);
+
+	return await applicationRepo.editApplication({ id, update: data });
 };
 
 /**

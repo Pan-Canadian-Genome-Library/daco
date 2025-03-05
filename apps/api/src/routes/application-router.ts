@@ -71,10 +71,8 @@ applicationRouter.post(
 	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 		// TODO: Add Auth
 		const data = req.body;
-
 		const { id, update } = data;
 		const result = await editApplication({ id, update });
-
 		if (result.success) {
 			res.send(result.data);
 		} else {
@@ -84,7 +82,6 @@ applicationRouter.post(
 			} else {
 				res.status(500);
 			}
-
 			res.send({ message: result.message, errors: String(result.errors) });
 		}
 	}),
