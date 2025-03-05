@@ -31,11 +31,6 @@ type SectionMenuItemProps = {
 	label: string;
 	isEditMode?: boolean;
 };
-/**
- * TODO: once we are in the DAC/REP revision state in the application, consider the following:
- * - determine which icon is to be rendered if REP/DAC requests revisions to a particular section (there could be checkmark or exclamation mark)
- *   - what would the endpoint response look like?
- */
 
 const SectionMenuItem = ({
 	isCurrentSection,
@@ -46,6 +41,9 @@ const SectionMenuItem = ({
 }: SectionMenuItemProps) => {
 	const { t: translate } = useTranslation();
 
+	/**
+	 * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
+	 */
 	const renderIcon = () => {
 		if (label === SectionRoutes.INTRO) {
 			// do not display intro icon
@@ -54,7 +52,7 @@ const SectionMenuItem = ({
 			// do not display icon if on currentpage
 			return;
 		} else if (!isEditMode) {
-			// display lock on editmode
+			// display lock on edit mode
 			return <LockOutlined />;
 		} else if (!isSectionTouched) {
 			// do not display icon if the section has not been worked on
