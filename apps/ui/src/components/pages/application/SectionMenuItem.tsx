@@ -47,12 +47,25 @@ const SectionMenuItem = ({
 	const { t: translate } = useTranslation();
 
 	const renderIcon = () => {
-		if (label === SectionRoutes.INTRO) return; // Do not display intro icon
-		if (isCurrentSection && isEditMode && !isSectionValid) return; // do not display icon if on currentpage
-		if (!isEditMode) return <LockOutlined />; // display lock on editmode
-		if (!isSectionTouched) return; // do not display icon if the section has not been worked on
-		if (isSectionValid) return <CheckCircleOutlined />; // display checkmark is section is valid
-		if (!isSectionValid) return <ExclamationCircleOutlined />; // display exlamation if section is invalid and needs revisions
+		if (label === SectionRoutes.INTRO) {
+			// do not display intro icon
+			return;
+		} else if (isCurrentSection && isEditMode && !isSectionValid) {
+			// do not display icon if on currentpage
+			return;
+		} else if (!isEditMode) {
+			// display lock on editmode
+			return <LockOutlined />;
+		} else if (!isSectionTouched) {
+			// do not display icon if the section has not been worked on
+			return;
+		} else if (isSectionValid) {
+			// display checkmark is section is valid
+			return <CheckCircleOutlined />;
+		} else if (!isSectionValid) {
+			// display exlamation if section is invalid and needs revisions
+			return <ExclamationCircleOutlined />;
+		}
 
 		return;
 	};
