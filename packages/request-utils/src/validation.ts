@@ -53,7 +53,7 @@ import { RequestValidationErrorResponse } from './responses.js';
 function withBodySchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
 	zodErrorMapping: ZodErrorMap | undefined,
-	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
+	handler: RequestHandler<ParamsDictionary, any, ReqBody, qs.ParsedQs>,
 ): RequestHandler {
 	return async (request: Request, response: Response, next: NextFunction) => {
 		try {

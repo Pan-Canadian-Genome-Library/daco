@@ -83,7 +83,7 @@ collaboratorsRouter.get(
 		apiZodErrorMapping,
 		async (request: Request, response: Response) => {
 			const { applicationId } = request.params;
-			console.log(applicationId);
+
 			if (!applicationId) {
 				response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
 				return;
