@@ -47,7 +47,7 @@ export enum SectionRoutes {
 	ETHICS = 'ethics',
 	AGREEMENT = 'agreement',
 	APPENDICES = 'appendices',
-	SIGN = 'route',
+	SIGN = 'sign',
 }
 
 export interface ApplicationSectionRouteTypes {
