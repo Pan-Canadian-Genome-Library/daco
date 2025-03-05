@@ -29,10 +29,9 @@ import {
 	getApplicationStateTotals,
 	rejectApplication,
 } from '@/controllers/applicationController.js';
-import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { editApplicationRequestSchema, isPositiveNumber } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();

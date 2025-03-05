@@ -29,6 +29,7 @@ import {
 	NonEmptyString,
 	OptionalURLString,
 } from './common/strings.js';
+import { isPositiveNumber } from './utils/functions.js';
 import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
@@ -72,12 +73,22 @@ export const collaboratorsRecordSchema = collaboratorsSchema.extend({
 	id: z.number(),
 });
 
-export const collaboratorsListParamsSchema = z.object({ applicationId: z.coerce.number() }).required();
+export const collaboratorsListParamsSchema = z
+	.object({
+		applicationId: z.string().refine((id) => {
+			return isPositiveNumber(parseInt(id)), { message: 'applicationId must be a positive number' };
+		}),
+	})
+	.required();
 
 export const collaboratorsDeleteParamsSchema = z
 	.object({
-		applicationId: z.coerce.number(),
-		collaboratorId: z.coerce.number(),
+		applicationId: z.string().refine((id) => {
+			return isPositiveNumber(parseInt(id)), { message: 'applicationId must be a positive number' };
+		}),
+		collaboratorId: z.string().refine((id) => {
+			return isPositiveNumber(parseInt(id)), { message: 'collaboratorId must be a positive number' };
+		}),
 	})
 	.required();
 
