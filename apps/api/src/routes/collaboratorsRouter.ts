@@ -120,7 +120,7 @@ collaboratorsRouter.get(
  * Delete Collaborator
  */
 collaboratorsRouter.post(
-	'/collaborators/delete',
+	'/delete',
 	jsonParser,
 	withBodySchemaValidation(collaboratorsDeleteRequestSchema, apiZodErrorMapping, async (request, response) => {
 		const { applicationId: application_id, userId: user_id, collaboratorId } = request.body;
