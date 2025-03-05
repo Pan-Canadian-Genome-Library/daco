@@ -369,13 +369,13 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
         '404':
-          description: 'Invalid request or rejection not allowed'
+          description: 'Invalid request or submit revision not allowed'
           content:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
         '200':
-          description: 'Application successfully rejected'
+          description: 'Application successfully submitted for revision'
           content:
             application/json:
               schema:

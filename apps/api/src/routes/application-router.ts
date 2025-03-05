@@ -253,9 +253,6 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
 
-	if (!applicationId) {
-		res.status(400).json({ message: 'Application ID is required.' });
-	}
 	if (!applicationId || isNaN(parseInt(applicationId))) {
 		res.status(400).json({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
@@ -328,7 +325,7 @@ applicationRouter.post('/applications/:applicationId/submit-revision', jsonParse
 			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
 				status = 404;
 				message = 'Application not found.';
-			} else if (errors === 'RejectionConflict') {
+			} else if (errors === 'RevisionConflict') {
 				status = 409;
 				message = 'Rejection conflict detected.';
 			} else if (errors === 'InvalidState') {

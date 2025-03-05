@@ -244,9 +244,7 @@ export const submitRevision = async ({ applicationId }: { applicationId: number 
 			return failure(submittedRevision.message || 'Failed to submit application revision.', 'StateTransitionError');
 		}
 
-		const updatedResult = await service.getApplicationById({ id: applicationId });
-
-		return updatedResult;
+		return submittedRevision;
 	} catch (error) {
 		const message = `Unable to submit revision with applicationId: ${applicationId}`;
 		logger.error(message);
