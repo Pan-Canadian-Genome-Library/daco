@@ -297,61 +297,64 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	}
 });
 
-applicationRouter.post('/applications/submit', jsonParser , 
+applicationRouter.post(
+	'/applications/submit',
+	jsonParser,
 	withSchemaValidation(submitApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
-	const { applicationId, role, signature } = req.body;
+		const { applicationId, role, signature } = req.body;
 
-	if (!applicationId || !role || !signature) {
-		res.status(400).json({ message: 'Missing required fields.' });
-	}
-
-	if (!isPositiveNumber(parseInt(applicationId))) {
-		res.status(400).json({
-			message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			errors: 'MissingOrInvalidParameters',
-		});
-	}
-
-	// Mock validation for now
-	if (signature !== 'mock_signature') {
-		res.status(400).json({ message: 'Invalid signature.' });
-	}
-
-	if (role !== 'APPLICANT' || role !== 'REP') {
-		res.status(400).json({ message: 'Invalid role. Must be APPLICANT or REP.' });
-	}
-
-	try {
-		const result = await submitApplication(applicationId);
-
-		if (result.success) {
-			res.status(200).send({
-				message: 'Application rejected successfully.',
-				data: result.data,
-			});
-		} else {
-			let status = 500;
-			let message = result.message || 'An unexpected error occurred.';
-			let errors = result.errors;
-
-			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-				status = 404;
-				message = 'Application not found.';
-			} else if (errors === 'RejectionConflict') {
-				status = 409;
-				message = 'Rejection conflict detected.';
-			} else if (errors === 'InvalidState') {
-				status = 400;
-				message = 'Invalid application state.';
-			}
-
-			res.status(status).send({ message, errors });
+		if (!applicationId || !role || !signature) {
+			res.status(400).json({ message: 'Missing required fields.' });
 		}
-	} catch (error) {
-		res.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-}));
+
+		if (!isPositiveNumber(parseInt(applicationId))) {
+			res.status(400).json({
+				message: 'Invalid request. ApplicationId is required and must be a valid number.',
+				errors: 'MissingOrInvalidParameters',
+			});
+		}
+
+		// Mock validation for now
+		if (signature !== 'mock_signature') {
+			res.status(400).json({ message: 'Invalid signature.' });
+		}
+
+		if (role !== 'APPLICANT' && role !== 'REP') {
+			res.status(400).json({ message: 'Invalid role. Must be APPLICANT or REP.' });
+		}
+
+		try {
+			const result = await submitApplication(applicationId);
+
+			if (result.success) {
+				res.status(200).send({
+					message: 'Application rejected successfully.',
+					data: result.data,
+				});
+			} else {
+				let status = 500;
+				let message = result.message || 'An unexpected error occurred.';
+				let errors = result.errors;
+
+				if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+					status = 404;
+					message = 'Application not found.';
+				} else if (errors === 'RejectionConflict') {
+					status = 409;
+					message = 'Rejection conflict detected.';
+				} else if (errors === 'InvalidState') {
+					status = 400;
+					message = 'Invalid application state.';
+				}
+
+				res.status(status).send({ message, errors });
+			}
+		} catch (error) {
+			res.status(500).send({
+				message: 'Internal server error.',
+				errors: String(error),
+			});
+		}
+	}),
+);
 export default applicationRouter;
