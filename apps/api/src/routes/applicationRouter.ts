@@ -17,9 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import bodyParser from 'body-parser';
-import express, { type Request } from 'express';
-
 import {
 	approveApplication,
 	createApplication,
@@ -28,11 +25,15 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	uploadEthicsFile,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
+import { fileUploadValidation, withBodySchemaValidation } from '@pcgl-daco/request-utils';
 import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import bodyParser from 'body-parser';
+import express, { type Request, type Response } from 'express';
+import formidable from 'formidable';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -286,5 +287,34 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
 		});
 	}
 });
+
+/**
+ * TODO: NO current Auth rules implemented
+ */
+applicationRouter.post(
+	'/file/ethics/:applicationId',
+	fileUploadValidation(async (req: Request<any, { file: formidable.File }>, res: Response) => {
+		const { applicationId } = req.params;
+
+		const { file } = req.body;
+
+		const id = parseInt(applicationId ? applicationId : '');
+		if (!isPositiveNumber(id)) {
+			res.status(400).send({ message: 'Invalid applicationId' });
+			return;
+		}
+
+		const result = await uploadEthicsFile({ applicationId: id, file });
+
+		if (result.success) {
+			res.status(200).send(result.data);
+			return;
+		} else {
+			const errorReturn = { message: result.message, errors: String(result.errors) };
+			res.status(500).send(errorReturn);
+			return;
+		}
+	}),
+);
 
 export default applicationRouter;
