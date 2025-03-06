@@ -303,12 +303,8 @@ applicationRouter.post(
 	withSchemaValidation(submitApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const { applicationId, role, signature } = req.body;
 
-		if (!applicationId || !role || !signature) {
-			res.status(400).json({ message: 'Missing required fields.' });
-		}
-
 		if (!isPositiveNumber(parseInt(applicationId))) {
-			res.status(400).json({
+			res.status(400).send({
 				message: 'Invalid request. ApplicationId is required and must be a valid number.',
 				errors: 'MissingOrInvalidParameters',
 			});
