@@ -397,7 +397,6 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/requests/SignatureSign'
               type: object
               properties:
                 applicationId:
