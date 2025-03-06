@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 import yaml from 'yamljs';
 
 import { getHealth, Status } from '@/app-health.js';
-import applicationRouter from '@/routes/application-router.js';
+import applicationRouter from '@/routes/applicationRouter.js';
 import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
 import { serverConfig } from './config/serverConfig.js';
@@ -46,9 +46,9 @@ const startServer = async () => {
 
 	app.use(sessionMiddleware);
 
+	app.use('/collaborators', collaboratorsRouter);
 	app.use('/applications', applicationRouter);
 	app.use('/signature', signatureRouter);
-	app.use(collaboratorsRouter);
 	app.use('/auth', authRouter);
 
 	app.use(

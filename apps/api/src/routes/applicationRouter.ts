@@ -17,10 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
-import express, { Request } from 'express';
+import express, { type Request } from 'express';
 
 import {
 	approveApplication,
@@ -34,6 +32,8 @@ import {
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
+import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
+import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 import formidable from 'formidable';
 
 const applicationRouter = express.Router();
@@ -68,7 +68,7 @@ applicationRouter.post('/create', jsonParser, async (request: Request<{}, {}, { 
 applicationRouter.post(
 	'/edit',
 	jsonParser,
-	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
+	withBodySchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 		// TODO: Add Auth
 		const data = req.body;
 		const { id, update } = data;

@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withSchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
 import { editSignatureRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -35,7 +35,7 @@ const jsonParser = bodyParser.json();
 signatureRouter.post(
 	'/sign',
 	jsonParser,
-	withSchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
+	withBodySchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const data = req.body;
 		const { id, signature, signee } = data;
 
