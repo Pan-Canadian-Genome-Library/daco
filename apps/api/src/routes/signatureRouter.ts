@@ -23,6 +23,7 @@ import bodyParser from 'body-parser';
 import express, { type Request, type Response } from 'express';
 
 import { getApplicationSignature, updateApplicationSignature } from '@/controllers/signatureController.ts';
+import { isPositiveNumber } from '@/utils/routes.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const signatureRouter = express.Router();
@@ -31,8 +32,8 @@ const jsonParser = bodyParser.json();
 signatureRouter.get('/', async (request: Request<{}, {}, {}, { applicationId: string }>, response: Response) => {
 	const { applicationId } = request.query;
 
-	if (!applicationId) {
-		response.status(400).send({ message: 'Application ID is required' });
+	if (!applicationId || !isPositiveNumber(Number(applicationId))) {
+		response.status(400).send({ message: 'Application ID is required and MUST be a positive number.' });
 		return;
 	}
 
