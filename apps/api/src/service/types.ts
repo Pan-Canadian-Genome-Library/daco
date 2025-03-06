@@ -22,6 +22,7 @@ import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
@@ -95,3 +96,6 @@ export type PostgresTransaction = PgTransaction<
 	typeof schema,
 	ExtractTablesWithRelations<typeof schema>
 >;
+
+export type RevisionRequestModel = typeof revisionRequests.$inferInsert;
+export type RevisionRequestRecord = typeof revisionRequests.$inferSelect;
