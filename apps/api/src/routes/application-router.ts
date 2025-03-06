@@ -324,7 +324,7 @@ applicationRouter.post(
 		}
 
 		try {
-			const result = await submitApplication(applicationId);
+			const result = await submitApplication({applicationId:parseInt(applicationId)});
 
 			if (result.success) {
 				res.status(200).send({
