@@ -87,7 +87,7 @@ const RequestedStudy = () => {
 								control={control}
 								rule={rule}
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyID.toString(), label: study.studyName };
+									return { value: study.studyID, label: study.studyName };
 								})}
 								required
 								disabled={!isEditMode}

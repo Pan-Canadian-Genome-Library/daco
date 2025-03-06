@@ -17,26 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
+import { Typography, theme } from 'antd';
+import { FieldError } from 'react-hook-form';
 
-const apiZodErrorMapping: z.ZodErrorMap = (issue, ctx) => {
-	if (issue.code === z.ZodIssueCode.invalid_type) {
-		if (!issue.expected.includes('undefined') && issue.received.includes('undefined')) {
-			return {
-				message: `Property '${issue.path[issue.path.length - 1]}' is required.`,
-			};
-		}
-	}
+const { Text } = Typography;
+const { useToken } = theme;
 
-	if (issue.code === z.ZodIssueCode.custom) {
-		if (issue.params?.violation === 'noEmptyObject') {
-			return {
-				message: `Object is empty or only contains unrecognized keys. Object may not be empty.`,
-			};
-		}
-	}
+interface ErrorLabelProps {
+	text?: string | FieldError;
+}
 
-	return { message: ctx.defaultError };
+const ErrorLabel = ({ text }: ErrorLabelProps) => {
+	const { token } = useToken();
+	return text ? (
+		<div style={{ margin: '1rem 0 0 0' }}>
+			<Text style={{ color: token.colorError, fontSize: 'small', whiteSpace: 'pre-line' }}>{text.toString()}</Text>
+		</div>
+	) : null;
 };
 
-export { apiZodErrorMapping };
+export default ErrorLabel;
