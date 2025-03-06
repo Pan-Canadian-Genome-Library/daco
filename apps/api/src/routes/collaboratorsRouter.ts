@@ -39,37 +39,33 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/create',
 	jsonParser,
-	withBodySchemaValidation(
-		collaboratorsRequestSchema,
-		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId: application_id, userId: user_id, collaborators } = request.body;
+	withBodySchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
-			const result = await createCollaborators({
-				application_id,
-				user_id,
-				collaborators,
-			});
+		const result = await createCollaborators({
+			application_id,
+			user_id,
+			collaborators,
+		});
 
-			if (result.success) {
-				response.status(201).send(result.data);
-				return;
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
+				response.status(400);
+			} else if (errors === 'Unauthorized') {
+				response.status(401);
 			} else {
-				const { message, errors } = result;
-
-				if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
-					response.status(400);
-				} else if (errors === 'Unauthorized') {
-					response.status(401);
-				} else {
-					response.status(500);
-				}
-
-				response.send({ message, errors });
-				return;
+				response.status(500);
 			}
-		},
-	),
+
+			response.send({ message, errors });
+			return;
+		}
+	}),
 );
 
 /**
@@ -130,14 +126,11 @@ collaboratorsRouter.delete(
 			return;
 		}
 
-		const user_id = testUserId;
-
 		const application_id = parseInt(applicationId);
 		const id = parseInt(collaboratorId);
 
 		const result = await deleteCollaborator({
 			application_id,
-			user_id,
 			id,
 		});
 
