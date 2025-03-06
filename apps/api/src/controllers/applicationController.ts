@@ -243,24 +243,28 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 	const ethicsLetterId = application.contents?.ethics_letter;
 	let result;
 
-	if (ethicsLetterId && ethicsLetterId !== null) {
-		result = await filesService.updateFile({
-			fileId: ethicsLetterId,
-			file,
-			application,
-			type: 'ETHICS_LETTER',
+	await database.transaction(async (tx) => {
+		if (ethicsLetterId && ethicsLetterId !== null) {
+			result = await filesService.updateFile({
+				fileId: ethicsLetterId,
+				file,
+				application,
+				type: 'ETHICS_LETTER',
+				transaction: tx,
+			});
+		} else {
+			result = await filesService.createFile({ file, application, type: 'ETHICS_LETTER' });
+		}
+
+		if (!result.success) {
+			return result;
+		}
+
+		await applicationRepo.editApplication({
+			id: applicationId,
+			update: { ethics_letter: result.data.id },
+			transaction: tx,
 		});
-	} else {
-		result = await filesService.createFile({ file, application, type: 'ETHICS_LETTER' });
-	}
-
-	if (!result.success) {
-		return result;
-	}
-
-	await applicationRepo.editApplication({
-		id: applicationId,
-		update: { ethics_letter: result.data.id },
 	});
 
 	return result;

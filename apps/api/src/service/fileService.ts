@@ -23,9 +23,9 @@ import fs from 'fs';
 import { type PostgresDb } from '@/db/index.js';
 import { files } from '@/db/schemas/files.js';
 import logger from '@/logger.ts';
-import { type AsyncResult, failure, success } from '@/utils/results.js';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { eq } from 'drizzle-orm';
-import { type FilesModel, type JoinedApplicationRecord } from './types.ts';
+import { PostgresTransaction, type FilesModel, type JoinedApplicationRecord } from './types.ts';
 
 /**
  * Upload service provides methods for file DB access
@@ -36,13 +36,17 @@ const filesSvc = (db: PostgresDb) => ({
 		file,
 		application,
 		type,
+		transaction,
 	}: {
 		file: formidable.File;
 		application: JoinedApplicationRecord;
 		type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
+		transaction?: PostgresTransaction;
 	}): AsyncResult<FilesModel & { id: number }> => {
 		try {
-			const result = await db.transaction(async (transaction) => {
+			const dbTransaction = transaction ? transaction : db;
+
+			const result = await dbTransaction.transaction(async (transaction) => {
 				const buffer = await fs.readFileSync(file.filepath);
 
 				const newFiles: typeof files.$inferInsert = {
@@ -76,14 +80,18 @@ const filesSvc = (db: PostgresDb) => ({
 		file,
 		application,
 		type,
+		transaction,
 	}: {
 		fileId: number;
 		file: formidable.File;
 		application: JoinedApplicationRecord;
 		type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
+		transaction?: PostgresTransaction;
 	}): AsyncResult<FilesModel & { id: number }> => {
 		try {
-			const result = await db.transaction(async (transaction) => {
+			const dbTransaction = transaction ? transaction : db;
+
+			const result = await dbTransaction.transaction(async (transaction) => {
 				const buffer = await fs.readFileSync(file.filepath);
 
 				const newFiles: typeof files.$inferInsert = {
