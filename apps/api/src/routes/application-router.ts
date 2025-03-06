@@ -298,15 +298,13 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 applicationRouter.post('/applications/:applicationId/submit-revision', jsonParser, async (req, res) => {
 	const { applicationId } = req.params;
 
-	if (!applicationId) {
-		res.status(400).json({ message: 'Application ID is required.' });
-	}
 	
-		res.status(400).json({
+	if (!applicationId || isNaN(parseInt(applicationId))) {
+		res.status(400).send({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
 		});
-		return;
+	}
 
 	try {
 		const applicationIdNum = Number(applicationId);
