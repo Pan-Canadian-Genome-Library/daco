@@ -41,6 +41,9 @@ const Institutional = () => {
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
 	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
+		defaultValues: {
+			institutionCountry: 'CAN',
+		},
 		resolver: zodResolver(institutionalRepSchema),
 	});
 
@@ -172,7 +175,7 @@ const Institutional = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title={translate('institutional-section.section2')}>
+				<SectionContent title={translate('institutional-section.section2')} showDivider={false}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox

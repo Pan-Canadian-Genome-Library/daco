@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { applicantInformationSchema, type ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -40,13 +40,12 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 
-	const { handleSubmit, control } = useForm<ApplicantInformationSchemaType>({
+	const { control } = useForm<ApplicantInformationSchemaType>({
+		defaultValues: {
+			applicantInstituteCountry: 'CAN',
+		},
 		resolver: zodResolver(applicantInformationSchema),
 	});
-
-	const onSubmit: SubmitHandler<ApplicantInformationSchemaType> = (data) => {
-		console.log(data);
-	};
 
 	return (
 		<SectionWrapper>
@@ -167,7 +166,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title={translate('applicant-section.section2')}>
+				<SectionContent title={translate('applicant-section.section2')} showDivider={false}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
@@ -240,7 +239,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
+				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);

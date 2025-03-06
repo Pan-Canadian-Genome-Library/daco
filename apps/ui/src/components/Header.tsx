@@ -126,8 +126,9 @@ const HeaderComponent = () => {
 		isLoggedIn
 			? {
 					name: translate('links.applications'),
-					href: `/dashboard`,
+					href: '/dashboard',
 					position: 'right',
+					target: '_self',
 				}
 			: {
 					name: translate('links.apply'),

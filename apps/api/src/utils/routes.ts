@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type JoinedApplicationRecord } from '@/service/types.js';
+import { type ApplicationContentUpdates, type JoinedApplicationRecord } from '@/service/types.js';
 import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model/src/types.js';
+import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
 /**
  * Helper function to determine if value is a valid number and is positive.
@@ -99,4 +100,45 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 		expiresAt,
 		contents,
 	};
+};
+
+/**
+ * Helper function to convert Postgres snake_case to FE camelCase for applicationContents
+ * @param data type UpdateEditApplicationRequest application contents in camelCase
+ * @returns  type ApplicationContentUpdates in snake_case
+ */
+export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
+	const formatedUpdate: ApplicationContentUpdates = {
+		applicant_first_name: update.applicantFirstname,
+		applicant_middle_name: update.applicantMiddlename,
+		applicant_last_name: update.applicantLastname,
+		applicant_institutional_email: update.applicantInstitutionalEmail,
+		applicant_position_title: update.applicantPositionTitle,
+		applicant_primary_affiliation: update.applicantPrimaryAffiliation,
+		applicant_profile_url: update.applicantProfileUrl,
+		applicant_suffix: update.applicantSuffix,
+		applicant_title: update.applicantTitle,
+		institutional_rep_first_name: update.institutionalRepFirstname,
+		institutional_rep_middle_name: update.institutionalRepMiddlename,
+		institutional_rep_last_name: update.institutionalRepLastname,
+		institutional_rep_title: update.institutionalRepTitle,
+		institutional_rep_position_title: update.institutionalRepPositionTitle,
+		institutional_rep_suffix: update.institutionalRepSuffix,
+		institutional_rep_email: update.institutionalRepEmail,
+		institutional_rep_primary_affiliation: update.institutionalRepPrimaryAffiliation,
+		institutional_rep_profile_url: update.institutionalRepProfileUrl,
+		institution_building: update.institutionBuilding,
+		institution_city: update.institutionCity,
+		institution_country: update.institutionCountry,
+		institution_postal_code: update.institutionPostalCode,
+		institution_state: update.institutionState,
+		institution_street_address: update.institutionStreetAddress,
+		project_aims: update.projectAims,
+		project_methodology: update.projectMethodology,
+		project_summary: update.projectSummary,
+		project_title: update.projectTitle,
+		project_website: update.projectWebsite,
+	};
+
+	return formatedUpdate;
 };

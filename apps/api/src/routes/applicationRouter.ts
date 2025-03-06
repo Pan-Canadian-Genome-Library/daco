@@ -20,7 +20,7 @@
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
 import { editApplicationRequestSchema, submitApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
-import express, { Request } from 'express';
+import express, { type Request } from 'express';
 
 import {
 	approveApplication,
@@ -34,6 +34,8 @@ import {
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
+import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
+import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -43,41 +45,35 @@ const jsonParser = bodyParser.json();
  * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
  * 	- Validate request params using Zod.
  */
-applicationRouter.post(
-	'/applications/create',
-	jsonParser,
-	async (request: Request<{}, {}, { userId: string }, any>, response) => {
-		const { userId } = request.body;
+applicationRouter.post('/create', jsonParser, async (request: Request<{}, {}, { userId: string }, any>, response) => {
+	const { userId } = request.body;
 
-		/**
-		 * TODO: Temporary userId check until validation/dto flow is confirmed.
-		 * Reflect changes in swagger once refactored.
-		 **/
-		if (!userId) {
-			response.status(400).send({ message: 'User ID is required.' });
-			return;
-		}
+	/**
+	 * TODO: Temporary userId check until validation/dto flow is confirmed.
+	 * Reflect changes in swagger once refactored.
+	 **/
+	if (!userId) {
+		response.status(400).send({ message: 'User ID is required.' });
+		return;
+	}
 
-		const result = await createApplication({ user_id: userId });
+	const result = await createApplication({ user_id: userId });
 
-		if (result.success) {
-			response.status(201).send(result.data);
-		} else {
-			response.status(500).send({ message: result.message, errors: String(result.errors) });
-		}
-	},
-);
+	if (result.success) {
+		response.status(201).send(result.data);
+	} else {
+		response.status(500).send({ message: result.message, errors: String(result.errors) });
+	}
+});
 
 applicationRouter.post(
-	'/applications/edit',
+	'/edit',
 	jsonParser,
-	withSchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
+	withBodySchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
 		// TODO: Add Auth
 		const data = req.body;
-
 		const { id, update } = data;
 		const result = await editApplication({ id, update });
-
 		if (result.success) {
 			res.send(result.data);
 		} else {
@@ -87,7 +83,6 @@ applicationRouter.post(
 			} else {
 				res.status(500);
 			}
-
 			res.send({ message: result.message, errors: String(result.errors) });
 		}
 	}),
@@ -96,7 +91,7 @@ applicationRouter.post(
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
 //       - verify if user can access applications
 //       - validate queryParam options using zod
-applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res) => {
+applicationRouter.get('/', async (req: Request<{}, {}, {}, any>, res) => {
 	const { userId, state: stateQuery, sort: sortQuery, page, pageSize } = req.query;
 
 	//  Temporary userId check until validation/dto flow is confirmed
@@ -156,28 +151,25 @@ applicationRouter.get('/applications', async (req: Request<{}, {}, {}, any>, res
  * 	- Validate request params using Zod.
  * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
  */
-applicationRouter.get(
-	'/applications/:applicationId',
-	async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {
-		const { applicationId } = request.params;
+applicationRouter.get('/:applicationId', async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {
+	const { applicationId } = request.params;
 
-		const result = await getApplicationById({ applicationId });
+	const result = await getApplicationById({ applicationId });
 
-		if (result.success) {
-			response.status(200).send(result.data);
+	if (result.success) {
+		response.status(200).send(result.data);
+	} else {
+		const resultErrors = String(result.errors);
+
+		if (resultErrors === 'Error: Application record is undefined') {
+			response.status(404);
 		} else {
-			const resultErrors = String(result.errors);
-
-			if (resultErrors === 'Error: Application record is undefined') {
-				response.status(404);
-			} else {
-				response.status(500);
-			}
-
-			response.send({ message: result.message, errors: resultErrors });
+			response.status(500);
 		}
-	},
-);
+
+		response.send({ message: result.message, errors: resultErrors });
+	}
+});
 
 /**
  * Gets the total of how many applications are in each state type (APPROVED, REJECTED, etc...),
@@ -187,7 +179,7 @@ applicationRouter.get(
  * 	- Currently no validation is done to ensure that the current logged in user can access the specified application. This should be done and refactored.
  * 	- Validate request params using Zod.
  */
-applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {}, {}, any>, res) => {
+applicationRouter.get('/metadata/counts', async (req: Request<{}, {}, {}, any>, res) => {
 	const { userId } = req.query;
 
 	if (!userId) {
@@ -205,7 +197,8 @@ applicationRouter.get('/applications/metadata/counts', async (req: Request<{}, {
 		res.status(500).send({ message: result.message, errors: String(result.errors) });
 	}
 });
-applicationRouter.post('/applications/approve', jsonParser, async (req, res) => {
+
+applicationRouter.post('/approve', jsonParser, async (req, res) => {
 	const { applicationId }: { applicationId?: number } = req.body;
 
 	if (typeof applicationId !== 'number' || !applicationId) {
@@ -250,7 +243,7 @@ applicationRouter.post('/applications/approve', jsonParser, async (req, res) => 
 	}
 });
 
-applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
+applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
 
 	if (!applicationId) {
@@ -296,6 +289,7 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 		});
 	}
 });
+
 
 applicationRouter.post(
 	'/applications/submit',

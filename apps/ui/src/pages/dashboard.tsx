@@ -24,13 +24,14 @@ import { useNavigate } from 'react-router';
 
 import useGetApplicationList from '@/api/useGetApplicationList';
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import ContentWrapper, { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { mockUserID } from '@/components/mock/applicationMockData';
 import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatusBar';
 import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { Application } from '@/global/types';
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -82,53 +83,55 @@ const DashboardPage = () => {
 			<Content>
 				<Flex style={{ height: '100%' }} vertical>
 					<ApplicationStatusBar />
-					<div
-						style={{
-							...contentWrapperStyles,
-							width: showDeviceRestriction ? '100%' : '90%',
-							padding: showDeviceRestriction ? token.paddingSM : token.paddingXL,
-						}}
-					>
-						<Row
-							gutter={[
-								showDeviceRestriction ? token.size : token.sizeXL,
-								showDeviceRestriction ? token.size : token.sizeXL,
-							]}
-							align={'middle'}
-							justify={'center'}
-							wrap
+					<ContentWrapper style={{ padding: '40px 0 40px 0' }}>
+						<div
+							style={{
+								...contentWrapperStyles,
+								width: showDeviceRestriction ? '100%' : '90%',
+								padding: showDeviceRestriction ? token.paddingSM : token.paddingXL,
+							}}
 						>
-							{applicationData === undefined ? (
-								<>
-									<Col span={showDeviceRestriction ? 24 : 12}>
-										<NewApplicationCard />
-									</Col>
-									<Col span={showDeviceRestriction ? 24 : 12}>
-										<LoadingApplicationCard />
-									</Col>
-									<Col span={showDeviceRestriction ? 24 : 12}>
-										<LoadingApplicationCard />
-									</Col>
-									<Col span={showDeviceRestriction ? 24 : 12}>
-										<LoadingApplicationCard />
-									</Col>
-								</>
-							) : (
-								<>
-									<Col xs={24} md={24} lg={12}>
-										<NewApplicationCard />
-									</Col>
-									{applicationData.applications.map((applicationItem) => {
-										return (
-											<Col key={applicationItem.id} xs={24} md={24} lg={12}>
-												<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />
-											</Col>
-										);
-									})}
-								</>
-							)}
-						</Row>
-					</div>
+							<Row
+								gutter={[
+									showDeviceRestriction ? token.size : token.sizeXL,
+									showDeviceRestriction ? token.size : token.sizeXL,
+								]}
+								align={'middle'}
+								justify={'center'}
+								wrap
+							>
+								{applicationData === undefined ? (
+									<>
+										<Col span={showDeviceRestriction ? 24 : 12}>
+											<NewApplicationCard />
+										</Col>
+										<Col span={showDeviceRestriction ? 24 : 12}>
+											<LoadingApplicationCard />
+										</Col>
+										<Col span={showDeviceRestriction ? 24 : 12}>
+											<LoadingApplicationCard />
+										</Col>
+										<Col span={showDeviceRestriction ? 24 : 12}>
+											<LoadingApplicationCard />
+										</Col>
+									</>
+								) : (
+									<>
+										<Col xs={24} md={24} lg={12}>
+											<NewApplicationCard />
+										</Col>
+										{applicationData.applications.map((applicationItem: Application) => {
+											return (
+												<Col key={applicationItem.id} xs={24} md={24} lg={12}>
+													<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />
+												</Col>
+											);
+										})}
+									</>
+								)}
+							</Row>
+						</div>
+					</ContentWrapper>
 				</Flex>
 				<Modal
 					title={translate('modal.editTitle', { id: modalAppId })}

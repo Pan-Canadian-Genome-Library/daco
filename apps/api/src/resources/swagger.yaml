@@ -280,6 +280,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationRecord'
+
   /applications/approve:
     post:
       tags:
@@ -317,6 +318,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
   /applications/reject:
     post:
       tags:
@@ -349,6 +351,117 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
+
+  /signature/sign:
+    post:
+      tags:
+        - Signature
+      summary: Sign an application with a signature.
+      requestBody:
+        description: The ID of the application you wish to add the signature to, the signature (encoded in base64) and the time the signature took place.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/SignatureSign'
+      responses:
+        '200':
+          description: Application has been successfully signed. It will return the same data to you as what you sent in with a status `200 OK`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/SignatureSign'
+        '400':
+          description: Body parameters incorrect / validation failed. Likely due to missing params, or a non-base64 string.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+
+  /collaborators/create:
+    post:
+      tags:
+        - Collaborators
+      summary: Create new Collaborators for an application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/SignatureSign'
+              type: object
+              properties:
+                applicationId:
+                  type: number
+                  description: ID of the related Application record that new Collaborators are associated with
+                userId:
+                  type: string
+                  description: Temporary, Applicant's User Id, required for authorization
+                collaborators:
+                  $ref: '#/components/requests/CreateCollaborators'
+      responses:
+        '500':
+          description: 'Error creating collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error creating Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '201':
+          description: 'Collaborators created'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+
+  /collaborators/{applicationId}:
+    get:
+      tags:
+        - Collaborators
+      summary: List all Collaborators for an application.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: number
+          description: Id of application to find related collaborators
+          required: true
+      responses:
+        '201':
+          description: 'Collaborators retrieved'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+        '500':
+          description: 'Error listing collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error listing Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+
   /applications/submit:
     post:
       summary: Submit an application
@@ -635,6 +748,34 @@ components:
           type: object
           $ref: '#/components/schemas/ApplicationContents'
 
+    Collaborators:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the collaborator in the database.
+        application_id:
+          type: number
+          description: The Application ID associated with the Collaborator.
+        first_name:
+          type: string
+          description: The collaborator's first name
+        middle_name:
+          type: string
+          description: The collaborator's middle name
+        last_name:
+          type: string
+          description: The collaborator's last name
+        suffix:
+          type: string
+          description: The collaborator's additional name suffix
+        position_title:
+          type: string
+          description: The collaborator's job title
+        institutional_email:
+          type: string
+          description: The collaborator's contact email
+
   requests:
     ApplicationCreation:
       type: object
@@ -667,6 +808,7 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+
     RejectApplication:
       type: object
       required:
@@ -692,6 +834,56 @@ components:
         - userId
         - role
         - signature
+
+    SignatureSign:
+      type: object
+      description: The contents of the signature details in an application.
+      properties:
+        id:
+          type: number
+          description: The ID of the application you want to add/modify the signature on.
+        signature:
+          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
+          type: string
+          description: |
+            The Base64 encoded PNG image containing the signature of the Applicant or Institutional Representative.
+        signee:
+          type: string
+          enum: [APPLICANT, INSTITUTIONAL_REP]
+          description: Whether the signature is being performed by an applicant or a Institutional Representative.
+
+    CreateCollaborators:
+      type: array
+      description: Array of new Collaborators to create
+      items:
+        $ref: '#/components/requests/NewCollaborator'
+
+    NewCollaborator:
+      type: object
+      required:
+        - collaboratorFirstName
+        - collaboratorLastName
+        - collaboratorPositionTitle
+        - collaboratorInstitutionalEmail
+      properties:
+        collaboratorFirstName:
+          type: string
+          description: The collaborator's first name
+        collaboratorMiddleName:
+          type: string
+          description: The collaborator's middle name
+        collaboratorLastName:
+          type: string
+          description: The collaborator's last name
+        collaboratorSuffix:
+          type: string
+          description: The collaborator's additional name suffix
+        collaboratorPositionTitle:
+          type: string
+          description: The collaborator's job title
+        collaboratorInstitutionalEmail:
+          type: string
+          description: The collaborator's contact email
 
   responses:
     ApplicationResponse:
@@ -856,6 +1048,12 @@ components:
           type: string
           description: General description of error with parameters and context
 
+    CollaboratorsListResponse:
+      type: array
+      description: Array of Collaborator records
+      items:
+        $ref: '#/components/schemas/Collaborators'
+
     ServerErrors:
       type: object
       required:
@@ -867,3 +1065,56 @@ components:
         errors:
           description: Detailed error data thrown by code failure
           type: string
+
+    SignatureSigned:
+      type: object
+      description: The contents of the signature details in an application.
+      properties:
+        id:
+          type: number
+          description: The ID of the application that you modified the signature on.
+        signature:
+          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
+          type: string
+          description: |
+            The Base64 encoded PNG image containing the signature of the Applicant or Institutional Representative.
+        signedAt:
+          type: string
+          format: date-time
+          description: The the signature was signed.
+
+    RequestValidationError:
+      type: object
+      required:
+        - message
+        - error
+        - details
+      properties:
+        error:
+          type: string
+          description: Error code, usually "RequestValidationError"
+        message:
+          type: string
+          description: General description of error with parameters and context
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                description: The validation error type
+              expected:
+                type: string
+                description: The expected property.
+              received:
+                type: string
+                description: The property that was received in the request
+              path:
+                type: array
+                items:
+                  type: string
+                  description: The path of the object where validation failed.
+              message:
+                type: string
+                description: A plain text error message describing why the validation failed.

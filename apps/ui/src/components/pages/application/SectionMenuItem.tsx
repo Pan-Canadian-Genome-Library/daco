@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CheckCircleOutlined, LockOutlined } from '@ant-design/icons';
+import { LockOutlined } from '@ant-design/icons';
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
@@ -40,7 +40,7 @@ const SectionMenuItem = ({ label, isEditMode }: SectionMenuItemProps) => {
 				{translate(`menu.${label}`)}
 			</Text>
 
-			<Flex>{!isEditMode ? <LockOutlined /> : <CheckCircleOutlined />}</Flex>
+			<Flex>{!isEditMode ? <LockOutlined /> : null}</Flex>
 		</Flex>
 	);
 };
