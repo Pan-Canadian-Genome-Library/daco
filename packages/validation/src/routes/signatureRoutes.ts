@@ -18,25 +18,12 @@
  */
 
 import { z } from 'zod';
+import { BASE64_IMAGE } from '../utils/regex.js';
 
-const apiZodErrorMapping: z.ZodErrorMap = (issue, ctx) => {
-	if (issue.code === z.ZodIssueCode.invalid_type) {
-		if (!issue.expected.includes('undefined') && issue.received.includes('undefined')) {
-			return {
-				message: `Property '${issue.path[issue.path.length - 1]}' is required.`,
-			};
-		}
-	}
+export const editSignatureRequestSchema = z.object({
+	id: z.number().nonnegative(),
+	signature: z.string().regex(BASE64_IMAGE),
+	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+});
 
-	if (issue.code === z.ZodIssueCode.custom) {
-		if (issue.params?.violation === 'noEmptyObject') {
-			return {
-				message: `Object is empty or only contains unrecognized keys. Object may not be empty.`,
-			};
-		}
-	}
-
-	return { message: ctx.defaultError };
-};
-
-export { apiZodErrorMapping };
+export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;

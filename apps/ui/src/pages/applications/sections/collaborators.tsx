@@ -117,7 +117,7 @@ const Collaborators = () => {
 					text={[translate('collab-section.description1'), translate('collab-section.note')]}
 					showDivider={false}
 				/>
-				<SectionContent>
+				<SectionContent showDivider={false}>
 					<Table
 						rowKey={(record: CollabTableData) => `PCGL-${record.id}`}
 						columns={columns}
