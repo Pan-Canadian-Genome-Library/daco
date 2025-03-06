@@ -220,52 +220,64 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
  * @returns Success with file data / Failure with Error.
  */
 export const uploadEthicsFile = async ({ applicationId, file }: { applicationId: number; file: formidable.File }) => {
-	const database = getDbInstance();
-	const filesService: FilesService = filesSvc(database);
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	try {
+		const database = getDbInstance();
+		const filesService: FilesService = filesSvc(database);
+		const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const applicationResult = await applicationRepo.getApplicationWithContents({ id: applicationId });
+		const applicationResult = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
-	if (!applicationResult.success) {
-		return failure('Failed getting application information');
-	}
+		if (!applicationResult.success) {
+			return failure('Failed getting application information');
+		}
 
-	const application = applicationResult.data;
-	const { edit } = ApplicationStateEvents;
+		const application = applicationResult.data;
+		const { edit } = ApplicationStateEvents;
 
-	const applicationRecord: ApplicationRecord = { ...application, contents: null };
-	const canEditResult = new ApplicationStateManager(applicationRecord)._canPerformAction(edit);
+		const applicationRecord: ApplicationRecord = { ...application, contents: null };
+		const canEditResult = new ApplicationStateManager(applicationRecord)._canPerformAction(edit);
 
-	if (!canEditResult) {
-		return failure('Invalid action, must be in a draft state', 'Invalid action');
-	}
+		if (!canEditResult) {
+			return failure('Invalid action, must be in a draft state', 'Invalid action');
+		}
 
-	const ethicsLetterId = application.contents?.ethics_letter;
-	let result;
+		const ethicsLetterId = application.contents?.ethics_letter;
 
-	await database.transaction(async (tx) => {
-		if (ethicsLetterId && ethicsLetterId !== null) {
-			result = await filesService.updateFile({
-				fileId: ethicsLetterId,
-				file,
-				application,
-				type: 'ETHICS_LETTER',
+		const txResult = await database.transaction(async (tx) => {
+			let result;
+
+			if (ethicsLetterId && ethicsLetterId !== null) {
+				result = await filesService.updateFile({
+					fileId: ethicsLetterId,
+					file,
+					application,
+					type: 'ETHICS_LETTER',
+					transaction: tx,
+				});
+			} else {
+				result = await filesService.createFile({ file, application, type: 'ETHICS_LETTER' });
+			}
+
+			if (!result.success) {
+				return result;
+			}
+
+			const applicantResult = await applicationRepo.editApplication({
+				id: applicationId,
+				update: { ethics_letter: result.data.id },
 				transaction: tx,
 			});
-		} else {
-			result = await filesService.createFile({ file, application, type: 'ETHICS_LETTER' });
-		}
 
-		if (!result.success) {
+			if (!applicantResult.success) {
+				return result;
+			}
 			return result;
-		}
-
-		await applicationRepo.editApplication({
-			id: applicationId,
-			update: { ethics_letter: result.data.id },
-			transaction: tx,
 		});
-	});
-
-	return result;
+		return txResult;
+	} catch (error) {
+		const message = `Unable to upload file to application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
 };
