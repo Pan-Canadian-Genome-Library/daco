@@ -83,12 +83,12 @@ export const collaboratorsListParamsSchema = z
 
 export const collaboratorsDeleteParamsSchema = z
 	.object({
-		applicationId: z.string().refine((id) => {
-			return isPositiveNumber(parseInt(id)), { message: 'applicationId must be a positive number' };
-		}),
-		collaboratorId: z.string().refine((id) => {
-			return isPositiveNumber(parseInt(id)), { message: 'collaboratorId must be a positive number' };
-		}),
+		applicationId: z
+			.string()
+			.refine((id) => isPositiveNumber(parseInt(id)), { message: 'applicationId must be a positive number' }),
+		collaboratorId: z
+			.string()
+			.refine((id) => isPositiveNumber(parseInt(id)), { message: 'collaboratorId must be a positive number' }),
 	})
 	.required();
 
