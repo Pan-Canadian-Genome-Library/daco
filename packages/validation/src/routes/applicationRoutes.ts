@@ -65,7 +65,7 @@ export const editApplicationRequestSchema = z.object({
 
 export const submitApplicationRequestSchema = z
 	.object({
-		applicationId: z.number().positive(),
+		applicationId:  z.string().min(1),
 		role: z.enum(['APPLICANT', 'REP']),
 		signature: z.string().min(1),
 	})
