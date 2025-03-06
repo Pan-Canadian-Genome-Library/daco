@@ -17,7 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import formidable from 'formidable';
 import assert from 'node:assert';
+import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
@@ -28,6 +30,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	uploadEthicsFile,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -229,6 +232,59 @@ describe('Application API', () => {
 			const rejectedApplication = await getApplicationById({ applicationId: id });
 			assert.ok(rejectedApplication.success);
 			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
+		});
+	});
+
+	describe('Upload Ethics File', () => {
+		it('Should create new file if there is no ethics_letter in the application contents', async () => {
+			const mockFile: formidable.File = {
+				filepath: path.join(process.cwd(), 'tests/fileuploadtest.docx'),
+				hashAlgorithm: 'sha256',
+				mimetype: 'application/msword',
+				newFilename: 'newFileName',
+				originalFilename: 'fileuploadtest',
+				size: 20000,
+				toJSON: function (): formidable.FileJSON {
+					throw new Error('Function not implemented.');
+				},
+			};
+
+			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
+			assert.ok(applicationResult.success);
+
+			const application = applicationResult.data;
+			const ethicsLetterId = application.contents?.ethics_letter;
+
+			assert.strictEqual(ethicsLetterId, null);
+
+			const fileResult = await uploadEthicsFile({ applicationId: 1, file: mockFile });
+
+			assert.ok(fileResult.success);
+		});
+
+		it('Should update file if there is an existing ethics_letter id in the application contents', async () => {
+			const mockFile: formidable.File = {
+				filepath: path.join(process.cwd(), 'tests/fileuploadtest-2.docx'),
+				hashAlgorithm: 'sha256',
+				mimetype: 'application/msword',
+				newFilename: 'newestFileName',
+				originalFilename: 'fileuploadtest-2',
+				size: 20000,
+				toJSON: function (): formidable.FileJSON {
+					// Does not need to be implemented, just need to satisfy formidable.File
+					throw new Error('Function not implemented.');
+				},
+			};
+
+			const fileResult = await uploadEthicsFile({ applicationId: 1, file: mockFile });
+			assert.ok(fileResult.success);
+
+			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
+			assert.ok(applicationResult.success);
+			const application = applicationResult.data;
+			const ethicsLetterId = application.contents?.ethics_letter;
+
+			assert.strictEqual(ethicsLetterId, fileResult.data.id);
 		});
 	});
 
