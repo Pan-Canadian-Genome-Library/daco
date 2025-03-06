@@ -17,9 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import bodyParser from 'body-parser';
-import express, { type Request } from 'express';
-
 import {
 	approveApplication,
 	createApplication,
@@ -32,8 +29,10 @@ import {
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
+import { fileUploadValidation, withBodySchemaValidation } from '@pcgl-daco/request-utils';
 import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import bodyParser from 'body-parser';
+import express, { type Request, type Response } from 'express';
 import formidable from 'formidable';
 
 const applicationRouter = express.Router();
@@ -289,55 +288,23 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	}
 });
 
-const validFileTypes = [
-	'application/pdf',
-	'application/msword',
-	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
-
 /**
  * TODO: NO current Auth rules implemented
  */
-applicationRouter.post('/applications/file/ethics/:applicationId', async (req, res) => {
-	const { applicationId } = req.params;
-	const id = parseInt(applicationId) ?? -1;
+applicationRouter.post(
+	'/file/ethics/:applicationId',
+	fileUploadValidation(async (req: Request<any, formidable.File>, res: Response) => {
+		const { applicationId } = req.params;
 
-	if (!isPositiveNumber(id)) {
-		res.status(400).send({ message: 'Invalid applicationId' });
-		return;
-	}
+		const { file } = req.body;
 
-	const form = formidable({
-		keepExtensions: true,
-		maxFileSize: 5 * 1024 * 1024, // 5MB limit
-		maxFiles: 1,
-		allowEmptyFiles: false,
-	});
-
-	form.parse(req, async (err, _, files) => {
-		if (err) {
-			res.status(400).send({ message: 'Invalid file upload' });
+		const id = parseInt(applicationId ? applicationId : '');
+		if (!isPositiveNumber(id)) {
+			res.status(400).send({ message: 'Invalid applicationId' });
 			return;
 		}
 
-		if (!files.file || !files.file[0]) {
-			res.status(400).send({ message: 'File does not exist' });
-			return;
-		}
-
-		const file = files.file[0];
-
-		if (!file.mimetype) {
-			res.status(400).send({ message: 'File type was not specified' });
-			return false;
-		}
-
-		if (!validFileTypes.includes(`${file.mimetype}`)) {
-			res.status(400).send({ message: 'Invalid file type' });
-			return false;
-		}
-
-		const result = await uploadFile({ applicationId: parseInt(applicationId), file });
+		const result = await uploadFile({ applicationId: id, file });
 
 		if (result.success) {
 			res.status(200).send(result.data);
@@ -347,7 +314,7 @@ applicationRouter.post('/applications/file/ethics/:applicationId', async (req, r
 			res.status(500).send(errorReturn);
 			return;
 		}
-	});
-});
+	}),
+);
 
 export default applicationRouter;
