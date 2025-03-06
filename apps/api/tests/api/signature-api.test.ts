@@ -26,7 +26,7 @@ import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 
-import { updateApplicationSignature } from '@/controllers/signatureController.ts';
+import { getApplicationSignature, updateApplicationSignature } from '@/controllers/signatureController.ts';
 import {
 	addInitialApplications,
 	initTestMigration,
@@ -106,6 +106,63 @@ describe('Signature API', () => {
 			const editedSignature = result.data;
 
 			assert.strictEqual(editedSignature.institutional_rep_signature, validBase64Signature);
+		});
+	});
+
+	describe('Retrieve Signed Application', () => {
+		it('Should retrieve a signed application', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			//This application was previously signed above.
+			const { id: applicationId } = applicationRecordsResult.data.applications[0];
+
+			const result = await getApplicationSignature({
+				applicationId,
+			});
+
+			assert.ok(result.success);
+
+			const retrievedSignature = result.data;
+			assert.notStrictEqual(retrievedSignature.applicantSignature, null);
+			assert.notStrictEqual(retrievedSignature.applicantSignedAt, null);
+		});
+		it('Should retrieve a unsigned application successfully', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[1],
+			);
+
+			//This application was not previously signed above.
+			const { id: applicationId } = applicationRecordsResult.data.applications[1];
+
+			const result = await getApplicationSignature({
+				applicationId,
+			});
+
+			assert.ok(result.success);
+
+			const retrievedSignature = result.data;
+			assert.strictEqual(retrievedSignature.applicantSignature, null);
+			assert.strictEqual(retrievedSignature.applicantSignedAt, null);
+		});
+
+		it('Be unable to retrieve an invalid signed application', async () => {
+			const applicationId = 9999;
+
+			const result = await getApplicationSignature({
+				applicationId,
+			});
+
+			assert.strictEqual(result.success, false);
 		});
 	});
 

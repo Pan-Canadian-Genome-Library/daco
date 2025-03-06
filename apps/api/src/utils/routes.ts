@@ -151,7 +151,7 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 /**
  * Helper function to convert Postgres snake_case to FE camelCase for the Signature Service
  * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
- * @returns type `SignatureDTO` - camelCase variation of a Postgress success response. 
+ * @returns type `SignatureDTO` - camelCase variation of a Postgress success response.
  */
 export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): SignatureDTO => {
 	const {
