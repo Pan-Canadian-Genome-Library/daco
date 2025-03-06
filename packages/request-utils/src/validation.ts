@@ -109,11 +109,8 @@ const validFileTypes = [
 	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 /**
- * Wrapper for express RequestHandler to provide request parameter validation using a Zod Schema.
+ * Wrapper for express RequestHandler to provide file validation checks before upload process
  *
- * @param paramsSchema Zod Schema which will perform the request parameter validation
- * @param zodErrorMapping A `ZodErrorMap` object which can be used to translate or intercept the existing error / message mapping. If you don't have a custom one, you may pass in `defaultErrorMap` from the `zod` package, or `undefined`.
- * @param handler RequestHandler to run once validation passes
  * @returns RequestHandler to be given to express router
  *
  */
