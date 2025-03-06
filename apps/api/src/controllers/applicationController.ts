@@ -25,9 +25,6 @@ import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
 	JoinedApplicationRecord,
-	type ApplicationContentUpdates,
-	type ApplicationRecord,
-	type ApplicationService,
 	type RevisionRequestModel,
 } from '@/service/types.js';
 import { type ApplicationRecord, type ApplicationService } from '@/service/types.js';
