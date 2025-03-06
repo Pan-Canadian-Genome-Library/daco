@@ -20,6 +20,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
+import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -75,7 +76,3 @@ const useGetApplication = (id?: string | number) => {
 };
 
 export default useGetApplication;
-
-export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
-	return value !== 'applicationId' && value !== 'createdAt' && value !== 'updatedAt';
-}

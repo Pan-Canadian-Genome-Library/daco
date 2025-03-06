@@ -17,8 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicantDTO, InstitutionalRepDTO, InstitutionDTO } from '@pcgl-daco/data-model';
+import { ApplicantDTO, ApplicationContentsResponse, InstitutionalRepDTO, InstitutionDTO } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+
+// Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
+export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
+	return value !== 'applicationId' && value !== 'createdAt' && value !== 'updatedAt';
+}
 
 // ApplicantKey
 export function isApplicantKey(value: string): value is keyof ApplicantDTO {
