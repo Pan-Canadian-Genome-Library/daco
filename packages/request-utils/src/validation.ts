@@ -128,7 +128,9 @@ function fileUploadValidation(handler: RequestHandler<ParamsDictionary, any, any
 			});
 			form.parse(request, async (err, _, files) => {
 				if (err) {
-					response.status(400).send({ message: 'Invalid file upload' });
+					response
+						.status(400)
+						.send({ message: 'Invalid file upload, file must be 5mb and only 1 file can be uploaded' });
 					return;
 				}
 
