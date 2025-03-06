@@ -46,6 +46,18 @@ describe('Signature Service', () => {
 	let testApplicationRepo: ApplicationService;
 	let testFileService: FilesService;
 
+	const mockFile: formidable.File = {
+		filepath: path.join(process.cwd(), 'tests/fileuploadtest.docx'),
+		hashAlgorithm: 'sha256',
+		mimetype: 'application/msword',
+		newFilename: 'newFileName',
+		originalFilename: 'fileuploadtest',
+		size: 20000,
+		toJSON: function (): formidable.FileJSON {
+			throw new Error('Function not implemented.');
+		},
+	};
+
 	before(async () => {
 		container = await new PostgreSqlContainer()
 			.withUsername(PG_USER)
@@ -65,18 +77,6 @@ describe('Signature Service', () => {
 
 	describe('File Create', () => {
 		it('should create a new application with type "ETHICS_LETTER"', async () => {
-			const mockFile: formidable.File = {
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest.docx'),
-				hashAlgorithm: 'sha256',
-				mimetype: 'application/msword',
-				newFilename: 'newFileName',
-				originalFilename: 'fileuploadtest',
-				size: 20000,
-				toJSON: function (): formidable.FileJSON {
-					throw new Error('Function not implemented.');
-				},
-			};
-
 			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
 			assert.ok(applicationResult.success);
 
@@ -90,19 +90,8 @@ describe('Signature Service', () => {
 
 			assert.equal(fileResponse.data.type, 'ETHICS_LETTER');
 		});
-		it('should create a new application with type "SIGNED_APPLICATION"', async () => {
-			const mockFile: formidable.File = {
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest.docx'),
-				hashAlgorithm: 'sha256',
-				mimetype: 'application/msword',
-				newFilename: 'newFileName',
-				originalFilename: 'fileuploadtest',
-				size: 20000,
-				toJSON: function (): formidable.FileJSON {
-					throw new Error('Function not implemented.');
-				},
-			};
 
+		it('should create a new application with type "SIGNED_APPLICATION"', async () => {
 			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
 			assert.ok(applicationResult.success);
 
@@ -114,6 +103,70 @@ describe('Signature Service', () => {
 
 			assert.ok(fileResponse.success);
 
+			assert.equal(fileResponse.data.type, 'SIGNED_APPLICATION');
+		});
+	});
+
+	describe('File Update', () => {
+		before(async () => {
+			const applicationResult = await testApplicationRepo.editApplication({ id: 2, update: { ethics_letter: 2 } });
+			assert.ok(applicationResult.success);
+
+			await testFileService.createFile({
+				application: applicationResult.data,
+				type: 'ETHICS_LETTER',
+				file: mockFile,
+			});
+		});
+
+		it('should update an application with new file "fileuploadtest2"', async () => {
+			const newMockFile: formidable.File = {
+				...mockFile,
+				filepath: path.join(process.cwd(), 'tests/fileuploadtest-2.docx'),
+				originalFilename: 'fileuploadtest-2',
+			};
+
+			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 2 });
+			assert.ok(applicationResult.success);
+
+			const ethicsLetterId = applicationResult.data.contents?.ethics_letter;
+
+			assert.ok(ethicsLetterId);
+
+			const fileResponse = await testFileService.updateFile({
+				fileId: ethicsLetterId,
+				application: applicationResult.data,
+				type: 'ETHICS_LETTER',
+				file: newMockFile,
+			});
+
+			assert.ok(fileResponse.success);
+
+			assert.equal(fileResponse.data.filename, 'fileuploadtest-2');
+		});
+
+		it('should update an application with type SIGNED_APPLICATION', async () => {
+			const newMockFile: formidable.File = {
+				...mockFile,
+				filepath: path.join(process.cwd(), 'tests/fileuploadtest-2.docx'),
+				originalFilename: 'fileuploadtest-2',
+			};
+
+			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 2 });
+			assert.ok(applicationResult.success);
+
+			const ethicsLetterId = applicationResult.data.contents?.ethics_letter;
+
+			assert.ok(ethicsLetterId);
+
+			const fileResponse = await testFileService.updateFile({
+				fileId: ethicsLetterId,
+				application: applicationResult.data,
+				type: 'SIGNED_APPLICATION',
+				file: newMockFile,
+			});
+
+			assert.ok(fileResponse.success);
 			assert.equal(fileResponse.data.type, 'SIGNED_APPLICATION');
 		});
 	});
