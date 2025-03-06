@@ -130,7 +130,7 @@ function fileUploadValidation(handler: RequestHandler<ParamsDictionary, any, any
 				if (err) {
 					response
 						.status(400)
-						.send({ message: 'Invalid file upload, file must be 5mb and only 1 file can be uploaded' });
+						.send({ message: 'Invalid file upload, file must be less than 5mb and only 1 file can be uploaded' });
 					return;
 				}
 
