@@ -370,7 +370,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/requests/SignatureSign'
+                $ref: '#/components/responses/SignatureSigned'
         '400':
           description: Body parameters incorrect / validation failed. Likely due to missing params, or a non-base64 string.
           content:
