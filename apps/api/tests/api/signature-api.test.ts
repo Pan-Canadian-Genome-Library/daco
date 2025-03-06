@@ -70,10 +70,10 @@ describe('Signature API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const { id } = applicationRecordsResult.data.applications[0];
+			const { id: applicationId } = applicationRecordsResult.data.applications[0];
 
 			const result = await updateApplicationSignature({
-				id,
+				applicationId,
 				signature: validBase64Signature,
 				signee: 'APPLICANT',
 			});
@@ -93,10 +93,10 @@ describe('Signature API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const { id } = applicationRecordsResult.data.applications[0];
+			const { id: applicationId } = applicationRecordsResult.data.applications[0];
 
 			const result = await updateApplicationSignature({
-				id,
+				applicationId,
 				signature: validBase64Signature,
 				signee: 'INSTITUTIONAL_REP',
 			});

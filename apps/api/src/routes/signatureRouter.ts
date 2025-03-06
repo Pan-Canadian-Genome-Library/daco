@@ -39,7 +39,7 @@ signatureRouter.get('/', async (request: Request<{}, {}, {}, { applicationId: st
 	const result = await getApplicationSignature({ applicationId: Number(applicationId) });
 
 	if (result.success) {
-		response.send(result);
+		response.status(200).send(result.data);
 		return;
 	}
 
@@ -61,10 +61,10 @@ signatureRouter.post(
 	jsonParser,
 	withBodySchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const data = req.body;
-		const { id, signature, signee } = data;
+		const { applicationId, signature, signee } = data;
 
 		const result = await updateApplicationSignature({
-			id,
+			applicationId,
 			signature,
 			signee,
 		});

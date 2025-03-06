@@ -20,8 +20,15 @@
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
 import { ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
+import { success } from '@/utils/results.ts';
+import { aliasSignatureRecord } from '@/utils/routes.ts';
 import { type EditSignatureRequest } from '@pcgl-daco/validation';
 
+/**
+ * Gets a signature for an application.
+ * @param application_id - The Application ID
+ * @returns Success with the signature and signed at time, properties may be `null` if not yet signed / Failure with Error.
+ */
 export const getApplicationSignature = async ({ applicationId }: { applicationId: number }) => {
 	if (applicationId < 0) {
 		throw new Error('Error: Application ID must be a positive number.');
@@ -32,6 +39,11 @@ export const getApplicationSignature = async ({ applicationId }: { applicationId
 
 	const result = await signatureRepo.getApplicationSignature({ application_id: applicationId });
 
+	if (result.success) {
+		const aliasedResponse = aliasSignatureRecord(result.data);
+		return success(aliasedResponse);
+	}
+
 	return result;
 };
 
@@ -41,12 +53,12 @@ export const getApplicationSignature = async ({ applicationId }: { applicationId
  * @param signature - The base64-encoded image containing the signature for the Application.
  * @returns Success with the signature and signed at time / Failure with Error
  */
-export const updateApplicationSignature = async ({ id, signature, signee }: EditSignatureRequest) => {
+export const updateApplicationSignature = async ({ applicationId, signature, signee }: EditSignatureRequest) => {
 	const database = getDbInstance();
 	const signatureRepo: SignatureService = signatureService(database);
 
 	let update: ApplicationSignatureUpdate = {
-		application_id: id,
+		application_id: applicationId,
 	};
 
 	if (signee === 'APPLICANT') {
