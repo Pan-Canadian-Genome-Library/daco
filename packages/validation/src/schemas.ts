@@ -29,7 +29,7 @@ import {
 	NonEmptyString,
 	OptionalURLString,
 } from './common/strings.js';
-import { isPositiveInteger } from './utils/functions.js';
+
 import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
@@ -62,35 +62,6 @@ export const collaboratorsSchema = z.object({
 	collaboratorResearcherProfileURL: EmptyOrOptionalString,
 	collaboratorType: EmptyOrOptionalString,
 });
-
-export const collaboratorsRequestSchema = z.object({
-	applicationId: z.number(),
-	userId: NonEmptyString,
-	collaborators: z.array(collaboratorsSchema).nonempty(),
-});
-
-export const collaboratorsRecordSchema = collaboratorsSchema.extend({
-	id: z.number(),
-});
-
-export const collaboratorsListParamsSchema = z
-	.object({
-		applicationId: z.string().refine((id) => {
-			return isPositiveInteger(Number(id)), { message: 'applicationId must be a positive number' };
-		}),
-	})
-	.required();
-
-export const collaboratorsDeleteParamsSchema = z
-	.object({
-		applicationId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId must be a positive number' }),
-		collaboratorId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'collaboratorId must be a positive number' }),
-	})
-	.required();
 
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
