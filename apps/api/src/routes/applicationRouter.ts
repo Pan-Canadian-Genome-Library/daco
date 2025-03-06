@@ -18,7 +18,7 @@
  */
 
 import bodyParser from 'body-parser';
-import express, { type Request } from 'express';
+import express, { Request, Response } from 'express';
 
 import {
 	approveApplication,
@@ -32,8 +32,9 @@ import {
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { collaboratorsListParamsSchema } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -286,12 +287,15 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
 });
 
 // POST: Submit revisions
-applicationRouter.post('/:applicationId/submit-revision', jsonParser, async (req, res) => {
-	const { applicationId } = req.params;
+applicationRouter.post('/:applicationId/submit-revision', jsonParser, withParamsSchemaValidation(
+    collaboratorsListParamsSchema,
+    apiZodErrorMapping,(
+	async (request: Request,response: Response) => {
+	const { applicationId } = request.params;
 
 
 	if (!applicationId || isNaN(parseInt(applicationId))) {
-		res.status(400).send({
+		response.status(400).json({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
 		});
@@ -302,7 +306,7 @@ applicationRouter.post('/:applicationId/submit-revision', jsonParser, async (req
 		const result = await submitRevision({ applicationId: applicationIdNum });
 
 		if (result.success) {
-			res.status(200).send({
+			response.status(200).send({
 				message: 'Application review submitted successfully.',
 				data: result.data,
 			});
@@ -322,14 +326,14 @@ applicationRouter.post('/:applicationId/submit-revision', jsonParser, async (req
 				message = 'Invalid application state.';
 			}
 
-			res.status(status).send({ message, errors });
+			response.status(status).send({ message, errors });
 		}
 	} catch (error) {
-		res.status(500).send({
+		response.status(500).send({
 			message: 'Internal server error.',
 			errors: String(error),
 		});
 	}
-});
+})));
 
 export default applicationRouter;
