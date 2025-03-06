@@ -25,7 +25,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
-	uploadFile,
+	uploadEthicsFile,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
@@ -293,7 +293,7 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
  */
 applicationRouter.post(
 	'/file/ethics/:applicationId',
-	fileUploadValidation(async (req: Request<any, formidable.File>, res: Response) => {
+	fileUploadValidation(async (req: Request<any, { file: formidable.File }>, res: Response) => {
 		const { applicationId } = req.params;
 
 		const { file } = req.body;
@@ -304,7 +304,7 @@ applicationRouter.post(
 			return;
 		}
 
-		const result = await uploadFile({ applicationId: id, file });
+		const result = await uploadEthicsFile({ applicationId: id, file });
 
 		if (result.success) {
 			res.status(200).send(result.data);

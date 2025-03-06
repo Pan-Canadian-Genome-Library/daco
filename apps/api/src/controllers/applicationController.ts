@@ -219,7 +219,7 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
  * @param file - File blob
  * @returns Success with file data / Failure with Error.
  */
-export const uploadFile = async ({ applicationId, file }: { applicationId: number; file: formidable.File }) => {
+export const uploadEthicsFile = async ({ applicationId, file }: { applicationId: number; file: formidable.File }) => {
 	const database = getDbInstance();
 	const filesService: FilesService = filesSvc(database);
 	const applicationRepo: ApplicationService = applicationSvc(database);
@@ -240,7 +240,19 @@ export const uploadFile = async ({ applicationId, file }: { applicationId: numbe
 		return failure('Invalid action, must be in a draft state', 'Invalid action');
 	}
 
-	const result = await filesService.uploadEthicsFile({ application_id: applicationId, file, application });
+	const ethicsLetterId = application.contents?.ethics_letter;
+	let result;
+
+	if (ethicsLetterId && ethicsLetterId !== null) {
+		result = await filesService.updateFile({
+			fileId: ethicsLetterId,
+			file,
+			application,
+			type: 'ETHICS_LETTER',
+		});
+	} else {
+		result = await filesService.createFile({ file, application, type: 'ETHICS_LETTER' });
+	}
 
 	if (!result.success) {
 		return result;

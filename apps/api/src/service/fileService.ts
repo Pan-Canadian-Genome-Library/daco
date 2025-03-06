@@ -32,37 +32,70 @@ import { type FilesModel, type JoinedApplicationRecord } from './types.ts';
  * @param db - Drizzle Postgres DB Instance
  */
 const filesSvc = (db: PostgresDb) => ({
-	uploadEthicsFile: async ({
-		application_id,
+	createFile: async ({
 		file,
 		application,
+		type,
 	}: {
-		application_id: number;
 		file: formidable.File;
 		application: JoinedApplicationRecord;
+		type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
 	}): AsyncResult<FilesModel & { id: number }> => {
 		try {
 			const result = await db.transaction(async (transaction) => {
 				const buffer = await fs.readFileSync(file.filepath);
 
 				const newFiles: typeof files.$inferInsert = {
-					application_id: application_id,
+					application_id: application.id,
 					filename: file.originalFilename,
-					type: 'ETHICS_LETTER',
+					type,
 					submitted_at: new Date(),
 					submitter_user_id: application.user_id,
 					content: buffer,
 				};
 
-				// Create New File
-				let newFileRecord;
-				const ethicsLetterId = application.contents?.ethics_letter;
+				const newFileRecord = await transaction.insert(files).values(newFiles).returning();
 
-				if (ethicsLetterId && ethicsLetterId !== null) {
-					newFileRecord = await transaction.update(files).set(newFiles).where(eq(files.id, ethicsLetterId)).returning();
-				} else {
-					newFileRecord = await transaction.insert(files).values(newFiles).returning();
-				}
+				if (!newFileRecord[0]) throw new Error('File record is undefined');
+
+				return newFileRecord[0];
+			});
+
+			return success(result);
+		} catch (err) {
+			const message = `Error uploading file`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
+	updateFile: async ({
+		fileId,
+		file,
+		application,
+		type,
+	}: {
+		fileId: number;
+		file: formidable.File;
+		application: JoinedApplicationRecord;
+		type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
+	}): AsyncResult<FilesModel & { id: number }> => {
+		try {
+			const result = await db.transaction(async (transaction) => {
+				const buffer = await fs.readFileSync(file.filepath);
+
+				const newFiles: typeof files.$inferInsert = {
+					application_id: application.id,
+					filename: file.originalFilename,
+					type,
+					submitted_at: new Date(),
+					submitter_user_id: application.user_id,
+					content: buffer,
+				};
+
+				const newFileRecord = await transaction.update(files).set(newFiles).where(eq(files.id, fileId)).returning();
 
 				if (!newFileRecord[0]) throw new Error('File record is undefined');
 
