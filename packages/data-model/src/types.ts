@@ -299,3 +299,11 @@ export interface FilesDTO {
 	content: any;
 	filename: string;
 }
+
+export interface SignatureDTO {
+	applicationId: number;
+	applicantSignature?: string | null;
+	applicantSignedAt?: Date | null;
+	institutionalRepSignature?: string | null;
+	institutionalRepSignedAt?: Date | null;
+}

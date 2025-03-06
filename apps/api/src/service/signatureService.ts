@@ -25,13 +25,42 @@ import { applications } from '@/db/schemas/applications.ts';
 import logger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates } from '@pcgl-daco/data-model';
-import { type ApplicationSignatureUpdate } from './types.js';
+import { ApplicationContentModel, type ApplicationSignatureUpdate } from './types.js';
 
 /**
  * SignatureService provides methods for DB access for the signature columns in Application Contents
  * @param db - Drizzle Postgres DB Instance
  */
 const signatureService = (db: PostgresDb) => ({
+	getApplicationSignature: async ({
+		application_id: id,
+	}: Pick<ApplicationContentModel, 'application_id'>): AsyncResult<ApplicationSignatureUpdate> => {
+		try {
+			const retrieveSignature = await db
+				.select({
+					application_id: applicationContents.application_id,
+					applicant_signature: applicationContents.applicant_signature,
+					applicant_signed_at: applicationContents.applicant_signed_at,
+					institutional_rep_signature: applicationContents.institutional_rep_signature,
+					institutional_rep_signed_at: applicationContents.institutional_rep_signed_at,
+				})
+				.from(applicationContents)
+				.where(eq(applicationContents.application_id, id));
+
+			if (retrieveSignature[0]) {
+				return success(retrieveSignature[0]);
+			} else {
+				throw new Error('Application record is undefined');
+			}
+		} catch (err) {
+			const message = `Error at updateApplicationSignature with id: ${id}`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
 	updateApplicationSignature: async ({
 		application_id,
 		applicant_signature,
