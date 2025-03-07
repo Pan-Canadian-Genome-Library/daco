@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { editApplicationRequestSchema, submitApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
@@ -29,13 +30,12 @@ import {
 	getApplicationStateTotals,
 	rejectApplication,
 	submitRevision,
+	submitApplication,
 } from '@/controllers/applicationController.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
 import { collaboratorsListParamsSchema } from '@pcgl-daco/validation';
-
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
 
@@ -68,21 +68,21 @@ applicationRouter.post('/create', jsonParser, async (request: Request<{}, {}, { 
 applicationRouter.post(
 	'/edit',
 	jsonParser,
-	withBodySchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
+	withBodySchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (request: Request,response: Response) => {
 		// TODO: Add Auth
-		const data = req.body;
+		const data = request.body;
 		const { id, update } = data;
 		const result = await editApplication({ id, update });
 		if (result.success) {
-			res.send(result.data);
+			response.send(result.data);
 		} else {
 			// TODO: System Error Handling
 			if (String(result.errors) === 'Error: Application record is undefined') {
-				res.status(404);
+				response.status(404);
 			} else {
-				res.status(500);
+				response.status(500);
 			}
-			res.send({ message: result.message, errors: String(result.errors) });
+			response.send({ message: result.message, errors: String(result.errors) });
 		}
 	}),
 );
@@ -336,4 +336,61 @@ applicationRouter.post('/:applicationId/submit-revision', jsonParser, withParams
 	}
 })));
 
+
+applicationRouter.post(
+	'/applications/submit',
+	jsonParser,
+	withBodySchemaValidation(submitApplicationRequestSchema, apiZodErrorMapping, async (request: Request, response: Response) => {
+		const { applicationId, role, signature } = request.body;
+
+		if (!isPositiveNumber(parseInt(applicationId))) {
+			response.status(400).send({
+				message: 'Invalid request. ApplicationId is required and must be a valid number.',
+				errors: 'MissingOrInvalidParameters',
+			});
+		}
+
+		// Mock validation for now
+		if (signature !== 'mock_signature') {
+			response.status(400).json({ message: 'Invalid signature.' });
+		}
+
+		if (role !== 'APPLICANT' && role !== 'REP') {
+			response.status(400).json({ message: 'Invalid role. Must be APPLICANT or REP.' });
+		}
+
+		try {
+			const result = await submitApplication({applicationId:parseInt(applicationId)});
+
+			if (result.success) {
+				response.status(200).send({
+					message: 'Application rejected successfully.',
+					data: result.data,
+				});
+			} else {
+				let status = 500;
+				let message = result.message || 'An unexpected error occurred.';
+				let errors = result.errors;
+
+				if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+					status = 404;
+					message = 'Application not found.';
+				} else if (errors === 'RejectionConflict') {
+					status = 409;
+					message = 'Rejection conflict detected.';
+				} else if (errors === 'InvalidState') {
+					status = 400;
+					message = 'Invalid application state.';
+				}
+
+				response.status(status).send({ message, errors });
+			}
+		} catch (error) {
+			response.status(500).send({
+				message: 'Internal server error.',
+				errors: String(error),
+			});
+		}
+	}),
+);
 export default applicationRouter;

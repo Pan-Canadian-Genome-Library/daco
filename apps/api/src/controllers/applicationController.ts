@@ -251,3 +251,49 @@ export const submitRevision = async ({ applicationId }: { applicationId: number 
 		return failure(message, error);
 	}
 };
+
+export const submitApplication = async ({ applicationId }: { applicationId: number }) => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		// Fetch the application
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		// Ensure the application can be submitted
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (
+			appStateManager.state !== ApplicationStates.DRAFT &&
+			appStateManager.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW
+		) {
+			return failure(`Application cannot be submitted from state ${appStateManager.state}`, 'SubmissionError');
+		}
+
+		// Transition application to the next state (e.g., under review)
+		let submissionResult;
+
+		if (appStateManager.state === ApplicationStates.DRAFT) {
+			submissionResult = await appStateManager.submitDraft();
+		} else {
+			submissionResult = await appStateManager.submitRepRevision();
+		}
+
+		if (!submissionResult.success) {
+			return failure(submissionResult.message || 'Failed to submit application.', 'StateTransitionError');
+		}
+
+		return submissionResult;
+	} catch (error) {
+		const message = `Unable to submit application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
