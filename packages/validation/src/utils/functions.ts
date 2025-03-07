@@ -17,10 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+/**
+ * Helper function to determine if value is a valid number and is positive.
+ * @param num Any integer value
+ * @returns True if the value is a valid number and is positive, false otherwise.
+ */
+export const isPositiveInteger = (num: number) => {
+	if (Number.isNaN(num) === false && Number.isInteger(num) && num > 0) {
+		return true;
+	}
+	return false;
+};

@@ -18,7 +18,6 @@
  */
 
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ZodErrorMap, ZodSchema } from 'zod';
 import { RequestValidationErrorResponse } from './responses.js';
@@ -54,9 +53,9 @@ import { RequestValidationErrorResponse } from './responses.js';
 function withBodySchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
 	zodErrorMapping: ZodErrorMap | undefined,
-	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
-): RequestHandler {
-	return async (request: Request, response: Response, next: NextFunction) => {
+	handler: RequestHandler<ParamsDictionary, any, ReqBody, qs.ParsedQs>,
+): RequestHandler<ParamsDictionary, any, ReqBody, qs.ParsedQs> {
+	return async (request, response, next: NextFunction) => {
 		try {
 			const validationResult = bodySchema.safeParse(request.body, { errorMap: zodErrorMapping });
 			if (validationResult.success) {

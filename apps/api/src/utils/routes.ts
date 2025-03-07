@@ -27,18 +27,6 @@ import { type ApplicationContentsResponse, type ApplicationResponseData } from '
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
 /**
- * Helper function to determine if value is a valid number and is positive.
- * @param num Any integer value
- * @returns True if the value is a valid number and is positive, false otherwise.
- */
-export const isPositiveNumber = (num: number) => {
-	if (Number.isNaN(num) === false && num >= 0) {
-		return true;
-	}
-	return false;
-};
-
-/**
  * Helper function to convert Postgres snake_case to FE camelCase
  * @param data Database Application Record
  * @returns ApplicationResponseData - Application record with updated keys
