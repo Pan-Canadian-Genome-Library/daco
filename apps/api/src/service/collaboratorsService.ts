@@ -110,7 +110,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		collaborator,
 	}: {
 		id: number;
-		collaborator: CollaboratorModel;
+		collaborator: Partial<CollaboratorModel>;
 	}): AsyncResult<CollaboratorRecord> => {
 		try {
 			const deletedRecord = await db

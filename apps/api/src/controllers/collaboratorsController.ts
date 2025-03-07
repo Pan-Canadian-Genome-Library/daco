@@ -196,7 +196,7 @@ export const updateCollaborator = async ({
 	// TODO: Add Real Auth
 	// Validate User is Applicant
 	if (!(user_id === application.user_id)) {
-		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
+		return failure('Unauthorized, cannot update Collaborators', 'Unauthorized');
 	}
 
 	if (!(application.state === 'DRAFT')) {
@@ -205,7 +205,7 @@ export const updateCollaborator = async ({
 
 	const { id } = collaboratorUpdates;
 
-	const collaborator: CollaboratorModel = {
+	const collaborator: Partial<CollaboratorModel> = {
 		first_name: collaboratorUpdates.collaboratorFirstName,
 		middle_name: collaboratorUpdates.collaboratorMiddleName,
 		last_name: collaboratorUpdates.collaboratorLastName,
