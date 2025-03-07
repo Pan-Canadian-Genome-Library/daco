@@ -30,10 +30,9 @@ import {
 	rejectApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
-import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { collaboratorsListParamsSchema, editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { collaboratorsListParamsSchema, editApplicationRequestSchema, isPositiveInteger } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -99,16 +98,16 @@ applicationRouter.get('/', async (req: Request<{}, {}, {}, any>, res) => {
 		return;
 	}
 
-	const pageRequested = page ? parseInt(page) : undefined;
-	const pageSizeRequested = pageSize ? parseInt(pageSize) : undefined;
+	const pageRequested = page ? Number(page) : undefined;
+	const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
 
 	/**
 	 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
 	 * If it is, we need to throw a client error, warning them that that's a bad request.
 	 */
 	if (
-		(pageRequested !== undefined && !isPositiveNumber(pageRequested)) ||
-		(pageSizeRequested !== undefined && !isPositiveNumber(pageSizeRequested))
+		(pageRequested !== undefined && pageRequested !== 0 && !isPositiveInteger(pageRequested)) ||
+		(pageSizeRequested !== undefined && !isPositiveInteger(pageSizeRequested))
 	) {
 		res.status(400).send({ message: 'Page and/or page size must be a positive integer.' });
 		return;
@@ -244,7 +243,7 @@ applicationRouter.post('/approve', jsonParser, async (req, res) => {
 applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
 
-	if (!applicationId || isNaN(parseInt(applicationId))) {
+	if (!applicationId || !isPositiveInteger(applicationId)) {
 		res.status(400).json({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
@@ -295,7 +294,7 @@ applicationRouter.post(
 		async (request: Request, response: Response) => {
 			const { applicationId } = request.params;
 
-			if (!applicationId || isNaN(parseInt(applicationId))) {
+			if (!applicationId || !isPositiveInteger(Number(applicationId))) {
 				response.status(400).json({
 					message: 'Invalid request. ApplicationId is required and must be a valid number.',
 					errors: 'MissingOrInvalidParameters',

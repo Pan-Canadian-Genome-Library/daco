@@ -371,6 +371,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error submitting revision. Request validation failed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
         '404':
           description: 'Invalid request or submit revision not allowed'
           content:
@@ -402,7 +408,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/requests/SignatureSign'
+                $ref: '#/components/responses/SignatureSigned'
         '400':
           description: Body parameters incorrect / validation failed. Likely due to missing params, or a non-base64 string.
           content:
@@ -522,7 +528,7 @@ paths:
               schema:
                 $ref: '#/components/responses/ClientErrors'
 
-  /collaborators/update:
+   /collaborators/update:
     post:
       tags:
         - Collaborators
@@ -563,6 +569,45 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/responses/CollaboratorsListResponse'
+
+  /collaborators/{applicationId}/{collaboratorId}:
+    delete:
+      tags:
+        - Collaborators
+      summary: Create new Collaborators for an application.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the relevant application to get
+        - in: path
+          name: collaboratorId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the Collaborator to delete
+      responses:
+        '201':
+          description: 'Collaborator deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+        '500':
+          description: 'Error deleting collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error deleting Collaborators. Request validation failed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
 
 components:
   schemas:

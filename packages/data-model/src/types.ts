@@ -253,7 +253,13 @@ export interface UpdateCollaboratorRequest extends BaseCollaboratorRequest {
 	collaborators: CollaboratorUpdateRecord;
 }
 
-export interface DeleteCollaboratorRequest extends BaseCollaboratorRequest {
+export interface CollaboratorUpdateRecord extends CollaboratorDTO {
+	id: number;
+}
+
+export interface DeleteCollaboratorRequest {
+	applicationId: number;
+	userId: string;
 	collaboratorId: number;
 }
 

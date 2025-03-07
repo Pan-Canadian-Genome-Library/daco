@@ -29,6 +29,7 @@ import {
 	NonEmptyString,
 	OptionalURLString,
 } from './common/strings.js';
+
 import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
@@ -60,35 +61,6 @@ export const collaboratorsSchema = z.object({
 	collaboratorPrimaryAffiliation: EmptyOrOptionalString,
 	collaboratorResearcherProfileURL: EmptyOrOptionalString,
 	collaboratorType: EmptyOrOptionalString,
-});
-
-export const collaboratorsListParamsSchema = z.object({ applicationId: z.coerce.number() }).required();
-
-export const collaboratorsRequestSchema = z.object({
-	applicationId: z.number(),
-	userId: NonEmptyString,
-	collaborators: z.array(collaboratorsSchema).nonempty(),
-});
-
-export const collaboratorsRecordSchema = collaboratorsSchema.extend({
-	id: z.number(),
-});
-
-export const baseCollaboratorsRequestSchema = z.object({
-	applicationId: z.number(),
-	userId: NonEmptyString,
-});
-
-export const collaboratorsListRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaborators: z.array(collaboratorsSchema).nonempty(),
-});
-
-export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaboratorId: z.number(),
-});
-
-export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaboratorUpdates: collaboratorsRecordSchema.partial(),
 });
 
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;

@@ -27,12 +27,11 @@ import {
 	updateCollaborator,
 } from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { DeleteCollaboratorRequest } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
-	collaboratorsDeleteRequestSchema,
+	collaboratorsCreateRequestSchema,
+	collaboratorsDeleteParamsSchema,
 	collaboratorsListParamsSchema,
-	collaboratorsRequestSchema,
 	collaboratorsUpdateRequestSchema,
 } from '@pcgl-daco/validation';
 import { testUserId } from '../../tests/testUtils.ts';
@@ -46,37 +45,33 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/create',
 	jsonParser,
-	withBodySchemaValidation(
-		collaboratorsRequestSchema,
-		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId: application_id, userId: user_id, collaborators } = request.body;
+	withBodySchemaValidation(collaboratorsCreateRequestSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
-			const result = await createCollaborators({
-				application_id,
-				user_id,
-				collaborators,
-			});
+		const result = await createCollaborators({
+			application_id,
+			user_id,
+			collaborators,
+		});
 
-			if (result.success) {
-				response.status(201).send(result.data);
-				return;
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
+				response.status(400);
+			} else if (errors === 'Unauthorized') {
+				response.status(401);
 			} else {
-				const { message, errors } = result;
-
-				if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
-					response.status(400);
-				} else if (errors === 'Unauthorized') {
-					response.status(401);
-				} else {
-					response.status(500);
-				}
-
-				response.send({ message, errors });
-				return;
+				response.status(500);
 			}
-		},
-	),
+
+			response.send({ message, errors });
+			return;
+		}
+	}),
 );
 
 /**
@@ -90,7 +85,7 @@ collaboratorsRouter.get(
 		apiZodErrorMapping,
 		async (request: Request, response: Response) => {
 			const { applicationId } = request.params;
-			console.log(applicationId);
+
 			if (!applicationId) {
 				response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
 				return;
@@ -126,59 +121,43 @@ collaboratorsRouter.get(
 /**
  * Delete Collaborator
  */
-collaboratorsRouter.post(
-	'/delete',
+collaboratorsRouter.delete(
+	'/:applicationId/:collaboratorId',
 	jsonParser,
-	async (request: Request<{}, {}, DeleteCollaboratorRequest, any>, response) => {
-		const validatedPayload = collaboratorsDeleteRequestSchema.safeParse(request.body);
+	withParamsSchemaValidation(collaboratorsDeleteParamsSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId, collaboratorId } = request.params;
 
-		if (validatedPayload.success) {
-			const { applicationId: application_id, userId: user_id, collaboratorId } = validatedPayload.data;
-
-			const result = await deleteCollaborator({
-				application_id,
-				user_id,
-				id: collaboratorId,
-			});
-
-			if (result.success) {
-				response.status(201).send(result.data);
-				return;
-			} else {
-				const { message, errors } = result;
-
-				if (errors === 'InvalidState') {
-					response.status(400);
-				} else if (errors === 'Unauthorized') {
-					response.status(401);
-				} else {
-					response.status(500);
-				}
-
-				response.send({ message, errors });
-				return;
-			}
-		} else {
-			const { issues } = validatedPayload.error;
-			const errorField = issues[0]?.path[0];
-			const errorMessage = issues[0]?.message;
-
-			if (errorField === 'collaborators') {
-				response.status(400).send({ message: `Required Collaborator details are missing. Error: ${errorMessage}` });
-			}
-
-			if (errorField === 'userId') {
-				// TODO: Add Real Auth
-				response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
-				return;
-			}
-
-			if (errorField === 'applicationId') {
-				response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
-				return;
-			}
+		if (typeof applicationId === 'undefined' || typeof collaboratorId === 'undefined') {
+			response.status(400).send({ message: 'Missing Request Params' });
+			return;
 		}
-	},
+
+		const application_id = parseInt(applicationId);
+		const id = parseInt(collaboratorId);
+
+		const result = await deleteCollaborator({
+			application_id,
+			id,
+		});
+
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'InvalidState') {
+				response.status(400);
+			} else if (errors === 'Unauthorized') {
+				response.status(401);
+			} else {
+				response.status(500);
+			}
+
+			response.send({ message, errors });
+			return;
+		}
+	}),
 );
 
 /**

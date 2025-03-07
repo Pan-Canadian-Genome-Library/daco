@@ -106,15 +106,7 @@ export const createCollaborators = async ({
  * @param collaborator_id - ID of Collaborator to delete
  * @returns Success with Collaborator data record / Failure with Error.
  */
-export const deleteCollaborator = async ({
-	application_id,
-	user_id,
-	id,
-}: {
-	application_id: number;
-	user_id: string;
-	id: number;
-}) => {
+export const deleteCollaborator = async ({ application_id, id }: { application_id: number; id: number }) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
 	const applicationRepo: ApplicationService = applicationSvc(database);
@@ -126,12 +118,6 @@ export const deleteCollaborator = async ({
 	}
 
 	const application = applicationResult.data;
-
-	// TODO: Add Real Auth
-	// Validate User is Applicant
-	if (!(user_id === application.user_id)) {
-		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
-	}
 
 	if (!(application.state === 'DRAFT')) {
 		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
