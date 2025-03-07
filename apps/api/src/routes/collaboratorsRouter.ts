@@ -20,10 +20,14 @@
 import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
-import { createCollaborators, listCollaborators } from '@/controllers/collaboratorsController.js';
+import { createCollaborators, deleteCollaborator, listCollaborators } from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { collaboratorsListParamsSchema, collaboratorsRequestSchema } from '@pcgl-daco/validation';
+import {
+	collaboratorsDeleteParamsSchema,
+	collaboratorsListParamsSchema,
+	collaboratorsRequestSchema,
+} from '@pcgl-daco/validation';
 import { testUserId } from '../../tests/testUtils.ts';
 
 const collaboratorsRouter = express.Router();
@@ -35,37 +39,33 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/create',
 	jsonParser,
-	withBodySchemaValidation(
-		collaboratorsRequestSchema,
-		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId: application_id, userId: user_id, collaborators } = request.body;
+	withBodySchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
-			const result = await createCollaborators({
-				application_id,
-				user_id,
-				collaborators,
-			});
+		const result = await createCollaborators({
+			application_id,
+			user_id,
+			collaborators,
+		});
 
-			if (result.success) {
-				response.status(201).send(result.data);
-				return;
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
+				response.status(400);
+			} else if (errors === 'Unauthorized') {
+				response.status(401);
 			} else {
-				const { message, errors } = result;
-
-				if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
-					response.status(400);
-				} else if (errors === 'Unauthorized') {
-					response.status(401);
-				} else {
-					response.status(500);
-				}
-
-				response.send({ message, errors });
-				return;
+				response.status(500);
 			}
-		},
-	),
+
+			response.send({ message, errors });
+			return;
+		}
+	}),
 );
 
 /**
@@ -79,7 +79,7 @@ collaboratorsRouter.get(
 		apiZodErrorMapping,
 		async (request: Request, response: Response) => {
 			const { applicationId } = request.params;
-			console.log(applicationId);
+
 			if (!applicationId) {
 				response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
 				return;
@@ -110,6 +110,48 @@ collaboratorsRouter.get(
 			}
 		},
 	),
+);
+
+/**
+ * Delete Collaborator
+ */
+collaboratorsRouter.delete(
+	'/:applicationId/:collaboratorId',
+	jsonParser,
+	withParamsSchemaValidation(collaboratorsDeleteParamsSchema, apiZodErrorMapping, async (request, response) => {
+		const { applicationId, collaboratorId } = request.params;
+
+		if (typeof applicationId === 'undefined' || typeof collaboratorId === 'undefined') {
+			response.status(400).send({ message: 'Missing Request Params' });
+			return;
+		}
+
+		const application_id = parseInt(applicationId);
+		const id = parseInt(collaboratorId);
+
+		const result = await deleteCollaborator({
+			application_id,
+			id,
+		});
+
+		if (result.success) {
+			response.status(201).send(result.data);
+			return;
+		} else {
+			const { message, errors } = result;
+
+			if (errors === 'InvalidState') {
+				response.status(400);
+			} else if (errors === 'Unauthorized') {
+				response.status(401);
+			} else {
+				response.status(500);
+			}
+
+			response.send({ message, errors });
+			return;
+		}
+	}),
 );
 
 export default collaboratorsRouter;
