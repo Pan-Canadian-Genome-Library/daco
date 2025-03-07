@@ -23,7 +23,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
 import { CollaboratorDTO, CollaboratorUpdateRecord } from '@pcgl-daco/data-model';
-import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
+import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
 /**
  * Creates a new collaborator and returns the created data.
