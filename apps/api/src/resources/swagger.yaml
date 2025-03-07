@@ -352,6 +352,38 @@ paths:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
 
+  /applications/{applicationId}/submit-revision:
+    post:
+      tags:
+        - Applications
+      summary: Submit revisions for an application
+      description: Allows applicants to submit requested revisions for DAC or Rep review.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '500':
+          description: 'Cannot reject application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '404':
+          description: 'Invalid request or submit revision not allowed'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application successfully submitted for revision'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
+
   /signature/sign:
     post:
       tags:
@@ -397,7 +429,6 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/requests/SignatureSign'
               type: object
               properties:
                 applicationId:
@@ -533,37 +564,6 @@ paths:
                 type: object
                 $ref: '#/components/responses/CollaboratorsListResponse'
 
-  /applications/{applicationId}/submit-revision:
-    post:
-      tags:
-        - Applications
-      summary: Submit revisions for an application
-      description: Allows applicants to submit requested revisions for DAC or Rep review.
-      parameters:
-        - name: applicationId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '500':
-          description: 'Cannot reject application by ID'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-        '404':
-          description: 'Invalid request or submit revision not allowed'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
-        '200':
-          description: 'Application successfully submitted for revision'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ApplicationResponse'
 components:
   schemas:
     ApplicationWithApplicantInfo:
