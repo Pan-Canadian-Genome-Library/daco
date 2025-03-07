@@ -528,7 +528,7 @@ paths:
               schema:
                 $ref: '#/components/responses/ClientErrors'
 
-   /collaborators/update:
+  /collaborators/update:
     post:
       tags:
         - Collaborators
