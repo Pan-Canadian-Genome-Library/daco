@@ -28,6 +28,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -76,7 +77,7 @@ describe('Application API', () => {
 
 			const { id } = applicationRecordsResult.data.applications[0];
 
-			const update = { applicant_first_name: 'Test' };
+			const update = { applicantFirstname: 'Test' };
 
 			const result = await editApplication({ id, update });
 
@@ -86,7 +87,7 @@ describe('Application API', () => {
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
 			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicant_first_name);
+			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstname);
 		});
 
 		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
@@ -107,7 +108,7 @@ describe('Application API', () => {
 			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
 			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
-			const contentUpdate = { applicant_last_name: 'User' };
+			const contentUpdate = { applicantLastname: 'User' };
 			const result = await editApplication({ id, update: contentUpdate });
 			assert.ok(result.success);
 
@@ -116,7 +117,7 @@ describe('Application API', () => {
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
 			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicant_last_name);
+			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastname);
 		});
 
 		it('should error and return null when application state is not draft or review', async () => {
@@ -131,7 +132,7 @@ describe('Application API', () => {
 			const stateUpdate = { state: ApplicationStates.CLOSED };
 			await testApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
 
-			const contentUpdate = { applicant_title: 'Dr.' };
+			const contentUpdate = { applicantTitle: 'Dr.' };
 			const result = await editApplication({ id, update: contentUpdate });
 
 			assert.ok(!result.success);
@@ -229,6 +230,26 @@ describe('Application API', () => {
 			const rejectedApplication = await getApplicationById({ applicationId: id });
 			assert.ok(rejectedApplication.success);
 			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
+		});
+	});
+
+	describe('Submit Revision', () => {
+		it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
+			});
+			const result = await submitRevision({ applicationId: testApplicationId });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.message, 'Application revision is already submitted.');
+		});
+
+		it('should fail to submit a revision for a non-existent application', async () => {
+			const result = await submitRevision({ applicationId: 9999 });
+
+			assert.ok(!result.success);
+			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
 		});
 	});
 

@@ -20,16 +20,22 @@
 import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
-import { createCollaborators, deleteCollaborator, updateCollaborator } from '@/controllers/collaboratorsController.js';
+import {
+	createCollaborators,
+	deleteCollaborator,
+	listCollaborators,
+	updateCollaborator,
+} from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-
-import { DeleteCollaboratorRequest, ListCollaboratorRequest } from '@pcgl-daco/data-model';
-import { withSchemaValidation } from '@pcgl-daco/request-utils';
+import { DeleteCollaboratorRequest } from '@pcgl-daco/data-model';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	collaboratorsDeleteRequestSchema,
-	collaboratorsListRequestSchema,
+	collaboratorsListParamsSchema,
+	collaboratorsRequestSchema,
 	collaboratorsUpdateRequestSchema,
 } from '@pcgl-daco/validation';
+import { testUserId } from '../../tests/testUtils.ts';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -40,11 +46,11 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/create',
 	jsonParser,
-	async (request: Request<{}, {}, ListCollaboratorRequest, any>, response) => {
-		const validatedPayload = collaboratorsListRequestSchema.safeParse(request.body);
-
-		if (validatedPayload.success) {
-			const { applicationId: application_id, userId: user_id, collaborators } = validatedPayload.data;
+	withBodySchemaValidation(
+		collaboratorsRequestSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
 			const result = await createCollaborators({
 				application_id,
@@ -69,27 +75,52 @@ collaboratorsRouter.post(
 				response.send({ message, errors });
 				return;
 			}
-		} else {
-			const { issues } = validatedPayload.error;
-			const errorField = issues[0]?.path[0];
-			const errorMessage = issues[0]?.message;
+		},
+	),
+);
 
-			if (errorField === 'collaborators') {
-				response.status(400).send({ message: `Required Collaborator details are missing. Error: ${errorMessage}` });
-			}
-
-			if (errorField === 'userId') {
-				// TODO: Add Real Auth
-				response.status(401).send({ message: 'Unauthorized, cannot create Collaborators' });
+/**
+ * List Collaborators
+ */
+collaboratorsRouter.get(
+	'/:applicationId',
+	jsonParser,
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+			console.log(applicationId);
+			if (!applicationId) {
+				response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
 				return;
 			}
 
-			if (errorField === 'applicationId') {
-				response.status(404).send({ message: 'applicationId is missing, cannot create Collaborators' });
+			const application_id = parseInt(applicationId);
+			const user_id = testUserId;
+
+			const result = await listCollaborators({
+				application_id,
+				user_id,
+			});
+
+			if (result.success) {
+				response.status(201).send(result.data);
+				return;
+			} else {
+				const { message, errors } = result;
+
+				if (errors === 'Unauthorized') {
+					response.status(401);
+				} else {
+					response.status(500);
+				}
+
+				response.send({ message, errors });
 				return;
 			}
-		}
-	},
+		},
+	),
 );
 
 /**
@@ -156,7 +187,7 @@ collaboratorsRouter.post(
 collaboratorsRouter.post(
 	'/update',
 	jsonParser,
-	withSchemaValidation(
+	withBodySchemaValidation(
 		collaboratorsUpdateRequestSchema,
 		apiZodErrorMapping,
 		async (request: Request, response: Response) => {

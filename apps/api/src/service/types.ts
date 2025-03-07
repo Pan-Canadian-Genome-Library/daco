@@ -16,18 +16,20 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { type ExtractTablesWithRelations } from 'drizzle-orm';
+import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
+import { PgTransaction } from 'drizzle-orm/pg-core';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
+
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
-import { type ExtractTablesWithRelations } from 'drizzle-orm';
-import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
-import { PgTransaction } from 'drizzle-orm/pg-core';
+import { signatureService } from '@/service/signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -39,7 +41,21 @@ export type ApplicationUpdates = Partial<ApplicationModel>;
 export type ApplicationService = ReturnType<typeof applicationSvc>;
 
 export type ApplicationContentModel = typeof applicationContents.$inferInsert;
-export type ApplicationContentUpdates = Partial<ApplicationContentModel>;
+export type ApplicationContentUpdates = Omit<
+	Partial<ApplicationContentModel>,
+	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
+>;
+export type ApplicationSignatureUpdate = Pick<
+	ApplicationContentModel,
+	| 'application_id'
+	| 'applicant_signature'
+	| 'applicant_signed_at'
+	| 'institutional_rep_signature'
+	| 'institutional_rep_signed_at'
+>;
+export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
+	contents: ApplicationContentUpdates | null;
+}
 
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
@@ -48,6 +64,8 @@ export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
 export type CollaboratorModel = typeof collaborators.$inferInsert;
 export type CollaboratorRecord = typeof collaborators.$inferSelect;
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
+
+export type SignatureService = ReturnType<typeof signatureService>;
 
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
