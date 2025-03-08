@@ -22,14 +22,25 @@ import { NonEmptyString } from '../common/strings.js';
 import { collaboratorsSchema } from '../schemas.js';
 import { isPositiveInteger } from '../utils/functions.js';
 
-export const collaboratorsRequestSchema = z.object({
+export const collaboratorsRecordSchema = collaboratorsSchema.extend({
+	id: z.number(),
+});
+
+export const baseCollaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
 	userId: NonEmptyString,
+});
+
+export const collaboratorsCreateRequestSchema = baseCollaboratorsRequestSchema.extend({
 	collaborators: z.array(collaboratorsSchema).nonempty(),
 });
 
-export const collaboratorsRecordSchema = collaboratorsSchema.extend({
-	id: z.number(),
+export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.extend({
+	collaboratorId: z.number(),
+});
+
+export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
+	collaboratorUpdates: collaboratorsRecordSchema.partial(),
 });
 
 export const collaboratorsListParamsSchema = z

@@ -122,6 +122,29 @@ describe('Application Service', () => {
 		});
 	});
 
+	describe('Update Collaborators', () => {
+		it('should successfully update a Collaborator', async () => {
+			const testCollaborators = await db
+				.select()
+				.from(collaborators)
+				.where(eq(collaborators.application_id, application_id));
+
+			assert.ok(testCollaborators.length && testCollaborators[0]);
+
+			const { id } = testCollaborators[0];
+
+			const collaboratorUpdate = { collaborator_type: 'Test User' };
+
+			const collaboratorResult = await testCollaboratorsRepo.updateCollaborator({
+				id,
+				collaborator: collaboratorUpdate,
+			});
+
+			assert.ok(collaboratorResult.success);
+			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdate.collaborator_type);
+		});
+	});
+
 	after(async () => {
 		await db.delete(collaborators).where(eq(collaborators.application_id, application_id));
 		await container.stop();

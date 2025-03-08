@@ -26,7 +26,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
 import { createApplication } from '@/controllers/applicationController.js';
-import { createCollaborators } from '@/controllers/collaboratorsController.js';
+import { createCollaborators, updateCollaborator } from '@/controllers/collaboratorsController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 
@@ -168,6 +168,30 @@ describe('Collaborators Controller', () => {
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.errors, `DuplicateRecords`);
+		});
+	});
+
+	describe('Update Collaborators', () => {
+		it('should successfully update a Collaborator', async () => {
+			const testCollaborators = await db
+				.select()
+				.from(collaborators)
+				.where(eq(collaborators.application_id, application_id));
+
+			assert.ok(testCollaborators.length && testCollaborators[0]);
+
+			const { id } = testCollaborators[0];
+
+			const collaboratorUpdates = { id, collaboratorType: 'Test User' };
+
+			const collaboratorResult = await updateCollaborator({
+				application_id,
+				user_id,
+				collaboratorUpdates,
+			});
+
+			assert.ok(collaboratorResult.success);
+			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdates.collaboratorType);
 		});
 	});
 
