@@ -28,6 +28,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -229,6 +230,26 @@ describe('Application API', () => {
 			const rejectedApplication = await getApplicationById({ applicationId: id });
 			assert.ok(rejectedApplication.success);
 			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
+		});
+	});
+
+	describe('Submit Revision', () => {
+		it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
+			});
+			const result = await submitRevision({ applicationId: testApplicationId });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.message, 'Application revision is already submitted.');
+		});
+
+		it('should fail to submit a revision for a non-existent application', async () => {
+			const result = await submitRevision({ applicationId: 9999 });
+
+			assert.ok(!result.success);
+			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
 		});
 	});
 
