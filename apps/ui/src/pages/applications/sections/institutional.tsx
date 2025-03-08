@@ -21,8 +21,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import InputBox from '@/components/pages/application/form-components/InputBox';
@@ -32,28 +33,82 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
-import { useOutletContext } from 'react-router';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { state, dispatch } = useApplicationContext();
 
-	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
+	const {
+		formState: { isDirty },
+		getValues,
+		control,
+	} = useForm<InstitutionalRepSchemaType>({
 		defaultValues: {
-			institutionCountry: 'CAN',
+			institutionalFirstName: state?.fields?.institutionalRepFirstName || undefined,
+			institutionalMiddleName: state?.fields?.institutionalRepMiddleName || undefined,
+			institutionalLastName: state?.fields?.institutionalRepLastName || undefined,
+			institutionalInstituteAffiliation: state?.fields?.institutionalRepEmail || undefined,
+			institutionalPositionTitle: state?.fields?.institutionalRepPositionTitle || undefined,
+			institutionalPrimaryAffiliation: state?.fields?.institutionalRepPrimaryAffiliation || undefined,
+			institutionalProfileUrl: state?.fields?.institutionalRepProfileUrl || undefined,
+			institutionalSuffix: state?.fields?.institutionalRepSuffix || undefined,
+			institutionalTitle: state?.fields?.institutionalRepTitle || undefined,
+			institutionBuilding: state?.fields?.institutionBuilding || undefined,
+			institutionCity: state?.fields?.institutionCity || undefined,
+			institutionCountry: state?.fields?.institutionCountry || 'CAN',
+			institutionPostalCode: state?.fields?.institutionPostalCode || undefined,
+			institutionState: state?.fields?.institutionState || undefined,
+			institutionStreetAddress: state?.fields?.institutionStreetAddress || undefined,
 		},
 		resolver: zodResolver(institutionalRepSchema),
 	});
 
-	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
-		console.log(data);
+	const onSubmit = () => {
+		const data = getValues();
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				fields: {
+					...state?.fields,
+					institutionalRepFirstName: data.institutionalFirstName,
+					institutionalRepMiddleName: data.institutionalMiddleName,
+					institutionalRepLastName: data.institutionalLastName,
+					institutionalRepEmail: data.institutionalInstituteAffiliation,
+					institutionalRepPositionTitle: data.institutionalPositionTitle,
+					institutionalRepPrimaryAffiliation: data.institutionalPrimaryAffiliation,
+					institutionalRepProfileUrl: data.institutionalProfileUrl,
+					institutionalRepSuffix: data.institutionalSuffix,
+					institutionalRepTitle: data.institutionalTitle,
+					institutionBuilding: data.institutionBuilding,
+					institutionCity: data.institutionCity,
+					institutionCountry: data.institutionCountry,
+					institutionPostalCode: data.institutionPostalCode,
+					institutionState: data.institutionState,
+					institutionStreetAddress: data.institutionStreetAddress,
+				},
+				formState: {
+					...state?.formState,
+					isDirty,
+				},
+			},
+		});
 	};
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle
 					title={translate('institutional-section.title')}
 					text={[translate('institutional-section.description1')]}
@@ -70,6 +125,7 @@ const Institutional = () => {
 								options={PERSONAL_TITLES.map((titles) => {
 									return { value: titles.en, label: titles.en };
 								})}
+								initialValue={getValues('institutionalTitle')}
 								required
 								disabled={!isEditMode}
 							/>

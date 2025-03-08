@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,39 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pcglSkeletonTheme } from '@/providers/ThemeProvider';
-import { ConfigProvider, Skeleton } from 'antd';
+import { createContext, useReducer } from 'react';
 
-const SkeletonLoader = () => {
-	return (
-		<ConfigProvider theme={pcglSkeletonTheme}>
-			<Skeleton active />
-		</ConfigProvider>
-	);
+import ApplicationReducer from '@/providers/context/application/ApplicationReducer';
+import { type ApplicationContextType, type ApplicationFormState } from '@/providers/context/application/types';
+
+const initialState: ApplicationFormState = {
+	formState: {
+		isFormCompleted: false,
+		isDirty: false,
+	},
 };
 
-const SkeletonButtonLoader = () => {
-	return (
-		<ConfigProvider theme={pcglSkeletonTheme}>
-			<Skeleton.Button active />
-		</ConfigProvider>
-	);
-};
+export const ApplicationContext = createContext<ApplicationContextType | undefined>(undefined);
 
-const SkeletonAvatarLoader = () => {
-	return (
-		<ConfigProvider theme={pcglSkeletonTheme}>
-			<Skeleton.Avatar active />
-		</ConfigProvider>
-	);
-};
+export const ApplicationContextProvider = ({ children }: { children: React.ReactNode }) => {
+	const [state, dispatch] = useReducer(ApplicationReducer, initialState);
 
-const SkeletonImageLoader = () => {
-	return (
-		<ConfigProvider theme={pcglSkeletonTheme}>
-			<Skeleton.Image active />
-		</ConfigProvider>
-	);
+	return <ApplicationContext.Provider value={{ state, dispatch }}>{children}</ApplicationContext.Provider>;
 };
-
-export { SkeletonAvatarLoader, SkeletonButtonLoader, SkeletonImageLoader, SkeletonLoader };

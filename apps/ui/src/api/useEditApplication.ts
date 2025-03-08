@@ -16,24 +16,30 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model';
+import { ApplicationResponseData } from '@pcgl-daco/data-model';
 
-const useGetApplication = (id?: string | number) => {
+const useEditApplication = () => {
 	const { t: translate } = useTranslation();
 	const { state, dispatch } = useApplicationContext();
 
-	return useQuery<ApplicationResponseData, ServerError>({
-		queryKey: [id],
-		queryFn: async () => {
-			const response = await fetch(`/applications/${id}`);
+	return useMutation<ApplicationResponseData, ServerError, { id: number | string }>({
+		mutationFn: async ({ id }) => {
+			const update = state?.fields;
+
+			const response = await fetch('/applications/edit', {
+				method: 'POST',
+				body: JSON.stringify({
+					id,
+					update,
+				}),
+			});
 
 			if (!response.ok) {
 				const error = {
@@ -42,6 +48,10 @@ const useGetApplication = (id?: string | number) => {
 				};
 
 				switch (response.status) {
+					case 400:
+						error.message = translate('errors.fetchError.title');
+						error.errors = translate('errors.fetchError.message');
+						break;
 					case 404:
 						error.message = translate('errors.http.404.title');
 						error.errors = translate('errors.http.404.message');
@@ -55,24 +65,17 @@ const useGetApplication = (id?: string | number) => {
 				throw error;
 			}
 
-			return await response.json().then((data: ApplicationResponseData) => {
-				// Filter out data if they contain null values and application metadata
-				if (data.contents) {
-					const fields = Object.entries(data.contents).reduce((acc, item) => {
-						const [key, value] = item;
-						if (value !== null && isRestrictedApplicationContentsKey(key)) {
-							acc[key] = value;
-						}
-
-						return acc;
-					}, {} as Partial<ApplicationContentsResponse>);
-
-					dispatch({ type: 'UPDATE_APPLICATION', payload: { ...state, fields } });
-				}
-				return data;
+			return await response.json();
+		},
+		onError: (error) => {
+			notification.error({
+				message: error.message,
 			});
+		},
+		onSuccess: () => {
+			dispatch({ type: 'UPDATE_DIRTY_STATE', payload: false });
 		},
 	});
 };
 
-export default useGetApplication;
+export default useEditApplication;
