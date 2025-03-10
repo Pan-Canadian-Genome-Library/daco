@@ -466,6 +466,40 @@ paths:
                 type: object
                 $ref: '#/components/responses/CollaboratorsListResponse'
 
+  /collaborators/delete:
+    post:
+      tags:
+        - Collaborators
+      summary: Create new Collaborators for an application.
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/requests/DeleteCollaborators'
+      responses:
+        '201':
+          description: 'Collaborator deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+        '500':
+          description: 'Error deleting collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error deleting Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+
   /collaborators/{applicationId}:
     get:
       tags:
@@ -494,6 +528,48 @@ paths:
                 $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error listing Collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+
+  /collaborators/update:
+    post:
+      tags:
+        - Collaborators
+      summary: Edit existing Collaborator records
+      requestBody:
+        description: The body containing information about the requesting user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                applicationId:
+                  type: number
+                  description: ID of the related Application record that Collaborator records are associated with
+                userId:
+                  type: string
+                  description: Temporary, Applicant's User Id, required for authorization
+                collaboratorUpdates:
+                  $ref: '#/components/requests/UpdatedCollaborators'
+      responses:
+        '201':
+          description: 'Collaborators updated'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+        '500':
+          description: 'Error updating collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error updating Collaborators'
           content:
             application/json:
               schema:
@@ -959,6 +1035,50 @@ components:
         collaboratorInstitutionalEmail:
           type: string
           description: The collaborator's contact email
+
+    UpdatedCollaborators:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: number
+          description: ID of the Collaborator record to update
+        collaboratorFirstName:
+          type: string
+          description: The collaborator's first name
+        collaboratorMiddleName:
+          type: string
+          description: The collaborator's middle name
+        collaboratorLastName:
+          type: string
+          description: The collaborator's last name
+        collaboratorSuffix:
+          type: string
+          description: The collaborator's additional name suffix
+        collaboratorPositionTitle:
+          type: string
+          description: The collaborator's job title
+        collaboratorInstitutionalEmail:
+          type: string
+          description: The collaborator's contact email
+
+    DeleteCollaborators:
+      type: object
+      required:
+        - applicationId
+        - userId
+        - collaboratorId
+      properties:
+        applicationId:
+          type: number
+          description: The id of the relevant Application record
+        userId:
+          type: string
+          description: The user ID belonging to the currently signed in user.
+        collaboratorId:
+          type: number
+          description: The ID of the Collaborator to delete.
 
   responses:
     ApplicationResponse:
