@@ -22,12 +22,12 @@ import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type CollaboratorRequest } from '@pcgl-daco/data-model';
+import { type GetCollaboratorsResponse } from '@pcgl-daco/data-model';
 
 const useGetCollaborators = (applicationId: string | number) => {
 	const { t: translate } = useTranslation();
 
-	return useQuery<CollaboratorRequest[], ServerError>({
+	return useQuery<GetCollaboratorsResponse[], ServerError>({
 		queryKey: [`collaborators-${applicationId}`],
 		queryFn: async () => {
 			const response = await fetch(`/collaborators/${applicationId}`);

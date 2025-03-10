@@ -33,20 +33,12 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationOutletContext } from '@/global/types';
+import { GetCollaboratorsResponse } from '@pcgl-daco/data-model';
 
 const { useToken } = theme;
 
-interface CollabTableData {
-	id: number;
-	firstName: string;
-	lastName: string;
-	institutionalEmail: string;
-	title: string;
-	suffix?: string;
-}
-
 export interface ModalState {
-	rowData?: CollabTableData;
+	rowData?: GetCollaboratorsResponse;
 	isOpen: boolean;
 }
 
@@ -65,26 +57,26 @@ const Collaborators = () => {
 	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
 	const [editModalState, setEditModalState] = useState<ModalState>({ isOpen: false });
 
-	const columns: TableProps<CollabTableData>['columns'] = [
+	const columns: TableProps<GetCollaboratorsResponse>['columns'] = [
 		{
-			key: 'firstName',
+			key: 'collaboratorFirstName',
 			title: 'First Name',
-			dataIndex: 'firstName',
+			dataIndex: 'collaboratorFirstName',
 		},
 		{
-			key: 'lastName',
+			key: 'collaboratorLastName',
 			title: 'Last Name',
-			dataIndex: 'lastName',
+			dataIndex: 'collaboratorLastName',
 		},
 		{
-			key: 'institutionalEmail',
+			key: 'collaboratorInstitutionalEmail',
 			title: 'Institutional Email',
-			dataIndex: 'institutionalEmail',
+			dataIndex: 'collaboratorInstitutionalEmail',
 		},
 		{
-			key: 'title',
+			key: 'collaboratorPositionTitle',
 			title: 'Position Title',
-			dataIndex: 'title',
+			dataIndex: 'collaboratorPositionTitle',
 		},
 		{
 			key: 'tools',
@@ -112,8 +104,7 @@ const Collaborators = () => {
 		},
 	];
 
-	console.log(data);
-
+	// ? TODO: make a nicer error/loading page with patrick
 	if (!data || isLoading || isError) {
 		return <ErrorPage loading={isLoading} error={null} />;
 	}
@@ -127,28 +118,7 @@ const Collaborators = () => {
 					showDivider={false}
 				/>
 				<SectionContent showDivider={false}>
-					<Table
-						rowKey={(record: CollabTableData) => `PCGL-${record.id}`}
-						columns={columns}
-						dataSource={[
-							{
-								id: 1,
-								firstName: 'John',
-								lastName: 'Doe',
-								institutionalEmail: 'thy.john.doe@oicr.ca',
-								title: 'PI',
-								suffix: 'Miss',
-							},
-							{
-								id: 53,
-								firstName: 'Sunny',
-								lastName: 'ShinShine',
-								institutionalEmail: 'the.sun.is.bright@oicr.ca',
-								title: 'Really good at job',
-							},
-						]}
-						pagination={false}
-					/>
+					<Table rowKey={(record) => `PCGL-${record.id}`} columns={columns} dataSource={data} pagination={false} />
 					<Row justify={'end'}>
 						<Col style={{ paddingTop: token.paddingLG }}>
 							<Button
