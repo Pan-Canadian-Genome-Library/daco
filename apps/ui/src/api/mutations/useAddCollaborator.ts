@@ -25,7 +25,7 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type ApplicationResponseData, type CollaboratorDTO } from '@pcgl-daco/data-model';
 
-const useCreateApplication = () => {
+const useAddCollaborator = () => {
 	const { t: translate } = useTranslation();
 
 	return useMutation<
@@ -79,4 +79,4 @@ const useCreateApplication = () => {
 	});
 };
 
-export default useCreateApplication;
+export default useAddCollaborator;
