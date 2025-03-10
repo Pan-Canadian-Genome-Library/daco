@@ -16,10 +16,6 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import bodyParser from 'body-parser';
-import express, { Request, Response } from 'express';
-
 import {
 	approveApplication,
 	createApplication,
@@ -33,6 +29,8 @@ import {
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import { collaboratorsListParamsSchema, editApplicationRequestSchema, isPositiveInteger } from '@pcgl-daco/validation';
+import bodyParser from 'body-parser';
+import express, { type Request, type Response } from 'express';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -284,6 +282,9 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	}
 });
 
+/**
+ * TODO: NO current Auth rules implemented
+ */
 // POST: Submit revisions
 applicationRouter.post(
 	'/:applicationId/submit-revision',
