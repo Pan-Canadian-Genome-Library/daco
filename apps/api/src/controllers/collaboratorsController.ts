@@ -22,7 +22,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure } from '@/utils/results.js';
-import { CollaboratorDTO, CollaboratorUpdateRecord } from '@pcgl-daco/data-model';
+import { type CollaboratorDTO, type CollaboratorUpdateRecord } from '@pcgl-daco/data-model';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
 /**
