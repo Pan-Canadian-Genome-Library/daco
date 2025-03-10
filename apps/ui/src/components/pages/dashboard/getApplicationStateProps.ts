@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pcglColors } from '@/components/providers/ThemeProvider';
+import { pcglColors } from '@/providers/ThemeProvider';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 type ApplicationCardProps = {

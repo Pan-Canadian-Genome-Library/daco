@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pcglSkeletonTheme } from '@/components/providers/ThemeProvider';
+import { pcglSkeletonTheme } from '@/providers/ThemeProvider';
 import { Card, ConfigProvider, Flex, Skeleton, theme } from 'antd';
 
 const { useToken } = theme;
