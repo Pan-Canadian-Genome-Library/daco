@@ -22,18 +22,6 @@ import { type ApplicationContentsResponse, type ApplicationResponseData } from '
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
 /**
- * Helper function to determine if value is a valid number and is positive.
- * @param num Any integer value
- * @returns True if the value is a valid number and is positive, false otherwise.
- */
-export const isPositiveNumber = (num: number) => {
-	if (Number.isNaN(num) === false && num >= 0) {
-		return true;
-	}
-	return false;
-};
-
-/**
  * Helper function to convert Postgres snake_case to FE camelCase
  * @param data Database Application Record
  * @returns ApplicationResponseData - Application record with updated keys
@@ -109,18 +97,18 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
  */
 export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
 	const formatedUpdate: ApplicationContentUpdates = {
-		applicant_first_name: update.applicantFirstname,
-		applicant_middle_name: update.applicantMiddlename,
-		applicant_last_name: update.applicantLastname,
+		applicant_first_name: update.applicantFirstName,
+		applicant_middle_name: update.applicantMiddleName,
+		applicant_last_name: update.applicantLastName,
 		applicant_institutional_email: update.applicantInstitutionalEmail,
 		applicant_position_title: update.applicantPositionTitle,
 		applicant_primary_affiliation: update.applicantPrimaryAffiliation,
 		applicant_profile_url: update.applicantProfileUrl,
 		applicant_suffix: update.applicantSuffix,
 		applicant_title: update.applicantTitle,
-		institutional_rep_first_name: update.institutionalRepFirstname,
-		institutional_rep_middle_name: update.institutionalRepMiddlename,
-		institutional_rep_last_name: update.institutionalRepLastname,
+		institutional_rep_first_name: update.institutionalRepFirstName,
+		institutional_rep_middle_name: update.institutionalRepMiddleName,
+		institutional_rep_last_name: update.institutionalRepLastName,
 		institutional_rep_title: update.institutionalRepTitle,
 		institutional_rep_position_title: update.institutionalRepPositionTitle,
 		institutional_rep_suffix: update.institutionalRepSuffix,

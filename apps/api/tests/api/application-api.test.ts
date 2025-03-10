@@ -30,6 +30,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	submitRevision,
 	uploadEthicsFile,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
@@ -79,7 +80,7 @@ describe('Application API', () => {
 
 			const { id } = applicationRecordsResult.data.applications[0];
 
-			const update = { applicantFirstname: 'Test' };
+			const update = { applicantFirstName: 'Test' };
 
 			const result = await editApplication({ id, update });
 
@@ -89,7 +90,7 @@ describe('Application API', () => {
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
 			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstname);
+			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstName);
 		});
 
 		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
@@ -110,7 +111,7 @@ describe('Application API', () => {
 			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
 			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
-			const contentUpdate = { applicantLastname: 'User' };
+			const contentUpdate = { applicantLastName: 'User' };
 			const result = await editApplication({ id, update: contentUpdate });
 			assert.ok(result.success);
 
@@ -119,7 +120,7 @@ describe('Application API', () => {
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
 			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastname);
+			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
 		});
 
 		it('should error and return null when application state is not draft or review', async () => {
@@ -286,10 +287,30 @@ describe('Application API', () => {
 
 			assert.strictEqual(ethicsLetterId, fileResult.data.id);
 		});
-	});
 
-	after(async () => {
-		await container.stop();
-		process.exit(0);
+		describe('Submit Revision', () => {
+			it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
+				await testApplicationRepo.findOneAndUpdate({
+					id: testApplicationId,
+					update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
+				});
+				const result = await submitRevision({ applicationId: testApplicationId });
+
+				assert.ok(!result.success);
+				assert.strictEqual(result.message, 'Application revision is already submitted.');
+			});
+
+			it('should fail to submit a revision for a non-existent application', async () => {
+				const result = await submitRevision({ applicationId: 9999 });
+
+				assert.ok(!result.success);
+				assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+			});
+		});
+
+		after(async () => {
+			await container.stop();
+			process.exit(0);
+		});
 	});
 });

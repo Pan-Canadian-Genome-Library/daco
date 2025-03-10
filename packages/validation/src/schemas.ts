@@ -29,6 +29,7 @@ import {
 	NonEmptyString,
 	OptionalURLString,
 } from './common/strings.js';
+
 import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
@@ -62,13 +63,6 @@ export const collaboratorsSchema = z.object({
 	collaboratorType: EmptyOrOptionalString,
 });
 
-export const collaboratorsListParamsSchema = z.object({ applicationId: z.coerce.number() }).required();
-
-export const collaboratorsRequestSchema = z.object({
-	applicationId: z.number(),
-	userId: NonEmptyString,
-	collaborators: z.array(collaboratorsSchema).nonempty(),
-});
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const institutionalRepSchema = z.object({

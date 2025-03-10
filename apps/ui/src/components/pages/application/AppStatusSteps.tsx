@@ -19,7 +19,7 @@
 
 import { Flex, theme } from 'antd';
 
-import { pcglColors } from '@/components/providers/ThemeProvider';
+import { pcglColors } from '@/providers/ThemeProvider';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 const { useToken } = theme;

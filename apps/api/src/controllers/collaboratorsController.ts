@@ -99,7 +99,7 @@ export const createCollaborators = async ({
 	return result;
 };
 
-/**
+/*
  * Lists all Collaborators for a given application
  * @param application_id - ID of related application record to associate with Collaborators
  * @param collaborators - Array of new Collaborators to create
@@ -128,4 +128,32 @@ export const listCollaborators = async ({ application_id, user_id }: { applicati
 	const collaboratorsResult = await collaboratorsRepo.listCollaborators(applicationId);
 
 	return collaboratorsResult;
+};
+
+/**
+ * Delete a selected collaborator by ID
+ * @param application_id - ID of related application record to associate with Collaborators
+ * @param id - ID of Collaborator to delete
+ * @returns Success with Collaborator data record / Failure with Error.
+ */
+export const deleteCollaborator = async ({ application_id, id }: { application_id: number; id: number }) => {
+	const database = getDbInstance();
+	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+
+	if (!applicationResult.success) {
+		return applicationResult;
+	}
+
+	const application = applicationResult.data;
+
+	if (!(application.state === 'DRAFT')) {
+		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
+	}
+
+	const result = await collaboratorsRepo.deleteCollaborator({ id });
+
+	return result;
 };

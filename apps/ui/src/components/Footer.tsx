@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
+import { pcglFooterTheme } from '@/providers/ThemeProvider';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;

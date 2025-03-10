@@ -352,6 +352,44 @@ paths:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
 
+  /applications/{applicationId}/submit-revision:
+    post:
+      tags:
+        - Applications
+      summary: Submit revisions for an application
+      description: Allows applicants to submit requested revisions for DAC or Rep review.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '500':
+          description: 'Cannot reject application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error submitting revision. Request validation failed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: 'Invalid request or submit revision not allowed'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application successfully submitted for revision'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
+
   /signature/sign:
     post:
       tags:
@@ -370,7 +408,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/requests/SignatureSign'
+                $ref: '#/components/responses/SignatureSigned'
         '400':
           description: Body parameters incorrect / validation failed. Likely due to missing params, or a non-base64 string.
           content:
@@ -397,7 +435,6 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/requests/SignatureSign'
               type: object
               properties:
                 applicationId:
@@ -461,6 +498,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
+
+  /collaborators/{applicationId}/{collaboratorId}:
+    delete:
+      tags:
+        - Collaborators
+      summary: Create new Collaborators for an application.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the relevant application to get
+        - in: path
+          name: collaboratorId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the Collaborator to delete
+      responses:
+        '201':
+          description: 'Collaborator deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
+        '500':
+          description: 'Error deleting collaborators'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error deleting Collaborators. Request validation failed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
 
 components:
   schemas:

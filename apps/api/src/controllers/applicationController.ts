@@ -281,3 +281,45 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 		return failure(message, error);
 	}
 };
+
+export const submitRevision = async ({ applicationId }: { applicationId: number }) => {
+	try {
+		// Fetch application
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (
+			appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED ||
+			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
+		) {
+			return failure('Application revision is already submitted.', 'RejectionConflict');
+		}
+
+		let submittedRevision;
+		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+			submittedRevision = await appStateManager.submitDacRevision();
+		} else {
+			submittedRevision = await appStateManager.submitRepRevision();
+		}
+
+		if (!submittedRevision.success) {
+			return failure(submittedRevision.message || 'Failed to submit application revision.', 'StateTransitionError');
+		}
+
+		return submittedRevision;
+	} catch (error) {
+		const message = `Unable to submit revision with applicationId: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
