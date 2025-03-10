@@ -26,6 +26,7 @@ import {
 	createApplication,
 	editApplication,
 	getApplicationById,
+	getApplicationStateTotals,
 	rejectApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
@@ -174,29 +175,29 @@ describe('Application API', () => {
 		});
 	});
 
-	// describe('Get Application Metadata', () => {
-	// 	it('should get the counts for each of the application states', async () => {
-	// 		const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+	describe('Get Application Metadata', () => {
+		it('should get the counts for each of the application states', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
-	// 		assert.ok(applicationRecordsResult.success);
+			assert.ok(applicationRecordsResult.success);
 
-	// 		assert.ok(
-	// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-	// 		);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
 
-	// 		const result = await getApplicationStateTotals({ userId: user_id });
+			const result = await getApplicationStateTotals({ userId: user_id });
 
-	// 		const totalDraftApplications = applicationRecordsResult.data.applications.filter(
-	// 			(apps) => apps.state === 'DRAFT',
-	// 		).length;
+			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
+				(apps) => apps.state === 'DRAFT',
+			).length;
 
-	// 		assert.ok(result.success);
-	// 		assert.ok(result.data);
+			assert.ok(result.success);
+			assert.ok(result.data);
 
-	// 		assert.equal(result.data.DRAFT, totalDraftApplications);
-	// 		assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
-	// 	});
-	// });
+			assert.equal(result.data.DRAFT, totalDraftApplications);
+			assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
+		});
+	});
 
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
