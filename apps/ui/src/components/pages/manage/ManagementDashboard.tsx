@@ -20,7 +20,7 @@
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/DashboardFilter';
-import { pcglTableTheme } from '@/components/providers/ThemeProvider';
+import { pcglTableTheme } from '@/providers/ThemeProvider';
 import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
