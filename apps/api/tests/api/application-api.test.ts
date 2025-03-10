@@ -77,7 +77,7 @@ describe('Application API', () => {
 
 			const { id } = applicationRecordsResult.data.applications[0];
 
-			const update = { applicantFirstname: 'Test' };
+			const update = { applicantFirstName: 'Test' };
 
 			const result = await editApplication({ id, update });
 
@@ -87,7 +87,7 @@ describe('Application API', () => {
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
 			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstname);
+			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstName);
 		});
 
 		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
@@ -108,7 +108,7 @@ describe('Application API', () => {
 			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
 			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
-			const contentUpdate = { applicantLastname: 'User' };
+			const contentUpdate = { applicantLastName: 'User' };
 			const result = await editApplication({ id, update: contentUpdate });
 			assert.ok(result.success);
 
@@ -117,7 +117,7 @@ describe('Application API', () => {
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
 			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastname);
+			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
 		});
 
 		it('should error and return null when application state is not draft or review', async () => {

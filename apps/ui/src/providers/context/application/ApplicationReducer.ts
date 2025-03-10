@@ -17,43 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* eslint-disable react-refresh/only-export-components */
+import { type ApplicationAction, type ApplicationFormState } from '@/providers/context/application/types';
 
-import type { UserResponse } from '@pcgl-daco/validation';
-import { createContext, useContext, type PropsWithChildren } from 'react';
-import useGetUser from '../../api/useGetUser';
-
-type UserState = {
-	isLoading: boolean;
-	isLoggedIn: boolean;
-	refresh: () => void;
-} & Partial<UserResponse>;
-
-const UserContext = createContext<UserState>({ isLoading: true, isLoggedIn: false, refresh: () => {} });
-
-export function UserProvider({ children }: PropsWithChildren) {
-	const { data, isLoading, refetch } = useGetUser();
-
-	// TODO: update local storage
-
-	const refresh = () => {
-		// TODO: update local storage
-		refetch();
-	};
-
-	const value: UserState = {
-		...data,
-		isLoading,
-		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : false,
-		refresh,
-	};
-	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
-}
-
-export function useUserContext() {
-	const context = useContext(UserContext);
-	if (context === undefined) {
-		throw new Error('useCount must be used within a CountProvider');
+function ApplicationReducer(state: ApplicationFormState, action: ApplicationAction) {
+	switch (action.type) {
+		case 'UPDATE_APPLICATION': {
+			return { ...state, ...action.payload };
+		}
+		case 'UPDATE_DIRTY_STATE': {
+			return { ...state, formState: { ...state?.formState, isDirty: action.payload } };
+		}
+		default:
+			return { ...state };
 	}
-	return context;
 }
+
+export default ApplicationReducer;

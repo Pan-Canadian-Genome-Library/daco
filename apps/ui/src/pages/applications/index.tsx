@@ -74,7 +74,7 @@ const ApplicationViewer = () => {
 						<>
 							<Row style={{ width: '25%' }}>
 								<Col style={{ width: '100%' }}>
-									<SectionMenu currentSection={currentSection} isEditMode={isEditMode} />
+									<SectionMenu appId={data.id} currentSection={currentSection} isEditMode={isEditMode} />
 								</Col>
 							</Row>
 							<Row style={{ width: '75%' }}>
