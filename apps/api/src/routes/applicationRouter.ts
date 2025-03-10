@@ -25,14 +25,12 @@ import {
 	getApplicationStateTotals,
 	rejectApplication,
 	submitRevision,
-	uploadEthicsFile,
 } from '@/controllers/applicationController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { fileUploadValidation, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import { collaboratorsListParamsSchema, editApplicationRequestSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { type Request, type Response } from 'express';
-import formidable from 'formidable';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -287,82 +285,57 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
 /**
  * TODO: NO current Auth rules implemented
  */
+// POST: Submit revisions
 applicationRouter.post(
-	'/file/ethics/:applicationId',
-	fileUploadValidation(async (req: Request<any, { file: formidable.File }>, res: Response) => {
-		const { applicationId } = req.params;
+	'/:applicationId/submit-revision',
+	jsonParser,
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
 
-		const { file } = req.body;
+			if (!applicationId || !isPositiveInteger(Number(applicationId))) {
+				response.status(400).json({
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					errors: 'MissingOrInvalidParameters',
+				});
+			}
 
-		const id = parseInt(applicationId ? applicationId : '');
-		if (!isPositiveInteger(id)) {
-			res.status(400).send({ message: 'Invalid applicationId' });
-			return;
-		}
+			try {
+				const applicationIdNum = Number(applicationId);
+				const result = await submitRevision({ applicationId: applicationIdNum });
 
-		const result = await uploadEthicsFile({ applicationId: id, file });
-
-		if (result.success) {
-			res.status(200).send(result.data);
-			return;
-		} else {
-			const errorReturn = { message: result.message, errors: String(result.errors) };
-			res.status(500).send(errorReturn);
-			return;
-		}
-	}),
-	// POST: Submit revisions
-	applicationRouter.post(
-		'/:applicationId/submit-revision',
-		jsonParser,
-		withParamsSchemaValidation(
-			collaboratorsListParamsSchema,
-			apiZodErrorMapping,
-			async (request: Request, response: Response) => {
-				const { applicationId } = request.params;
-
-				if (!applicationId || !isPositiveInteger(Number(applicationId))) {
-					response.status(400).json({
-						message: 'Invalid request. ApplicationId is required and must be a valid number.',
-						errors: 'MissingOrInvalidParameters',
+				if (result.success) {
+					response.status(200).send({
+						message: 'Application review submitted successfully.',
+						data: result.data,
 					});
-				}
+				} else {
+					let status = 500;
+					let message = result.message || 'An unexpected error occurred.';
+					let errors = result.errors;
 
-				try {
-					const applicationIdNum = Number(applicationId);
-					const result = await submitRevision({ applicationId: applicationIdNum });
-
-					if (result.success) {
-						response.status(200).send({
-							message: 'Application review submitted successfully.',
-							data: result.data,
-						});
-					} else {
-						let status = 500;
-						let message = result.message || 'An unexpected error occurred.';
-						let errors = result.errors;
-
-						if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-							status = 404;
-							message = 'Application not found.';
-						} else if (errors === 'RevisionConflict') {
-							status = 409;
-							message = 'Revision conflict detected.';
-						} else if (errors === 'InvalidState') {
-							status = 400;
-							message = 'Invalid application state.';
-						}
-
-						response.status(status).send({ message, errors });
+					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+						status = 404;
+						message = 'Application not found.';
+					} else if (errors === 'RevisionConflict') {
+						status = 409;
+						message = 'Revision conflict detected.';
+					} else if (errors === 'InvalidState') {
+						status = 400;
+						message = 'Invalid application state.';
 					}
-				} catch (error) {
-					response.status(500).send({
-						message: 'Internal server error.',
-						errors: String(error),
-					});
+
+					response.status(status).send({ message, errors });
 				}
-			},
-		),
+			} catch (error) {
+				response.status(500).send({
+					message: 'Internal server error.',
+					errors: String(error),
+				});
+			}
+		},
 	),
 );
 
