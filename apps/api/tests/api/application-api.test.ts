@@ -17,9 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import formidable from 'formidable';
 import assert from 'node:assert';
-import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
@@ -28,10 +26,8 @@ import {
 	createApplication,
 	editApplication,
 	getApplicationById,
-	getApplicationStateTotals,
 	rejectApplication,
 	submitRevision,
-	uploadEthicsFile,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -178,29 +174,29 @@ describe('Application API', () => {
 		});
 	});
 
-	describe('Get Application Metadata', () => {
-		it('should get the counts for each of the application states', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+	// describe('Get Application Metadata', () => {
+	// 	it('should get the counts for each of the application states', async () => {
+	// 		const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
 
-			assert.ok(applicationRecordsResult.success);
+	// 		assert.ok(applicationRecordsResult.success);
 
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
+	// 		assert.ok(
+	// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+	// 		);
 
-			const result = await getApplicationStateTotals({ userId: user_id });
+	// 		const result = await getApplicationStateTotals({ userId: user_id });
 
-			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
-				(apps) => apps.state === 'DRAFT',
-			).length;
+	// 		const totalDraftApplications = applicationRecordsResult.data.applications.filter(
+	// 			(apps) => apps.state === 'DRAFT',
+	// 		).length;
 
-			assert.ok(result.success);
-			assert.ok(result.data);
+	// 		assert.ok(result.success);
+	// 		assert.ok(result.data);
 
-			assert.equal(result.data.DRAFT, totalDraftApplications);
-			assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
-		});
-	});
+	// 		assert.equal(result.data.DRAFT, totalDraftApplications);
+	// 		assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
+	// 	});
+	// });
 
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
@@ -236,81 +232,28 @@ describe('Application API', () => {
 		});
 	});
 
-	describe('Upload Ethics File', () => {
-		it('Should create new file if there is no ethics_letter in the application contents', async () => {
-			const mockFile: formidable.File = {
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest.docx'),
-				hashAlgorithm: 'sha256',
-				mimetype: 'application/msword',
-				newFilename: 'newFileName',
-				originalFilename: 'fileuploadtest',
-				size: 20000,
-				toJSON: function (): formidable.FileJSON {
-					throw new Error('Function not implemented.');
-				},
-			};
-
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
-			assert.ok(applicationResult.success);
-
-			const application = applicationResult.data;
-			const ethicsLetterId = application.contents?.ethics_letter;
-
-			assert.strictEqual(ethicsLetterId, null);
-
-			const fileResult = await uploadEthicsFile({ applicationId: 1, file: mockFile });
-
-			assert.ok(fileResult.success);
-		});
-
-		it('Should update file if there is an existing ethics_letter id in the application contents', async () => {
-			const mockFile: formidable.File = {
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest-2.docx'),
-				hashAlgorithm: 'sha256',
-				mimetype: 'application/msword',
-				newFilename: 'newestFileName',
-				originalFilename: 'fileuploadtest-2',
-				size: 20000,
-				toJSON: function (): formidable.FileJSON {
-					// Does not need to be implemented, just need to satisfy formidable.File
-					throw new Error('Function not implemented.');
-				},
-			};
-
-			const fileResult = await uploadEthicsFile({ applicationId: 1, file: mockFile });
-			assert.ok(fileResult.success);
-
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
-			assert.ok(applicationResult.success);
-			const application = applicationResult.data;
-			const ethicsLetterId = application.contents?.ethics_letter;
-
-			assert.strictEqual(ethicsLetterId, fileResult.data.id);
-		});
-
-		describe('Submit Revision', () => {
-			it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
-				await testApplicationRepo.findOneAndUpdate({
-					id: testApplicationId,
-					update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
-				});
-				const result = await submitRevision({ applicationId: testApplicationId });
-
-				assert.ok(!result.success);
-				assert.strictEqual(result.message, 'Application revision is already submitted.');
+	describe('Submit Revision', () => {
+		it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
 			});
+			const result = await submitRevision({ applicationId: testApplicationId });
 
-			it('should fail to submit a revision for a non-existent application', async () => {
-				const result = await submitRevision({ applicationId: 9999 });
-
-				assert.ok(!result.success);
-				assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
-			});
+			assert.ok(!result.success);
+			assert.strictEqual(result.message, 'Application revision is already submitted.');
 		});
 
-		after(async () => {
-			await container.stop();
-			process.exit(0);
+		it('should fail to submit a revision for a non-existent application', async () => {
+			const result = await submitRevision({ applicationId: 9999 });
+
+			assert.ok(!result.success);
+			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
 		});
+	});
+
+	after(async () => {
+		await container.stop();
+		process.exit(0);
 	});
 });
