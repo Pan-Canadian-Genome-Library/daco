@@ -18,7 +18,7 @@
  */
 
 import bodyParser from 'body-parser';
-import express, { type Request } from 'express';
+import express, { Request, Response } from 'express';
 
 import {
 	approveApplication,
@@ -28,13 +28,13 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	submitRevision,
 	requestApplicationRevisions,
 } from '@/controllers/applicationController.js';
 import { RevisionRequestModel } from '@/service/types.ts';
-import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
-import { applicationRevisionRequestSchema, editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { collaboratorsListParamsSchema, editApplicationRequestSchema, isPositiveInteger, applicationRevisionRequestSchema } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -100,16 +100,16 @@ applicationRouter.get('/', async (req: Request<{}, {}, {}, any>, res) => {
 		return;
 	}
 
-	const pageRequested = page ? parseInt(page) : undefined;
-	const pageSizeRequested = pageSize ? parseInt(pageSize) : undefined;
+	const pageRequested = page ? Number(page) : undefined;
+	const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
 
 	/**
 	 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
 	 * If it is, we need to throw a client error, warning them that that's a bad request.
 	 */
 	if (
-		(pageRequested !== undefined && !isPositiveNumber(pageRequested)) ||
-		(pageSizeRequested !== undefined && !isPositiveNumber(pageSizeRequested))
+		(pageRequested !== undefined && pageRequested !== 0 && !isPositiveInteger(pageRequested)) ||
+		(pageSizeRequested !== undefined && !isPositiveInteger(pageSizeRequested))
 	) {
 		res.status(400).send({ message: 'Page and/or page size must be a positive integer.' });
 		return;
@@ -245,10 +245,7 @@ applicationRouter.post('/approve', jsonParser, async (req, res) => {
 applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	const { applicationId } = req.body;
 
-	if (!applicationId) {
-		res.status(400).json({ message: 'Application ID is required.' });
-	}
-	if (!applicationId || isNaN(parseInt(applicationId))) {
+	if (!applicationId || !isPositiveInteger(applicationId)) {
 		res.status(400).json({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
@@ -289,6 +286,60 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	}
 });
 
+// POST: Submit revisions
+applicationRouter.post(
+	'/:applicationId/submit-revision',
+	jsonParser,
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+
+			if (!applicationId || !isPositiveInteger(Number(applicationId))) {
+				response.status(400).json({
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					errors: 'MissingOrInvalidParameters',
+				});
+			}
+
+			try {
+				const applicationIdNum = Number(applicationId);
+				const result = await submitRevision({ applicationId: applicationIdNum });
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Application review submitted successfully.',
+						data: result.data,
+					});
+				} else {
+					let status = 500;
+					let message = result.message || 'An unexpected error occurred.';
+					let errors = result.errors;
+
+					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+						status = 404;
+						message = 'Application not found.';
+					} else if (errors === 'RevisionConflict') {
+						status = 409;
+						message = 'Revision conflict detected.';
+					} else if (errors === 'InvalidState') {
+						status = 400;
+						message = 'Invalid application state.';
+					}
+
+					response.status(status).send({ message, errors });
+				}
+			} catch (error) {
+				response.status(500).send({
+					message: 'Internal server error.',
+					errors: String(error),
+				});
+			}
+		},
+	),
+);
+
 // Endpoint for reps to request revisions
 applicationRouter.post(
 	'/request-revisions',
@@ -307,7 +358,6 @@ applicationRouter.post(
 
 		const updatedRevisionData: RevisionRequestModel = {
 			application_id: applicationId,
-			created_at: revisionData.createdAt,
 			comments: revisionData.comments,
 			applicant_approved: revisionData.applicantApproved,
 			applicant_notes: revisionData.applicantNotes,

@@ -243,6 +243,16 @@ export type CollaboratorRequest = {
 	collaborators: CollaboratorDTO[];
 };
 
+export interface CollaboratorUpdateRecord extends CollaboratorDTO {
+	id: number;
+}
+
+export interface DeleteCollaboratorRequest {
+	applicationId: number;
+	userId: string;
+	collaboratorId: number;
+}
+
 // TODO: Additional Types to be updated
 export interface EthicsDataDTO {
 	ethicsReviewRequired?: boolean | null;

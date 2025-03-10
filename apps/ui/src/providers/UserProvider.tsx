@@ -17,10 +17,43 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+/* eslint-disable react-refresh/only-export-components */
+
+import useGetUser from '@/api/useGetUser';
+import type { UserResponse } from '@pcgl-daco/validation';
+import { createContext, useContext, type PropsWithChildren } from 'react';
+
+type UserState = {
+	isLoading: boolean;
+	isLoggedIn: boolean;
+	refresh: () => void;
+} & Partial<UserResponse>;
+
+const UserContext = createContext<UserState>({ isLoading: true, isLoggedIn: false, refresh: () => {} });
+
+export function UserProvider({ children }: PropsWithChildren) {
+	const { data, isLoading, refetch } = useGetUser();
+
+	// TODO: update local storage
+
+	const refresh = () => {
+		// TODO: update local storage
+		refetch();
+	};
+
+	const value: UserState = {
+		...data,
+		isLoading,
+		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : false,
+		refresh,
+	};
+	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+}
+
+export function useUserContext() {
+	const context = useContext(UserContext);
+	if (context === undefined) {
+		throw new Error('useCount must be used within a CountProvider');
+	}
+	return context;
+}

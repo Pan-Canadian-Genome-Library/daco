@@ -24,9 +24,9 @@ export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationR
 
 export const updateEditApplicationRequestSchema = z
 	.object({
-		applicantFirstname: z.string(),
-		applicantMiddlename: z.string(),
-		applicantLastname: z.string(),
+		applicantFirstName: z.string(),
+		applicantMiddleName: z.string(),
+		applicantLastName: z.string(),
 		applicantTitle: z.string(),
 		applicantSuffix: z.string(),
 		applicantPositionTitle: z.string(),
@@ -34,9 +34,9 @@ export const updateEditApplicationRequestSchema = z
 		applicantInstitutionalEmail: z.string(),
 		applicantProfileUrl: z.string(),
 		institutionalRepTitle: z.string(),
-		institutionalRepFirstname: z.string(),
-		institutionalRepMiddlename: z.string(),
-		institutionalRepLastname: z.string(),
+		institutionalRepFirstName: z.string(),
+		institutionalRepMiddleName: z.string(),
+		institutionalRepLastName: z.string(),
 		institutionalRepSuffix: z.string(),
 		institutionalRepPrimaryAffiliation: z.string(),
 		institutionalRepEmail: z.string(),
