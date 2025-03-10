@@ -21,7 +21,8 @@ import { getDbInstance } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
-import { failure } from '@/utils/results.js';
+import { failure, success } from '@/utils/results.js';
+import { aliasCollaboratorRecord } from '@/utils/routes.ts';
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
@@ -127,7 +128,13 @@ export const listCollaborators = async ({ application_id, user_id }: { applicati
 	const applicationId = application.id;
 	const collaboratorsResult = await collaboratorsRepo.listCollaborators(applicationId);
 
-	return collaboratorsResult;
+	if (!collaboratorsResult.success) {
+		return collaboratorsResult;
+	}
+
+	const result = aliasCollaboratorRecord(collaboratorsResult.data);
+
+	return success(result);
 };
 
 /**

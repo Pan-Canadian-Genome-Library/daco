@@ -105,7 +105,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-	listCollaborators: async (application_id: number) => {
+	listCollaborators: async (application_id: number): AsyncResult<CollaboratorRecord[]> => {
 		try {
 			const collaboratorRecords = await db
 				.select()

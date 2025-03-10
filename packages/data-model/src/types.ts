@@ -225,6 +225,11 @@ export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 };
 
+export interface GetCollaboratorsResponse extends CollaboratorDTO {
+	id: number;
+	applicationId: number;
+}
+
 export interface CollaboratorDTO {
 	collaboratorFirstName: string;
 	collaboratorInstitutionalEmail: string;
