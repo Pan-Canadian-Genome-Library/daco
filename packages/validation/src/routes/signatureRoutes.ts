@@ -18,6 +18,7 @@
  */
 
 import { z } from 'zod';
+import { isPositiveInteger } from '../utils/functions.js';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export const editSignatureRequestSchema = z.object({
@@ -25,5 +26,12 @@ export const editSignatureRequestSchema = z.object({
 	signature: z.string().regex(BASE64_IMAGE),
 	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
 });
-
 export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;
+
+export const getSignatureParamsSchema = z
+	.object({
+		applicationId: z
+			.string()
+			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a Positive Number' }),
+	})
+	.required();

@@ -390,19 +390,19 @@ paths:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
 
-  /signature/:
+  /signature/{applicationId}:
     get:
       tags:
         - Signature
       summary: Get the signatures associated with an application.
       parameters:
-        - in: query
-          name: applicationId
+        - name: applicationId
+          in: path
           description: The ID of the application you wish to retrieve the signature from.
+          required: true
           schema:
-            applicationId:
-            type: number
-            minimum: 0
+            type: integer
+            minimum: 1
       responses:
         '200':
           description: Successfully retrieved signature details from an application record. Note that these may be `null`, depending on if the application has been signed or not.

@@ -20,9 +20,9 @@
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
 import { ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
-import { success } from '@/utils/results.ts';
+import { failure, success } from '@/utils/results.ts';
 import { aliasSignatureRecord } from '@/utils/routes.ts';
-import { type EditSignatureRequest } from '@pcgl-daco/validation';
+import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
  * Gets a signature for an application.
@@ -30,8 +30,8 @@ import { type EditSignatureRequest } from '@pcgl-daco/validation';
  * @returns Success with the signature and signed at time, properties may be `null` if not yet signed / Failure with Error.
  */
 export const getApplicationSignature = async ({ applicationId }: { applicationId: number }) => {
-	if (applicationId < 0) {
-		throw new Error('Error: Application ID must be a positive number.');
+	if (!isPositiveInteger(applicationId)) {
+		return failure('InvalidParams', 'Error: Application ID MUST be a positive number greater than or equal to 1.');
 	}
 
 	const database = getDbInstance();

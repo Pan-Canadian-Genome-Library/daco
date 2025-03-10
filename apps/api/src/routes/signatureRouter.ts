@@ -17,41 +17,53 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
-import { editSignatureRequestSchema } from '@pcgl-daco/validation';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { editSignatureRequestSchema, getSignatureParamsSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { type Request, type Response } from 'express';
 
 import { getApplicationSignature, updateApplicationSignature } from '@/controllers/signatureController.ts';
-import { isPositiveNumber } from '@/utils/routes.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const signatureRouter = express.Router();
 const jsonParser = bodyParser.json();
 
-signatureRouter.get('/', async (request: Request<{}, {}, {}, { applicationId: string }>, response: Response) => {
-	const { applicationId } = request.query;
+signatureRouter.get(
+	'/:applicationId',
+	withParamsSchemaValidation(
+		getSignatureParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
 
-	if (!applicationId || !isPositiveNumber(Number(applicationId))) {
-		response.status(400).send({ message: 'Application ID is required and MUST be a positive number.' });
-		return;
-	}
+			if (!applicationId) {
+				response.status(400).send({ message: 'Application ID MUST be a positive number greater than or equal to 1.' });
+				return;
+			}
 
-	const result = await getApplicationSignature({ applicationId: Number(applicationId) });
+			const result = await getApplicationSignature({ applicationId: Number(applicationId) });
 
-	if (result.success) {
-		response.status(200).send(result.data);
-		return;
-	}
+			if (result.success) {
+				response.status(200).send(result.data);
+				return;
+			}
 
-	if (String(result.errors) === 'Error: Application contents record is undefined') {
-		response.status(404);
-	} else {
-		response.status(500);
-	}
+			switch (String(result.errors)) {
+				case 'Error: Application record is undefined':
+					response.status(404);
+					break;
+				case 'Error: Application ID MUST be a positive number greater than or equal to 1.':
+					response.status(400);
+					break;
+				default:
+					response.status(500);
+					break;
+			}
 
-	response.send({ message: result.message, errors: String(result.errors) });
-});
+			response.send({ message: result.message, errors: String(result.errors) });
+		},
+	),
+);
 
 /**
  * TODO:
