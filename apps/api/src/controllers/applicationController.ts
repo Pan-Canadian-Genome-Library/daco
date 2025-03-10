@@ -25,9 +25,10 @@ import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
 	JoinedApplicationRecord,
+	type ApplicationRecord,
+	type ApplicationService,
 	type RevisionRequestModel,
 } from '@/service/types.js';
-import { type ApplicationRecord, type ApplicationService } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/routes.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -237,13 +238,19 @@ export const requestApplicationRevisions = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (
-			(role === 'DAC' && application.state !== ApplicationStates.DAC_REVIEW) ||
-			(role === 'REP' && application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW)
+			(role === 'DAC_MEMBER' && application.state !== ApplicationStates.DAC_REVIEW) ||
+			(role === 'INSTITUTIONAL_REP' && application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW)
 		) {
 			return failure('Application is not in the correct status for revisions.');
 		}
 
-		const revisionResult = await appStateManager.reviseRepReview();
+		let revisionResult;
+
+		if (role === 'DAC_MEMBER') {
+			revisionResult = await appStateManager.reviseDacReview();
+		} else {
+			revisionResult = await appStateManager.reviseRepReview();
+		}
 
 		if (!revisionResult.success) {
 			return failure(revisionResult.message || 'Failed to reject application.', 'StateTransitionError');

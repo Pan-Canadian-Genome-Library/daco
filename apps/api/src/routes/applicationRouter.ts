@@ -30,10 +30,11 @@ import {
 	rejectApplication,
 	requestApplicationRevisions,
 } from '@/controllers/applicationController.js';
+import { RevisionRequestModel } from '@/service/types.ts';
 import { isPositiveNumber } from '@/utils/routes.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { applicationRevisionRequestSchema, editApplicationRequestSchema } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
 const jsonParser = bodyParser.json();
@@ -288,13 +289,14 @@ applicationRouter.post('/reject', jsonParser, async (req, res) => {
 	}
 });
 
-
 // Endpoint for reps to request revisions
-applicationRouter.post('/applications/request-revisions', jsonParser, async (req, res) => {
-	try {
+applicationRouter.post(
+	'/request-revisions',
+	jsonParser,
+	withBodySchemaValidation(applicationRevisionRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const { applicationId, revisionData, role } = req.body;
 
-		if (!role || role !== 'INSTITUTIONAL_REP' || role !== 'DAC_MEMBER') {
+		if (!role || (role !== 'INSTITUTIONAL_REP' && role !== 'DAC_MEMBER')) {
 			res.status(400).json({ message: 'Invalid request: Invalid role' });
 		}
 
@@ -303,15 +305,30 @@ applicationRouter.post('/applications/request-revisions', jsonParser, async (req
 			res.status(400).json({ message: 'Invalid request: revisionData are required' });
 		}
 
+		const updatedRevisionData: RevisionRequestModel = {
+			application_id: applicationId,
+			created_at: revisionData.createdAt,
+			comments: revisionData.comments,
+			applicant_approved: revisionData.applicantApproved,
+			applicant_notes: revisionData.applicantNotes,
+			institution_rep_approved: revisionData.institutionRepApproved,
+			institution_rep_notes: revisionData.institutionRepNotes,
+			collaborators_approved: revisionData.collaboratorsApproved,
+			collaborators_notes: revisionData.collaboratorsNotes,
+			project_approved: revisionData.projectApproved,
+			project_notes: revisionData.projectNotes,
+			requested_studies_approved: revisionData.requestedStudiesApproved,
+			requested_studies_notes: revisionData.requestedStudiesNotes,
+		};
+
 		// Call service method to handle request
-		const updatedApplication = await requestApplicationRevisions({ applicationId, role, revisionData });
+		const updatedApplication = await requestApplicationRevisions({
+			applicationId,
+			role,
+			revisionData: updatedRevisionData,
+		});
 
 		res.status(200).json(updatedApplication);
-	} catch (error) {
-		res.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-});
+	}),
+);
 export default applicationRouter;
