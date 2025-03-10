@@ -82,8 +82,9 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 			});
 
 			if (!applicantResult.success) {
-				return result;
+				return applicantResult;
 			}
+
 			return result;
 		});
 		return txResult;
