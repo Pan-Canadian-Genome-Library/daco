@@ -24,6 +24,7 @@ import { type PostgresDb } from '@/db/index.js';
 import { files } from '@/db/schemas/files.js';
 import logger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { FileType } from '@pcgl-daco/data-model';
 import { eq } from 'drizzle-orm';
 import { PostgresTransaction, type FilesModel, type JoinedApplicationRecord } from './types.ts';
 
@@ -40,7 +41,7 @@ const filesSvc = (db: PostgresDb) => ({
 	}: {
 		file: formidable.File;
 		application: JoinedApplicationRecord;
-		type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
+		type: FileType;
 		transaction?: PostgresTransaction;
 	}): AsyncResult<FilesModel & { id: number }> => {
 		try {
@@ -84,7 +85,7 @@ const filesSvc = (db: PostgresDb) => ({
 		fileId: number;
 		file: formidable.File;
 		application: JoinedApplicationRecord;
-		type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
+		type: FileType;
 		transaction?: PostgresTransaction;
 	}): AsyncResult<FilesModel & { id: number }> => {
 		try {
