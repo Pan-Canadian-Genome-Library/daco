@@ -22,7 +22,7 @@ import { isPositiveInteger } from '../utils/functions.js';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export const editSignatureRequestSchema = z.object({
-	applicationId: z.number().nonnegative(),
+	applicationId: z.number().nonnegative().min(1),
 	signature: z.string().regex(BASE64_IMAGE),
 	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
 });
