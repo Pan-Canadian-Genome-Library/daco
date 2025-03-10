@@ -45,10 +45,9 @@ const filesSvc = (db: PostgresDb) => ({
 	}): AsyncResult<FilesModel & { id: number }> => {
 		try {
 			const dbTransaction = transaction ? transaction : db;
+			const buffer = await fs.readFileSync(file.filepath);
 
 			const result = await dbTransaction.transaction(async (transaction) => {
-				const buffer = await fs.readFileSync(file.filepath);
-
 				const newFiles: typeof files.$inferInsert = {
 					application_id: application.id,
 					filename: file.originalFilename,
@@ -90,10 +89,9 @@ const filesSvc = (db: PostgresDb) => ({
 	}): AsyncResult<FilesModel & { id: number }> => {
 		try {
 			const dbTransaction = transaction ? transaction : db;
+			const buffer = await fs.readFileSync(file.filepath);
 
 			const result = await dbTransaction.transaction(async (transaction) => {
-				const buffer = await fs.readFileSync(file.filepath);
-
 				const newFiles: typeof files.$inferInsert = {
 					application_id: application.id,
 					filename: file.originalFilename,
