@@ -23,7 +23,8 @@ import { useTranslation } from 'react-i18next';
 import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type ApplicationResponseData, type CollaboratorDTO } from '@pcgl-daco/data-model';
+import { type ApplicationResponseData } from '@pcgl-daco/data-model';
+import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
 
 const useAddCollaborator = () => {
 	const { t: translate } = useTranslation();
@@ -31,7 +32,7 @@ const useAddCollaborator = () => {
 	return useMutation<
 		ApplicationResponseData,
 		ServerError,
-		{ applicationId: number | string; collaborators: CollaboratorDTO[]; userId?: number | string }
+		{ applicationId: number | string; collaborators: CollaboratorsSchemaType[]; userId?: number | string }
 	>({
 		mutationFn: async ({ applicationId, collaborators, userId }) => {
 			const response = await fetch('/collaborators/create', {
