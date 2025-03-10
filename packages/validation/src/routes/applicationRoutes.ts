@@ -18,6 +18,7 @@
  */
 
 import { z } from 'zod';
+import { BASE64_IMAGE } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
