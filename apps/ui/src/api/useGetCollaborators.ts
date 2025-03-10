@@ -27,7 +27,7 @@ import { type CollaboratorRequest } from '@pcgl-daco/data-model';
 const useGetCollaborators = (applicationId: string | number) => {
 	const { t: translate } = useTranslation();
 
-	return useQuery<CollaboratorRequest, ServerError>({
+	return useQuery<CollaboratorRequest[], ServerError>({
 		queryKey: [`collaborators-${applicationId}`],
 		queryFn: async () => {
 			const response = await fetch(`/collaborators/${applicationId}`);

@@ -23,6 +23,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useGetCollaborators from '@/api/useGetCollaborators';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
 import DeleteCollaboratorModal from '@/components/pages/application/modals/DeleteCollaboratorModal';
@@ -30,6 +31,7 @@ import EditCollaboratorModal from '@/components/pages/application/modals/EditCol
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationOutletContext } from '@/global/types';
 
 const { useToken } = theme;
@@ -56,6 +58,7 @@ const Collaborators = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
+	const { data, isLoading, isError } = useGetCollaborators(appId);
 
 	// MODAL STATES
 	const [addModalState, setAddModalState] = useState<ModalState>({ isOpen: false });
@@ -108,6 +111,12 @@ const Collaborators = () => {
 			},
 		},
 	];
+
+	console.log(data);
+
+	if (!data || isLoading || isError) {
+		return <ErrorPage loading={isLoading} error={null} />;
+	}
 
 	return (
 		<SectionWrapper>
