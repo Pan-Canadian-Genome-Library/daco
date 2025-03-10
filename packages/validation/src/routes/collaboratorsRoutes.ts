@@ -34,9 +34,9 @@ export const collaboratorsRecordSchema = collaboratorsSchema.extend({
 
 export const collaboratorsListParamsSchema = z
 	.object({
-		applicationId: z.string().refine((id) => {
-			return isPositiveInteger(Number(id)), { message: 'applicationId must be a positive number' };
-		}),
+		applicationId: z
+			.string()
+			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
 	})
 	.required();
 
@@ -44,9 +44,9 @@ export const collaboratorsDeleteParamsSchema = z
 	.object({
 		applicationId: z
 			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId must be a positive number' }),
+			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
 		collaboratorId: z
 			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'collaboratorId must be a positive number' }),
+			.refine((id) => isPositiveInteger(Number(id)), { message: 'collaboratorId MUST be a positive number' }),
 	})
 	.required();

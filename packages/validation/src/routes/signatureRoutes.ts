@@ -32,6 +32,6 @@ export const getSignatureParamsSchema = z
 	.object({
 		applicationId: z
 			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a Positive Number' }),
+			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number.' }),
 	})
 	.required();
