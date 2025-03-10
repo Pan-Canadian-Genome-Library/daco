@@ -480,6 +480,13 @@ paths:
               type: object
               $ref: '#/components/requests/DeleteCollaborators'
       responses:
+        '201':
+          description: 'Collaborator deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
         '500':
           description: 'Error deleting collaborators'
           content:
@@ -492,8 +499,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
-        '201':
-          description: 'Collaborator deleted'
 
   /collaborators/{applicationId}:
     get:
@@ -550,6 +555,13 @@ paths:
                 collaboratorUpdates:
                   $ref: '#/components/requests/UpdatedCollaborators'
       responses:
+        '201':
+          description: 'Collaborators updated'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/responses/CollaboratorsListResponse'
         '500':
           description: 'Error updating collaborators'
           content:
@@ -562,13 +574,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
-        '201':
-          description: 'Collaborators updated'
-          content:
-            application/json:
-              schema:
-                type: object
-                $ref: '#/components/responses/CollaboratorsListResponse'
 
   /collaborators/{applicationId}/{collaboratorId}:
     delete:

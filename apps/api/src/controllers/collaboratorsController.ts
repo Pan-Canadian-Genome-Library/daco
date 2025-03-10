@@ -155,10 +155,6 @@ export const listCollaborators = async ({ application_id, user_id }: { applicati
 		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
 	}
 
-	if (!(application.state === 'DRAFT')) {
-		return failure(`Can only list Collaborators when Application is in state DRAFT`, 'InvalidState');
-	}
-
 	const applicationId = application.id;
 	const collaboratorsResult = await collaboratorsRepo.listCollaborators(applicationId);
 
