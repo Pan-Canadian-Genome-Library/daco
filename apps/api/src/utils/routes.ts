@@ -101,7 +101,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
  * @returns  type ApplicationContentUpdates in snake_case
  */
 export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
-	const formatedUpdate: ApplicationContentUpdates = {
+	const formattedUpdate: ApplicationContentUpdates = {
 		applicant_first_name: update.applicantFirstName,
 		applicant_middle_name: update.applicantMiddleName,
 		applicant_last_name: update.applicantLastName,
