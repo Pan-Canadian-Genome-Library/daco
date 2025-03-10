@@ -81,7 +81,7 @@ collaboratorsRouter.get(
 			const { applicationId } = request.params;
 
 			if (!applicationId) {
-				response.status(404).send({ message: 'applicationId is missing, cannot list Collaborators' });
+				response.status(400).send({ message: 'applicationId is missing, cannot list Collaborators' });
 				return;
 			}
 
@@ -99,10 +99,16 @@ collaboratorsRouter.get(
 			} else {
 				const { message, errors } = result;
 
-				if (errors === 'Unauthorized') {
-					response.status(401);
-				} else {
-					response.status(500);
+				switch (String(errors)) {
+					case 'Unauthorized':
+						response.status(401);
+						break;
+					case 'Error: Application record is undefined':
+						response.status(404);
+						break;
+					default:
+						response.status(500);
+						break;
 				}
 
 				response.send({ message, errors });
