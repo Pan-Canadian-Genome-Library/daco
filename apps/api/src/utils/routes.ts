@@ -143,8 +143,10 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
  */
 
 export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): GetCollaboratorsResponse[] => {
-	const formatedUpdate = data.reduce((acu, value) => {
-		acu.push({
+	const formatedUpdate: GetCollaboratorsResponse[] = [];
+
+	data.forEach((value) => {
+		formatedUpdate.push({
 			id: value.id,
 			applicationId: value.application_id,
 			collaboratorFirstName: value.first_name,
@@ -157,8 +159,7 @@ export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): GetCollabor
 			collaboratorSuffix: value.suffix,
 			collaboratorType: value.collaborator_type,
 		});
-		return acu;
-	}, [] as GetCollaboratorsResponse[]);
+	});
 
 	return formatedUpdate;
 };
