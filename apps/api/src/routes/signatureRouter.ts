@@ -17,17 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { editSignatureRequestSchema, getSignatureParamsSchema } from '@pcgl-daco/validation';
+import {
+	withBodySchemaValidation,
+	withParamsSchemaValidation,
+	withQuerySchemaValidation,
+} from '@pcgl-daco/request-utils';
+import {
+	deleteSignatureParamsSchema,
+	deleteSignatureQuerySchema,
+	editSignatureRequestSchema,
+	getSignatureParamsSchema,
+} from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { type Request, type Response } from 'express';
 
-import { getApplicationSignature, updateApplicationSignature } from '@/controllers/signatureController.ts';
+import {
+	deleteApplicationSignature,
+	getApplicationSignature,
+	updateApplicationSignature,
+} from '@/controllers/signatureController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const signatureRouter = express.Router();
 const jsonParser = bodyParser.json();
 
+/**
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ */
 signatureRouter.get(
 	'/:applicationId',
 	withParamsSchemaValidation(
@@ -64,7 +81,6 @@ signatureRouter.get(
 		},
 	),
 );
-
 /**
  * TODO:
  * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
@@ -109,6 +125,53 @@ signatureRouter.post(
 
 		res.send({ message: result.message, errors: String(result.errors) });
 	}),
+);
+
+/**
+ * TODO:
+ * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ */
+signatureRouter.delete(
+	'/:applicationId',
+	withParamsSchemaValidation(
+		deleteSignatureParamsSchema,
+		apiZodErrorMapping,
+		withQuerySchemaValidation(
+			deleteSignatureQuerySchema,
+			apiZodErrorMapping,
+			async (request: Request, response: Response) => {
+				const { applicationId } = request.params;
+				const { signee } = request.query;
+
+				if (!applicationId || !signee || (signee !== 'APPLICANT' && signee !== 'INSTITUTIONAL_REP')) {
+					response.status(400).send({ message: 'Missing Required Parameters.' });
+					return;
+				}
+
+				const result = await deleteApplicationSignature({
+					applicationId: Number(applicationId),
+					signee: signee,
+				});
+
+				if (result.success) {
+					/**
+					 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
+					 */
+					response.status(204).send();
+					return;
+				}
+
+				if (
+					String(result.errors) === 'Error: Application contents record is undefined' ||
+					'Application record is undefined'
+				) {
+					response.status(404);
+				} else {
+					response.status(500);
+				}
+			},
+		),
+	),
 );
 
 export default signatureRouter;

@@ -122,6 +122,65 @@ const signatureService = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	deleteApplicationSignature: async ({
+		application_id,
+		signature_type,
+	}: Pick<ApplicationContentModel, 'application_id'> & {
+		signature_type: 'APPLICANT' | 'INSTITUTIONAL_REP';
+	}): AsyncResult<ApplicationSignatureUpdate> => {
+		try {
+			const updatedSignature = await db.transaction(async (transaction) => {
+				const signature_fields = {
+					applicant_signature: signature_type === 'APPLICANT' ? null : undefined,
+					applicant_signed_at: signature_type === 'APPLICANT' ? null : undefined,
+					institutional_rep_signature: signature_type === 'INSTITUTIONAL_REP' ? null : undefined,
+					institutional_rep_signed_at: signature_type === 'INSTITUTIONAL_REP' ? null : undefined,
+				};
+
+				const editedContents = await transaction
+					.update(applicationContents)
+					.set(signature_fields)
+					.where(eq(applicationContents.application_id, application_id))
+					.returning();
+				if (!editedContents[0]) {
+					throw new Error('Error: Application contents record is undefined');
+				}
+
+				// Update Related Application
+				const applicationUpdates = {
+					updated_at: sql`NOW()`,
+					state: ApplicationStates.DRAFT,
+				};
+
+				const editedApplication = await transaction
+					.update(applications)
+					.set(applicationUpdates)
+					.where(eq(applications.id, application_id))
+					.returning();
+
+				if (!editedApplication[0]) {
+					throw new Error('Application record is undefined');
+				}
+
+				return {
+					application_id: editedContents[0].application_id,
+					applicant_signature: editedContents[0].applicant_signature,
+					applicant_signed_at: editedContents[0].applicant_signed_at,
+					institutional_rep_signature: editedContents[0].institutional_rep_signature,
+					institutional_rep_signed_at: editedContents[0].institutional_rep_signed_at,
+				};
+			});
+
+			return success(updatedSignature);
+		} catch (err) {
+			const message = `Error at deleteApplicationSignature with id: ${application_id}`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
 });
 
 export { signatureService };

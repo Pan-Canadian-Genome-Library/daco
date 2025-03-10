@@ -79,3 +79,28 @@ export const updateApplicationSignature = async ({ applicationId, signature, sig
 
 	return result;
 };
+
+/**
+ * Deletes a signature from an application.
+ * @param id - The Application ID
+ * @param signee - A `APPLICANT` or `INSTITUTIONAL_REP` whose signature you'd like to delete.
+ * @returns Success with the signature and signed at time / Failure with Error
+ * TODO: - There is no auth validation for this route yet.
+ */
+export const deleteApplicationSignature = async ({
+	applicationId,
+	signee,
+}: {
+	applicationId: number;
+	signee: 'APPLICANT' | 'INSTITUTIONAL_REP';
+}) => {
+	const database = getDbInstance();
+	const signatureRepo: SignatureService = signatureService(database);
+
+	const result = await signatureRepo.deleteApplicationSignature({
+		application_id: applicationId,
+		signature_type: signee,
+	});
+
+	return result;
+};

@@ -35,3 +35,13 @@ export const getSignatureParamsSchema = z
 			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number.' }),
 	})
 	.required();
+
+export const deleteSignatureParamsSchema = z.object({
+	applicationId: z
+		.string()
+		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number.' }),
+});
+
+export const deleteSignatureQuerySchema = z.object({
+	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+});
