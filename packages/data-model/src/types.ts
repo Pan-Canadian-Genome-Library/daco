@@ -242,14 +242,21 @@ export interface CollaboratorDTO {
 	collaboratorType?: string | null;
 }
 
-export type CollaboratorRequest = {
+export type BaseCollaboratorRequest = {
 	applicationId: number;
 	userId: string;
-	collaborators: CollaboratorDTO[];
 };
 
-export interface CollaboratorUpdateRecord extends CollaboratorDTO {
+export interface ListCollaboratorRequest extends BaseCollaboratorRequest {
+	collaborators: CollaboratorDTO[];
+}
+
+export type CollaboratorUpdateRecord = Partial<CollaboratorDTO> & {
 	id: number;
+};
+
+export interface UpdateCollaboratorRequest extends BaseCollaboratorRequest {
+	collaborators: CollaboratorUpdateRecord;
 }
 
 export interface DeleteCollaboratorRequest {

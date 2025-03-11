@@ -23,7 +23,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { failure, success } from '@/utils/results.js';
 import { aliasCollaboratorRecord } from '@/utils/routes.ts';
-import { CollaboratorDTO } from '@pcgl-daco/data-model';
+import { type CollaboratorDTO, type CollaboratorUpdateRecord } from '@pcgl-daco/data-model';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
 /**
@@ -100,6 +100,37 @@ export const createCollaborators = async ({
 	return result;
 };
 
+/**
+ * Delete a selected collaborator by ID
+ * @param application_id - ID of related application record to associate with Collaborators
+ * @param user_id - ID of Applicant updating the application
+ * @param collaborator_id - ID of Collaborator to delete
+ * @returns Success with Collaborator data record / Failure with Error.
+ */
+export const deleteCollaborator = async ({ application_id, id }: { application_id: number; id: number }) => {
+	const database = getDbInstance();
+	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+
+	if (!applicationResult.success) {
+		return applicationResult;
+	}
+
+	const application = applicationResult.data;
+
+	if (!(application.state === 'DRAFT')) {
+		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
+	}
+
+	const result = await collaboratorsRepo.deleteCollaborator({
+		id,
+	});
+
+	return result;
+};
+
 /*
  * Lists all Collaborators for a given application
  * @param application_id - ID of related application record to associate with Collaborators
@@ -138,12 +169,21 @@ export const listCollaborators = async ({ application_id, user_id }: { applicati
 };
 
 /**
- * Delete a selected collaborator by ID
+ * Update a selected collaborator by ID
  * @param application_id - ID of related application record to associate with Collaborators
- * @param id - ID of Collaborator to delete
+ * @param user_id - ID of Applicant updating the application
+ * @param collaborators - Collaborator record with updated properties
  * @returns Success with Collaborator data record / Failure with Error.
  */
-export const deleteCollaborator = async ({ application_id, id }: { application_id: number; id: number }) => {
+export const updateCollaborator = async ({
+	application_id,
+	user_id,
+	collaboratorUpdates,
+}: {
+	application_id: number;
+	user_id: string;
+	collaboratorUpdates: CollaboratorUpdateRecord;
+}) => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
 	const applicationRepo: ApplicationService = applicationSvc(database);
@@ -156,11 +196,34 @@ export const deleteCollaborator = async ({ application_id, id }: { application_i
 
 	const application = applicationResult.data;
 
-	if (!(application.state === 'DRAFT')) {
-		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
+	// TODO: Add Real Auth
+	// Validate User is Applicant
+	if (!(user_id === application.user_id)) {
+		return failure('Unauthorized, cannot update Collaborators', 'Unauthorized');
 	}
 
-	const result = await collaboratorsRepo.deleteCollaborator({ id });
+	if (!(application.state === 'DRAFT')) {
+		return failure(`Can only edit Collaborators when Application is in state DRAFT`, 'InvalidState');
+	}
+
+	const { id } = collaboratorUpdates;
+
+	const collaborator: Partial<CollaboratorModel> = {
+		first_name: collaboratorUpdates.collaboratorFirstName,
+		middle_name: collaboratorUpdates.collaboratorMiddleName,
+		last_name: collaboratorUpdates.collaboratorLastName,
+		suffix: collaboratorUpdates.collaboratorSuffix,
+		position_title: collaboratorUpdates.collaboratorPositionTitle,
+		institutional_email: collaboratorUpdates.collaboratorInstitutionalEmail,
+		profile_url: collaboratorUpdates.collaboratorResearcherProfileURL,
+		collaborator_type: collaboratorUpdates.collaboratorType,
+		application_id,
+	};
+
+	const result = await collaboratorsRepo.updateCollaborator({
+		id,
+		collaborator,
+	});
 
 	return result;
 };
