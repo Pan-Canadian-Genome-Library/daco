@@ -416,8 +416,8 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/responses/ClientErrors'
                   - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:
@@ -458,8 +458,8 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/responses/ClientErrors'
                   - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:
@@ -498,8 +498,8 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/responses/ClientErrors'
                   - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:
