@@ -23,7 +23,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
-import useGetCollaborators from '@/api/useGetCollaborators';
+import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
 import DeleteCollaboratorModal from '@/components/pages/application/modals/DeleteCollaboratorModal';
