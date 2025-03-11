@@ -19,7 +19,7 @@
 
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
-import { ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
+import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
 import { failure, success } from '@/utils/results.ts';
 import { aliasSignatureRecord } from '@/utils/routes.ts';
 import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
@@ -39,12 +39,12 @@ export const getApplicationSignature = async ({ applicationId }: { applicationId
 
 	const result = await signatureRepo.getApplicationSignature({ application_id: applicationId });
 
-	if (result.success) {
-		const aliasedResponse = aliasSignatureRecord(result.data);
-		return success(aliasedResponse);
+	if (!result.success) {
+		return result;
 	}
 
-	return result;
+	const aliasedResponse = aliasSignatureRecord(result.data);
+	return success(aliasedResponse);
 };
 
 /**

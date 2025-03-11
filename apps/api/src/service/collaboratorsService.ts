@@ -105,6 +105,34 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	updateCollaborator: async ({
+		id,
+		collaborator,
+	}: {
+		id: number;
+		collaborator: Partial<CollaboratorModel>;
+	}): AsyncResult<CollaboratorRecord> => {
+		try {
+			const deletedRecord = await db
+				.update(collaborators)
+				.set(collaborator)
+				.where(eq(collaborators.id, id))
+				.returning();
+
+			if (!deletedRecord[0]) {
+				throw new Error(`Error updating collaborator with ${id}, no record updated`);
+			}
+
+			return success(deletedRecord[0]);
+		} catch (err) {
+			const message = `Error at updateCollaborator`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
 	listCollaborators: async (application_id: number) => {
 		try {
 			const collaboratorRecords = await db

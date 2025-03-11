@@ -25,7 +25,7 @@ import { applications } from '@/db/schemas/applications.ts';
 import logger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates } from '@pcgl-daco/data-model';
-import { ApplicationContentModel, type ApplicationSignatureUpdate } from './types.js';
+import { type ApplicationContentModel, type ApplicationSignatureUpdate } from './types.js';
 
 /**
  * SignatureService provides methods for DB access for the signature columns in Application Contents

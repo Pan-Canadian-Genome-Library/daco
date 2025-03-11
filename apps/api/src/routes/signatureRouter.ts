@@ -41,6 +41,43 @@ import { apiZodErrorMapping } from '@/utils/validation.js';
 const signatureRouter = express.Router();
 const jsonParser = bodyParser.json();
 
+signatureRouter.get(
+	'/:applicationId',
+	withParamsSchemaValidation(
+		getSignatureParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+
+			if (!applicationId) {
+				response.status(400).send({ message: 'Application ID MUST be a positive number greater than or equal to 1.' });
+				return;
+			}
+
+			const result = await getApplicationSignature({ applicationId: Number(applicationId) });
+
+			if (result.success) {
+				response.status(200).send(result.data);
+				return;
+			}
+
+			switch (String(result.errors)) {
+				case 'Error: Application record is undefined':
+					response.status(404);
+					break;
+				case 'Error: Application ID MUST be a positive number greater than or equal to 1.':
+					response.status(400);
+					break;
+				default:
+					response.status(500);
+					break;
+			}
+
+			response.send({ message: result.message, errors: String(result.errors) });
+		},
+	),
+);
+
 /**
  * TODO:
  * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.

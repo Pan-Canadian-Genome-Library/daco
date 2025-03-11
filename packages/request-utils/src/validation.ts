@@ -19,6 +19,7 @@
 
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+import formidable from 'formidable';
 import { ZodErrorMap, ZodSchema } from 'zod';
 import { RequestValidationErrorResponse } from './responses.js';
 
@@ -155,4 +156,61 @@ function withQuerySchemaValidation<ReqParams>(
 	};
 }
 
-export { withBodySchemaValidation, withParamsSchemaValidation, withQuerySchemaValidation };
+const validFileTypes = [
+	'application/pdf',
+	'application/msword',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+/**
+ * Wrapper for express RequestHandler to provide file validation checks before upload process
+ *
+ * @returns RequestHandler to be given to express router
+ *
+ */
+function fileUploadValidation(handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>): RequestHandler {
+	return async (request: Request, response: Response, next: NextFunction) => {
+		try {
+			const form = formidable({
+				keepExtensions: true,
+				maxFileSize: 5 * 1024 * 1024, // 5MB limit
+				maxFiles: 1,
+				allowEmptyFiles: false,
+			});
+			form.parse(request, async (err, _, files) => {
+				if (err) {
+					response
+						.status(400)
+						.send({ message: 'Invalid file upload, file must be less than 5mb and only 1 file can be uploaded' });
+					return;
+				}
+
+				if (!files.file || !files.file[0]) {
+					response.status(400).send({ message: 'File does not exist' });
+					return;
+				}
+
+				const uploadedFile = files.file[0];
+
+				if (!uploadedFile.mimetype) {
+					response.status(400).send({ message: 'File type was not specified' });
+					return false;
+				}
+
+				if (!validFileTypes.includes(`${uploadedFile.mimetype}`)) {
+					response.status(400).send({ message: 'Invalid file type' });
+					return false;
+				}
+
+				request.body = { ...request.body, file: uploadedFile };
+
+				return await handler(request, response, next);
+			});
+
+			return;
+		} catch (err: unknown) {
+			next(err);
+		}
+	};
+}
+
+export { fileUploadValidation, withBodySchemaValidation, withParamsSchemaValidation, withQuerySchemaValidation };
