@@ -16,6 +16,9 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { type ExtractTablesWithRelations } from 'drizzle-orm';
+import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
+import { PgTransaction } from 'drizzle-orm/pg-core';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
@@ -23,20 +26,19 @@ import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
 import { files } from '@/db/schemas/index.js';
+
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
-import { signatureService } from '@/service/signatureService.ts';
-import { type ExtractTablesWithRelations } from 'drizzle-orm';
-import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
-import { PgTransaction } from 'drizzle-orm/pg-core';
 import { filesSvc } from './fileService.js';
+import { signatureService } from './signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
 export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 
 export type ApplicationModel = typeof applications.$inferInsert;
+export type ApplicationRecord = typeof applications.$inferSelect;
 export type ApplicationUpdates = Partial<ApplicationModel>;
 export type ApplicationService = ReturnType<typeof applicationSvc>;
 
@@ -56,8 +58,6 @@ export type ApplicationSignatureUpdate = Pick<
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
-
-export type ApplicationRecord = typeof applications.$inferSelect;
 
 export type FilesModel = typeof files.$inferInsert;
 export type FilesUpdate = Partial<FilesModel>;
