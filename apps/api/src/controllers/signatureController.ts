@@ -39,12 +39,12 @@ export const getApplicationSignature = async ({ applicationId }: { applicationId
 
 	const result = await signatureRepo.getApplicationSignature({ application_id: applicationId });
 
-	if (result.success) {
-		const aliasedResponse = aliasSignatureRecord(result.data);
-		return success(aliasedResponse);
+	if (!result.success) {
+		return result;
 	}
 
-	return result;
+	const aliasedResponse = aliasSignatureRecord(result.data);
+	return success(aliasedResponse);
 };
 
 /**
