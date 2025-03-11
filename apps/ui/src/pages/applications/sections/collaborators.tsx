@@ -33,12 +33,12 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationOutletContext } from '@/global/types';
-import { GetCollaboratorsResponse } from '@pcgl-daco/data-model';
+import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
 
 const { useToken } = theme;
 
 export interface ModalState {
-	rowData?: GetCollaboratorsResponse;
+	rowData?: CollaboratorsResponse;
 	isOpen: boolean;
 }
 
@@ -57,7 +57,7 @@ const Collaborators = () => {
 	const [deleteModalState, setDeleteModalState] = useState<ModalState>({ isOpen: false });
 	const [editModalState, setEditModalState] = useState<ModalState>({ isOpen: false });
 
-	const columns: TableProps<GetCollaboratorsResponse>['columns'] = [
+	const columns: TableProps<CollaboratorsResponse>['columns'] = [
 		{
 			key: 'collaboratorFirstName',
 			title: 'First Name',
