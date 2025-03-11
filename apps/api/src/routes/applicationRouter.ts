@@ -37,7 +37,6 @@ import {
 	collaboratorsListParamsSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
-	submitApplicationRequestSchema,
 } from '@pcgl-daco/validation';
 
 const applicationRouter = express.Router();
@@ -349,28 +348,16 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/applications/submit',
+	'/:applicationId/submit',
 	jsonParser,
-	withBodySchemaValidation(
-		submitApplicationRequestSchema,
-		apiZodErrorMapping,
 		async (request: Request, response: Response) => {
-			const { applicationId, role, signature } = request.body;
+			const { applicationId } = request.params;
 
 			if (!isPositiveInteger(parseInt(applicationId))) {
 				response.status(400).send({
 					message: 'Invalid request. ApplicationId is required and must be a valid number.',
 					errors: 'MissingOrInvalidParameters',
 				});
-			}
-
-			// Mock validation for now
-			if (signature !== 'mock_signature') {
-				response.status(400).json({ message: 'Invalid signature.' });
-			}
-
-			if (role !== 'APPLICANT' && role !== 'REP') {
-				response.status(400).json({ message: 'Invalid role. Must be APPLICANT or REP.' });
 			}
 
 			try {
@@ -398,6 +385,7 @@ applicationRouter.post(
 					}
 
 					response.status(status).send({ message, errors });
+					return;
 				}
 			} catch (error) {
 				response.status(500).send({
@@ -406,6 +394,6 @@ applicationRouter.post(
 				});
 			}
 		},
-	),
+	
 );
 export default applicationRouter;

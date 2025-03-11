@@ -269,18 +269,13 @@ export const submitApplication = async ({ applicationId }: { applicationId: numb
 		// Ensure the application can be submitted
 		const appStateManager = new ApplicationStateManager(application);
 
-		if (
-			appStateManager.state !== ApplicationStates.DRAFT &&
-			appStateManager.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW
-		) {
-			return failure(`Application cannot be submitted from state ${appStateManager.state}`, 'SubmissionError');
-		}
-
 		// Transition application to the next state (e.g., under review)
 		let submissionResult;
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
 			submissionResult = await appStateManager.submitDraft();
+		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+			submissionResult = await appStateManager.approveRepReview();
 		} else {
 			submissionResult = await appStateManager.submitRepRevision();
 		}
