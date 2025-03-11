@@ -415,7 +415,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ClientErrors'
+                oneOf:
+                  - $ref: '#/components/responses/ClientErrors'
+                  - $ref: '#/components/responses/RequestValidationError'
         '404':
           description: Application not found.
           content:
@@ -424,6 +426,53 @@ paths:
                 $ref: '#/components/responses/ClientErrors'
         '500':
           description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+    delete:
+      tags:
+        - Signature
+      summary: Delete signatures associated with an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to retrieve the signature from.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: signee
+          schema:
+            type: string
+            enum: [INSTITUTIONAL_REP, APPLICANT]
+          description: Which signature to delete
+          required: true
+      responses:
+        '204':
+          description: Successfully deleted the signature requested. This will always result in a `No Content` response.
+        '400':
+          description: Will occur when not provided a valid `applicationId`, either a negative number, or not a number at all or invalid `signee`.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/ClientErrors'
+                  - $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
   /signature/sign:
     post:
       tags:
@@ -448,7 +497,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/RequestValidationError'
+                oneOf:
+                  - $ref: '#/components/responses/ClientErrors'
+                  - $ref: '#/components/responses/RequestValidationError'
         '404':
           description: Application not found.
           content:
