@@ -119,6 +119,34 @@ const filesSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+	deleteFileById: async ({
+		fileId,
+		transaction,
+	}: {
+		fileId: number;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<{ id: number }> => {
+		try {
+			const dbTransaction = transaction ? transaction : db;
+
+			await dbTransaction.transaction(async (transaction) => {
+				const deletedRecord = await transaction.delete(files).where(eq(files.id, fileId)).returning();
+
+				if (deletedRecord) throw new Error('Error: deleting file record has failed');
+
+				return deletedRecord;
+			});
+
+			return success({ id: fileId });
+		} catch (err) {
+			const message = `Error uploading file`;
+
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
 });
 
 export { filesSvc };

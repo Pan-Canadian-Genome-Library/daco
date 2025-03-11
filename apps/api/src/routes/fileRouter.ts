@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { uploadEthicsFile } from '@/controllers/fileController.ts';
+import { deleteFile, uploadEthicsFile } from '@/controllers/fileController.ts';
 import { fileUploadValidation } from '@pcgl-daco/request-utils';
 import { isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request, type Response } from 'express';
@@ -51,5 +51,20 @@ fileRouter.post(
 		}
 	}),
 );
+
+fileRouter.delete('/:fileId', async (req: Request, res: Response) => {
+	const { fileId } = req.params;
+	const id = parseInt(fileId ? fileId : '');
+
+	if (!isPositiveInteger(id)) {
+		res.status(400).send({ message: 'Invalid applicationId' });
+		return;
+	}
+
+	await deleteFile({ fileId: id });
+
+	res.status(400).send({ message: 'Invalid applicationId' });
+	return;
+});
 
 export default fileRouter;
