@@ -22,7 +22,7 @@ import {
 	type CollaboratorRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { GetCollaboratorsResponse } from '@pcgl-daco/data-model';
+import { CollaboratorsResponse } from '@pcgl-daco/data-model';
 import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model/src/types.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
@@ -142,8 +142,8 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
  * @returns  type GetCollaboratorsResponse in camelcase
  */
 
-export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): GetCollaboratorsResponse[] => {
-	const formatedUpdate: GetCollaboratorsResponse[] = [];
+export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): CollaboratorsResponse[] => {
+	const formatedUpdate: CollaboratorsResponse[] = [];
 
 	data.forEach((value) => {
 		formatedUpdate.push({
