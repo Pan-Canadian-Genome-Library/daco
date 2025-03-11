@@ -1,6 +1,6 @@
 # PCGL DACO Data Model
 
-![Data Model](data-model.png)
+![Data Model](current-data-model.png)
 
 ## Entities
 ### Applications
