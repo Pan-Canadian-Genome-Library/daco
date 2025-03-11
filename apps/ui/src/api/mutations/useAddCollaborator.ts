@@ -23,14 +23,16 @@ import { useTranslation } from 'react-i18next';
 import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type ApplicationResponseData } from '@pcgl-daco/data-model';
+
+import { queryClient } from '@/providers/Providers';
+import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
 import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
 
 const useAddCollaborator = () => {
 	const { t: translate } = useTranslation();
 
 	return useMutation<
-		ApplicationResponseData,
+		CollaboratorsResponse[],
 		ServerError,
 		{ applicationId: number | string; collaborators: CollaboratorsSchemaType[]; userId?: number | string }
 	>({
@@ -76,7 +78,12 @@ const useAddCollaborator = () => {
 				message: error.message,
 			});
 		},
-		onSuccess: (data) => {},
+		onSuccess: async (data) => {
+			//  Update the cache if the add collaborator request is successful to prevent refetching data
+			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
+				return [...prev, ...data];
+			});
+		},
 	});
 };
 
