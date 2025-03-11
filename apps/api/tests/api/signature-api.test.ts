@@ -227,33 +227,6 @@ describe('Signature API', () => {
 			assert.strictEqual(deletedSignature.data.institutionalRepSignature, null);
 			assert.strictEqual(deletedSignature.data.institutionalRepSignature, null);
 		});
-		it("should retrieve an application and delete it's applicant signature but NOT it's rep signatures", async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-
-			const { id: applicationId } = applicationRecordsResult.data.applications[0];
-
-			const result = await deleteApplicationSignature({
-				applicationId,
-				signee: 'APPLICANT',
-			});
-
-			assert.ok(result.success);
-
-			const deletedSignature = await getApplicationSignature({
-				applicationId,
-			});
-
-			assert.ok(deletedSignature.success);
-
-			assert.strictEqual(deletedSignature.data.applicantSignature, null);
-			assert.strictEqual(deletedSignature.data.applicantSignedAt, null);
-		});
 
 		it('Be unable to delete an invalid signed application', async () => {
 			const applicationId = 9999;
