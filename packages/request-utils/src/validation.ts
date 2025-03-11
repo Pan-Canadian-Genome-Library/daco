@@ -80,6 +80,18 @@ function withBodySchemaValidation<ReqBody>(
  * @param handler RequestHandler to run once validation passes
  * @returns RequestHandler to be given to express router
  *
+ * @example
+ * ```
+ * import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
+ * import { defaultErrorMap } from 'zod';
+ *
+ * router.post('/', withParamsSchemaValidation(ExampleSchema, defaultErrorMap, (request, response, next) => {
+ * 	const { body } = request;
+ * 	// TS knows the structure of `body` from `ExampleSchema`. It is already validated, you can use it immediately
+ * 	const output = doSomethingWithBody(body);
+ * 	res.json(output);
+ * });
+ * ```
  */
 function withParamsSchemaValidation<ReqParams>(
 	paramsSchema: ZodSchema<ReqParams>,
