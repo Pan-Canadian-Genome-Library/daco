@@ -20,13 +20,19 @@
 import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
 
-import { createCollaborators, deleteCollaborator, listCollaborators } from '@/controllers/collaboratorsController.js';
+import {
+	createCollaborators,
+	deleteCollaborator,
+	listCollaborators,
+	updateCollaborator,
+} from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
+	collaboratorsCreateRequestSchema,
 	collaboratorsDeleteParamsSchema,
 	collaboratorsListParamsSchema,
-	collaboratorsRequestSchema,
+	collaboratorsUpdateRequestSchema,
 } from '@pcgl-daco/validation';
 import { testUserId } from '../../tests/testUtils.ts';
 
@@ -39,7 +45,7 @@ const jsonParser = bodyParser.json();
 collaboratorsRouter.post(
 	'/create',
 	jsonParser,
-	withBodySchemaValidation(collaboratorsRequestSchema, apiZodErrorMapping, async (request, response) => {
+	withBodySchemaValidation(collaboratorsCreateRequestSchema, apiZodErrorMapping, async (request, response) => {
 		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
 
 		const result = await createCollaborators({
@@ -152,6 +158,45 @@ collaboratorsRouter.delete(
 			return;
 		}
 	}),
+);
+
+/**
+ * Update Collaborator
+ */
+collaboratorsRouter.post(
+	'/update',
+	jsonParser,
+	withBodySchemaValidation(
+		collaboratorsUpdateRequestSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId: application_id, userId: user_id, collaboratorUpdates } = request.body;
+
+			const result = await updateCollaborator({
+				application_id,
+				user_id,
+				collaboratorUpdates,
+			});
+
+			if (result.success) {
+				response.status(201).send(result.data);
+				return;
+			} else {
+				const { message, errors } = result;
+
+				if (errors === 'InvalidState') {
+					response.status(400);
+				} else if (errors === 'Unauthorized') {
+					response.status(401);
+				} else {
+					response.status(500);
+				}
+
+				response.send({ message, errors });
+				return;
+			}
+		},
+	),
 );
 
 export default collaboratorsRouter;
