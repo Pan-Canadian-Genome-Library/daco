@@ -1,4 +1,4 @@
-import { userRoles, type UserRole } from '@pcgl-daco/validation';
+import { userRoleSchema, type UserRole } from '@pcgl-daco/validation';
 import type { SessionData } from 'express-session';
 
 /**
@@ -8,5 +8,5 @@ import type { SessionData } from 'express-session';
  * This is temporarily returning only `APPLICANT` or `ANONYMOUS`
  */
 export function getUserRole(session: Partial<SessionData>): UserRole {
-	return session.user ? userRoles.Values.APPLICANT : userRoles.Values.ANONYMOUS;
+	return session.user ? userRoleSchema.Values.APPLICANT : userRoleSchema.Values.ANONYMOUS;
 }

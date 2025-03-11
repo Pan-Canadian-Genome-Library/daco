@@ -30,7 +30,7 @@ import {
 import baseLogger from '@/logger.js';
 import { isPositiveNumber } from '@/utils/routes.js';
 import type { ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
-import { userRoles } from '@pcgl-daco/validation';
+import { userRoleSchema } from '@pcgl-daco/validation';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { getUserRole } from '../service/authService.js';
 import type { ApplicationRecord, ApplicationStateTotals, JoinedApplicationRecord } from '../service/types.js';
@@ -239,7 +239,7 @@ applicationRouter.get(
 			const { data } = result;
 
 			// Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER
-			if (data.userId !== userId || getUserRole(request.session) === userRoles.Values.DAC_MEMBER) {
+			if (data.userId !== userId || getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER) {
 				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 				return;
 			}
