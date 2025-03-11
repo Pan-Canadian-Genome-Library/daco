@@ -24,39 +24,52 @@ import lodash from 'lodash';
 
 const filterOmittedKeys = (key: string, omittedKeys: string[]) => !(omittedKeys.includes(key) || key === 'id');
 
-export const aliasDatabaseRecord = (
-	data: ApplicationContentUpdates,
+export const aliasToResponseData = <
+	DatabaseRecord extends Record<string, any>,
+	ResponseRecord extends Record<string, any>,
+>(
+	data: DatabaseRecord,
 	omittedKeys: string[] = [],
-): ApplicationContentsResponse => {
-	const databaseKeys = Object.keys(data).filter((key): key is keyof ApplicationContentUpdates => {
-		return filterOmittedKeys(key, omittedKeys);
+): ResponseRecord => {
+	type snakeCaseKey = string & keyof DatabaseRecord;
+	const allKeys = Object.keys(data).map((key): snakeCaseKey => key);
+
+	const filteredKeys = allKeys.filter((key) => {
+		return filterOmittedKeys(String(key), omittedKeys);
 	});
 
-	const responseData = databaseKeys.reduce((acc, key) => {
+	const responseData = filteredKeys.reduce((acc, key) => {
 		const aliasedKey = lodash.camelCase(key);
-		const accumulator = { ...acc, [aliasedKey]: data[key] };
+		const value = data[key];
+		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
-	}, {}) as ApplicationContentsResponse;
+	}, {}) as ResponseRecord;
 
 	return responseData;
 };
 
-// DRAFT
-export const aliasResponseRecord = (
-	data: ApplicationContentUpdates,
+export const aliasToDatabaseData = <
+	ResponseRecord extends Record<string, any>,
+	DatabaseRecord extends Record<string, any>,
+>(
+	data: ResponseRecord,
 	omittedKeys: string[] = [],
-): ApplicationContentsResponse => {
-	const databaseKeys = Object.keys(data).filter((key): key is keyof ApplicationContentUpdates => {
-		return filterOmittedKeys(key, omittedKeys);
+): DatabaseRecord => {
+	type camelCaseKey = string & keyof ResponseRecord;
+	const allKeys = Object.keys(data).map((key): camelCaseKey => key);
+
+	const filteredKeys = allKeys.filter((key) => {
+		return filterOmittedKeys(String(key), omittedKeys);
 	});
 
-	const responseData = databaseKeys.reduce((acc, key) => {
+	const databaseData = filteredKeys.reduce((acc, key) => {
 		const aliasedKey = lodash.snakeCase(key);
-		const accumulator = { ...acc, [aliasedKey]: data[key] };
+		const value = data[key];
+		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
-	}, {}) as ApplicationContentsResponse;
+	}, {}) as DatabaseRecord;
 
-	return responseData;
+	return databaseData;
 };
 
 /**
@@ -86,8 +99,8 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 		'ethics_letter',
 		'signed_pdf',
 	];
-	const contents: ApplicationContentsResponse | null = applicationContents
-		? aliasDatabaseRecord(applicationContents, omittedKeys)
+	const contents = applicationContents
+		? aliasToResponseData<ApplicationContentUpdates, ApplicationContentsResponse>(applicationContents, omittedKeys)
 		: null;
 
 	return {
