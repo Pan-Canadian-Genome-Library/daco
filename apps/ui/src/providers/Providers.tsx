@@ -22,7 +22,7 @@ import { BrowserRouter } from 'react-router';
 import ThemeProvider from './ThemeProvider';
 import { UserProvider } from './UserProvider';
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
 	return (
