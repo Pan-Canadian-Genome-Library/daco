@@ -101,9 +101,7 @@ export const createCollaborators = async ({
 		return collaboratorsResult;
 	}
 
-	console.log('test----');
 	const result = aliasCollaboratorRecord(collaboratorsResult.data);
-	console.log('mans-----', result);
 
 	return success(result);
 };
