@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,19 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import './i18n/translations';
-import './index.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router';
+import ThemeProvider from './ThemeProvider';
+import { UserProvider } from './UserProvider';
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+const queryClient = new QueryClient();
 
-import AppRouter from '@/pages/AppRouter';
-import Providers from './providers/Providers';
+const Providers = ({ children }: { children: React.ReactNode }) => {
+	return (
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider>
+				<BrowserRouter>
+					<UserProvider>{children}</UserProvider>
+				</BrowserRouter>
+			</ThemeProvider>
+		</QueryClientProvider>
+	);
+};
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<Providers>
-			<AppRouter />
-		</Providers>
-	</StrictMode>,
-);
+export default Providers;
