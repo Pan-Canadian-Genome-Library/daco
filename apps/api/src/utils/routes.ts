@@ -171,10 +171,10 @@ export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Signatur
  */
 
 export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): GetCollaboratorsResponse[] => {
-	const formatedUpdate: GetCollaboratorsResponse[] = [];
+	const formattedUpdate: GetCollaboratorsResponse[] = [];
 
 	data.forEach((value) => {
-		formatedUpdate.push({
+		formattedUpdate.push({
 			id: value.id,
 			applicationId: value.application_id,
 			collaboratorFirstName: value.first_name,
@@ -189,5 +189,5 @@ export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): GetCollabor
 		});
 	});
 
-	return formatedUpdate;
+	return formattedUpdate;
 };
