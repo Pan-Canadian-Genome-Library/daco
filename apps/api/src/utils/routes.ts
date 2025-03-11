@@ -20,6 +20,44 @@
 import { type ApplicationContentUpdates, type JoinedApplicationRecord } from '@/service/types.js';
 import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model/src/types.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
+import lodash from 'lodash';
+
+const filterOmittedKeys = (key: string, omittedKeys: string[]) => !(omittedKeys.includes(key) || key === 'id');
+
+export const aliasDatabaseRecord = (
+	data: ApplicationContentUpdates,
+	omittedKeys: string[] = [],
+): ApplicationContentsResponse => {
+	const databaseKeys = Object.keys(data).filter((key): key is keyof ApplicationContentUpdates => {
+		return filterOmittedKeys(key, omittedKeys);
+	});
+
+	const responseData = databaseKeys.reduce((acc, key) => {
+		const aliasedKey = lodash.camelCase(key);
+		const accumulator = { ...acc, [aliasedKey]: data[key] };
+		return accumulator;
+	}, {}) as ApplicationContentsResponse;
+
+	return responseData;
+};
+
+// DRAFT
+export const aliasResponseRecord = (
+	data: ApplicationContentUpdates,
+	omittedKeys: string[] = [],
+): ApplicationContentsResponse => {
+	const databaseKeys = Object.keys(data).filter((key): key is keyof ApplicationContentUpdates => {
+		return filterOmittedKeys(key, omittedKeys);
+	});
+
+	const responseData = databaseKeys.reduce((acc, key) => {
+		const aliasedKey = lodash.snakeCase(key);
+		const accumulator = { ...acc, [aliasedKey]: data[key] };
+		return accumulator;
+	}, {}) as ApplicationContentsResponse;
+
+	return responseData;
+};
 
 /**
  * Helper function to convert Postgres snake_case to FE camelCase
@@ -38,44 +76,18 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 		contents: applicationContents,
 	} = data;
 
+	const omittedKeys = [
+		'id',
+		'applicant_signature',
+		'applicant_signed_at',
+		'institutional_rep_signature',
+		'institutional_rep_signed_at',
+		'ethics_review_required',
+		'ethics_letter',
+		'signed_pdf',
+	];
 	const contents: ApplicationContentsResponse | null = applicationContents
-		? {
-				applicationId: applicationContents.application_id,
-				createdAt: applicationContents.created_at,
-				updatedAt: applicationContents.updated_at,
-				applicantFirstName: applicationContents.applicant_first_name,
-				applicantLastName: applicationContents.applicant_last_name,
-				applicantMiddleName: applicationContents.applicant_middle_name,
-				applicantTitle: applicationContents.applicant_title,
-				applicantSuffix: applicationContents.applicant_suffix,
-				applicantPositionTitle: applicationContents.applicant_position_title,
-				applicantPrimaryAffiliation: applicationContents.applicant_primary_affiliation,
-				applicantInstitutionalEmail: applicationContents.applicant_institutional_email,
-				applicantProfileUrl: applicationContents.applicant_profile_url,
-				institutionalRepTitle: applicationContents.institutional_rep_title,
-				institutionalRepFirstName: applicationContents.institutional_rep_first_name,
-				institutionalRepMiddleName: applicationContents.institutional_rep_middle_name,
-				institutionalRepLastName: applicationContents.institutional_rep_last_name,
-				institutionalRepSuffix: applicationContents.institutional_rep_suffix,
-				institutionalRepPrimaryAffiliation: applicationContents.institutional_rep_primary_affiliation,
-				institutionalRepEmail: applicationContents.institutional_rep_email,
-				institutionalRepProfileUrl: applicationContents.institutional_rep_profile_url,
-				institutionalRepPositionTitle: applicationContents.institutional_rep_position_title,
-				institutionCountry: applicationContents.institution_country,
-				institutionState: applicationContents.institution_state,
-				institutionCity: applicationContents.institution_city,
-				institutionStreetAddress: applicationContents.institution_street_address,
-				institutionPostalCode: applicationContents.institution_postal_code,
-				institutionBuilding: applicationContents.institution_building,
-				projectTitle: applicationContents.project_title,
-				projectWebsite: applicationContents.project_website,
-				projectBackground: applicationContents.project_background,
-				projectMethodology: applicationContents.project_methodology,
-				projectAims: applicationContents.project_aims,
-				projectSummary: applicationContents.project_summary,
-				projectPublicationUrls: applicationContents.project_publication_urls,
-				requestedStudies: applicationContents.requested_studies,
-			}
+		? aliasDatabaseRecord(applicationContents, omittedKeys)
 		: null;
 
 	return {
