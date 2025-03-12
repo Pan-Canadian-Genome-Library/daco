@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RequestHandler } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+import formidable from 'formidable';
 import { ZodErrorMap, ZodSchema } from 'zod';
 import { RequestValidationErrorResponse } from './responses.js';
 
@@ -39,10 +40,10 @@ import { RequestValidationErrorResponse } from './responses.js';
  *
  * @example
  * ```
- * import { withSchemaValidation } from '@pcgl-daco/request-utils';
+ * import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
  * import { defaultErrorMap } from 'zod';
  *
- * router.post('/', withSchemaValidation(ExampleSchema, defaultErrorMap, (request, response, next) => {
+ * router.post('/', withBodySchemaValidation(ExampleSchema, defaultErrorMap, (request, response, next) => {
  * 	const { body } = request;
  * 	// TS knows the structure of `body` from `ExampleSchema`. It is already validated, you can use it immediately
  * 	const output = doSomethingWithBody(body);
@@ -50,12 +51,12 @@ import { RequestValidationErrorResponse } from './responses.js';
  * });
  * ```
  */
-function withSchemaValidation<ReqBody>(
+function withBodySchemaValidation<ReqBody>(
 	bodySchema: ZodSchema<ReqBody>,
 	zodErrorMapping: ZodErrorMap | undefined,
-	handler: RequestHandler<ParamsDictionary, any, ReqBody>,
-): RequestHandler {
-	return async (request, response, next) => {
+	handler: RequestHandler<ParamsDictionary, any, ReqBody, qs.ParsedQs>,
+): RequestHandler<ParamsDictionary, any, ReqBody, qs.ParsedQs> {
+	return async (request, response, next: NextFunction) => {
 		try {
 			const validationResult = bodySchema.safeParse(request.body, { errorMap: zodErrorMapping });
 			if (validationResult.success) {
@@ -63,11 +64,111 @@ function withSchemaValidation<ReqBody>(
 			}
 
 			// Request body failed validation
-			return response.status(400).json(RequestValidationErrorResponse(validationResult.error));
+			response.status(400).json(RequestValidationErrorResponse(validationResult.error));
+			return;
 		} catch (err: unknown) {
 			next(err);
 		}
 	};
 }
 
-export { withSchemaValidation };
+/**
+ * Wrapper for express RequestHandler to provide request parameter validation using a Zod Schema.
+ *
+ * @param paramsSchema Zod Schema which will perform the request parameter validation
+ * @param zodErrorMapping A `ZodErrorMap` object which can be used to translate or intercept the existing error / message mapping. If you don't have a custom one, you may pass in `defaultErrorMap` from the `zod` package, or `undefined`.
+ * @param handler RequestHandler to run once validation passes
+ * @returns RequestHandler to be given to express router
+ *
+ * @example
+ * ```
+ * import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
+ * import { defaultErrorMap } from 'zod';
+ *
+ * router.post('/', withParamsSchemaValidation(ExampleSchema, defaultErrorMap, (request, response, next) => {
+ * 	const { body } = request;
+ * 	// TS knows the structure of `body` from `ExampleSchema`. It is already validated, you can use it immediately
+ * 	const output = doSomethingWithBody(body);
+ * 	res.json(output);
+ * });
+ * ```
+ */
+function withParamsSchemaValidation<ReqParams>(
+	paramsSchema: ZodSchema<ReqParams>,
+	zodErrorMapping: ZodErrorMap | undefined,
+	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
+): RequestHandler {
+	return async (request: Request, response: Response, next: NextFunction) => {
+		try {
+			const validationResult = paramsSchema.safeParse(request.params, { errorMap: zodErrorMapping });
+			if (validationResult.success) {
+				return await handler(request, response, next);
+			}
+
+			// Request params failed validation
+			response.status(400).json(RequestValidationErrorResponse(validationResult.error));
+			return;
+		} catch (err: unknown) {
+			next(err);
+		}
+	};
+}
+
+const validFileTypes = [
+	'application/pdf',
+	'application/msword',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+/**
+ * Wrapper for express RequestHandler to provide file validation checks before upload process
+ *
+ * @returns RequestHandler to be given to express router
+ *
+ */
+function fileUploadValidation(handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>): RequestHandler {
+	return async (request: Request, response: Response, next: NextFunction) => {
+		try {
+			const form = formidable({
+				keepExtensions: true,
+				maxFileSize: 5 * 1024 * 1024, // 5MB limit
+				maxFiles: 1,
+				allowEmptyFiles: false,
+			});
+			form.parse(request, async (err, _, files) => {
+				if (err) {
+					response
+						.status(400)
+						.send({ message: 'Invalid file upload, file must be less than 5mb and only 1 file can be uploaded' });
+					return;
+				}
+
+				if (!files.file || !files.file[0]) {
+					response.status(400).send({ message: 'File does not exist' });
+					return;
+				}
+
+				const uploadedFile = files.file[0];
+
+				if (!uploadedFile.mimetype) {
+					response.status(400).send({ message: 'File type was not specified' });
+					return false;
+				}
+
+				if (!validFileTypes.includes(`${uploadedFile.mimetype}`)) {
+					response.status(400).send({ message: 'Invalid file type' });
+					return false;
+				}
+
+				request.body = { ...request.body, file: uploadedFile };
+
+				return await handler(request, response, next);
+			});
+
+			return;
+		} catch (err: unknown) {
+			next(err);
+		}
+	};
+}
+
+export { fileUploadValidation, withBodySchemaValidation, withParamsSchemaValidation };

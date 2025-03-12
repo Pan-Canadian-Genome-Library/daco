@@ -17,43 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* eslint-disable react-refresh/only-export-components */
+import { Typography, theme } from 'antd';
+import { FieldError } from 'react-hook-form';
 
-import type { UserResponse } from '@pcgl-daco/validation';
-import { createContext, useContext, type PropsWithChildren } from 'react';
-import useGetUser from '../../api/useGetUser';
+const { Text } = Typography;
+const { useToken } = theme;
 
-type UserState = {
-	isLoading: boolean;
-	isLoggedIn: boolean;
-	refresh: () => void;
-} & Partial<UserResponse>;
-
-const UserContext = createContext<UserState>({ isLoading: true, isLoggedIn: false, refresh: () => {} });
-
-export function UserProvider({ children }: PropsWithChildren) {
-	const { data, isLoading, refetch } = useGetUser();
-
-	// TODO: update local storage
-
-	const refresh = () => {
-		// TODO: update local storage
-		refetch();
-	};
-
-	const value: UserState = {
-		...data,
-		isLoading,
-		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : false,
-		refresh,
-	};
-	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+interface ErrorLabelProps {
+	text?: string | FieldError;
 }
 
-export function useUserContext() {
-	const context = useContext(UserContext);
-	if (context === undefined) {
-		throw new Error('useCount must be used within a CountProvider');
-	}
-	return context;
-}
+const ErrorLabel = ({ text }: ErrorLabelProps) => {
+	const { token } = useToken();
+	return text ? (
+		<div style={{ margin: '1rem 0 0 0' }}>
+			<Text style={{ color: token.colorError, fontSize: 'small', whiteSpace: 'pre-line' }}>{text.toString()}</Text>
+		</div>
+	) : null;
+};
+
+export default ErrorLabel;

@@ -21,8 +21,8 @@ import { Checkbox, Form, Row, theme, Typography } from 'antd';
 import { ReactNode } from 'react';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
-import { pcglColors } from '@/components/providers/ThemeProvider';
 import { BasicFormFieldProps } from '@/global/types';
+import { pcglColors } from '@/providers/ThemeProvider';
 
 const { Item } = Form;
 const { useToken } = theme;
@@ -47,7 +47,13 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 			control={props.control}
 			render={({ field }) => {
 				return (
-					<Item label={props.label} name={`${props.name}`} rules={[props.rule]} required={props.required}>
+					<Item
+						label={props.label}
+						name={`${props.name}`}
+						rules={[props.rule]}
+						required={props.required}
+						validateTrigger="onChange"
+					>
 						<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
 							{props.options.map((checkbox) => (
 								<Row

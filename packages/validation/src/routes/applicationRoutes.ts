@@ -18,49 +18,49 @@
  */
 
 import { z } from 'zod';
-import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from '../common/strings.js';
-import { ONLY_ALPHANUMERIC } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
+export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
+
+export const updateEditApplicationRequestSchema = z
+	.object({
+		applicantFirstName: z.string(),
+		applicantMiddleName: z.string(),
+		applicantLastName: z.string(),
+		applicantTitle: z.string(),
+		applicantSuffix: z.string(),
+		applicantPositionTitle: z.string(),
+		applicantPrimaryAffiliation: z.string(),
+		applicantInstitutionalEmail: z.string(),
+		applicantProfileUrl: z.string(),
+		institutionalRepTitle: z.string(),
+		institutionalRepFirstName: z.string(),
+		institutionalRepMiddleName: z.string(),
+		institutionalRepLastName: z.string(),
+		institutionalRepSuffix: z.string(),
+		institutionalRepPrimaryAffiliation: z.string(),
+		institutionalRepEmail: z.string(),
+		institutionalRepProfileUrl: z.string(),
+		institutionalRepPositionTitle: z.string(),
+		institutionCountry: z.string(),
+		institutionState: z.string(),
+		institutionCity: z.string(),
+		institutionStreetAddress: z.string(),
+		institutionPostalCode: z.string(),
+		institutionBuilding: z.string(),
+		projectTitle: z.string(),
+		projectWebsite: z.string(),
+		projectAims: z.string(),
+		projectMethodology: z.string(),
+		projectSummary: z.string(),
+	})
+	.partial();
+
 export const editApplicationRequestSchema = z.object({
 	id: z.number().nonnegative(),
-	update: z
-		.object({
-			applicant_first_name: NonEmptyString,
-			applicant_middle_name: EmptyOrOptionalString,
-			applicant_last_name: NonEmptyString,
-			applicant_title: NonEmptyString,
-			applicant_suffix: EmptyOrOptionalString,
-			applicant_position_title: NonEmptyString,
-			applicant_primary_affiliation: NonEmptyString,
-			applicant_institutional_email: NonEmptyString.email(),
-			applicant_profile_url: NonEmptyString.url(),
-			institutional_rep_title: NonEmptyString,
-			institutional_rep_first_name: NonEmptyString,
-			institutional_rep_middle_name: EmptyOrOptionalString,
-			institutional_rep_last_name: NonEmptyString,
-			institutional_rep_suffix: EmptyOrOptionalString,
-			institutional_rep_primary_affiliation: NonEmptyString,
-			institutional_rep_email: NonEmptyString.email(),
-			institutional_rep_profile_url: NonEmptyString.url(),
-			institutional_rep_position_title: NonEmptyString,
-			institution_country: NonEmptyString,
-			institution_state: NonEmptyString,
-			institution_city: NonEmptyString,
-			institution_street_address: NonEmptyString,
-			institution_postal_code: NonEmptyString.regex(ONLY_ALPHANUMERIC),
-			institution_building: NonEmptyString,
-			project_title: NonEmptyString,
-			project_website: OptionalURLString,
-			project_abstract: ConciseWordCountString,
-			project_methodology: ConciseWordCountString,
-			project_summary: ConciseWordCountString,
-		})
-		.partial()
-		.strict()
-		.refine((updateObj) => Object.keys(updateObj).length !== 0, {
-			params: { violation: 'noEmptyObject' },
-		}),
+	update: updateEditApplicationRequestSchema.strict().refine((updateObj) => Object.keys(updateObj).length !== 0, {
+		params: { violation: 'noEmptyObject' },
+	}),
 });
 
 export const closeApplicationSchema = z.object({

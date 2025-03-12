@@ -57,6 +57,11 @@ const ApplicationViewer = () => {
 		}
 	}, [data, isEditMode, navigation]);
 
+	// scroll to top on page change
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [match]);
+
 	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
 	return (
@@ -64,25 +69,27 @@ const ApplicationViewer = () => {
 			<Flex style={{ height: '100%' }} vertical>
 				<AppHeader id={data.id} state={data.state} />
 				{/* Multipart form Viewer */}
-				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
-					<>
-						<Row style={{ width: '25%' }}>
-							<Col style={{ width: '100%' }}>
-								<SectionMenu currentSection={currentSection} isEditMode={isEditMode} />
-							</Col>
-						</Row>
-						<Row style={{ width: '75%' }}>
-							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet
-									context={{
-										appId: data.id,
-										isEditMode,
-									}}
-								/>
-							</Col>
-						</Row>
-					</>
-				</ContentWrapper>
+				<Flex style={{ width: '100%', paddingInline: '52px' }}>
+					<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
+						<>
+							<Row style={{ width: '25%' }}>
+								<Col style={{ width: '100%' }}>
+									<SectionMenu appId={data.id} currentSection={currentSection} isEditMode={isEditMode} />
+								</Col>
+							</Row>
+							<Row style={{ width: '75%' }}>
+								<Col style={{ background: 'white', width: '100%' }}>
+									<Outlet
+										context={{
+											appId: data.id,
+											isEditMode,
+										}}
+									/>
+								</Col>
+							</Row>
+						</>
+					</ContentWrapper>
+				</Flex>
 			</Flex>
 		</Content>
 	);

@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 
 import PCGLFOOTER from '@/assets/pcgl-logo-footer.png';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { pcglFooterTheme } from '@/components/providers/ThemeProvider';
+import { pcglFooterTheme } from '@/providers/ThemeProvider';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -93,9 +93,20 @@ const FooterComponent = () => {
 
 	const logoStyles: React.CSSProperties = {
 		margin: (() => {
-			if (breakpoints.md) return '1rem auto 0 0';
-			if (breakpoints.xl) return '0 -8rem 0 0';
+			if (breakpoints.md) {
+				return '1rem auto 0 0';
+			}
+			if (breakpoints.xl) {
+				return '0 -8rem 0 0';
+			}
 			return '1rem auto';
+		})(),
+		position: (() => {
+			if (breakpoints.xl) {
+				return 'absolute';
+			}
+
+			return 'relative';
 		})(),
 	};
 

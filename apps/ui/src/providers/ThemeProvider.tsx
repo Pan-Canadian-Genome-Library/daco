@@ -51,7 +51,7 @@ const pcglTheme: ThemeConfig = {
 
 		colorPrimary: pcglColors.primary,
 		colorFillAlter: pcglColors.white,
-		colorFillSecondary: pcglColors.secondary,
+		colorFillSecondary: pcglColors.white,
 		colorBgContainer: pcglColors.tertiary,
 
 		// States

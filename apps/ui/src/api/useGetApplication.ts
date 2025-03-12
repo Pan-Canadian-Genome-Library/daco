@@ -20,12 +20,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
+import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type ApplicationResponseData } from '@pcgl-daco/data-model';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {
 	const { t: translate } = useTranslation();
+	const { state, dispatch } = useApplicationContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [id],
@@ -43,12 +46,31 @@ const useGetApplication = (id?: string | number) => {
 						error.message = translate('errors.http.404.title');
 						error.errors = translate('errors.http.404.message');
 						break;
+					case 500:
+						error.message = translate('errors.http.500.title');
+						error.errors = translate('errors.http.500.message');
+						break;
 				}
 
 				throw error;
 			}
 
-			return await response.json();
+			return await response.json().then((data: ApplicationResponseData) => {
+				// Filter out data if they contain null values and application metadata
+				if (data.contents) {
+					const fields = Object.entries(data.contents).reduce((acc, item) => {
+						const [key, value] = item;
+						if (value !== null && isRestrictedApplicationContentsKey(key)) {
+							acc[key] = value;
+						}
+
+						return acc;
+					}, {} as Partial<ApplicationContentsResponse>);
+
+					dispatch({ type: 'UPDATE_APPLICATION', payload: { ...state, fields } });
+				}
+				return data;
+			});
 		},
 	});
 };

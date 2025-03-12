@@ -20,6 +20,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import ApplicationViewer from '@/pages/applications';
 import AccessAgreement from '@/pages/applications/sections/access';
 import Appendices from '@/pages/applications/sections/appendices';
@@ -30,56 +31,81 @@ import Institutional from '@/pages/applications/sections/institutional';
 import Introduction from '@/pages/applications/sections/intro';
 import Project from '@/pages/applications/sections/project';
 import RequestedStudy from '@/pages/applications/sections/requestedStudy';
+import SignAndSubmit from '@/pages/applications/sections/sign';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
-import ProtectedRoute from '../components/ProtectedRoute';
+import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
 
-export const ApplicationSectionRoutes = [
+export enum SectionRoutes {
+	INTRO = 'intro',
+	APPLICANT = 'applicant',
+	INSTITUTIONAL = 'institutional',
+	COLLABORATORS = 'collaborators',
+	PROJECT = 'project',
+	STUDY = 'study',
+	ETHICS = 'ethics',
+	AGREEMENT = 'agreement',
+	APPENDICES = 'appendices',
+	SIGN = 'sign',
+}
+
+export interface ApplicationSectionRouteTypes {
+	route: SectionRoutes;
+	path: string;
+	element: React.ReactElement;
+}
+
+export const ApplicationSectionRoutes: ApplicationSectionRouteTypes[] = [
 	{
-		route: 'intro',
-		path: 'intro/edit?',
+		route: SectionRoutes.INTRO,
+		path: `${SectionRoutes.INTRO}/edit?`,
 		element: <Introduction />,
 	},
 	{
-		route: 'applicant',
-		path: 'applicant/edit?',
+		route: SectionRoutes.APPLICANT,
+		path: `${SectionRoutes.APPLICANT}/edit?`,
 		element: <Applicant />,
 	},
 	{
-		route: 'institutional',
-		path: 'institutional/edit?',
+		route: SectionRoutes.INSTITUTIONAL,
+		path: `${SectionRoutes.INSTITUTIONAL}/edit?`,
 		element: <Institutional />,
 	},
 	{
-		route: 'collaborators',
-		path: 'collaborators/edit?',
+		route: SectionRoutes.COLLABORATORS,
+		path: `${SectionRoutes.COLLABORATORS}/edit?`,
 		element: <Collaborators />,
 	},
 	{
-		route: 'project',
-		path: 'project/edit?',
+		route: SectionRoutes.PROJECT,
+		path: `${SectionRoutes.PROJECT}/edit?`,
 		element: <Project />,
 	},
 	{
-		route: 'study',
-		path: 'study/edit?',
+		route: SectionRoutes.STUDY,
+		path: `${SectionRoutes.STUDY}/edit?`,
 		element: <RequestedStudy />,
 	},
 	{
-		route: 'ethics',
-		path: 'ethics/edit?',
+		route: SectionRoutes.ETHICS,
+		path: `${SectionRoutes.ETHICS}/edit?`,
 		element: <Ethics />,
 	},
 	{
-		route: 'agreement',
-		path: 'agreement/edit?',
+		route: SectionRoutes.AGREEMENT,
+		path: `${SectionRoutes.AGREEMENT}/edit?`,
 		element: <AccessAgreement />,
 	},
 	{
-		route: 'appendices',
-		path: 'appendices/edit?',
+		route: SectionRoutes.APPENDICES,
+		path: `${SectionRoutes.APPENDICES}/edit?`,
 		element: <Appendices />,
+	},
+	{
+		route: SectionRoutes.SIGN,
+		path: `${SectionRoutes.SIGN}/edit?`,
+		element: <SignAndSubmit />,
 	},
 ];
 
@@ -100,7 +126,9 @@ function AppRouter() {
 					path="application/:id"
 					element={
 						<ProtectedRoute>
-							<ApplicationViewer />
+							<ApplicationContextProvider>
+								<ApplicationViewer />
+							</ApplicationContextProvider>
 						</ProtectedRoute>
 					}
 				>

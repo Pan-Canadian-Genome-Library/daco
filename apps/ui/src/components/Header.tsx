@@ -25,10 +25,10 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
-import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { pcglHeaderTheme } from '@/providers/ThemeProvider';
+import { useUserContext } from '@/providers/UserProvider';
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
-import { useUserContext } from './providers/UserProvider';
 
 const { Link } = Typography;
 const { Header } = Layout;
@@ -126,8 +126,9 @@ const HeaderComponent = () => {
 		isLoggedIn
 			? {
 					name: translate('links.applications'),
-					href: `/dashboard`,
+					href: '/dashboard',
 					position: 'right',
+					target: '_self',
 				}
 			: {
 					name: translate('links.apply'),
