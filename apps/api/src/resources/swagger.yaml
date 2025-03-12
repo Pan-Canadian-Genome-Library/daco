@@ -913,7 +913,7 @@ components:
         update:
           description: Changes to make to the application
           type: object
-          $ref: '#/components/schemas/ApplicationContents'
+          $ref: '#/components/responses/ApplicationContentsResponse'
 
     ApproveApplication:
       type: object
@@ -1177,7 +1177,7 @@ components:
           type: array
           description: URLs of publications related to the project
         # Studies
-        requested_studies:
+        requestedStudies:
           type: array
           description: List of studies
 

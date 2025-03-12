@@ -22,8 +22,19 @@ import { type ApplicationContentsResponse, type ApplicationResponseData } from '
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import lodash from 'lodash';
 
+/** Used in filter functions for alias utilities below
+ * @param key Current key to validate
+ * @param omittedKeys List of keys to remove from output
+ */
 const filterOmittedKeys = (key: string, omittedKeys: string[]) => !(omittedKeys.includes(key) || key === 'id');
 
+/**
+ * Helper function to convert Postgres snake_case to FE camelCase
+ * Generics allow usage w/ multiple input/output combinations
+ * @param data Original Database record with snake case keys to convert
+ * @param omittedKeys List of keys to remove from output for cases where a partial record is returned
+ * @returns ResponseRecord - Generic type representing new record with updated camelCase keys
+ */
 export const aliasToResponseData = <
 	DatabaseRecord extends Record<string, any>,
 	ResponseRecord extends Record<string, any>,
@@ -48,14 +59,21 @@ export const aliasToResponseData = <
 	return responseData;
 };
 
+/**
+ * Helper function to convert FE camelCase to Postgres snake_case
+ * Generics allow usage w/ multiple input/output combinations
+ * @param data Original Request record with camelCase keys to convert
+ * @param omittedKeys List of keys to remove from output for cases where a partial record is returned
+ * @returns DatabaseRecord - Generic type representing new record with updated snake_case keys
+ */
 export const aliasToDatabaseData = <
-	ResponseRecord extends Record<string, any>,
+	RequestRecord extends Record<string, any>,
 	DatabaseRecord extends Record<string, any>,
 >(
-	data: ResponseRecord,
+	data: RequestRecord,
 	omittedKeys: string[] = [],
 ): DatabaseRecord => {
-	type camelCaseKey = string & keyof ResponseRecord;
+	type camelCaseKey = string & keyof RequestRecord;
 	const allKeys = Object.keys(data).map((key): camelCaseKey => key);
 
 	const filteredKeys = allKeys.filter((key) => {
@@ -72,11 +90,7 @@ export const aliasToDatabaseData = <
 	return databaseData;
 };
 
-/**
- * Helper function to convert Postgres snake_case to FE camelCase
- * @param data Database Application Record
- * @returns ApplicationResponseData - Application record with updated keys
- */
+/** Convenience function for specific alias utils input/output scenarios */
 export const aliasApplicationRecord = (data: JoinedApplicationRecord): ApplicationResponseData => {
 	const {
 		id,
@@ -99,6 +113,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 		'ethics_letter',
 		'signed_pdf',
 	];
+
 	const contents = applicationContents
 		? aliasToResponseData<ApplicationContentUpdates, ApplicationContentsResponse>(applicationContents, omittedKeys)
 		: null;
@@ -115,43 +130,13 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 	};
 };
 
-/**
- * Helper function to convert Postgres snake_case to FE camelCase for applicationContents
- * @param data type UpdateEditApplicationRequest application contents in camelCase
- * @returns  type ApplicationContentUpdates in snake_case
- */
+/** Convenience function for specific alias utils input/output scenarios */
 export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
-	const formatedUpdate: ApplicationContentUpdates = {
-		applicant_first_name: update.applicantFirstName,
-		applicant_middle_name: update.applicantMiddleName,
-		applicant_last_name: update.applicantLastName,
-		applicant_institutional_email: update.applicantInstitutionalEmail,
-		applicant_position_title: update.applicantPositionTitle,
-		applicant_primary_affiliation: update.applicantPrimaryAffiliation,
-		applicant_profile_url: update.applicantProfileUrl,
-		applicant_suffix: update.applicantSuffix,
-		applicant_title: update.applicantTitle,
-		institutional_rep_first_name: update.institutionalRepFirstName,
-		institutional_rep_middle_name: update.institutionalRepMiddleName,
-		institutional_rep_last_name: update.institutionalRepLastName,
-		institutional_rep_title: update.institutionalRepTitle,
-		institutional_rep_position_title: update.institutionalRepPositionTitle,
-		institutional_rep_suffix: update.institutionalRepSuffix,
-		institutional_rep_email: update.institutionalRepEmail,
-		institutional_rep_primary_affiliation: update.institutionalRepPrimaryAffiliation,
-		institutional_rep_profile_url: update.institutionalRepProfileUrl,
-		institution_building: update.institutionBuilding,
-		institution_city: update.institutionCity,
-		institution_country: update.institutionCountry,
-		institution_postal_code: update.institutionPostalCode,
-		institution_state: update.institutionState,
-		institution_street_address: update.institutionStreetAddress,
-		project_aims: update.projectAims,
-		project_methodology: update.projectMethodology,
-		project_summary: update.projectSummary,
-		project_title: update.projectTitle,
-		project_website: update.projectWebsite,
-	};
+	const omitKeys = ['applicantSignature', 'applicantSignedAt', 'institutionalRepSignature', 'institutionalRepSignedAt'];
+	const formattedUpdate = aliasToDatabaseData<UpdateEditApplicationRequest, ApplicationContentUpdates>(
+		update,
+		omitKeys,
+	);
 
-	return formatedUpdate;
+	return formattedUpdate;
 };
