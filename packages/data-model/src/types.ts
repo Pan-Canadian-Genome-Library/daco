@@ -237,6 +237,11 @@ export interface CollaboratorDTO {
 	collaboratorType?: string | null;
 }
 
+export interface GetCollaboratorsResponse extends CollaboratorDTO {
+	id: number;
+	applicationId: number;
+}
+
 export type BaseCollaboratorRequest = {
 	applicationId: number;
 	userId: string;
