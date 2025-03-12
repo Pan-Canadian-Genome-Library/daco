@@ -20,6 +20,7 @@
 import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import useDeleteCollaborator from '@/api/mutations/useDeleteCollaborator';
 import { ModalStateProps } from '@/pages/applications/sections/collaborators';
 
 const { Text } = Typography;
@@ -30,6 +31,14 @@ interface DeleteCollaboratorModalProps extends ModalStateProps {
 
 const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
+	const { mutate: deleteCollaborator } = useDeleteCollaborator();
+
+	const onSumbit = () => {
+		if (rowData?.id) {
+			deleteCollaborator({ applicationId: appId, collaboratorId: rowData.id });
+			setIsOpen({ isOpen: false });
+		}
+	};
 
 	return (
 		<Modal
@@ -40,11 +49,14 @@ const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCo
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 			open={isOpen}
+			onOk={onSumbit}
 			onCancel={() => setIsOpen({ isOpen: false })}
 			destroyOnClose
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
-				<Text>{translate('collab-section.deleteModalDescription', { name: rowData?.firstName, appId })}</Text>
+				<Text>
+					{translate('collab-section.deleteModalDescription', { name: rowData?.collaboratorFirstName, appId })}
+				</Text>
 			</Flex>
 		</Modal>
 	);
