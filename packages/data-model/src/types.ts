@@ -237,14 +237,26 @@ export interface CollaboratorDTO {
 	collaboratorType?: string | null;
 }
 
-export type CollaboratorRequest = {
+export interface GetCollaboratorsResponse extends CollaboratorDTO {
+	id: number;
+	applicationId: number;
+}
+
+export type BaseCollaboratorRequest = {
 	applicationId: number;
 	userId: string;
-	collaborators: CollaboratorDTO[];
 };
 
-export interface CollaboratorUpdateRecord extends CollaboratorDTO {
+export interface ListCollaboratorRequest extends BaseCollaboratorRequest {
+	collaborators: CollaboratorDTO[];
+}
+
+export type CollaboratorUpdateRecord = Partial<CollaboratorDTO> & {
 	id: number;
+};
+
+export interface UpdateCollaboratorRequest extends BaseCollaboratorRequest {
+	collaborators: CollaboratorUpdateRecord;
 }
 
 export interface DeleteCollaboratorRequest {
@@ -308,4 +320,12 @@ export interface FilesDTO {
 	submittedAt: Date;
 	content: any;
 	filename: string;
+}
+
+export interface SignatureDTO {
+	applicationId: number;
+	applicantSignature?: string | null;
+	applicantSignedAt?: Date | null;
+	institutionalRepSignature?: string | null;
+	institutionalRepSignedAt?: Date | null;
 }

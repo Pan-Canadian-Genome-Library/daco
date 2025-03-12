@@ -101,12 +101,16 @@ const applicationSvc = (db: PostgresDb) => ({
 	editApplication: async ({
 		id,
 		update,
+		transaction,
 	}: {
 		id: number;
 		update: ApplicationContentUpdates;
+		transaction?: PostgresTransaction;
 	}): AsyncResult<JoinedApplicationRecord> => {
 		try {
-			const application = await db.transaction(async (transaction) => {
+			const dbTransaction = transaction ? transaction : db;
+
+			const application = await dbTransaction.transaction(async (transaction) => {
 				// Update Application Contents
 				const contents = { ...update, updated_at: sql`NOW()` };
 				const editedContents = await transaction
