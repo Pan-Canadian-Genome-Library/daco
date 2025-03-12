@@ -23,9 +23,12 @@ import {
 	type CollaboratorRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-
-import { CollaboratorsResponse, SignatureDTO } from '@pcgl-daco/data-model';
-import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model/src/types.js';
+import {
+	type ApplicationContentsResponse,
+	type ApplicationResponseData,
+	type CollaboratorsResponse,
+	type SignatureDTO,
+} from '@pcgl-daco/data-model';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
 /**
@@ -168,10 +171,10 @@ export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Signatur
  */
 
 export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): CollaboratorsResponse[] => {
-	const formatedUpdate: CollaboratorsResponse[] = [];
+	const formattedUpdate: CollaboratorsResponse[] = [];
 
 	data.forEach((value) => {
-		formatedUpdate.push({
+		formattedUpdate.push({
 			id: value.id,
 			applicationId: value.application_id,
 			collaboratorFirstName: value.first_name,
@@ -186,5 +189,5 @@ export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): Collaborato
 		});
 	});
 
-	return formatedUpdate;
+	return formattedUpdate;
 };
