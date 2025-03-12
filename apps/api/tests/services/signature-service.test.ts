@@ -120,6 +120,44 @@ describe('Signature Service', () => {
 		});
 	});
 
+	describe('Retrieve Signed Application', () => {
+		it('should retrieve a valid application with signatures', async () => {
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			const applicationRecords = applicationRecordsResult.data.applications;
+
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
+
+			const { id } = applicationRecords[0];
+
+			const applicationResult = await testSignatureService.getApplicationSignature({
+				application_id: id,
+			});
+
+			assert.ok(applicationResult.success && applicationResult.data);
+
+			const application = applicationResult.data;
+
+			assert.strictEqual(application.application_id, id);
+			assert.strictEqual(application.applicant_signature, validBase64Signature);
+			assert.notStrictEqual(application.applicant_signed_at, null);
+			assert.strictEqual(application.institutional_rep_signature, validBase64Signature);
+			assert.notStrictEqual(application.institutional_rep_signed_at, null);
+		});
+		it("should be unable to get an application that doesn't exist", async () => {
+			const application_id = 9999;
+
+			const applicationResult = await testSignatureService.getApplicationSignature({
+				application_id: application_id,
+			});
+
+			assert.strictEqual(applicationResult.success, false);
+		});
+	});
+
 	after(async () => {
 		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
