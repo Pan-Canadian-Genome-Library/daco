@@ -105,8 +105,32 @@ export const deleteFile = async ({ fileId }: { fileId: number }) => {
 	try {
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
+		const applicationRepo: ApplicationService = applicationSvc(database);
 
-		return await filesService.deleteFileById({ fileId });
+		const txResult = await database.transaction(async (tx) => {
+			const deleteResult = await filesService.deleteFileById({ fileId, transaction: tx });
+
+			if (!deleteResult.success) {
+				return deleteResult;
+			}
+			const { application_id } = deleteResult.data;
+
+			const editApplicationResult = await applicationRepo.editApplication({
+				id: application_id,
+				update: {
+					ethics_letter: null,
+				},
+				transaction: tx,
+			});
+
+			if (!editApplicationResult.success) {
+				return editApplicationResult;
+			}
+
+			return deleteResult;
+		});
+
+		return txResult;
 	} catch (error) {
 		const message = `Unable to delete file with id: ${fileId}`;
 		logger.error(message);
