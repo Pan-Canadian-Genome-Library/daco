@@ -28,6 +28,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	revokeApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
@@ -248,6 +249,63 @@ describe('Application API', () => {
 		it('should fail to submit a revision for a non-existent application', async () => {
 			const result = await submitRevision({ applicationId: 9999 });
 
+			assert.ok(!result.success);
+			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+		});
+	});
+
+	describe('Revoke Application', () => {
+		it('should successfully revoke an application in APPROVED state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({
+				id,
+				update: { state: ApplicationStates.APPROVED },
+			});
+
+			const result = await revokeApplication(id);
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.REVOKED);
+
+			// Verify the application state in the database
+			const revokedApplication = await testApplicationRepo.getApplicationById({ id });
+			assert.ok(revokedApplication.success);
+			assert.strictEqual(revokedApplication.data.state, ApplicationStates.REVOKED);
+		});
+
+		it('should fail to revoke an application not in APPROVED state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({
+				id,
+				update: { state: ApplicationStates.DRAFT },
+			});
+
+			const result = await revokeApplication(id);
+
+			// Verify the revocation failed
+			assert.ok(!result.success);
+			assert.strictEqual(result.errors, 'RevokeConflict');
+			assert.strictEqual(result.message, 'Application should be in APPROVED status');
+		});
+
+		it('should fail if application does not exist', async () => {
+			const nonExistentId = 9999;
+
+			const result = await revokeApplication(nonExistentId);
+
+			// Assert: Verify the revocation failed
 			assert.ok(!result.success);
 			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
 		});

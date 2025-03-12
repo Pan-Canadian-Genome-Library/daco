@@ -24,6 +24,7 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	revokeApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
@@ -338,5 +339,54 @@ applicationRouter.post(
 		},
 	),
 );
+
+applicationRouter.post('/applications/:applicationId/revoke', jsonParser, async (request: Request, response: Response) => {
+	const { applicationId } = request.params;
+
+	if (!applicationId || isNaN(parseInt(applicationId))) {
+		response.status(400).json({
+			message: 'Invalid request. ApplicationId is required and must be a valid number.',
+			errors: 'MissingOrInvalidParameters',
+		});
+	}
+
+	try {
+		const applicationIdNum = Number(applicationId);
+
+		const result = await revokeApplication(applicationIdNum);
+
+		if (result.success) {
+			response.status(200).send({
+				message: 'Application revoked successfully.',
+				data: result.data,
+			});
+		} else {
+			let status = 500;
+			let message = result.message || 'An unexpected error occurred.';
+			let errors = result.errors;
+
+			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+				status = 404;
+				message = 'Application not found.';
+			} else if (errors === 'StateConflict') {
+				status = 409;
+				message = 'Application is already revoked.';
+			} else if (errors === 'Unauthorized') {
+				status = 403;
+				message = 'Unauthorized to revoke this application.';
+			} else if (errors === 'InvalidState') {
+				status = 400;
+				message = 'Cannot revoke application in its current state.';
+			}
+
+			response.status(status).send({ message, errors });
+		}
+	} catch (error) {
+		response.status(500).send({
+			message: 'Internal server error.',
+			errors: String(error),
+		});
+	}
+});
 
 export default applicationRouter;
