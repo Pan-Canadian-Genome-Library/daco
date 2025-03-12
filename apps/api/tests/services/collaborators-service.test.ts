@@ -118,7 +118,7 @@ describe('Application Service', () => {
 			const collaboratorResult = await testCollaboratorsRepo.deleteCollaborator({ id });
 
 			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.id, id);
+			assert.strictEqual(collaboratorResult.data[0]?.id, id);
 		});
 	});
 
