@@ -106,7 +106,7 @@ export const deleteFile = async ({ fileId }: { fileId: number }) => {
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
 
-		await filesService.deleteFileById({ fileId });
+		return await filesService.deleteFileById({ fileId });
 	} catch (error) {
 		const message = `Unable to delete file with id: ${fileId}`;
 		logger.error(message);
