@@ -226,10 +226,16 @@ export const updateCollaborator = async ({
 		application_id,
 	};
 
-	const result = await collaboratorsRepo.updateCollaborator({
+	const updateResult = await collaboratorsRepo.updateCollaborator({
 		id,
 		collaborator,
 	});
 
-	return result;
+	if (!updateResult.success) {
+		return updateResult;
+	}
+
+	const result = aliasCollaboratorRecord(updateResult.data);
+
+	return success(result);
 };
