@@ -76,6 +76,12 @@ table application_contents {
   applicant_primary_affiliation varchar(500)
   applicant_institutional_email varchar(320)
   applicant_profile_url text
+  applicant_institution_country varchar(255)
+  applicant_institution_state varchar(255)
+  applicant_institution_city varchar(255)
+  applicant_institution_street_address text
+  applicant_institution_postal_code varchar(255)
+  applicant_institution_building varchar(255)
   institutional_rep_title varchar(255)
   institutional_rep_first_name varchar(255)
   institutional_rep_middle_name varchar(255)
@@ -98,8 +104,10 @@ table application_contents {
   project_aims text
   project_summary text
   project_publication_urls text[]
-  signature text
-  signature_signed_at timestamp
+  applicant_signature text
+  applicant_signed_at timestamp
+  institutional_rep_signature text
+  institutional_rep_signed_at timestamp
   requested_studies text[]
   ethics_review_required boolean
   ethics_letter bigint
@@ -119,7 +127,7 @@ table applications {
 
 table collaborators {
   id bigint [pk, not null]
-  application_id bigint
+  application_id bigint [not null]
   first_name varchar(255) [not null]
   middle_name varchar(255)
   last_name varchar(255) [not null]
