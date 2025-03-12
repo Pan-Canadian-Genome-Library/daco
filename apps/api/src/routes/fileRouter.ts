@@ -17,21 +17,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import { isPositiveInteger } from '../utils/functions.js';
-import { BASE64_IMAGE } from '../utils/regex.js';
+import { uploadEthicsFile } from '@/controllers/fileController.ts';
+import { fileUploadValidation } from '@pcgl-daco/request-utils';
+import { isPositiveInteger } from '@pcgl-daco/validation';
+import express, { type Request, type Response } from 'express';
+import formidable from 'formidable';
 
-export const editSignatureRequestSchema = z.object({
-	applicationId: z.number().nonnegative(),
-	signature: z.string().regex(BASE64_IMAGE),
-	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
-});
-export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;
+const fileRouter = express.Router();
 
-export const getSignatureParamsSchema = z
-	.object({
-		applicationId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number.' }),
-	})
-	.required();
+fileRouter.post(
+	'/ethics/:applicationId',
+	fileUploadValidation(async (req: Request<any, { file: formidable.File }>, res: Response) => {
+		const { applicationId } = req.params;
+
+		const { file } = req.body;
+
+		const id = parseInt(applicationId ? applicationId : '');
+
+		if (!isPositiveInteger(id)) {
+			res.status(400).send({ message: 'Invalid applicationId' });
+			return;
+		}
+
+		const result = await uploadEthicsFile({ applicationId: id, file });
+
+		if (result.success) {
+			res.status(200).send(result.data);
+			return;
+		} else {
+			const errorReturn = { message: result.message, errors: String(result.errors) };
+			res.status(500).send(errorReturn);
+			return;
+		}
+	}),
+);
+
+export default fileRouter;

@@ -390,6 +390,40 @@ paths:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
 
+  /signature/{applicationId}:
+    get:
+      tags:
+        - Signature
+      summary: Get the signatures associated with an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to retrieve the signature from.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Successfully retrieved signature details from an application record. Note that these may be `null`, depending on if the application has been signed or not.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SignatureRecord'
+        '400':
+          description: Will occur when not provided a valid `applicationId`, either a negative number, or not a number at all.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
   /signature/sign:
     post:
       tags:
@@ -423,6 +457,10 @@ paths:
                 $ref: '#/components/responses/ClientErrors'
         '500':
           description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
 
   /collaborators/create:
     post:
@@ -927,6 +965,35 @@ components:
           type: string
           description: The collaborator's contact email
 
+    SignatureRecord:
+      type: object
+      properties:
+        applicationId:
+          type: number
+          description: The ID of the application you want to add/modify the signature on.
+        applicantSignature:
+          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
+          type: string
+          description: |
+            The Base64 encoded PNG image containing the signature of the Applicant.
+          nullable: true
+        applicantSignedAt:
+          type: string
+          format: date-time
+          description: The time the applicant signed at.
+          nullable: true
+        institutionalRepSignature:
+          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
+          type: string
+          description: |
+            The Base64 encoded PNG image containing the signature of the Applicant.
+          nullable: true
+        institutionalRepSignedAt:
+          type: string
+          format: date-time
+          description: The time the applicant signed at.
+          nullable: true
+
   requests:
     ApplicationCreation:
       type: object
@@ -990,7 +1057,7 @@ components:
       type: object
       description: The contents of the signature details in an application.
       properties:
-        id:
+        applicationId:
           type: number
           description: The ID of the application you want to add/modify the signature on.
         signature:
@@ -1260,6 +1327,36 @@ components:
         errors:
           description: Detailed error data thrown by code failure
           type: string
+
+    SignatureRecord:
+      type: object
+      description: The contents of the signature details contained within an application record.
+      properties:
+        applicationId:
+          type: number
+          description: The ID of the application you want to add/modify the signature on.
+        applicantSignature:
+          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
+          type: string
+          description: |
+            The Base64 encoded PNG image containing the signature of the Applicant.
+          nullable: true
+        applicantSignedAt:
+          type: string
+          format: date-time
+          description: The time the applicant signed at.
+          nullable: true
+        institutionalRepSignature:
+          pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
+          type: string
+          description: |
+            The Base64 encoded PNG image containing the signature of the Applicant.
+          nullable: true
+        institutionalRepSignedAt:
+          type: string
+          format: date-time
+          description: The time the applicant signed at.
+          nullable: true
 
     SignatureSigned:
       type: object
