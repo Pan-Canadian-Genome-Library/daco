@@ -40,6 +40,15 @@ export const applicationContents = pgTable('application_contents', {
 	applicant_primary_affiliation: varchar({ length: 500 }),
 	applicant_institutional_email: varchar({ length: 320 }),
 	applicant_profile_url: text(),
+
+	//Applicant Institutional Mailing
+	applicant_institution_country: varchar({ length: 255 }),
+	applicant_institution_state: varchar({ length: 255 }),
+	applicant_institution_city: varchar({ length: 255 }),
+	applicant_institution_street_address: text(),
+	applicant_institution_postal_code: varchar({ length: 255 }),
+	applicant_institution_building: varchar({ length: 255 }),
+
 	// Institutional Rep
 	institutional_rep_title: varchar({ length: 255 }),
 	institutional_rep_first_name: varchar({ length: 255 }),
