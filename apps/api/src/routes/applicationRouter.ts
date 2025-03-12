@@ -353,11 +353,12 @@ applicationRouter.post(
 		async (request: Request, response: Response) => {
 			const { applicationId } = request.params;
 
-			if (!isPositiveInteger(parseInt(applicationId))) {
+			if (!applicationId || !isPositiveInteger(parseInt(applicationId))) {
 				response.status(400).send({
 					message: 'Invalid request. ApplicationId is required and must be a valid number.',
 					errors: 'MissingOrInvalidParameters',
 				});
+				return;
 			}
 
 			try {
