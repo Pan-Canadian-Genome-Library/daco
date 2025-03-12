@@ -36,7 +36,7 @@ import lodash from 'lodash';
  * @param key Current key to validate
  * @param omittedKeys List of keys to remove from output
  */
-const filterOmittedKeys = (key: string, omittedKeys: string[]) => !(omittedKeys.includes(key) || key === 'id');
+const filterOmittedKeys = (key: string, omittedKeys: string[]) => !omittedKeys.includes(key);
 
 /**
  * Helper function to convert Postgres snake_case to FE camelCase
@@ -142,7 +142,13 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 
 /** Convenience function for specific alias utils input/output scenarios */
 export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
-	const omitKeys = ['applicantSignature', 'applicantSignedAt', 'institutionalRepSignature', 'institutionalRepSignedAt'];
+	const omitKeys = [
+		'id',
+		'applicantSignature',
+		'applicantSignedAt',
+		'institutionalRepSignature',
+		'institutionalRepSignedAt',
+	];
 	const formattedUpdate = aliasToDatabaseData<UpdateEditApplicationRequest, ApplicationContentUpdates>(
 		update,
 		omitKeys,
@@ -157,29 +163,16 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
  * @returns type `SignatureDTO` - camelCase variation of a Postgress success response.
  */
 export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): SignatureDTO => {
-	const {
-		application_id,
-		applicant_signature,
-		applicant_signed_at,
-		institutional_rep_signature,
-		institutional_rep_signed_at,
-	} = data;
+	const responseData = aliasToResponseData<ApplicationSignatureUpdate, SignatureDTO>(data);
 
-	return {
-		applicationId: application_id,
-		applicantSignature: applicant_signature,
-		applicantSignedAt: applicant_signed_at,
-		institutionalRepSignature: institutional_rep_signature,
-		institutionalRepSignedAt: institutional_rep_signed_at,
-	};
+	return responseData;
 };
 
 /**
- * Helper function to convert Postgres snake_case to FE camelCase for CollaboratorRecord
+ * Helper function to change CollaboratorRecord db keys to DTO Collaborator camelCase keys
  * @param data type CollaboratorRecord in snake_case
- * @returns  type GetCollaboratorsResponse in camelcase
+ * @returns  type GetCollaboratorsResponse in camelCase w/ Collaborator added
  */
-
 export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): GetCollaboratorsResponse[] => {
 	const formattedUpdate: GetCollaboratorsResponse[] = [];
 
