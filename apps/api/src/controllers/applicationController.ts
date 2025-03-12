@@ -269,7 +269,7 @@ export const closeApplication = async ({
 		}
 
 		// Update the database with the new CLOSED state
-		const update = { state: ApplicationStates.CLOSED, updated_at: new Date() };
+		const update = { state: ApplicationStates.CLOSED };
 		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
 
 		return updatedResult;

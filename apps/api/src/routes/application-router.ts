@@ -18,7 +18,7 @@
  */
 
 import { withSchemaValidation } from '@pcgl-daco/request-utils';
-import { editApplicationRequestSchema } from '@pcgl-daco/validation';
+import { closeApplicationSchema, editApplicationRequestSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { Request } from 'express';
 
@@ -297,57 +297,61 @@ applicationRouter.post('/applications/reject', jsonParser, async (req, res) => {
 	}
 });
 
-applicationRouter.post('/applications/:applicationId/close', jsonParser, async (req, res) => {
-	const { applicationId } = req.params;
-	const { requesterId, isDacMember } = req.body;
+applicationRouter.post(
+	'/applications/:applicationId/close',
+	jsonParser,
+	withSchemaValidation(closeApplicationSchema, apiZodErrorMapping, async (req, res) => {
+		const { applicationId } = req.params;
+		const { requesterId, isDacMember } = req.body;
 
-	if (!applicationId || isNaN(parseInt(applicationId))) {
-		res.status(400).json({
-			message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			errors: 'MissingOrInvalidParameters',
-		});
-	}
-
-	if (!requesterId) {
-		res.status(401).json({ message: 'Unauthorized: Requester ID is required.' });
-	}
-
-	try {
-		const applicationIdNum = Number(applicationId);
-		const result = await closeApplication({ applicationId: applicationIdNum, requesterId, isDacMember });
-
-		if (result.success) {
-			res.status(200).send({
-				message: 'Application closed successfully.',
-				data: result.data,
+		if (!applicationId || isNaN(parseInt(applicationId))) {
+			res.status(400).json({
+				message: 'Invalid request. ApplicationId is required and must be a valid number.',
+				errors: 'MissingOrInvalidParameters',
 			});
-		} else {
-			let status = 500;
-			let message = result.message || 'An unexpected error occurred.';
-			let errors = result.errors;
-
-			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-				status = 404;
-				message = 'Application not found.';
-			} else if (errors === 'StateConflict') {
-				status = 409;
-				message = 'Application is already closed.';
-			} else if (errors === 'Unauthorized') {
-				status = 403;
-				message = 'Unauthorized to close this application.';
-			} else if (errors === 'InvalidState') {
-				status = 400;
-				message = 'Cannot close application in its current state.';
-			}
-
-			res.status(status).send({ message, errors });
 		}
-	} catch (error) {
-		res.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-});
+
+		if (!requesterId) {
+			res.status(401).json({ message: 'Unauthorized: Requester ID is required.' });
+		}
+
+		try {
+			const applicationIdNum = Number(applicationId);
+			const result = await closeApplication({ applicationId: applicationIdNum, requesterId, isDacMember });
+
+			if (result.success) {
+				res.status(200).send({
+					message: 'Application closed successfully.',
+					data: result.data,
+				});
+			} else {
+				let status = 500;
+				let message = result.message || 'An unexpected error occurred.';
+				let errors = result.errors;
+
+				if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+					status = 404;
+					message = 'Application not found.';
+				} else if (errors === 'StateConflict') {
+					status = 409;
+					message = 'Application is already closed.';
+				} else if (errors === 'Unauthorized') {
+					status = 403;
+					message = 'Unauthorized to close this application.';
+				} else if (errors === 'InvalidState') {
+					status = 400;
+					message = 'Cannot close application in its current state.';
+				}
+
+				res.status(status).send({ message, errors });
+			}
+		} catch (error) {
+			res.status(500).send({
+				message: 'Internal server error.',
+				errors: String(error),
+			});
+		}
+	}),
+);
 
 export default applicationRouter;
