@@ -17,16 +17,53 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withBodySchemaValidation } from '@pcgl-daco/request-utils';
-import { editSignatureRequestSchema } from '@pcgl-daco/validation';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { editSignatureRequestSchema, getSignatureParamsSchema } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 
-import { updateApplicationSignature } from '@/controllers/signatureController.ts';
+import { getApplicationSignature, updateApplicationSignature } from '@/controllers/signatureController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 
 const signatureRouter = express.Router();
 const jsonParser = bodyParser.json();
+
+signatureRouter.get(
+	'/:applicationId',
+	withParamsSchemaValidation(
+		getSignatureParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+
+			if (!applicationId) {
+				response.status(400).send({ message: 'Application ID MUST be a positive number greater than or equal to 1.' });
+				return;
+			}
+
+			const result = await getApplicationSignature({ applicationId: Number(applicationId) });
+
+			if (result.success) {
+				response.status(200).send(result.data);
+				return;
+			}
+
+			switch (String(result.errors)) {
+				case 'Error: Application record is undefined':
+					response.status(404);
+					break;
+				case 'Error: Application ID MUST be a positive number greater than or equal to 1.':
+					response.status(400);
+					break;
+				default:
+					response.status(500);
+					break;
+			}
+
+			response.send({ message: result.message, errors: String(result.errors) });
+		},
+	),
+);
 
 /**
  * TODO:
@@ -37,10 +74,10 @@ signatureRouter.post(
 	jsonParser,
 	withBodySchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
 		const data = req.body;
-		const { id, signature, signee } = data;
+		const { applicationId, signature, signee } = data;
 
 		const result = await updateApplicationSignature({
-			id,
+			applicationId,
 			signature,
 			signee,
 		});

@@ -237,6 +237,11 @@ export interface CollaboratorDTO {
 	collaboratorType?: string | null;
 }
 
+export interface GetCollaboratorsResponse extends CollaboratorDTO {
+	id: number;
+	applicationId: number;
+}
+
 export type BaseCollaboratorRequest = {
 	applicationId: number;
 	userId: string;
@@ -315,4 +320,12 @@ export interface FilesDTO {
 	submittedAt: Date;
 	content: any;
 	filename: string;
+}
+
+export interface SignatureDTO {
+	applicationId: number;
+	applicantSignature?: string | null;
+	applicantSignedAt?: Date | null;
+	institutionalRepSignature?: string | null;
+	institutionalRepSignedAt?: Date | null;
 }
