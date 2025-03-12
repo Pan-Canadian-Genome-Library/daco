@@ -681,7 +681,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ClientErrors'
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
         '403':
           description: Unauthorized - requester lacks permission to close the application in its current state.
           content:
