@@ -21,12 +21,12 @@ import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
 import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
+import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 type AppHeaderProps = {
@@ -69,19 +69,18 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 	};
 
 	return (
-		<StatusBannerWrapper>
+		<PageHeader
+			title={`${translate('dashboard.title')}: PCGL-${id}`}
+			description={`${formatDate(new Date(), new Date())}`}
+		>
 			<Flex style={{ width: '100%' }} justify="center" align="end" vertical>
-				<Row style={{ width: '100%' }} wrap>
+				<Row style={{ width: '100%' }} justify={'end'} wrap>
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
-						<Flex style={{ height: '100%' }} vertical justify="center" align="start">
-							<Title>
-								{translate('dashboard.title')}: PCGL-{id}
-							</Title>
-							<Text>{formatDate(new Date(), new Date())}</Text>
-						</Flex>
-					</Col>
-					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
-						<Flex style={{ height: '100%' }} justify={isLowResDevice ? 'center' : 'end'} align="center">
+						<Flex
+							style={{ height: '100%', width: '100%' }}
+							justify={isLowResDevice ? 'center' : 'end'}
+							align="flex-end"
+						>
 							<Flex
 								flex={1}
 								style={{
@@ -110,6 +109,7 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 					{/* TODO: Disable for MVP */}
 					{/* <Button>{translate('button.history')}</Button> */}
 					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
+					<Button onClick={showCloseApplicationModal}>{translate('button.requestRevisions')}</Button>
 				</Flex>
 				<Modal
 					title={translate('modal.closeTitle', { id })}
@@ -125,8 +125,22 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 						<Text>{translate('modal.closeDescription')}</Text>
 					</Flex>
 				</Modal>
+				<Modal
+					title={translate('modal.closeTitle', { id })}
+					okText={translate('button.closeApp')}
+					cancelText={translate('button.cancel')}
+					width={'100%'}
+					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+					open={openModal}
+					onOk={handleOk}
+					onCancel={() => setOpenModal(false)}
+				>
+					<Flex style={{ height: '100%', marginTop: 20 }}>
+						<Text>{translate('modal.closeDescription')}</Text>
+					</Flex>
+				</Modal>
 			</Flex>
-		</StatusBannerWrapper>
+		</PageHeader>
 	);
 };
 
