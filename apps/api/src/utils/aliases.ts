@@ -30,7 +30,9 @@ import {
 	type SignatureDTO,
 } from '@pcgl-daco/data-model/src/types.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
-import lodash from 'lodash';
+import { camelCase, snakeCase } from 'lodash';
+
+type inputKey = string & keyof Record<string, any>;
 
 /** Used in filter functions for alias utilities below
  * @param key Current key to validate
@@ -52,15 +54,12 @@ export const aliasToResponseData = <
 	data: DatabaseRecord,
 	omittedKeys: string[] = [],
 ): ResponseRecord => {
-	type snakeCaseKey = string & keyof DatabaseRecord;
-	const allKeys = Object.keys(data).map((key): snakeCaseKey => key);
+	const allKeys: inputKey[] = Object.keys(data);
 
-	const filteredKeys = allKeys.filter((key) => {
-		return filterOmittedKeys(String(key), omittedKeys);
-	});
+	const filteredKeys = allKeys.filter((key) => filterOmittedKeys(key, omittedKeys));
 
 	const responseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = lodash.camelCase(key);
+		const aliasedKey = camelCase(key);
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
@@ -83,15 +82,12 @@ export const aliasToDatabaseData = <
 	data: RequestRecord,
 	omittedKeys: string[] = [],
 ): DatabaseRecord => {
-	type camelCaseKey = string & keyof RequestRecord;
-	const allKeys = Object.keys(data).map((key): camelCaseKey => key);
+	const allKeys: inputKey[] = Object.keys(data);
 
-	const filteredKeys = allKeys.filter((key) => {
-		return filterOmittedKeys(String(key), omittedKeys);
-	});
+	const filteredKeys = allKeys.filter((key) => filterOmittedKeys(key, omittedKeys));
 
 	const databaseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = lodash.snakeCase(key);
+		const aliasedKey = snakeCase(key);
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
@@ -100,7 +96,10 @@ export const aliasToDatabaseData = <
 	return databaseData;
 };
 
-/** Convenience function for specific alias utils input/output scenarios */
+/** Convenience function for specific alias utils input/output scenarios
+ * @param data Joined Application Record - Snake case database Application / ApplicationContents record
+ * @returns ApplicationResponseData - Application record with updated keys
+ */
 export const aliasApplicationRecord = (data: JoinedApplicationRecord): ApplicationResponseData => {
 	const {
 		id,
@@ -140,7 +139,10 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 	};
 };
 
-/** Convenience function for specific alias utils input/output scenarios */
+/** Convenience function for specific alias utils input/output scenarios
+ * @param data type UpdateEditApplicationRequest application contents in camelCase
+ * @returns  type ApplicationContentUpdates in snake_case
+ */
 export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
 	const omitKeys = [
 		'id',
