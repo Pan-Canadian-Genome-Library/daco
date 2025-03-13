@@ -652,6 +652,49 @@ paths:
               schema:
                 $ref: '#/components/responses/RequestValidationError'
 
+  /file/ethics/{applicationId}:
+    post:
+      tags:
+        - File
+      summary: Upload
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated application upload
+      consumes:
+        - multipart/form-data
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: 'File uploaded'
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: 'Error uploading file to database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error uploading file. File must be less than 5mb and only 1 file can be uploaded.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
 components:
   schemas:
     ApplicationWithApplicantInfo:
