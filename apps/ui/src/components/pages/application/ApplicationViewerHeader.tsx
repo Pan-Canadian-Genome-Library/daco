@@ -21,7 +21,7 @@ import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
+import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
@@ -43,7 +43,7 @@ export interface RevisionModalStateProps extends RevisionModalState {
 	setIsOpen: (props: RevisionModalState) => void;
 }
 
-const AppHeader = ({ id, state }: AppHeaderProps) => {
+const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -106,7 +106,7 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 								vertical
 								gap={'middle'}
 							>
-								<AppStatusSteps currentStatus={state} />
+								<ApplicationStatusSteps currentStatus={state} />
 							</Flex>
 						</Flex>
 					</Col>
@@ -144,4 +144,4 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 	);
 };
 
-export default AppHeader;
+export default ApplicationViewerHeader;
