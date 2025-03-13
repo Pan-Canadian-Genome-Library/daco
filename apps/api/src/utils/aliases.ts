@@ -30,7 +30,7 @@ import {
 	type SignatureDTO,
 } from '@pcgl-daco/data-model/src/types.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
-import { camelCase, snakeCase } from 'lodash';
+import lodash from 'lodash';
 
 type inputKey = string & keyof Record<string, any>;
 
@@ -59,7 +59,7 @@ export const aliasToResponseData = <
 	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
 
 	const responseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = camelCase(key);
+		const aliasedKey = lodash.camelCase(key);
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
@@ -87,7 +87,7 @@ export const aliasToDatabaseData = <
 	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
 
 	const databaseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = snakeCase(key);
+		const aliasedKey = lodash.snakeCase(key);
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
