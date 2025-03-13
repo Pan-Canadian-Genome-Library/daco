@@ -37,7 +37,7 @@ export const PG_PASSWORD = 'postgres';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const migrationsFolder = __dirname + '/../drizzle';
+const migrationsFolder = __dirname + '/../../drizzle';
 
 export const initTestMigration = async (db: PostgresDb) => {
 	try {

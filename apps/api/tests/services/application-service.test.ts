@@ -38,7 +38,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
@@ -366,7 +366,6 @@ describe('Application Service', () => {
 	});
 
 	after(async () => {
-		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});

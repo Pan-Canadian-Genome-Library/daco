@@ -23,13 +23,11 @@ import { after, before, describe, it } from 'node:test';
 
 import { ApplicationStateManager, createApplicationStateManager } from '@/controllers/stateManager.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationActions } from '@/db/schemas/applicationActions.js';
-import { applications } from '@/db/schemas/applications.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
+import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
 
 const {
 	APPROVED,
@@ -447,8 +445,6 @@ describe('State Machine', () => {
 	});
 
 	after(async () => {
-		await db.delete(applicationActions);
-		await db.delete(applications);
 		await container.stop();
 		process.exit(0);
 	});

@@ -43,7 +43,7 @@ import {
 	PG_USER,
 	testApplicationId,
 	testUserId as user_id,
-} from '../testUtils.ts';
+} from '../utils/testUtils.ts';
 
 describe('Application Controller', () => {
 	let db: PostgresDb;

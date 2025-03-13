@@ -17,28 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applications } from '@/db/schemas/applications.js';
 
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { ApplicationService, FilesService } from '@/service/types.ts';
 import formidable from 'formidable';
 import path from 'node:path';
-import {
-	addInitialApplications,
-	initTestMigration,
-	PG_DATABASE,
-	PG_PASSWORD,
-	PG_USER,
-	testUserId as user_id,
-} from '../testUtils.js';
+import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
 
 describe('Signature Service', () => {
 	let db: PostgresDb;
@@ -47,7 +38,7 @@ describe('Signature Service', () => {
 	let testFileService: FilesService;
 
 	const mockFile: formidable.File = {
-		filepath: path.join(process.cwd(), 'tests/fileuploadtest.docx'),
+		filepath: path.join(process.cwd(), 'tests/utils/fileuploadtest.docx'),
 		hashAlgorithm: 'sha256',
 		mimetype: 'application/msword',
 		newFilename: 'newFileName',
@@ -122,7 +113,7 @@ describe('Signature Service', () => {
 		it('should update an application with new file "fileuploadtest2"', async () => {
 			const newMockFile: formidable.File = {
 				...mockFile,
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest-2.docx'),
+				filepath: path.join(process.cwd(), 'tests/utils/fileuploadtest-2.docx'),
 				originalFilename: 'fileuploadtest-2',
 			};
 
@@ -148,7 +139,7 @@ describe('Signature Service', () => {
 		it('should update an application with type SIGNED_APPLICATION', async () => {
 			const newMockFile: formidable.File = {
 				...mockFile,
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest-2.docx'),
+				filepath: path.join(process.cwd(), 'tests/utils/fileuploadtest-2.docx'),
 				originalFilename: 'fileuploadtest-2',
 			};
 
@@ -172,7 +163,6 @@ describe('Signature Service', () => {
 	});
 
 	after(async () => {
-		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});
