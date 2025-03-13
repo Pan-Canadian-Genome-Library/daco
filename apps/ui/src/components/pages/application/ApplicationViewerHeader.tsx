@@ -26,6 +26,7 @@ import RequestRevisionsModal from '@/components/pages/application/modals/Request
 import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -35,12 +36,10 @@ type AppHeaderProps = {
 	state: ApplicationStateValues;
 };
 
-export interface RevisionModalState {
+export interface RevisionModalStateProps {
 	isOpen: boolean;
-}
-
-export interface RevisionModalStateProps extends RevisionModalState {
-	setIsOpen: (props: RevisionModalState) => void;
+	setIsOpen: (isOpen: boolean) => void;
+	onSubmit: (data: RevisionsModalSchemaType) => void;
 }
 
 const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
@@ -49,18 +48,24 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
-	const [openRevisionsModal, setOpenRevisionsModal] = useState<RevisionModalState>({ isOpen: false });
+	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 
 	const showRevisionsModal = () => {
-		setOpenRevisionsModal({ isOpen: true });
+		setOpenRevisionsModal(true);
 	};
-	const handleShowCloseModal = () => {
-		setShowCloseApplicationModal(true);
+
+	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
+		console.log('Submission Handled', data);
+		setOpenRevisionsModal(false);
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleCloseApplicationRequest = () => {
 		setShowCloseApplicationModal(false);
+	};
+
+	const handleShowCloseModal = () => {
+		setShowCloseApplicationModal(true);
 	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
@@ -83,7 +88,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 
 	return (
 		<PageHeader
-			title={`${translate('dashboard.title')}: PCGL-${id}`}
+			title={translate('applicationViewer.title', { id: id })}
 			description={`${formatDate(new Date(), new Date())}`}
 		>
 			<Flex style={{ width: '100%' }} justify="center" align="end" vertical>
@@ -138,7 +143,11 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 						<Text>{translate('modal.closeDescription')}</Text>
 					</Flex>
 				</Modal>
-				<RequestRevisionsModal isOpen={openRevisionsModal.isOpen} setIsOpen={setOpenRevisionsModal} />
+				<RequestRevisionsModal
+					onSubmit={onRevisionsSubmit}
+					isOpen={openRevisionsModal}
+					setIsOpen={setOpenRevisionsModal}
+				/>
 			</Flex>
 		</PageHeader>
 	);

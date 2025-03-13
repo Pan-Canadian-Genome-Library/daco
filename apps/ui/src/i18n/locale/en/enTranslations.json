@@ -17,6 +17,9 @@
 		"noAccess": "You do not have access to PCGL Controlled Data",
 		"startNewApp": "Start A New Application"
 	},
+	"applicationViewer": {
+		"title": "My Application: PCGL-{{id}}"
+	},
 	"manage": {
 		"applications": {
 			"title": "Manage Applications",

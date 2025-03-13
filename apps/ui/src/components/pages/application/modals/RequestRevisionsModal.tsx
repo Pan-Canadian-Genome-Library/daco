@@ -19,6 +19,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { revisionsModalSchema, RevisionsModalSchemaType } from '@pcgl-daco/validation';
+
 import { Button, Col, Flex, Form, Modal, Row, theme, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { memo } from 'react';
@@ -26,48 +27,45 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { RevisionModalStateProps } from '@/components/pages/application/ApplicationViewerHeader';
+import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import TextAreaBox from '../form-components/TextAreaBox';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
 const rule = createSchemaFieldRule(revisionsModalSchema);
 
-const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) => {
+const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallback }: RevisionModalStateProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
-	const { handleSubmit, control, reset } = useForm<RevisionsModalSchemaType>({
+	const { handleSubmit, control, reset, formState } = useForm<RevisionsModalSchemaType>({
+		defaultValues: {
+			applicantInformation: '',
+			institutionalRep: '',
+			collaborators: '',
+			projectInformation: '',
+			requestedStudy: '',
+			ethics: '',
+			signature: '',
+			general: '',
+		},
 		resolver: zodResolver(revisionsModalSchema),
 	});
 
-	/**
-	 * This is only needed on the modal component specifically because we are utilizing ONE modal component and updating its values via useState (editState).
-	 * Since useState is async, need a useEffect to properly update the fields without delay
-	 */
-	// useEffect(() => {
-	// 	// reset({
-	// 	// 	collaboratorFirstName: rowData?.firstName || '',
-	// 	// 	collaboratorMiddleName: rowData?.lastName || '',
-	// 	// 	collaboratorLastName: rowData?.lastName || '',
-	// 	// 	collaboratorInstitutionalEmail: rowData?.institutionalEmail || '',
-	// 	// 	collaboratorPositionTitle: rowData?.title || '',
-	// 	// 	collaboratorSuffix: rowData?.suffix || '',
-	// 	// });
-	// }, [reset]);
-
 	const onSubmit: SubmitHandler<RevisionsModalSchemaType> = (data) => {
-		console.log(data);
+		onSubmitCallback(data);
+		reset();
 	};
 
 	return (
 		<Modal
 			title={translate('modals.applications.global.revisions.title')}
 			width={'100%'}
+			centered={true}
 			style={{
 				paddingInline: 10,
 			}}
@@ -76,8 +74,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 					paddingLeft: '1rem',
 				},
 				content: {
-					top: '10%',
-					left: !isLowResDevice ? 'calc(50vw - 35em)' : '0',
+					left: !isLowResDevice ? 'calc(50vw - 36em)' : '0',
 					maxWidth: '1000px',
 				},
 				body: {
@@ -101,7 +98,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 				},
 			}}
 			open={isOpen}
-			onCancel={(prev) => setIsOpen({ ...prev, isOpen: false })}
+			onCancel={(prev) => setIsOpen(!prev)}
 			footer={[]}
 			destroyOnClose
 		>
@@ -225,10 +222,16 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 							zIndex: 100,
 						}}
 					>
-						<Button htmlType="button" onClick={(prev) => setIsOpen({ ...prev, isOpen: false })}>
+						<Button
+							htmlType="button"
+							onClick={(prev) => {
+								setIsOpen(!prev);
+								reset();
+							}}
+						>
 							{translate('modals.applications.global.revisions.cancel')}
 						</Button>
-						<Button type="primary" onClick={handleSubmit(onSubmit)}>
+						<Button type="primary" onClick={handleSubmit(onSubmit)} disabled={!formState.isDirty}>
 							{translate('modals.applications.global.revisions.sendRequest')}
 						</Button>
 					</Flex>
@@ -238,4 +241,4 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 	);
 });
 
-export default AddRevisionsModal;
+export default RequestRevisionsModal;
