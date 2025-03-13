@@ -43,9 +43,9 @@ import {
 	PG_USER,
 	testApplicationId,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../testUtils.ts';
 
-describe('Application API', () => {
+describe('Application Controller', () => {
 	let db: PostgresDb;
 	let testApplicationRepo: ApplicationService;
 	let container: StartedPostgreSqlContainer;
