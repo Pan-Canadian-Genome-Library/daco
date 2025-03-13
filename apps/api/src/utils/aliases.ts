@@ -38,7 +38,7 @@ type inputKey = string & keyof Record<string, any>;
  * @param key Current key to validate
  * @param omittedKeys List of keys to remove from output
  */
-const filterOmittedKeys = (key: string, omittedKeys: string[]) => !omittedKeys.includes(key);
+const filterOmittedKeys = (omittedKeys: string[]) => (key: string) => !omittedKeys.includes(key);
 
 /**
  * Helper function to convert Postgres snake_case to FE camelCase
@@ -56,7 +56,7 @@ export const aliasToResponseData = <
 ): ResponseRecord => {
 	const allKeys: inputKey[] = Object.keys(data);
 
-	const filteredKeys = allKeys.filter((key) => filterOmittedKeys(key, omittedKeys));
+	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
 
 	const responseData = filteredKeys.reduce((acc, key) => {
 		const aliasedKey = camelCase(key);
@@ -84,7 +84,7 @@ export const aliasToDatabaseData = <
 ): DatabaseRecord => {
 	const allKeys: inputKey[] = Object.keys(data);
 
-	const filteredKeys = allKeys.filter((key) => filterOmittedKeys(key, omittedKeys));
+	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
 
 	const databaseData = filteredKeys.reduce((acc, key) => {
 		const aliasedKey = snakeCase(key);
