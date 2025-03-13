@@ -48,19 +48,19 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
-	const [openModal, setOpenModal] = useState(false);
+	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState<RevisionModalState>({ isOpen: false });
 
 	const showRevisionsModal = () => {
 		setOpenRevisionsModal({ isOpen: true });
 	};
-	const showCloseApplicationModal = () => {
-		setOpenModal(true);
+	const handleShowCloseModal = () => {
+		setShowCloseApplicationModal(true);
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
-	const handleOk = () => {
-		setOpenModal(false);
+	const handleCloseApplicationRequest = () => {
+		setShowCloseApplicationModal(false);
 	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
@@ -121,7 +121,7 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 				>
 					{/* TODO: Disable for MVP */}
 					{/* <Button>{translate('button.history')}</Button> */}
-					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
+					<Button onClick={handleShowCloseModal}>{translate('button.closeApp')}</Button>
 					<Button onClick={showRevisionsModal}>{translate('button.requestRevisions')}</Button>
 				</Flex>
 				<Modal
@@ -130,9 +130,9 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 					cancelText={translate('button.cancel')}
 					width={'100%'}
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-					open={openModal}
-					onOk={handleOk}
-					onCancel={() => setOpenModal(false)}
+					open={showCloseApplicationModal}
+					onOk={handleCloseApplicationRequest}
+					onCancel={() => setShowCloseApplicationModal(false)}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
 						<Text>{translate('modal.closeDescription')}</Text>
