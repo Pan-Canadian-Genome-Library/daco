@@ -57,14 +57,14 @@ fileRouter.delete('/:fileId', async (req: Request, res: Response) => {
 	const id = parseInt(fileId ? fileId : '');
 
 	if (!isPositiveInteger(id)) {
-		res.status(400).send({ message: 'Invalid applicationId' });
+		res.status(400).send({ message: 'Invalid fileId' });
 		return;
 	}
 
 	const result = await deleteFile({ fileId: id });
 
 	if (!result.success) {
-		res.status(400).send(result);
+		res.status(500).send(result);
 	}
 
 	res.status(200).send(result);

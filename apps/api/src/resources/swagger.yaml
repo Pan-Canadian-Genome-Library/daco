@@ -656,7 +656,7 @@ paths:
     post:
       tags:
         - File
-      summary: Upload
+      summary: Upload new file or replace old file
       parameters:
         - in: path
           name: applicationId
@@ -690,6 +690,37 @@ paths:
                 $ref: '#/components/responses/ServerErrors'
         '400':
           description: 'Error uploading file. File must be less than 5mb and only 1 file can be uploaded.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+  /file/{fileId}:
+    delete:
+      tags:
+        - File
+      summary: Delete Upload By file id
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File deleted'
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: 'Error deleting file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
           content:
             application/json:
               schema:
