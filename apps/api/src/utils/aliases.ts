@@ -47,13 +47,13 @@ const filterOmittedKeys = (omittedKeys: string[]) => (key: string) => !omittedKe
  * @param omittedKeys List of keys to remove from output for cases where a partial record is returned
  * @returns ResponseRecord - Generic type representing new record with updated camelCase keys
  */
-export const aliasToResponseData = <
-	DatabaseRecord extends Record<string, any>,
-	ResponseRecord extends Record<string, any>,
+export const convertToCamelCase = <
+	SnakeCaseRecord extends Record<string, any>,
+	CamelCaseRecord extends Record<string, any>,
 >(
-	data: DatabaseRecord,
+	data: SnakeCaseRecord,
 	omittedKeys: string[] = [],
-): ResponseRecord => {
+): CamelCaseRecord => {
 	const allKeys: inputKey[] = Object.keys(data);
 
 	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
@@ -63,7 +63,7 @@ export const aliasToResponseData = <
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
-	}, {}) as ResponseRecord;
+	}, {}) as CamelCaseRecord;
 
 	return responseData;
 };
@@ -75,13 +75,13 @@ export const aliasToResponseData = <
  * @param omittedKeys List of keys to remove from output for cases where a partial record is returned
  * @returns DatabaseRecord - Generic type representing new record with updated snake_case keys
  */
-export const aliasToDatabaseData = <
-	RequestRecord extends Record<string, any>,
-	DatabaseRecord extends Record<string, any>,
+export const convertToSnakeCase = <
+	CamelCaseRecord extends Record<string, any>,
+	SnakeCaseRecord extends Record<string, any>,
 >(
-	data: RequestRecord,
+	data: CamelCaseRecord,
 	omittedKeys: string[] = [],
-): DatabaseRecord => {
+): SnakeCaseRecord => {
 	const allKeys: inputKey[] = Object.keys(data);
 
 	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
@@ -91,7 +91,7 @@ export const aliasToDatabaseData = <
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
-	}, {}) as DatabaseRecord;
+	}, {}) as SnakeCaseRecord;
 
 	return databaseData;
 };
@@ -124,7 +124,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 	];
 
 	const contents = applicationContents
-		? aliasToResponseData<ApplicationContentUpdates, ApplicationContentsResponse>(applicationContents, omittedKeys)
+		? convertToCamelCase<ApplicationContentUpdates, ApplicationContentsResponse>(applicationContents, omittedKeys)
 		: null;
 
 	return {
@@ -151,10 +151,7 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 		'institutionalRepSignature',
 		'institutionalRepSignedAt',
 	];
-	const formattedUpdate = aliasToDatabaseData<UpdateEditApplicationRequest, ApplicationContentUpdates>(
-		update,
-		omitKeys,
-	);
+	const formattedUpdate = convertToSnakeCase<UpdateEditApplicationRequest, ApplicationContentUpdates>(update, omitKeys);
 
 	return formattedUpdate;
 };
@@ -165,7 +162,7 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
  * @returns type `SignatureDTO` - camelCase variation of a Postgress success response.
  */
 export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): SignatureDTO => {
-	const responseData = aliasToResponseData<ApplicationSignatureUpdate, SignatureDTO>(data);
+	const responseData = convertToCamelCase<ApplicationSignatureUpdate, SignatureDTO>(data);
 
 	return responseData;
 };
