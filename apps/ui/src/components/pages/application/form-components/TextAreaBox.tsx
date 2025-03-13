@@ -57,7 +57,8 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 				rows={props.rows ?? 10}
 				count={{
 					show: props.showCount,
-					strategy: (text) => (text.length === 0 ? text.split(WORDS).length - 1 : text.split(WORDS).length),
+					strategy: (text) =>
+						text.length === 0 ? text.trim().split(WORDS).length - 1 : text.trim().split(WORDS).length,
 					max: props.maxWordCount,
 				}}
 				disabled={props.disabled}

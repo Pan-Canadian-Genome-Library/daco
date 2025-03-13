@@ -18,21 +18,21 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type CollaboratorsSchemaType, collaboratorsSchema } from '@pcgl-daco/validation';
-import { Button, Col, Flex, Form, Modal, Row, Typography, theme } from 'antd';
+import { revisionsModalSchema, RevisionsModalSchemaType } from '@pcgl-daco/validation';
+import { Button, Col, Flex, Form, Modal, Row, theme, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { memo } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { RevisionModalStateProps } from '@/components/pages/application/ApplicationViewerHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { RevisionModalStateProps } from '../AppHeader';
 import TextAreaBox from '../form-components/TextAreaBox';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
-const rule = createSchemaFieldRule(collaboratorsSchema);
+const rule = createSchemaFieldRule(revisionsModalSchema);
 
 const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) => {
 	const { t: translate } = useTranslation();
@@ -41,8 +41,8 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
-	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
-		resolver: zodResolver(collaboratorsSchema),
+	const { handleSubmit, control, reset } = useForm<RevisionsModalSchemaType>({
+		resolver: zodResolver(revisionsModalSchema),
 	});
 
 	/**
@@ -60,7 +60,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 	// 	// });
 	// }, [reset]);
 
-	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
+	const onSubmit: SubmitHandler<RevisionsModalSchemaType> = (data) => {
 		console.log(data);
 	};
 
@@ -72,17 +72,32 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 				paddingInline: 10,
 			}}
 			styles={{
+				header: {
+					paddingLeft: '1rem',
+				},
 				content: {
 					top: '10%',
 					left: !isLowResDevice ? 'calc(50vw - 35em)' : '0',
-					maxHeight: '100%',
 					maxWidth: '1000px',
 				},
 				body: {
 					maxHeight: '70vh',
+					maxWidth: '1000px',
 					overflowX: 'hidden',
 					overflowY: 'scroll',
-					maxWidth: '1000px',
+					paddingLeft: '1rem',
+					paddingRight: '1rem',
+				},
+				footer: {
+					position: 'absolute',
+					width: '100%',
+					height: '10rem',
+					padding: 0,
+					bottom: 0,
+					left: 0,
+					border: 'transparent',
+					borderRadius: token.borderRadiusLG,
+					background: 'linear-gradient(360deg, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)',
 				},
 			}}
 			open={isOpen}
@@ -92,7 +107,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 		>
 			<Flex style={{ height: '10%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('modals.applications.global.revisions.description')}</Text>
-				<Form layout="vertical" clearOnDestroy>
+				<Form layout="vertical" clearOnDestroy validateTrigger={['onChange']}>
 					<Flex vertical>
 						<Row>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
@@ -101,7 +116,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.applicantInformation')}
-									name="collaboratorFirstName"
+									name="applicantInformation"
 									control={control}
 									rule={rule}
 								/>
@@ -114,7 +129,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.institutionalRepresentative')}
-									name="collaboratorMiddleName"
+									name="institutionalRep"
 									control={control}
 									rule={rule}
 								/>
@@ -127,7 +142,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.collaborators')}
-									name="collaboratorLastName"
+									name="collaborators"
 									control={control}
 									rule={rule}
 								/>
@@ -140,7 +155,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.projectInformation')}
-									name="collaboratorSuffix"
+									name="projectInformation"
 									control={control}
 									rule={rule}
 								/>
@@ -153,7 +168,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.requestedStudy')}
-									name="collaboratorPositionTitle"
+									name="requestedStudy"
 									control={control}
 									rule={rule}
 								/>
@@ -166,7 +181,7 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.ethics')}
-									name="collaboratorPositionTitle"
+									name="ethics"
 									control={control}
 									rule={rule}
 								/>
@@ -179,27 +194,37 @@ const AddRevisionsModal = memo(({ isOpen, setIsOpen }: RevisionModalStateProps) 
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.signSubmit')}
-									name="collaboratorPositionTitle"
+									name="signature"
 									control={control}
 									rule={rule}
 								/>
 							</Col>
 						</Row>
 						<Row>
-							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }} style={{ marginBottom: '1rem' }}>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }} style={{ marginBottom: '6rem' }}>
 								<TextAreaBox
 									showCount
 									maxWordCount={300}
 									rows={2}
 									label={translate('modals.applications.global.revisions.general')}
-									name="collaboratorPositionTitle"
+									name="general"
 									control={control}
 									rule={rule}
 								/>
 							</Col>
 						</Row>
 					</Flex>
-					<Flex align="center" justify="flex-end" gap={'middle'}>
+					<Flex
+						align="center"
+						justify="flex-end"
+						gap={'middle'}
+						style={{
+							position: 'absolute',
+							bottom: '2rem',
+							right: '2.5rem',
+							zIndex: 100,
+						}}
+					>
 						<Button htmlType="button" onClick={(prev) => setIsOpen({ ...prev, isOpen: false })}>
 							{translate('modals.applications.global.revisions.cancel')}
 						</Button>
