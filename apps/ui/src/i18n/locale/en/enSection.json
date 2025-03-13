@@ -124,7 +124,7 @@
 		"title": "Ethics",
 		"description1": "PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.",
 		"description2": "Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual research projects and bear no responsibility for the applicant's failure to comply with local/national ethical requirements.",
-		"approval": "Ethical Approval",
+		"approval": "Ethics Approval",
 		"pleaseChose": "Please choose one of the following options",
 		"ethicsLetterDescription": "Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.",
 		"exemptionDescription": "You represent and warrant that your country/region does not require your research project to undergo ethics review.",
