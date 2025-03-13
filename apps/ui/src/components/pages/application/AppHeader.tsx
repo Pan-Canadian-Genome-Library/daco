@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
+import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
@@ -34,13 +35,25 @@ type AppHeaderProps = {
 	state: ApplicationStateValues;
 };
 
+export interface RevisionModalState {
+	isOpen: boolean;
+}
+
+export interface RevisionModalStateProps extends RevisionModalState {
+	setIsOpen: (props: RevisionModalState) => void;
+}
+
 const AppHeader = ({ id, state }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
 	const [openModal, setOpenModal] = useState(false);
+	const [openRevisionsModal, setOpenRevisionsModal] = useState<RevisionModalState>({ isOpen: false });
 
+	const showRevisionsModal = () => {
+		setOpenRevisionsModal({ isOpen: true });
+	};
 	const showCloseApplicationModal = () => {
 		setOpenModal(true);
 	};
@@ -109,7 +122,7 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 					{/* TODO: Disable for MVP */}
 					{/* <Button>{translate('button.history')}</Button> */}
 					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
-					<Button onClick={showCloseApplicationModal}>{translate('button.requestRevisions')}</Button>
+					<Button onClick={showRevisionsModal}>{translate('button.requestRevisions')}</Button>
 				</Flex>
 				<Modal
 					title={translate('modal.closeTitle', { id })}
@@ -125,20 +138,7 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 						<Text>{translate('modal.closeDescription')}</Text>
 					</Flex>
 				</Modal>
-				<Modal
-					title={translate('modal.closeTitle', { id })}
-					okText={translate('button.closeApp')}
-					cancelText={translate('button.cancel')}
-					width={'100%'}
-					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-					open={openModal}
-					onOk={handleOk}
-					onCancel={() => setOpenModal(false)}
-				>
-					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modal.closeDescription')}</Text>
-					</Flex>
-				</Modal>
+				<RequestRevisionsModal isOpen={openRevisionsModal.isOpen} setIsOpen={setOpenRevisionsModal} />
 			</Flex>
 		</PageHeader>
 	);

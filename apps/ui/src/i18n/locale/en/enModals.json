@@ -1,0 +1,22 @@
+{
+	"modals": {
+		"applications": {
+			"global": {
+				"revisions": {
+					"title": "Request Revisions",
+					"description": "Please provide the revisions details for the sections that have issues. These details will be emailed to the applicant.",
+					"applicantInformation": "A. Applicant Information",
+					"institutionalRepresentative": "B. Institutional Representative",
+					"collaborators": "C. Collaborators",
+					"projectInformation": "D. Project Information",
+					"requestedStudy": "E. Requested Study",
+					"ethics": "F. Ethics",
+					"signSubmit": "Sign & Submit",
+					"general": "General Comments",
+					"cancel": "Cancel",
+					"sendRequest": "Send Request"
+				}
+			}
+		}
+	}
+}
