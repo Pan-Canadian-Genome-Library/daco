@@ -27,13 +27,13 @@
 		}
 	},
 	"status": {
-		"404": "Oops, didnt find what you were looking for!"
+		"404": "Oops, we couldn't find what you were looking for!"
 	},
 	"modal": {
 		"authorization": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access.",
-		"editTitle": "Are you sure you want to edit Applications: PCGL-{{id}}",
+		"editTitle": "Are you sure you want to edit Application: PCGL-{{id}}",
 		"editDescription": "If so, the application will move back into Draft status and you will need to resubmit the application for review.",
-		"closeTitle": "Are you sure you want to close Applications: PCGL-{{id}}",
+		"closeTitle": "Are you sure you want to close Application: PCGL-{{id}}",
 		"closeDescription": "Closed application cannot be reopened."
 	},
 	"alert": {
