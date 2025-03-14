@@ -18,8 +18,9 @@
  */
 
 import { deleteFile, uploadEthicsFile } from '@/controllers/fileController.ts';
-import { fileUploadValidation } from '@pcgl-daco/request-utils';
-import { isPositiveInteger } from '@pcgl-daco/validation';
+import { apiZodErrorMapping } from '@/utils/validation.ts';
+import { fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { fileDeleteParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request, type Response } from 'express';
 import formidable from 'formidable';
 
@@ -52,23 +53,26 @@ fileRouter.post(
 	}),
 );
 
-fileRouter.delete('/:fileId', async (req: Request, res: Response) => {
-	const { fileId } = req.params;
-	const id = parseInt(fileId ? fileId : '');
+fileRouter.delete(
+	'/:fileId',
+	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
+		const { fileId } = req.params;
+		const id = parseInt(fileId ? fileId : '');
 
-	if (!isPositiveInteger(id)) {
-		res.status(400).send({ message: 'Invalid fileId' });
+		if (!isPositiveInteger(id)) {
+			res.status(400).send({ message: 'Invalid fileId' });
+			return;
+		}
+
+		const result = await deleteFile({ fileId: id });
+
+		if (!result.success) {
+			res.status(500).send(result);
+		}
+
+		res.status(200).send(result);
 		return;
-	}
-
-	const result = await deleteFile({ fileId: id });
-
-	if (!result.success) {
-		res.status(500).send(result);
-	}
-
-	res.status(200).send(result);
-	return;
-});
+	}),
+);
 
 export default fileRouter;
