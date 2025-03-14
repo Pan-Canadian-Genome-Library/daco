@@ -28,11 +28,12 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	requestApplicationRevisionsByDac,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService } from '@/service/types.js';
+import { type ApplicationService, type RevisionRequestModel } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -44,6 +45,23 @@ import {
 	testApplicationId,
 	testUserId as user_id,
 } from '../testUtils.js';
+
+// Sample revision request data
+const revisionRequestData: RevisionRequestModel = {
+	application_id: testApplicationId,
+	created_at: new Date(),
+	comments: 'Please provide additional documentation.',
+	applicant_notes: 'Needs more details',
+	applicant_approved: false,
+	institution_rep_approved: false,
+	institution_rep_notes: 'Incomplete information',
+	collaborators_approved: false,
+	collaborators_notes: 'Requires additional clarification',
+	project_approved: false,
+	project_notes: 'Not sufficient justification',
+	requested_studies_approved: false,
+	requested_studies_notes: 'Unclear scope',
+};
 
 describe('Application API', () => {
 	let db: PostgresDb;
@@ -250,6 +268,64 @@ describe('Application API', () => {
 
 			assert.ok(!result.success);
 			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+		});
+	});
+
+	describe('Request Application Revisions', () => {
+		it('should request revisions when application is in DAC_REVIEW state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
+			const role = 'DAC';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisionsByDac({
+				applicationId: id,
+				role,
+				revisionData: revisionRequestData,
+			});
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail if application is not in the correct state', async () => {
+			// Arrange: Set up test data
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
+			const role = 'DAC';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisionsByDac({
+				applicationId: id,
+				role,
+				revisionData: revisionRequestData,
+			});
+
+			// Assert: Should return a failure message
+			assert.strictEqual(result.success, false, 'Function should return failure when state is incorrect');
+		});
+
+		it('should handle errors gracefully', async () => {
+			// Arrange: Force an error
+			const invalidApplicationId = -1;
+			const role = 'DAC';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisionsByDac({
+				applicationId: invalidApplicationId,
+				role,
+				revisionData: revisionRequestData,
+			});
+
+			// Assert: Should return an error message
+			assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
 		});
 	});
 

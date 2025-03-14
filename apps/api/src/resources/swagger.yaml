@@ -415,7 +415,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ClientErrors'
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:
@@ -424,6 +426,53 @@ paths:
                 $ref: '#/components/responses/ClientErrors'
         '500':
           description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+    delete:
+      tags:
+        - Signature
+      summary: Delete signatures associated with an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to retrieve the signature from.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: signee
+          schema:
+            type: string
+            enum: [INSTITUTIONAL_REP, APPLICANT]
+          description: Which signature to delete
+          required: true
+      responses:
+        '204':
+          description: Successfully deleted the signature requested. This will always result in a `No Content` response.
+        '400':
+          description: Will occur when not provided a valid `applicationId`, either a negative number, or not a number at all or invalid `signee`.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
   /signature/sign:
     post:
       tags:
@@ -448,7 +497,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/RequestValidationError'
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:
@@ -503,40 +554,6 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/responses/CollaboratorsListResponse'
-
-  /collaborators/delete:
-    post:
-      tags:
-        - Collaborators
-      summary: Create new Collaborators for an application.
-      requestBody:
-        description: The body containing information about the requesting user.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              $ref: '#/components/requests/DeleteCollaborators'
-      responses:
-        '201':
-          description: 'Collaborator deleted'
-          content:
-            application/json:
-              schema:
-                type: object
-                $ref: '#/components/responses/CollaboratorsListResponse'
-        '500':
-          description: 'Error deleting collaborators'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-        '400':
-          description: 'Error deleting Collaborators'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
 
   /collaborators/{applicationId}:
     get:
@@ -652,6 +669,39 @@ paths:
               schema:
                 $ref: '#/components/responses/RequestValidationError'
 
+  /applications/request-revisions:
+    post:
+      tags:
+        - Applications
+      summary: 'Request revisions for an application'
+      description: 'Allows a rep to request revisions for an application, including approval status and comments on various sections.'
+      operationId: 'requestRevisions'
+      requestBody:
+        description: Request body containing revision request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/RequestRevisions'
+      responses:
+        '200':
+          description: 'Revisions request successfully processed'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'Indicates if the revision request was successful.'
+                  updatedApplication:
+                    allOf:
+                      - description: 'Details of the updated application after revisions.'
+                      - $ref: '#/components/responses/ApplicationResponse'
+        '400':
+          description: 'Error in requesting revisions. Invalid input, missing required fields.'
+        '500':
+          description: 'Error in requesting revisions'
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -1093,6 +1143,77 @@ components:
         collaboratorId:
           type: number
           description: The ID of the Collaborator to delete.
+
+    RequestRevisions:
+      type: object
+      required:
+        - applicationId
+        - role
+        - revisionData
+      properties:
+        applicationId:
+          type: integer
+          description: 'ID of the application for which revisions are being requested.'
+          example: 12345
+        role:
+          type: string
+          description: 'Role of the reviewer'
+          example: DAC_MEMBER
+        revisionData:
+          type: object
+          description: 'Data containing approval status and notes for various sections of the application.'
+          properties:
+            applicantApproved:
+              type: boolean
+              description: 'Approval status for the applicant information section.'
+              example: true
+            applicantNotes:
+              type: string
+              description: 'Notes related to the applicant information section.'
+              example: 'Applicant needs to update personal details.'
+            institutionRepApproved:
+              type: boolean
+              description: 'Approval status for the institutional representative section.'
+              example: false
+            institutionRepNotes:
+              type: string
+              description: 'Notes related to the institutional representative section.'
+              example: 'Institution rep has missing documents.'
+            collaboratorsApproved:
+              type: boolean
+              description: 'Approval status for the collaborators section.'
+              example: true
+            collaboratorsNotes:
+              type: string
+              description: 'Notes related to the collaborators section.'
+              example: 'All collaborators have provided necessary details.'
+            projectApproved:
+              type: boolean
+              description: 'Approval status for the project information section.'
+              example: true
+            projectNotes:
+              type: string
+              description: 'Notes related to the project information section.'
+              example: 'Project details are complete.'
+            requestedStudiesApproved:
+              type: boolean
+              description: 'Approval status for the requested study section.'
+              example: true
+            requestedStudiesNotes:
+              type: string
+              description: 'Notes related to the requested study section.'
+              example: 'Requested studies are well defined.'
+            ethicsApproved:
+              type: boolean
+              description: 'Approval status for the ethics section.'
+              example: true
+            ethicsNotes:
+              type: string
+              description: 'Notes related to the ethics section.'
+              example: 'Ethics review is pending.'
+            comments:
+              type: string
+              description: 'Additional comments'
 
   responses:
     ApplicationResponse:

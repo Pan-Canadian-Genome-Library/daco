@@ -40,6 +40,13 @@ export const FileTypes = {
 
 export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
+export const SignatureTypes = {
+	APPLICANT: 'APPLICANT',
+	INSTITUTIONAL_REP: 'INSTITUTIONAL_REP',
+} as const;
+
+export type SignatureType = (typeof SignatureTypes)[keyof typeof SignatureTypes];
+
 export enum ApplicationReviewOutcomes {
 	'APPROVED',
 	'REJECTED',
@@ -235,6 +242,11 @@ export interface CollaboratorDTO {
 	collaboratorResearcherProfileURL?: string | null;
 	collaboratorSuffix?: string | null;
 	collaboratorType?: string | null;
+}
+
+export interface GetCollaboratorsResponse extends CollaboratorDTO {
+	id: number;
+	applicationId: number;
 }
 
 export type BaseCollaboratorRequest = {
