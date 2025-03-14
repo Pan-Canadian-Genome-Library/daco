@@ -504,40 +504,6 @@ paths:
                 type: object
                 $ref: '#/components/responses/CollaboratorsListResponse'
 
-  /collaborators/delete:
-    post:
-      tags:
-        - Collaborators
-      summary: Create new Collaborators for an application.
-      requestBody:
-        description: The body containing information about the requesting user.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              $ref: '#/components/requests/DeleteCollaborators'
-      responses:
-        '201':
-          description: 'Collaborator deleted'
-          content:
-            application/json:
-              schema:
-                type: object
-                $ref: '#/components/responses/CollaboratorsListResponse'
-        '500':
-          description: 'Error deleting collaborators'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-        '400':
-          description: 'Error deleting Collaborators'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
-
   /collaborators/{applicationId}:
     get:
       tags:
