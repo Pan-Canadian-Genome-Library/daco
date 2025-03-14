@@ -17,43 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* eslint-disable react-refresh/only-export-components */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router';
+import ThemeProvider from './ThemeProvider';
+import { UserProvider } from './UserProvider';
 
-import useGetUser from '@/api/queries/useGetUser';
-import type { UserResponse } from '@pcgl-daco/validation';
-import { createContext, useContext, type PropsWithChildren } from 'react';
+export const queryClient = new QueryClient();
 
-type UserState = {
-	isLoading: boolean;
-	isLoggedIn: boolean;
-	refresh: () => void;
-} & Partial<UserResponse>;
+const Providers = ({ children }: { children: React.ReactNode }) => {
+	return (
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider>
+				<BrowserRouter>
+					<UserProvider>{children}</UserProvider>
+				</BrowserRouter>
+			</ThemeProvider>
+		</QueryClientProvider>
+	);
+};
 
-const UserContext = createContext<UserState>({ isLoading: true, isLoggedIn: false, refresh: () => {} });
-
-export function UserProvider({ children }: PropsWithChildren) {
-	const { data, isLoading, refetch } = useGetUser();
-
-	// TODO: update local storage
-
-	const refresh = () => {
-		// TODO: update local storage
-		refetch();
-	};
-
-	const value: UserState = {
-		...data,
-		isLoading,
-		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : false,
-		refresh,
-	};
-	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
-}
-
-export function useUserContext() {
-	const context = useContext(UserContext);
-	if (context === undefined) {
-		throw new Error('useCount must be used within a CountProvider');
-	}
-	return context;
-}
+export default Providers;

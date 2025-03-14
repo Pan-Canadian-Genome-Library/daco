@@ -75,7 +75,7 @@ describe('Collaborators Controller', () => {
 
 			const newCollaboratorRecord = result.data[0];
 
-			assert.strictEqual(newCollaboratorRecord.application_id, application_id);
+			assert.strictEqual(newCollaboratorRecord.applicationId, application_id);
 		});
 
 		it('should successfully create multiple collaborators with the provided application id', async () => {
@@ -191,7 +191,7 @@ describe('Collaborators Controller', () => {
 			});
 
 			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdates.collaboratorType);
+			assert.strictEqual(collaboratorResult.data[0]?.collaboratorType, collaboratorUpdates.collaboratorType);
 		});
 	});
 

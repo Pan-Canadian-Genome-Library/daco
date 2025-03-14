@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import useCreateApplication from '@/api/useCreateApplication';
+import useCreateApplication from '@/api/mutations/useCreateApplication';
 import { Button, Card, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 

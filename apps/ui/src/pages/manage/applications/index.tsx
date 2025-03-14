@@ -18,7 +18,7 @@
  */
 
 import useGetApplicationCounts from '@/api/metadata/useGetApplicationCounts';
-import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/useGetApplicationList';
+import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/queries/useGetApplicationList';
 import { mockUserID } from '@/components/mock/applicationMockData';
 import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';

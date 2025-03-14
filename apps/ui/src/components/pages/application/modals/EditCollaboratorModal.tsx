@@ -27,6 +27,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useEditCollaborator from '@/api/mutations/useEditCollaborator';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import { ModalStateProps } from '@/pages/applications/sections/collaborators';
 
@@ -36,15 +37,16 @@ const rule = createSchemaFieldRule(collaboratorsSchema);
 
 const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { mutate: editCollaborator } = useEditCollaborator();
 
 	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
 		defaultValues: {
-			collaboratorFirstName: rowData?.firstName || '',
-			collaboratorMiddleName: rowData?.lastName || '',
-			collaboratorLastName: rowData?.lastName || '',
-			collaboratorInstitutionalEmail: rowData?.institutionalEmail || '',
-			collaboratorPositionTitle: rowData?.title || '',
+			collaboratorFirstName: rowData?.collaboratorFirstName || undefined,
+			collaboratorMiddleName: rowData?.collaboratorMiddleName || undefined,
+			collaboratorLastName: rowData?.collaboratorLastName || undefined,
+			collaboratorInstitutionalEmail: rowData?.collaboratorInstitutionalEmail || undefined,
+			collaboratorPositionTitle: rowData?.collaboratorPositionTitle || undefined,
 		},
 		resolver: zodResolver(collaboratorsSchema),
 	});
@@ -55,17 +57,23 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 	 */
 	useEffect(() => {
 		reset({
-			collaboratorFirstName: rowData?.firstName || '',
-			collaboratorMiddleName: rowData?.lastName || '',
-			collaboratorLastName: rowData?.lastName || '',
-			collaboratorInstitutionalEmail: rowData?.institutionalEmail || '',
-			collaboratorPositionTitle: rowData?.title || '',
-			collaboratorSuffix: rowData?.suffix || '',
+			collaboratorFirstName: rowData?.collaboratorFirstName || undefined,
+			collaboratorMiddleName: rowData?.collaboratorMiddleName || undefined,
+			collaboratorLastName: rowData?.collaboratorLastName || undefined,
+			collaboratorInstitutionalEmail: rowData?.collaboratorInstitutionalEmail || undefined,
+			collaboratorPositionTitle: rowData?.collaboratorPositionTitle || undefined,
+			collaboratorSuffix: rowData?.collaboratorSuffix || undefined,
 		});
 	}, [rowData, reset]);
 
 	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
-		console.log(data);
+		if (!!rowData?.id) {
+			editCollaborator({
+				applicationId: appId,
+				collaboratorUpdates: { ...data, id: rowData?.id },
+			});
+			setIsOpen({ isOpen: false });
+		}
 	};
 
 	return (

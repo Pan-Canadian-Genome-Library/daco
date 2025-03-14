@@ -87,7 +87,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
-	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord> => {
+	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord[]> => {
 		try {
 			const deletedRecord = await db.delete(collaborators).where(eq(collaborators.id, id)).returning();
 
@@ -95,7 +95,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 				throw new Error(`Error deleting collaborator with ${id}, no record deleted`);
 			}
 
-			return success(deletedRecord[0]);
+			return success(deletedRecord);
 		} catch (err) {
 			const message = `Error at deleteCollaborators with id ${id}`;
 
@@ -111,19 +111,19 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 	}: {
 		id: number;
 		collaborator: Partial<CollaboratorModel>;
-	}): AsyncResult<CollaboratorRecord> => {
+	}): AsyncResult<CollaboratorRecord[]> => {
 		try {
-			const deletedRecord = await db
+			const updatedRecord = await db
 				.update(collaborators)
 				.set(collaborator)
 				.where(eq(collaborators.id, id))
 				.returning();
 
-			if (!deletedRecord[0]) {
+			if (!updatedRecord[0]) {
 				throw new Error(`Error updating collaborator with ${id}, no record updated`);
 			}
 
-			return success(deletedRecord[0]);
+			return success(updatedRecord);
 		} catch (err) {
 			const message = `Error at updateCollaborator`;
 
