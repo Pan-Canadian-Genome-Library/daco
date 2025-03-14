@@ -25,7 +25,7 @@ import { applications } from '@/db/schemas/applications.ts';
 import logger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates } from '@pcgl-daco/data-model';
-import { SignatureType } from '@pcgl-daco/data-model/src/types.ts';
+import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
 import { type ApplicationContentModel, type ApplicationSignatureUpdate } from './types.js';
 
 /**

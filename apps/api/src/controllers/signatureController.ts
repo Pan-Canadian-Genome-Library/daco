@@ -22,7 +22,7 @@ import { signatureService } from '@/service/signatureService.ts';
 import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
 import { failure, success } from '@/utils/results.ts';
 import { aliasSignatureRecord } from '@/utils/routes.ts';
-import { SignatureType } from '@pcgl-daco/data-model/src/types.ts';
+import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
 import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
