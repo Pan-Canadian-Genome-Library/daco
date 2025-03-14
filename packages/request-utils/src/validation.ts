@@ -135,14 +135,14 @@ function withParamsSchemaValidation<ReqParams>(
  * });
  * ```
  */
-function withQuerySchemaValidation<ReqParams>(
-	paramsSchema: ZodSchema<ReqParams>,
+function withQuerySchemaValidation<ReqQuery>(
+	querySchema: ZodSchema<ReqQuery>,
 	zodErrorMapping: ZodErrorMap | undefined,
 	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
 ): RequestHandler {
 	return async (request: Request, response: Response, next: NextFunction) => {
 		try {
-			const validationResult = paramsSchema.safeParse(request.query, { errorMap: zodErrorMapping });
+			const validationResult = querySchema.safeParse(request.query, { errorMap: zodErrorMapping });
 			if (validationResult.success) {
 				return await handler(request, response, next);
 			}

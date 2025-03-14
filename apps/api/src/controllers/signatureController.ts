@@ -22,6 +22,7 @@ import { signatureService } from '@/service/signatureService.ts';
 import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
 import { failure, success } from '@/utils/results.ts';
 import { aliasSignatureRecord } from '@/utils/routes.ts';
+import { SignatureType } from '@pcgl-daco/data-model/src/types.ts';
 import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
@@ -92,7 +93,7 @@ export const deleteApplicationSignature = async ({
 	signee,
 }: {
 	applicationId: number;
-	signee: 'APPLICANT' | 'INSTITUTIONAL_REP';
+	signee: SignatureType;
 }) => {
 	const database = getDbInstance();
 	const signatureRepo: SignatureService = signatureService(database);

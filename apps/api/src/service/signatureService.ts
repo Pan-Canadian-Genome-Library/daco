@@ -25,6 +25,7 @@ import { applications } from '@/db/schemas/applications.ts';
 import logger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates } from '@pcgl-daco/data-model';
+import { SignatureType } from '@pcgl-daco/data-model/src/types.ts';
 import { type ApplicationContentModel, type ApplicationSignatureUpdate } from './types.js';
 
 /**
@@ -126,7 +127,7 @@ const signatureService = (db: PostgresDb) => ({
 		application_id,
 		signature_type,
 	}: Pick<ApplicationContentModel, 'application_id'> & {
-		signature_type: 'APPLICANT' | 'INSTITUTIONAL_REP';
+		signature_type: SignatureType;
 	}): AsyncResult<ApplicationSignatureUpdate> => {
 		try {
 			const updatedSignature = await db.transaction(async (transaction) => {
