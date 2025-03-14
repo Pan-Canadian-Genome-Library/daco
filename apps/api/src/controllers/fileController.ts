@@ -95,3 +95,46 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 		return failure(message, error);
 	}
 };
+
+/**
+ * Delete a file with id
+ * @param fileId - The target fileId to associate the uploaded file
+ * @returns Success with file data / Failure with Error.
+ */
+export const deleteFile = async ({ fileId }: { fileId: number }) => {
+	try {
+		const database = getDbInstance();
+		const filesService: FilesService = filesSvc(database);
+		const applicationRepo: ApplicationService = applicationSvc(database);
+
+		const txResult = await database.transaction(async (tx) => {
+			const deleteResult = await filesService.deleteFileById({ fileId, transaction: tx });
+
+			if (!deleteResult.success) {
+				return deleteResult;
+			}
+			const { application_id } = deleteResult.data;
+
+			const editApplicationResult = await applicationRepo.editApplication({
+				id: application_id,
+				update: {
+					ethics_letter: null,
+				},
+				transaction: tx,
+			});
+
+			if (!editApplicationResult.success) {
+				return editApplicationResult;
+			}
+
+			return deleteResult;
+		});
+
+		return txResult;
+	} catch (error) {
+		const message = `Unable to delete file with id: ${fileId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
