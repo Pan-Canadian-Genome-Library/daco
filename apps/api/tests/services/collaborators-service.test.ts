@@ -141,7 +141,7 @@ describe('Application Service', () => {
 			});
 
 			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdate.collaborator_type);
+			assert.strictEqual(collaboratorResult.data[0]?.collaborator_type, collaboratorUpdate.collaborator_type);
 		});
 	});
 
