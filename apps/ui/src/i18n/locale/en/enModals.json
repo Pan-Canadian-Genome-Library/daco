@@ -1,5 +1,23 @@
 {
 	"modals": {
+		"buttons": {
+			"cancel": "Cancel",
+			"ok": "OK"
+		},
+		"editApplication": {
+			"title": "Are you sure you want to edit Application: PCGL-{{id}}",
+			"description": "If so, the application will move back into Draft status and you will need to resubmit the application for review.",
+			"buttons": {
+				"edit": "Edit Application"
+			}
+		},
+		"closeApplication": {
+			"title": "Are you sure you want to close Application: PCGL-{{id}}",
+			"description": "Closed application cannot be reopened."
+		},
+		"authorization": {
+			"description": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access."
+		},
 		"applications": {
 			"global": {
 				"revisions": {
@@ -15,6 +33,9 @@
 					"general": "General Comments",
 					"cancel": "Cancel",
 					"sendRequest": "Send Request"
+				},
+				"success": {
+					"text": "Request for revisions has been sent to Application PCGL-{{id}}"
 				}
 			}
 		}
