@@ -19,9 +19,10 @@
 
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
-import { ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
+import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
 import { failure, success } from '@/utils/results.ts';
 import { aliasSignatureRecord } from '@/utils/routes.ts';
+import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
 import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
@@ -76,6 +77,31 @@ export const updateApplicationSignature = async ({ applicationId, signature, sig
 	}
 
 	const result = await signatureRepo.updateApplicationSignature(update);
+
+	return result;
+};
+
+/**
+ * Deletes a signature from an application.
+ * @param id - The Application ID
+ * @param signee - A `APPLICANT` or `INSTITUTIONAL_REP` whose signature you'd like to delete.
+ * @returns Success with the signature and signed at time / Failure with Error
+ * TODO: - There is no auth validation for this route yet.
+ */
+export const deleteApplicationSignature = async ({
+	applicationId,
+	signee,
+}: {
+	applicationId: number;
+	signee: SignatureType;
+}) => {
+	const database = getDbInstance();
+	const signatureRepo: SignatureService = signatureService(database);
+
+	const result = await signatureRepo.deleteApplicationSignature({
+		application_id: applicationId,
+		signature_type: signee,
+	});
 
 	return result;
 };
