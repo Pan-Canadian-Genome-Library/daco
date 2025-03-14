@@ -28,8 +28,8 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
+	requestApplicationRevisionsByDac,
 	submitRevision,
-	requestApplicationRevisions,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -282,7 +282,7 @@ describe('Application API', () => {
 			const role = 'DAC';
 
 			// Act: Call the function
-			const result = await requestApplicationRevisions({
+			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
 				role,
 				revisionData: revisionRequestData,
@@ -302,7 +302,7 @@ describe('Application API', () => {
 			const role = 'DAC';
 
 			// Act: Call the function
-			const result = await requestApplicationRevisions({
+			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
 				role,
 				revisionData: revisionRequestData,
@@ -318,7 +318,7 @@ describe('Application API', () => {
 			const role = 'DAC';
 
 			// Act: Call the function
-			const result = await requestApplicationRevisions({
+			const result = await requestApplicationRevisionsByDac({
 				applicationId: invalidApplicationId,
 				role,
 				revisionData: revisionRequestData,

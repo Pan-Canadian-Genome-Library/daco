@@ -682,9 +682,9 @@ paths:
                       - description: 'Details of the updated application after revisions.'
                       - $ref: '#/components/responses/ApplicationResponse'
         '400':
-          description: 'Invalid input, missing required fields.'
+          description: 'Error in requesting revisions. Invalid input, missing required fields.'
         '500':
-          description: 'Internal server error.'
+          description: 'Error in requesting revisions'
 components:
   schemas:
     ApplicationWithApplicantInfo:

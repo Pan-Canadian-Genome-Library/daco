@@ -257,7 +257,7 @@ export const submitRevision = async ({ applicationId }: { applicationId: number 
 	}
 };
 
-export const requestApplicationRevisions = async ({
+export const requestApplicationRevisionsByDac = async ({
 	applicationId,
 	role,
 	revisionData,
@@ -279,29 +279,71 @@ export const requestApplicationRevisions = async ({
 		const application = result.data;
 		const appStateManager = new ApplicationStateManager(application);
 
-		if (
-			(role === 'DAC_MEMBER' && application.state !== ApplicationStates.DAC_REVIEW) ||
-			(role === 'INSTITUTIONAL_REP' && application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW)
-		) {
+		if (role === 'DAC_MEMBER' && application.state !== ApplicationStates.DAC_REVIEW) {
 			return failure('Application is not in the correct status for revisions.');
 		}
 
-		let revisionResult;
-
-		if (role === 'DAC_MEMBER') {
-			revisionResult = await appStateManager.reviseDacReview();
-		} else {
-			revisionResult = await appStateManager.reviseRepReview();
-		}
+		const revisionResult = await appStateManager.reviseDacReview();
 
 		if (!revisionResult.success) {
-			return failure(revisionResult.message || 'Failed to reject application.', 'StateTransitionError');
+			return failure(revisionResult.message || 'Failed to request revisions for application.', 'StateTransitionError');
 		}
 
 		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
-			return failure(revisionRequestResult.message || 'Failed to reject application.', 'StateTransitionError');
+			return failure(
+				revisionRequestResult.message || 'Failed to request revisions for application.',
+				'StateTransitionError',
+			);
+		}
+
+		return service.getApplicationWithContents({ id: applicationId });
+	} catch (error) {
+		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
+		return failure('An error occurred while processing the request.', error);
+	}
+};
+
+export const requestApplicationRevisionsByRep = async ({
+	applicationId,
+	role,
+	revisionData,
+}: {
+	applicationId: number;
+	role: string;
+	revisionData: RevisionRequestModel;
+}): AsyncResult<JoinedApplicationRecord> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (role === 'INSTITUTIONAL_REP' && application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+			return failure('Application is not in the correct status for revisions.');
+		}
+
+		const revisionResult = await appStateManager.reviseRepReview();
+
+		if (!revisionResult.success) {
+			return failure(revisionResult.message || 'Failed to request revisions for application.', 'StateTransitionError');
+		}
+
+		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+
+		if (!revisionRequestResult.success) {
+			return failure(
+				revisionRequestResult.message || 'Failed to request revisions for application.',
+				'StateTransitionError',
+			);
 		}
 
 		return service.getApplicationWithContents({ id: applicationId });
