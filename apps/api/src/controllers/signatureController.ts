@@ -20,8 +20,8 @@
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
 import { ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
+import { aliasSignatureRecord } from '@/utils/aliases.ts';
 import { failure, success } from '@/utils/results.ts';
-import { aliasSignatureRecord } from '@/utils/routes.ts';
 import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
