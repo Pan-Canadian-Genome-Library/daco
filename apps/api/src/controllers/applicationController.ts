@@ -281,25 +281,23 @@ export const closeApplication = async ({
 
 		// Authorization logic based on state
 		const isApplicant = application.user_id === requesterId;
+
+		const canCloseApplication = isDacMember && appStateManager.state === ApplicationStates.DAC_REVIEW;
+
+		if (!isApplicant && !canCloseApplication) {
+			return failure('Current user is not authorized to close the application', 'Unauthorized');
+		}
+
 		let closeResult;
 
 		switch (appStateManager.state) {
 			case ApplicationStates.DRAFT:
-				if (!isApplicant) {
-					return failure('Only the applicant can close the application in this state.', 'Unauthorized');
-				}
 				closeResult = await appStateManager.closeDraft();
 				break;
 			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-				if (!isApplicant) {
-					return failure('Only the applicant can close the application in this state.', 'Unauthorized');
-				}
 				closeResult = await appStateManager.closeRepReview();
 				break;
 			case ApplicationStates.DAC_REVIEW:
-				if (!isApplicant && !isDacMember) {
-					return failure('Only the applicant or a DAC member can close the application in DAC Review.', 'Unauthorized');
-				}
 				closeResult = await appStateManager.closeDacReview();
 				break;
 			default:
@@ -310,11 +308,7 @@ export const closeApplication = async ({
 			return failure(closeResult.message || 'Failed to close application.', 'StateTransitionError');
 		}
 
-		// Update the database with the new CLOSED state
-		const update = { state: ApplicationStates.CLOSED };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
-
-		return updatedResult;
+		return closeResult;
 	} catch (error) {
 		const message = `Unable to close application with id: ${applicationId}`;
 		logger.error(message);

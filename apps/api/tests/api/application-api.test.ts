@@ -311,7 +311,7 @@ describe('Application API', () => {
 			const result = await closeApplication({ applicationId: testApplicationId, requesterId: 'other_user' });
 
 			assert.ok(!result.success);
-			assert.strictEqual(result.message, 'Only the applicant can close the application in this state.');
+			assert.strictEqual(result.message, 'Current user is not authorized to close the application');
 		});
 
 		it('should prevent closing an already CLOSED application', async () => {
