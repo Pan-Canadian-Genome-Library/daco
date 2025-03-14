@@ -618,6 +618,39 @@ paths:
               schema:
                 $ref: '#/components/responses/RequestValidationError'
 
+  /applications/request-revisions:
+    post:
+      tags:
+        - Applications
+      summary: 'Request revisions for an application'
+      description: 'Allows a rep to request revisions for an application, including approval status and comments on various sections.'
+      operationId: 'requestRevisions'
+      requestBody:
+        description: Request body containing revision request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/RequestRevisions'
+      responses:
+        '200':
+          description: 'Revisions request successfully processed'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'Indicates if the revision request was successful.'
+                  updatedApplication:
+                    allOf:
+                      - description: 'Details of the updated application after revisions.'
+                      - $ref: '#/components/responses/ApplicationResponse'
+        '400':
+          description: 'Error in requesting revisions. Invalid input, missing required fields.'
+        '500':
+          description: 'Error in requesting revisions'
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -1059,6 +1092,77 @@ components:
         collaboratorId:
           type: number
           description: The ID of the Collaborator to delete.
+
+    RequestRevisions:
+      type: object
+      required:
+        - applicationId
+        - role
+        - revisionData
+      properties:
+        applicationId:
+          type: integer
+          description: 'ID of the application for which revisions are being requested.'
+          example: 12345
+        role:
+          type: string
+          description: 'Role of the reviewer'
+          example: DAC_MEMBER
+        revisionData:
+          type: object
+          description: 'Data containing approval status and notes for various sections of the application.'
+          properties:
+            applicantApproved:
+              type: boolean
+              description: 'Approval status for the applicant information section.'
+              example: true
+            applicantNotes:
+              type: string
+              description: 'Notes related to the applicant information section.'
+              example: 'Applicant needs to update personal details.'
+            institutionRepApproved:
+              type: boolean
+              description: 'Approval status for the institutional representative section.'
+              example: false
+            institutionRepNotes:
+              type: string
+              description: 'Notes related to the institutional representative section.'
+              example: 'Institution rep has missing documents.'
+            collaboratorsApproved:
+              type: boolean
+              description: 'Approval status for the collaborators section.'
+              example: true
+            collaboratorsNotes:
+              type: string
+              description: 'Notes related to the collaborators section.'
+              example: 'All collaborators have provided necessary details.'
+            projectApproved:
+              type: boolean
+              description: 'Approval status for the project information section.'
+              example: true
+            projectNotes:
+              type: string
+              description: 'Notes related to the project information section.'
+              example: 'Project details are complete.'
+            requestedStudiesApproved:
+              type: boolean
+              description: 'Approval status for the requested study section.'
+              example: true
+            requestedStudiesNotes:
+              type: string
+              description: 'Notes related to the requested study section.'
+              example: 'Requested studies are well defined.'
+            ethicsApproved:
+              type: boolean
+              description: 'Approval status for the ethics section.'
+              example: true
+            ethicsNotes:
+              type: string
+              description: 'Notes related to the ethics section.'
+              example: 'Ethics review is pending.'
+            comments:
+              type: string
+              description: 'Additional comments'
 
   responses:
     ApplicationResponse:
