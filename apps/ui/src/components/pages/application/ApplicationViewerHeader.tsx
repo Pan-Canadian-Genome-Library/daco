@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
+import SuccessModal from '@/components/pages/application/modals/SuccessModal';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
@@ -49,14 +50,17 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const isLowResDevice = minWidth <= token.screenLG;
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
 
 	const showRevisionsModal = () => {
 		setOpenRevisionsModal(true);
 	};
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
+		//TODO: Add logic to this to actually submit the revisions.
 		console.log('Submission Handled', data);
 		setOpenRevisionsModal(false);
+		setShowSuccessModal(true);
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
@@ -130,9 +134,9 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 					<Button onClick={showRevisionsModal}>{translate('button.requestRevisions')}</Button>
 				</Flex>
 				<Modal
-					title={translate('modal.closeTitle', { id })}
+					title={translate('modals.closeApplication.title', { id })}
 					okText={translate('button.closeApp')}
-					cancelText={translate('button.cancel')}
+					cancelText={translate('modals.buttons.cancel')}
 					width={'100%'}
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 					open={showCloseApplicationModal}
@@ -140,7 +144,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 					onCancel={() => setShowCloseApplicationModal(false)}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modal.closeDescription')}</Text>
+						<Text>{translate('modals.closeApplication.description')}</Text>
 					</Flex>
 				</Modal>
 				<RequestRevisionsModal
@@ -149,6 +153,12 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 					setIsOpen={setOpenRevisionsModal}
 				/>
 			</Flex>
+			<SuccessModal
+				successText={translate('modals.applications.global.success.text', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showSuccessModal}
+				onOk={() => setShowSuccessModal(false)}
+			/>
 		</PageHeader>
 	);
 };

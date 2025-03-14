@@ -198,7 +198,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 							</Col>
 						</Row>
 						<Row>
-							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }} style={{ marginBottom: '6rem' }}>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }} style={{ marginBottom: '7rem' }}>
 								<TextAreaBox
 									showCount
 									maxWordCount={300}
