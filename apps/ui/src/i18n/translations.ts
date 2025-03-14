@@ -22,6 +22,7 @@ import { initReactI18next } from 'react-i18next';
 import { z } from 'zod';
 
 import enFormErrors from './locale/en/enFormErrors.json';
+import enModalsLang from './locale/en/enModals.json';
 import enApplicationSection from './locale/en/enSection.json';
 import enGeneralLang from './locale/en/enTranslations.json';
 import frFormErrors from './locale/fr/frFormErrors.json';
@@ -34,6 +35,7 @@ i18n.use(initReactI18next).init({
 				...enGeneralLang,
 				...enApplicationSection,
 				...enFormErrors,
+				...enModalsLang,
 			},
 		},
 		fr: {

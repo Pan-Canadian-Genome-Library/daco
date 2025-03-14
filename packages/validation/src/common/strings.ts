@@ -58,6 +58,11 @@ export const Maximum250WordsString = TrimmedString.refine((value) => value.split
 });
 export type Maximum250WordsString = z.infer<typeof Maximum250WordsString>;
 
+export const Maximum300WordsString = TrimmedString.refine((value) => value.split(WORDS).length <= 300, {
+	params: { violation: 'tooManyWords', length: 300 },
+});
+export type Maximum300WordsString = z.infer<typeof Maximum300WordsString>;
+
 export const Concise200WordCountString = MinimumWordCountString.and(Maximum200WordsString);
 export type Concise200WordCountString = z.infer<typeof Concise200WordCountString>;
 

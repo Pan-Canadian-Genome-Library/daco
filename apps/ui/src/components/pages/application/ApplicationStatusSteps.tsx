@@ -58,7 +58,7 @@ const appStatusItems: AppStatusType[] = [
 // Temporary logic
 const isFilled = true;
 
-const AppStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValues }) => {
+const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValues }) => {
 	const { token } = useToken();
 
 	const renderAppStatusItems = (): JSX.Element[] => {
@@ -105,4 +105,4 @@ const AppStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValu
 	);
 };
 
-export default AppStatusSteps;
+export default ApplicationStatusSteps;
