@@ -57,7 +57,7 @@ const DashboardPage = () => {
 	const handleOk = () => {
 		setOpenModal(false);
 		//TODO: No endpoint exists to move this to draft mode in the API just yet, this needs to be done otherwise we redirect to view mode automatically.
-		navigate(`/application/${modalAppId}/edit`);
+		navigate(`/application/${modalAppId}/intro/edit`);
 	};
 
 	return (
@@ -142,7 +142,6 @@ const DashboardPage = () => {
 					open={openModal}
 					onOk={handleOk}
 					onCancel={() => setOpenModal(false)}
-					footer={[]}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
 						<Text>{translate('modals.editApplication.description')}</Text>
