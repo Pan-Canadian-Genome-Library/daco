@@ -34,7 +34,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 describe('Signature API', () => {
 	let db: PostgresDb;

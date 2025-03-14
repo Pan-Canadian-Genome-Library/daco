@@ -17,14 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applications } from '@/db/schemas/applications.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -38,7 +36,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
@@ -57,6 +55,7 @@ describe('Application Service', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
+		await addPaginationDonors(db);
 
 		testApplicationService = applicationSvc(db);
 	});
@@ -267,8 +266,6 @@ describe('Application Service', () => {
 		});
 
 		it('should allow record pagination', async () => {
-			await addPaginationDonors(db);
-
 			const paginationResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 10 });
 
 			assert.ok(paginationResult.success);
@@ -300,17 +297,9 @@ describe('Application Service', () => {
 			assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);
 			assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
 		});
-
-		after(async () => {
-			await db.delete(applications).where(eq(applications.user_id, user_id));
-		});
 	});
 
 	describe('Edit Applications', () => {
-		before(async () => {
-			await addInitialApplications(db);
-		});
-
 		it('should allow editing applications and return record with updated fields', async () => {
 			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
 
@@ -337,10 +326,6 @@ describe('Application Service', () => {
 	});
 
 	describe('Get Application Metadata', () => {
-		before(async () => {
-			await addInitialApplications(db);
-		});
-
 		it('should list statistics for how many applications are in each state category', async () => {
 			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
 			assert.ok(appStateTotals.success);
@@ -366,7 +351,6 @@ describe('Application Service', () => {
 	});
 
 	after(async () => {
-		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});

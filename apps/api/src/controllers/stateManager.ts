@@ -241,11 +241,21 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async closeRepReview() {
-		return this.closeDraft();
+		const transitionResult = this._canPerformAction(close);
+		if (transitionResult.success) {
+			return await this._dispatchAndUpdateAction(close, 'close');
+		} else {
+			return failure(`Cannot close application with state ${this.getState()}`);
+		}
 	}
 
 	async closeDacReview() {
-		return this.closeDraft();
+		const transitionResult = this._canPerformAction(close);
+		if (transitionResult.success) {
+			return await this._dispatchAndUpdateAction(close, 'close');
+		} else {
+			return failure(`Cannot close application with state ${this.getState()}`);
+		}
 	}
 
 	private async _onClose() {
