@@ -93,11 +93,17 @@ export const createCollaborators = async ({
 		application_id,
 	}));
 
-	const result = await collaboratorsRepo.createCollaborators({
+	const collaboratorsResult = await collaboratorsRepo.createCollaborators({
 		newCollaborators,
 	});
 
-	return result;
+	if (!collaboratorsResult.success) {
+		return collaboratorsResult;
+	}
+
+	const result = aliasCollaboratorRecord(collaboratorsResult.data);
+
+	return success(result);
 };
 
 /**
@@ -124,11 +130,16 @@ export const deleteCollaborator = async ({ application_id, id }: { application_i
 		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
 	}
 
-	const result = await collaboratorsRepo.deleteCollaborator({
+	const deleteResult = await collaboratorsRepo.deleteCollaborator({
 		id,
 	});
 
-	return result;
+	if (!deleteResult.success) {
+		return deleteResult;
+	}
+	const result = aliasCollaboratorRecord(deleteResult.data);
+
+	return success(result);
 };
 
 /*
