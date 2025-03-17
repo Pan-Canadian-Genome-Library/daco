@@ -68,6 +68,7 @@ fileRouter.delete(
 
 		if (!result.success) {
 			res.status(500).send(result);
+			return;
 		}
 
 		res.status(204).send({});
