@@ -18,12 +18,30 @@
  */
 
 import { uploadEthicsFile } from '@/controllers/fileController.ts';
-import { fileUploadValidation } from '@pcgl-daco/request-utils';
-import { isPositiveInteger } from '@pcgl-daco/validation';
+import { apiZodErrorMapping } from '@/utils/validation.ts';
+import { fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request, type Response } from 'express';
 import formidable from 'formidable';
 
 const fileRouter = express.Router();
+
+fileRouter.get(
+	'/:fileId',
+	withParamsSchemaValidation(getFileByIdParamsSchema, apiZodErrorMapping, async (req, res) => {
+		const { fileId } = req.params;
+
+		const id = parseInt(fileId ? fileId : '');
+
+		if (!isPositiveInteger(id)) {
+			res.status(400).send({ message: 'Invalid fileId' });
+			return;
+		}
+
+		res.status(200).send({});
+		return;
+	}),
+);
 
 fileRouter.post(
 	'/ethics/:applicationId',

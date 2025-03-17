@@ -22,7 +22,7 @@ import logger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { type ApplicationRecord, type ApplicationService, type FilesService } from '@/service/types.ts';
-import { failure } from '@/utils/results.ts';
+import { failure, success } from '@/utils/results.ts';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
@@ -90,6 +90,28 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 		return txResult;
 	} catch (error) {
 		const message = `Unable to upload file to application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
+
+/**
+ * Get a file by application
+ * @param fileId - The target fileId to associate the uploaded file
+ * @returns Success with file data / Failure with Error.
+ */
+export const getFile = async ({ fileId }: { fileId: number }) => {
+	try {
+		const database = getDbInstance();
+		const filesService: FilesService = filesSvc(database);
+
+		let result = await filesService.getFileById({ fileId });
+
+		console.log(result);
+		return success(result);
+	} catch (error) {
+		const message = `Unable to get file with id: ${fileId}`;
 		logger.error(message);
 		logger.error(error);
 		return failure(message, error);

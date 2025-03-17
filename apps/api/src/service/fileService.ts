@@ -33,6 +33,9 @@ import { PostgresTransaction, type FilesModel, type JoinedApplicationRecord } fr
  * @param db - Drizzle Postgres DB Instance
  */
 const filesSvc = (db: PostgresDb) => ({
+	getFileById: async ({ fileId }: { fileId: number; transaction?: PostgresTransaction }) => {
+		return fileId;
+	},
 	createFile: async ({
 		file,
 		application,
