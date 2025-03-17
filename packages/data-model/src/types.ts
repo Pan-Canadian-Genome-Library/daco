@@ -40,6 +40,13 @@ export const FileTypes = {
 
 export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
+export const SignatureTypes = {
+	APPLICANT: 'APPLICANT',
+	INSTITUTIONAL_REP: 'INSTITUTIONAL_REP',
+} as const;
+
+export type SignatureType = (typeof SignatureTypes)[keyof typeof SignatureTypes];
+
 export enum ApplicationReviewOutcomes {
 	'APPROVED',
 	'REJECTED',
