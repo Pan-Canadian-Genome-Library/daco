@@ -24,7 +24,7 @@ import assert from 'node:assert';
 import { describe } from 'node:test';
 import { testUserId } from '../testUtils.ts';
 
-import { aliasToDatabaseData, aliasToResponseData } from '@/utils/aliases.ts';
+import { convertToCamelCase, convertToSnakeCase } from '@/utils/aliases.ts';
 
 describe('Alias Utils', () => {
 	describe('Alias camelCase to snake_case', () => {
@@ -36,7 +36,7 @@ describe('Alias Utils', () => {
 			approvedAt: new Date(),
 		};
 
-		const aliasResult = aliasToDatabaseData<ApplicationDTO, ApplicationModel>(testData);
+		const aliasResult = convertToSnakeCase<ApplicationDTO, ApplicationModel>(testData);
 
 		assert.ok(aliasResult.hasOwnProperty('user_id'));
 		assert.ok(aliasResult.hasOwnProperty('created_at'));
@@ -51,7 +51,7 @@ describe('Alias Utils', () => {
 			approved_at: new Date(),
 		};
 
-		const aliasResult = aliasToResponseData<ApplicationModel, ApplicationDTO>(testData);
+		const aliasResult = convertToCamelCase<ApplicationModel, ApplicationDTO>(testData);
 
 		assert.ok(aliasResult.hasOwnProperty('userId'));
 		assert.ok(aliasResult.hasOwnProperty('createdAt'));
@@ -69,7 +69,7 @@ describe('Alias Utils', () => {
 
 		const omitKeys = ['approved_at', 'updated_at'];
 
-		const aliasResult = aliasToResponseData<ApplicationModel, ApplicationDTO>(testData, omitKeys);
+		const aliasResult = convertToCamelCase<ApplicationModel, ApplicationDTO>(testData, omitKeys);
 
 		assert.ok(aliasResult.hasOwnProperty('userId'));
 		assert.ok(aliasResult.hasOwnProperty('createdAt'));
