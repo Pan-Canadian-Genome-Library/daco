@@ -149,7 +149,7 @@ export type ProjectDTO = {
 };
 
 export type EthicsLetterDTO = {
-	ethicsLetter?: string | null;
+	ethicsLetter?: number | null;
 	ethicsReviewRequired?: boolean | null;
 };
 

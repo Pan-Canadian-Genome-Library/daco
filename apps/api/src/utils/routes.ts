@@ -86,6 +86,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				projectPublicationUrls: applicationContents.project_publication_urls,
 				requestedStudies: applicationContents.requested_studies,
 				ethicsReviewRequired: applicationContents.ethics_review_required,
+				ethicsLetter: applicationContents.ethics_letter,
 			}
 		: null;
 
