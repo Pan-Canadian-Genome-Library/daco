@@ -21,6 +21,7 @@ import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
 import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
@@ -40,21 +41,7 @@ const useCreateApplication = () => {
 				}),
 			});
 
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.fetchError.title');
-						error.errors = translate('errors.fetchError.message');
-						break;
-				}
-
-				throw error;
-			}
+			GenericApiErrorResponseHandler({ response, translate });
 
 			return await response.json();
 		},

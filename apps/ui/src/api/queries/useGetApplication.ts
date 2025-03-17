@@ -20,6 +20,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
+import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
 import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
@@ -35,25 +36,7 @@ const useGetApplication = (id?: string | number) => {
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}`);
 
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-					case 500:
-						error.message = translate('errors.http.500.title');
-						error.errors = translate('errors.http.500.message');
-						break;
-				}
-
-				throw error;
-			}
+			GenericApiErrorResponseHandler({ response, translate });
 
 			return await response.json().then((data: ApplicationResponseData) => {
 				// Filter out data if they contain null values and application metadata

@@ -20,6 +20,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
+import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
@@ -31,30 +32,7 @@ const useGetCollaborators = (applicationId: string | number) => {
 		queryKey: [`collaborators-${applicationId}`],
 		queryFn: async () => {
 			const response = await fetch(`/collaborators/${applicationId}`);
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-					case 400:
-						error.message = translate('errors.http.400.title');
-						error.errors = translate('errors.http.400.message');
-						break;
-					case 500:
-						error.message = translate('errors.http.500.title');
-						error.errors = translate('errors.http.500.message');
-						break;
-				}
-
-				throw error;
-			}
+			GenericApiErrorResponseHandler({ response, translate });
 
 			return await response.json();
 		},

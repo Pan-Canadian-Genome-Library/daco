@@ -17,27 +17,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 
-import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
-import { fetch } from '@/global/FetchClient';
-import { ApplicationCountMetadata, ServerError } from '@/global/types';
+export const GenericApiErrorResponseHandler = ({
+	response,
+	translate,
+}: {
+	response: Response;
+	translate: TFunction<'translation', undefined>;
+}) => {
+	if (!response.ok) {
+		const error = {
+			message: translate('errors.generic.title'),
+			errors: translate('errors.generic.message'),
+		};
 
-const useGetApplicationCounts = (id?: string | number) => {
-	const { t: translate } = useTranslation();
+		switch (response.status) {
+			case 400:
+				error.message = translate('errors.fetchError.title');
+				error.errors = translate('errors.fetchError.message');
+				break;
+			case 404:
+				error.message = translate('errors.http.404.title');
+				error.errors = translate('errors.http.404.message');
+				break;
+			case 500:
+				error.message = translate('errors.http.500.title');
+				error.errors = translate('errors.http.500.message');
+				break;
+		}
 
-	return useQuery<ApplicationCountMetadata, ServerError>({
-		queryKey: [id],
-
-		queryFn: async () => {
-			const response = await fetch(`/applications/metadata/counts?userId=${id}`);
-
-			GenericApiErrorResponseHandler({ response, translate });
-
-			return await response.json();
-		},
-	});
+		throw error;
+	}
 };
-
-export default useGetApplicationCounts;

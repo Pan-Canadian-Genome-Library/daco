@@ -24,6 +24,7 @@ import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
+import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
 import { queryClient } from '@/providers/Providers';
 import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
 import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
@@ -47,29 +48,7 @@ const useAddCollaborator = () => {
 				}),
 			});
 
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.fetchError.title');
-						error.errors = translate('errors.fetchError.message');
-						break;
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-					case 500:
-						error.message = translate('errors.http.500.title');
-						error.errors = translate('errors.http.500.message');
-						break;
-				}
-
-				throw error;
-			}
+			GenericApiErrorResponseHandler({ response, translate });
 
 			return await response.json();
 		},
