@@ -26,6 +26,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applications } from '@/db/schemas/applications.js';
 
+import { files } from '@/db/schemas/files.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { ApplicationService, FilesService } from '@/service/types.ts';
@@ -171,8 +172,26 @@ describe('Signature Service', () => {
 		});
 	});
 
+	describe('File Delete', () => {
+		it('should delete by its id', async () => {
+			const fileResponse = await testFileService.deleteFileById({
+				fileId: 1,
+			});
+
+			assert.ok(fileResponse.success);
+		});
+		it('should fail if id does not exist', async () => {
+			const fileResponse = await testFileService.deleteFileById({
+				fileId: 999,
+			});
+
+			assert.ok(!fileResponse.success);
+		});
+	});
+
 	after(async () => {
 		await db.delete(applications).where(eq(applications.user_id, user_id));
+		await db.delete(files).where(eq(files.submitter_user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});
