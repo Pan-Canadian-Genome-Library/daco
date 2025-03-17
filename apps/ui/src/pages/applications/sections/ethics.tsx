@@ -47,7 +47,7 @@ const MAX_FILE_SIZE = 5000000;
 
 const Ethics = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { control, watch, getValues } = useForm<EthicsSchemaType>({});
 	const { token } = useToken();
 
@@ -55,7 +55,7 @@ const Ethics = () => {
 
 	// File Upload configuration
 	const uploadFile: UploadProps = {
-		action: 'https://www.localhost:3000',
+		action: `${__API_PROXY_PATH__}/file/ethics/${appId}`,
 		maxCount: 1,
 		showUploadList: {
 			showDownloadIcon: true,
