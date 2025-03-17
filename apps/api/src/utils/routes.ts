@@ -139,7 +139,6 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 		project_title: update.projectTitle,
 		project_website: update.projectWebsite,
 		ethics_review_required: update.ethicsReviewRequired,
-		ethics_letter: null, // Prevent updateApplicaition CRUD from updating ethics_letter. This should only be updated via files controller/service
 	};
 
 	return formattedUpdate;

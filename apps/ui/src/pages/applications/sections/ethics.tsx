@@ -54,7 +54,7 @@ const Ethics = () => {
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
-	const { data } = useGetFile({ fileId: state.fields?.ethicsLetter });
+	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
 	const {
 		control,
 		watch,
@@ -87,6 +87,22 @@ const Ethics = () => {
 					description: translate('invalidFileSizeDescription'),
 				});
 				return false;
+			}
+		},
+		onChange: (info) => {
+			if (info.file.status === 'done') {
+				dispatch({
+					type: 'UPDATE_APPLICATION',
+					payload: {
+						fields: {
+							...state?.fields,
+							ethicsLetter: info.file.response.id,
+						},
+						formState: {
+							...state?.formState,
+						},
+					},
+				});
 			}
 		},
 	};
@@ -160,26 +176,32 @@ const Ethics = () => {
 										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
 											{translate('ethics-section.allowedFileTypes')}
 										</Text>
-										<Upload
-											{...uploadFile}
-											action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
-											maxCount={1}
-											showUploadList={{
-												showDownloadIcon: true,
-												downloadIcon: 'Download',
-											}}
-											defaultFileList={[
-												{
-													uid: `${data?.id}`,
-													name: `${data?.filename}`,
-													status: 'done',
-												},
-											]}
-										>
-											<Button type="primary" icon={<UploadOutlined />}>
-												{translate('button.upload')}
-											</Button>
-										</Upload>
+										{!isLoading ? (
+											<Upload
+												{...uploadFile}
+												action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
+												maxCount={1}
+												showUploadList={{
+													showDownloadIcon: true,
+													downloadIcon: 'Download',
+												}}
+												defaultFileList={
+													data
+														? [
+																{
+																	uid: `${data?.id}`,
+																	name: `${data?.filename}`,
+																	status: 'done',
+																},
+															]
+														: []
+												}
+											>
+												<Button type="primary" icon={<UploadOutlined />}>
+													{translate('button.upload')}
+												</Button>
+											</Upload>
+										) : null}
 									</Flex>
 								</Form.Item>
 							</Flex>
