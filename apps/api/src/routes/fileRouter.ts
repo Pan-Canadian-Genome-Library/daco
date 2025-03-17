@@ -70,7 +70,7 @@ fileRouter.delete(
 			res.status(500).send(result);
 		}
 
-		res.status(200).send(result);
+		res.status(204);
 		return;
 	}),
 );
