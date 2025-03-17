@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import useEditApplication from '@/api/useEditApplication';
+import useGetFile from '@/api/useGetFIle';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -53,6 +54,7 @@ const Ethics = () => {
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
+	const { data } = useGetFile({ fileId: state.fields?.ethicsLetter });
 	const {
 		control,
 		watch,
@@ -69,12 +71,6 @@ const Ethics = () => {
 
 	// File Upload configuration
 	const uploadFile: UploadProps = {
-		action: `${__API_PROXY_PATH__}/file/ethics/${appId}`,
-		maxCount: 1,
-		showUploadList: {
-			showDownloadIcon: true,
-			downloadIcon: 'Download',
-		},
 		beforeUpload: (file) => {
 			const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
 
@@ -92,9 +88,6 @@ const Ethics = () => {
 				});
 				return false;
 			}
-		},
-		onChange: () => {
-			// Add file data to the rhf here, once the file upload is complete.
 		},
 	};
 
@@ -114,6 +107,7 @@ const Ethics = () => {
 					},
 				},
 			});
+			// This page should edit the backend immediately
 			editApplication({
 				id: appId,
 				update: {
@@ -166,7 +160,22 @@ const Ethics = () => {
 										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
 											{translate('ethics-section.allowedFileTypes')}
 										</Text>
-										<Upload {...uploadFile}>
+										<Upload
+											{...uploadFile}
+											action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
+											maxCount={1}
+											showUploadList={{
+												showDownloadIcon: true,
+												downloadIcon: 'Download',
+											}}
+											defaultFileList={[
+												{
+													uid: `${data?.id}`,
+													name: `${data?.filename}`,
+													status: 'done',
+												},
+											]}
+										>
 											<Button type="primary" icon={<UploadOutlined />}>
 												{translate('button.upload')}
 											</Button>

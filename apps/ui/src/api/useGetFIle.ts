@@ -22,16 +22,24 @@ import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import type { UserResponse } from '@pcgl-daco/validation';
 
-const useGetFile = ({ fileId }: { fileId?: string | null }) => {
+type FilesUpdate = {
+	application_id?: number | undefined;
+	type?: 'SIGNED_APPLICATION' | 'ETHICS_LETTER' | undefined;
+	submitter_user_id?: string | undefined;
+	submitted_at?: Date | undefined;
+	content?: Buffer<ArrayBufferLike> | undefined;
+	filename?: string | null | undefined;
+};
+
+const useGetFile = ({ fileId }: { fileId?: number | null }) => {
 	const { t: translate } = useTranslation();
 
-	return useQuery<UserResponse, ServerError>({
+	return useQuery<FilesUpdate & { id: number }, ServerError>({
 		queryKey: ['file'],
 		enabled: !!fileId,
 		queryFn: async () => {
-			const response = await fetch(`/auth/user`);
+			const response = await fetch(`/file/${fileId}`);
 
 			if (!response.ok) {
 				const error = {
