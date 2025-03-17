@@ -20,10 +20,14 @@
 import { z } from 'zod';
 import { isPositiveInteger } from '../utils/functions.js';
 
-export const getFileByIdParamsSchema = z
+export const getFileByIdParamsSchema = z.object({
+	fileId: z
+		.string()
+		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+});
+
+export const fileDeleteParamsSchema = z
 	.object({
-		fileId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+		fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
 	})
 	.required();
