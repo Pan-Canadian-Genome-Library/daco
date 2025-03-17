@@ -693,7 +693,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ServerErrors'
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
   /file/{fileId}:
     delete:
       tags:
@@ -724,7 +726,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ServerErrors'
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
 components:
   schemas:
     ApplicationWithApplicantInfo:
