@@ -23,6 +23,7 @@ import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { type ApplicationRecord, type ApplicationService, type FilesService } from '@/service/types.ts';
 import { failure } from '@/utils/results.ts';
+import { FileTypes } from '@pcgl-daco/data-model';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
@@ -113,13 +114,23 @@ export const deleteFile = async ({ fileId }: { fileId: number }) => {
 			if (!deleteResult.success) {
 				return deleteResult;
 			}
-			const { application_id } = deleteResult.data;
+			const { application_id, type } = deleteResult.data;
+
+			// Check which field in ApplicationContents needs to be set to null
+			let update = {};
+			if (type === FileTypes.ETHICS_LETTER) {
+				update = {
+					ethics_letter: null,
+				};
+			} else {
+				update = {
+					signed_pdf: null,
+				};
+			}
 
 			const editApplicationResult = await applicationRepo.editApplication({
 				id: application_id,
-				update: {
-					ethics_letter: null,
-				},
+				update,
 				transaction: tx,
 			});
 
