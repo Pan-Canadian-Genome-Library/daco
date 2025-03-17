@@ -18,19 +18,22 @@
  */
 
 import { UploadOutlined } from '@ant-design/icons';
-import { EthicsFileEnum, ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
+import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Form, notification, theme, Typography, Upload, UploadProps } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useEditApplication from '@/api/useEditApplication';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -48,10 +51,21 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { control, watch, getValues } = useForm<EthicsSchemaType>({});
+	const { state, dispatch } = useApplicationContext();
+	const { mutate: editApplication } = useEditApplication();
+	const {
+		control,
+		watch,
+		getValues,
+		formState: { isDirty },
+	} = useForm<EthicsSchemaType>({
+		defaultValues: {
+			ethicsReviewRequired: state.fields?.ethicsReviewRequired ?? undefined,
+		},
+	});
 	const { token } = useToken();
 
-	const showFileUpload = watch('ethicsApproval');
+	const showFileUpload = watch('ethicsReviewRequired') !== undefined;
 
 	// File Upload configuration
 	const uploadFile: UploadProps = {
@@ -84,6 +98,31 @@ const Ethics = () => {
 		},
 	};
 
+	// Update ethicsReviewRequired record on change
+	useEffect(() => {
+		const ethicsReviewReq = watch('ethicsReviewRequired');
+		if (isDirty) {
+			dispatch({
+				type: 'UPDATE_APPLICATION',
+				payload: {
+					fields: {
+						...state?.fields,
+						ethicsReviewRequired: ethicsReviewReq,
+					},
+					formState: {
+						...state?.formState,
+					},
+				},
+			});
+			editApplication({
+				id: appId,
+				update: {
+					ethicsReviewRequired: ethicsReviewReq,
+				},
+			});
+		}
+	}, [watch('ethicsReviewRequired')]);
+
 	return (
 		<SectionWrapper>
 			<>
@@ -96,17 +135,19 @@ const Ethics = () => {
 					<Form layout="vertical">
 						<BlockRadioBox
 							label={translate('ethics-section.pleaseChose')}
-							name="ethicsApproval"
+							name="ethicsReviewRequired"
 							control={control}
 							rule={rule}
 							required
 							options={[
 								{
-									value: EthicsFileEnum.EXEMPTION,
+									key: 'exemption',
+									value: false,
 									label: translate('ethics-section.exemptionDescription'),
 								},
 								{
-									value: EthicsFileEnum.ETHICS_LETTER,
+									key: 'ethicsLetter',
+									value: true,
 									label: translate('ethics-section.ethicsLetterDescription'),
 								},
 							]}
@@ -118,7 +159,7 @@ const Ethics = () => {
 									style={{ fontWeight: 600 }}
 									required
 									label={translate('ethics-section.attach', {
-										letter: getValues('ethicsApproval') === 'exemption' ? 'exemption' : 'approval',
+										letter: getValues('ethicsReviewRequired') === false ? 'exemption' : 'approval',
 									})}
 								>
 									<Flex vertical gap={'large'}>

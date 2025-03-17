@@ -148,6 +148,11 @@ export type ProjectDTO = {
 	projectPublicationUrls?: string[] | null;
 };
 
+export type EthicsLetterDTO = {
+	ethicsLetter?: string | null;
+	ethicsReviewRequired?: boolean | null;
+};
+
 export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
@@ -198,7 +203,8 @@ export type ApplicationContentsResponse = {
 	InstitutionDTO &
 	InstitutionalRepDTO &
 	ProjectDTO &
-	RequestedStudiesDTO;
+	RequestedStudiesDTO &
+	EthicsLetterDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;
