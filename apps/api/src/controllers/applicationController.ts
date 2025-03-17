@@ -23,7 +23,6 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-
 import {
 	JoinedApplicationRecord,
 	type ApplicationRecord,
