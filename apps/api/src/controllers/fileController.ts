@@ -22,7 +22,7 @@ import logger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { type ApplicationRecord, type ApplicationService, type FilesService } from '@/service/types.ts';
-import { failure, success } from '@/utils/results.ts';
+import { failure } from '@/utils/results.ts';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
@@ -106,10 +106,9 @@ export const getFile = async ({ fileId }: { fileId: number }) => {
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
 
-		let result = await filesService.getFileById({ fileId });
+		const result = await filesService.getFileById({ fileId });
 
-		console.log(result);
-		return success(result);
+		return result;
 	} catch (error) {
 		const message = `Unable to get file with id: ${fileId}`;
 		logger.error(message);

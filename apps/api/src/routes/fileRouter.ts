@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { uploadEthicsFile } from '@/controllers/fileController.ts';
+import { getFile, uploadEthicsFile } from '@/controllers/fileController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.ts';
 import { fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import { getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
@@ -37,8 +37,14 @@ fileRouter.get(
 			res.status(400).send({ message: 'Invalid fileId' });
 			return;
 		}
+		const result = await getFile({ fileId: id });
 
-		res.status(200).send({});
+		if (!result.success) {
+			res.status(500).send(result);
+			return;
+		}
+
+		res.status(200).send(result.data);
 		return;
 	}),
 );
