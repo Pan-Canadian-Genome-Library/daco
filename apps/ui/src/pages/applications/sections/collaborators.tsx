@@ -114,7 +114,11 @@ const Collaborators = () => {
 			<>
 				<SectionTitle
 					title={translate('collab-section.title')}
-					text={[translate('collab-section.description1'), translate('collab-section.note')]}
+					text={[
+						translate('collab-section.description1'),
+						translate('collab-section.optional'),
+						translate('collab-section.note'),
+					]}
 					showDivider={false}
 				/>
 				<SectionContent showDivider={false}>
