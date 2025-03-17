@@ -38,7 +38,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testApplicationId,
-} from '../utils/testUtils.ts';
+} from '@tests/utils/testUtils.ts';
 
 describe('File API', () => {
 	let db: PostgresDb;

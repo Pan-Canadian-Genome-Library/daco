@@ -35,7 +35,7 @@ import {
 	PG_DATABASE,
 	PG_PASSWORD,
 	PG_USER,
-} from '../utils/testUtils.ts';
+} from '@tests/utils/testUtils.ts';
 
 describe('Application Service', () => {
 	let db: PostgresDb;

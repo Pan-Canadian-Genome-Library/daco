@@ -42,7 +42,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../utils/testUtils.ts';
+} from '@tests/utils/testUtils.ts';
 
 describe('Application Action Service', () => {
 	let db: PostgresDb;

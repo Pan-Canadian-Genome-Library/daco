@@ -27,7 +27,13 @@ import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
+import {
+	addInitialApplications,
+	initTestMigration,
+	PG_DATABASE,
+	PG_PASSWORD,
+	PG_USER,
+} from '@tests/utils/testUtils.ts';
 
 const {
 	APPROVED,

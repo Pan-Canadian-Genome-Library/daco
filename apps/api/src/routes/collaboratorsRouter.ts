@@ -34,7 +34,7 @@ import {
 	collaboratorsListParamsSchema,
 	collaboratorsUpdateRequestSchema,
 } from '@pcgl-daco/validation';
-import { testUserId } from '../../tests/utils/testUtils.ts';
+import { testUserId } from '@tests/utils/testUtils.ts';
 
 const collaboratorsRouter = express.Router();
 const jsonParser = bodyParser.json();

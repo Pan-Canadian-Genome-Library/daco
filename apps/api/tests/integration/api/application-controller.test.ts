@@ -44,7 +44,7 @@ import {
 	PG_USER,
 	testApplicationId,
 	testUserId as user_id,
-} from '../utils/testUtils.ts';
+} from '@tests/utils/testUtils.ts';
 
 // Sample revision request data
 const revisionRequestData: RevisionRequestModel = {
