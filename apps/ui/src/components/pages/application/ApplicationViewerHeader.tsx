@@ -52,10 +52,6 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-	const showRevisionsModal = () => {
-		setOpenRevisionsModal(true);
-	};
-
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
 		//TODO: Add logic to this to actually submit the revisions.
 		console.log('Submission Handled', data);
@@ -66,10 +62,6 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleCloseApplicationRequest = () => {
 		setShowCloseApplicationModal(false);
-	};
-
-	const handleShowCloseModal = () => {
-		setShowCloseApplicationModal(true);
 	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
@@ -130,8 +122,8 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 				>
 					{/* TODO: Disable for MVP */}
 					{/* <Button>{translate('button.history')}</Button> */}
-					<Button onClick={handleShowCloseModal}>{translate('button.closeApp')}</Button>
-					<Button onClick={showRevisionsModal}>{translate('button.requestRevisions')}</Button>
+					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
+					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				</Flex>
 				<Modal
 					title={translate('modals.closeApplication.title', { id })}
