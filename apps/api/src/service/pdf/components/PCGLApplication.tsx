@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const MyDocument = () => (
+const PCGLApplication = () => (
 	<Document
 		title="PCGL DACO Agreement / Accord du bureau de conformité de l'accès aux données BGP"
 		style={styles.document}
@@ -61,8 +61,8 @@ const MyDocument = () => (
 	</Document>
 );
 
-const renderPDF = async () => {
-	return await renderToBuffer(<MyDocument />);
+const renderApplicationPDF = async () => {
+	return await renderToBuffer(<PCGLApplication />);
 };
 
-export { renderPDF };
+export { renderApplicationPDF };

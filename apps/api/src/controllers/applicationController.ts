@@ -23,8 +23,10 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
+import { pdfSvc } from '@/service/pdf/pdfService.ts';
 import {
 	JoinedApplicationRecord,
+	PDFService,
 	type ApplicationRecord,
 	type ApplicationService,
 	type RevisionRequestModel,
@@ -128,6 +130,32 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
 
 	return await service.applicationStateTotals({ user_id: userId });
 };
+
+/**
+ * Gets an application by a corresponding application ID
+ * @param applicationId - The ID of the application within the database.
+ * @returns Success with the details of the application / Failure with Error.
+ */
+export const getApplicationPDF = async ({ applicationId }: { applicationId: number }) => {
+	const database = getDbInstance();
+	const applicationService: ApplicationService = applicationSvc(database);
+	const pdfService: PDFService = pdfSvc();
+
+	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
+
+	if (!applicationContents.success) {
+		return applicationContents;
+	}
+
+	const renderedPDF = await pdfService.renderPCGLApplicationPDF();
+
+	if (!renderedPDF.success) {
+		return renderedPDF;
+	}
+
+	return renderedPDF;
+};
+
 /**
  * Approves the application by providing the applicationId
  *
