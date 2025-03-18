@@ -30,6 +30,7 @@ import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
+import { errorHandler } from './middleware/errorHandler.ts';
 import authRouter from './routes/authRouter.js';
 import fileRouter from './routes/fileRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
@@ -52,6 +53,7 @@ const startServer = async () => {
 	app.use('/signature', signatureRouter);
 	app.use('/auth', authRouter);
 	app.use('/file', fileRouter);
+	app.use(errorHandler);
 
 	app.use(
 		`/${API_DOCS_PATH}`,
