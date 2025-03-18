@@ -162,6 +162,23 @@ describe('Signature Service', () => {
 		});
 	});
 
+	describe('File Delete', () => {
+		it('should delete by its id', async () => {
+			const fileResponse = await testFileService.deleteFileById({
+				fileId: 1,
+			});
+
+			assert.ok(fileResponse.success);
+		});
+		it('should fail if id does not exist', async () => {
+			const fileResponse = await testFileService.deleteFileById({
+				fileId: 999,
+			});
+
+			assert.ok(!fileResponse.success);
+		});
+	});
+
 	after(async () => {
 		await container.stop();
 		process.exit(0);
