@@ -747,6 +747,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+
   /file/{fileId}:
     delete:
       tags:
@@ -780,6 +781,39 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+    get:
+      tags:
+        - File
+      summary: Get file By File id
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File retrieved'
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: 'Error retrieved file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+
 components:
   schemas:
     ApplicationWithApplicantInfo:
