@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import useEditApplication from '@/api/useEditApplication';
-import useGetFile from '@/api/useGetFIle';
+import useGetFile from '@/api/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
 import SectionContent from '@/components/pages/application/SectionContent';
