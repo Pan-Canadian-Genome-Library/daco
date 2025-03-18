@@ -22,22 +22,12 @@ import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-
-type FilesUpdate = {
-	application_id: number;
-	type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
-	submitter_user_id: string;
-	submitted_at: Date;
-	content: {
-		data: Buffer<ArrayBufferLike>;
-	};
-	filename: string;
-};
+import { UploadFile } from 'antd';
 
 const useGetFile = ({ fileId }: { fileId?: number | null }) => {
 	const { t: translate } = useTranslation();
 
-	return useQuery<FilesUpdate & { id: number }, ServerError>({
+	return useQuery<UploadFile[], ServerError>({
 		queryKey: ['file'],
 		enabled: !!fileId,
 		queryFn: async () => {
@@ -58,8 +48,19 @@ const useGetFile = ({ fileId }: { fileId?: number | null }) => {
 
 				throw error;
 			}
+			const result = await response.json();
 
-			return await response.json();
+			const formatedFile: UploadFile[] = [
+				{
+					uid: `${result?.id}`,
+					name: `${result?.filename}`,
+					status: 'done',
+					url: '/', // to show red color link after retrieving file
+					response: result,
+				},
+			];
+
+			return formatedFile;
 		},
 	});
 };

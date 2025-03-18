@@ -31,4 +31,26 @@ const isValidPageNumber = (page: number) => {
 	return false;
 };
 
+export function getFileType(filename: string): string {
+	const match = filename.match(/\.([^.]+)$/);
+	const type = match && match[1] ? match[1].toLowerCase() : '';
+
+	switch (type) {
+		case 'pdf':
+			return AllowedFilesEnum.PDF;
+		case 'doc':
+			return AllowedFilesEnum.DOC;
+		case 'docx':
+			return AllowedFilesEnum.DOCX;
+	}
+
+	return AllowedFilesEnum.DOC;
+}
+
+export enum AllowedFilesEnum {
+	PDF = 'application/pdf',
+	DOC = 'application/msword',
+	DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+}
+
 export { isValidPageNumber };

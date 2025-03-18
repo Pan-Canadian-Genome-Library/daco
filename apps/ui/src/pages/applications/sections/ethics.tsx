@@ -33,36 +33,14 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
+import { AllowedFilesEnum, getFileType } from '@/global/utils';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
-import { useEffect, useState } from 'react';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
 const rule = createSchemaFieldRule(ethicsSchema);
-
-enum AllowedFilesEnum {
-	PDF = 'application/pdf',
-	DOC = 'application/msword',
-	DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-}
-
-function getFileType(filename: string): string {
-	const match = filename.match(/\.([^.]+)$/);
-	const type = match && match[1] ? match[1].toLowerCase() : '';
-
-	switch (type) {
-		case 'pdf':
-			return AllowedFilesEnum.PDF;
-		case 'doc':
-			return AllowedFilesEnum.DOC;
-		case 'docx':
-			return AllowedFilesEnum.DOCX;
-	}
-
-	return AllowedFilesEnum.DOC;
-}
 
 const MAX_FILE_SIZE = 5000000;
 
@@ -72,7 +50,6 @@ const Ethics = () => {
 	const { state, dispatch } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
-	const [files, setFiles] = useState<UploadFile[]>([]);
 	const { token } = useToken();
 
 	const { control, watch, getValues } = useForm<EthicsSchemaType>({
@@ -82,34 +59,6 @@ const Ethics = () => {
 	});
 
 	const showFileUpload = watch('ethicsReviewRequired') !== undefined;
-
-	// Generate URL for download and set files state
-	// revokeObjectUrl on page exit
-	useEffect(() => {
-		if (!data || !data?.content || !data.content.data) {
-			return;
-		}
-		const bufferArray = new Uint8Array(data.content.data).buffer;
-		const fileType = getFileType(data.filename);
-
-		const blob = new Blob([bufferArray], {
-			type: fileType,
-		});
-
-		const url = URL.createObjectURL(blob);
-		setFiles([
-			{
-				uid: `${data?.id}`,
-				name: `${data?.filename}`,
-				status: 'done',
-				url,
-			},
-		]);
-
-		return () => {
-			URL.revokeObjectURL(url);
-		};
-	}, [data]);
 
 	// Update the state on file change
 	const uploadChange = (info: UploadChangeParam<UploadFile>) => {
@@ -129,6 +78,7 @@ const Ethics = () => {
 		}
 	};
 
+	// file meta data check before triggering upload process
 	const beforeUpload = (file: RcFile) => {
 		const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
 
@@ -146,6 +96,27 @@ const Ethics = () => {
 			});
 			return false;
 		}
+	};
+
+	// Generate download url and then remove the link after downloading
+	const onDownload = (value: UploadFile) => {
+		const bufferArray = new Uint8Array(value.response.content.data).buffer;
+		const fileType = getFileType(value.name);
+
+		const blob = new Blob([bufferArray], {
+			type: fileType,
+		});
+
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+
+		a.download = value.name;
+		document.body.appendChild(a);
+		a.click();
+
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
 	};
 
 	return (
@@ -215,13 +186,14 @@ const Ethics = () => {
 										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
 											{translate('ethics-section.allowedFileTypes')}
 										</Text>
-										{!isLoading && files.length === 1 ? (
+										{!isLoading ? (
 											<Upload
 												action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
 												maxCount={1}
 												beforeUpload={beforeUpload}
 												onChange={uploadChange}
-												defaultFileList={files}
+												defaultFileList={data}
+												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
 											>
 												<Button type="primary" icon={<UploadOutlined />}>
 													{translate('button.upload')}
