@@ -24,6 +24,7 @@ import {
 	editApplication,
 	getAllApplications,
 	getApplicationById,
+	getApplicationPDF,
 	getApplicationStateTotals,
 	getRevisions,
 	rejectApplication,
@@ -182,6 +183,20 @@ applicationRouter.get('/:applicationId', async (request: Request<{ applicationId
 
 		response.send({ message: result.message, errors: resultErrors });
 	}
+});
+
+applicationRouter.get('/:applicationId/pdf', async (request, response) => {
+	const pdf = await getApplicationPDF({ applicationId: 1 });
+
+	if (!pdf.success) {
+		response.status(500).send('Error.');
+		return;
+	}
+
+	response.setHeader('Content-type', 'application/pdf');
+	response.end(pdf.data);
+
+	return;
 });
 
 /**

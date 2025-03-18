@@ -17,15 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { renderPDF } from '@/service/pdf/components/document.tsx';
-import express from 'express';
+import logger from '@/logger.ts';
+import { renderApplicationPDF } from '@/service/pdf/components/PCGLApplication.tsx';
+import { failure, success } from '@/utils/results.ts';
 
-const pdfRouter = express.Router();
+const pdfSvc = () => ({
+	renderPCGLApplicationPDF: async () => {
+		try {
+			const pdf = await renderApplicationPDF();
+			return success(pdf);
+		} catch (err) {
+			const message = `Error Rendering Application to PDF file`;
 
-pdfRouter.get('/', async (req, res) => {
-	const pdf = await renderPDF();
-	res.setHeader('Content-type', 'application/pdf');
-	res.end(pdf);
+			logger.error(message);
+			logger.error(err);
+
+			return failure(message, err);
+		}
+	},
 });
 
-export default pdfRouter;
+export { pdfSvc };
