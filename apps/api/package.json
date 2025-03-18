@@ -14,7 +14,8 @@
 		"setup:env": "cp -n .env.schema .env",
 		"migrate": "pnpm drizzle-kit migrate",
 		"start:prod": "pnpm migrate && tsx ./src/main.js",
-		"test": "pnpm run test:api && pnpm run test:db && pnpm run test:services",
+		"test": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/**/*.test.ts",
+		"test:local": "pnpm run test:api && pnpm run test:db && pnpm run test:services",
 		"test:api": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/api/*.test.ts",
 		"test:db": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/db/*.test.ts",
 		"test:services": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/services/*.test.ts"
