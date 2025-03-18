@@ -22,6 +22,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
@@ -40,6 +41,8 @@ import {
 	type JoinedApplicationRecord,
 	type OrderBy,
 	type PostgresTransaction,
+	type RevisionRequestModel,
+	type RevisionRequestRecord,
 } from './types.js';
 
 /**
@@ -358,6 +361,33 @@ const applicationSvc = (db: PostgresDb) => ({
 			logger.error(message);
 			logger.error(exception);
 			return failure(message, exception);
+		}
+	},
+
+	createRevisionRequest: async ({
+		applicationId,
+		revisionData,
+	}: {
+		applicationId: number;
+		revisionData: RevisionRequestModel;
+	}): AsyncResult<RevisionRequestRecord> => {
+		try {
+			// Using transaction for inserting
+			const result = await db.transaction(async (transaction) => {
+				// Insert into the revision_requests table
+				const revisionRecord = await transaction.insert(revisionRequests).values(revisionData).returning();
+				if (!revisionRecord[0]) throw new Error('Revision request record is undefined');
+
+				// Returning the inserted revision request
+				return revisionRecord[0];
+			});
+
+			return success(result);
+		} catch (err) {
+			const message = `Error at createRevisionRequest for applicationId: ${applicationId}`;
+			logger.error(message);
+			logger.error(err);
+			return failure(message, err);
 		}
 	},
 });
