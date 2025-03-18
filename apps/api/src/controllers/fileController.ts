@@ -111,7 +111,7 @@ export const getFile = async ({ fileId }: { fileId: number }) => {
 
 		return result;
 	} catch (error) {
-		const message = `Unable to delete file with id: ${fileId}`;
+		const message = `Unable to retrieve file with id: ${fileId}`;
 		logger.error(message);
 		logger.error(error);
 		return failure(message, error);
