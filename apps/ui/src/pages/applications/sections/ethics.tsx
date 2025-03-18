@@ -19,9 +19,8 @@
 
 import { UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Flex, Form, notification, theme, Typography, Upload, UploadProps } from 'antd';
+import { Button, Flex, Form, notification, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -35,6 +34,8 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { RcFile, UploadChangeParam } from 'antd/es/upload';
+import { useEffect, useState } from 'react';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -47,6 +48,22 @@ enum AllowedFilesEnum {
 	DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 }
 
+function getFileType(filename: string): string {
+	const match = filename.match(/\.([^.]+)$/);
+	const type = match && match[1] ? match[1].toLowerCase() : '';
+
+	switch (type) {
+		case 'pdf':
+			return AllowedFilesEnum.PDF;
+		case 'doc':
+			return AllowedFilesEnum.DOC;
+		case 'docx':
+			return AllowedFilesEnum.DOCX;
+	}
+
+	return AllowedFilesEnum.DOC;
+}
+
 const MAX_FILE_SIZE = 5000000;
 
 const Ethics = () => {
@@ -55,83 +72,81 @@ const Ethics = () => {
 	const { state, dispatch } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
-	const {
-		control,
-		watch,
-		getValues,
-		formState: { isDirty },
-	} = useForm<EthicsSchemaType>({
+	const [files, setFiles] = useState<UploadFile[]>([]);
+	const { token } = useToken();
+
+	const { control, watch, getValues } = useForm<EthicsSchemaType>({
 		defaultValues: {
 			ethicsReviewRequired: state.fields?.ethicsReviewRequired ?? undefined,
 		},
 	});
-	const { token } = useToken();
 
 	const showFileUpload = watch('ethicsReviewRequired') !== undefined;
 
-	// File Upload configuration
-	const uploadFile: UploadProps = {
-		beforeUpload: (file) => {
-			const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
-
-			if (!isValidImage) {
-				notification.error({
-					message: translate('invalidFileTitle'),
-				});
-				return isValidImage || Upload.LIST_IGNORE;
-			}
-
-			if (file.size > MAX_FILE_SIZE) {
-				notification.error({
-					message: translate('invalidFileSizeTitle'),
-					description: translate('invalidFileSizeDescription'),
-				});
-				return false;
-			}
-		},
-		onChange: (info) => {
-			if (info.file.status === 'done') {
-				dispatch({
-					type: 'UPDATE_APPLICATION',
-					payload: {
-						fields: {
-							...state?.fields,
-							ethicsLetter: info.file.response.id,
-						},
-						formState: {
-							...state?.formState,
-						},
-					},
-				});
-			}
-		},
-	};
-
-	// Update ethicsReviewRequired record on change
+	// Generate URL for download and set files state
+	// revokeObjectUrl on page exit
 	useEffect(() => {
-		const ethicsReviewReq = watch('ethicsReviewRequired');
-		if (isDirty) {
+		if (!data || !data?.content || !data.content.data) {
+			return;
+		}
+		const bufferArray = new Uint8Array(data.content.data).buffer;
+		const fileType = getFileType(data.filename);
+
+		const blob = new Blob([bufferArray], {
+			type: fileType,
+		});
+
+		const url = URL.createObjectURL(blob);
+		setFiles([
+			{
+				uid: `${data?.id}`,
+				name: `${data?.filename}`,
+				status: 'done',
+				url,
+			},
+		]);
+
+		return () => {
+			URL.revokeObjectURL(url);
+		};
+	}, [data]);
+
+	// Update the state on file change
+	const uploadChange = (info: UploadChangeParam<UploadFile>) => {
+		if (info.file.status === 'done') {
 			dispatch({
 				type: 'UPDATE_APPLICATION',
 				payload: {
 					fields: {
 						...state?.fields,
-						ethicsReviewRequired: ethicsReviewReq,
+						ethicsLetter: info.file.response.id,
 					},
 					formState: {
 						...state?.formState,
 					},
 				},
 			});
-			// This page should edit the backend immediately
-			editApplication({
-				id: appId,
-				update: {
-					ethicsReviewRequired: ethicsReviewReq,
-				},
-			});
 		}
-	}, [watch('ethicsReviewRequired')]);
+	};
+
+	const beforeUpload = (file: RcFile) => {
+		const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
+
+		if (!isValidImage) {
+			notification.error({
+				message: translate('invalidFileTitle'),
+			});
+			return isValidImage || Upload.LIST_IGNORE;
+		}
+
+		if (file.size > MAX_FILE_SIZE) {
+			notification.error({
+				message: translate('invalidFileSizeTitle'),
+				description: translate('invalidFileSizeDescription'),
+			});
+			return false;
+		}
+	};
 
 	return (
 		<SectionWrapper>
@@ -142,7 +157,31 @@ const Ethics = () => {
 					showDivider={true}
 				/>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>
-					<Form layout="vertical">
+					<Form
+						layout="vertical"
+						onChange={() => {
+							const ethicsReviewReq = getValues('ethicsReviewRequired');
+							dispatch({
+								type: 'UPDATE_APPLICATION',
+								payload: {
+									fields: {
+										...state?.fields,
+										ethicsReviewRequired: ethicsReviewReq,
+									},
+									formState: {
+										...state?.formState,
+									},
+								},
+							});
+							// This page should edit the backend immediately
+							editApplication({
+								id: appId,
+								update: {
+									ethicsReviewRequired: ethicsReviewReq,
+								},
+							});
+						}}
+					>
 						<BlockRadioBox
 							label={translate('ethics-section.pleaseChose')}
 							name="ethicsReviewRequired"
@@ -176,26 +215,13 @@ const Ethics = () => {
 										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
 											{translate('ethics-section.allowedFileTypes')}
 										</Text>
-										{!isLoading ? (
+										{!isLoading && files.length === 1 ? (
 											<Upload
-												{...uploadFile}
 												action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
 												maxCount={1}
-												showUploadList={{
-													showDownloadIcon: true,
-													downloadIcon: 'Download',
-												}}
-												defaultFileList={
-													data
-														? [
-																{
-																	uid: `${data?.id}`,
-																	name: `${data?.filename}`,
-																	status: 'done',
-																},
-															]
-														: []
-												}
+												beforeUpload={beforeUpload}
+												onChange={uploadChange}
+												defaultFileList={files}
 											>
 												<Button type="primary" icon={<UploadOutlined />}>
 													{translate('button.upload')}

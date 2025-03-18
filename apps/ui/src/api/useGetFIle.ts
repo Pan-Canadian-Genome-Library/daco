@@ -24,12 +24,14 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
 type FilesUpdate = {
-	application_id?: number | undefined;
-	type?: 'SIGNED_APPLICATION' | 'ETHICS_LETTER' | undefined;
-	submitter_user_id?: string | undefined;
-	submitted_at?: Date | undefined;
-	content?: Buffer<ArrayBufferLike> | undefined;
-	filename?: string | null | undefined;
+	application_id: number;
+	type: 'SIGNED_APPLICATION' | 'ETHICS_LETTER';
+	submitter_user_id: string;
+	submitted_at: Date;
+	content: {
+		data: Buffer<ArrayBufferLike>;
+	};
+	filename: string;
 };
 
 const useGetFile = ({ fileId }: { fileId?: number | null }) => {
