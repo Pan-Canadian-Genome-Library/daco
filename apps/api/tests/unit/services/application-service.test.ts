@@ -20,8 +20,6 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
@@ -32,25 +30,14 @@ import {
 	addPaginationDonors,
 	allRecordsPageSize,
 	initTestMigration,
-	PG_DATABASE,
-	PG_PASSWORD,
-	PG_USER,
 	testUserId as user_id,
 } from '@tests/utils/testUtils.ts';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
 	let testApplicationService: ApplicationService;
-	let container: StartedPostgreSqlContainer;
 
 	before(async () => {
-		container = await new PostgreSqlContainer()
-			.withUsername(PG_USER)
-			.withPassword(PG_PASSWORD)
-			.withDatabase(PG_DATABASE)
-			.start();
-
-		const connectionString = container.getConnectionUri();
 		db = connectToDb(connectionString);
 
 		await initTestMigration(db);
@@ -351,7 +338,6 @@ describe('Application Service', () => {
 	});
 
 	after(async () => {
-		await container.stop();
 		process.exit(0);
 	});
 });
