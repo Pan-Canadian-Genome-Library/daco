@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { FileExtentionTypes } from '@pcgl-daco/data-model';
+
 /**
  * Determines if the page number provided to it would be valid for the DACO API.
  *
@@ -37,20 +39,14 @@ export function getFileType(filename: string): string {
 
 	switch (type) {
 		case 'pdf':
-			return AllowedFilesEnum.PDF;
+			return FileExtentionTypes.PDF;
 		case 'doc':
-			return AllowedFilesEnum.DOC;
+			return FileExtentionTypes.DOC;
 		case 'docx':
-			return AllowedFilesEnum.DOCX;
+			return FileExtentionTypes.DOCX;
 	}
 
-	return AllowedFilesEnum.DOC;
-}
-
-export enum AllowedFilesEnum {
-	PDF = 'application/pdf',
-	DOC = 'application/msword',
-	DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+	return FileExtentionTypes.DOC;
 }
 
 export { isValidPageNumber };

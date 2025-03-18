@@ -33,8 +33,9 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
-import { AllowedFilesEnum, getFileType } from '@/global/utils';
+import { getFileType } from '@/global/utils';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { FileExtentionTypes } from '@pcgl-daco/data-model';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
 
 const { Text } = Typography;
@@ -80,7 +81,7 @@ const Ethics = () => {
 
 	// file meta data check before triggering upload process
 	const beforeUpload = (file: RcFile) => {
-		const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
+		const isValidImage = new Set(Object.values(FileExtentionTypes)).has(file.type);
 
 		if (!isValidImage) {
 			notification.error({
