@@ -57,6 +57,9 @@ const useAddCollaborator = () => {
 			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
 				return [...prev, ...data];
 			});
+			notification.success({
+				message: `User ${data[0]?.collaboratorFirstName} was added successfully`,
+			});
 		},
 	});
 };

@@ -18,7 +18,6 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
-import { useTranslation } from 'react-i18next';
 
 import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
@@ -26,10 +25,9 @@ import { ServerError } from '@/global/types';
 
 import { queryClient } from '@/providers/Providers';
 import { type CollaboratorUpdateRecord, type CollaboratorsResponse } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
 const useEditCollaborator = () => {
-	const { t: translate } = useTranslation();
-
 	return useMutation<
 		CollaboratorsResponse[],
 		ServerError,
@@ -39,7 +37,7 @@ const useEditCollaborator = () => {
 			userId?: number | string;
 		}
 	>({
-		mutationFn: async ({ applicationId, collaboratorUpdates, userId }) => {
+		mutationFn: async ({ applicationId, collaboratorUpdates }) => {
 			const response = await fetch('/collaborators/update', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -48,31 +46,7 @@ const useEditCollaborator = () => {
 					applicationId,
 					collaboratorUpdates,
 				}),
-			});
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.fetchError.title');
-						error.errors = translate('errors.fetchError.message');
-						break;
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-					case 500:
-						error.message = translate('errors.http.500.title');
-						error.errors = translate('errors.http.500.message');
-						break;
-				}
-
-				throw error;
-			}
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
