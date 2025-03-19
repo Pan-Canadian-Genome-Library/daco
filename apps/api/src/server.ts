@@ -30,7 +30,7 @@ import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
-import { errorHandler } from './middleware/errorHandler.ts';
+import { errorHandler } from '@pcgl-daco/request-utils';
 import authRouter from './routes/authRouter.js';
 import fileRouter from './routes/fileRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
