@@ -24,11 +24,13 @@ import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { pdfSvc } from '@/service/pdf/pdfService.ts';
+import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
-	JoinedApplicationRecord,
-	PDFService,
+	SignatureService,
 	type ApplicationRecord,
 	type ApplicationService,
+	type JoinedApplicationRecord,
+	type PDFService,
 	type RevisionRequestModel,
 } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
@@ -139,15 +141,22 @@ export const getApplicationStateTotals = async ({ userId }: { userId: string }) 
 export const getApplicationPDF = async ({ applicationId }: { applicationId: number }) => {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
+	const signatureService: SignatureService = signatureSvc(database);
 	const pdfService: PDFService = pdfSvc();
 
 	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
+	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
 
 	if (!applicationContents.success) {
 		return applicationContents;
+	} else if (!signatureContents.success) {
+		return signatureContents;
 	}
 
-	const renderedPDF = await pdfService.renderPCGLApplicationPDF();
+	const renderedPDF = await pdfService.renderPCGLApplicationPDF({
+		application_contents: applicationContents.data,
+		signature_contents: signatureContents.data,
+	});
 
 	if (!renderedPDF.success) {
 		return renderedPDF;
