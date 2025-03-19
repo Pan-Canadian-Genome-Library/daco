@@ -18,9 +18,8 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
-import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ApplicationList, ServerError } from '@/global/types';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
@@ -38,7 +37,6 @@ interface ApplicationListParams {
 }
 
 const useGetApplicationList = ({ userId, state, sort, page, pageSize }: ApplicationListParams) => {
-	const { t: translate } = useTranslation();
 	const queryParams = new URLSearchParams({ userId: userId });
 
 	if (state && state.length) {
@@ -57,9 +55,7 @@ const useGetApplicationList = ({ userId, state, sort, page, pageSize }: Applicat
 	return useQuery<ApplicationList, ServerError>({
 		queryKey: [queryParams],
 		queryFn: async () => {
-			const response = await fetch(`/applications?${queryParams.toString()}`);
-
-			GenericApiErrorResponseHandler({ response, translate });
+			const response = await fetch(`/applications?${queryParams.toString()}`).then(withErrorResponseHandler);
 
 			return await response.json();
 		},

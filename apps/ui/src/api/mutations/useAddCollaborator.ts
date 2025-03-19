@@ -18,20 +18,17 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
-import { useTranslation } from 'react-i18next';
 
 import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
-import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { queryClient } from '@/providers/Providers';
 import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
 import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
 
 const useAddCollaborator = () => {
-	const { t: translate } = useTranslation();
-
 	return useMutation<
 		CollaboratorsResponse[],
 		ServerError,
@@ -46,9 +43,7 @@ const useAddCollaborator = () => {
 					applicationId,
 					collaborators,
 				}),
-			});
-
-			GenericApiErrorResponseHandler({ response, translate });
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},

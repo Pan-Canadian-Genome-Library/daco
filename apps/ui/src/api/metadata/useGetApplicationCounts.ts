@@ -18,22 +18,17 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
-import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ApplicationCountMetadata, ServerError } from '@/global/types';
 
 const useGetApplicationCounts = (id?: string | number) => {
-	const { t: translate } = useTranslation();
-
 	return useQuery<ApplicationCountMetadata, ServerError>({
 		queryKey: [id],
 
 		queryFn: async () => {
-			const response = await fetch(`/applications/metadata/counts?userId=${id}`);
-
-			GenericApiErrorResponseHandler({ response, translate });
+			const response = await fetch(`/applications/metadata/counts?userId=${id}`).then(withErrorResponseHandler);
 
 			return await response.json();
 		},

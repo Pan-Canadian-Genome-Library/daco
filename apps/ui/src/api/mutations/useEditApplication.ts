@@ -18,16 +18,14 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
-import { useTranslation } from 'react-i18next';
 
-import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
 const useEditApplication = () => {
-	const { t: translate } = useTranslation();
 	const { state, dispatch } = useApplicationContext();
 
 	return useMutation<ApplicationResponseData, ServerError, { id: number | string }>({
@@ -40,9 +38,7 @@ const useEditApplication = () => {
 					id,
 					update,
 				}),
-			});
-
-			GenericApiErrorResponseHandler({ response, translate });
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},

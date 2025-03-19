@@ -17,33 +17,29 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { TFunction } from 'i18next';
+import i18n from '@/i18n/translations';
 
-export const GenericApiErrorResponseHandler = ({
-	response,
-	translate,
-}: {
-	response: Response;
-	translate: TFunction<'translation', undefined>;
-}) => {
-	if (!response.ok) {
+export const withErrorResponseHandler = (response: Response) => {
+	if (response.ok) {
+		return response;
+	} else {
 		const error = {
-			message: translate('errors.generic.title'),
-			errors: translate('errors.generic.message'),
+			message: i18n.t('errors.generic.title'),
+			errors: i18n.t('errors.generic.message'),
 		};
 
 		switch (response.status) {
 			case 400:
-				error.message = translate('errors.fetchError.title');
-				error.errors = translate('errors.fetchError.message');
+				error.message = i18n.t('errors.fetchError.title');
+				error.errors = i18n.t('errors.fetchError.message');
 				break;
 			case 404:
-				error.message = translate('errors.http.404.title');
-				error.errors = translate('errors.http.404.message');
+				error.message = i18n.t('errors.http.404.title');
+				error.errors = i18n.t('errors.http.404.message');
 				break;
 			case 500:
-				error.message = translate('errors.http.500.title');
-				error.errors = translate('errors.http.500.message');
+				error.message = i18n.t('errors.http.500.title');
+				error.errors = i18n.t('errors.http.500.message');
 				break;
 		}
 

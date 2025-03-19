@@ -18,21 +18,17 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
-import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
 const useGetCollaborators = (applicationId: string | number) => {
-	const { t: translate } = useTranslation();
-
 	return useQuery<CollaboratorsResponse[], ServerError>({
 		queryKey: [`collaborators-${applicationId}`],
 		queryFn: async () => {
-			const response = await fetch(`/collaborators/${applicationId}`);
-			GenericApiErrorResponseHandler({ response, translate });
+			const response = await fetch(`/collaborators/${applicationId}`).then(withErrorResponseHandler);
 
 			return await response.json();
 		},

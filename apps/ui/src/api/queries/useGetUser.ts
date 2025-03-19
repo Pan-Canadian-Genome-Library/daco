@@ -18,22 +18,17 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
-import { GenericApiErrorResponseHandler } from '@/api/apiUtils';
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import type { UserResponse } from '@pcgl-daco/validation';
 
 const useGetUser = () => {
-	const { t: translate } = useTranslation();
-
 	return useQuery<UserResponse, ServerError>({
 		queryKey: ['user'],
 		queryFn: async () => {
-			const response = await fetch(`/auth/user`);
-
-			GenericApiErrorResponseHandler({ response, translate });
+			const response = await fetch(`/auth/user`).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
