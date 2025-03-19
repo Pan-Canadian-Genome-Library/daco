@@ -97,7 +97,7 @@ const SignAndSubmit = () => {
 						</Row>
 						<Row style={{ minHeight: '40vh' }} />
 					</SectionContent>
-					<SectionFooter currentRoute="sign" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
+					<SectionFooter currentRoute="sign" isEditMode={isEditMode} signSubmitHandler={handleSubmit(onSubmit)} />
 				</Form>
 			</SectionWrapper>
 			<Modal
