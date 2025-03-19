@@ -6,7 +6,7 @@ import {
 	NotImplemented,
 	ServiceUnavailable,
 	StatusConflict,
-} from '../utils/errors.ts';
+} from '@pcgl-daco/request-utils';
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 	console.error('error handler received error: ', err);
