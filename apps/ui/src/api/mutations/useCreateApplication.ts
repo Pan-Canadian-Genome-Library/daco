@@ -18,17 +18,16 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
 const useCreateApplication = () => {
 	const navigation = useNavigate();
-	const { t: translate } = useTranslation();
 
 	return useMutation<ApplicationResponseData, ServerError>({
 		mutationFn: async () => {
@@ -38,23 +37,7 @@ const useCreateApplication = () => {
 					//TODO: Replace this with the globally authenticated user once authentication is implemented;
 					userId: mockUserID,
 				}),
-			});
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.fetchError.title');
-						error.errors = translate('errors.fetchError.message');
-						break;
-				}
-
-				throw error;
-			}
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
