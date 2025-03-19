@@ -18,13 +18,25 @@
  */
 
 import logger from '@/logger.ts';
-import { renderApplicationPDF } from '@/service/pdf/components/PCGLApplication.tsx';
+import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
+import { ApplicationSignatureUpdate, type JoinedApplicationRecord } from '@/service/types.ts';
 import { failure, success } from '@/utils/results.ts';
 
 const pdfSvc = () => ({
-	renderPCGLApplicationPDF: async () => {
+	renderPCGLApplicationPDF: async ({
+		application_contents,
+		signature_contents,
+	}: {
+		application_contents: JoinedApplicationRecord;
+		signature_contents: ApplicationSignatureUpdate;
+	}) => {
 		try {
-			const pdf = await renderApplicationPDF();
+			logger.info(application_contents);
+			logger.info(signature_contents);
+			const pdf = await renderApplicationPDF({
+				applicationContents: application_contents,
+				signature: signature_contents,
+			});
 			return success(pdf);
 		} catch (err) {
 			const message = `Error Rendering Application to PDF file`;
