@@ -382,9 +382,10 @@ export const closeApplication = async ({
 		// Authorization logic based on state
 		const isApplicant = application.user_id === requesterId;
 
-		const canCloseApplication = isDacMember && appStateManager.state === ApplicationStates.DAC_REVIEW;
+		const canCloseDacApplication =
+			(isDacMember && appStateManager.state === ApplicationStates.DAC_REVIEW) || isApplicant;
 
-		if (!isApplicant && !canCloseApplication) {
+		if (!canCloseDacApplication) {
 			return failure('Current user is not authorized to close the application', 'Unauthorized');
 		}
 
