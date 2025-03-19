@@ -93,11 +93,17 @@ export const createCollaborators = async ({
 		application_id,
 	}));
 
-	const result = await collaboratorsRepo.createCollaborators({
+	const collaboratorsResult = await collaboratorsRepo.createCollaborators({
 		newCollaborators,
 	});
 
-	return result;
+	if (!collaboratorsResult.success) {
+		return collaboratorsResult;
+	}
+
+	const result = aliasCollaboratorRecord(collaboratorsResult.data);
+
+	return success(result);
 };
 
 /**

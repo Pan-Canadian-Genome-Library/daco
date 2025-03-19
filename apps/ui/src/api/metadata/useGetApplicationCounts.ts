@@ -18,43 +18,17 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ApplicationCountMetadata, ServerError } from '@/global/types';
 
 const useGetApplicationCounts = (id?: string | number) => {
-	const { t: translate } = useTranslation();
-
 	return useQuery<ApplicationCountMetadata, ServerError>({
 		queryKey: [id],
 
 		queryFn: async () => {
-			const response = await fetch(`/applications/metadata/counts?userId=${id}`);
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.http.400.title');
-						error.errors = translate('errors.http.400.message');
-						break;
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-					default:
-						error.message = translate('errors.http.500.title');
-						error.errors = translate('errors.http.500.message');
-						break;
-				}
-
-				throw error;
-			}
+			const response = await fetch(`/applications/metadata/counts?userId=${id}`).then(withErrorResponseHandler);
 
 			return await response.json();
 		},

@@ -17,22 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router';
+import ThemeProvider from './ThemeProvider';
+import { UserProvider } from './UserProvider';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from './apiUtils';
+export const queryClient = new QueryClient();
 
-const useGetCollaborators = (applicationId: string | number) => {
-	return useQuery<CollaboratorsResponse[], ServerError>({
-		queryKey: [`collaborators-${applicationId}`],
-		queryFn: async () => {
-			const response = await fetch(`/collaborators/${applicationId}`).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-	});
+const Providers = ({ children }: { children: React.ReactNode }) => {
+	return (
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider>
+				<BrowserRouter>
+					<UserProvider>{children}</UserProvider>
+				</BrowserRouter>
+			</ThemeProvider>
+		</QueryClientProvider>
+	);
 };
 
-export default useGetCollaborators;
+export default Providers;

@@ -22,7 +22,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import useGetApplicationList from '@/api/useGetApplicationList';
+import useGetApplicationList from '@/api/queries/useGetApplicationList';
 
 import ContentWrapper, { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { mockUserID } from '@/components/mock/applicationMockData';

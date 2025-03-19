@@ -22,7 +22,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from './apiUtils';
+import { withErrorResponseHandler } from '../apiUtils';
 
 const useGetCollaborators = (applicationId: string | number) => {
 	return useQuery<CollaboratorsResponse[], ServerError>({
