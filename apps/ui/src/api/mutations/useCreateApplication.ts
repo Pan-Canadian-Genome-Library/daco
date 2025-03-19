@@ -18,52 +18,26 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
-import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
+import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
-const useEditApplication = () => {
-	const { t: translate } = useTranslation();
-	const { state, dispatch } = useApplicationContext();
+const useCreateApplication = () => {
+	const navigation = useNavigate();
 
-	return useMutation<ApplicationResponseData, ServerError, { id: number | string }>({
-		mutationFn: async ({ id }) => {
-			const update = state?.fields;
-
-			const response = await fetch('/applications/edit', {
+	return useMutation<ApplicationResponseData, ServerError>({
+		mutationFn: async () => {
+			const response = await fetch('/applications/create', {
 				method: 'POST',
 				body: JSON.stringify({
-					id,
-					update,
+					//TODO: Replace this with the globally authenticated user once authentication is implemented;
+					userId: mockUserID,
 				}),
-			});
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.fetchError.title');
-						error.errors = translate('errors.fetchError.message');
-						break;
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-					case 500:
-						error.message = translate('errors.http.500.title');
-						error.errors = translate('errors.http.500.message');
-						break;
-				}
-
-				throw error;
-			}
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
@@ -72,10 +46,10 @@ const useEditApplication = () => {
 				message: error.message,
 			});
 		},
-		onSuccess: () => {
-			dispatch({ type: 'UPDATE_DIRTY_STATE', payload: false });
+		onSuccess: (data) => {
+			navigation(`/application/${data.id}/intro/edit`);
 		},
 	});
 };
 
-export default useEditApplication;
+export default useCreateApplication;

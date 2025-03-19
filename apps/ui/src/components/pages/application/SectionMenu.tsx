@@ -21,7 +21,7 @@ import { Menu, MenuProps } from 'antd';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
-import useEditApplication from '@/api/useEditApplication';
+import useEditApplication from '@/api/mutations/useEditApplication';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
