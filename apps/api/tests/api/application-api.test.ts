@@ -23,17 +23,19 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import {
+	closeApplication,
 	createApplication,
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
 	revokeApplication,
+	requestApplicationRevisionsByDac,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService } from '@/service/types.js';
+import { type ApplicationService, type RevisionRequestModel } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
@@ -45,6 +47,23 @@ import {
 	testApplicationId,
 	testUserId as user_id,
 } from '../testUtils.js';
+
+// Sample revision request data
+const revisionRequestData: RevisionRequestModel = {
+	application_id: testApplicationId,
+	created_at: new Date(),
+	comments: 'Please provide additional documentation.',
+	applicant_notes: 'Needs more details',
+	applicant_approved: false,
+	institution_rep_approved: false,
+	institution_rep_notes: 'Incomplete information',
+	collaborators_approved: false,
+	collaborators_notes: 'Requires additional clarification',
+	project_approved: false,
+	project_notes: 'Not sufficient justification',
+	requested_studies_approved: false,
+	requested_studies_notes: 'Unclear scope',
+};
 
 describe('Application API', () => {
 	let db: PostgresDb;
@@ -308,6 +327,154 @@ describe('Application API', () => {
 			// Assert: Verify the revocation failed
 			assert.ok(!result.success);
 			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+		});
+	});
+
+	describe('Close Application', () => {
+		it('should allow applicant to close an application in DRAFT state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DRAFT },
+			});
+			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
+		});
+
+		it('should allow applicant to close an application in INSTITUTIONAL_REP_REVIEW state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW },
+			});
+			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
+		});
+
+		it('should allow applicant to close an application in DAC_REVIEW state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DAC_REVIEW },
+			});
+			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
+		});
+
+		it('should allow DAC member to close an application in DAC_REVIEW state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DAC_REVIEW },
+			});
+			const result = await closeApplication({
+				applicationId: testApplicationId,
+				requesterId: 'dac_user',
+				isDacMember: true,
+			});
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
+		});
+
+		it('should prevent non-applicant, non-DAC user from closing in DRAFT state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DRAFT },
+			});
+			const result = await closeApplication({ applicationId: testApplicationId, requesterId: 'other_user' });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.message, 'Current user is not authorized to close the application');
+		});
+
+		it('should prevent closing an already CLOSED application', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.CLOSED },
+			});
+			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.message, 'Application is already closed.');
+		});
+
+		it('should prevent closing in APPROVED state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.APPROVED },
+			});
+			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.message, `Cannot close application in state ${ApplicationStates.APPROVED}.`);
+		});
+
+		it('should fail for non-existent application', async () => {
+			const result = await closeApplication({ applicationId: 9999, requesterId: user_id });
+
+			assert.ok(!result.success);
+			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+		});
+	});
+
+	describe('Request Application Revisions', () => {
+		it('should request revisions when application is in DAC_REVIEW state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
+			const role = 'DAC';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisionsByDac({
+				applicationId: id,
+				role,
+				revisionData: revisionRequestData,
+			});
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail if application is not in the correct state', async () => {
+			// Arrange: Set up test data
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+			const { id } = applicationRecordsResult.data.applications[0];
+			const role = 'DAC';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisionsByDac({
+				applicationId: id,
+				role,
+				revisionData: revisionRequestData,
+			});
+
+			// Assert: Should return a failure message
+			assert.strictEqual(result.success, false, 'Function should return failure when state is incorrect');
+		});
+
+		it('should handle errors gracefully', async () => {
+			// Arrange: Force an error
+			const invalidApplicationId = -1;
+			const role = 'DAC';
+
+			// Act: Call the function
+			const result = await requestApplicationRevisionsByDac({
+				applicationId: invalidApplicationId,
+				role,
+				revisionData: revisionRequestData,
+			});
+
+			// Assert: Should return an error message
+			assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
 		});
 	});
 

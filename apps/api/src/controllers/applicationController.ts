@@ -23,8 +23,12 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationRecord, type ApplicationService } from '@/service/types.js';
-
+import {
+	JoinedApplicationRecord,
+	type ApplicationRecord,
+	type ApplicationService,
+	type RevisionRequestModel,
+} from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/routes.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -290,3 +294,164 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 	}
 };
 
+
+export const requestApplicationRevisionsByDac = async ({
+	applicationId,
+	role,
+	revisionData,
+}: {
+	applicationId: number;
+	role: string;
+	revisionData: RevisionRequestModel;
+}): AsyncResult<JoinedApplicationRecord> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (role === 'DAC_MEMBER' && application.state !== ApplicationStates.DAC_REVIEW) {
+			return failure('Application is not in the correct status for revisions.');
+		}
+
+		const revisionResult = await appStateManager.reviseDacReview();
+
+		if (!revisionResult.success) {
+			return failure(revisionResult.message || 'Failed to request revisions for application.', 'StateTransitionError');
+		}
+
+		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+
+		if (!revisionRequestResult.success) {
+			return failure(
+				revisionRequestResult.message || 'Failed to request revisions for application.',
+				'StateTransitionError',
+			);
+		}
+
+		return service.getApplicationWithContents({ id: applicationId });
+	} catch (error) {
+		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
+		return failure('An error occurred while processing the request.', error);
+	}
+};
+
+export const requestApplicationRevisionsByRep = async ({
+	applicationId,
+	role,
+	revisionData,
+}: {
+	applicationId: number;
+	role: string;
+	revisionData: RevisionRequestModel;
+}): AsyncResult<JoinedApplicationRecord> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		if (role === 'INSTITUTIONAL_REP' && application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+			return failure('Application is not in the correct status for revisions.');
+		}
+
+		const revisionResult = await appStateManager.reviseRepReview();
+
+		if (!revisionResult.success) {
+			return failure(revisionResult.message || 'Failed to request revisions for application.', 'StateTransitionError');
+		}
+
+		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+
+		if (!revisionRequestResult.success) {
+			return failure(
+				revisionRequestResult.message || 'Failed to request revisions for application.',
+				'StateTransitionError',
+			);
+		}
+
+		return service.getApplicationWithContents({ id: applicationId });
+	} catch (error) {
+		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
+		return failure('An error occurred while processing the request.', error);
+	}
+};
+
+export const closeApplication = async ({
+	applicationId,
+	requesterId,
+	isDacMember = false,
+}: {
+	applicationId: number;
+	requesterId: string;
+	isDacMember?: boolean;
+}) => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		// Check if application is already closed
+		if (appStateManager.state === ApplicationStates.CLOSED) {
+			return failure('Application is already closed.', 'StateConflict');
+		}
+
+		// Authorization logic based on state
+		const isApplicant = application.user_id === requesterId;
+
+		const canCloseDacApplication =
+			(isDacMember && appStateManager.state === ApplicationStates.DAC_REVIEW) || isApplicant;
+
+		if (!canCloseDacApplication) {
+			return failure('Current user is not authorized to close the application', 'Unauthorized');
+		}
+
+		let closeResult;
+
+		switch (appStateManager.state) {
+			case ApplicationStates.DRAFT:
+				closeResult = await appStateManager.closeDraft();
+				break;
+			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+				closeResult = await appStateManager.closeRepReview();
+				break;
+			case ApplicationStates.DAC_REVIEW:
+				closeResult = await appStateManager.closeDacReview();
+				break;
+			default:
+				return failure(`Cannot close application in state ${appStateManager.state}.`, 'InvalidState');
+		}
+
+		if (!closeResult.success) {
+			return failure(closeResult.message || 'Failed to close application.', 'StateTransitionError');
+		}
+
+		return closeResult;
+	} catch (error) {
+		const message = `Unable to close application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};

@@ -26,7 +26,11 @@ import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 
-import { getApplicationSignature, updateApplicationSignature } from '@/controllers/signatureController.ts';
+import {
+	deleteApplicationSignature,
+	getApplicationSignature,
+	updateApplicationSignature,
+} from '@/controllers/signatureController.ts';
 import {
 	addInitialApplications,
 	initTestMigration,
@@ -160,6 +164,76 @@ describe('Signature API', () => {
 
 			const result = await getApplicationSignature({
 				applicationId,
+			});
+
+			assert.strictEqual(result.success, false);
+		});
+	});
+
+	describe('Delete Signatures', () => {
+		it("should retrieve an application and delete it's applicant signature but NOT it's rep signatures", async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id: applicationId } = applicationRecordsResult.data.applications[0];
+
+			const result = await deleteApplicationSignature({
+				applicationId,
+				signee: 'APPLICANT',
+			});
+
+			assert.ok(result.success);
+
+			const deletedSignature = await getApplicationSignature({
+				applicationId,
+			});
+
+			assert.ok(deletedSignature.success);
+
+			assert.strictEqual(deletedSignature.data.applicantSignature, null);
+			assert.strictEqual(deletedSignature.data.applicantSignedAt, null);
+			assert.notStrictEqual(deletedSignature.data.institutionalRepSignature, null);
+			assert.notStrictEqual(deletedSignature.data.institutionalRepSignedAt, null);
+		});
+		it("should retrieve an application and delete it's rep signatures", async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id: applicationId } = applicationRecordsResult.data.applications[0];
+
+			const result = await deleteApplicationSignature({
+				applicationId,
+				signee: 'INSTITUTIONAL_REP',
+			});
+
+			assert.ok(result.success);
+
+			const deletedSignature = await getApplicationSignature({
+				applicationId,
+			});
+
+			assert.ok(deletedSignature.success);
+
+			assert.strictEqual(deletedSignature.data.institutionalRepSignature, null);
+			assert.strictEqual(deletedSignature.data.institutionalRepSignature, null);
+		});
+
+		it('Be unable to delete an invalid signed application', async () => {
+			const applicationId = 9999;
+
+			const result = await deleteApplicationSignature({
+				applicationId,
+				signee: 'APPLICANT',
 			});
 
 			assert.strictEqual(result.success, false);

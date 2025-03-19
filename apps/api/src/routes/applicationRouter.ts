@@ -18,6 +18,7 @@
  */
 import {
 	approveApplication,
+	closeApplication,
 	createApplication,
 	editApplication,
 	getAllApplications,
@@ -25,11 +26,20 @@ import {
 	getApplicationStateTotals,
 	rejectApplication,
 	revokeApplication,
+	requestApplicationRevisionsByDac,
+	requestApplicationRevisionsByRep,
 	submitRevision,
 } from '@/controllers/applicationController.js';
+import { RevisionRequestModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { collaboratorsListParamsSchema, editApplicationRequestSchema, isPositiveInteger } from '@pcgl-daco/validation';
+import {
+	applicationRevisionRequestSchema,
+	collaboratorsListParamsSchema,
+	editApplicationRequestSchema,
+	isPositiveInteger,
+	closeApplicationSchema,
+} from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { type Request, type Response } from 'express';
 
@@ -389,4 +399,148 @@ applicationRouter.post('/applications/:applicationId/revoke', jsonParser, async 
 	}
 });
 
+applicationRouter.post(
+	'/applications/:applicationId/close',
+	jsonParser,
+	withParamsSchemaValidation(
+		closeApplicationSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+			const { requesterId, isDacMember } = request.body;
+
+			if (!applicationId || isNaN(parseInt(applicationId))) {
+				response.status(400).json({
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					errors: 'MissingOrInvalidParameters',
+				});
+			}
+
+			if (!requesterId) {
+				response.status(401).json({ message: 'Unauthorized: Requester ID is required.' });
+			}
+
+			try {
+				const applicationIdNum = Number(applicationId);
+				const result = await closeApplication({ applicationId: applicationIdNum, requesterId, isDacMember });
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Application closed successfully.',
+						data: result.data,
+					});
+				} else {
+					let status = 500;
+					let message = result.message || 'An unexpected error occurred.';
+					let errors = result.errors;
+
+					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+						status = 404;
+						message = 'Application not found.';
+					} else if (errors === 'StateConflict') {
+						status = 409;
+						message = 'Application is already closed.';
+					} else if (errors === 'Unauthorized') {
+						status = 403;
+						message = 'Unauthorized to close this application.';
+					} else if (errors === 'InvalidState') {
+						status = 400;
+						message = 'Cannot close application in its current state.';
+					}
+
+					response.status(status).send({ message, errors });
+				}
+			} catch (error) {
+				response.status(500).send({
+					message: 'Internal server error.',
+					errors: String(error),
+				});
+			}
+		},
+	),
+);
+
+// Endpoint for reps to request revisions
+applicationRouter.post(
+	'/dac/request-revisions',
+	jsonParser,
+	withBodySchemaValidation(applicationRevisionRequestSchema, apiZodErrorMapping, async (req, res) => {
+		const { applicationId, revisionData, role } = req.body;
+
+		if (!role && role !== 'DAC_MEMBER') {
+			res.status(400).json({ message: 'Invalid request: Invalid role' });
+		}
+
+		// Validate input
+		if (!revisionData) {
+			res.status(400).json({ message: 'Invalid request: revisionData are required' });
+		}
+
+		const updatedRevisionData: RevisionRequestModel = {
+			application_id: applicationId,
+			comments: revisionData.comments,
+			applicant_approved: revisionData.applicantApproved,
+			applicant_notes: revisionData.applicantNotes,
+			institution_rep_approved: revisionData.institutionRepApproved,
+			institution_rep_notes: revisionData.institutionRepNotes,
+			collaborators_approved: revisionData.collaboratorsApproved,
+			collaborators_notes: revisionData.collaboratorsNotes,
+			project_approved: revisionData.projectApproved,
+			project_notes: revisionData.projectNotes,
+			requested_studies_approved: revisionData.requestedStudiesApproved,
+			requested_studies_notes: revisionData.requestedStudiesNotes,
+		};
+
+		// Call service method to handle request
+		const updatedApplication = await requestApplicationRevisionsByDac({
+			applicationId,
+			role,
+			revisionData: updatedRevisionData,
+		});
+
+		res.status(200).json(updatedApplication);
+	}),
+);
+
+// Endpoint for reps to request revisions
+applicationRouter.post(
+	'/rep/request-revisions',
+	jsonParser,
+	withBodySchemaValidation(applicationRevisionRequestSchema, apiZodErrorMapping, async (req, res) => {
+		const { applicationId, revisionData, role } = req.body;
+
+		if (!role && role !== 'INSTITUTIONAL_REP') {
+			res.status(400).json({ message: 'Invalid request: Invalid role' });
+		}
+
+		// Validate input
+		if (!revisionData) {
+			res.status(400).json({ message: 'Invalid request: revisionData are required' });
+		}
+
+		const updatedRevisionData: RevisionRequestModel = {
+			application_id: applicationId,
+			comments: revisionData.comments,
+			applicant_approved: revisionData.applicantApproved,
+			applicant_notes: revisionData.applicantNotes,
+			institution_rep_approved: revisionData.institutionRepApproved,
+			institution_rep_notes: revisionData.institutionRepNotes,
+			collaborators_approved: revisionData.collaboratorsApproved,
+			collaborators_notes: revisionData.collaboratorsNotes,
+			project_approved: revisionData.projectApproved,
+			project_notes: revisionData.projectNotes,
+			requested_studies_approved: revisionData.requestedStudiesApproved,
+			requested_studies_notes: revisionData.requestedStudiesNotes,
+		};
+
+		// Call service method to handle request
+		const updatedApplication = await requestApplicationRevisionsByRep({
+			applicationId,
+			role,
+			revisionData: updatedRevisionData,
+		});
+
+		res.status(200).json(updatedApplication);
+	}),
+);
 export default applicationRouter;

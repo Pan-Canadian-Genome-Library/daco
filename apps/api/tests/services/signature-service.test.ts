@@ -158,6 +158,82 @@ describe('Signature Service', () => {
 		});
 	});
 
+	describe('Delete Signatures from an Application', () => {
+		it('should get an application and delete signatures of the Institutional Representative', async () => {
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			const applicationRecords = applicationRecordsResult.data.applications;
+
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
+
+			const { id } = applicationRecords[0];
+
+			const applicationResult = await testSignatureService.deleteApplicationSignature({
+				application_id: id,
+				signature_type: 'INSTITUTIONAL_REP',
+			});
+
+			assert.ok(applicationResult.success);
+
+			const getSignatures = await testSignatureService.getApplicationSignature({
+				application_id: id,
+			});
+
+			assert.ok(getSignatures.success);
+
+			const application = getSignatures.data;
+
+			assert.strictEqual(application.institutional_rep_signature, null);
+			assert.strictEqual(application.institutional_rep_signed_at, null);
+			assert.notStrictEqual(application.applicant_signature, null);
+			assert.notStrictEqual(application.applicant_signed_at, null);
+		});
+
+		it('should get an application and delete signatures of the Applicant', async () => {
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+
+			assert.ok(applicationRecordsResult.success);
+
+			const applicationRecords = applicationRecordsResult.data.applications;
+
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
+
+			const { id } = applicationRecords[0];
+
+			const applicationResult = await testSignatureService.deleteApplicationSignature({
+				application_id: id,
+				signature_type: 'APPLICANT',
+			});
+
+			assert.ok(applicationResult.success);
+
+			const getSignatures = await testSignatureService.getApplicationSignature({
+				application_id: id,
+			});
+
+			assert.ok(getSignatures.success);
+
+			const application = getSignatures.data;
+
+			assert.strictEqual(application.applicant_signature, null);
+			assert.strictEqual(application.applicant_signed_at, null);
+		});
+		it('Error out when trying to delete a signature from a non-existant application', async () => {
+			const id = 9999;
+
+			const applicationResult = await testSignatureService.deleteApplicationSignature({
+				application_id: id,
+				signature_type: 'APPLICANT',
+			});
+
+			assert.ok(!applicationResult.success);
+		});
+	});
+
 	after(async () => {
 		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();

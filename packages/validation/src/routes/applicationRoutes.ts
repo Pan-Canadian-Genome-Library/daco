@@ -62,3 +62,37 @@ export const editApplicationRequestSchema = z.object({
 		params: { violation: 'noEmptyObject' },
 	}),
 });
+
+export const revisionDataSchema = z
+	.object({
+		comments: z.string().optional(),
+		applicantNotes: z.string().optional(),
+		applicantApproved: z.boolean(),
+		institutionRepApproved: z.boolean(),
+		institutionRepNotes: z.string().optional(),
+		collaboratorsApproved: z.boolean(),
+		collaboratorsNotes: z.string().optional(),
+		projectApproved: z.boolean(),
+		projectNotes: z.string().optional(),
+		requestedStudiesApproved: z.boolean(),
+		requestedStudiesNotes: z.string().optional(),
+		ethicsApproved: z.boolean(),
+		ethicsNotes: z.string().optional(),
+	})
+	.strict();
+
+export const applicationRevisionRequestSchema = z
+	.object({
+		applicationId: z.number().nonnegative(),
+		revisionData: revisionDataSchema.refine((data) => Object.keys(data).length !== 0, {
+			message: 'revisionData cannot be empty',
+		}),
+		role: z.enum(['DAC_MEMBER', 'INSTITUTIONAL_REP']),
+	})
+	.strict();
+
+export const closeApplicationSchema = z.object({
+	requesterId: z.string().min(1, { message: 'requesterId is required' }),
+	isDacMember: z.boolean({ required_error: 'isDacMember is required' }),
+	applicationId: z.string().min(1, { message: 'applicationId is required' }),
+});
