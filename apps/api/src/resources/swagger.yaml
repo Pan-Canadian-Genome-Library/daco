@@ -780,6 +780,62 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+  /applications/{applicationId}/close:
+    post:
+      tags:
+        - Applications
+      summary: Close an application
+      description: |
+        Allows an applicant or DAC member to close an application.
+        - In `DRAFT` or `INSTITUTIONAL_REP_REVIEW` states, only the applicant can close.
+        - In `DAC_REVIEW` state, both the applicant and DAC members can close.
+        - Closed applications cannot be reopened.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application to close.
+      responses:
+        '200':
+          description: Application successfully closed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applications'
+        '400':
+          description: Invalid request - missing or invalid application ID, or the application is in an invalid state for closure.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Unauthorized - requester lacks permission to close the application in its current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '409':
+          description: Conflict - application is already closed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server error - unable to process closure request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
 components:
   schemas:
     ApplicationWithApplicantInfo:
