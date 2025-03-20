@@ -58,9 +58,9 @@ const DataItem = ({ item, children, layout = 'horizontal', isLink = false, linkP
 		<View style={calcLayout()}>
 			<Text style={styles.itemText}>{item}:</Text>
 			<Text>
-				{isLink ? (
-					<Link style={styles.linkItem} src={`${linkPrefix && children ? linkPrefix : ''}${String(children)}`}>
-						{children ?? '—'}
+				{isLink && children ? (
+					<Link style={styles.linkItem} src={`${linkPrefix ?? ''}${String(children)}`}>
+						{children}
 					</Link>
 				) : (
 					(children ?? '—')

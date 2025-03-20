@@ -18,6 +18,11 @@ const textStyles = {
 
 const colours = {
 	primary: '#C41D7F',
+	secondary: '#520339',
+	tertiary: '#FFF0F6',
+	grey: '#D9D9D9',
+	lightGrey: '#FAFAFA',
+
 };
 
 const standardStyles = {
