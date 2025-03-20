@@ -393,3 +393,68 @@ export const submitApplication = async ({ applicationId }: { applicationId: numb
 		return failure(message, error);
 	}
 };
+
+export const closeApplication = async ({
+	applicationId,
+	requesterId,
+	isDacMember = false,
+}: {
+	applicationId: number;
+	requesterId: string;
+	isDacMember?: boolean;
+}) => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		// Check if application is already closed
+		if (appStateManager.state === ApplicationStates.CLOSED) {
+			return failure('Application is already closed.', 'StateConflict');
+		}
+
+		// Authorization logic based on state
+		const isApplicant = application.user_id === requesterId;
+
+		const canCloseDacApplication =
+			(isDacMember && appStateManager.state === ApplicationStates.DAC_REVIEW) || isApplicant;
+
+		if (!canCloseDacApplication) {
+			return failure('Current user is not authorized to close the application', 'Unauthorized');
+		}
+
+		let closeResult;
+
+		switch (appStateManager.state) {
+			case ApplicationStates.DRAFT:
+				closeResult = await appStateManager.closeDraft();
+				break;
+			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+				closeResult = await appStateManager.closeRepReview();
+				break;
+			case ApplicationStates.DAC_REVIEW:
+				closeResult = await appStateManager.closeDacReview();
+				break;
+			default:
+				return failure(`Cannot close application in state ${appStateManager.state}.`, 'InvalidState');
+		}
+
+		if (!closeResult.success) {
+			return failure(closeResult.message || 'Failed to close application.', 'StateTransitionError');
+		}
+
+		return closeResult;
+	} catch (error) {
+		const message = `Unable to close application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};

@@ -244,7 +244,7 @@ export interface CollaboratorDTO {
 	collaboratorType?: string | null;
 }
 
-export interface GetCollaboratorsResponse extends CollaboratorDTO {
+export interface CollaboratorsResponse extends CollaboratorDTO {
 	id: number;
 	applicationId: number;
 }

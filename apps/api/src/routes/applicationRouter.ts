@@ -18,6 +18,7 @@
  */
 import {
 	approveApplication,
+	closeApplication,
 	createApplication,
 	editApplication,
 	getAllApplications,
@@ -37,6 +38,7 @@ import {
 	collaboratorsListParamsSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
+	closeApplicationSchema,
 } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { type Request, type Response } from 'express';
@@ -338,6 +340,67 @@ applicationRouter.post(
 					} else if (errors === 'InvalidState') {
 						status = 400;
 						message = 'Invalid application state.';
+					}
+
+					response.status(status).send({ message, errors });
+				}
+			} catch (error) {
+				response.status(500).send({
+					message: 'Internal server error.',
+					errors: String(error),
+				});
+			}
+		},
+	),
+);
+
+applicationRouter.post(
+	'/applications/:applicationId/close',
+	jsonParser,
+	withParamsSchemaValidation(
+		closeApplicationSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+			const { requesterId, isDacMember } = request.body;
+
+			if (!applicationId || isNaN(parseInt(applicationId))) {
+				response.status(400).json({
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					errors: 'MissingOrInvalidParameters',
+				});
+			}
+
+			if (!requesterId) {
+				response.status(401).json({ message: 'Unauthorized: Requester ID is required.' });
+			}
+
+			try {
+				const applicationIdNum = Number(applicationId);
+				const result = await closeApplication({ applicationId: applicationIdNum, requesterId, isDacMember });
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Application closed successfully.',
+						data: result.data,
+					});
+				} else {
+					let status = 500;
+					let message = result.message || 'An unexpected error occurred.';
+					let errors = result.errors;
+
+					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+						status = 404;
+						message = 'Application not found.';
+					} else if (errors === 'StateConflict') {
+						status = 409;
+						message = 'Application is already closed.';
+					} else if (errors === 'Unauthorized') {
+						status = 403;
+						message = 'Unauthorized to close this application.';
+					} else if (errors === 'InvalidState') {
+						status = 400;
+						message = 'Cannot close application in its current state.';
 					}
 
 					response.status(status).send({ message, errors });

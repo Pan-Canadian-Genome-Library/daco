@@ -24,7 +24,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 
 import { connectToDb, getDbInstance, type PostgresDb } from '@/db/index.js';
 
-import { PG_DATABASE, PG_PASSWORD, PG_USER } from '../testUtils.js';
+import { PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
 
 describe('Postgres Database', () => {
 	let db: PostgresDb;

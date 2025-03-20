@@ -17,22 +17,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { Button, Flex, Modal, Typography } from 'antd';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from './apiUtils';
+const { Title } = Typography;
 
-const useGetCollaborators = (applicationId: string | number) => {
-	return useQuery<CollaboratorsResponse[], ServerError>({
-		queryKey: [`collaborators-${applicationId}`],
-		queryFn: async () => {
-			const response = await fetch(`/collaborators/${applicationId}`).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-	});
+interface SuccessModalProps {
+	isOpen: boolean;
+	okText: string;
+	onOk: () => void;
+	successText: string;
+}
+const SuccessModal = ({ isOpen, onOk, successText, okText }: SuccessModalProps) => {
+	return (
+		<Modal
+			width={'100%'}
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			open={isOpen}
+			onOk={onOk}
+			footer={[]}
+			destroyOnClose
+		>
+			<Flex justify="center" align="center" vertical>
+				<Title level={3} aria-level={1}>
+					{successText}
+				</Title>
+				<Button type="primary" onClick={onOk}>
+					{okText}
+				</Button>
+			</Flex>
+		</Modal>
+	);
 };
 
-export default useGetCollaborators;
+export default SuccessModal;

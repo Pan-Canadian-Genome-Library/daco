@@ -92,6 +92,12 @@ export const applicationRevisionRequestSchema = z
 	})
 	.strict();
 
+export const closeApplicationSchema = z.object({
+	requesterId: z.string().min(1, { message: 'requesterId is required' }),
+	isDacMember: z.boolean({ required_error: 'isDacMember is required' }),
+	applicationId: z.string().min(1, { message: 'applicationId is required' }),
+});
+
 export const submitApplicationRequestSchema = z
 	.object({
 		applicationId: z.number().nonnegative().min(1),
