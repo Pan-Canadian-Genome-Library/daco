@@ -25,7 +25,7 @@ import ContentWrapper from '@/components/layouts/ContentWrapper';
 import ApplicationViewerHeader from '@/components/pages/application/ApplicationViewerHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
 
-import useGetApplication from '@/api/useGetApplication';
+import useGetApplication from '@/api/queries/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
