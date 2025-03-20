@@ -14,11 +14,13 @@
 		"setup:env": "cp -n .env.schema .env",
 		"migrate": "pnpm drizzle-kit migrate",
 		"start:prod": "pnpm migrate && tsx ./src/main.js",
+		"test": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/**/*.test.ts",
 		"test:unit": "pnpm run test:unit:api && pnpm run test:unit:db && pnpm run test:unit:services",
 		"test:integration": "pnpm run test:int:api && pnpm run test:int:db && pnpm run test:int:services",
 		"test:int:api": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/integration/api/*.test.ts",
 		"test:int:db": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/integration/db/*.test.ts",
-		"test:int:services": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/integration/services/*.test.ts"
+		"test:int:services": "tsx --test --test-reporter=spec --experimental-test-coverage ./tests/integration/services/*.test.ts",
+		"test:local": "pnpm run test:api && pnpm run test:db && pnpm run test:services"
 	},
 	"devDependencies": {
 		"@testcontainers/postgresql": "^10.14.0",
