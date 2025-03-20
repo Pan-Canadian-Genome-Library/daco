@@ -38,7 +38,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testApplicationId,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 describe('File API', () => {
 	let db: PostgresDb;
@@ -64,7 +64,7 @@ describe('File API', () => {
 	describe('Upload Ethics File', () => {
 		it('Should create new file if there is no ethics_letter in the application contents', async () => {
 			const mockFile: formidable.File = {
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest.docx'),
+				filepath: path.join(process.cwd(), 'tests/utils/fileuploadtest.docx'),
 				hashAlgorithm: 'sha256',
 				mimetype: 'application/msword',
 				newFilename: 'newFileName',
@@ -90,7 +90,7 @@ describe('File API', () => {
 
 		it('Should update file if there is an existing ethics_letter id in the application contents', async () => {
 			const mockFile: formidable.File = {
-				filepath: path.join(process.cwd(), 'tests/fileuploadtest-2.docx'),
+				filepath: path.join(process.cwd(), 'tests/utils/fileuploadtest-2.docx'),
 				hashAlgorithm: 'sha256',
 				mimetype: 'application/msword',
 				newFilename: 'newestFileName',
