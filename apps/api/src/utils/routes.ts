@@ -26,7 +26,7 @@ import {
 import {
 	type ApplicationContentsResponse,
 	type ApplicationResponseData,
-	type GetCollaboratorsResponse,
+	type CollaboratorsResponse,
 	type SignatureDTO,
 } from '@pcgl-daco/data-model';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -173,8 +173,8 @@ export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Signatur
  * @returns  type GetCollaboratorsResponse in camelcase
  */
 
-export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): GetCollaboratorsResponse[] => {
-	const formattedUpdate: GetCollaboratorsResponse[] = [];
+export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): CollaboratorsResponse[] => {
+	const formattedUpdate: CollaboratorsResponse[] = [];
 
 	data.forEach((value) => {
 		formattedUpdate.push({
