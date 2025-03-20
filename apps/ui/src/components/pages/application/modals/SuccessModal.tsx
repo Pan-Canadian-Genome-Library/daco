@@ -35,6 +35,7 @@ const SuccessModal = ({ isOpen, onOk, successText, okText }: SuccessModalProps) 
 			open={isOpen}
 			onOk={onOk}
 			footer={[]}
+			destroyOnClose
 		>
 			<Flex justify="center" align="center" vertical>
 				<Title level={3} aria-level={1}>
