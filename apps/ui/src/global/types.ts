@@ -64,3 +64,7 @@ export interface BasicFormFieldProps {
 	rule: RuleRender;
 	required?: boolean;
 }
+
+export type Nullable<T> = {
+	[K in keyof T]: T[K] | null;
+};
