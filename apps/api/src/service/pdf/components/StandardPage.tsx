@@ -12,6 +12,7 @@ interface StandardPageProps extends FooterProps {
 	children: ReactNode;
 	ignorePadding?: boolean;
 	useVerticalStackLayout?: boolean;
+	fixed?: boolean;
 }
 
 const styles = StyleSheet.create({
@@ -88,9 +89,10 @@ const StandardPage = ({
 	ignorePadding = false,
 	alternatingAttribution = false,
 	useVerticalStackLayout = false,
+	fixed = false,
 }: StandardPageProps) => {
 	return (
-		<Page size={'A4'} style={ignorePadding ? styles.page__noPadding : styles.page}>
+		<Page size={'A4'} fixed={fixed} style={ignorePadding ? styles.page__noPadding : styles.page}>
 			{useVerticalStackLayout ? (
 				<View style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>{children}</View>
 			) : (

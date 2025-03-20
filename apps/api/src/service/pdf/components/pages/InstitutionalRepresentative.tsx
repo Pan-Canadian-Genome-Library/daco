@@ -22,51 +22,48 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { ApplicantDTO, InstitutionDTO } from '@pcgl-daco/data-model';
+import { InstitutionalRepDTO, InstitutionDTO } from '@pcgl-daco/data-model';
 
-const ApplicantInformation = ({
-	applicantFirstName,
-	applicantLastName,
-	applicantMiddleName,
-	applicantTitle,
-	applicantSuffix,
-	applicantPrimaryAffiliation,
-	applicantInstitutionalEmail,
-	applicantProfileUrl,
-	applicantPositionTitle,
+const InstitutionalRepresentative = ({
+	institutionalRepTitle,
+	institutionalRepFirstName,
+	institutionalRepMiddleName,
+	institutionalRepLastName,
+	institutionalRepSuffix,
+	institutionalRepPrimaryAffiliation,
+	institutionalRepEmail,
+	institutionalRepProfileUrl,
+	institutionalRepPositionTitle,
 	institutionCountry,
 	institutionState,
 	institutionStreetAddress,
 	institutionBuilding,
 	institutionCity,
 	institutionPostalCode,
-}: ApplicantDTO & InstitutionDTO) => {
+}: InstitutionalRepDTO & InstitutionDTO) => {
 	return (
 		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Applicant Information (Principal Investigator)</Title>
+			<Title>Institutional Representative</Title>
 			<Paragraph>
-				Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated
-				with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to
-				apply for federal research grants, etc.).
+				An Institutional Representative is a qualified representative of a legal entity who has the administrative power
+				to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g.
+				Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional
+				Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.
 			</Paragraph>
-			<Paragraph>
-				Please include a valid institutional email address that will be used to log in to PCGL and will be the email
-				address associated with PCGL Controlled Data access.
-			</Paragraph>
-			<FormDisplay title="Principal Investigator Information">
-				<DataItem item="Title">{applicantTitle}</DataItem>
-				<DataItem item="First Name">{applicantFirstName}</DataItem>
-				<DataItem item="Middle Name">{applicantMiddleName}</DataItem>
-				<DataItem item="Last Name">{applicantLastName}</DataItem>
-				<DataItem item="Suffix">{applicantSuffix}</DataItem>
-				<DataItem item="Primary Affiliation">{applicantPrimaryAffiliation}</DataItem>
+			<FormDisplay title="Institutional Representative">
+				<DataItem item="Title">{institutionalRepTitle}</DataItem>
+				<DataItem item="First Name">{institutionalRepFirstName}</DataItem>
+				<DataItem item="Middle Name">{institutionalRepMiddleName}</DataItem>
+				<DataItem item="Last Name">{institutionalRepLastName}</DataItem>
+				<DataItem item="Suffix">{institutionalRepSuffix}</DataItem>
+				<DataItem item="Primary Affiliation">{institutionalRepPrimaryAffiliation}</DataItem>
 				<DataItem isLink linkPrefix="mailto:" item="Institutional Email">
-					{applicantInstitutionalEmail}
+					{institutionalRepEmail}
 				</DataItem>
 				<DataItem isLink item="Researcher Profile">
-					{applicantProfileUrl}
+					{institutionalRepProfileUrl}
 				</DataItem>
-				<DataItem item="Position Title">{applicantPositionTitle}</DataItem>
+				<DataItem item="Position Title">{institutionalRepPositionTitle}</DataItem>
 			</FormDisplay>
 			<FormDisplay title="Institution/Company Mailing Address">
 				<DataItem item="Country">{institutionCountry}</DataItem>
@@ -80,4 +77,4 @@ const ApplicantInformation = ({
 	);
 };
 
-export default ApplicantInformation;
+export default InstitutionalRepresentative;

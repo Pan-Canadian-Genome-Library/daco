@@ -20,25 +20,29 @@
 import logger from '@/logger.ts';
 import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
 import { failure, success } from '@/utils/results.ts';
-import { ApplicationResponseData, SignatureDTO } from '@pcgl-daco/data-model';
+import { ApplicationResponseData, CollaboratorDTO, SignatureDTO } from '@pcgl-daco/data-model';
 
 const pdfSvc = () => ({
 	renderPCGLApplicationPDF: async ({
 		applicationContents,
 		signatureContents,
+		collaboratorsContents,
 	}: {
 		applicationContents: ApplicationResponseData;
 		signatureContents: SignatureDTO;
+		collaboratorsContents: CollaboratorDTO[];
 	}) => {
 		try {
 			const pdfCreationDate = new Date();
 
 			logger.info(applicationContents);
 			logger.info(signatureContents);
+			logger.info(collaboratorsContents);
 
 			const pdf = await renderApplicationPDF({
 				applicationContents: applicationContents,
 				signature: signatureContents,
+				collaborators: collaboratorsContents,
 				docCreatedAt: pdfCreationDate,
 			});
 			return success(pdf);

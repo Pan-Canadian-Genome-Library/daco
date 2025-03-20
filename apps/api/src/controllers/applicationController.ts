@@ -23,9 +23,11 @@ import { getDbInstance } from '@/db/index.js';
 import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
+import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { pdfSvc } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
+	CollaboratorsService,
 	SignatureService,
 	type ApplicationRecord,
 	type ApplicationService,
@@ -34,7 +36,12 @@ import {
 	type RevisionRequestModel,
 } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { aliasApplicationContentsRecord, aliasApplicationRecord, aliasSignatureRecord } from '@/utils/routes.js';
+import {
+	aliasApplicationContentsRecord,
+	aliasApplicationRecord,
+	aliasCollaboratorRecord,
+	aliasSignatureRecord,
+} from '@/utils/routes.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
@@ -142,15 +149,24 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
 	const signatureService: SignatureService = signatureSvc(database);
+	const collaboratorsService: CollaboratorsService = collaboratorsSvc(database);
+
 	const pdfService: PDFService = pdfSvc();
 
 	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
 	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
+	const collaboratorsContents = await collaboratorsService.listCollaborators(applicationId);
 
 	if (!applicationContents.success) {
 		return applicationContents;
-	} else if (!signatureContents.success) {
+	}
+
+	if (!signatureContents.success) {
 		return signatureContents;
+	}
+
+	if (!collaboratorsContents.success) {
+		return collaboratorsContents;
 	}
 
 	/**
@@ -160,6 +176,7 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 	const renderedPDF = await pdfService.renderPCGLApplicationPDF({
 		applicationContents: aliasApplicationRecord(applicationContents.data),
 		signatureContents: aliasSignatureRecord(signatureContents.data),
+		collaboratorsContents: aliasCollaboratorRecord(collaboratorsContents.data),
 	});
 
 	if (!renderedPDF.success) {

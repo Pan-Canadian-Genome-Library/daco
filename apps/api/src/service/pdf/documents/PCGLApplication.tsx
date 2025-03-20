@@ -21,12 +21,15 @@ import ApplicantInformation from '@/service/pdf/components/pages/ApplicantInform
 import IntroductionPage from '@/service/pdf/components/pages/IntroductionPage.tsx';
 import TitlePage from '@/service/pdf/components/pages/TitlePage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
-import { ApplicationResponseData, SignatureDTO } from '@pcgl-daco/data-model';
+import { ApplicationResponseData, CollaboratorDTO, SignatureDTO } from '@pcgl-daco/data-model';
 import { Document, Font, renderToBuffer, StyleSheet } from '@react-pdf/renderer';
+import Collaborators from '../components/pages/Collaborators.tsx';
+import InstitutionalRepresentative from '../components/pages/InstitutionalRepresentative.tsx';
 
 interface PCGLApplicationProps {
 	applicationContents: ApplicationResponseData;
 	signature: SignatureDTO;
+	collaborators: CollaboratorDTO[];
 	docCreatedAt: Date;
 }
 /**
@@ -63,7 +66,7 @@ const styles = StyleSheet.create({
 	},
 });
 
-const PCGLApplication = ({ applicationContents, signature, docCreatedAt }: PCGLApplicationProps) => {
+const PCGLApplication = ({ applicationContents, signature, collaborators, docCreatedAt }: PCGLApplicationProps) => {
 	const contents = applicationContents.contents;
 
 	return (
@@ -94,13 +97,41 @@ const PCGLApplication = ({ applicationContents, signature, docCreatedAt }: PCGLA
 				institutionCity={contents?.institutionCity}
 				institutionPostalCode={contents?.institutionPostalCode}
 			/>
+			<InstitutionalRepresentative
+				institutionalRepTitle={contents?.institutionalRepTitle}
+				institutionalRepFirstName={contents?.institutionalRepFirstName}
+				institutionalRepMiddleName={contents?.institutionalRepMiddleName}
+				institutionalRepLastName={contents?.institutionalRepLastName}
+				institutionalRepSuffix={contents?.institutionalRepSuffix}
+				institutionalRepPrimaryAffiliation={contents?.institutionalRepPrimaryAffiliation}
+				institutionalRepEmail={contents?.institutionalRepEmail}
+				institutionalRepProfileUrl={contents?.institutionalRepProfileUrl}
+				institutionalRepPositionTitle={contents?.institutionalRepPositionTitle}
+				institutionCountry={contents?.institutionCountry}
+				institutionState={contents?.institutionState}
+				institutionStreetAddress={contents?.institutionStreetAddress}
+				institutionBuilding={contents?.institutionBuilding}
+				institutionCity={contents?.institutionCity}
+				institutionPostalCode={contents?.institutionPostalCode}
+			/>
+			<Collaborators collaborators={collaborators} />
 		</Document>
 	);
 };
 
-const renderApplicationPDF = async ({ applicationContents, signature, docCreatedAt }: PCGLApplicationProps) => {
+const renderApplicationPDF = async ({
+	applicationContents,
+	signature,
+	docCreatedAt,
+	collaborators,
+}: PCGLApplicationProps) => {
 	return await renderToBuffer(
-		<PCGLApplication docCreatedAt={docCreatedAt} applicationContents={applicationContents} signature={signature} />,
+		<PCGLApplication
+			collaborators={collaborators}
+			docCreatedAt={docCreatedAt}
+			applicationContents={applicationContents}
+			signature={signature}
+		/>,
 	);
 };
 
