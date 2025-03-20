@@ -48,7 +48,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
-	const formatDate = (createdAt: Date, expiresAt: Date) => {
+	const formatDate = (createdAt: string, expiresAt: string) => {
 		const createdDate = translate('date.intlDateTime', {
 			val: new Date(createdAt),
 			formatParams: {

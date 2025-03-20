@@ -22,7 +22,7 @@ import { useEffect } from 'react';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 
 import ContentWrapper from '@/components/layouts/ContentWrapper';
-import AppHeader from '@/components/pages/application/AppHeader';
+import ApplicationViewerHeader from '@/components/pages/application/ApplicationViewerHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/queries/useGetApplication';
@@ -67,7 +67,7 @@ const ApplicationViewer = () => {
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<AppHeader id={data.id} state={data.state} />
+				<ApplicationViewerHeader id={data.id} state={data.state} />
 				{/* Multipart form Viewer */}
 				<Flex style={{ width: '100%', paddingInline: '52px' }}>
 					<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
