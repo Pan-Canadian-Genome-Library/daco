@@ -32,6 +32,8 @@ import {
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import lodash from 'lodash';
 
+const { camelCase, snakeCase } = lodash;
+
 type inputKey = string & keyof Record<string, any>;
 
 /** Used in filter functions for alias utilities below
@@ -59,7 +61,7 @@ export const convertToCamelCase = <
 	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
 
 	const responseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = lodash.camelCase(key);
+		const aliasedKey = camelCase(key);
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
@@ -87,7 +89,7 @@ export const convertToSnakeCase = <
 	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
 
 	const databaseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = lodash.snakeCase(key);
+		const aliasedKey = snakeCase(key);
 		const value = data[key];
 		const accumulator = { ...acc, [aliasedKey]: value };
 		return accumulator;
