@@ -10,8 +10,6 @@ import {
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 	let status: number;
-	const customizableMsg = err.message;
-	const details = err.cause;
 
 	switch (true) {
 		case err instanceof BadRequest:
@@ -37,5 +35,5 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 	}
 
 	// Send the response without returning anything
-	res.status(status).send({ error: err.name, message: customizableMsg, details: details });
+	res.status(status).send({ error: err.name, message: err.message, details: err.cause });
 };
