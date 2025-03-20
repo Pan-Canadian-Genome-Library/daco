@@ -28,6 +28,7 @@ import {
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
+	getRevisions,
 	rejectApplication,
 	requestApplicationRevisionsByDac,
 	submitRevision,
@@ -417,6 +418,34 @@ describe('Application API', () => {
 
 			// Assert: Should return an error message
 			assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
+		});
+	});
+
+	describe('getRevisions', () => {
+		it('should fetch revisions for a valid applicationId where revisions exist', async () => {
+			// Arrange: Add revisions to the database for a specific application
+			const applicationId = testApplicationId;
+			await testApplicationRepo.createRevisionRequest({
+				applicationId,
+				revisionData: {
+					application_id: applicationId,
+					comments: 'Initial revision',
+					applicant_approved: false,
+					institution_rep_approved: false,
+					collaborators_approved: false,
+					project_approved: false,
+					requested_studies_approved: false,
+					created_at: new Date(),
+				},
+			});
+
+			// Act: Call the getRevisions method
+			const result = await getRevisions({ applicationId });
+
+			// Assert: Verify that revisions are fetched successfully
+			assert.ok(result.success, 'Expected revisions to be fetched successfully');
+			assert.ok(Array.isArray(result.data), 'Expected revisions to be an array');
+			assert.strictEqual(result.data.length, 1, 'Expected one revision to be returned');
 		});
 	});
 
