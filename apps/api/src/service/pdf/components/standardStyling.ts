@@ -16,8 +16,13 @@ const textStyles = {
 	},
 };
 
+const colours = {
+	primary: '#C41D7F',
+};
+
 const standardStyles = {
 	textStyles,
+	colours,
 };
 
 export { standardStyles };
