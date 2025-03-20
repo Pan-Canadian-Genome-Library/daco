@@ -21,11 +21,12 @@ import { UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Form, notification, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { RcFile, UploadChangeParam } from 'antd/es/upload';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
-import useEditApplication from '@/api/useEditApplication';
+import useEditApplication from '@/api/mutations/useEditApplication';
 import useGetFile from '@/api/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
@@ -36,7 +37,6 @@ import { ApplicationOutletContext } from '@/global/types';
 import { getFileType } from '@/global/utils';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { FileExtentionTypes } from '@pcgl-daco/data-model';
-import { RcFile, UploadChangeParam } from 'antd/es/upload';
 
 const { Text } = Typography;
 const { useToken } = theme;
