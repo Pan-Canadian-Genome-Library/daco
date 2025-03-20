@@ -29,7 +29,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 		label: string;
 		value: string | number;
 	}[];
-	initialValue?: object | string;
+	initialValue?: object | string | null;
 	placeholder?: string;
 }
 
