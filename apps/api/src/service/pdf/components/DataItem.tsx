@@ -17,37 +17,57 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
-import { StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Link, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
+import { standardStyles } from './standardStyling.ts';
+
+interface DataItemProps {
+	item: string;
+	children: ReactNode | string;
+	layout?: 'stacked' | 'horizontal';
+	isLink?: boolean;
+	linkPrefix?: string;
+}
 
 const styles = StyleSheet.create({
-	list: {
-		fontFamily: 'OpenSans',
-		fontWeight: 'normal',
-		lineHeight: '1rem',
+	dataItem: {
+		display: 'flex',
 		fontSize: standardStyles.textStyles.sizes.md,
-		display: 'flex',
-		flexDirection: 'column',
-		gap: '.3rem',
-		padding: '0 0 0 0.7cm',
 	},
-	listItem: {
-		display: 'flex',
+	linkItem: {
+		color: standardStyles.colours.primary,
+	},
+	itemText: {
+		fontWeight: 'bold',
+	},
+	horizontalLayout: {
 		flexDirection: 'row',
-		gap: '.5rem',
+		gap: '5pt',
+	},
+	stackedLayout: {
+		flexDirection: 'column',
 	},
 });
-const List = ({ items, isNumbered }: { items: string[]; isNumbered?: boolean }) => {
+
+const DataItem = ({ item, children, layout = 'horizontal', isLink = false, linkPrefix }: DataItemProps) => {
+	const calcLayout = () =>
+		layout === 'horizontal'
+			? { ...styles.dataItem, ...styles.horizontalLayout }
+			: { ...styles.dataItem, ...styles.stackedLayout };
 	return (
-		<View style={styles.list}>
-			{items.map((li, index) => (
-				<View style={styles.listItem} key={li}>
-					{isNumbered ? <Text>{`${index + 1}.`}</Text> : <Text>&#x2022;</Text>}
-					<Text>{`${li}`}</Text>
-				</View>
-			))}
+		<View style={calcLayout()}>
+			<Text style={styles.itemText}>{item}:</Text>
+			<Text>
+				{isLink ? (
+					<Link style={styles.linkItem} src={`${linkPrefix && children ? linkPrefix : ''}${String(children)}`}>
+						{children ?? '—'}
+					</Link>
+				) : (
+					(children ?? '—')
+				)}
+			</Text>
 		</View>
 	);
 };
 
-export default List;
+export default DataItem;
