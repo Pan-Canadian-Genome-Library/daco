@@ -28,7 +28,7 @@ const useGetFile = ({ fileId }: { fileId?: number | null }) => {
 	const { t: translate } = useTranslation();
 
 	return useQuery<UploadFile[], ServerError>({
-		queryKey: ['file'],
+		queryKey: [`file-${fileId}`],
 		enabled: !!fileId,
 		queryFn: async () => {
 			const response = await fetch(`/file/${fileId}`);

@@ -49,7 +49,7 @@ const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const { mutate: editApplication } = useEditApplication();
+	const { mutateAsync: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
 	const { token } = useToken();
 
@@ -133,24 +133,26 @@ const Ethics = () => {
 						layout="vertical"
 						onChange={() => {
 							const ethicsReviewReq = getValues('ethicsReviewRequired');
-							dispatch({
-								type: 'UPDATE_APPLICATION',
-								payload: {
-									fields: {
-										...state?.fields,
-										ethicsReviewRequired: ethicsReviewReq,
-									},
-									formState: {
-										...state?.formState,
-									},
-								},
-							});
+
 							// This page should edit the backend immediately
 							editApplication({
 								id: appId,
 								update: {
 									ethicsReviewRequired: ethicsReviewReq,
 								},
+							}).then(() => {
+								dispatch({
+									type: 'UPDATE_APPLICATION',
+									payload: {
+										fields: {
+											...state?.fields,
+											ethicsReviewRequired: ethicsReviewReq,
+										},
+										formState: {
+											...state?.formState,
+										},
+									},
+								});
 							});
 						}}
 					>
@@ -160,6 +162,7 @@ const Ethics = () => {
 							control={control}
 							rule={rule}
 							required
+							disabled={!isEditMode}
 							options={[
 								{
 									key: 'exemption',
@@ -195,8 +198,9 @@ const Ethics = () => {
 												onChange={uploadChange}
 												defaultFileList={data}
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
+												disabled={!isEditMode}
 											>
-												<Button type="primary" icon={<UploadOutlined />}>
+												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
 													{translate('button.upload')}
 												</Button>
 											</Upload>
