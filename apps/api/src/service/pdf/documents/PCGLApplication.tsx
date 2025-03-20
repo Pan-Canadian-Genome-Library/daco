@@ -1,14 +1,19 @@
-import { type ApplicationSignatureUpdate, type JoinedApplicationRecord } from '@/service/types.ts';
+import { ApplicationResponseData, SignatureDTO } from '@pcgl-daco/data-model';
 import { Document, Font, renderToBuffer, StyleSheet } from '@react-pdf/renderer';
+import ApplicantInformation from '../components/pages/ApplicantInformation.tsx';
 import IntroductionPage from '../components/pages/IntroductionPage.tsx';
 import TitlePage from '../components/pages/TitlePage.tsx';
 import { standardStyles } from '../components/standardStyling.ts';
 
 interface PCGLApplicationProps {
-	applicationContents: JoinedApplicationRecord;
-	signature: ApplicationSignatureUpdate;
+	applicationContents: ApplicationResponseData;
+	signature: SignatureDTO;
+	docCreatedAt: Date;
 }
-
+/**
+ * Open Sans is openly licensed and used on our front end. While React PDF has its own font
+ * the rendering of it seemed weird, and felt hard to read when rending upon the page.
+ */
 Font.register({
 	family: 'OpenSans',
 	fonts: [
@@ -17,6 +22,10 @@ Font.register({
 		{ src: standardStyles.textStyles.fonts.openSansBold, fontWeight: 'bold' },
 	],
 });
+/**
+ * Closest openly licensed font similar enough to our PCGL brand font,
+ * this was a suggestion OK'd by Patrick.
+ */
 Font.register({
 	family: 'LeagueSpartan',
 	fonts: [
@@ -35,15 +44,25 @@ const styles = StyleSheet.create({
 	},
 });
 
-const PCGLApplication = ({ applicationContents, signature }: PCGLApplicationProps) => (
+const PCGLApplication = ({ applicationContents, signature, docCreatedAt }: PCGLApplicationProps) => (
 	<Document title="PCGL DACO Agreement" style={styles.document}>
-		<TitlePage title={'Application for Access to PCGL Controlled Data'} displayLogo />
+		<TitlePage
+			applicationId={applicationContents.id}
+			docCreatedAt={docCreatedAt}
+			title={'Application for Access to PCGL Controlled Data'}
+			principalInvestigatorName={`${applicationContents.contents?.applicantFirstName ?? ''} ${applicationContents.contents?.applicantLastName ?? '—'}`}
+			applicantPrimaryAffiliation={applicationContents.contents?.applicantPrimaryAffiliation ?? '—'}
+			displayLogo
+		/>
 		<IntroductionPage />
+		<ApplicantInformation />
 	</Document>
 );
 
-const renderApplicationPDF = async ({ applicationContents, signature }: PCGLApplicationProps) => {
-	return await renderToBuffer(<PCGLApplication applicationContents={applicationContents} signature={signature} />);
+const renderApplicationPDF = async ({ applicationContents, signature, docCreatedAt }: PCGLApplicationProps) => {
+	return await renderToBuffer(
+		<PCGLApplication docCreatedAt={docCreatedAt} applicationContents={applicationContents} signature={signature} />,
+	);
 };
 
 export { renderApplicationPDF };

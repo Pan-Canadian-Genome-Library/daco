@@ -1,11 +1,14 @@
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { StyleSheet, Text, View } from '@react-pdf/renderer';
 import Logo from '../Logo/Logo.tsx';
 import StandardPage from '../StandardPage.tsx';
 import { standardStyles } from '../standardStyling.ts';
 
-interface TitlePageProps {
+interface TitlePageProps extends Pick<ApplicationContentsResponse, 'applicationId' | 'applicantPrimaryAffiliation'> {
 	displayLogo?: boolean;
 	title: string;
+	principalInvestigatorName: string;
+	docCreatedAt: Date;
 }
 
 const styles = StyleSheet.create({
@@ -54,28 +57,37 @@ const styles = StyleSheet.create({
 	},
 });
 
-const TitlePage = ({ title, displayLogo }: TitlePageProps) => {
+const TitlePage = ({
+	title,
+	displayLogo,
+	applicationId,
+	principalInvestigatorName,
+	applicantPrimaryAffiliation,
+	docCreatedAt,
+}: TitlePageProps) => {
 	return (
-		<StandardPage ignorePadding showAttribution={false}>
+		<StandardPage ignorePadding showAttribution={true}>
 			<View style={styles.content}>
 				{displayLogo ? <Logo style={styles.logoImage} /> : null}
 				<Text style={styles.titleText}>{title}</Text>
 				<View style={styles.infoGrid}>
 					<View style={styles.infoItem}>
 						<Text style={styles.dataQuestion}>Application Number:</Text>
-						<Text style={styles.dataAnswer}> PCGL-123</Text>
+						<Text style={styles.dataAnswer}>{`PCGL-${applicationId}`}</Text>
 					</View>
 					<View style={styles.infoItem}>
 						<Text style={styles.dataQuestion}>Principal Investigator:</Text>
-						<Text style={styles.dataAnswer}>Jane Doe</Text>
+						<Text style={styles.dataAnswer}>{principalInvestigatorName}</Text>
 					</View>
 					<View style={styles.infoItem}>
 						<Text style={styles.dataQuestion}>Institution:</Text>
-						<Text style={styles.dataAnswer}>Ontario Institute for Cancer Research</Text>
+						<Text style={styles.dataAnswer}>{applicantPrimaryAffiliation}</Text>
 					</View>
 					<View style={styles.infoItem}>
 						<Text style={styles.dataQuestion}>Document Created On:</Text>
-						<Text style={styles.dataAnswer}>Tuesday, Feb. 18, 2025 at 11:00 AM</Text>
+						<Text style={styles.dataAnswer}>
+							{docCreatedAt.toLocaleString('en-CA', { dateStyle: 'full', timeStyle: 'long' })}
+						</Text>
 					</View>
 				</View>
 			</View>
