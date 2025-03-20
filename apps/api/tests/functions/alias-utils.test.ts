@@ -22,7 +22,7 @@ import { ApplicationDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import assert from 'node:assert';
 import { describe } from 'node:test';
-import { testUserId } from '../testUtils.ts';
+import { testUserId } from '../utils/testUtils.ts';
 
 import { convertToCamelCase, convertToSnakeCase } from '@/utils/aliases.ts';
 
