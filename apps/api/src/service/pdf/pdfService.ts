@@ -19,23 +19,27 @@
 
 import logger from '@/logger.ts';
 import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
-import { ApplicationSignatureUpdate, type JoinedApplicationRecord } from '@/service/types.ts';
 import { failure, success } from '@/utils/results.ts';
+import { ApplicationResponseData, SignatureDTO } from '@pcgl-daco/data-model';
 
 const pdfSvc = () => ({
 	renderPCGLApplicationPDF: async ({
-		application_contents,
-		signature_contents,
+		applicationContents,
+		signatureContents,
 	}: {
-		application_contents: JoinedApplicationRecord;
-		signature_contents: ApplicationSignatureUpdate;
+		applicationContents: ApplicationResponseData;
+		signatureContents: SignatureDTO;
 	}) => {
 		try {
-			logger.info(application_contents);
-			logger.info(signature_contents);
+			const pdfCreationDate = new Date();
+
+			logger.info(applicationContents);
+			logger.info(signatureContents);
+
 			const pdf = await renderApplicationPDF({
-				applicationContents: application_contents,
-				signature: signature_contents,
+				applicationContents: applicationContents,
+				signature: signatureContents,
+				docCreatedAt: pdfCreationDate,
 			});
 			return success(pdf);
 		} catch (err) {

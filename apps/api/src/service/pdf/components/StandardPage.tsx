@@ -11,17 +11,18 @@ interface FooterProps {
 interface StandardPageProps extends FooterProps {
 	children: ReactNode;
 	ignorePadding?: boolean;
+	useVerticalStackLayout?: boolean;
 }
 
 const styles = StyleSheet.create({
 	page: {
-		backgroundColor: '#fff',
 		/**
-		 * Standardized margins: https://www.noslangues-ourlanguages.gc.ca/en/writing-tips-plus/reports-margins
+		 * Standardized margins based off of Word & https://www.noslangues-ourlanguages.gc.ca/en/writing-tips-plus/reports-margins
 		 **/
 		padding: '2.5cm 3cm 2.5cm 3cm',
 		fontFamily: 'OpenSans',
 		fontWeight: 'normal',
+		backgroundColor: '#fff',
 	},
 	page__noPadding: {
 		fontFamily: 'OpenSans',
@@ -86,10 +87,15 @@ const StandardPage = ({
 	showPageNumbers = true,
 	ignorePadding = false,
 	alternatingAttribution = false,
+	useVerticalStackLayout = false,
 }: StandardPageProps) => {
 	return (
 		<Page size={'A4'} style={ignorePadding ? styles.page__noPadding : styles.page}>
-			{children}
+			{useVerticalStackLayout ? (
+				<View style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>{children}</View>
+			) : (
+				children
+			)}
 			<Footer
 				alternatingAttribution={alternatingAttribution}
 				showAttribution={showAttribution}

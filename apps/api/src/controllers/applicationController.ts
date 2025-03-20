@@ -34,7 +34,7 @@ import {
 	type RevisionRequestModel,
 } from '@/service/types.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/routes.js';
+import { aliasApplicationContentsRecord, aliasApplicationRecord, aliasSignatureRecord } from '@/utils/routes.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
@@ -153,9 +153,13 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 		return signatureContents;
 	}
 
+	/**
+	 * This is a bit odd because we're using the DTO aliases while passing back to the service (usually its the opposite),
+	 * however, given this service is essentially running a React render, we need to.
+	 */
 	const renderedPDF = await pdfService.renderPCGLApplicationPDF({
-		application_contents: applicationContents.data,
-		signature_contents: signatureContents.data,
+		applicationContents: aliasApplicationRecord(applicationContents.data),
+		signatureContents: aliasSignatureRecord(signatureContents.data),
 	});
 
 	if (!renderedPDF.success) {

@@ -186,7 +186,10 @@ applicationRouter.get('/:applicationId', async (request: Request<{ applicationId
 });
 
 applicationRouter.get('/:applicationId/pdf', async (request, response) => {
-	const pdf = await getApplicationPDF({ applicationId: 1 });
+	//TODO: Add validation layer to this.
+	const { applicationId } = request.params;
+
+	const pdf = await getApplicationPDF({ applicationId: Number(applicationId) });
 
 	if (!pdf.success) {
 		response.status(500).send('Error.');
