@@ -199,6 +199,10 @@ const Ethics = () => {
 												defaultFileList={data}
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
 												disabled={!isEditMode}
+												showUploadList={{
+													showDownloadIcon: false,
+													showRemoveIcon: false,
+												}}
 											>
 												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
 													{translate('button.upload')}
