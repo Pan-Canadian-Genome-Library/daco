@@ -18,36 +18,18 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { UploadFile } from 'antd';
+import { withErrorResponseHandler } from '../apiUtils';
 
 const useGetFile = ({ fileId }: { fileId?: number | null }) => {
-	const { t: translate } = useTranslation();
-
 	return useQuery<UploadFile[], ServerError>({
 		queryKey: [`file-${fileId}`],
 		enabled: !!fileId,
 		queryFn: async () => {
-			const response = await fetch(`/file/${fileId}`);
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.http.400.title');
-						error.errors = translate('errors.http.400.message');
-						break;
-				}
-
-				throw error;
-			}
+			const response = await fetch(`/file/${fileId}`).then(withErrorResponseHandler);
 			const result = await response.json();
 
 			const formatedFile: UploadFile[] = [
