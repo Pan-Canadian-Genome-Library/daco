@@ -8,7 +8,7 @@ export class BadRequest extends Error {
 
 export class NotFound extends Error {
 	constructor(msg: string) {
-		super(msg);
+		super(msg || "Sorry, looks like the resource you're trying to access does not exist.");
 		this.name = 'Not Found';
 	}
 }
