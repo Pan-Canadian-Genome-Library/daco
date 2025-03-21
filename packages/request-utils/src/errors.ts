@@ -36,7 +36,7 @@ export class ServiceUnavailable extends Error {
 
 export class InternalServerError extends Error {
 	constructor(msg?: string) {
-		super(msg || 'Something unexpected happened');
+		super(msg || "Sorry, something went wrong. We're unable to process your request, please try again later.");
 		this.name = 'Internal Server Error';
 	}
 }
