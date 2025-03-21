@@ -22,41 +22,29 @@ import { after, before, describe, it } from 'node:test';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { applicationSvc } from '@/service/applicationService.js';
-import {
-	type ApplicationActionsColumnName,
-	type ApplicationActionService,
-	type ApplicationService,
-	type OrderBy,
-} from '@/service/types.js';
+import { type ApplicationActionsColumnName, type ApplicationActionService, type OrderBy } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
+import { mockApplicationRepo } from '@tests/utils/mocks.ts';
 import {
-	addInitialApplications,
 	testApplicationId as application_id,
 	testActionId as id,
-	initTestMigration,
 	testUserId as user_id,
 } from '@tests/utils/testUtils.ts';
 
-describe('Application Action Service', { skip: true }, () => {
+describe('Application Action Service', () => {
 	let db: PostgresDb;
 	let testActionRepo: ApplicationActionService;
-	let testApplicationRepo: ApplicationService;
 
 	before(async () => {
 		db = connectToDb('');
 
-		await initTestMigration(db);
-		await addInitialApplications(db);
-
 		testActionRepo = applicationActionSvc(db);
-		testApplicationRepo = applicationSvc(db);
 	});
 
 	describe('All Actions', () => {
 		it('should perform WITHDRAW actions with after state DRAFT', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -74,7 +62,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform CLOSE actions with after state CLOSED', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -92,7 +80,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform SUBMIT_DRAFT actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -110,7 +98,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform WITHDRAW actions with after state DRAFT', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -128,7 +116,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform INSTITUTIONAL_REP_REVISION_REQUEST actions with after state INSTITUTIONAL_REP_REVISION_REQUESTED', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -146,7 +134,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform INSTITUTIONAL_REP_SUBMIT actions with after state INSTITUTIONAL_REP_REVIEW', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -164,7 +152,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform INSTITUTIONAL_REP_APPROVED actions with after state DAC_REVIEW', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -182,7 +170,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform DAC_REVIEW_APPROVED actions with after state APPROVED', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -200,7 +188,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform DAC_REVIEW_REJECTED actions with after state REJECTED', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -218,7 +206,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform DAC_REVIEW_REVISIONS actions with after state DAC_REVISIONS_REQUESTED', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -236,7 +224,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform DAC_REVIEW_SUBMIT actions with after state DAC_REVIEW', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
@@ -254,7 +242,7 @@ describe('Application Action Service', { skip: true }, () => {
 		});
 
 		it('should perform REVOKE actions with after state REVOKED', async () => {
-			const testApplicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 

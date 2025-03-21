@@ -17,21 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import formidable from 'formidable';
 import assert from 'node:assert';
+import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 
-import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { ApplicationService, FilesService } from '@/service/types.ts';
-import { addInitialApplications, initTestMigration } from '@tests/utils/testUtils.ts';
-import formidable from 'formidable';
-import path from 'node:path';
+import { FilesService } from '@/service/types.ts';
 
-describe('Signature Service', { skip: true }, () => {
+import { mockApplicationRepo } from '@tests/utils/mocks.ts';
+
+describe('Signature Service', () => {
 	let db: PostgresDb;
-	let testApplicationRepo: ApplicationService;
 	let testFileService: FilesService;
 
 	const mockFile: formidable.File = {
@@ -48,17 +47,12 @@ describe('Signature Service', { skip: true }, () => {
 
 	before(async () => {
 		db = connectToDb('');
-
-		await initTestMigration(db);
-		await addInitialApplications(db);
-
 		testFileService = filesSvc(db);
-		testApplicationRepo = applicationSvc(db);
 	});
 
 	describe('File Create', () => {
 		it('should create a new application with type "ETHICS_LETTER"', async () => {
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
+			const applicationResult = await mockApplicationRepo.getApplicationWithContents({ id: 1 });
 			assert.ok(applicationResult.success);
 
 			const fileResponse = await testFileService.createFile({
@@ -73,7 +67,7 @@ describe('Signature Service', { skip: true }, () => {
 		});
 
 		it('should create a new application with type "SIGNED_APPLICATION"', async () => {
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
+			const applicationResult = await mockApplicationRepo.getApplicationWithContents({ id: 1 });
 			assert.ok(applicationResult.success);
 
 			const fileResponse = await testFileService.createFile({
@@ -90,7 +84,7 @@ describe('Signature Service', { skip: true }, () => {
 
 	describe('File Update', () => {
 		before(async () => {
-			const applicationResult = await testApplicationRepo.editApplication({ id: 2, update: { ethics_letter: 2 } });
+			const applicationResult = await mockApplicationRepo.editApplication({ id: 2, update: { ethics_letter: 2 } });
 			assert.ok(applicationResult.success);
 
 			await testFileService.createFile({
@@ -107,7 +101,7 @@ describe('Signature Service', { skip: true }, () => {
 				originalFilename: 'fileuploadtest-2',
 			};
 
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 2 });
+			const applicationResult = await mockApplicationRepo.getApplicationWithContents({ id: 2 });
 			assert.ok(applicationResult.success);
 
 			const ethicsLetterId = applicationResult.data.contents?.ethics_letter;
@@ -133,7 +127,7 @@ describe('Signature Service', { skip: true }, () => {
 				originalFilename: 'fileuploadtest-2',
 			};
 
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 2 });
+			const applicationResult = await mockApplicationRepo.getApplicationWithContents({ id: 2 });
 			assert.ok(applicationResult.success);
 
 			const ethicsLetterId = applicationResult.data.contents?.ethics_letter;
