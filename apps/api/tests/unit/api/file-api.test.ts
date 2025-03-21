@@ -20,30 +20,16 @@
 import formidable from 'formidable';
 import assert from 'node:assert';
 import path from 'node:path';
-import { after, before, describe, it } from 'node:test';
+import { after, describe, it } from 'node:test';
 
 import { submitRevision } from '@/controllers/applicationController.js';
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import { uploadEthicsFile } from '@/controllers/fileController.ts';
-import { addInitialApplications, initTestMigration, testApplicationId } from '@tests/utils/testUtils.ts';
+import { mockApplicationRepo } from '@tests/utils/mocks.ts';
+import { testApplicationId } from '@tests/utils/testUtils.ts';
 
-describe('File API', { skip: true }, () => {
-	let db: PostgresDb;
-	let testApplicationRepo: ApplicationService;
-
-	before(async () => {
-		db = connectToDb('');
-
-		await initTestMigration(db);
-		await addInitialApplications(db);
-
-		testApplicationRepo = applicationSvc(db);
-	});
-
+describe('File API', () => {
 	describe('Upload Ethics File', () => {
 		it('Should create new file if there is no ethics_letter in the application contents', async () => {
 			const mockFile: formidable.File = {
@@ -58,7 +44,7 @@ describe('File API', { skip: true }, () => {
 				},
 			};
 
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
+			const applicationResult = await mockApplicationRepo.getApplicationWithContents({ id: 1 });
 			assert.ok(applicationResult.success);
 
 			const application = applicationResult.data;
@@ -88,7 +74,7 @@ describe('File API', { skip: true }, () => {
 			const fileResult = await uploadEthicsFile({ applicationId: 1, file: mockFile });
 			assert.ok(fileResult.success);
 
-			const applicationResult = await testApplicationRepo.getApplicationWithContents({ id: 1 });
+			const applicationResult = await mockApplicationRepo.getApplicationWithContents({ id: 1 });
 			assert.ok(applicationResult.success);
 			const application = applicationResult.data;
 			const ethicsLetterId = application.contents?.ethics_letter;
@@ -98,7 +84,7 @@ describe('File API', { skip: true }, () => {
 
 		describe('Submit Revision', () => {
 			it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
-				await testApplicationRepo.findOneAndUpdate({
+				await mockApplicationRepo.findOneAndUpdate({
 					id: testApplicationId,
 					update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
 				});

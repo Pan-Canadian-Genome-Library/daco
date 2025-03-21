@@ -23,10 +23,10 @@ import { after, before, describe, it } from 'node:test';
 import { ApplicationStateManager, createApplicationStateManager } from '@/controllers/stateManager.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
+import { type ApplicationActionService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { addInitialApplications, initTestMigration } from '@tests/utils/testUtils.ts';
+
+import { mockApplicationRepo } from '@tests/utils/mocks.ts';
 
 const {
 	APPROVED,
@@ -44,16 +44,10 @@ describe('State Machine', { skip: true }, () => {
 	let db: PostgresDb;
 
 	let testActionRepo: ApplicationActionService;
-	let testApplicationRepo: ApplicationService;
 
 	before(async () => {
 		db = connectToDb('');
-
-		await initTestMigration(db);
-		await addInitialApplications(db);
-
 		testActionRepo = applicationActionSvc(db);
-		testApplicationRepo = applicationSvc(db);
 	});
 
 	describe('Success path: Create/Edit/Revisions/Submit/Approve', () => {
@@ -98,7 +92,7 @@ describe('State Machine', { skip: true }, () => {
 				),
 			);
 
-			const applicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const applicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(applicationResult.success && applicationResult.data);
 			assert.ok(applicationResult.data.state === 'INSTITUTIONAL_REP_REVIEW');
 		});
@@ -170,7 +164,7 @@ describe('State Machine', { skip: true }, () => {
 				),
 			);
 
-			const applicationResult = await testApplicationRepo.getApplicationById({ id: 1 });
+			const applicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(applicationResult.success && applicationResult.data);
 			assert.ok(applicationResult.data.state === ApplicationStates.DAC_REVIEW);
 		});

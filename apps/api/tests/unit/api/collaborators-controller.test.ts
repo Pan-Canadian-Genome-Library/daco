@@ -28,21 +28,13 @@ import { createCollaborators, updateCollaborator } from '@/controllers/collabora
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 
-import {
-	addInitialApplications,
-	testApplicationId as application_id,
-	initTestMigration,
-	testUserId as user_id,
-} from '@tests/utils/testUtils.ts';
+import { testApplicationId as application_id, testUserId as user_id } from '@tests/utils/testUtils.ts';
 
 describe('Collaborators Controller', { skip: true }, () => {
 	let db: PostgresDb;
 
 	before(async () => {
 		db = connectToDb('');
-
-		await initTestMigration(db);
-		await addInitialApplications(db);
 	});
 
 	describe('Create new collaborators', () => {

@@ -18,38 +18,23 @@
  */
 
 import assert from 'node:assert';
-import { after, before, describe, it } from 'node:test';
-
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService } from '@/service/types.js';
+import { after, describe, it } from 'node:test';
 
 import {
 	deleteApplicationSignature,
 	getApplicationSignature,
 	updateApplicationSignature,
 } from '@/controllers/signatureController.ts';
-import { addInitialApplications, initTestMigration, testUserId as user_id } from '@tests/utils/testUtils.ts';
+import { mockApplicationRepo } from '@tests/utils/mocks.ts';
+import { testUserId as user_id } from '@tests/utils/testUtils.ts';
 
-describe('Signature API', { skip: true }, () => {
-	let db: PostgresDb;
-	let testApplicationRepo: ApplicationService;
-
+describe('Signature API', () => {
 	const validBase64Signature =
 		'data:image/png;base64,0ZxJm5HcCop3TCvbnvoHxseg4L0XM5WqylNBdkHKeEmIe4s5s4A7CZYs8TrPUzIuIA0bxD+Ei6764LcM2sPsmxKBuY3REWQ/uEe1j85hUHoiTbQqwln6Kfsd8cGC8sfjrNQD02oZ';
 
-	before(async () => {
-		db = connectToDb('');
-
-		await initTestMigration(db);
-		await addInitialApplications(db);
-
-		testApplicationRepo = applicationSvc(db);
-	});
-
 	describe('Sign Application', () => {
 		it('Should allow signing an application as an Applicant', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -72,7 +57,7 @@ describe('Signature API', { skip: true }, () => {
 		});
 
 		it('Should allow signing an application as an Institutional Rep', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -98,7 +83,7 @@ describe('Signature API', { skip: true }, () => {
 
 	describe('Retrieve Signed Application', () => {
 		it('Should retrieve a signed application', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -120,7 +105,7 @@ describe('Signature API', { skip: true }, () => {
 			assert.notStrictEqual(retrievedSignature.applicantSignedAt, null);
 		});
 		it('Should retrieve a unsigned application successfully', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -155,7 +140,7 @@ describe('Signature API', { skip: true }, () => {
 
 	describe('Delete Signatures', () => {
 		it("should retrieve an application and delete it's applicant signature but NOT it's rep signatures", async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -184,7 +169,7 @@ describe('Signature API', { skip: true }, () => {
 			assert.notStrictEqual(deletedSignature.data.institutionalRepSignedAt, null);
 		});
 		it("should retrieve an application and delete it's rep signatures", async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
