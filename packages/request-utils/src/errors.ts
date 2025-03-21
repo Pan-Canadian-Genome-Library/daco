@@ -15,7 +15,7 @@ export class NotFound extends Error {
 
 export class StatusConflict extends Error {
 	constructor(msg: string) {
-		super(msg);
+		super(msg || "Sorry, we're unable to process this request because the server has detected a conflict between the expected state of this resource and the state you attempted to apply. Please try again.");
 		this.name = 'Conflict';
 	}
 }
