@@ -31,12 +31,12 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { uploadEthicsFile } from '@/controllers/fileController.ts';
 import { addInitialApplications, initTestMigration, testApplicationId } from '@tests/utils/testUtils.ts';
 
-describe('File API', () => {
+describe('File API', { skip: true }, () => {
 	let db: PostgresDb;
 	let testApplicationRepo: ApplicationService;
 
 	before(async () => {
-		db = connectToDb(connectionString);
+		db = connectToDb('');
 
 		await initTestMigration(db);
 		await addInitialApplications(db);

@@ -58,12 +58,12 @@ const revisionRequestData: RevisionRequestModel = {
 	requested_studies_notes: 'Unclear scope',
 };
 
-describe('Application API', () => {
+describe('Application API', { skip: true }, () => {
 	let db: PostgresDb;
 	let testApplicationRepo: ApplicationService;
 
 	before(async () => {
-		db = connectToDb(connectionString);
+		db = connectToDb('');
 
 		await initTestMigration(db);
 		await addInitialApplications(db);

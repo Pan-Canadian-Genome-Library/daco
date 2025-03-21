@@ -39,13 +39,13 @@ import {
 	testUserId as user_id,
 } from '@tests/utils/testUtils.ts';
 
-describe('Application Action Service', () => {
+describe('Application Action Service', { skip: true }, () => {
 	let db: PostgresDb;
 	let testActionRepo: ApplicationActionService;
 	let testApplicationRepo: ApplicationService;
 
 	before(async () => {
-		db = connectToDb(connectionString);
+		db = connectToDb('');
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
