@@ -17,6 +17,42 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './validation.js';
-export * from './errors.js';
-export * from './errorHandler.js';
+import { ErrorRequestHandler } from 'express';
+import {
+	BadRequest,
+	InternalServerError,
+	NotFound,
+	NotImplemented,
+	ServiceUnavailable,
+	StatusConflict,
+} from '@pcgl-daco/request-utils';
+
+export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+	let status: number;
+
+	switch (true) {
+		case err instanceof BadRequest:
+			status = 400;
+			break;
+		case err instanceof NotFound:
+			status = 404;
+			break;
+		case err instanceof StatusConflict:
+			status = 409;
+			break;
+		case err instanceof InternalServerError:
+			status = 500;
+			break;
+		case err instanceof NotImplemented:
+			status = 501;
+			break;
+		case err instanceof ServiceUnavailable:
+			status = 503;
+			break;
+		default:
+			status = 500;
+	}
+
+	// Send the response without returning anything
+	res.status(status).send({ error: err.name, message: err.message, details: err.cause });
+};
