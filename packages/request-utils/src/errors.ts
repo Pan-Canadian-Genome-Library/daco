@@ -22,7 +22,7 @@ export class StatusConflict extends Error {
 
 export class NotImplemented extends Error {
 	constructor(msg?: string) {
-		super(msg || 'This functionallity is not yet implemented');
+		super(msg || "Sorry, looks like you may have tried to access functionality which has not been implemented yet. Please try again later.");
 		this.name = 'Not Implemented';
 	}
 }
