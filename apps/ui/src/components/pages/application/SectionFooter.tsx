@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import useEditApplication from '@/api/useEditApplication';
+import useEditApplication from '@/api/mutations/useEditApplication';
 import { ApplicationOutletContext } from '@/global/types';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -31,9 +31,10 @@ const { useToken } = theme;
 type SectionFooterProps = {
 	currentRoute: string;
 	isEditMode: boolean;
+	signSubmitHandler?: () => void;
 };
 
-const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
+const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler }: SectionFooterProps) => {
 	const { token } = useToken();
 	const { t: translate } = useTranslation();
 	const navigate = useNavigate();
@@ -70,7 +71,10 @@ const SectionFooter = ({ currentRoute, isEditMode }: SectionFooterProps) => {
 	};
 
 	const submitApplication = () => {
-		// Temp logic to trigger validation errors on ui edit mode
+		if (!!signSubmitHandler && isEditMode) {
+			signSubmitHandler();
+			return;
+		}
 
 		console.log('Submit application');
 	};

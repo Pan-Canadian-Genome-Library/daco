@@ -17,9 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { uploadEthicsFile } from '@/controllers/fileController.ts';
-import { fileUploadValidation } from '@pcgl-daco/request-utils';
-import { isPositiveInteger } from '@pcgl-daco/validation';
+import { deleteFile, uploadEthicsFile } from '@/controllers/fileController.ts';
+import { apiZodErrorMapping } from '@/utils/validation.ts';
+import { fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { fileDeleteParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request, type Response } from 'express';
 import formidable from 'formidable';
 
@@ -49,6 +50,29 @@ fileRouter.post(
 			res.status(500).send(errorReturn);
 			return;
 		}
+	}),
+);
+
+fileRouter.delete(
+	'/:fileId',
+	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
+		const { fileId } = req.params;
+		const id = parseInt(fileId ? fileId : '');
+
+		if (!isPositiveInteger(id)) {
+			res.status(400).send({ message: 'Invalid fileId' });
+			return;
+		}
+
+		const result = await deleteFile({ fileId: id });
+
+		if (!result.success) {
+			res.status(500).send(result);
+			return;
+		}
+
+		res.status(204).send({});
+		return;
 	}),
 );
 

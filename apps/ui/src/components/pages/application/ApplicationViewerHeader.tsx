@@ -21,12 +21,15 @@ import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
-import AppStatusSteps from '@/components/pages/application/AppStatusSteps';
+import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
+import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
+import SuccessModal from '@/components/pages/application/modals/SuccessModal';
+import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 type AppHeaderProps = {
@@ -34,20 +37,31 @@ type AppHeaderProps = {
 	state: ApplicationStateValues;
 };
 
-const AppHeader = ({ id, state }: AppHeaderProps) => {
+export interface RevisionModalStateProps {
+	isOpen: boolean;
+	setIsOpen: (isOpen: boolean) => void;
+	onSubmit: (data: RevisionsModalSchemaType) => void;
+}
+
+const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
-	const [openModal, setOpenModal] = useState(false);
+	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
+	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-	const showCloseApplicationModal = () => {
-		setOpenModal(true);
+	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
+		//TODO: Add logic to this to actually submit the revisions.
+		console.log('Submission Handled', data);
+		setOpenRevisionsModal(false);
+		setShowSuccessModal(true);
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
-	const handleOk = () => {
-		setOpenModal(false);
+	const handleCloseApplicationRequest = () => {
+		setShowCloseApplicationModal(false);
 	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
@@ -69,19 +83,18 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 	};
 
 	return (
-		<StatusBannerWrapper>
+		<PageHeader
+			title={translate('applicationViewer.title', { id: id })}
+			description={`${formatDate(new Date(), new Date())}`}
+		>
 			<Flex style={{ width: '100%' }} justify="center" align="end" vertical>
-				<Row style={{ width: '100%' }} wrap>
+				<Row style={{ width: '100%' }} justify={'end'} wrap>
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
-						<Flex style={{ height: '100%' }} vertical justify="center" align="start">
-							<Title>
-								{translate('dashboard.title')}: PCGL-{id}
-							</Title>
-							<Text>{formatDate(new Date(), new Date())}</Text>
-						</Flex>
-					</Col>
-					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
-						<Flex style={{ height: '100%' }} justify={isLowResDevice ? 'center' : 'end'} align="center">
+						<Flex
+							style={{ height: '100%', width: '100%' }}
+							justify={isLowResDevice ? 'center' : 'end'}
+							align="flex-end"
+						>
 							<Flex
 								flex={1}
 								style={{
@@ -94,7 +107,7 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 								vertical
 								gap={'middle'}
 							>
-								<AppStatusSteps currentStatus={state} />
+								<ApplicationStatusSteps currentStatus={state} />
 							</Flex>
 						</Flex>
 					</Col>
@@ -109,25 +122,37 @@ const AppHeader = ({ id, state }: AppHeaderProps) => {
 				>
 					{/* TODO: Disable for MVP */}
 					{/* <Button>{translate('button.history')}</Button> */}
-					<Button onClick={showCloseApplicationModal}>{translate('button.closeApp')}</Button>
+					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
+					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				</Flex>
 				<Modal
-					title={translate('modal.closeTitle', { id })}
+					title={translate('modals.closeApplication.title', { id })}
 					okText={translate('button.closeApp')}
-					cancelText={translate('button.cancel')}
+					cancelText={translate('modals.buttons.cancel')}
 					width={'100%'}
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-					open={openModal}
-					onOk={handleOk}
-					onCancel={() => setOpenModal(false)}
+					open={showCloseApplicationModal}
+					onOk={handleCloseApplicationRequest}
+					onCancel={() => setShowCloseApplicationModal(false)}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modal.closeDescription')}</Text>
+						<Text>{translate('modals.closeApplication.description')}</Text>
 					</Flex>
 				</Modal>
+				<RequestRevisionsModal
+					onSubmit={onRevisionsSubmit}
+					isOpen={openRevisionsModal}
+					setIsOpen={setOpenRevisionsModal}
+				/>
 			</Flex>
-		</StatusBannerWrapper>
+			<SuccessModal
+				successText={translate('modals.applications.global.success.text', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showSuccessModal}
+				onOk={() => setShowSuccessModal(false)}
+			/>
+		</PageHeader>
 	);
 };
 
-export default AppHeader;
+export default ApplicationViewerHeader;

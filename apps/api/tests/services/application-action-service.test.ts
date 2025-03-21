@@ -17,15 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationActions } from '@/db/schemas/applicationActions.js';
-import { applications } from '@/db/schemas/applications.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import {
@@ -45,7 +42,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 describe('Application Action Service', () => {
 	let db: PostgresDb;
@@ -367,8 +364,6 @@ describe('Application Action Service', () => {
 	});
 
 	after(async () => {
-		await db.delete(applicationActions).where(eq(applicationActions.user_id, user_id));
-		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});

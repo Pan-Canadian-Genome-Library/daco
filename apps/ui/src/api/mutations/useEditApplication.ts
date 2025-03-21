@@ -18,43 +18,27 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
-import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
-const useCreateApplication = () => {
-	const navigation = useNavigate();
-	const { t: translate } = useTranslation();
+const useEditApplication = () => {
+	const { state, dispatch } = useApplicationContext();
 
-	return useMutation<ApplicationResponseData, ServerError>({
-		mutationFn: async () => {
-			const response = await fetch('/applications/create', {
+	return useMutation<ApplicationResponseData, ServerError, { id: number | string }>({
+		mutationFn: async ({ id }) => {
+			const update = state?.fields;
+
+			const response = await fetch('/applications/edit', {
 				method: 'POST',
 				body: JSON.stringify({
-					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
+					id,
+					update,
 				}),
-			});
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.fetchError.title');
-						error.errors = translate('errors.fetchError.message');
-						break;
-				}
-
-				throw error;
-			}
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
@@ -63,10 +47,10 @@ const useCreateApplication = () => {
 				message: error.message,
 			});
 		},
-		onSuccess: (data) => {
-			navigation(`/application/${data.id}/intro/edit`);
+		onSuccess: () => {
+			dispatch({ type: 'UPDATE_DIRTY_STATE', payload: false });
 		},
 	});
 };
 
-export default useCreateApplication;
+export default useEditApplication;

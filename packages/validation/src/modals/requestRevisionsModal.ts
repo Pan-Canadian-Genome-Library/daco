@@ -17,22 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { z } from 'zod';
+import { Maximum300WordsString } from '../common/strings.js';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from './apiUtils';
-
-const useGetCollaborators = (applicationId: string | number) => {
-	return useQuery<CollaboratorsResponse[], ServerError>({
-		queryKey: [`collaborators-${applicationId}`],
-		queryFn: async () => {
-			const response = await fetch(`/collaborators/${applicationId}`).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-	});
-};
-
-export default useGetCollaborators;
+export const revisionsModalSchema = z.object({
+	applicantInformation: Maximum300WordsString.optional(),
+	institutionalRep: Maximum300WordsString.optional(),
+	collaborators: Maximum300WordsString.optional(),
+	projectInformation: Maximum300WordsString.optional(),
+	requestedStudy: Maximum300WordsString.optional(),
+	ethics: Maximum300WordsString.optional(),
+	signature: Maximum300WordsString.optional(),
+	general: Maximum300WordsString.optional(),
+});
+export type RevisionsModalSchemaType = z.infer<typeof revisionsModalSchema>;

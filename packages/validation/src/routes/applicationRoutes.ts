@@ -90,3 +90,9 @@ export const applicationRevisionRequestSchema = z
 		role: z.enum(['DAC_MEMBER', 'INSTITUTIONAL_REP']),
 	})
 	.strict();
+
+export const closeApplicationSchema = z.object({
+	requesterId: z.string().min(1, { message: 'requesterId is required' }),
+	isDacMember: z.boolean({ required_error: 'isDacMember is required' }),
+	applicationId: z.string().min(1, { message: 'applicationId is required' }),
+});

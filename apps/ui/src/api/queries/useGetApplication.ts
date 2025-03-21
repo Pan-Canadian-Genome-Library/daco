@@ -18,8 +18,8 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
@@ -27,33 +27,12 @@ import { useApplicationContext } from '@/providers/context/application/Applicati
 import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {
-	const { t: translate } = useTranslation();
 	const { state, dispatch } = useApplicationContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [id],
 		queryFn: async () => {
-			const response = await fetch(`/applications/${id}`);
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 404:
-						error.message = translate('errors.http.404.title');
-						error.errors = translate('errors.http.404.message');
-						break;
-					case 500:
-						error.message = translate('errors.http.500.title');
-						error.errors = translate('errors.http.500.message');
-						break;
-				}
-
-				throw error;
-			}
+			const response = await fetch(`/applications/${id}`).then(withErrorResponseHandler);
 
 			return await response.json().then((data: ApplicationResponseData) => {
 				// Filter out data if they contain null values and application metadata

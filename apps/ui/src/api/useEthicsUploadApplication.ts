@@ -18,11 +18,11 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
-import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from './apiUtils';
 
 interface ParamsType {
 	applicationId: string | number;
@@ -30,8 +30,6 @@ interface ParamsType {
 }
 
 const useEthicsUploadApplication = () => {
-	const { t: translate } = useTranslation();
-
 	return useMutation<ApplicationResponseData, ServerError, ParamsType>({
 		mutationFn: async ({ applicationId, formData }: ParamsType) => {
 			console.log(applicationId, formData);
@@ -39,23 +37,7 @@ const useEthicsUploadApplication = () => {
 			const response = await fetch('/applications/upload-ethics', {
 				method: 'POST',
 				body: formData,
-			});
-
-			if (!response.ok) {
-				const error = {
-					message: translate('errors.generic.title'),
-					errors: translate('errors.generic.message'),
-				};
-
-				switch (response.status) {
-					case 400:
-						error.message = translate('errors.fetchError.title');
-						error.errors = translate('errors.fetchError.message');
-						break;
-				}
-
-				throw error;
-			}
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},

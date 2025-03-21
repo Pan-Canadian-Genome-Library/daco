@@ -19,7 +19,7 @@
 
 /* eslint-disable react-refresh/only-export-components */
 
-import useGetUser from '@/api/useGetUser';
+import useGetUser from '@/api/queries/useGetUser';
 import type { UserResponse } from '@pcgl-daco/validation';
 import { createContext, useContext, type PropsWithChildren } from 'react';
 
