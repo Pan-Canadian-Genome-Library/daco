@@ -18,7 +18,7 @@
  */
 
 import { ColProps, Form, Input } from 'antd';
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
@@ -33,6 +33,8 @@ interface TextAreaProps extends BasicFormFieldProps {
 	labelCol?: ColProps;
 	showCount?: boolean;
 	maxWordCount?: number;
+	rows?: number;
+	style?: CSSProperties;
 }
 
 const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextAreaProps) => {
@@ -46,14 +48,17 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
 		return (
 			<Input.TextArea
-				style={{
-					height: 'auto',
-				}}
+				style={
+					props.style ?? {
+						height: 'auto',
+					}
+				}
 				{...field}
-				rows={10}
+				rows={props.rows ?? 10}
 				count={{
 					show: props.showCount,
-					strategy: (text) => (text.length === 0 ? text.split(WORDS).length - 1 : text.split(WORDS).length),
+					strategy: (text) =>
+						text.length === 0 ? text.trim().split(WORDS).length - 1 : text.trim().split(WORDS).length,
 					max: props.maxWordCount,
 				}}
 				disabled={props.disabled}

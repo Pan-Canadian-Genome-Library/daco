@@ -134,7 +134,7 @@ const HomePage = () => {
 				onCancel={() => setOpenModal(false)}
 			>
 				<Flex>
-					<Text>{translate('modal.authorization')}</Text>
+					<Text>{translate('modals.authorization.description')}</Text>
 				</Flex>
 			</Modal>
 		</Content>

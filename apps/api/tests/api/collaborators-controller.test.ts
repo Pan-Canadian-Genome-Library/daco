@@ -38,7 +38,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 describe('Collaborators Controller', () => {
 	let db: PostgresDb;
@@ -191,12 +191,11 @@ describe('Collaborators Controller', () => {
 			});
 
 			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdates.collaboratorType);
+			assert.strictEqual(collaboratorResult.data[0]?.collaboratorType, collaboratorUpdates.collaboratorType);
 		});
 	});
 
 	after(async () => {
-		await db.delete(collaborators).where(eq(collaborators.application_id, application_id));
 		await container.stop();
 		process.exit(0);
 	});

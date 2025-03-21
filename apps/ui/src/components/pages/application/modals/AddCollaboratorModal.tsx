@@ -38,15 +38,17 @@ const rule = createSchemaFieldRule(collaboratorsSchema);
 const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
-	const { mutate: addCollaborator } = useAddCollaborator();
+	const { mutateAsync: addCollaborator } = useAddCollaborator();
 
-	const { handleSubmit, control } = useForm<CollaboratorsSchemaType>({
+	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
 		resolver: zodResolver(collaboratorsSchema),
 	});
 
-	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
-		addCollaborator({ applicationId: appId, collaborators: [data] });
-		setIsOpen({ isOpen: false });
+	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = async (data) => {
+		addCollaborator({ applicationId: appId, collaborators: [data] }).then(() => {
+			reset(); // Clear form after submit
+			setIsOpen({ isOpen: false });
+		});
 	};
 
 	return (
@@ -63,7 +65,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('collab-section.addModalDescription')}</Text>
-				<Form layout="vertical" clearOnDestroy onFinish={handleSubmit(onSubmit)}>
+				<Form layout="vertical" clearOnDestroy onFinish={handleSubmit(onSubmit)} preserve={false}>
 					<Flex vertical>
 						<Row gutter={26}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
