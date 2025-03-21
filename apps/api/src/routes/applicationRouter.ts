@@ -504,6 +504,7 @@ applicationRouter.get('/revisions/:applicationId', async (request: Request, resp
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
 		});
+		return;
 	}
 
 	try {
