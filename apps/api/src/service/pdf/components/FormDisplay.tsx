@@ -6,6 +6,8 @@ import { standardStyles } from './standardStyling.ts';
 interface FormDisplay {
 	title: string;
 	children: ReactNode;
+	fixed?: boolean;
+	wrap?: boolean;
 }
 
 const styles = StyleSheet.create({
@@ -22,9 +24,9 @@ const styles = StyleSheet.create({
 	},
 });
 
-const FormDisplay = ({ title, children }: FormDisplay) => {
+const FormDisplay = ({ title, children, fixed = false, wrap = true }: FormDisplay) => {
 	return (
-		<View style={styles.form}>
+		<View style={styles.form} fixed={fixed} wrap={wrap}>
 			<Title level="h2">{title}</Title>
 			<View style={styles.formItems}>{children}</View>
 		</View>

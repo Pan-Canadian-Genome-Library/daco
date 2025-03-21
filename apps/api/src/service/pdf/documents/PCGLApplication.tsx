@@ -25,6 +25,8 @@ import { ApplicationResponseData, CollaboratorDTO, SignatureDTO } from '@pcgl-da
 import { Document, Font, renderToBuffer, StyleSheet } from '@react-pdf/renderer';
 import Collaborators from '../components/pages/Collaborators.tsx';
 import InstitutionalRepresentative from '../components/pages/InstitutionalRepresentative.tsx';
+import ProjectInformation from '../components/pages/ProjectInformation.tsx';
+import RequestedStudy from '../components/pages/RequestedStudy.tsx';
 
 interface PCGLApplicationProps {
 	applicationContents: ApplicationResponseData;
@@ -115,6 +117,16 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				institutionPostalCode={contents?.institutionPostalCode}
 			/>
 			<Collaborators collaborators={collaborators} />
+			<ProjectInformation
+				projectTitle={contents?.projectTitle}
+				projectWebsite={contents?.projectWebsite}
+				projectBackground={contents?.projectBackground}
+				projectAims={contents?.projectAims}
+				projectSummary={contents?.projectSummary}
+				projectMethodology={contents?.projectMethodology}
+				projectPublicationUrls={contents?.projectPublicationUrls}
+			/>
+			<RequestedStudy requestedStudies={contents?.requestedStudies} />
 		</Document>
 	);
 };

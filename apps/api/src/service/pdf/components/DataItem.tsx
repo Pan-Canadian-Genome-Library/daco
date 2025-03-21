@@ -31,6 +31,7 @@ interface DataItemProps {
 
 const styles = StyleSheet.create({
 	dataItem: {
+		lineHeight: '1rem',
 		display: 'flex',
 		fontSize: standardStyles.textStyles.sizes.md,
 	},
@@ -46,6 +47,7 @@ const styles = StyleSheet.create({
 	},
 	stackedLayout: {
 		flexDirection: 'column',
+		gap: '5pt',
 	},
 });
 
