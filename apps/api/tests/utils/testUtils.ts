@@ -82,7 +82,7 @@ export const addInitialApplications = async (db: PostgresDb) => {
 };
 
 /** Create additional 20 Applications to test paginated results */
-export const addPaginationDonors = async (db: PostgresDb) => {
+export const addPaginationApplications = async (db: PostgresDb) => {
 	const newApplication: typeof applications.$inferInsert = {
 		user_id: testUserId,
 		state: ApplicationStates.DRAFT,
