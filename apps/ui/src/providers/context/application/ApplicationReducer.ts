@@ -25,7 +25,7 @@ function ApplicationReducer(state: ApplicationFormState, action: ApplicationActi
 			return { ...state, ...action.payload };
 		}
 		case 'UPDATE_DIRTY_STATE': {
-			return { ...state, formState: { ...state?.formState, isDirty: action.payload } };
+			return { ...state, formState: { ...state.formState, isDirty: action.payload } };
 		}
 		default:
 			return { ...state };

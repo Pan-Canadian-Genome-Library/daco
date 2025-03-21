@@ -64,3 +64,15 @@ export interface BasicFormFieldProps {
 	rule: RuleRender;
 	required?: boolean;
 }
+
+/**
+ * This is needed for the disconnect between the API-DTO's and zodSchema types for the application sections.
+ * 	The dtos allow for null fields to be returned and zodschema does not allow null fields as apart of their schemas. So to match the Application Context fields: `Partial<ApplicationContentsResponse>`
+ * 	We will add null values to the zodSchemaType returned from the validation package on the frontend.
+ *
+ *  EXAMPLE:
+ * 	const {...} = useForm<Nullable<InstitutionalRepSchemaType>>({...})
+ */
+export type Nullable<T> = {
+	[K in keyof T]: T[K] | null;
+};

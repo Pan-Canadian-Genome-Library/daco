@@ -21,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -32,7 +33,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
@@ -41,28 +42,29 @@ const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const [form] = Form.useForm();
 
 	const {
 		formState: { isDirty },
 		getValues,
 		control,
-	} = useForm<InstitutionalRepSchemaType>({
+	} = useForm<Nullable<InstitutionalRepSchemaType>>({
 		defaultValues: {
-			institutionalFirstName: state?.fields?.institutionalRepFirstName || undefined,
-			institutionalMiddleName: state?.fields?.institutionalRepMiddleName || undefined,
-			institutionalLastName: state?.fields?.institutionalRepLastName || undefined,
-			institutionalInstituteAffiliation: state?.fields?.institutionalRepEmail || undefined,
-			institutionalPositionTitle: state?.fields?.institutionalRepPositionTitle || undefined,
-			institutionalPrimaryAffiliation: state?.fields?.institutionalRepPrimaryAffiliation || undefined,
-			institutionalProfileUrl: state?.fields?.institutionalRepProfileUrl || undefined,
-			institutionalSuffix: state?.fields?.institutionalRepSuffix || undefined,
-			institutionalTitle: state?.fields?.institutionalRepTitle || undefined,
-			institutionBuilding: state?.fields?.institutionBuilding || undefined,
-			institutionCity: state?.fields?.institutionCity || undefined,
-			institutionCountry: state?.fields?.institutionCountry || 'CAN',
-			institutionPostalCode: state?.fields?.institutionPostalCode || undefined,
-			institutionState: state?.fields?.institutionState || undefined,
-			institutionStreetAddress: state?.fields?.institutionStreetAddress || undefined,
+			institutionalFirstName: state.fields.institutionalRepFirstName,
+			institutionalMiddleName: state.fields.institutionalRepMiddleName,
+			institutionalLastName: state.fields.institutionalRepLastName,
+			institutionalInstituteAffiliation: state.fields.institutionalRepEmail,
+			institutionalPositionTitle: state.fields.institutionalRepPositionTitle,
+			institutionalPrimaryAffiliation: state.fields.institutionalRepPrimaryAffiliation,
+			institutionalProfileUrl: state.fields.institutionalRepProfileUrl,
+			institutionalSuffix: state.fields.institutionalRepSuffix,
+			institutionalTitle: state.fields.institutionalRepTitle,
+			institutionBuilding: state.fields.institutionBuilding,
+			institutionCity: state.fields.institutionCity,
+			institutionCountry: state.fields.institutionCountry || 'CAN',
+			institutionPostalCode: state.fields.institutionPostalCode,
+			institutionState: state.fields.institutionState,
+			institutionStreetAddress: state.fields.institutionStreetAddress,
 		},
 		resolver: zodResolver(institutionalRepSchema),
 	});
@@ -74,7 +76,7 @@ const Institutional = () => {
 			type: 'UPDATE_APPLICATION',
 			payload: {
 				fields: {
-					...state?.fields,
+					...state.fields,
 					institutionalRepFirstName: data.institutionalFirstName,
 					institutionalRepMiddleName: data.institutionalMiddleName,
 					institutionalRepLastName: data.institutionalLastName,
@@ -92,16 +94,22 @@ const Institutional = () => {
 					institutionStreetAddress: data.institutionStreetAddress,
 				},
 				formState: {
-					...state?.formState,
+					...state.formState,
 					isDirty,
 				},
 			},
 		});
 	};
 
+	// validate fields that have been dirtied on page load
+	useEffect(() => {
+		form.validateFields({ dirty: true });
+	}, [form]);
+
 	return (
 		<SectionWrapper>
 			<Form
+				form={form}
 				layout="vertical"
 				onBlur={() => {
 					if (isEditMode) {
