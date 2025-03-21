@@ -29,7 +29,7 @@ export class NotImplemented extends Error {
 
 export class ServiceUnavailable extends Error {
 	constructor(msg?: string) {
-		super(msg || 'Server is unable to access the necessary resources to process the request. Please try again later.');
+		super(msg || "Sorry, this service is currently unavailable and is not able to process your request. Please try again at later time. We apologize for the inconvenience.");
 		this.name = 'Service unavailable';
 	}
 }
