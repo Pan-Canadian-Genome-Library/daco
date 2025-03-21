@@ -36,10 +36,7 @@ const RequestedStudy = ({ requestedStudies }: RequestedStudiesDTO) => {
 				<Link style={{ color: standardStyles.colours.primary }}>PCGL Research Portal - Studies.</Link>
 			</Paragraph>
 			<DataItem item={requestedStudies?.length && requestedStudies.length > 1 ? 'Study Names' : 'Study Name'}>
-				{requestedStudies?.map(
-					(study, index) =>
-						`${study}${requestedStudies.length !== index + 1 ? ', ' : ''}`,
-				)}
+				{requestedStudies?.map((study, index) => `${study}${requestedStudies.length !== index + 1 ? ', ' : ''}`)}
 			</DataItem>
 		</StandardPage>
 	);
