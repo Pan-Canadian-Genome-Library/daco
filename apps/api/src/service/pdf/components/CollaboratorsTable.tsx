@@ -1,5 +1,5 @@
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
-import { StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Link, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { standardStyles } from './standardStyling.ts';
 
 interface CollaboratorsTable {
@@ -48,6 +48,9 @@ const styles = StyleSheet.create({
 		padding: `${standardStyles.textStyles.sizes.sm} 0 ${standardStyles.textStyles.sizes.sm} ${standardStyles.textStyles.sizes.sm}`,
 		textAlign: 'left',
 	},
+	tableContents__Link: {
+		color: '#000',
+	},
 	tableNoData: {
 		display: 'flex',
 		flexDirection: 'row',
@@ -77,7 +80,13 @@ const CollaboratorsTable = ({ data }: CollaboratorsTable) => {
 				<Text style={styles.tableContents__Text}>{collaborator.collaboratorFirstName ?? '—'}</Text>
 				<Text style={styles.tableContents__Text}>{collaborator.collaboratorLastName ?? '—'}</Text>
 				<Text wrap style={styles.tableContents__Text}>
-					{collaborator.collaboratorInstitutionalEmail ?? '—'}
+					{collaborator.collaboratorInstitutionalEmail ? (
+						<Link style={styles.tableContents__Link} src={`mailto:${collaborator.collaboratorInstitutionalEmail}`}>
+							{collaborator.collaboratorInstitutionalEmail}
+						</Link>
+					) : (
+						'—'
+					)}
 				</Text>
 				<Text style={styles.tableContents__Text}>{collaborator.collaboratorPositionTitle ?? '—'}</Text>
 			</View>

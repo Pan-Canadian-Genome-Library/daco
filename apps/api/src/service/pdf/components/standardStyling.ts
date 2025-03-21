@@ -1,3 +1,11 @@
+const colours = {
+	primary: '#C41D7F',
+	secondary: '#520339',
+	tertiary: '#FFF0F6',
+	grey: '#D9D9D9',
+	lightGrey: '#FAFAFA',
+};
+
 const textStyles = {
 	fonts: {
 		openSansLight: './src/service/pdf/components/fonts/OpenSans-Light.ttf',
@@ -14,15 +22,6 @@ const textStyles = {
 		xl: '18.14pt',
 		xxl: '21.77pt',
 	},
-};
-
-const colours = {
-	primary: '#C41D7F',
-	secondary: '#520339',
-	tertiary: '#FFF0F6',
-	grey: '#D9D9D9',
-	lightGrey: '#FAFAFA',
-
 };
 
 const standardStyles = {
