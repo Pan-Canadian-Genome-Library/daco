@@ -17,11 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { z } from 'zod';
+import { Maximum300WordsString } from '../common/strings.js';
+
+export const revisionsModalSchema = z.object({
+	applicantInformation: Maximum300WordsString.optional(),
+	institutionalRep: Maximum300WordsString.optional(),
+	collaborators: Maximum300WordsString.optional(),
+	projectInformation: Maximum300WordsString.optional(),
+	requestedStudy: Maximum300WordsString.optional(),
+	ethics: Maximum300WordsString.optional(),
+	signature: Maximum300WordsString.optional(),
+	general: Maximum300WordsString.optional(),
+});
+export type RevisionsModalSchemaType = z.infer<typeof revisionsModalSchema>;
