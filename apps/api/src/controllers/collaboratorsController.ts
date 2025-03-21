@@ -21,8 +21,8 @@ import { getDbInstance } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
+import { aliasCollaboratorRecord } from '@/utils/aliases.ts';
 import { failure, success } from '@/utils/results.js';
-import { aliasCollaboratorRecord } from '@/utils/routes.ts';
 import { type CollaboratorDTO, type CollaboratorUpdateRecord } from '@pcgl-daco/data-model';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 

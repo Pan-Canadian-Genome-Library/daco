@@ -35,10 +35,10 @@ import { apiZodErrorMapping } from '@/utils/validation.js';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
+	closeApplicationSchema,
 	collaboratorsListParamsSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
-	closeApplicationSchema,
 } from '@pcgl-daco/validation';
 import bodyParser from 'body-parser';
 import express, { type Request, type Response } from 'express';
