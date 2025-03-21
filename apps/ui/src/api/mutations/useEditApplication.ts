@@ -22,21 +22,26 @@ import { notification } from 'antd';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useEditApplication = () => {
 	const { state, dispatch } = useApplicationContext();
 
-	return useMutation<ApplicationResponseData, ServerError, { id: number | string }>({
-		mutationFn: async ({ id }) => {
-			const update = state?.fields;
-
+	return useMutation<
+		ApplicationResponseData,
+		ServerError,
+		{ id: number | string; update?: Partial<ApplicationContentsResponse> }
+	>({
+		mutationFn: async ({ id, update }) => {
 			const response = await fetch('/applications/edit', {
 				method: 'POST',
 				body: JSON.stringify({
 					id,
-					update,
+					update: {
+						...state.fields,
+						...update,
+					},
 				}),
 			}).then(withErrorResponseHandler);
 

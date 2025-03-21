@@ -18,70 +18,106 @@
  */
 
 import { UploadOutlined } from '@ant-design/icons';
-import { EthicsFileEnum, ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Flex, Form, notification, theme, Typography, Upload, UploadProps } from 'antd';
+import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
+import { Button, Flex, Form, notification, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { RcFile, UploadChangeParam } from 'antd/es/upload';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useEditApplication from '@/api/mutations/useEditApplication';
+import useGetFile from '@/api/queries/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
+import { getFileType } from '@/global/utils';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { FileExtentionTypes } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
 const rule = createSchemaFieldRule(ethicsSchema);
 
-enum AllowedFilesEnum {
-	PDF = 'application/pdf',
-	DOC = 'application/msword',
-	DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-}
-
 const MAX_FILE_SIZE = 5000000;
 
 const Ethics = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { control, watch, getValues } = useForm<EthicsSchemaType>({});
+	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { state, dispatch } = useApplicationContext();
+	const { mutateAsync: editApplication } = useEditApplication();
+	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
 	const { token } = useToken();
 
-	const showFileUpload = watch('ethicsApproval');
-
-	// File Upload configuration
-	const uploadFile: UploadProps = {
-		action: 'https://www.localhost:3000',
-		maxCount: 1,
-		showUploadList: {
-			showDownloadIcon: true,
-			downloadIcon: 'Download',
+	const { control, watch, getValues } = useForm<EthicsSchemaType>({
+		defaultValues: {
+			ethicsReviewRequired: state.fields?.ethicsReviewRequired ?? undefined,
 		},
-		beforeUpload: (file) => {
-			const isValidImage = new Set(Object.values(AllowedFilesEnum)).has(file.type as AllowedFilesEnum);
+	});
 
-			if (!isValidImage) {
-				notification.error({
-					message: translate('invalidFileTitle'),
-				});
-				return isValidImage || Upload.LIST_IGNORE;
-			}
+	const showFileUpload = watch('ethicsReviewRequired') !== undefined;
 
-			if (file.size > MAX_FILE_SIZE) {
-				notification.error({
-					message: translate('invalidFileSizeTitle'),
-					description: translate('invalidFileSizeDescription'),
-				});
-				return false;
-			}
-		},
-		onChange: () => {
-			// Add file data to the rhf here, once the file upload is complete.
-		},
+	// Update the state on file change
+	const uploadChange = (info: UploadChangeParam<UploadFile>) => {
+		if (info.file.status === 'done') {
+			dispatch({
+				type: 'UPDATE_APPLICATION',
+				payload: {
+					fields: {
+						...state?.fields,
+						ethicsLetter: info.file.response.id,
+					},
+					formState: {
+						...state?.formState,
+					},
+				},
+			});
+		}
+	};
+
+	// file meta data check before triggering upload process
+	const beforeUpload = (file: RcFile) => {
+		const isValidImage = new Set(Object.values(FileExtentionTypes)).has(file.type);
+
+		if (!isValidImage) {
+			notification.error({
+				message: translate('invalidFileTitle'),
+			});
+			return isValidImage || Upload.LIST_IGNORE;
+		}
+
+		if (file.size > MAX_FILE_SIZE) {
+			notification.error({
+				message: translate('invalidFileSizeTitle'),
+				description: translate('invalidFileSizeDescription'),
+			});
+			return false;
+		}
+	};
+
+	// Generate download url and then remove the link after downloading
+	const onDownload = (value: UploadFile) => {
+		const bufferArray = new Uint8Array(value.response.content.data).buffer;
+		const fileType = getFileType(value.name);
+
+		const blob = new Blob([bufferArray], {
+			type: fileType,
+		});
+
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+
+		a.download = value.name;
+		document.body.appendChild(a);
+		a.click();
+
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
 	};
 
 	return (
@@ -93,20 +129,49 @@ const Ethics = () => {
 					showDivider={true}
 				/>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>
-					<Form layout="vertical">
+					<Form
+						layout="vertical"
+						onChange={() => {
+							const ethicsReviewReq = getValues('ethicsReviewRequired');
+
+							// This page should edit the backend immediately
+							editApplication({
+								id: appId,
+								update: {
+									ethicsReviewRequired: ethicsReviewReq,
+								},
+							}).then(() => {
+								dispatch({
+									type: 'UPDATE_APPLICATION',
+									payload: {
+										fields: {
+											...state?.fields,
+											ethicsReviewRequired: ethicsReviewReq,
+										},
+										formState: {
+											...state?.formState,
+										},
+									},
+								});
+							});
+						}}
+					>
 						<BlockRadioBox
 							label={translate('ethics-section.pleaseChose')}
-							name="ethicsApproval"
+							name="ethicsReviewRequired"
 							control={control}
 							rule={rule}
 							required
+							disabled={!isEditMode}
 							options={[
 								{
-									value: EthicsFileEnum.EXEMPTION,
+									key: 'exemption',
+									value: false,
 									label: translate('ethics-section.exemptionDescription'),
 								},
 								{
-									value: EthicsFileEnum.ETHICS_LETTER,
+									key: 'ethicsLetter',
+									value: true,
 									label: translate('ethics-section.ethicsLetterDescription'),
 								},
 							]}
@@ -118,18 +183,32 @@ const Ethics = () => {
 									style={{ fontWeight: 600 }}
 									required
 									label={translate('ethics-section.attach', {
-										letter: getValues('ethicsApproval') === 'exemption' ? 'exemption' : 'approval',
+										letter: getValues('ethicsReviewRequired') === false ? 'exemption' : 'approval',
 									})}
 								>
 									<Flex vertical gap={'large'}>
 										<Text style={{ fontSize: token.fontSize, fontWeight: 300 }}>
 											{translate('ethics-section.allowedFileTypes')}
 										</Text>
-										<Upload {...uploadFile}>
-											<Button type="primary" icon={<UploadOutlined />}>
-												{translate('button.upload')}
-											</Button>
-										</Upload>
+										{!isLoading ? (
+											<Upload
+												action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
+												maxCount={1}
+												beforeUpload={beforeUpload}
+												onChange={uploadChange}
+												defaultFileList={data}
+												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
+												disabled={!isEditMode}
+												showUploadList={{
+													showDownloadIcon: false,
+													showRemoveIcon: false,
+												}}
+											>
+												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
+													{translate('button.upload')}
+												</Button>
+											</Upload>
+										) : null}
 									</Flex>
 								</Form.Item>
 							</Flex>
