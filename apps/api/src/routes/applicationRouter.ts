@@ -358,6 +358,7 @@ applicationRouter.post('/applications/:applicationId/revoke', jsonParser, async 
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
 		});
+		return;
 	}
 
 	try {
@@ -374,21 +375,26 @@ applicationRouter.post('/applications/:applicationId/revoke', jsonParser, async 
 			let status = 500;
 			let message = result.message || 'An unexpected error occurred.';
 			let errors = result.errors;
+			switch(errors) {
+				case "ApplicationNotFound": 
+				case "Application record is undefined": 
+					status = 404;
+					message = 'Application not found.';
+					break;
+				case "StateConflict":
+					status = 409;
+					message = 'Application is already revoked.';
+					break;
+				case "Unauthorized":
+					status = 403;
+					message = 'Unauthorized to revoke this application.';
+					break;
+				case "InvalidState":
+					status = 400;
+					message = 'Cannot revoke application in its current state.';
+					break;
 
-			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-				status = 404;
-				message = 'Application not found.';
-			} else if (errors === 'StateConflict') {
-				status = 409;
-				message = 'Application is already revoked.';
-			} else if (errors === 'Unauthorized') {
-				status = 403;
-				message = 'Unauthorized to revoke this application.';
-			} else if (errors === 'InvalidState') {
-				status = 400;
-				message = 'Cannot revoke application in its current state.';
 			}
-
 			response.status(status).send({ message, errors });
 		}
 	} catch (error) {
