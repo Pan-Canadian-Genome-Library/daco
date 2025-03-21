@@ -29,7 +29,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
 	addInitialApplications,
-	addPaginationDonors,
+	addPaginationApplications,
 	allRecordsPageSize,
 	initTestMigration,
 	PG_DATABASE,
@@ -55,7 +55,7 @@ describe('Application Service', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
-		await addPaginationDonors(db);
+		await addPaginationApplications(db);
 
 		testApplicationService = applicationSvc(db);
 	});
