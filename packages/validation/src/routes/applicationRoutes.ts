@@ -18,6 +18,7 @@
  */
 
 import { z } from 'zod';
+import { BASE64_IMAGE } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
@@ -96,3 +97,11 @@ export const closeApplicationSchema = z.object({
 	isDacMember: z.boolean({ required_error: 'isDacMember is required' }),
 	applicationId: z.string().min(1, { message: 'applicationId is required' }),
 });
+
+export const submitApplicationRequestSchema = z
+	.object({
+		applicationId: z.number().nonnegative().min(1),
+	      role: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+	      signature: z.string().regex(BASE64_IMAGE),
+	})
+	.strict();
