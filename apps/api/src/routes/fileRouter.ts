@@ -64,9 +64,11 @@ fileRouter.post(
 		}
 
 		const result = await uploadEthicsFile({ applicationId: id, file });
-
 		if (result.success) {
-			res.status(200).send({});
+			res.status(200).send({
+				id: result.data.id,
+				filename: result.data.filename,
+			});
 			return;
 		} else {
 			const errorReturn = { message: result.message, errors: String(result.errors) };

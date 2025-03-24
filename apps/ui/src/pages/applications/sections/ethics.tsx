@@ -105,7 +105,7 @@ const Ethics = () => {
 
 	const handleChange = (info: UploadChangeParam<UploadFile>) => {
 		// Handle upload progress
-		if (info.file.status === 'uploading' || info.file.status === 'done') {
+		if (info.file.status === 'uploading') {
 			setFileList(() => [
 				{
 					uid: `${info.file.uid}`,
@@ -114,6 +114,23 @@ const Ethics = () => {
 					url: '/',
 				},
 			]);
+			return;
+		}
+
+		if (info.file.status === 'done') {
+			dispatch({
+				type: 'UPDATE_APPLICATION',
+				payload: {
+					fields: {
+						...state?.fields,
+						ethicsLetter: info.file.response.id,
+					},
+					formState: {
+						...state?.formState,
+					},
+				},
+			});
+
 			return;
 		}
 	};
