@@ -23,139 +23,40 @@ import {
 	type CollaboratorRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
+import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { type CollaboratorsResponse, type SignatureDTO } from '@pcgl-daco/data-model/src/types.js';
 import {
-	type ApplicationContentsResponse,
-	type ApplicationResponseData,
-	type CollaboratorsResponse,
-	type SignatureDTO,
-} from '@pcgl-daco/data-model/src/types.js';
-import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
-import lodash from 'lodash';
-
-const { camelCase, snakeCase } = lodash;
-
-type inputKey = string & keyof Record<string, any>;
-
-/** Used in filter functions for alias utilities below
- * @param key Current key to validate
- * @param omittedKeys List of keys to remove from output
- */
-const filterOmittedKeys = (omittedKeys: string[]) => (key: string) => !omittedKeys.includes(key);
-
-/**
- * Helper function to convert Postgres snake_case to FE camelCase
- * Generics allow usage w/ multiple input/output combinations
- * @param data Original Database record with snake case keys to convert
- * @param omittedKeys List of keys to remove from output for cases where a partial record is returned
- * @returns ResponseRecord - Generic type representing new record with updated camelCase keys
- */
-export const convertToCamelCase = <
-	SnakeCaseRecord extends Record<string, any>,
-	CamelCaseRecord extends Record<string, any>,
->(
-	data: SnakeCaseRecord,
-	omittedKeys: string[] = [],
-): CamelCaseRecord => {
-	const allKeys: inputKey[] = Object.keys(data);
-
-	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
-
-	const responseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = camelCase(key);
-		const value = data[key];
-		const accumulator = { ...acc, [aliasedKey]: value };
-		return accumulator;
-	}, {}) as CamelCaseRecord;
-
-	return responseData;
-};
-
-/**
- * Helper function to convert FE camelCase to Postgres snake_case
- * Generics allow usage w/ multiple input/output combinations
- * @param data Original Request record with camelCase keys to convert
- * @param omittedKeys List of keys to remove from output for cases where a partial record is returned
- * @returns DatabaseRecord - Generic type representing new record with updated snake_case keys
- */
-export const convertToSnakeCase = <
-	CamelCaseRecord extends Record<string, any>,
-	SnakeCaseRecord extends Record<string, any>,
->(
-	data: CamelCaseRecord,
-	omittedKeys: string[] = [],
-): SnakeCaseRecord => {
-	const allKeys: inputKey[] = Object.keys(data);
-
-	const filteredKeys = allKeys.filter(filterOmittedKeys(omittedKeys));
-
-	const databaseData = filteredKeys.reduce((acc, key) => {
-		const aliasedKey = snakeCase(key);
-		const value = data[key];
-		const accumulator = { ...acc, [aliasedKey]: value };
-		return accumulator;
-	}, {}) as SnakeCaseRecord;
-
-	return databaseData;
-};
+	applicationResponseSchema,
+	editSignatureRequestSchema,
+	type UpdateEditApplicationRequest,
+	updateEditApplicationRequestSchema,
+} from '@pcgl-daco/validation';
+import { type ObjectToCamel, objectToCamel, objectToSnake, type ObjectToSnake } from 'ts-case-convert';
+import { type SafeParseReturnType } from 'zod';
 
 /** Convenience function for specific alias utils input/output scenarios
  * @param data Joined Application Record - Snake case database Application / ApplicationContents record
  * @returns ApplicationResponseData - Application record with updated keys
  */
-export const aliasApplicationRecord = (data: JoinedApplicationRecord): ApplicationResponseData => {
-	const {
-		id,
-		user_id: userId,
-		state,
-		created_at: createdAt,
-		approved_at: approvedAt,
-		updated_at: updatedAt,
-		expires_at: expiresAt,
-		contents: applicationContents,
-	} = data;
-
-	const omittedKeys = [
-		'id',
-		'applicant_signature',
-		'applicant_signed_at',
-		'institutional_rep_signature',
-		'institutional_rep_signed_at',
-		'ethics_review_required',
-		'ethics_letter',
-		'signed_pdf',
-	];
-
-	const contents = applicationContents
-		? convertToCamelCase<ApplicationContentUpdates, ApplicationContentsResponse>(applicationContents, omittedKeys)
-		: null;
-
-	return {
-		id,
-		userId,
-		state,
-		createdAt,
-		approvedAt,
-		updatedAt,
-		expiresAt,
-		contents,
-	};
+export const aliasApplicationRecord = (
+	data: JoinedApplicationRecord,
+): SafeParseReturnType<ObjectToCamel<JoinedApplicationRecord>, ApplicationResponseData> => {
+	const aliasedRecord = objectToCamel(data);
+	const validationResult = applicationResponseSchema.safeParse(aliasedRecord);
+	return validationResult;
 };
 
 /** Convenience function for specific alias utils input/output scenarios
  * @param data type UpdateEditApplicationRequest application contents in camelCase
  * @returns  type ApplicationContentUpdates in snake_case
  */
-export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
-	const omitKeys = [
-		'id',
-		'applicantSignature',
-		'applicantSignedAt',
-		'institutionalRepSignature',
-		'institutionalRepSignedAt',
-	];
-	const formattedUpdate = convertToSnakeCase<UpdateEditApplicationRequest, ApplicationContentUpdates>(update, omitKeys);
-
-	return formattedUpdate;
+export const aliasApplicationContentsRecord = (
+	update: UpdateEditApplicationRequest,
+): SafeParseReturnType<ObjectToSnake<UpdateEditApplicationRequest>, ApplicationContentUpdates> => {
+	const snakeCaseRecord = objectToSnake(update);
+	const validationResult = updateEditApplicationRequestSchema.safeParse(snakeCaseRecord);
+	// TODO: Use correct schema
+	return validationResult;
 };
 
 /**
@@ -163,10 +64,13 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
  * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
  * @returns type `SignatureDTO` - camelCase variation of a Postgress success response.
  */
-export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): SignatureDTO => {
-	const responseData = convertToCamelCase<ApplicationSignatureUpdate, SignatureDTO>(data);
+export const aliasSignatureRecord = (
+	data: ApplicationSignatureUpdate,
+): SafeParseReturnType<ObjectToCamel<ApplicationSignatureUpdate>, SignatureDTO> => {
+	const camelCaseRecord = objectToCamel(data);
+	const validationResult = editSignatureRequestSchema.safeParse(camelCaseRecord);
 
-	return responseData;
+	return validationResult;
 };
 
 /**

@@ -17,12 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationStates } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
 
-export const updateEditApplicationRequestSchema = z
+export const applicationContentsSchema = z
 	.object({
 		applicantFirstName: z.string(),
 		applicantMiddleName: z.string(),
@@ -56,11 +57,32 @@ export const updateEditApplicationRequestSchema = z
 	})
 	.partial();
 
+export const updateEditApplicationRequestSchema = applicationContentsSchema;
+
+export const applicationContentsResponseSchema = applicationContentsSchema
+	.extend({
+		applicationId: z.number(),
+		createdAt: z.date(),
+		updatedAt: z.date(),
+	})
+	.nullable();
+
 export const editApplicationRequestSchema = z.object({
 	id: z.number().nonnegative(),
 	update: updateEditApplicationRequestSchema.strict().refine((updateObj) => Object.keys(updateObj).length !== 0, {
 		params: { violation: 'noEmptyObject' },
 	}),
+});
+
+export const applicationResponseSchema = z.object({
+	id: z.number(),
+	userId: z.string(),
+	state: z.nativeEnum(ApplicationStates),
+	createdAt: z.date(),
+	approvedAt: z.date().nullable(),
+	updatedAt: z.date().nullable(),
+	expiresAt: z.date().nullable(),
+	contents: applicationContentsResponseSchema,
 });
 
 export const revisionDataSchema = z
