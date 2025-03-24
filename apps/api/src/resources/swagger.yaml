@@ -839,7 +839,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
-  /revisions/{applicationId}:
+  /applications/{applicationId}/revisions:
     get:
       tags:
         - Revisions

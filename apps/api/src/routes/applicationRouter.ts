@@ -496,7 +496,7 @@ applicationRouter.post(
 	}),
 );
 
-applicationRouter.get('/revisions/:applicationId', async (request: Request, response: Response) => {
+applicationRouter.get('/:applicationId/revisions', jsonParser, withParamsSchemaValidation (collaboratorsListParamsSchema, apiZodErrorMapping, async (request: Request, response: Response) => {
 	const { applicationId } = request.params;
 
 	if (!applicationId || isNaN(Number(applicationId))) {
@@ -537,6 +537,6 @@ applicationRouter.get('/revisions/:applicationId', async (request: Request, resp
 	} catch (error) {
 		response.status(500).json({ message: 'Internal server error', error: String(error) });
 	}
-});
+}));
 
 export default applicationRouter;
