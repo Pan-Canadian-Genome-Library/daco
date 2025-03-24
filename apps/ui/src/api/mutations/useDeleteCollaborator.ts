@@ -19,30 +19,22 @@
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
 
-import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
-import { withErrorResponseHandler } from '@/api/apiUtils';
 import { queryClient } from '@/providers/Providers';
 import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
-import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
+import { withErrorResponseHandler } from '../apiUtils';
 
-const useAddCollaborator = () => {
+const useDeleteCollaborator = () => {
 	return useMutation<
 		CollaboratorsResponse[],
 		ServerError,
-		{ applicationId: number | string; collaborators: CollaboratorsSchemaType[]; userId?: number | string }
+		{ applicationId: number | string; collaboratorId: number | string }
 	>({
-		mutationFn: async ({ applicationId, collaborators }) => {
-			const response = await fetch('/collaborators/create', {
-				method: 'POST',
-				body: JSON.stringify({
-					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
-					applicationId,
-					collaborators,
-				}),
+		mutationFn: async ({ applicationId, collaboratorId }) => {
+			const response = await fetch(`/collaborators/${applicationId}/${collaboratorId}`, {
+				method: 'DELETE',
 			}).then(withErrorResponseHandler);
 
 			return await response.json();
@@ -53,15 +45,15 @@ const useAddCollaborator = () => {
 			});
 		},
 		onSuccess: async (data) => {
-			//  Update the cache if the add collaborator request is successful to prevent refetching data
+			//  Update the cache if the delete collaborator request is successful to prevent refetching data
 			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
-				return [...prev, ...data];
+				return prev.filter((value) => value.id !== data[0]?.id);
 			});
 			notification.success({
-				message: `User ${data[0]?.collaboratorFirstName} was added successfully`,
+				message: `User ${data[0]?.collaboratorFirstName} was deleted successfully`,
 			});
 		},
 	});
 };
 
-export default useAddCollaborator;
+export default useDeleteCollaborator;

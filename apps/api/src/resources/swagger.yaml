@@ -668,6 +668,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/RequestValidationError'
+  /applications/submit:
+    post:
+      summary: Submit an application
+      description: Retrieves the application by ID, verifies the user and role, and submits it.
+      tags:
+        - Applications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/SubmitApplicationRequest'
+      responses:
+        '200':
+          description: Application submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
+        '400':
+          description: Invalid request or application cannot be submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
 
   /applications/request-revisions:
     post:
@@ -1308,6 +1345,23 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+    SubmitApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          description: The id of the Application
+        role:
+          type: string
+          description: The role of the user submitting the application
+        signature:
+          type: string
+          format: base64
+          description: The digital signature of the user
+      required:
+        - userId
+        - role
+        - signature
 
     SignatureSign:
       type: object

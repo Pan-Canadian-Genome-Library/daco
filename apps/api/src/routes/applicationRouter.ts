@@ -16,7 +16,6 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 import {
 	approveApplication,
 	closeApplication,
@@ -27,6 +26,7 @@ import {
 	getApplicationStateTotals,
 	getRevisions,
 	rejectApplication,
+	submitApplication,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByRep,
 	submitRevision,
@@ -76,23 +76,27 @@ applicationRouter.post('/create', jsonParser, async (request: Request<{}, {}, { 
 applicationRouter.post(
 	'/edit',
 	jsonParser,
-	withBodySchemaValidation(editApplicationRequestSchema, apiZodErrorMapping, async (req, res) => {
-		// TODO: Add Auth
-		const data = req.body;
-		const { id, update } = data;
-		const result = await editApplication({ id, update });
-		if (result.success) {
-			res.send(result.data);
-		} else {
-			// TODO: System Error Handling
-			if (String(result.errors) === 'Error: Application record is undefined') {
-				res.status(404);
+	withBodySchemaValidation(
+		editApplicationRequestSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			// TODO: Add Auth
+			const data = request.body;
+			const { id, update } = data;
+			const result = await editApplication({ id, update });
+			if (result.success) {
+				response.send(result.data);
 			} else {
-				res.status(500);
+				// TODO: System Error Handling
+				if (String(result.errors) === 'Error: Application record is undefined') {
+					response.status(404);
+				} else {
+					response.status(500);
+				}
+				response.send({ message: result.message, errors: String(result.errors) });
 			}
-			res.send({ message: result.message, errors: String(result.errors) });
-		}
-	}),
+		},
+	),
 );
 
 // TODO: - Refactor endpoint logic once validation/dto flow is in place
@@ -412,6 +416,55 @@ applicationRouter.post(
 	),
 );
 
+applicationRouter.post(
+	'/:applicationId/submit',
+	jsonParser,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
+
+			if (!applicationId || !isPositiveInteger(parseInt(applicationId))) {
+				response.status(400).send({
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					errors: 'MissingOrInvalidParameters',
+				});
+				return;
+			}
+
+			try {
+				const result = await submitApplication({ applicationId: parseInt(applicationId) });
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Application rejected successfully.',
+						data: result.data,
+					});
+				} else {
+					let status = 500;
+					let message = result.message || 'An unexpected error occurred.';
+					let errors = result.errors;
+
+					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+						status = 404;
+						message = 'Application not found.';
+					} else if (errors === 'RejectionConflict') {
+						status = 409;
+						message = 'Rejection conflict detected.';
+					} else if (errors === 'InvalidState') {
+						status = 400;
+						message = 'Invalid application state.';
+					}
+
+					response.status(status).send({ message, errors });
+					return;
+				}
+			} catch (error) {
+				response.status(500).send({
+					message: 'Internal server error.',
+					errors: String(error),
+				});
+			}
+		},
+
 // Endpoint for reps to request revisions
 applicationRouter.post(
 	'/dac/request-revisions',
@@ -452,7 +505,7 @@ applicationRouter.post(
 
 		res.status(200).json(updatedApplication);
 	}),
-);
+));
 
 // Endpoint for reps to request revisions
 applicationRouter.post(
