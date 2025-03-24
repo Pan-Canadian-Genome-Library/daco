@@ -350,10 +350,11 @@ applicationRouter.post(
 	),
 );
 
-applicationRouter.post('/applications/:applicationId/revoke', jsonParser, async (request: Request, response: Response) => {
+applicationRouter.post('/:applicationId/revoke', jsonParser, withParamsSchemaValidation (collaboratorsListParamsSchema, apiZodErrorMapping ,async (request: Request, response: Response) => {
 	const { applicationId } = request.params;
 
-	if (!applicationId || isNaN(parseInt(applicationId))) {
+	const applicationIdNum = parseInt(applicationId || '');
+	if (isNaN(applicationIdNum)) {
 		response.status(400).json({
 			message: 'Invalid request. ApplicationId is required and must be a valid number.',
 			errors: 'MissingOrInvalidParameters',
@@ -403,10 +404,10 @@ applicationRouter.post('/applications/:applicationId/revoke', jsonParser, async 
 			errors: String(error),
 		});
 	}
-});
+}));
 
 applicationRouter.post(
-	'/applications/:applicationId/close',
+	'/:applicationId/close',
 	jsonParser,
 	withParamsSchemaValidation(
 		closeApplicationSchema,

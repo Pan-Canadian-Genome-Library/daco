@@ -272,10 +272,6 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		if (appStateManager.state !== ApplicationStates.APPROVED) {
-			return failure('Application should be in APPROVED status', 'RevokeConflict');
-		}
-
 		const revokeApplicationResult = await appStateManager.revokeApproval();
 
 		if (!revokeApplicationResult.success) {
