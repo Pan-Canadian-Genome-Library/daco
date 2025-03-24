@@ -22,6 +22,7 @@ import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Form, notification, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -51,6 +52,7 @@ const Ethics = () => {
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
+	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const { token } = useToken();
 
 	const { control, watch, getValues } = useForm<EthicsSchemaType>({
@@ -58,26 +60,7 @@ const Ethics = () => {
 			ethicsReviewRequired: state.fields?.ethicsReviewRequired ?? undefined,
 		},
 	});
-
 	const showFileUpload = watch('ethicsReviewRequired') !== undefined;
-
-	// Update the state on file change
-	const uploadChange = (info: UploadChangeParam<UploadFile>) => {
-		if (info.file.status === 'done') {
-			dispatch({
-				type: 'UPDATE_APPLICATION',
-				payload: {
-					fields: {
-						...state?.fields,
-						ethicsLetter: info.file.response.id,
-					},
-					formState: {
-						...state?.formState,
-					},
-				},
-			});
-		}
-	};
 
 	// file meta data check before triggering upload process
 	const beforeUpload = (file: RcFile) => {
@@ -119,6 +102,28 @@ const Ethics = () => {
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
 	};
+
+	const handleChange = (info: UploadChangeParam<UploadFile>) => {
+		// Handle upload progress
+		if (info.file.status === 'uploading' || info.file.status === 'done') {
+			setFileList(() => [
+				{
+					uid: `${info.file.uid}`,
+					name: `${info.file.name}`,
+					status: 'done',
+					url: '/',
+				},
+			]);
+			return;
+		}
+	};
+
+	useEffect(() => {
+		// Transform and update fileList when data arrives
+		if (!isLoading && data) {
+			setFileList(data);
+		}
+	}, [data, fileList.length, isLoading]);
 
 	return (
 		<SectionWrapper>
@@ -195,10 +200,10 @@ const Ethics = () => {
 												action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
 												maxCount={1}
 												beforeUpload={beforeUpload}
-												onChange={uploadChange}
-												defaultFileList={data}
+												fileList={fileList}
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
 												disabled={!isEditMode}
+												onChange={handleChange}
 												showUploadList={{
 													showDownloadIcon: false,
 													showRemoveIcon: false,
