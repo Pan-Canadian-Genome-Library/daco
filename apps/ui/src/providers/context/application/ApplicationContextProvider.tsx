@@ -23,6 +23,7 @@ import ApplicationReducer from '@/providers/context/application/ApplicationReduc
 import { type ApplicationContextType, type ApplicationFormState } from '@/providers/context/application/types';
 
 const initialState: ApplicationFormState = {
+	fields: {},
 	formState: {
 		isFormCompleted: false,
 		isDirty: false,
