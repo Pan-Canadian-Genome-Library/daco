@@ -29,8 +29,8 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
-	requestApplicationRevisionsByDac,
 	submitApplication,
+	requestApplicationRevisionsByDac,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
