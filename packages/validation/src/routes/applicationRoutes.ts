@@ -65,7 +65,7 @@ export const applicationContentsResponseSchema = applicationContentsSchema
 		createdAt: z.date(),
 		updatedAt: z.date(),
 	})
-	.nullable();
+	.partial();
 
 export const editApplicationRequestSchema = z.object({
 	id: z.number().nonnegative(),
@@ -82,7 +82,7 @@ export const applicationResponseSchema = z.object({
 	approvedAt: z.date().nullable(),
 	updatedAt: z.date().nullable(),
 	expiresAt: z.date().nullable(),
-	contents: applicationContentsResponseSchema,
+	contents: applicationContentsResponseSchema.nullable(),
 });
 
 export const revisionDataSchema = z

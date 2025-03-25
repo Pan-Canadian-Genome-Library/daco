@@ -25,7 +25,7 @@ import assert from 'node:assert';
 import { describe } from 'node:test';
 import { testUserId } from '../utils/testUtils.ts';
 
-describe('Alias Utils', { skip: true }, () => {
+describe('Alias Utils', () => {
 	describe('Alias snake_case to camelCase', () => {
 		const testData: JoinedApplicationRecord = {
 			id: 1,
@@ -53,9 +53,10 @@ describe('Alias Utils', { skip: true }, () => {
 		};
 		const aliasResult = aliasApplicationContentsRecord(testData);
 		assert.ok(aliasResult.success && aliasResult.data);
-		assert.ok(aliasResult.hasOwnProperty('user_id'));
-		assert.ok(aliasResult.hasOwnProperty('created_at'));
-		assert.ok(aliasResult.hasOwnProperty('approved_at'));
+		assert.ok(aliasResult.data.hasOwnProperty('applicant_first_name'));
+		assert.ok(aliasResult.data.hasOwnProperty('applicant_last_name'));
+		assert.ok(aliasResult.data.hasOwnProperty('applicant_position_title'));
+		assert.ok(aliasResult.data.hasOwnProperty('applicant_institutional_email'));
 	});
 
 	describe('Remove keys not in schema', () => {
@@ -76,8 +77,9 @@ describe('Alias Utils', { skip: true }, () => {
 		};
 
 		const aliasResult = aliasApplicationRecord(testData);
+
 		assert.ok(aliasResult.success && aliasResult.data.contents);
-		assert.ok(aliasResult.data.contents.hasOwnProperty('applicationFirstName'));
+		assert.ok(aliasResult.data.contents.hasOwnProperty('applicantFirstName'));
 		assert.ok(!aliasResult.data.contents.hasOwnProperty('ethicsLetter'));
 		assert.ok(!aliasResult.data.contents.hasOwnProperty('ethicsReviewRequired'));
 		assert.ok(!aliasResult.data.contents.hasOwnProperty('signedPdf'));

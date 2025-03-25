@@ -20,4 +20,4 @@
 import { applicationContents } from '@/db/schemas/applicationContents.ts';
 import { createInsertSchema } from 'drizzle-zod';
 
-export const applicationContentUpdateSchema = createInsertSchema(applicationContents);
+export const applicationContentUpdateSchema = createInsertSchema(applicationContents).partial();
