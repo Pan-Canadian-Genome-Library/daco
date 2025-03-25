@@ -760,6 +760,41 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
 
+  /file/{fileId}/download:
+    post:
+      tags:
+        - File
+      summary: Get file with buffer data
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File retrieved'
+          content:
+            application/json:
+              schema:
+                type: object
+
+        '500':
+          description: 'Error retrieving file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+
   /file/ethics/{applicationId}:
     post:
       tags:
@@ -791,7 +826,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/uploadFileResponse'
         '500':
           description: 'Error uploading file to database'
           content:
@@ -1581,6 +1616,18 @@ components:
           type: string
           format: date-time
           description: The the signature was signed.
+
+    uploadFileResponse:
+      type: object
+      description: The contents of the upload file.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
 
     RequestValidationError:
       type: object
