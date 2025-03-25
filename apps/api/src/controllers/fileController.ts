@@ -102,12 +102,12 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
  * @param fileId - The target fileId to associate the uploaded file
  * @returns Success with file data / Failure with Error.
  */
-export const getFile = async ({ fileId }: { fileId: number }) => {
+export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; withBuffer?: boolean }) => {
 	try {
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
 
-		const result = await filesService.getFileById({ fileId });
+		const result = await filesService.getFileById({ fileId, withBuffer });
 
 		return result;
 	} catch (error) {

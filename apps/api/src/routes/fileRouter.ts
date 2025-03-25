@@ -101,4 +101,27 @@ fileRouter.delete(
 	}),
 );
 
+fileRouter.get(
+	'/:fileId/download',
+	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
+		const { fileId } = req.params;
+		const id = parseInt(fileId ? fileId : '');
+
+		if (!isPositiveInteger(id)) {
+			res.status(400).send({ message: 'Invalid fileId' });
+			return;
+		}
+
+		const result = await getFile({ fileId: id, withBuffer: true });
+
+		if (!result.success) {
+			res.status(500).send(result);
+			return;
+		}
+
+		res.status(200).send(result.data);
+		return;
+	}),
+);
+
 export default fileRouter;
