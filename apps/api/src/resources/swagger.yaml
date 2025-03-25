@@ -798,7 +798,7 @@ paths:
                 $ref: '#/components/responses/ServerErrors'
 
   /file/{fileId}/download:
-    post:
+    get:
       tags:
         - File
       summary: Get file with buffer data
@@ -815,7 +815,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/responses/fileDownloadResponse'
 
         '500':
           description: 'Error retrieving file in database'
@@ -880,10 +880,42 @@ paths:
                   - $ref: '#/components/responses/ClientErrors'
 
   /file/{fileId}:
+    get:
+      tags:
+        - File
+      summary: Get uploaded file by its id
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/fileGetResponse'
+        '500':
+          description: 'Error deleting file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
     delete:
       tags:
         - File
-      summary: Delete uploaded by file id
+      summary: Delete file by id
       parameters:
         - in: path
           name: fileId
@@ -1682,6 +1714,64 @@ components:
           type: string
           description: |
             The name of the file.
+    fileDownloadResponse:
+      type: object
+      description: The contents of the upload file.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        application_id:
+          type: number
+          description: |
+            The associated application id.
+        content:
+          type: object
+          description: |
+            File in the form of a arraylike buffer.
+        submitted_at:
+          type: string
+          description: |
+            Date it was submitted at
+        submitter_user_id:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          description: |
+            The type of the file
+    fileGetResponse:
+      type: object
+      description: The contents of the upload file.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        application_id:
+          type: number
+          description: |
+            The associated application id.
+        submitted_at:
+          type: string
+          description: |
+            Date it was submitted at
+        submitter_user_id:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          description: |
+            The type of the file
 
     RequestValidationError:
       type: object
