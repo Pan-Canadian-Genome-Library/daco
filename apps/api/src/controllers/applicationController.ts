@@ -76,7 +76,6 @@ export const editApplication = async ({ id, update }: { id: number; update: Upda
 		return failure(message);
 	}
 
-	// TODO: Review Result pattern
 	const formattedResult = aliasApplicationContentsRecord(update);
 
 	if (!formattedResult.success) return formattedResult;
@@ -292,7 +291,6 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 		return failure(message, error);
 	}
 };
-
 
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
