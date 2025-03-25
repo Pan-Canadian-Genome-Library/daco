@@ -26,10 +26,10 @@ import {
 	getApplicationById,
 	getApplicationStateTotals,
 	rejectApplication,
-	submitApplication,
-	revokeApplication,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByRep,
+	revokeApplication,
+	submitApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { RevisionRequestModel } from '@/service/types.ts';
@@ -356,61 +356,68 @@ applicationRouter.post(
 	),
 );
 
-applicationRouter.post('/:applicationId/revoke', jsonParser, withParamsSchemaValidation (collaboratorsListParamsSchema, apiZodErrorMapping ,async (request: Request, response: Response) => {
-	const { applicationId } = request.params;
+applicationRouter.post(
+	'/:applicationId/revoke',
+	jsonParser,
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
 
-	const applicationIdNum = parseInt(applicationId || '');
-	if (isNaN(applicationIdNum)) {
-		response.status(400).json({
-			message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			errors: 'MissingOrInvalidParameters',
-		});
-		return;
-	}
-
-	try {
-		const applicationIdNum = Number(applicationId);
-
-		const result = await revokeApplication(applicationIdNum);
-
-		if (result.success) {
-			response.status(200).send({
-				message: 'Application revoked successfully.',
-				data: result.data,
-			});
-		} else {
-			let status = 500;
-			let message = result.message || 'An unexpected error occurred.';
-			let errors = result.errors;
-			switch(errors) {
-				case "ApplicationNotFound":
-				case "Application record is undefined":
-					status = 404;
-					message = 'Application not found.';
-					break;
-				case "StateConflict":
-					status = 409;
-					message = 'Application is already revoked.';
-					break;
-				case "Unauthorized":
-					status = 403;
-					message = 'Unauthorized to revoke this application.';
-					break;
-				case "InvalidState":
-					status = 400;
-					message = 'Cannot revoke application in its current state.';
-					break;
-
+			const applicationIdNum = parseInt(applicationId || '');
+			if (isNaN(applicationIdNum)) {
+				response.status(400).json({
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					errors: 'MissingOrInvalidParameters',
+				});
+				return;
 			}
-			response.status(status).send({ message, errors });
-		}
-	} catch (error) {
-		response.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-}));
+
+			try {
+				const applicationIdNum = Number(applicationId);
+
+				const result = await revokeApplication(applicationIdNum);
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Application revoked successfully.',
+						data: result.data,
+					});
+				} else {
+					let status = 500;
+					let message = result.message || 'An unexpected error occurred.';
+					let errors = result.errors;
+					switch (errors) {
+						case 'ApplicationNotFound':
+						case 'Application record is undefined':
+							status = 404;
+							message = 'Application not found.';
+							break;
+						case 'StateConflict':
+							status = 409;
+							message = 'Application is already revoked.';
+							break;
+						case 'Unauthorized':
+							status = 403;
+							message = 'Unauthorized to revoke this application.';
+							break;
+						case 'InvalidState':
+							status = 400;
+							message = 'Cannot revoke application in its current state.';
+							break;
+					}
+					response.status(status).send({ message, errors });
+				}
+			} catch (error) {
+				response.status(500).send({
+					message: 'Internal server error.',
+					errors: String(error),
+				});
+			}
+		},
+	),
+);
 
 applicationRouter.post(
 	'/:applicationId/close',
@@ -476,93 +483,94 @@ applicationRouter.post(
 applicationRouter.post(
 	'/:applicationId/submit',
 	jsonParser,
-		async (request: Request, response: Response) => {
-			const { applicationId } = request.params;
+	async (request: Request, response: Response) => {
+		const { applicationId } = request.params;
 
-			if (!applicationId || !isPositiveInteger(parseInt(applicationId))) {
-				response.status(400).send({
-					message: 'Invalid request. ApplicationId is required and must be a valid number.',
-					errors: 'MissingOrInvalidParameters',
+		if (!applicationId || !isPositiveInteger(parseInt(applicationId))) {
+			response.status(400).send({
+				message: 'Invalid request. ApplicationId is required and must be a valid number.',
+				errors: 'MissingOrInvalidParameters',
+			});
+			return;
+		}
+
+		try {
+			const result = await submitApplication({ applicationId: parseInt(applicationId) });
+
+			if (result.success) {
+				response.status(200).send({
+					message: 'Application rejected successfully.',
+					data: result.data,
 				});
+			} else {
+				let status = 500;
+				let message = result.message || 'An unexpected error occurred.';
+				let errors = result.errors;
+
+				if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
+					status = 404;
+					message = 'Application not found.';
+				} else if (errors === 'RejectionConflict') {
+					status = 409;
+					message = 'Rejection conflict detected.';
+				} else if (errors === 'InvalidState') {
+					status = 400;
+					message = 'Invalid application state.';
+				}
+
+				response.status(status).send({ message, errors });
 				return;
 			}
+		} catch (error) {
+			response.status(500).send({
+				message: 'Internal server error.',
+				errors: String(error),
+			});
+		}
+	},
 
-			try {
-				const result = await submitApplication({ applicationId: parseInt(applicationId) });
+	// Endpoint for reps to request revisions
+	applicationRouter.post(
+		'/dac/request-revisions',
+		jsonParser,
+		withBodySchemaValidation(applicationRevisionRequestSchema, apiZodErrorMapping, async (req, res) => {
+			const { applicationId, revisionData, role } = req.body;
 
-				if (result.success) {
-					response.status(200).send({
-						message: 'Application rejected successfully.',
-						data: result.data,
-					});
-				} else {
-					let status = 500;
-					let message = result.message || 'An unexpected error occurred.';
-					let errors = result.errors;
-
-					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-						status = 404;
-						message = 'Application not found.';
-					} else if (errors === 'RejectionConflict') {
-						status = 409;
-						message = 'Rejection conflict detected.';
-					} else if (errors === 'InvalidState') {
-						status = 400;
-						message = 'Invalid application state.';
-					}
-
-					response.status(status).send({ message, errors });
-					return;
-				}
-			} catch (error) {
-				response.status(500).send({
-					message: 'Internal server error.',
-					errors: String(error),
-				});
+			if (!role && role !== 'DAC_MEMBER') {
+				res.status(400).json({ message: 'Invalid request: Invalid role' });
 			}
-		},
 
-// Endpoint for reps to request revisions
-applicationRouter.post(
-	'/dac/request-revisions',
-	jsonParser,
-	withBodySchemaValidation(applicationRevisionRequestSchema, apiZodErrorMapping, async (req, res) => {
-		const { applicationId, revisionData, role } = req.body;
+			// Validate input
+			if (!revisionData) {
+				res.status(400).json({ message: 'Invalid request: revisionData are required' });
+			}
 
-		if (!role && role !== 'DAC_MEMBER') {
-			res.status(400).json({ message: 'Invalid request: Invalid role' });
-		}
+			const updatedRevisionData: RevisionRequestModel = {
+				application_id: applicationId,
+				comments: revisionData.comments,
+				applicant_approved: revisionData.applicantApproved,
+				applicant_notes: revisionData.applicantNotes,
+				institution_rep_approved: revisionData.institutionRepApproved,
+				institution_rep_notes: revisionData.institutionRepNotes,
+				collaborators_approved: revisionData.collaboratorsApproved,
+				collaborators_notes: revisionData.collaboratorsNotes,
+				project_approved: revisionData.projectApproved,
+				project_notes: revisionData.projectNotes,
+				requested_studies_approved: revisionData.requestedStudiesApproved,
+				requested_studies_notes: revisionData.requestedStudiesNotes,
+			};
 
-		// Validate input
-		if (!revisionData) {
-			res.status(400).json({ message: 'Invalid request: revisionData are required' });
-		}
+			// Call service method to handle request
+			const updatedApplication = await requestApplicationRevisionsByDac({
+				applicationId,
+				role,
+				revisionData: updatedRevisionData,
+			});
 
-		const updatedRevisionData: RevisionRequestModel = {
-			application_id: applicationId,
-			comments: revisionData.comments,
-			applicant_approved: revisionData.applicantApproved,
-			applicant_notes: revisionData.applicantNotes,
-			institution_rep_approved: revisionData.institutionRepApproved,
-			institution_rep_notes: revisionData.institutionRepNotes,
-			collaborators_approved: revisionData.collaboratorsApproved,
-			collaborators_notes: revisionData.collaboratorsNotes,
-			project_approved: revisionData.projectApproved,
-			project_notes: revisionData.projectNotes,
-			requested_studies_approved: revisionData.requestedStudiesApproved,
-			requested_studies_notes: revisionData.requestedStudiesNotes,
-		};
-
-		// Call service method to handle request
-		const updatedApplication = await requestApplicationRevisionsByDac({
-			applicationId,
-			role,
-			revisionData: updatedRevisionData,
-		});
-
-		res.status(200).json(updatedApplication);
-	}),
-));
+			res.status(200).json(updatedApplication);
+		}),
+	),
+);
 
 // Endpoint for reps to request revisions
 applicationRouter.post(
