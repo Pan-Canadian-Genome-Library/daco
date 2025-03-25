@@ -22,6 +22,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import logger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
@@ -40,6 +41,8 @@ import {
 	type JoinedApplicationRecord,
 	type OrderBy,
 	type PostgresTransaction,
+	type RevisionRequestModel,
+	type RevisionRequestRecord,
 } from './types.js';
 
 /**
@@ -100,12 +103,15 @@ const applicationSvc = (db: PostgresDb) => ({
 	editApplication: async ({
 		id,
 		update,
+		transaction,
 	}: {
 		id: number;
 		update: ApplicationContentUpdates;
 	}): AsyncResult<JoinedApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
-			const result = await db.transaction(async (transaction) => {
+			const dbTransaction = transaction ? transaction : db;
+
+			const application = await dbTransaction.transaction(async (transaction) => {
 				// Update Application Contents
 				const contents = { ...update, updated_at: sql`NOW()` };
 				const editedContents = await transaction
@@ -138,7 +144,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				});
 			});
 
-			return result;
+			return application;
 		} catch (err) {
 			logger.error(`Error at editApplication with id: ${id}`, err);
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to edit application.');
@@ -315,11 +321,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		}
 	},
 	/** @method applicationStateTotals: Obtain count for all Application records with each State */
-	applicationStateTotals: async ({
-		user_id,
-	}: {
-		user_id?: string;
-	}): AsyncResult<ApplicationStateTotals, 'SYSTEM_ERROR'> => {
+	applicationStateTotals: async (): AsyncResult<ApplicationStateTotals, 'SYSTEM_ERROR'> => {
 		try {
 			const rawApplicationRecord = await db
 				.select({
@@ -357,8 +359,35 @@ const applicationSvc = (db: PostgresDb) => ({
 				});
 			}
 		} catch (err) {
-			logger.error(`Error at applicationStateTotals with with user_id: ${user_id}`, err);
+			logger.error(`Error querying applicationStateTotals`, err);
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to retrieve application counts.');
+		}
+	},
+
+	createRevisionRequest: async ({
+		applicationId,
+		revisionData,
+	}: {
+		applicationId: number;
+		revisionData: RevisionRequestModel;
+	}): AsyncResult<RevisionRequestRecord> => {
+		try {
+			// Using transaction for inserting
+			const result = await db.transaction(async (transaction) => {
+				// Insert into the revision_requests table
+				const revisionRecord = await transaction.insert(revisionRequests).values(revisionData).returning();
+				if (!revisionRecord[0]) throw new Error('Revision request record is undefined');
+
+				// Returning the inserted revision request
+				return revisionRecord[0];
+			});
+
+			return success(result);
+		} catch (err) {
+			const message = `Error at createRevisionRequest for applicationId: ${applicationId}`;
+			logger.error(message);
+			logger.error(err);
+			return failure(message, err);
 		}
 	},
 });

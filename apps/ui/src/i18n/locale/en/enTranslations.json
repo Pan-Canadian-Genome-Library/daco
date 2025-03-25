@@ -17,6 +17,9 @@
 		"noAccess": "You do not have access to PCGL Controlled Data",
 		"startNewApp": "Start A New Application"
 	},
+	"applicationViewer": {
+		"title": "My Application: PCGL-{{id}}"
+	},
 	"manage": {
 		"applications": {
 			"title": "Manage Applications",
@@ -24,14 +27,7 @@
 		}
 	},
 	"status": {
-		"404": "Oops, didnt find what you were looking for!"
-	},
-	"modal": {
-		"authorization": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access.",
-		"editTitle": "Are you sure you want to edit Applications: PCGL-{{id}}",
-		"editDescription": "If so, the application will move back into Draft status and you will need to resubmit the application for review.",
-		"closeTitle": "Are you sure you want to close Applications: PCGL-{{id}}",
-		"closeDescription": "Closed application cannot be reopened."
+		"404": "Oops, we couldn't find what you were looking for!"
 	},
 	"alert": {
 		"sizeWarning": "This website may not be supported by your device.",
@@ -62,6 +58,7 @@
 		"delete": "Delete",
 		"history": "History",
 		"closeApp": "Close Application",
+		"requestRevisions": "Request Revisions",
 		"back": "Back",
 		"submitApplication": "Submit Application",
 		"addCollab": "Add Collaborator",
@@ -96,8 +93,11 @@
 		"applicant": "A. Applicant Information",
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
+		"study": "E. Requested Study",
 		"ethics": "F. Ethics",
-		"study": "E. Requested Study"
+		"agreement": "G. Data Access Agreement",
+		"appendices": "H. Appendices",
+		"sign": "Sign & Submit"
 	},
 	"errors": {
 		"http": {

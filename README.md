@@ -30,6 +30,7 @@ The repository is organized with the following directory structure:
 | [data-model](packages/data-model/README.md) | @pcgl-daco/data-model | packages/data-model | DACO database schemas and generated types.                           |
 | [logger](packages/logger/README.md)         | @pcgl-daco/logger     | packages/logger     | Standardized reusable logger and express middleware request logging. |
 | [validation](packages/validation/README.md) | @pcgl-daco/validation | packages/validation | Shared type schemas for API and UI.                                  |
+| [request-utils](packages/request-utils/README.md) | @pcgl-daco/request-utils | packages/request-utils | A package containing utilities useful for processing express requests, including Zod validation, and centralized error handling. |
 
 
 The modules in the monorepo are organized into two categories:
@@ -55,7 +56,7 @@ Follow these steps to install and run all dependencies, then run all application
 
 - Install PNPM: `npm i -g pnpm`
 - Install dependencies: `pnpm i`
-- Run dependencies: `docker-compose up -d`
+- Run dependencies: `docker compose up -d`
 - Initialize application environment files: `pnpm setup:all`
   - This will fail if you have already made any `.env` files inside any of the `/apps` dirs. If this is the case, try removing these files before retrying the script.
   - This will also run the initial database migration for the DACO API, so make sure the docker dependencies are running.

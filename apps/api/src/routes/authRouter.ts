@@ -1,19 +1,38 @@
+/*
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ *
+ * This program and the accompanying materials are made available under the terms of
+ * the GNU Affero General Public License v3.0. You should have received a copy of the
+ * GNU Affero General Public License along with this program.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 import axios, { AxiosError } from 'axios';
 import { Router } from 'express';
 import urlJoin from 'url-join';
+import { z as zod } from 'zod';
 
 import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import baseLogger from '@/logger.js';
 import { serverConfig } from '../config/serverConfig.js';
-import * as oidcClient from '../external/oidcAuthClient.js';
 import { resetSession } from '../session/index.js';
-import type { ResponseWithData } from './types.js';
+import { type ResponseWithData } from './types.js';
 
 const logger = baseLogger.forModule(`authRouter`);
 
-const authorizeRedirectUri = urlJoin(serverConfig.UI_HOST, `/api/auth/token`);
+const getOauthRedirectUri = (host: string) => urlJoin(host, `/api/auth/token`);
 
 const authRouter = Router();
 
@@ -28,9 +47,18 @@ authRouter.get('/login', (req, res) => {
 		return;
 	}
 
-	const oidcAuthorizeUrl = oidcClient.getOidcAuthorizeUrl(authConfig, authorizeRedirectUri);
+	// Ensure the user has an active session.
+	req.session.save();
 
-	res.redirect(oidcAuthorizeUrl);
+	const params = new URLSearchParams({
+		client_id: authConfig.AUTH_CLIENT_ID,
+		response_type: `code`,
+		scope: `openid profile email org.cilogon.userinfo`,
+		redirect_uri: getOauthRedirectUri(serverConfig.UI_HOST),
+	});
+	const redirectUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize`, `?${params.toString()}`);
+
+	res.redirect(redirectUrl);
 	return;
 });
 
@@ -41,19 +69,19 @@ authRouter.get('/login', (req, res) => {
  * remove account and user information from the current session.
  *
  * On success it will redirect the user agent to the root path for the UI.
- *
- * TODO: Where to redirect on logout failure.
  */
 authRouter.get('/logout', async (req, res) => {
 	if (!authConfig.enabled) {
 		res.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
 		return;
 	}
-	const logoutSuccessRedirectUrl = urlJoin(serverConfig.UI_HOST, '/');
+	const logoutSuccessRedirectUrl = urlJoin(serverConfig.UI_HOST, authConfig.logoutRedirectPath);
 
 	const { account } = req.session;
 	if (!account) {
 		logger.warn(`User with no valid session attempted to logout.`);
+
+		// TODO: Where to redirect on logout failure.
 		res.redirect(logoutSuccessRedirectUrl);
 		return;
 	}
@@ -91,6 +119,19 @@ authRouter.get('/logout', async (req, res) => {
 // ##############
 //   GET /token
 // ##############
+const oidcTokenResponseSchema = zod.object({
+	access_token: zod.string(),
+	refresh_token: zod.string(),
+	refresh_token_iat: zod.number(),
+	id_token: zod.string(),
+});
+
+const oidcUserinfoResponseSchema = zod.object({
+	sub: zod.string(),
+	given_name: zod.string().optional(),
+	family_name: zod.string().optional(),
+	email: zod.string().optional(),
+});
 
 /**
  * This is the callback that the OIDC Provider will redirect the user agent to after
@@ -104,7 +145,7 @@ authRouter.get('/logout', async (req, res) => {
  * Then, the access token will be used to call the OIDC User Info endpoint to retrieve
  * the available information for this user.
  *
- * ALl of this information will be stored in the user session.
+ * All of this information will be stored in the user session.
  *
  * Finally, if everything is successful, the response will redirect the user agent to
  * the correct UI page for their role:
@@ -121,24 +162,24 @@ authRouter.get('/token', async (req, res) => {
 		return;
 	}
 
-	// TODO: seperate page to redirect to on failure
-	const errorRedirectUrl = serverConfig.UI_HOST;
-
 	const { code } = req.query;
-	if (typeof code !== 'string') {
-		res.redirect(errorRedirectUrl);
-		return;
-	}
 
 	try {
 		// Fetch user tokens using authorization code
-		const oidcTokenResult = await oidcClient.exchangeCodeForTokens(authConfig, {
+		const oauth2TokenUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/oauth2/token`);
+		const params = {
 			code,
-			redirectUrl: authorizeRedirectUri,
-		});
-		if (!oidcTokenResult.success) {
-			res.redirect(errorRedirectUrl);
-			return;
+			client_id: authConfig.AUTH_CLIENT_ID,
+			client_secret: authConfig.AUTH_CLIENT_SECRET,
+			grant_type: 'authorization_code',
+			redirect_uri: getOauthRedirectUri(serverConfig.UI_HOST),
+		};
+
+		const tokenResponse = await axios.get(oauth2TokenUrl, { params });
+		const parsedTokenResponse = oidcTokenResponseSchema.safeParse(tokenResponse.data);
+		if (!parsedTokenResponse.success) {
+			logger.debug(`Token response has unexpected format.`, parsedTokenResponse.error);
+			throw new Error(`Token response has unexpected format.`);
 		}
 
 		const {
@@ -146,17 +187,18 @@ authRouter.get('/token', async (req, res) => {
 			id_token: idToken,
 			refresh_token: refreshToken,
 			refresh_token_iat: refreshTokenIat,
-		} = oidcTokenResult.data;
+		} = parsedTokenResponse.data;
 
-		// Fetch user info using access token
-		const userInfoResult = await oidcClient.getUserInfo(authConfig, accessToken);
-		if (!userInfoResult.success) {
-			res.redirect(errorRedirectUrl);
-			return;
+		const userResponse = await axios.get(urlJoin(authConfig.AUTH_PROVIDER_HOST, `/oauth2/userinfo`), {
+			headers: { Authorization: `Bearer ${accessToken}` },
+		});
+		const parsedUserinfoResponse = oidcUserinfoResponseSchema.safeParse(userResponse.data);
+		if (!parsedUserinfoResponse.success) {
+			logger.debug(`Userinfo response has unexpected format.`, parsedUserinfoResponse.error);
+			throw new Error(`Userinfo response has unexpected format.`);
 		}
 
-		const { sub, family_name: familyName, given_name: givenName } = userInfoResult.data;
-
+		const { sub, family_name: familyName, given_name: givenName } = parsedUserinfoResponse.data;
 		// Update session with all user information retrieved from OIDC Provider
 		req.session.account = {
 			accessToken,
@@ -187,7 +229,7 @@ authRouter.get('/token', async (req, res) => {
 	}
 
 	// Auth success! User info saved to session!
-	res.redirect(urlJoin(serverConfig.UI_HOST, authConfig.AUTH_UI_REDIRECT_PATH));
+	res.redirect(urlJoin(serverConfig.UI_HOST, authConfig.loginRedirectPath));
 	return;
 });
 
@@ -205,7 +247,7 @@ authRouter.get('/user', async (req, res: ResponseWithData<UserResponse, ['AUTH_D
 	const { user } = req.session;
 
 	const output: UserResponse = {
-		role: user ? 'APPLICANT' : 'ANONYMOUS',
+		role: user ? 'DAC_MEMBER' : 'ANONYMOUS',
 		user,
 	};
 

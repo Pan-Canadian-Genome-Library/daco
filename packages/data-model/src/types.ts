@@ -40,6 +40,13 @@ export const FileTypes = {
 
 export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
+export const SignatureTypes = {
+	APPLICANT: 'APPLICANT',
+	INSTITUTIONAL_REP: 'INSTITUTIONAL_REP',
+} as const;
+
+export type SignatureType = (typeof SignatureTypes)[keyof typeof SignatureTypes];
+
 export enum ApplicationReviewOutcomes {
 	'APPROVED',
 	'REJECTED',
@@ -62,17 +69,18 @@ export const ApplicationActions = {
 
 export type ApplicationActionValues = (typeof ApplicationActions)[keyof typeof ApplicationActions];
 
-export enum ApplicationAgreements {
-	'dac_agreement_software_updates',
-	'dac_agreement_non_disclosure',
-	'dac_agreement_monitor_individual_access',
-	'dac_agreement_destroy_data',
-	'dac_agreement_familiarize_restrictions',
-	'dac_agreement_provide_it_policy',
-	'dac_agreement_notify_unauthorized_access',
-	'dac_agreement_certify_application',
-	'dac_agreement_read_and_agreed',
-}
+export const ApplicationAgreements = {
+	dac_agreement_software_updates: 'dac_agreement_software_updates',
+	dac_agreement_non_disclosure: 'dac_agreement_non_disclosure',
+	dac_agreement_monitor_individual_access: 'dac_agreement_monitor_individual_access',
+	dac_agreement_destroy_data: 'dac_agreement_destroy_data',
+	dac_agreement_familiarize_restrictions: 'dac_agreement_familiarize_restrictions',
+	dac_agreement_provide_it_policy: 'dac_agreement_provide_it_policy',
+	dac_agreement_notify_unauthorized_access: 'dac_agreement_notify_unauthorized_access',
+	dac_agreement_certify_application: 'dac_agreement_certify_application',
+	dac_agreement_read_and_agreed: 'dac_agreement_read_and_agreed',
+} as const;
+
 // TODO: dedupe keys
 export const ApplicationMessages = {
 	dac_agreement_software_updates:
@@ -134,6 +142,7 @@ export type ProjectDTO = {
 	projectTitle?: string | null;
 	projectWebsite?: string | null;
 	projectBackground?: string | null;
+	projectAims?: string | null;
 	projectMethodology?: string | null;
 	projectSummary?: string | null;
 	projectPublicationUrls?: string[] | null;
@@ -152,6 +161,34 @@ export type ApplicationDTO = {
 	updatedAt?: Date | null;
 	expiresAt?: Date | null;
 };
+
+export interface ApplicationResponseData extends ApplicationDTO {
+	contents: ApplicationContentsResponse | null;
+}
+
+export interface PagingMetadata {
+	totalRecords: number;
+	page: number;
+	pageSize: number;
+}
+
+export interface ApplicantSummary {
+	createdAt: Date;
+	firstName: string | null;
+	lastName: string | null;
+	email: string | null;
+	country: string | null;
+	institution: string | null;
+}
+
+export interface ApplicationListSummary extends ApplicationDTO {
+	applicant: ApplicantSummary | null;
+}
+
+export interface ApplicationListResponse {
+	applications: ApplicationListSummary[];
+	pagingMetadata: PagingMetadata;
+}
 
 export type ApplicationContentsResponse = {
 	applicationId?: number;
@@ -195,23 +232,51 @@ export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 };
 
+export interface CollaboratorDTO {
+	collaboratorFirstName: string;
+	collaboratorInstitutionalEmail: string;
+	collaboratorLastName: string;
+	collaboratorMiddleName?: string | null;
+	collaboratorPositionTitle: string;
+	collaboratorPrimaryAffiliation?: string | null;
+	collaboratorResearcherProfileURL?: string | null;
+	collaboratorSuffix?: string | null;
+	collaboratorType?: string | null;
+}
+
+export interface CollaboratorsResponse extends CollaboratorDTO {
+	id: number;
+	applicationId: number;
+}
+
+export type BaseCollaboratorRequest = {
+	applicationId: number;
+	userId: string;
+};
+
+export interface ListCollaboratorRequest extends BaseCollaboratorRequest {
+	collaborators: CollaboratorDTO[];
+}
+
+export type CollaboratorUpdateRecord = Partial<CollaboratorDTO> & {
+	id: number;
+};
+
+export interface UpdateCollaboratorRequest extends BaseCollaboratorRequest {
+	collaborators: CollaboratorUpdateRecord;
+}
+
+export interface DeleteCollaboratorRequest {
+	applicationId: number;
+	userId: string;
+	collaboratorId: number;
+}
+
 // TODO: Additional Types to be updated
 export interface EthicsDataDTO {
 	ethicsReviewRequired?: boolean | null;
 	ethicsLetter?: number | null;
 	signedPdf?: number | null;
-}
-
-export interface CollaboratorDTO {
-	collaboratorFirstName?: string | null;
-	collaboratorMiddleName?: string | null;
-	collaboratorLastName?: string | null;
-	collaboratorSuffix?: string | null;
-	collaboratorPrimaryAffiliation?: string | null;
-	collaboratorInstitutionalEmail?: string | null;
-	collaboratorResearcherProfileURL?: string | null;
-	collaboratorPositionTitle?: string | null;
-	collaboratorType?: string | null;
 }
 
 export type RevisionRequestDTO = {
@@ -262,4 +327,12 @@ export interface FilesDTO {
 	submittedAt: Date;
 	content: any;
 	filename: string;
+}
+
+export interface SignatureDTO {
+	applicationId: number;
+	applicantSignature?: string | null;
+	applicantSignedAt?: Date | null;
+	institutionalRepSignature?: string | null;
+	institutionalRepSignedAt?: Date | null;
 }

@@ -22,25 +22,14 @@ import './index.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
 
-import ThemeProvider from '@/components/providers/ThemeProvider';
 import AppRouter from '@/pages/AppRouter';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { UserProvider } from './components/providers/UserProvider';
-
-const queryClient = new QueryClient();
+import Providers from './providers/Providers';
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<UserProvider>
-					<BrowserRouter>
-						<AppRouter />
-					</BrowserRouter>
-				</UserProvider>
-			</ThemeProvider>
-		</QueryClientProvider>
+		<Providers>
+			<AppRouter />
+		</Providers>
 	</StrictMode>,
 );

@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { applicantInformationSchema, type ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -33,24 +33,71 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { state, dispatch } = useApplicationContext();
 
-	const { handleSubmit, control } = useForm<ApplicantInformationSchemaType>({
+	const {
+		formState: { isDirty },
+		getValues,
+		control,
+	} = useForm<ApplicantInformationSchemaType>({
+		defaultValues: {
+			applicantInstituteCountry: 'CAN',
+			applicantTitle: state?.fields?.applicantTitle || undefined,
+			applicantFirstName: state?.fields?.applicantFirstName || undefined,
+			applicantMiddleName: state?.fields?.applicantMiddleName || undefined,
+			applicantLastName: state?.fields?.applicantLastName || undefined,
+			applicantSuffix: state?.fields?.applicantSuffix || undefined,
+			applicantPrimaryAffiliation: state?.fields?.applicantPrimaryAffiliation || undefined,
+			applicantInstituteEmail: state?.fields?.applicantInstitutionalEmail || undefined,
+			applicantProfileUrl: state?.fields?.applicantProfileUrl || undefined,
+			applicantPositionTitle: state?.fields?.applicantPositionTitle || undefined,
+		},
 		resolver: zodResolver(applicantInformationSchema),
 	});
 
-	const onSubmit: SubmitHandler<ApplicantInformationSchemaType> = (data) => {
-		console.log(data);
+	const onSubmit = () => {
+		const data = getValues();
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				fields: {
+					...state?.fields,
+					applicantTitle: data.applicantTitle,
+					applicantFirstName: data.applicantFirstName,
+					applicantMiddleName: data.applicantMiddleName,
+					applicantLastName: data.applicantLastName,
+					applicantSuffix: data.applicantSuffix,
+					applicantPrimaryAffiliation: data.applicantPrimaryAffiliation,
+					applicantInstitutionalEmail: data.applicantInstituteEmail,
+					applicantProfileUrl: data.applicantProfileUrl,
+					applicantPositionTitle: data.applicantPositionTitle,
+					// TODO: currently database does not have mailing address for applicant section, once fields are migrated into db, add the fields here
+				},
+				formState: {
+					isDirty,
+				},
+			},
+		});
 	};
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical">
+			<Form
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle
 					title={translate('applicant-section.title')}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
@@ -68,6 +115,7 @@ const Applicant = () => {
 									return { value: titles.en, label: titles.en };
 								})}
 								required
+								initialValue={getValues('applicantTitle')}
 								disabled={!isEditMode}
 							/>
 						</Col>
@@ -167,7 +215,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title={translate('applicant-section.section2')}>
+				<SectionContent title={translate('applicant-section.section2')} showDivider={false}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
@@ -240,7 +288,7 @@ const Applicant = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} onSubmit={handleSubmit(onSubmit)} />
+				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} />
 			</Form>
 		</SectionWrapper>
 	);

@@ -22,6 +22,7 @@ import { initReactI18next } from 'react-i18next';
 import { z } from 'zod';
 
 import enFormErrors from './locale/en/enFormErrors.json';
+import enModalsLang from './locale/en/enModals.json';
 import enApplicationSection from './locale/en/enSection.json';
 import enGeneralLang from './locale/en/enTranslations.json';
 import frFormErrors from './locale/fr/frFormErrors.json';
@@ -34,6 +35,7 @@ i18n.use(initReactI18next).init({
 				...enGeneralLang,
 				...enApplicationSection,
 				...enFormErrors,
+				...enModalsLang,
 			},
 		},
 		fr: {
@@ -57,6 +59,8 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 		case z.ZodIssueCode.invalid_type:
 			if (error.expected === 'string') {
 				return { message: i18n.t('requiredField') };
+			} else if (error.expected === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('requiredNumberOfCheckboxes') };
 			}
 
 			return { message: i18n.t('defaultViolationText') };
@@ -70,14 +74,38 @@ const CustomFormErrorTranslationMapping: z.ZodErrorMap = (error, ctx) => {
 				return { message: i18n.t('validPostalCode') };
 			}
 			break;
+		case z.ZodIssueCode.too_small:
+			if (error.type === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('checkboxesNotFilledOut') };
+			} else if (error.type === 'number' && error.path[0] === 'requestedStudy') {
+				return { message: i18n.t('invalidIdNumber') };
+			} else if (error.code === 'too_small') {
+				return { message: i18n.t('tooSmall', { value: error.minimum }) };
+			}
+			break;
+		case z.ZodIssueCode.too_big:
+			if (error.type === 'array' && error.path[0] === 'agreements') {
+				return { message: i18n.t('requiredNumberOfCheckboxes') };
+			}
+			break;
+		// Custom zod errors using refine / super refine
 		case z.ZodIssueCode.custom:
 			if (error.params?.violation) {
-				return { message: i18n.t(error.params?.violation) };
-			} else {
-				return { message: i18n.t('defaultViolationText') };
+				const violation = error.params.violation;
+				const params = error.params;
+
+				switch (violation) {
+					case 'tooFewWords':
+						return { message: i18n.t(violation, { length: params.length }) };
+					case 'tooManyWords':
+						return { message: i18n.t(violation, { length: params.length }) };
+					default:
+						return { message: i18n.t(violation) };
+				}
 			}
+			return { message: i18n.t('defaultViolationText') };
 		case z.ZodIssueCode.invalid_enum_value:
-			return { message: i18n.t('recievedInvalidEnum') };
+			return { message: i18n.t('receivedInvalidEnum') };
 	}
 	return { message: ctx.defaultError };
 };

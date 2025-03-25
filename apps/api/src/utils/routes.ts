@@ -17,20 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type JoinedApplicationRecord } from '@/service/types.js';
-import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model/src/types.js';
-
-/**
- * Helper function to determine if value is a valid number and is positive.
- * @param num Any integer value
- * @returns True if the value is a valid number and is positive, false otherwise.
- */
-export const isPositiveNumber = (num: number) => {
-	if (Number.isNaN(num) === false && num >= 0) {
-		return true;
-	}
-	return false;
-};
+import {
+	type ApplicationContentUpdates,
+	type ApplicationSignatureUpdate,
+	type CollaboratorRecord,
+	type JoinedApplicationRecord,
+} from '@/service/types.js';
+import {
+	type ApplicationContentsResponse,
+	type ApplicationResponseData,
+	type CollaboratorsResponse,
+	type SignatureDTO,
+} from '@pcgl-daco/data-model';
+import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
 /**
  * Helper function to convert Postgres snake_case to FE camelCase
@@ -82,6 +81,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				projectWebsite: applicationContents.project_website,
 				projectBackground: applicationContents.project_background,
 				projectMethodology: applicationContents.project_methodology,
+				projectAims: applicationContents.project_aims,
 				projectSummary: applicationContents.project_summary,
 				projectPublicationUrls: applicationContents.project_publication_urls,
 				requestedStudies: applicationContents.requested_studies,
@@ -98,4 +98,96 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 		expiresAt,
 		contents,
 	};
+};
+
+/**
+ * Helper function to convert FE camelCase to snake_case for applicationContents
+ * @param data type UpdateEditApplicationRequest application contents in camelCase
+ * @returns  type ApplicationContentUpdates in snake_case
+ */
+export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
+	const formattedUpdate: ApplicationContentUpdates = {
+		applicant_first_name: update.applicantFirstName,
+		applicant_middle_name: update.applicantMiddleName,
+		applicant_last_name: update.applicantLastName,
+		applicant_institutional_email: update.applicantInstitutionalEmail,
+		applicant_position_title: update.applicantPositionTitle,
+		applicant_primary_affiliation: update.applicantPrimaryAffiliation,
+		applicant_profile_url: update.applicantProfileUrl,
+		applicant_suffix: update.applicantSuffix,
+		applicant_title: update.applicantTitle,
+		institutional_rep_first_name: update.institutionalRepFirstName,
+		institutional_rep_middle_name: update.institutionalRepMiddleName,
+		institutional_rep_last_name: update.institutionalRepLastName,
+		institutional_rep_title: update.institutionalRepTitle,
+		institutional_rep_position_title: update.institutionalRepPositionTitle,
+		institutional_rep_suffix: update.institutionalRepSuffix,
+		institutional_rep_email: update.institutionalRepEmail,
+		institutional_rep_primary_affiliation: update.institutionalRepPrimaryAffiliation,
+		institutional_rep_profile_url: update.institutionalRepProfileUrl,
+		institution_building: update.institutionBuilding,
+		institution_city: update.institutionCity,
+		institution_country: update.institutionCountry,
+		institution_postal_code: update.institutionPostalCode,
+		institution_state: update.institutionState,
+		institution_street_address: update.institutionStreetAddress,
+		project_aims: update.projectAims,
+		project_methodology: update.projectMethodology,
+		project_summary: update.projectSummary,
+		project_title: update.projectTitle,
+		project_website: update.projectWebsite,
+	};
+
+	return formattedUpdate;
+};
+
+/**
+ * Helper function to convert Postgres snake_case to FE camelCase for the Signature Service
+ * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
+ * @returns type `SignatureDTO` - camelCase variation of a Postgress success response.
+ */
+export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): SignatureDTO => {
+	const {
+		application_id,
+		applicant_signature,
+		applicant_signed_at,
+		institutional_rep_signature,
+		institutional_rep_signed_at,
+	} = data;
+
+	return {
+		applicationId: application_id,
+		applicantSignature: applicant_signature,
+		applicantSignedAt: applicant_signed_at,
+		institutionalRepSignature: institutional_rep_signature,
+		institutionalRepSignedAt: institutional_rep_signed_at,
+	};
+};
+
+/**
+ * Helper function to convert Postgres snake_case to FE camelCase for CollaboratorRecord
+ * @param data type CollaboratorRecord in snake_case
+ * @returns  type GetCollaboratorsResponse in camelcase
+ */
+
+export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): CollaboratorsResponse[] => {
+	const formattedUpdate: CollaboratorsResponse[] = [];
+
+	data.forEach((value) => {
+		formattedUpdate.push({
+			id: value.id,
+			applicationId: value.application_id,
+			collaboratorFirstName: value.first_name,
+			collaboratorMiddleName: value.middle_name,
+			collaboratorLastName: value.last_name,
+			collaboratorInstitutionalEmail: value.institutional_email,
+			collaboratorPositionTitle: value.position_title,
+			collaboratorPrimaryAffiliation: value.title,
+			collaboratorResearcherProfileURL: value.profile_url,
+			collaboratorSuffix: value.suffix,
+			collaboratorType: value.collaborator_type,
+		});
+	});
+
+	return formattedUpdate;
 };

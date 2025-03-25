@@ -18,16 +18,19 @@
  */
 
 import { z } from 'zod';
-import { EthicsEnum } from './common/enums.js';
-import { ConciseWordCountString, EmptyOrOptionalString, NonEmptyString, OptionalURLString } from './common/strings.js';
-import { ONLY_ALPHANUMERIC } from './utils/regex.js';
 
-export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
-export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
-export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
-export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
-export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
-export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+import { ApplicationAgreements } from '@pcgl-daco/data-model';
+
+import { EthicsEnum } from './common/enums.js';
+import {
+	Concise200WordCountString,
+	Concise250WordCountString,
+	EmptyOrOptionalString,
+	NonEmptyString,
+	OptionalURLString,
+} from './common/strings.js';
+
+import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
 	applicantTitle: NonEmptyString,
@@ -46,15 +49,21 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteStreetAddress: NonEmptyString,
 	applicantInstituteBuilding: EmptyOrOptionalString,
 });
+export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 
 export const collaboratorsSchema = z.object({
-	collabFirstName: NonEmptyString,
-	collabMiddleName: EmptyOrOptionalString,
-	collabLastName: NonEmptyString,
-	collabSuffix: EmptyOrOptionalString,
-	collabPrimaryEmail: NonEmptyString.email(),
-	collabPositionTitle: NonEmptyString,
+	collaboratorFirstName: NonEmptyString,
+	collaboratorMiddleName: EmptyOrOptionalString,
+	collaboratorLastName: NonEmptyString,
+	collaboratorSuffix: EmptyOrOptionalString,
+	collaboratorInstitutionalEmail: NonEmptyString.email(),
+	collaboratorPositionTitle: NonEmptyString,
+	collaboratorPrimaryAffiliation: EmptyOrOptionalString,
+	collaboratorResearcherProfileURL: EmptyOrOptionalString,
+	collaboratorType: EmptyOrOptionalString,
 });
+
+export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const institutionalRepSchema = z.object({
 	institutionalTitle: NonEmptyString,
@@ -73,24 +82,82 @@ export const institutionalRepSchema = z.object({
 	institutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
 	institutionBuilding: EmptyOrOptionalString,
 });
+export type InstitutionalRepSchemaType = z.infer<typeof institutionalRepSchema>;
 
 export const projectInformationSchema = z.object({
 	projectTitle: NonEmptyString,
 	projectWebsite: OptionalURLString,
-	projectBackground: ConciseWordCountString,
-	projectAims: ConciseWordCountString,
-	projectDataUse: ConciseWordCountString,
-	projectMethodology: ConciseWordCountString,
-	projectLaySummary: ConciseWordCountString,
+	projectBackground: Concise200WordCountString,
+	projectAims: Concise200WordCountString,
+	projectDataUse: Concise200WordCountString,
+	projectMethodology: Concise200WordCountString,
+	projectLaySummary: Concise250WordCountString,
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
 });
+export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 
 export const ethicsSchema = z.object({
 	ethicsApproval: EthicsEnum,
 });
+export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
 export const requestedStudySchema = z.object({
-	requestedStudy: NonEmptyString,
+	requestedStudy: z.number().nonnegative(),
 });
+export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+
+export const agreementsSchema = z.object({
+	agreements: z.array(z.string()).superRefine((allAgreements, context) => {
+		if (allAgreements.length > 9) {
+			context.addIssue({
+				code: z.ZodIssueCode.too_big,
+				maximum: 9,
+				type: 'array',
+				inclusive: true,
+			});
+		}
+
+		if (allAgreements.length < 9) {
+			context.addIssue({
+				code: z.ZodIssueCode.too_small,
+				minimum: 9,
+				type: 'array',
+				inclusive: true,
+			});
+		}
+
+		if (allAgreements.length !== new Set(allAgreements).size) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'duplicateAgreementItems' },
+			});
+		}
+
+		if (allAgreements.filter((agreement) => !Object.keys(ApplicationAgreements).includes(agreement)).length !== 0) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'invalidAgreementItem' },
+			});
+		}
+	}),
+});
+export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
+
+export const appendicesSchema = z.object({
+	appendices: z.array(z.string()).superRefine((policies, context) => {
+		if (policies.length !== 3) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'checkboxesNotFilledOut' },
+			});
+		}
+	}),
+});
+export type AppendicesSchemaType = z.infer<typeof appendicesSchema>;
+
+export const esignatureSchema = z.object({
+	signature: z.string().regex(BASE64_IMAGE).nullable(),
+});
+export type eSignatureSchemaType = z.infer<typeof esignatureSchema>;

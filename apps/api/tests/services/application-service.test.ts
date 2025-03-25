@@ -17,14 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applications } from '@/db/schemas/applications.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
@@ -32,12 +30,13 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import {
 	addInitialApplications,
 	addPaginationDonors,
+	allRecordsPageSize,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
 	PG_USER,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 describe('Application Service', () => {
 	let db: PostgresDb;
@@ -56,6 +55,7 @@ describe('Application Service', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
+		await addPaginationDonors(db);
 
 		testApplicationService = applicationSvc(db);
 	});
@@ -187,7 +187,7 @@ describe('Application Service', () => {
 				sort: [
 					{
 						direction: 'asc',
-						column: 'created_at',
+						column: 'updated_at',
 					},
 				],
 			});
@@ -249,24 +249,23 @@ describe('Application Service', () => {
 						column: 'state',
 					},
 				],
+				pageSize: allRecordsPageSize,
 			});
 			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data.applications;
+			const { applications, pagingMetadata } = applicationRecordsResult.data;
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords.length >= 3);
+			assert.ok(Array.isArray(applications));
+			assert.ok((applications.length = pagingMetadata.pageSize));
 
-			const draftRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.DRAFT);
-			const rejectedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.REJECTED);
-			const approvedRecordIndex = applicationRecords.findIndex((record) => record.state === ApplicationStates.APPROVED);
+			const draftRecordIndex = applications.findIndex((record) => record.state === ApplicationStates.DRAFT);
+			const rejectedRecordIndex = applications.findIndex((record) => record.state === ApplicationStates.REJECTED);
+			const approvedRecordIndex = applications.findIndex((record) => record.state === ApplicationStates.APPROVED);
 
 			assert.ok(draftRecordIndex < rejectedRecordIndex);
 			assert.ok(rejectedRecordIndex < approvedRecordIndex);
 		});
 
 		it('should allow record pagination', async () => {
-			await addPaginationDonors(db);
-
 			const paginationResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 10 });
 
 			assert.ok(paginationResult.success);
@@ -298,17 +297,9 @@ describe('Application Service', () => {
 			assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);
 			assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
 		});
-
-		after(async () => {
-			await db.delete(applications).where(eq(applications.user_id, user_id));
-		});
 	});
 
 	describe('Edit Applications', () => {
-		before(async () => {
-			await addInitialApplications(db);
-		});
-
 		it('should allow editing applications and return record with updated fields', async () => {
 			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
 
@@ -335,23 +326,21 @@ describe('Application Service', () => {
 	});
 
 	describe('Get Application Metadata', () => {
-		before(async () => {
-			await addInitialApplications(db);
-		});
-
 		it('should list statistics for how many applications are in each state category', async () => {
 			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
 			assert.ok(appStateTotals.success);
 
 			const allStates = appStateTotals.data;
 
-			const allApplications = await testApplicationService.listApplications({ user_id });
+			const allApplications = await testApplicationService.listApplications({
+				user_id,
+				pageSize: allRecordsPageSize,
+			});
 			assert.ok(allApplications.success);
 
 			const applicationRecords = allApplications.data.applications;
 
 			assert.ok(Array.isArray(applicationRecords));
-
 			assert.ok(allStates);
 
 			const allDraftRecords = applicationRecords.filter((records) => records.state === 'DRAFT');
@@ -362,7 +351,6 @@ describe('Application Service', () => {
 	});
 
 	after(async () => {
-		await db.delete(applications).where(eq(applications.user_id, user_id));
 		await container.stop();
 		process.exit(0);
 	});

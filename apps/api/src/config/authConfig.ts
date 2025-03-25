@@ -17,22 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z as zod } from 'zod';
-
+import { z } from 'zod';
 import EnvironmentConfigError from './EnvironmentConfigError.js';
 import { serverConfig } from './serverConfig.js';
 
-const authConfigSchema = zod.object({
-	AUTH_PROVIDER_HOST: zod.string().url(),
-	AUTH_CLIENT_ID: zod.string(),
-	AUTH_CLIENT_SECRET: zod.string(),
-	AUTH_UI_REDIRECT_PATH: zod.string(),
-});
-export type AuthConfig = zod.infer<typeof authConfigSchema>;
-
 function getAuthConfig() {
-	const flag = process.env.ENABLE_AUTH;
-	const enabled = flag === 'true';
+	const enabled = process.env.DISABLE_AUTH !== 'true';
 
 	// Enforce enabling auth when running in production
 	if (serverConfig.isProduction && !enabled) {
@@ -46,6 +36,12 @@ function getAuthConfig() {
 		return { enabled };
 	}
 
+	const authConfigSchema = z.object({
+		AUTH_PROVIDER_HOST: z.string().url(),
+		AUTH_CLIENT_ID: z.string(),
+		AUTH_CLIENT_SECRET: z.string(),
+	});
+
 	const parseResult = authConfigSchema.safeParse(process.env);
 
 	if (!parseResult.success) {
@@ -53,7 +49,7 @@ function getAuthConfig() {
 		throw new EnvironmentConfigError(`db`, parseResult.error);
 	}
 
-	return { enabled, ...parseResult.data };
+	return { enabled, ...parseResult.data, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
 }
 
 export const authConfig = getAuthConfig();

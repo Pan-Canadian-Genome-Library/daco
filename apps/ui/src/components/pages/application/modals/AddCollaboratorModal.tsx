@@ -23,10 +23,11 @@ import { type CollaboratorsSchemaType, collaboratorsSchema } from '@pcgl-daco/va
 import { Button, Col, Flex, Form, Modal, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { memo } from 'react';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useAddCollaborator from '@/api/mutations/useAddCollaborator';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import { ModalStateProps } from '@/pages/applications/sections/collaborators';
 
@@ -36,11 +37,19 @@ const rule = createSchemaFieldRule(collaboratorsSchema);
 
 const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
+	const { mutateAsync: addCollaborator } = useAddCollaborator();
 
-	const { control } = useForm<CollaboratorsSchemaType>({
+	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
 		resolver: zodResolver(collaboratorsSchema),
 	});
+
+	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = async (data) => {
+		addCollaborator({ applicationId: appId, collaborators: [data] }).then(() => {
+			reset(); // Clear form after submit
+			setIsOpen({ isOpen: false });
+		});
+	};
 
 	return (
 		<Modal
@@ -56,13 +65,13 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('collab-section.addModalDescription')}</Text>
-				<Form layout="vertical" clearOnDestroy>
+				<Form layout="vertical" clearOnDestroy onFinish={handleSubmit(onSubmit)} preserve={false}>
 					<Flex vertical>
 						<Row gutter={26}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.firstName')}
-									name="collabFirstName"
+									name="collaboratorFirstName"
 									control={control}
 									rule={rule}
 									required
@@ -71,8 +80,8 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
+									name="collaboratorMiddleName"
 									label={translate('form.middleName')}
-									name="collabMiddleName"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -83,7 +92,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.lastName')}
-									name="collabLastName"
+									name="collaboratorLastName"
 									control={control}
 									rule={rule}
 									required
@@ -93,7 +102,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.suffix')}
-									name="collabSuffix"
+									name="collaboratorSuffix"
 									control={control}
 									rule={rule}
 									disabled={!isEditMode}
@@ -104,8 +113,8 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.primaryEmail')}
+									name="collaboratorInstitutionalEmail"
 									subLabel={translate('form.primaryEmailLabel')}
-									name="collabPrimaryEmail"
 									control={control}
 									rule={rule}
 									required
@@ -114,9 +123,9 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
-									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									label={translate('form.positionTitle')}
-									name="collabPositionTitle"
+									name="collaboratorPositionTitle"
+									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									control={control}
 									rule={rule}
 									required

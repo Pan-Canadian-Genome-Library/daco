@@ -38,13 +38,13 @@ const PageHeader = ({ title, description, children }: PageHeaderProps) => {
 	return (
 		<StatusBannerWrapper style={!description ? { minHeight: 150 } : { minHeight: 300 }}>
 			<Row style={{ width: '100%' }} gutter={token.sizeXXL} wrap>
-				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }} xl={{ flex: '50%' }}>
 					<Flex style={{ height: '100%' }} vertical justify="center" align="start">
 						<Title>{title}</Title>
 						{description ? <Text>{description}</Text> : null}
 					</Flex>
 				</Col>
-				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
+				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }} xl={{ flex: '50%' }}>
 					<Flex style={{ height: '100%' }} justify={responsiveMode ? 'center' : 'end'} align="center">
 						{children ? children : null}
 					</Flex>

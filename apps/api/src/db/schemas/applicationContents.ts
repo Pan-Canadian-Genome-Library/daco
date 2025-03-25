@@ -19,11 +19,11 @@
 
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { agreements } from './agreements.js';
-import { applications } from './applications.js';
-import { collaborators } from './collaborators.js';
-import { files } from './files.js';
-import { revisionRequests } from './revisionRequests.js';
+import { agreements } from './agreements.ts';
+import { applications } from './applications.ts';
+import { collaborators } from './collaborators.ts';
+import { files } from './files.ts';
+import { revisionRequests } from './revisionRequests.ts';
 
 export const applicationContents = pgTable('application_contents', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
@@ -40,6 +40,15 @@ export const applicationContents = pgTable('application_contents', {
 	applicant_primary_affiliation: varchar({ length: 500 }),
 	applicant_institutional_email: varchar({ length: 320 }),
 	applicant_profile_url: text(),
+
+	//Applicant Institutional Mailing
+	applicant_institution_country: varchar({ length: 255 }),
+	applicant_institution_state: varchar({ length: 255 }),
+	applicant_institution_city: varchar({ length: 255 }),
+	applicant_institution_street_address: text(),
+	applicant_institution_postal_code: varchar({ length: 255 }),
+	applicant_institution_building: varchar({ length: 255 }),
+
 	// Institutional Rep
 	institutional_rep_title: varchar({ length: 255 }),
 	institutional_rep_first_name: varchar({ length: 255 }),
@@ -62,8 +71,14 @@ export const applicationContents = pgTable('application_contents', {
 	project_website: text(),
 	project_background: text(),
 	project_methodology: text(),
+	project_aims: text(),
 	project_summary: text(),
 	project_publication_urls: text().array(),
+	// Signature for Sign & Submit
+	applicant_signature: text(),
+	applicant_signed_at: timestamp(),
+	institutional_rep_signature: text(),
+	institutional_rep_signed_at: timestamp(),
 	// Studies
 	// TODO: requested study information
 	requested_studies: text().array(),

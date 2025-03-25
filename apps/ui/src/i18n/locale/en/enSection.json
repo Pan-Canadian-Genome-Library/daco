@@ -29,7 +29,8 @@
 	},
 	"collab-section": {
 		"title": "Collaborators",
-		"description1": "Please include the names of all investigators, collaborators, research staff (including post-docs) and students (including graduate students), who will have access to the PCGL Controlled Data in order to work on the Research Summary as outlined in Section D of this application",
+		"description1": "Please include the names of all investigators, collaborators, research staff (including post-docs) and students (including graduate students), who will have access to the PCGL Controlled Data in order to work on the Research Summary as outlined in Section D of this application.",
+		"optional": "Collaborators are not required for your applications to be approved.",
 		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data.",
 		"deleteModalTitle": "Are you sure you want to delete collaborator?",
 		"deleteModalDescription": "You are about to delete collaborator, {{name}} from application PCGL-{{appId}}",
@@ -69,7 +70,7 @@
 		},
 		"section1": {
 			"title": "Research Summary - Scientific Abstract",
-			"description": "This section should describe the background, aims, and methodology of your research project, as well as plans for how you will use the PCGL Controlled Data.",
+			"description": "This section should describe the background, aims, and methodology of your research project, as well as plans for how you will use the PCGL Controlled Data.",
 			"form": {
 				"background": {
 					"title": "Background:",
@@ -85,7 +86,7 @@
 						"text": "(min. 100 words, max. 200 words)\nProvide a summary of the methods for your research project and the plans for data usage, including:",
 						"exemplar1": "What major methods and technologies will you use (in-depth methodology is not required)?",
 						"exemplar2": "How exactly will the PCGL Controlled Data be used?",
-						"exemplar3": "Please note: If you are planning on combining PCGL controlled data with other datasets, you agree not to link or combine the PCGL Controlled Data to other data available in a way that could re-identify the donors. Please confirm how the methods you intend to use to combine datasets will minimize the risk for re-identification of the PCGL data donors."
+						"exemplar3": "Please note: If you are planning on combining PCGL controlled data with other datasets, you agree not to link or combine the PCGL Controlled Data to other data available in a way that could re-identify the donors. Please confirm how the methods you intend to use to combine datasets will minimize the risk for re-identification of the PCGL data donors."
 					}
 				},
 				"aims": {
@@ -105,9 +106,9 @@
 						"text": "(min. 100 words, max. 250 words)\nProvide a summary of your project targeted towards the general public.\nWhen writing your lay summary:",
 						"exemplar1": "Develop the language in your lay summary as if you are describing the project to someone outside your field.",
 						"exemplar2": "Define any technical terms used.",
-						"exemplar3": "We strongly recommend you use an online readability tool such as www.readabilityformulas.com to assess the reading grade of your text. The reading grade level to be aimed at for the lay summaries is grade 8 or 9.",
+						"exemplar3": "We strongly recommend you use an online readability tool such as www.readabilityformulas.com to assess the reading grade of your text. The reading grade level to be aimed at for the lay summaries is grade 8 or 9.",
 						"exemplar4": "Explain in plain language why you are asking the research question, what you expect to find out and how you plan to use the findings.",
-						"exemplar5": "Consider the 3 key elements when developing your lay summary: structure and content, readability, and language guide. Finding it challenging? Read our lay summary guide, which includes before and after examples of real lay summaries."
+						"exemplar5": "Consider the 3 key elements when developing your lay summary: structure and content, readability, and language guide. Finding it challenging? Read our lay summary guide, which includes before and after examples of real lay summaries."
 					}
 				}
 			}
@@ -124,11 +125,11 @@
 		"title": "Ethics",
 		"description1": "PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.",
 		"description2": "Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual research projects and bear no responsibility for the applicant's failure to comply with local/national ethical requirements.",
-		"approval": "Ethical Approval",
+		"approval": "Ethics Approval",
 		"pleaseChose": "Please choose one of the following options",
 		"ethicsLetterDescription": "Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.",
-		"exemptionDescription": "You represent and warrant thexemptionDescriptionat your country/region does not require your research project to undergo ethics review.",
-		"attach": "Please attach an ethics approval letter to this application:",
+		"exemptionDescription": "You represent and warrant that your country/region does not require your research project to undergo ethics review.",
+		"attach": "Please attach an ethics {{letter}} letter to this application:",
 		"allowedFileTypes": "Allowed file types: pdf, doc, docx, | Max file size: 5MB"
 	},
 	"requested-study": {
@@ -139,6 +140,60 @@
 			"form": {
 				"studyName": "Study Name:"
 			}
+		}
+	},
+	"data-access-section": {
+		"title": "Data Access Agreement",
+		"description1": "This application form must be completed by the applicant and the legal entity with which you are affiliated (\"You\") prior to being granted access to Pan Canadian Genome Library (\"PCGL\") controlled data (the \"PCGL Controlled Data\" as further defined in Section F of this application). To receive access, You must complete this entire application form and agree to its terms by signing this application. All sections, as well as Appendices I through III, are integral components of this application. Your Research Project (as defined below) will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the participants and the security of the participants' data.\n\nIf the Data Access Compliance Office of the PCGL (the \"DACO\"), approves your application, access to the PCGL Controlled Data will be granted starting from the date You are approved for access.\n\nIf your application is approved, You agree that Your application information will be included in a public registry containing project details and lay summaries of the scientific abstracts of applicants having been granted access to PCGL Controlled Data.\n\nYou agree you have read the DACO Policies and Procedures document prior to completing this application. This agreement governs the terms of access to the PCGL Controlled Data (further defined below). In signing this agreement, you agree to be bound by the terms and conditions of access set out therein.\n\nFor the sake of clarity, the terms of access set out in this agreement apply to the User and to the User Institution(s) (as defined below). The current agreement is limited to the PCGL Controlled Data (as defined below) and does not cover other data generated at the different centres participating in the project. A list of PCGL members can be found on the PCGL website. Data Producer: An PCGL participating center, responsible for the development, organization, and oversight of a local database. Collaborator: A collaborator of the User, working for the same institution as the User Institution(s) (see below for definitions of User and User Institution(s)). PCGL Controlled Data: The Controlled Access Datasets of the library as defined in section E8.1 Data Access Framework of the Library’s Policies and Guidelines. Publications: Includes, without limitation, articles published in print journals, electronic journals, reviews, books, posters and other written and verbal presentations of research. Research Participant: An individual having contributed their personal data to an PCGL project, also referred to as a Donor. User: An applicant (principal investigator), having signed this Data Access Agreement, whose User Institution has cosigned this Data Access Agreement, both of them having received acknowledgement of its acceptance. User Institution(s): Institution(s) at which the User is employed, affiliated or enrolled. A representative of it has cosigned this Data Access Agreement with the User and received acknowledgement of its acceptance.",
+		"section1": {
+			"title": "Definitions",
+			"description": "* Library: The Pan Canadian Genome Library, an initiative to unify Canada's genome sequencing efforts, aiming to harness the potential of genomic medicine and maintain Canada's leadership in genomic research. * Data Producer: A PCGL participating center, responsible for the development, organization, and oversight of a local database. * Collaborator: A collaborator of the User, working for the same institution as the User Institution(s) (see below for definitions of User and User Institution(s)). * PCGL Controlled Data: The Controlled Access Datasets of the Library as defined in section E8.1 Data Access Framework of the Library's Policies and Guidelines. * Publications: Includes, without limitation, articles published in print journals, electronic journals, reviews, books, posters and other written and verbal presentations of research. * Research Participant: An individual having contributed their personal data to an PCGL project. *User: An applicant (principal investigator), having signed this Data Access Agreement, whose User Institution has cosigned this Data Access Agreement, both of them having received acknowledgement of its acceptance. *User Institution(s): Institution(s) at which the User is employed, affiliated or enrolled. A representative of it has cosigned this Data Access Agreement with the User and received acknowledgement of its acceptance."
+		},
+		"section2": {
+			"title": "Terms and Conditions",
+			"description": "In signing this Agreement: * The User and the User Institution(s) agree to use the PCGL Controlled Data in compliance with all PCGL Goals, Structures, Policies and Guidelines including section E. Ethics and Appendix I of this application. * The User and the User Institution(s) agree to only use the PCGL Controlled Data for the objectives and analyses outlined in section D. Project Information. * The User and the User Institution(s) assumes responsibility for maintaining appropriate Ethical approval (if so required). Ethical approval must be current for the duration of the approved Data Access Period. * The User and the User Institution(s) agree to preserve, at all times, the confidentiality of the information and PCGL Controlled Data. In particular, they undertake not to use, or attempt to use the PCGL Controlled Data to compromise or otherwise infringe the confidentiality of information on Research Participants. * The User and the User Institution(s) agree to protect the confidentiality of Research Participants in any research papers or publications that they prepare by taking all reasonable care to limit the possibility of identification. * The User and the User Institution(s) agree not to link or combine the PCGL Controlled Data provided under this agreement to other information or archived data available in a way that could re-identify the Research Participants, even if access to that data has been formally granted to the User and the User Institution(s), or is freely available without restriction. * The User and the User Institution(s) agree not to transfer or disclose the PCGL Controlled Data, in whole or part, or any material derived from the PCGL Controlled Data, to anyone not listed in section C. Collaborators of this application, except where prior written permission for such transfer or disclosure has been agreed to by the University. Should the User or the User Institution(s) wish to share the PCGL Controlled Data with an External Collaborator, the External Collaborator must complete a separate application for Access to the PCGL Controlled Data. * The User and the User Institution(s) accept that the Consortium, the member institutions including producers, depositors or copyright holders, or the funders of the PCGL Controlled Data or any part of the PCGL Controlled Data supplied bear no responsibility for the further analysis or interpretation of these PCGL Controlled Data, over and above that published by the Consortium. * The User and the User Institution(s) agree to follow the Fort Lauderdale Guidelines, the Toronto Statement, as well as the GA4GH Framework for Responsible Sharing of Genomic and Health-Related Data included as linked Appendix II of this application. This includes but is not limited to recognizing the contribution of the Consortium including an acknowledgement in all reports or publications resulting from the User and the User Institutions use of the PCGL Controlled Data. * The User agrees to confirm as requested submit ongoing compliance with this agreement and its conditions each year on the anniversary of the approval date. * The User agrees to submit a final report at the completion of the Data Access Period, or if a study is closed, upon request by the DACO Officer. * The User and the User Institution(s) agree to follow the Consortium Publication Policy. * The User and the User Institution(s) agree to destroy, remove or revoke access to any controlled data where they have been notified that consent has been withdrawn. * The User and the User Institution(s) agree not to make intellectual property claims on the PCGL Controlled Data (including somatic mutations) and not to use intellectual property protection in ways that would prevent or block access to, or use of, any element of the PCGL Controlled Data, or conclusion drawn directly from the PCGL Controlled Data. * The User and the User Institution(s) can elect to perform further research that would add intellectual and resource capital to the PCGL Controlled Data and decide to obtain intellectual property rights on these downstream discoveries. In this case, the User and the User Institution(s) agree to implement licensing policies that will not obstruct further research and to follow the U.S. National Institutes of Health's, Best Practices for the Licensing of Genomic Inventions or a similar national guideline that is in conformity with the OECD, Guidelines for the Licensing of the Genetic Inventions. These two policies (NIH and OECD) are included as part of the linked Appendix III of this application. * The User and the User Institution (s) shall implement and maintain, at its cost and expense, appropriate technical and organisational measures in relation to the processing of PCGL Controlled Data and Personal Information. The User will ensure that the security it implements in respect of Personal Information processed by it is appropriate to the risks that are presented by the processing, in particular from accidental or unlawful destruction, loss, alteration, unauthorised disclosure of, or access to Personal Information transmitted, stored or otherwise processed. * The User and the User Institution(s) agree to destroy/discard any PCGL Controlled Data held, once it is no longer used for the project described in this application unless obligated to retain the PCGL Controlled Data for archival purposes in conformity with national audits or legal requirements. * The User and the User Institution(s) will update the Section C. Collaborators to reflect any changes or departures in researchers, collaborators and personnel within 30 days of the changes made. * The User and the User Institution(s) must notify the DACO prior to any significant changes to the Research Project's protocol of the User.  * The User and the User Institution(s) will notify the DACO as soon as they become aware of a breach of the terms or conditions of this agreement. All security incidents are to be reported without delay as outlined in the Data Breach Policy. * The User and the User Institution(s) accept that this agreement may terminate upon any breach of this agreement from the User, the User Institution(s) or any authorized personnel mentioned in section C. Collaborators of this application. In this case, The User and the User Institution(s) will be required to destroy/discard any PCGL Controlled Data held, including copies and backup copies. This clause does not prevent the User and the User Institution(s) from retaining the PCGL Controlled Data for archival purposes in conformity with national audits or legal requirements. * The User and the User Institution(s) accept that it may be necessary for the Consortium or its appointed agent to alter the terms of this agreement from time to time. In this event, the Consortium or its appointed agent will contact the User and the User Institution(s) to inform them of any changes. The revised terms shall be binding upon the User and the User Institution(s) upon notification to the User or the User Institution(s) or the continued use of the PCGL Controlled Data by the User or the User Institution(s) after any such revision. * The User and the User Institution(s) agree to distribute a copy of this agreement and explain its content to any person mentioned in section C. Collaborators. * The University as Data Controller (Regulation (EU) 2016/679 (General Data Protection Regulation) governs PCGL operations and management, including the DACO and Data Coordination Centre and associated Regional Data Processing Centres."
+		},
+		"section3": {
+			"title": "Agreements",
+			"description": "You MUST agree to the following procedures in order to have access to the PCGL Controlled Data:",
+			"agreement1": "Yes, You will keep all computer systems on which PCGL Controlled Data reside, or which provide access to such data, up-to-date with respect to software patches and antivirus file definitions (if applicable).",
+			"agreement2": "Yes, You will protect PCGL Controlled Data against disclosure to and use by unauthorized individuals.",
+			"agreement3": "Yes, You will monitor and control which individuals have access to PCGL controlled Data.",
+			"agreement4": "Yes, You will securely destroy all copies of PCGL Controlled Data in accordance with the terms and conditions of the Data Access Agreement.",
+			"agreement5": "Yes, You will familiarize all individuals who have access to PCGL Controlled Data with the restrictions on its use.",
+			"agreement6": "Yes, You agree to swiftly provide a copy of both your institutional and Research Project related IT policy documents upon request from a DACO representative.",
+			"agreement7": "Yes, You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized access to the PCGL Controlled Data.",
+			"agreement8": "Yes, You certify that the contents in the application are true and correct to the best of your knowledge and belief.",
+			"agreement9": "Yes, You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement."
+		}
+	},
+	"appendices": {
+		"title": "Appendices",
+		"description": "Please review and agree to the following Appendices.",
+		"section1": "PCGL Policies",
+		"readAppendix": "READ THE APPENDIX",
+		"haveReadAppendix": "You have read {{value}}",
+		"appendix1": "APPENDIX I - PCGL ARGO Goals and Policies",
+		"appendix2": "APPENDIX II - Data Access and Data Use Policies and Guidelines",
+		"appendix3": "APPENDIX III - Intellectual Property Policy"
+	},
+	"sign-and-submit-section": {
+		"title": "Sign & Submit",
+		"section": {
+			"title": "E-Signature",
+			"description": "Please use your mouse to sign within the box below. Once you’re happy with the signature click save.",
+			"buttons": {
+				"view": "View Preview",
+				"download": "Download PDF",
+				"clear": "Clear",
+				"save": "Save"
+			}
+		},
+		"modal": {
+			"title": "Are you sure you want to submit this application? ",
+			"description": "Are you sure you want to submit Application: PCGL-{{id}}? If so, the application will be locked for editing and the institutional Representative will be notified to begin the review process.",
+			"submit": "I understand, proceed with submission",
+			"cancel": "Cancel"
 		}
 	}
 }

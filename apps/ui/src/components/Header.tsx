@@ -25,10 +25,10 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
-import { pcglHeaderTheme } from '@/components/providers/ThemeProvider';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { pcglHeaderTheme } from '@/providers/ThemeProvider';
+import { useUserContext } from '@/providers/UserProvider';
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
-import { useUserContext } from './providers/UserProvider';
 
 const { Link } = Typography;
 const { Header } = Layout;
@@ -80,20 +80,6 @@ const HeaderComponent = () => {
 		buttonAction();
 	};
 
-	/**
-	 * Default action when a button in the menu is clicked, used particularly for the mobile menu which should close after click.
-	 * @param buttonAction The function for the action needed to be performed.
-	 */
-	// const onMenuButtonClick = (buttonAction: VoidFunction) => {
-	// 	if (isResponsiveMode) {
-	// 		setResponsiveMenuOpen(false);
-	// 	}
-	// 	buttonAction();
-	// };
-
-	// Temporary logic
-	// Once we have the authorization setup, we can remove isHome and location
-	// This is purely temp UI logic
 	const location = useLocation();
 	const isHome = location.pathname === '/';
 
@@ -140,8 +126,9 @@ const HeaderComponent = () => {
 		isLoggedIn
 			? {
 					name: translate('links.applications'),
-					href: `/dashboard`,
+					href: '/dashboard',
 					position: 'right',
+					target: '_self',
 				}
 			: {
 					name: translate('links.apply'),
@@ -178,12 +165,7 @@ const HeaderComponent = () => {
 					);
 				} else {
 					return (
-						<Link
-							key={`menuItem-${key}`}
-							style={linkStyle}
-							// target={menuItem.target ?? '_blank'}
-							href={menuItem.href ?? '#'}
-						>
+						<Link key={`menuItem-${key}`} style={linkStyle} href={menuItem.href ?? '#'}>
 							{menuItem.name}
 						</Link>
 					);

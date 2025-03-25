@@ -21,8 +21,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import InputBox from '@/components/pages/application/form-components/InputBox';
@@ -31,26 +33,90 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
-import { ApplicationOutletContext } from '@/global/types';
-import { useOutletContext } from 'react-router';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { state, dispatch } = useApplicationContext();
+	const [form] = Form.useForm();
 
-	const { handleSubmit, control } = useForm<InstitutionalRepSchemaType>({
+	const {
+		formState: { isDirty },
+		getValues,
+		control,
+	} = useForm<Nullable<InstitutionalRepSchemaType>>({
+		defaultValues: {
+			institutionalFirstName: state.fields.institutionalRepFirstName,
+			institutionalMiddleName: state.fields.institutionalRepMiddleName,
+			institutionalLastName: state.fields.institutionalRepLastName,
+			institutionalInstituteAffiliation: state.fields.institutionalRepEmail,
+			institutionalPositionTitle: state.fields.institutionalRepPositionTitle,
+			institutionalPrimaryAffiliation: state.fields.institutionalRepPrimaryAffiliation,
+			institutionalProfileUrl: state.fields.institutionalRepProfileUrl,
+			institutionalSuffix: state.fields.institutionalRepSuffix,
+			institutionalTitle: state.fields.institutionalRepTitle,
+			institutionBuilding: state.fields.institutionBuilding,
+			institutionCity: state.fields.institutionCity,
+			institutionCountry: state.fields.institutionCountry || 'CAN',
+			institutionPostalCode: state.fields.institutionPostalCode,
+			institutionState: state.fields.institutionState,
+			institutionStreetAddress: state.fields.institutionStreetAddress,
+		},
 		resolver: zodResolver(institutionalRepSchema),
 	});
 
-	const onSubmit: SubmitHandler<InstitutionalRepSchemaType> = (data) => {
-		console.log(data);
+	const onSubmit = () => {
+		const data = getValues();
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				fields: {
+					...state.fields,
+					institutionalRepFirstName: data.institutionalFirstName,
+					institutionalRepMiddleName: data.institutionalMiddleName,
+					institutionalRepLastName: data.institutionalLastName,
+					institutionalRepEmail: data.institutionalInstituteAffiliation,
+					institutionalRepPositionTitle: data.institutionalPositionTitle,
+					institutionalRepPrimaryAffiliation: data.institutionalPrimaryAffiliation,
+					institutionalRepProfileUrl: data.institutionalProfileUrl,
+					institutionalRepSuffix: data.institutionalSuffix,
+					institutionalRepTitle: data.institutionalTitle,
+					institutionBuilding: data.institutionBuilding,
+					institutionCity: data.institutionCity,
+					institutionCountry: data.institutionCountry,
+					institutionPostalCode: data.institutionPostalCode,
+					institutionState: data.institutionState,
+					institutionStreetAddress: data.institutionStreetAddress,
+				},
+				formState: {
+					...state.formState,
+					isDirty,
+				},
+			},
+		});
 	};
+
+	// validate fields that have been dirtied on page load
+	useEffect(() => {
+		form.validateFields({ dirty: true });
+	}, [form]);
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form
+				form={form}
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle
 					title={translate('institutional-section.title')}
 					text={[translate('institutional-section.description1')]}
@@ -67,6 +133,7 @@ const Institutional = () => {
 								options={PERSONAL_TITLES.map((titles) => {
 									return { value: titles.en, label: titles.en };
 								})}
+								initialValue={getValues('institutionalTitle')}
 								required
 								disabled={!isEditMode}
 							/>
@@ -172,7 +239,7 @@ const Institutional = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionContent title={translate('institutional-section.section2')}>
+				<SectionContent title={translate('institutional-section.section2')} showDivider={false}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox

@@ -17,30 +17,68 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CheckCircleOutlined, LockOutlined } from '@ant-design/icons';
+import { SectionRoutes } from '@/pages/AppRouter';
+import { pcglColors } from '@/providers/ThemeProvider';
+import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
 type SectionMenuItemProps = {
+	isCurrentSection: boolean;
+	isSectionTouched?: boolean;
+	isSectionValid?: boolean;
 	label: string;
 	isEditMode?: boolean;
 };
-/**
- * TODO: once we are in the DAC/REP revision state in the application, consider the following:
- * - determine which icon is to be rendered if REP/DAC requests revisions to a particular section (there could be checkmark or exclamation mark)
- *   - what would the endpoint response look like?
- */
-const SectionMenuItem = ({ label, isEditMode }: SectionMenuItemProps) => {
+
+const SectionMenuItem = ({
+	isCurrentSection,
+	isSectionTouched,
+	isSectionValid,
+	label,
+	isEditMode,
+}: SectionMenuItemProps) => {
 	const { t: translate } = useTranslation();
+
+	/**
+	 * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
+	 */
+	const renderIcon = () => {
+		if (label === SectionRoutes.INTRO) {
+			// do not display intro icon
+			return;
+		} else if (label === SectionRoutes.COLLABORATORS)
+			// Collaborators is an optional field, so it will always be checkmarked
+			return <CheckCircleOutlined />;
+		else if (isCurrentSection && isEditMode && !isSectionValid) {
+			// do not display icon if on currentpage
+			return;
+		} else if (!isEditMode) {
+			// display lock on edit mode
+			return <LockOutlined />;
+		} else if (!isSectionTouched) {
+			// do not display icon if the section has not been worked on
+			return;
+		} else if (isSectionValid) {
+			// display checkmark is section is valid
+			return <CheckCircleOutlined />;
+		} else if (!isSectionValid) {
+			// display exlamation if section is invalid and needs revisions
+			return <ExclamationCircleFilled />;
+		}
+
+		return;
+	};
+
 	return (
 		<Flex style={{ width: '100%' }} justify="space-between">
 			<Text style={{ color: 'inherit' }} ellipsis>
 				{translate(`menu.${label}`)}
 			</Text>
 
-			<Flex>{!isEditMode ? <LockOutlined /> : <CheckCircleOutlined />}</Flex>
+			<Flex style={{ color: !isEditMode ? 'inherit' : pcglColors.primary }}>{renderIcon()}</Flex>
 		</Flex>
 	);
 };

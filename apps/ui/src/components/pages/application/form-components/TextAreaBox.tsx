@@ -18,10 +18,11 @@
  */
 
 import { ColProps, Form, Input } from 'antd';
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
+import { WORDS } from '@pcgl-daco/validation';
 
 const { Item } = Form;
 
@@ -30,6 +31,10 @@ interface TextAreaProps extends BasicFormFieldProps {
 	placeHolder?: string;
 	labelAlign?: 'left' | 'right';
 	labelCol?: ColProps;
+	showCount?: boolean;
+	maxWordCount?: number;
+	rows?: number;
+	style?: CSSProperties;
 }
 
 const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextAreaProps) => {
@@ -41,7 +46,25 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 	 * @returns `ReactNode` with the input component.
 	 */
 	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
-		return <Input.TextArea {...field} disabled={props.disabled} placeholder={props.placeHolder} />;
+		return (
+			<Input.TextArea
+				style={
+					props.style ?? {
+						height: 'auto',
+					}
+				}
+				{...field}
+				rows={props.rows ?? 10}
+				count={{
+					show: props.showCount,
+					strategy: (text) =>
+						text.length === 0 ? text.trim().split(WORDS).length - 1 : text.trim().split(WORDS).length,
+					max: props.maxWordCount,
+				}}
+				disabled={props.disabled}
+				placeholder={props.placeHolder}
+			/>
+		);
 	};
 
 	return (
@@ -58,6 +81,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 						labelAlign={props.labelAlign}
 						labelCol={props.labelCol}
 						initialValue={!props.subLabel ? field.value : undefined}
+						validateTrigger="onBlur"
 					>
 						{props.subLabel ? (
 							<Item
@@ -67,6 +91,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 								labelAlign={props.labelAlign}
 								labelCol={props.labelCol}
 								initialValue={field.value}
+								validateTrigger="onBlur"
 							>
 								{renderControl(field)}
 							</Item>

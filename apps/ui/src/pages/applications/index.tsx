@@ -22,10 +22,10 @@ import { useEffect } from 'react';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 
 import ContentWrapper from '@/components/layouts/ContentWrapper';
-import AppHeader from '@/components/pages/application/AppHeader';
+import ApplicationViewerHeader from '@/components/pages/application/ApplicationViewerHeader';
 import SectionMenu from '@/components/pages/application/SectionMenu';
 
-import useGetApplication from '@/api/useGetApplication';
+import useGetApplication from '@/api/queries/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
@@ -57,32 +57,39 @@ const ApplicationViewer = () => {
 		}
 	}, [data, isEditMode, navigation]);
 
+	// scroll to top on page change
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [match]);
+
 	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
 
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<AppHeader id={data.id} state={data.state} />
+				<ApplicationViewerHeader id={data.id} state={data.state} />
 				{/* Multipart form Viewer */}
-				<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
-					<>
-						<Row style={{ width: '25%' }}>
-							<Col style={{ width: '100%' }}>
-								<SectionMenu currentSection={currentSection} isEditMode={isEditMode} />
-							</Col>
-						</Row>
-						<Row style={{ width: '75%' }}>
-							<Col style={{ background: 'white', width: '100%' }}>
-								<Outlet
-									context={{
-										appId: data.id,
-										isEditMode,
-									}}
-								/>
-							</Col>
-						</Row>
-					</>
-				</ContentWrapper>
+				<Flex style={{ width: '100%', paddingInline: '52px' }}>
+					<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
+						<>
+							<Row style={{ width: '25%' }}>
+								<Col style={{ width: '100%' }}>
+									<SectionMenu appId={data.id} currentSection={currentSection} isEditMode={isEditMode} />
+								</Col>
+							</Row>
+							<Row style={{ width: '75%' }}>
+								<Col style={{ background: 'white', width: '100%' }}>
+									<Outlet
+										context={{
+											appId: data.id,
+											isEditMode,
+										}}
+									/>
+								</Col>
+							</Row>
+						</>
+					</ContentWrapper>
+				</Flex>
 			</Flex>
 		</Content>
 	);

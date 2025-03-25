@@ -21,8 +21,8 @@ import { Navigate, type To } from 'react-router';
 
 import { UserRole } from '@pcgl-daco/validation';
 
+import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
-import { useUserContext } from './providers/UserProvider';
 
 type ProtectedRouteProps = PropsWithChildren<{
 	requiredRoles?: [UserRole, ...UserRole[]];

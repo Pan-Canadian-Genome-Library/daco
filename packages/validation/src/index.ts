@@ -18,8 +18,10 @@
  */
 
 export * from './common/strings.js';
+export * from './modals/requestRevisionsModal.js';
 export * from './routes/index.js';
 export * from './schemas.js';
 export * from './types.js';
 export * from './user.js';
+export * from './utils/functions.js';
 export * from './utils/regex.js';

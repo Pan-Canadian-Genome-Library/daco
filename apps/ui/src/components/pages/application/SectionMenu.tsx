@@ -18,22 +18,42 @@
  */
 
 import { Menu, MenuProps } from 'antd';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
+import useEditApplication from '@/api/mutations/useEditApplication';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
+import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
+	appId: string | number;
 };
 
-const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
+const SectionMenu = ({ currentSection, isEditMode, appId }: SectionMenuProps) => {
 	const navigate = useNavigate();
+	const { state } = useApplicationContext();
+	const { mutate: editApplication } = useEditApplication();
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
+		if (state?.formState?.isDirty) {
+			editApplication({ id: appId });
+		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};
+
+	// Check if the form on each section is valid
+	const SectionValidator = useMemo(() => {
+		return VerifyFormSections(state?.fields);
+	}, [state]);
+
+	// Check if the form has beed dirtied at all
+	const SectionTouched = useMemo(() => {
+		return VerifySectionsTouched(state?.fields);
+	}, [state]);
 
 	return (
 		<Menu
@@ -41,9 +61,19 @@ const SectionMenu = ({ currentSection, isEditMode }: SectionMenuProps) => {
 			selectedKeys={[currentSection]}
 			mode="inline"
 			items={ApplicationSectionRoutes.map((item) => {
+				const route = item.route;
+
 				return {
 					key: item.route,
-					label: <SectionMenuItem label={item.route} isEditMode={isEditMode} />,
+					label: (
+						<SectionMenuItem
+							isCurrentSection={currentSection === route}
+							isSectionTouched={SectionTouched[route]}
+							isSectionValid={SectionValidator[route]}
+							label={item.route}
+							isEditMode={isEditMode}
+						/>
+					),
 				};
 			})}
 			onClick={handleNavigation}

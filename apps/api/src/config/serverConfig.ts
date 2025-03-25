@@ -22,9 +22,11 @@ import { z } from 'zod';
 import EnvironmentConfigError from './EnvironmentConfigError.js';
 
 const serverConfigSchema = z.object({
+	// Node built in env variables
 	NODE_ENV: z.string().optional().default('development'),
 	npm_package_version: z.string().optional().default('unknown'),
 
+	// Custom env variables
 	PORT: z.coerce.number().optional().default(3000),
 	SESSION_KEYS: z.string(),
 	SESSION_MAX_AGE: z.coerce
