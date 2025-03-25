@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { projectInformationSchema, type ProjectInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -32,25 +32,80 @@ import TextAreaBox from '@/components/pages/application/form-components/TextArea
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useEffect } from 'react';
 
 const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-
-	const { handleSubmit, control } = useForm<ProjectInformationSchemaType>({
+	const { state, dispatch } = useApplicationContext();
+	const [form] = Form.useForm();
+	const {
+		control,
+		getValues,
+		formState: { isDirty },
+	} = useForm<Nullable<ProjectInformationSchemaType>>({
+		defaultValues: {
+			projectTitle: state.fields.projectTitle,
+			projectWebsite: state.fields.projectWebsite,
+			projectBackground: state.fields.projectBackground,
+			projectAims: state.fields.projectAims,
+			projectMethodology: state.fields.projectMethodology,
+			projectSummary: state.fields.projectSummary,
+			// relevantPublicationURL1: state.fields.projectPublicationUrls[0] || undefined,
+			// relevantPublicationURL2: state.fields.projectPublicationUrls[1] || undefined,
+			// relevantPublicationURL3: state.fields.projectPublicationUrls[2] || undefined,
+		},
 		resolver: zodResolver(projectInformationSchema),
 	});
 
-	const onSubmit: SubmitHandler<ProjectInformationSchemaType> = (data) => {
-		console.log(data);
+	const onSubmit = () => {
+		const data = getValues();
+		// let projectPublicationUrls = [];
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				fields: {
+					...state.fields,
+					projectTitle: data.projectTitle,
+					projectWebsite: data.projectWebsite,
+					projectAims: data.projectAims,
+					projectBackground: data.projectBackground,
+					projectMethodology: data.projectMethodology,
+					projectSummary: data.projectSummary,
+					projectPublicationUrls: [
+						data.relevantPublicationURL1 || '',
+						data.relevantPublicationURL2 || '',
+						data.relevantPublicationURL3 || '',
+					],
+				},
+				formState: {
+					isDirty,
+				},
+			},
+		});
 	};
+
+	// validate fields that have been dirtied on page load
+	useEffect(() => {
+		form.validateFields({ dirty: true });
+	}, [form]);
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form
+				form={form}
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle title={translate('project-section.title')} text={[translate('project-section.description')]} />
 				<Row gutter={26}>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -160,7 +215,7 @@ const Project = () => {
 											]}
 										/>
 									}
-									name="projectLaySummary"
+									name="projectSummary"
 									control={control}
 									rule={rule}
 									required

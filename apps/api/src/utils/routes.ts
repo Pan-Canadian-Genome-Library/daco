@@ -148,11 +148,14 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 		institution_postal_code: update.institutionPostalCode,
 		institution_state: update.institutionState,
 		institution_street_address: update.institutionStreetAddress,
+		// Project
 		project_aims: update.projectAims,
 		project_methodology: update.projectMethodology,
+		project_background: update.projectBackground,
 		project_summary: update.projectSummary,
 		project_title: update.projectTitle,
 		project_website: update.projectWebsite,
+		project_publication_urls: update.projectPublicationUrls,
 	};
 
 	return formattedUpdate;

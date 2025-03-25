@@ -57,11 +57,14 @@ export const updateEditApplicationRequestSchema = z
 		institutionStreetAddress: z.string(),
 		institutionPostalCode: z.string(),
 		institutionBuilding: z.string(),
+		// Project
 		projectTitle: z.string(),
 		projectWebsite: z.string(),
 		projectAims: z.string(),
 		projectMethodology: z.string(),
 		projectSummary: z.string(),
+		projectBackground: z.string(),
+		projectPublicationUrls: z.array(z.string()),
 	})
 	.partial();
 

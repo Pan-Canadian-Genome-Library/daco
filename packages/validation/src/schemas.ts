@@ -91,7 +91,7 @@ export const projectInformationSchema = z.object({
 	projectAims: Concise200WordCountString,
 	projectDataUse: Concise200WordCountString,
 	projectMethodology: Concise200WordCountString,
-	projectLaySummary: Concise250WordCountString,
+	projectSummary: Concise250WordCountString,
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),

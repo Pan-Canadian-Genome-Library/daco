@@ -17,7 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicantDTO, ApplicationContentsResponse, InstitutionalRepDTO, InstitutionDTO } from '@pcgl-daco/data-model';
+import {
+	ApplicantDTO,
+	ApplicationContentsResponse,
+	InstitutionalRepDTO,
+	InstitutionDTO,
+	ProjectDTO,
+} from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
@@ -32,5 +38,11 @@ export function isApplicantKey(value: string): value is keyof ApplicantDTO {
 // InstitutionalKey
 interface InstitutionalKey extends InstitutionalRepDTO, InstitutionDTO {}
 export function isInstitutionalKey(value: string): value is keyof InstitutionalKey {
+	return value in institutionalRepSchema.keyof().Values;
+}
+
+// ProjectKey
+// interface ProjectKey extends InstitutionalRepDTO, InstitutionDTO {}
+export function isProjectKey(value: string): value is keyof ProjectDTO {
 	return value in institutionalRepSchema.keyof().Values;
 }
