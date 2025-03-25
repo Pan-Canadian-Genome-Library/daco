@@ -30,9 +30,9 @@ import {
 	getApplicationStateTotals,
 	getRevisions,
 	rejectApplication,
-	submitApplication,
-	revokeApplication,
 	requestApplicationRevisionsByDac,
+	revokeApplication,
+	submitApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
@@ -317,7 +317,7 @@ describe('Application API', () => {
 
 			// Verify the revocation failed
 			assert.ok(!result.success);
-			assert.strictEqual(result.errors, 'RevokeConflict');
+			assert.strictEqual(result.errors, 'StateTransitionError');
 			assert.strictEqual(result.message, 'Application should be in APPROVED status');
 		});
 
@@ -546,7 +546,7 @@ describe('Application API', () => {
 
 			// Assert
 			assert.ok(!result.success);
-			assert.strictEqual(result.errors, 'SubmissionError');
+			assert.strictEqual(result.errors, 'StateTransitionError');
 			assert.match(result.message || '', /Application cannot be submitted from state/);
 		});
 	});
