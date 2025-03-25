@@ -16,6 +16,7 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 import {
 	approveApplication,
 	closeApplication,
@@ -27,6 +28,7 @@ import {
 	getRevisions,
 	rejectApplication,
 	submitApplication,
+	revokeApplication,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByRep,
 	submitRevision,
@@ -355,8 +357,64 @@ applicationRouter.post(
 	),
 );
 
+applicationRouter.post('/:applicationId/revoke', jsonParser, withParamsSchemaValidation (collaboratorsListParamsSchema, apiZodErrorMapping ,async (request: Request, response: Response) => {
+	const { applicationId } = request.params;
+
+	const applicationIdNum = parseInt(applicationId || '');
+	if (isNaN(applicationIdNum)) {
+		response.status(400).json({
+			message: 'Invalid request. ApplicationId is required and must be a valid number.',
+			errors: 'MissingOrInvalidParameters',
+		});
+		return;
+	}
+
+	try {
+		const applicationIdNum = Number(applicationId);
+
+		const result = await revokeApplication(applicationIdNum);
+
+		if (result.success) {
+			response.status(200).send({
+				message: 'Application revoked successfully.',
+				data: result.data,
+			});
+		} else {
+			let status = 500;
+			let message = result.message || 'An unexpected error occurred.';
+			let errors = result.errors;
+			switch(errors) {
+				case "ApplicationNotFound":
+				case "Application record is undefined":
+					status = 404;
+					message = 'Application not found.';
+					break;
+				case "StateConflict":
+					status = 409;
+					message = 'Application is already revoked.';
+					break;
+				case "Unauthorized":
+					status = 403;
+					message = 'Unauthorized to revoke this application.';
+					break;
+				case "InvalidState":
+					status = 400;
+					message = 'Cannot revoke application in its current state.';
+					break;
+
+			}
+			response.status(status).send({ message, errors });
+		}
+	} catch (error) {
+		response.status(500).send({
+			message: 'Internal server error.',
+			errors: String(error),
+		});
+	}
+}));
+
 applicationRouter.post(
-	'/applications/:applicationId/close',
+	'/:applicationId/close',
 	jsonParser,
 	withParamsSchemaValidation(
 		closeApplicationSchema,
