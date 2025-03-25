@@ -23,29 +23,27 @@ import {
 	type CollaboratorRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { applicationContentUpdateSchema } from '@/utils/schemas.ts';
-
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
-import { type CollaboratorsResponse, type SignatureDTO } from '@pcgl-daco/data-model/src/types.js';
+import { ApplicationResponseData, type CollaboratorsResponse, type SignatureDTO } from '@pcgl-daco/data-model';
 import {
 	applicationResponseSchema,
 	editSignatureRequestSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
-
-import { type ObjectToCamel, objectToCamel, objectToSnake, type ObjectToSnake } from 'ts-case-convert';
-import { type SafeParseReturnType } from 'zod';
+import { objectToCamel, objectToSnake } from 'ts-case-convert';
+import { failure, Result, success } from './results.ts';
+import { applicationContentUpdateSchema } from './schemas.ts';
 
 /** Convenience function for specific alias utils input/output scenarios
  * @param data Joined Application Record - Snake case database Application / ApplicationContents record
  * @returns ApplicationResponseData - Application record with updated keys
  */
-export const aliasApplicationRecord = (
-	data: JoinedApplicationRecord,
-): SafeParseReturnType<ObjectToCamel<JoinedApplicationRecord>, ApplicationResponseData> => {
+export const aliasApplicationRecord = (data: JoinedApplicationRecord): Result<ApplicationResponseData> => {
 	const aliasedRecord = objectToCamel(data);
 	const validationResult = applicationResponseSchema.safeParse(aliasedRecord);
-	return validationResult;
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure('Validation Error', validationResult.error);
+	return result;
 };
 
 /** Convenience function for specific alias utils input/output scenarios
@@ -54,10 +52,13 @@ export const aliasApplicationRecord = (
  */
 export const aliasApplicationContentsRecord = (
 	update: UpdateEditApplicationRequest,
-): SafeParseReturnType<ObjectToSnake<UpdateEditApplicationRequest>, ApplicationContentUpdates> => {
+): Result<ApplicationContentUpdates> => {
 	const snakeCaseRecord = objectToSnake(update);
 	const validationResult = applicationContentUpdateSchema.safeParse(snakeCaseRecord);
-	return validationResult;
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure('Validation Error', validationResult.error);
+	return result;
 };
 
 /**
@@ -65,13 +66,13 @@ export const aliasApplicationContentsRecord = (
  * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
  * @returns type `SignatureDTO` - camelCase variation of a Postgres success response.
  */
-export const aliasSignatureRecord = (
-	data: ApplicationSignatureUpdate,
-): SafeParseReturnType<ObjectToCamel<ApplicationSignatureUpdate>, SignatureDTO> => {
+export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Result<SignatureDTO> => {
 	const camelCaseRecord = objectToCamel(data);
 	const validationResult = editSignatureRequestSchema.safeParse(camelCaseRecord);
-
-	return validationResult;
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure('Validation Error', validationResult.error);
+	return result;
 };
 
 /**

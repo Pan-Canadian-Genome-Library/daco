@@ -77,11 +77,11 @@ export const editApplication = async ({ id, update }: { id: number; update: Upda
 	}
 
 	// TODO: Review Result pattern
-	const dataResult = aliasApplicationContentsRecord(update);
+	const formattedResult = aliasApplicationContentsRecord(update);
 
-	if (!dataResult.success) return dataResult;
+	if (!formattedResult.success) return formattedResult;
 
-	return await applicationRepo.editApplication({ id, update: dataResult.data });
+	return await applicationRepo.editApplication({ id, update: formattedResult.data });
 };
 
 /**

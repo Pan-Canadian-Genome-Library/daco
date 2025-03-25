@@ -19,7 +19,7 @@
 
 import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
 import { aliasSignatureRecord } from '@/utils/aliases.ts';
-import { failure, success } from '@/utils/results.ts';
+import { failure } from '@/utils/results.ts';
 
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
@@ -46,7 +46,7 @@ export const getApplicationSignature = async ({ applicationId }: { applicationId
 	}
 
 	const aliasedResponse = aliasSignatureRecord(result.data);
-	return success(aliasedResponse);
+	return aliasedResponse;
 };
 
 /**
