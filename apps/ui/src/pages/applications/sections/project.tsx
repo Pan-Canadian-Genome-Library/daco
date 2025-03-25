@@ -55,16 +55,27 @@ const Project = () => {
 			projectAims: state.fields.projectAims,
 			projectMethodology: state.fields.projectMethodology,
 			projectSummary: state.fields.projectSummary,
-			// relevantPublicationURL1: state.fields.projectPublicationUrls[0] || undefined,
-			// relevantPublicationURL2: state.fields.projectPublicationUrls[1] || undefined,
-			// relevantPublicationURL3: state.fields.projectPublicationUrls[2] || undefined,
+			projectPublicationUrls: state.fields.projectPublicationUrls || [],
+			relevantPublicationURL1: state.fields.projectPublicationUrls && state.fields.projectPublicationUrls[0],
+			relevantPublicationURL2: state.fields.projectPublicationUrls && state.fields.projectPublicationUrls[1],
+			relevantPublicationURL3: state.fields.projectPublicationUrls && state.fields.projectPublicationUrls[2],
 		},
 		resolver: zodResolver(projectInformationSchema),
 	});
 
 	const onSubmit = () => {
 		const data = getValues();
-		// let projectPublicationUrls = [];
+		const projectPublicationUrls = [];
+
+		if (data.relevantPublicationURL1) {
+			projectPublicationUrls.push(data.relevantPublicationURL1);
+		}
+		if (data.relevantPublicationURL2) {
+			projectPublicationUrls.push(data.relevantPublicationURL2);
+		}
+		if (data.relevantPublicationURL3) {
+			projectPublicationUrls.push(data.relevantPublicationURL3);
+		}
 
 		dispatch({
 			type: 'UPDATE_APPLICATION',
@@ -77,11 +88,7 @@ const Project = () => {
 					projectBackground: data.projectBackground,
 					projectMethodology: data.projectMethodology,
 					projectSummary: data.projectSummary,
-					projectPublicationUrls: [
-						data.relevantPublicationURL1 || '',
-						data.relevantPublicationURL2 || '',
-						data.relevantPublicationURL3 || '',
-					],
+					projectPublicationUrls,
 				},
 				formState: {
 					isDirty,
