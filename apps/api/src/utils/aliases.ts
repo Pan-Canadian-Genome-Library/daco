@@ -26,7 +26,7 @@ import {
 import { ApplicationResponseData, type CollaboratorsResponse, type SignatureDTO } from '@pcgl-daco/data-model';
 import {
 	applicationResponseSchema,
-	editSignatureRequestSchema,
+	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
@@ -68,7 +68,7 @@ export const aliasApplicationContentsRecord = (
  */
 export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Result<SignatureDTO> => {
 	const camelCaseRecord = objectToCamel(data);
-	const validationResult = editSignatureRequestSchema.safeParse(camelCaseRecord);
+	const validationResult = signatureResponseSchema.safeParse(camelCaseRecord);
 	const result = validationResult.success
 		? success(validationResult.data)
 		: failure('Validation Error', validationResult.error);
