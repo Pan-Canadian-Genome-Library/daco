@@ -33,7 +33,7 @@ import { objectToCamel, objectToSnake } from 'ts-case-convert';
 import { failure, Result, success } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
 
-/** Convenience function for specific alias utils input/output scenarios
+/** Converts database Application Record + Contents into camelCase response record
  * @param data Joined Application Record - Snake case database Application / ApplicationContents record
  * @returns ApplicationResponseData - Application record with updated keys
  */
@@ -46,7 +46,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Result<Ap
 	return result;
 };
 
-/** Convenience function for specific alias utils input/output scenarios
+/** Converts partial Application Content update into database insert snake_case model format
  * @param data type UpdateEditApplicationRequest application contents in camelCase
  * @returns  type ApplicationContentUpdates in snake_case
  */
