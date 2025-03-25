@@ -26,7 +26,7 @@ export interface FormState {
 }
 
 export interface ApplicationFormState {
-	fields?: Partial<ApplicationContentsResponse>;
+	fields: Partial<ApplicationContentsResponse>;
 	formState: FormState;
 }
 

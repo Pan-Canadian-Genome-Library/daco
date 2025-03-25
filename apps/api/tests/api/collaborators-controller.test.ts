@@ -191,7 +191,7 @@ describe('Collaborators Controller', () => {
 			});
 
 			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdates.collaboratorType);
+			assert.strictEqual(collaboratorResult.data[0]?.collaboratorType, collaboratorUpdates.collaboratorType);
 		});
 	});
 

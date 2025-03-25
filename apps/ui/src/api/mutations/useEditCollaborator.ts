@@ -23,25 +23,28 @@ import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
-import { withErrorResponseHandler } from '@/api/apiUtils';
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
-import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
+import { type CollaboratorUpdateRecord, type CollaboratorsResponse } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
-const useAddCollaborator = () => {
+const useEditCollaborator = () => {
 	return useMutation<
 		CollaboratorsResponse[],
 		ServerError,
-		{ applicationId: number | string; collaborators: CollaboratorsSchemaType[]; userId?: number | string }
+		{
+			applicationId: number | string;
+			collaboratorUpdates: CollaboratorUpdateRecord;
+			userId?: number | string;
+		}
 	>({
-		mutationFn: async ({ applicationId, collaborators }) => {
-			const response = await fetch('/collaborators/create', {
+		mutationFn: async ({ applicationId, collaboratorUpdates }) => {
+			const response = await fetch('/collaborators/update', {
 				method: 'POST',
 				body: JSON.stringify({
 					//TODO: Replace this with the globally authenticated user once authentication is implemented;
 					userId: mockUserID,
 					applicationId,
-					collaborators,
+					collaboratorUpdates,
 				}),
 			}).then(withErrorResponseHandler);
 
@@ -53,15 +56,21 @@ const useAddCollaborator = () => {
 			});
 		},
 		onSuccess: async (data) => {
-			//  Update the cache if the add collaborator request is successful to prevent refetching data
+			//  Update the cache if the edit collaborator request is successful to prevent refetching data
 			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
-				return [...prev, ...data];
+				return prev.map((value) => {
+					// Replace cached value with response object
+					if (value.id === data[0]?.id) {
+						return data[0];
+					}
+					return value;
+				});
 			});
 			notification.success({
-				message: `User ${data[0]?.collaboratorFirstName} was added successfully`,
+				message: 'Update collaborator was successful',
 			});
 		},
 	});
 };
 
-export default useAddCollaborator;
+export default useEditCollaborator;
