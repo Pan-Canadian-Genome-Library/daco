@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import useEditApplication from '@/api/mutations/useEditApplication';
+import useGetDownload from '@/api/queries/useGetDownload';
 import useGetFile from '@/api/queries/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
@@ -52,6 +53,7 @@ const Ethics = () => {
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
+	const { refetch: getDownload } = useGetDownload({ fileId: state.fields?.ethicsLetter });
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const { token } = useToken();
 
@@ -83,9 +85,17 @@ const Ethics = () => {
 	};
 
 	// Generate download url and then remove the link after downloading
-	const onDownload = (value: UploadFile) => {
-		const bufferArray = new Uint8Array(value.response.content.data).buffer;
-		const fileType = getFileType(value.name);
+	const onDownload = async () => {
+		const response = await getDownload();
+
+		const { data: responseData } = response;
+
+		if (!responseData) {
+			return;
+		}
+
+		const bufferArray = new Uint8Array(responseData.content.data).buffer;
+		const fileType = getFileType(responseData.filename);
 
 		const blob = new Blob([bufferArray], {
 			type: fileType,
@@ -95,7 +105,7 @@ const Ethics = () => {
 		const a = document.createElement('a');
 		a.href = url;
 
-		a.download = value.name;
+		a.download = responseData.filename;
 		document.body.appendChild(a);
 		a.click();
 
