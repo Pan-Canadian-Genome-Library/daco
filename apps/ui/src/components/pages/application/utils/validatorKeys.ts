@@ -42,7 +42,6 @@ export function isInstitutionalKey(value: string): value is keyof InstitutionalK
 }
 
 // ProjectKey
-// interface ProjectKey extends InstitutionalRepDTO, InstitutionDTO {}
 export function isProjectKey(value: string): value is keyof ProjectDTO {
 	return value in projectInformationSchema.keyof().Values;
 }
