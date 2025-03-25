@@ -23,14 +23,16 @@ import {
 	type CollaboratorRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
+import { applicationContentUpdateSchema } from '@/utils/schemas.ts';
+
 import { ApplicationResponseData } from '@pcgl-daco/data-model';
 import { type CollaboratorsResponse, type SignatureDTO } from '@pcgl-daco/data-model/src/types.js';
 import {
 	applicationResponseSchema,
 	editSignatureRequestSchema,
 	type UpdateEditApplicationRequest,
-	updateEditApplicationRequestSchema,
 } from '@pcgl-daco/validation';
+
 import { type ObjectToCamel, objectToCamel, objectToSnake, type ObjectToSnake } from 'ts-case-convert';
 import { type SafeParseReturnType } from 'zod';
 
@@ -54,15 +56,14 @@ export const aliasApplicationContentsRecord = (
 	update: UpdateEditApplicationRequest,
 ): SafeParseReturnType<ObjectToSnake<UpdateEditApplicationRequest>, ApplicationContentUpdates> => {
 	const snakeCaseRecord = objectToSnake(update);
-	const validationResult = updateEditApplicationRequestSchema.safeParse(snakeCaseRecord);
-	// TODO: Use correct schema
+	const validationResult = applicationContentUpdateSchema.safeParse(snakeCaseRecord);
 	return validationResult;
 };
 
 /**
  * Helper function to convert Postgres snake_case to FE camelCase for the Signature Service
  * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
- * @returns type `SignatureDTO` - camelCase variation of a Postgress success response.
+ * @returns type `SignatureDTO` - camelCase variation of a Postgres success response.
  */
 export const aliasSignatureRecord = (
 	data: ApplicationSignatureUpdate,

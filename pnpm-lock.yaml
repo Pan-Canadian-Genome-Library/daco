@@ -74,6 +74,9 @@ importers:
       drizzle-orm:
         specifier: ^0.39.1
         version: 0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(pg@8.13.0)
+      drizzle-zod:
+        specifier: ^0.7.0
+        version: 0.7.0(drizzle-orm@0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(pg@8.13.0))(zod@3.24.1)
       express:
         specifier: ^4.21.0
         version: 4.21.0
@@ -2236,6 +2239,12 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  drizzle-zod@0.7.0:
+    resolution: {integrity: sha512-xgCRYYVEzRkeXTS33GSMgoowe3vKsMNBjSI+cwG1oLQVEhAWWbqtb/AAMlm7tkmV4fG/uJjEmWzdzlEmTgWOoQ==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: '>=3.0.0'
 
   dtrace-provider@0.8.8:
     resolution: {integrity: sha512-b7Z7cNtHPhH9EJhNNbbeqTcXB8LGFFZhq1PGgEvpeHlzd36bhbdTWoE/Ba/YguqpBSlAPKnARWhVlhunCMwfxg==}
@@ -6214,6 +6223,11 @@ snapshots:
       '@libsql/client-wasm': 0.14.0
       '@types/pg': 8.11.10
       pg: 8.13.0
+
+  drizzle-zod@0.7.0(drizzle-orm@0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(pg@8.13.0))(zod@3.24.1):
+    dependencies:
+      drizzle-orm: 0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.10)(pg@8.13.0)
+      zod: 3.24.1
 
   dtrace-provider@0.8.8:
     dependencies:
