@@ -22,21 +22,21 @@ import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/v
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
 	return applicantInformationSchema.safeParse({
-		applicantTitle: fields?.applicantTitle,
-		applicantFirstName: fields?.applicantFirstName,
-		applicantMiddleName: fields?.applicantMiddleName,
-		applicantLastName: fields?.applicantLastName,
-		applicantSuffix: fields?.applicantSuffix,
-		applicantPrimaryAffiliation: fields?.applicantPrimaryAffiliation,
-		applicantInstituteEmail: fields?.applicantInstitutionalEmail,
-		applicantProfileUrl: fields?.applicantProfileUrl,
-		applicantPositionTitle: fields?.applicantPositionTitle,
-		applicantInstituteCountry: 'test', // NO mailing field in db
-		applicantInstituteState: 'test', // NO mailing field in db
-		applicantInstituteCity: 'test', // NO mailing field in db
-		applicantInstitutePostalCode: 'test', // NO mailing field in db
-		applicantInstituteStreetAddress: 'test', // NO mailing field in db
-		applicantInstituteBuilding: 'test', // NO mailing field in db
+		applicantTitle: fields.applicantTitle,
+		applicantFirstName: fields.applicantFirstName,
+		applicantMiddleName: fields.applicantMiddleName,
+		applicantLastName: fields.applicantLastName,
+		applicantSuffix: fields.applicantSuffix,
+		applicantPrimaryAffiliation: fields.applicantPrimaryAffiliation,
+		applicantInstituteEmail: fields.applicantInstitutionalEmail,
+		applicantProfileUrl: fields.applicantProfileUrl,
+		applicantPositionTitle: fields.applicantPositionTitle,
+		applicantInstituteCountry: fields.applicantInstituteCountry,
+		applicantInstituteState: fields.applicantInstituteState,
+		applicantInstituteCity: fields.applicantInstituteCity,
+		applicantInstitutePostalCode: fields.applicantInstitutePostalCode,
+		applicantInstituteStreetAddress: fields.applicantInstituteStreetAddress,
+		applicantInstituteBuilding: fields.applicantInstituteBuilding,
 	}).success;
 };
 

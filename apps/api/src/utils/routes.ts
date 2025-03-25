@@ -53,6 +53,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				applicationId: applicationContents.application_id,
 				createdAt: applicationContents.created_at,
 				updatedAt: applicationContents.updated_at,
+				// Applicant information
 				applicantFirstName: applicationContents.applicant_first_name,
 				applicantLastName: applicationContents.applicant_last_name,
 				applicantMiddleName: applicationContents.applicant_middle_name,
@@ -62,6 +63,13 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				applicantPrimaryAffiliation: applicationContents.applicant_primary_affiliation,
 				applicantInstitutionalEmail: applicationContents.applicant_institutional_email,
 				applicantProfileUrl: applicationContents.applicant_profile_url,
+				applicantInstituteCountry: applicationContents.applicant_institution_country,
+				applicantInstituteState: applicationContents.applicant_institution_state,
+				applicantInstituteCity: applicationContents.applicant_institution_city,
+				applicantInstitutePostalCode: applicationContents.applicant_institution_postal_code,
+				applicantInstituteStreetAddress: applicationContents.applicant_institution_street_address,
+				applicantInstituteBuilding: applicationContents.applicant_institution_building,
+				//Institutional Representative
 				institutionalRepTitle: applicationContents.institutional_rep_title,
 				institutionalRepFirstName: applicationContents.institutional_rep_first_name,
 				institutionalRepMiddleName: applicationContents.institutional_rep_middle_name,
@@ -77,6 +85,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				institutionStreetAddress: applicationContents.institution_street_address,
 				institutionPostalCode: applicationContents.institution_postal_code,
 				institutionBuilding: applicationContents.institution_building,
+				// Project
 				projectTitle: applicationContents.project_title,
 				projectWebsite: applicationContents.project_website,
 				projectBackground: applicationContents.project_background,
@@ -107,6 +116,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
  */
 export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequest): ApplicationContentUpdates => {
 	const formattedUpdate: ApplicationContentUpdates = {
+		// Applicant
 		applicant_first_name: update.applicantFirstName,
 		applicant_middle_name: update.applicantMiddleName,
 		applicant_last_name: update.applicantLastName,
@@ -116,6 +126,13 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 		applicant_profile_url: update.applicantProfileUrl,
 		applicant_suffix: update.applicantSuffix,
 		applicant_title: update.applicantTitle,
+		applicant_institution_country: update.applicantInstituteCountry,
+		applicant_institution_state: update.applicantInstituteState,
+		applicant_institution_city: update.applicantInstituteCity,
+		applicant_institution_postal_code: update.applicantInstitutePostalCode,
+		applicant_institution_street_address: update.applicantInstituteStreetAddress,
+		applicant_institution_building: update.applicantInstituteBuilding,
+		// Institutional
 		institutional_rep_first_name: update.institutionalRepFirstName,
 		institutional_rep_middle_name: update.institutionalRepMiddleName,
 		institutional_rep_last_name: update.institutionalRepLastName,
