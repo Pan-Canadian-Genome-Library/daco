@@ -24,7 +24,7 @@ import {
 	InstitutionDTO,
 	ProjectDTO,
 } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import { applicantInformationSchema, institutionalRepSchema, projectInformationSchema } from '@pcgl-daco/validation';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
 export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
@@ -44,5 +44,5 @@ export function isInstitutionalKey(value: string): value is keyof InstitutionalK
 // ProjectKey
 // interface ProjectKey extends InstitutionalRepDTO, InstitutionDTO {}
 export function isProjectKey(value: string): value is keyof ProjectDTO {
-	return value in institutionalRepSchema.keyof().Values;
+	return value in projectInformationSchema.keyof().Values;
 }

@@ -68,6 +68,7 @@ export const ValidatorProject = (fields: ApplicationContentsResponse): boolean =
 		projectAims: fields.projectAims,
 		projectMethodology: fields.projectMethodology,
 		projectSummary: fields.projectSummary,
+		projectPublicationUrls: fields.projectPublicationUrls,
 		relevantPublicationURL1: fields.projectPublicationUrls ? fields.projectPublicationUrls[0] : null,
 		relevantPublicationURL2: fields.projectPublicationUrls ? fields.projectPublicationUrls[1] : null,
 		relevantPublicationURL3: fields.projectPublicationUrls ? fields.projectPublicationUrls[2] : null,
