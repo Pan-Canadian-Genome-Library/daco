@@ -1,8 +1,9 @@
 import { Path, StyleSheet, Svg, Text, View } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
 import { standardStyles } from './standardStyling.ts';
 
 interface CheckboxProps {
-	children: string;
+	children: string | ReactNode;
 	unchecked?: boolean;
 }
 
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
 
 const Checkbox = ({ children, unchecked }: CheckboxProps) => {
 	return (
-		<View style={styles.checkboxContainer}>
+		<View style={styles.checkboxContainer} wrap={false}>
 			<View
 				style={{
 					...styles.checkboxImageContainer,
@@ -49,7 +50,7 @@ const Checkbox = ({ children, unchecked }: CheckboxProps) => {
 					</Svg>
 				) : null}
 			</View>
-			<Text style={styles.checkboxText}>{children}</Text>
+			{typeof children === 'string' ? <Text style={styles.checkboxText}>{children}</Text> : children}
 		</View>
 	);
 };

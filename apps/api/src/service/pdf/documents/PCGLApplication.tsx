@@ -23,11 +23,15 @@ import TitlePage from '@/service/pdf/components/pages/TitlePage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import { ApplicationResponseData, CollaboratorDTO, SignatureDTO } from '@pcgl-daco/data-model';
 import { Document, Font, renderToBuffer, StyleSheet } from '@react-pdf/renderer';
+import Appendices from '../components/pages/Appendices.tsx';
 import Collaborators from '../components/pages/Collaborators.tsx';
+import DataAccessAgreement from '../components/pages/DataAccessAgreement.tsx';
 import Ethics from '../components/pages/Ethics.tsx';
 import InstitutionalRepresentative from '../components/pages/InstitutionalRepresentative.tsx';
 import ProjectInformation from '../components/pages/ProjectInformation.tsx';
 import RequestedStudy from '../components/pages/RequestedStudy.tsx';
+import Signature from '../components/Signature.tsx';
+import SignSubmit from '../components/pages/SignSubmit.tsx';
 
 interface PCGLApplicationProps {
 	applicationContents: ApplicationResponseData;
@@ -129,6 +133,9 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 			/>
 			<RequestedStudy requestedStudies={contents?.requestedStudies} />
 			<Ethics />
+			<DataAccessAgreement />
+			<Appendices />
+			<SignSubmit/>
 		</Document>
 	);
 };

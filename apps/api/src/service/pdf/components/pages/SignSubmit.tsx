@@ -20,40 +20,51 @@
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
 import { RequestedStudiesDTO } from '@pcgl-daco/data-model';
+import { Link, StyleSheet, Text } from '@react-pdf/renderer';
 import Checkbox from '../Checkbox.tsx';
 import FormDisplay from '../FormDisplay.tsx';
 import Paragraph from '../Paragraph.tsx';
+import { standardStyles } from '../standardStyling.ts';
 
-const Ethics = ({ requestedStudies }: RequestedStudiesDTO) => {
+const styles = StyleSheet.create({
+	link: {
+		color: standardStyles.colours.primary,
+	},
+	text: {
+		fontSize: standardStyles.textStyles.sizes.md,
+	},
+});
+
+const SignSubmit = ({ requestedStudies }: RequestedStudiesDTO) => {
 	return (
-		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Ethics</Title>
+		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+			<Title>Sign &amp; Submit</Title>
 			<Paragraph>
-				PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the
-				PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such
-				approval is needed in your country. If you are uncertain as to whether your research project needs ethics
-				approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research
-				ethics committee (IRB/REC) to clarify the matter.
+				You must include BOTH the Principal Investigator and the Institutional Representative signatures in order for
+				your application to be reviewed.
 			</Paragraph>
-			<Paragraph>
-				Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual
-				research projects and bear no responsibility for the applicant's failure to comply with local/national ethical
-				requirements.
-			</Paragraph>
-			<FormDisplay title="Ethics Approval">
+			<FormDisplay title="Applicant Authorization">
 				<Checkbox>
-					You represent and warrant that your country/region does not require your research project to undergo ethics
-					review.
+					<Text style={styles.text}>
+						You have read APPENDIX I &mdash;{' '}
+						<Link src="#" style={styles.link}>
+							PCGL ARGO Goals and Policies
+						</Link>
+					</Text>
 				</Checkbox>
+			</FormDisplay>
+			<FormDisplay title="Institutional Representative Authorization">
 				<Checkbox>
-					Your country/region requires your Research Project to undergo ethics review, and therefore, this research
-					project has been approved by an IRB/REC formally designated to approve and/or monitor research involving
-					humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the
-					responsibility of the Principal Investigator
+					<Text style={styles.text}>
+						You have read APPENDIX I &mdash;{' '}
+						<Link src="#" style={styles.link}>
+							PCGL ARGO Goals and Policies
+						</Link>
+					</Text>
 				</Checkbox>
 			</FormDisplay>
 		</StandardPage>
 	);
 };
 
-export default Ethics;
+export default SignSubmit;

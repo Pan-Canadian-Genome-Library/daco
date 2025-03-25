@@ -41,7 +41,7 @@ const List = ({ items, isNumbered }: { items: string[]; isNumbered?: boolean }) 
 	return (
 		<View style={styles.list}>
 			{items.map((li, index) => (
-				<View style={styles.listItem} key={li}>
+				<View style={styles.listItem} key={li} wrap={false}>
 					{isNumbered ? <Text>{`${index + 1}.`}</Text> : <Text>&#x2022;</Text>}
 					<Text>{`${li}`}</Text>
 				</View>
