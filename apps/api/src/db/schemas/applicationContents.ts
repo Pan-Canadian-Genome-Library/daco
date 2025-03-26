@@ -81,7 +81,7 @@ export const applicationContents = pgTable('application_contents', {
 	institutional_rep_signed_at: timestamp(),
 	// Studies
 	// TODO: requested study information
-	requested_studies: text().array(),
+	requested_studies: text(),
 	// Agreements & Ethics
 	ethics_review_required: boolean(),
 	ethics_letter: bigint({ mode: 'number' }),
