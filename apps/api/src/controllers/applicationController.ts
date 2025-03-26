@@ -290,7 +290,6 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 	}
 };
 
-
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
 	role,
