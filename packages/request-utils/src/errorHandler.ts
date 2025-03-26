@@ -29,7 +29,6 @@ export const errorHandler =
 		if (res.headersSent) {
 			return next(err);
 		}
-		res.headersSent;
 
 		logger?.error('Unhandled error thrown from request', req.url, err);
 
