@@ -130,6 +130,12 @@ export type InstitutionalRepDTO = {
 };
 
 export type InstitutionDTO = {
+	applicantInstitutionCountry?: string | null;
+	applicantInstitutionState?: string | null;
+	applicantInstitutionStreetAddress?: string | null;
+	applicantInstitutionBuilding?: string | null;
+	applicantInstitutionCity?: string | null;
+	applicantInstitutionPostalCode?: string | null;
 	institutionCountry?: string | null;
 	institutionState?: string | null;
 	institutionStreetAddress?: string | null;

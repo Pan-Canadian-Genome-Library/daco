@@ -34,12 +34,12 @@ const ApplicantInformation = ({
 	applicantInstitutionalEmail,
 	applicantProfileUrl,
 	applicantPositionTitle,
-	institutionCountry,
-	institutionState,
-	institutionStreetAddress,
-	institutionBuilding,
-	institutionCity,
-	institutionPostalCode,
+	applicantInstitutionCountry,
+	applicantInstitutionState,
+	applicantInstitutionStreetAddress,
+	applicantInstitutionBuilding,
+	applicantInstitutionCity,
+	applicantInstitutionPostalCode,
 }: ApplicantDTO & InstitutionDTO) => {
 	return (
 		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
@@ -69,12 +69,12 @@ const ApplicantInformation = ({
 				<DataItem item="Position Title">{applicantPositionTitle}</DataItem>
 			</FormDisplay>
 			<FormDisplay title="Institution/Company Mailing Address">
-				<DataItem item="Country">{institutionCountry}</DataItem>
-				<DataItem item="Street Address">{institutionStreetAddress}</DataItem>
-				<DataItem item="Building">{institutionBuilding}</DataItem>
-				<DataItem item="Province">{institutionState}</DataItem>
-				<DataItem item="City">{institutionCity}</DataItem>
-				<DataItem item="Postal Code / ZIP Code">{institutionPostalCode}</DataItem>
+				<DataItem item="Country">{applicantInstitutionCountry}</DataItem>
+				<DataItem item="Street Address">{applicantInstitutionStreetAddress}</DataItem>
+				<DataItem item="Building">{applicantInstitutionBuilding}</DataItem>
+				<DataItem item="Province">{applicantInstitutionState}</DataItem>
+				<DataItem item="City">{applicantInstitutionCity}</DataItem>
+				<DataItem item="Postal Code / ZIP Code">{applicantInstitutionPostalCode}</DataItem>
 			</FormDisplay>
 		</StandardPage>
 	);

@@ -96,12 +96,12 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				applicantInstitutionalEmail={contents?.applicantInstitutionalEmail}
 				applicantProfileUrl={contents?.applicantProfileUrl}
 				applicantPositionTitle={contents?.applicantPositionTitle}
-				institutionCountry={contents?.institutionCountry}
-				institutionState={contents?.institutionState}
-				institutionStreetAddress={contents?.institutionStreetAddress}
-				institutionBuilding={contents?.institutionBuilding}
-				institutionCity={contents?.institutionCity}
-				institutionPostalCode={contents?.institutionPostalCode}
+				applicantInstitutionCountry={contents?.applicantInstitutionCountry}
+				applicantInstitutionState={contents?.applicantInstitutionState}
+				applicantInstitutionStreetAddress={contents?.applicantInstitutionStreetAddress}
+				applicantInstitutionBuilding={contents?.applicantInstitutionBuilding}
+				applicantInstitutionCity={contents?.applicantInstitutionCity}
+				applicantInstitutionPostalCode={contents?.applicantInstitutionPostalCode}
 			/>
 			<InstitutionalRepresentative
 				institutionalRepTitle={contents?.institutionalRepTitle}

@@ -69,13 +69,13 @@ const SignSubmit = ({
 				your application to be reviewed.
 			</Paragraph>
 			<FormDisplay title="Applicant Authorization">
-				<DataItem item="Name">{`${applicantFirstName} ${applicantMiddleName}${applicantMiddleName ? ' ' : ''}${applicantLastName}`}</DataItem>
+				<DataItem item="Name">{`${applicantFirstName} ${applicantMiddleName ?? ''}${!applicantMiddleName ? '' : ' '}${applicantLastName}`}</DataItem>
 				<DataItem item="Primary Affiliation">{applicantPrimaryAffiliation}</DataItem>
 				<DataItem item="Position Title">{applicantPositionTitle}</DataItem>
 				<Signature src={applicantSignature} date={applicantSignedAt} />
 			</FormDisplay>
 			<FormDisplay title="Institutional Representative Authorization">
-				<DataItem item="Name">{`${institutionalRepFirstName} ${institutionalRepMiddleName}${institutionalRepMiddleName ? ' ' : ''}${institutionalRepLastName}`}</DataItem>
+				<DataItem item="Name">{`${institutionalRepFirstName} ${institutionalRepMiddleName ?? ''}${!institutionalRepMiddleName ? '' : ' '}${institutionalRepLastName}`}</DataItem>
 				<DataItem item="Primary Affiliation">{institutionalRepPrimaryAffiliation}</DataItem>
 				<DataItem item="Position Title">{institutionalRepPositionTitle}</DataItem>
 				<Signature src={institutionalRepSignature} date={institutionalRepSignedAt} />
