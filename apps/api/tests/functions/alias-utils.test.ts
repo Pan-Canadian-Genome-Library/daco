@@ -20,7 +20,7 @@
 import { JoinedApplicationRecord } from '@/service/types.ts';
 import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/aliases.ts';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
-import { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
+import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import assert from 'node:assert';
 import { describe } from 'node:test';
 import { testUserId } from '../utils/testUtils.ts';
