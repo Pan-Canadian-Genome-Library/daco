@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2023 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,25 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Logger } from '@pcgl-daco/logger';
-import { ServerErrorResponse } from './error/ServerErrorResponse.js';
-import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
+export enum ErrorName {
+	BAD_REQUEST_ERROR = 'BadRequestError',
+	CONFLICT_ERROR = 'ConflictError',
+	NOT_FOUND_ERROR = 'NotFoundError',
+	RECAPTCHA_ERROR = 'RecaptchaError',
+	REQUEST_VALIDATION_ERROR = 'RequestValidationError',
+	SERVER_ERROR = 'ServerError',
+	UNAUTHORIZED = 'Unauthorized',
+}
 
-const errorHandler =
-	(params: { logger?: Logger }): ErrorRequestHandler =>
-	(err: any, req: Request, res: Response, next: NextFunction) => {
-		const { logger } = params;
+export type ErrorResponse = {
+	error: ErrorName | 'NOT_IMPLEMENTED'; // TODO: remove once all routes are implemented
+	message: string;
+};
 
-		if (res.headersSent) {
-			return next(err);
-		}
-		res.headersSent;
-
-		logger?.error('Unhandled error thrown from request', req.url, err);
-
-		const errorMessage = err.message || 'An error occurred.';
-
-		 res.status(500).json(ServerErrorResponse(errorMessage));
-	};
-
-export default errorHandler;
+export const ErrorResponse = (error: ErrorName | 'NOT_IMPLEMENTED', message: string) => ({
+	error,
+	message,
+});

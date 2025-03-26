@@ -28,9 +28,9 @@ import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/applicationRouter.js';
 import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
+import { errorHandler } from '@pcgl-daco/request-utils';
 import { serverConfig } from './config/serverConfig.js';
 import logger from './logger.js';
-import { errorHandler } from '@pcgl-daco/request-utils';
 import authRouter from './routes/authRouter.js';
 import fileRouter from './routes/fileRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
@@ -53,7 +53,6 @@ const startServer = async () => {
 	app.use('/signature', signatureRouter);
 	app.use('/auth', authRouter);
 	app.use('/file', fileRouter);
-	app.use(errorHandler);
 
 	app.use(
 		`/${API_DOCS_PATH}`,
@@ -87,6 +86,7 @@ const startServer = async () => {
 			logger.info(`API Docs available at: http://localhost:${serverConfig.PORT}/${API_DOCS_PATH}`);
 		}
 	});
+	app.use(errorHandler);
 };
 
 export default startServer;
