@@ -104,8 +104,8 @@ describe('Application Service', { skip: true }, () => {
 
 			const collaboratorResult = await testCollaboratorsRepo.deleteCollaborator({ id });
 
-			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.id, id);
+			assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
+			assert.strictEqual(collaboratorResult.data[0].id, id);
 		});
 	});
 
@@ -127,8 +127,8 @@ describe('Application Service', { skip: true }, () => {
 				collaborator: collaboratorUpdate,
 			});
 
-			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdate.collaborator_type);
+			assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
+			assert.strictEqual(collaboratorResult.data[0].collaborator_type, collaboratorUpdate.collaborator_type);
 		});
 	});
 

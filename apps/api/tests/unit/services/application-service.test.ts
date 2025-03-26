@@ -18,38 +18,17 @@
  */
 
 import assert from 'node:assert';
-import { after, before, describe, it } from 'node:test';
+import { after, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { mockApplicationRepo } from '@tests/utils/mocks.ts';
 
-import {
-	addInitialApplications,
-	addPaginationApplications,
-	allRecordsPageSize,
-	initTestMigration,
-	testUserId as user_id,
-} from '@tests/utils/testUtils.ts';
+import { allRecordsPageSize, testUserId as user_id } from '@tests/utils/testUtils.ts';
 
-describe('Application Service', { skip: true }, () => {
-	let db: PostgresDb;
-	let testApplicationService: ApplicationService;
-
-	before(async () => {
-		db = connectToDb('');
-
-		await initTestMigration(db);
-		await addInitialApplications(db);
-		await addPaginationApplications(db);
-
-		testApplicationService = applicationSvc(db);
-	});
-
+describe('Application Service', () => {
 	describe('Create Applications', () => {
 		it('should create applications with status DRAFT and submitted user_id', async () => {
-			const applicationResult = await testApplicationService.createApplication({ user_id });
+			const applicationResult = await mockApplicationRepo.createApplication({ user_id });
 
 			assert.ok(applicationResult.success && applicationResult.data);
 
@@ -62,7 +41,7 @@ describe('Application Service', { skip: true }, () => {
 
 	describe('Get Applications', () => {
 		it('should get applications requested by id, with application_contents', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -73,7 +52,7 @@ describe('Application Service', { skip: true }, () => {
 
 			const { id } = applicationRecords[0];
 
-			const result = await testApplicationService.getApplicationWithContents({ id });
+			const result = await mockApplicationRepo.getApplicationWithContents({ id });
 
 			assert.ok(result.success);
 
@@ -85,7 +64,7 @@ describe('Application Service', { skip: true }, () => {
 
 	describe('FindOneAndUpdate Application', () => {
 		it('should populate updated_at field', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -95,9 +74,9 @@ describe('Application Service', { skip: true }, () => {
 			assert.ok(applicationRecords[0]);
 
 			const { id } = applicationRecords[0];
-			await testApplicationService.findOneAndUpdate({ id, update: {} });
+			await mockApplicationRepo.findOneAndUpdate({ id, update: {} });
 
-			const result = await testApplicationService.getApplicationById({ id });
+			const result = await mockApplicationRepo.getApplicationById({ id });
 
 			assert.ok(result.success);
 
@@ -109,7 +88,7 @@ describe('Application Service', { skip: true }, () => {
 
 	describe('List Applications', () => {
 		it('should filter by user_id', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 			const applicationRecords = applicationRecordsResult.data.applications;
@@ -125,7 +104,7 @@ describe('Application Service', { skip: true }, () => {
 		});
 
 		it('should filter by state', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({
 				state: [ApplicationStates.DRAFT],
 			});
 
@@ -143,7 +122,7 @@ describe('Application Service', { skip: true }, () => {
 		});
 
 		it('should allow sorting records by created_at', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({
 				sort: [
 					{
 						direction: 'asc',
@@ -169,7 +148,7 @@ describe('Application Service', { skip: true }, () => {
 		});
 
 		it('should allow sorting records by updated_at', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({
 				user_id,
 				sort: [
 					{
@@ -192,17 +171,17 @@ describe('Application Service', { skip: true }, () => {
 			const { id: secondRecordId } = applicationRecords[2];
 
 			// State values are used in the next test so first record remains in 'Draft', this is just populating `updatedAt`
-			await testApplicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
-			await testApplicationService.findOneAndUpdate({
+			await mockApplicationRepo.findOneAndUpdate({ id: zeroRecordId, update: {} });
+			await mockApplicationRepo.findOneAndUpdate({
 				id: firstRecordId,
 				update: { state: ApplicationStates.APPROVED },
 			});
-			await testApplicationService.findOneAndUpdate({
+			await mockApplicationRepo.findOneAndUpdate({
 				id: secondRecordId,
 				update: { state: ApplicationStates.REJECTED },
 			});
 
-			const updatedRecordsResult = await testApplicationService.listApplications({
+			const updatedRecordsResult = await mockApplicationRepo.listApplications({
 				user_id,
 				sort: [
 					{
@@ -229,7 +208,7 @@ describe('Application Service', { skip: true }, () => {
 		});
 
 		it('should allow sorting records by state', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({
 				sort: [
 					{
 						direction: 'asc',
@@ -253,7 +232,7 @@ describe('Application Service', { skip: true }, () => {
 		});
 
 		it('should allow record pagination', async () => {
-			const paginationResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 10 });
+			const paginationResult = await mockApplicationRepo.listApplications({ user_id, page: 1, pageSize: 10 });
 
 			assert.ok(paginationResult.success);
 			const paginatedRecords = paginationResult.data.applications;
@@ -263,7 +242,7 @@ describe('Application Service', { skip: true }, () => {
 
 			assert.strictEqual(paginatedRecords.length, 10);
 
-			const allRecordsResult = await testApplicationService.listApplications({ user_id });
+			const allRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(allRecordsResult.success);
 
@@ -288,7 +267,7 @@ describe('Application Service', { skip: true }, () => {
 
 	describe('Edit Applications', () => {
 		it('should allow editing applications and return record with updated fields', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -300,7 +279,7 @@ describe('Application Service', { skip: true }, () => {
 
 			const update = { applicant_first_name: 'Test' };
 
-			const result = await testApplicationService.editApplication({ id, update });
+			const result = await mockApplicationRepo.editApplication({ id, update });
 
 			assert.ok(result.success);
 
@@ -314,12 +293,12 @@ describe('Application Service', { skip: true }, () => {
 
 	describe('Get Application Metadata', () => {
 		it('should list statistics for how many applications are in each state category', async () => {
-			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
+			const appStateTotals = await mockApplicationRepo.applicationStateTotals({ user_id });
 			assert.ok(appStateTotals.success);
 
 			const allStates = appStateTotals.data;
 
-			const allApplications = await testApplicationService.listApplications({
+			const allApplications = await mockApplicationRepo.listApplications({
 				user_id,
 				pageSize: allRecordsPageSize,
 			});

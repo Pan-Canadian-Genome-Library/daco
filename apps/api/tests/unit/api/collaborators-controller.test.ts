@@ -169,8 +169,10 @@ describe('Collaborators Controller', { skip: true }, () => {
 				collaboratorUpdates,
 			});
 
-			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data?.collaborator_type, collaboratorUpdates.collaboratorType);
+			assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
+
+			const collaboratorRecord = collaboratorResult.data[0];
+			assert.strictEqual(collaboratorRecord.collaboratorType, collaboratorUpdates.collaboratorType);
 		});
 	});
 

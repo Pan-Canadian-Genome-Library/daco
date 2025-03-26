@@ -29,7 +29,7 @@ import {
 	requestApplicationRevisionsByDac,
 	submitRevision,
 } from '@/controllers/applicationController.js';
-import { type ApplicationService, type RevisionRequestModel } from '@/service/types.js';
+import { type RevisionRequestModel } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import { mockApplicationRepo } from '@tests/utils/mocks.ts';
@@ -53,8 +53,6 @@ const revisionRequestData: RevisionRequestModel = {
 };
 
 describe('Application API', () => {
-	let testApplicationRepo: ApplicationService;
-
 	describe('Edit Application', { skip: true }, () => {
 		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
 			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
@@ -166,7 +164,7 @@ describe('Application API', () => {
 
 	describe('Get Application Metadata', { skip: true }, () => {
 		it('should get the counts for each of the application states', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
