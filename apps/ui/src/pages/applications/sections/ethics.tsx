@@ -36,7 +36,6 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
-import { getFileType } from '@/global/utils';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { FileExtentionTypes } from '@pcgl-daco/data-model';
 
@@ -95,10 +94,9 @@ const Ethics = () => {
 		}
 
 		const bufferArray = new Uint8Array(responseData.content.data).buffer;
-		const fileType = getFileType(responseData.filename);
 
 		const blob = new Blob([bufferArray], {
-			type: fileType,
+			type: 'pdf',
 		});
 
 		const url = URL.createObjectURL(blob);

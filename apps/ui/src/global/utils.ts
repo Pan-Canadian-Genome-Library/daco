@@ -17,8 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { FileExtentionTypes } from '@pcgl-daco/data-model';
-
 /**
  * Determines if the page number provided to it would be valid for the DACO API.
  *
@@ -32,21 +30,5 @@ const isValidPageNumber = (page: number) => {
 	}
 	return false;
 };
-
-export function getFileType(filename: string): string {
-	const match = filename.match(/\.([^.]+)$/);
-	const type = match && match[1] ? match[1].toLowerCase() : '';
-
-	switch (type) {
-		case 'pdf':
-			return FileExtentionTypes.PDF;
-		case 'doc':
-			return FileExtentionTypes.DOC;
-		case 'docx':
-			return FileExtentionTypes.DOCX;
-	}
-
-	return FileExtentionTypes.DOC;
-}
 
 export { isValidPageNumber };
