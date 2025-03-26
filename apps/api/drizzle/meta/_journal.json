@@ -1,69 +1,69 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1732142275956,
-      "tag": "0000_init",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1737046429457,
-      "tag": "0001_revised_actions_and_states",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1738362244032,
-      "tag": "0002_remove_create_actions",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1738866324516,
-      "tag": "0003_rename_project_abstract",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1739210934649,
-      "tag": "0004_add_project_aims_field",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1739460666408,
-      "tag": "0005_require_collaborator_app_id",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1740780078583,
-      "tag": "0006_add_signature_fields",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1741728267648,
-      "tag": "0007_add_applicant_mailing_address",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1743009266935,
-      "tag": "0008_wakeful_salo",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1732142275956,
+			"tag": "0000_init",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1737046429457,
+			"tag": "0001_revised_actions_and_states",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1738362244032,
+			"tag": "0002_remove_create_actions",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1738866324516,
+			"tag": "0003_rename_project_abstract",
+			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "7",
+			"when": 1739210934649,
+			"tag": "0004_add_project_aims_field",
+			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1739460666408,
+			"tag": "0005_require_collaborator_app_id",
+			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1740780078583,
+			"tag": "0006_add_signature_fields",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1741728267648,
+			"tag": "0007_add_applicant_mailing_address",
+			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "7",
+			"when": 1743009266935,
+			"tag": "0008_wakeful_salo",
+			"breakpoints": true
+		}
+	]
 }
