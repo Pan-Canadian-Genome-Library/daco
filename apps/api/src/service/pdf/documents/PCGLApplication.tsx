@@ -30,7 +30,6 @@ import Ethics from '../components/pages/Ethics.tsx';
 import InstitutionalRepresentative from '../components/pages/InstitutionalRepresentative.tsx';
 import ProjectInformation from '../components/pages/ProjectInformation.tsx';
 import RequestedStudy from '../components/pages/RequestedStudy.tsx';
-import Signature from '../components/Signature.tsx';
 import SignSubmit from '../components/pages/SignSubmit.tsx';
 
 interface PCGLApplicationProps {
@@ -132,10 +131,25 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				projectPublicationUrls={contents?.projectPublicationUrls}
 			/>
 			<RequestedStudy requestedStudies={contents?.requestedStudies} />
-			<Ethics />
+			<Ethics ethicsReviewRequired={contents?.ethicsReviewRequired} />
 			<DataAccessAgreement />
 			<Appendices />
-			<SignSubmit/>
+			<SignSubmit
+				applicantFirstName={contents?.applicantFirstName}
+				applicantMiddleName={contents?.applicantMiddleName}
+				applicantLastName={contents?.applicantLastName}
+				applicantPositionTitle={contents?.applicantPositionTitle}
+				applicantPrimaryAffiliation={contents?.applicantPrimaryAffiliation}
+				applicantSignature={signature.applicantSignature}
+				applicantSignedAt={signature.applicantSignedAt}
+				institutionalRepFirstName={contents?.institutionalRepFirstName}
+				institutionalRepMiddleName={contents?.institutionalRepMiddleName}
+				institutionalRepLastName={contents?.institutionalRepLastName}
+				institutionalRepPositionTitle={contents?.institutionalRepPositionTitle}
+				institutionalRepPrimaryAffiliation={contents?.institutionalRepPrimaryAffiliation}
+				institutionalRepSignature={signature.institutionalRepSignature}
+				institutionalRepSignedAt={signature.institutionalRepSignedAt}
+			/>
 		</Document>
 	);
 };

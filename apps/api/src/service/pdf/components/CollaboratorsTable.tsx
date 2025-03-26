@@ -56,8 +56,11 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
+		textAlign: 'center',
 		width: '100%',
-		padding: `${standardStyles.textStyles.sizes.md}`,
+		minWidth: '100%',
+		color: standardStyles.colours.primary,
+		margin: `${standardStyles.textStyles.sizes.lg} 0`,
 		fontSize: standardStyles.textStyles.sizes.md,
 	},
 });
@@ -67,7 +70,7 @@ const CollaboratorsTable = ({ data }: CollaboratorsTable) => {
 		if (data.length === 0) {
 			return (
 				<View style={styles.tableNoData}>
-					<Text>&mdash; No Collaborators Listed &mdash; </Text>
+					<Text>&mdash; No Collaborators Listed &mdash;</Text>
 				</View>
 			);
 		}

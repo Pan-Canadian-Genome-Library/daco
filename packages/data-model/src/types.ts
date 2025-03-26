@@ -152,6 +152,12 @@ export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
 
+export interface EthicsDTO {
+	ethicsReviewRequired?: boolean | null;
+	ethicsLetter?: number | null;
+	signedPDF?: number | null;
+}
+
 export type ApplicationDTO = {
 	id: number;
 	userId: string;
@@ -198,7 +204,8 @@ export type ApplicationContentsResponse = {
 	InstitutionDTO &
 	InstitutionalRepDTO &
 	ProjectDTO &
-	RequestedStudiesDTO;
+	RequestedStudiesDTO &
+	EthicsDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;

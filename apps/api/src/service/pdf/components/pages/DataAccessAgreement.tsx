@@ -19,13 +19,12 @@
 
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { RequestedStudiesDTO } from '@pcgl-daco/data-model';
 import Checkbox from '../Checkbox.tsx';
 import FormDisplay from '../FormDisplay.tsx';
 import List from '../List.tsx';
 import Paragraph from '../Paragraph.tsx';
 
-const DataAccessAgreement = ({ requestedStudies }: RequestedStudiesDTO) => {
+const DataAccessAgreement = () => {
 	return (
 		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Data Access Agreement</Title>

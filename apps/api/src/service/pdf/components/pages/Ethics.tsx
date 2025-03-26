@@ -19,12 +19,13 @@
 
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { RequestedStudiesDTO } from '@pcgl-daco/data-model';
+import { EthicsDTO } from '@pcgl-daco/data-model';
+import { View } from '@react-pdf/renderer';
 import Checkbox from '../Checkbox.tsx';
 import FormDisplay from '../FormDisplay.tsx';
 import Paragraph from '../Paragraph.tsx';
 
-const Ethics = ({ requestedStudies }: RequestedStudiesDTO) => {
+const Ethics = ({ ethicsReviewRequired }: EthicsDTO) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Ethics</Title>
@@ -41,16 +42,36 @@ const Ethics = ({ requestedStudies }: RequestedStudiesDTO) => {
 				requirements.
 			</Paragraph>
 			<FormDisplay title="Ethics Approval">
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						ethicsReviewRequired === true || ethicsReviewRequired === null || ethicsReviewRequired === undefined
+					}
+				>
 					You represent and warrant that your country/region does not require your research project to undergo ethics
 					review.
 				</Checkbox>
-				<Checkbox>
+				<Checkbox unchecked={!ethicsReviewRequired}>
 					Your country/region requires your Research Project to undergo ethics review, and therefore, this research
 					project has been approved by an IRB/REC formally designated to approve and/or monitor research involving
 					humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the
 					responsibility of the Principal Investigator
 				</Checkbox>
+				{ethicsReviewRequired !== undefined && ethicsReviewRequired !== null ? (
+					<View
+						wrap={false}
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							height: '50%',
+						}}
+					>
+						<Paragraph notice>
+							&mdash;&nbsp;Ethics {ethicsReviewRequired === true ? `approval` : 'exemption'} letter attached at end of
+							document.&nbsp;&mdash;
+						</Paragraph>
+					</View>
+				) : null}
 			</FormDisplay>
 		</StandardPage>
 	);

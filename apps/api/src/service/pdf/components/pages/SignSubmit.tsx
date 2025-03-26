@@ -19,49 +19,66 @@
 
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { RequestedStudiesDTO } from '@pcgl-daco/data-model';
-import { Link, StyleSheet, Text } from '@react-pdf/renderer';
-import Checkbox from '../Checkbox.tsx';
+import { ApplicantDTO, InstitutionalRepDTO, SignatureDTO } from '@pcgl-daco/data-model';
+import DataItem from '../DataItem.tsx';
 import FormDisplay from '../FormDisplay.tsx';
 import Paragraph from '../Paragraph.tsx';
-import { standardStyles } from '../standardStyling.ts';
+import Signature from '../Signature.tsx';
 
-const styles = StyleSheet.create({
-	link: {
-		color: standardStyles.colours.primary,
-	},
-	text: {
-		fontSize: standardStyles.textStyles.sizes.md,
-	},
-});
+interface SignSubmitProps
+	extends Omit<SignatureDTO, 'applicationId'>,
+		Pick<
+			ApplicantDTO,
+			| 'applicantFirstName'
+			| 'applicantMiddleName'
+			| 'applicantLastName'
+			| 'applicantPrimaryAffiliation'
+			| 'applicantPositionTitle'
+		>,
+		Pick<
+			InstitutionalRepDTO,
+			| 'institutionalRepFirstName'
+			| 'institutionalRepMiddleName'
+			| 'institutionalRepLastName'
+			| 'institutionalRepPrimaryAffiliation'
+			| 'institutionalRepPositionTitle'
+		> {}
 
-const SignSubmit = ({ requestedStudies }: RequestedStudiesDTO) => {
+const SignSubmit = ({
+	applicantFirstName,
+	applicantMiddleName,
+	applicantLastName,
+	applicantSignature,
+	applicantSignedAt,
+	applicantPositionTitle,
+	applicantPrimaryAffiliation,
+
+	institutionalRepFirstName,
+	institutionalRepMiddleName,
+	institutionalRepLastName,
+	institutionalRepSignature,
+	institutionalRepSignedAt,
+	institutionalRepPositionTitle,
+	institutionalRepPrimaryAffiliation,
+}: SignSubmitProps) => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Sign &amp; Submit</Title>
 			<Paragraph>
 				You must include BOTH the Principal Investigator and the Institutional Representative signatures in order for
 				your application to be reviewed.
 			</Paragraph>
 			<FormDisplay title="Applicant Authorization">
-				<Checkbox>
-					<Text style={styles.text}>
-						You have read APPENDIX I &mdash;{' '}
-						<Link src="#" style={styles.link}>
-							PCGL ARGO Goals and Policies
-						</Link>
-					</Text>
-				</Checkbox>
+				<DataItem item="Name">{`${applicantFirstName} ${applicantMiddleName}${applicantMiddleName ? ' ' : ''}${applicantLastName}`}</DataItem>
+				<DataItem item="Primary Affiliation">{applicantPrimaryAffiliation}</DataItem>
+				<DataItem item="Position Title">{applicantPositionTitle}</DataItem>
+				<Signature src={applicantSignature} date={applicantSignedAt} />
 			</FormDisplay>
 			<FormDisplay title="Institutional Representative Authorization">
-				<Checkbox>
-					<Text style={styles.text}>
-						You have read APPENDIX I &mdash;{' '}
-						<Link src="#" style={styles.link}>
-							PCGL ARGO Goals and Policies
-						</Link>
-					</Text>
-				</Checkbox>
+				<DataItem item="Name">{`${institutionalRepFirstName} ${institutionalRepMiddleName}${institutionalRepMiddleName ? ' ' : ''}${institutionalRepLastName}`}</DataItem>
+				<DataItem item="Primary Affiliation">{institutionalRepPrimaryAffiliation}</DataItem>
+				<DataItem item="Position Title">{institutionalRepPositionTitle}</DataItem>
+				<Signature src={institutionalRepSignature} date={institutionalRepSignedAt} />
 			</FormDisplay>
 		</StandardPage>
 	);

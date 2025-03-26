@@ -10,8 +10,10 @@ const styles = StyleSheet.create({
 		fontSize: standardStyles.textStyles.sizes.md,
 	},
 });
-const Paragraph = ({ children }: { children: ReactNode }) => {
-	return <Text style={styles.paragraph}>{children}</Text>;
+const Paragraph = ({ children, notice }: { children: ReactNode; notice?: boolean }) => {
+	return (
+		<Text style={{ ...styles.paragraph, color: notice ? standardStyles.colours.primary : '#000' }}>{children}</Text>
+	);
 };
 
 export default Paragraph;
