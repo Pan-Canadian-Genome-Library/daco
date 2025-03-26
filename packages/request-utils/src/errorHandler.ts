@@ -17,12 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Logger } from '@pcgl-daco/logger';
+import {type LoggerType } from '@pcgl-daco/logger';
 import { ServerErrorResponse } from './error/ServerErrorResponse.js';
 import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 
-const errorHandler =
-	(params: { logger?: Logger }): ErrorRequestHandler =>
+export const errorHandler =
+	(params: { logger?: LoggerType }): ErrorRequestHandler =>
 	(err: any, req: Request, res: Response, next: NextFunction) => {
 		const { logger } = params;
 
@@ -37,5 +37,3 @@ const errorHandler =
 
 		 res.status(500).json(ServerErrorResponse(errorMessage));
 	};
-
-export default errorHandler;
