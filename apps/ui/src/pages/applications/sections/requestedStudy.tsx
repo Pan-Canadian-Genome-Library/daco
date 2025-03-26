@@ -18,7 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { requestedStudySchema, type RequestedStudySchemaType } from '@pcgl-daco/validation';
+import { requestedStudiesSchema, RequestedStudiesSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { useEffect } from 'react';
@@ -37,7 +37,7 @@ import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
 
-const rule = createSchemaFieldRule(requestedStudySchema);
+const rule = createSchemaFieldRule(requestedStudiesSchema);
 
 interface RequestedStudy {
 	studyName: string;
@@ -65,11 +65,11 @@ const RequestedStudy = () => {
 		formState: { isDirty },
 		control,
 		getValues,
-	} = useForm<Nullable<RequestedStudySchemaType>>({
+	} = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
-			requestedStudy: state.fields.requestedStudies,
+			requestedStudies: state.fields.requestedStudies,
 		},
-		resolver: zodResolver(requestedStudySchema),
+		resolver: zodResolver(requestedStudiesSchema),
 	});
 
 	const onSubmit = () => {
@@ -81,7 +81,7 @@ const RequestedStudy = () => {
 			payload: {
 				fields: {
 					...state.fields,
-					requestedStudies: data.requestedStudy,
+					requestedStudies: data.requestedStudies,
 				},
 				formState: {
 					...state.formState,
@@ -121,11 +121,11 @@ const RequestedStudy = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
 								label={translate('requested-study.section1.form.studyName')}
-								name="requestedStudy"
+								name="requestedStudies"
 								placeholder="Select"
 								control={control}
 								rule={rule}
-								initialValue={getValues('requestedStudy')}
+								initialValue={getValues('requestedStudies')}
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
 									return { value: study.studyName, label: study.studyName };
 								})}

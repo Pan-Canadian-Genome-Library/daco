@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import { type ApplicationContentsResponse } from '@pcgl-daco/data-model';
+import { applicantInformationSchema, institutionalRepSchema, requestedStudiesSchema } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
 	return applicantInformationSchema.safeParse({
@@ -57,5 +57,11 @@ export const ValidatorInstitution = (fields: ApplicationContentsResponse): boole
 		institutionalMiddleName: fields?.institutionalRepMiddleName,
 		institutionalSuffix: fields?.institutionalRepSuffix,
 		institutionBuilding: fields?.institutionBuilding,
+	}).success;
+};
+
+export const ValidatorStudy = (fields: ApplicationContentsResponse): boolean => {
+	return requestedStudiesSchema.safeParse({
+		requestedStudies: fields.requestedStudies,
 	}).success;
 };

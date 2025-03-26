@@ -103,10 +103,10 @@ export const ethicsSchema = z.object({
 });
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
-export const requestedStudySchema = z.object({
-	requestedStudy: z.string(),
+export const requestedStudiesSchema = z.object({
+	requestedStudies: z.string(),
 });
-export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+export type RequestedStudiesSchemaType = z.infer<typeof requestedStudiesSchema>;
 
 export const agreementsSchema = z.object({
 	agreements: z.array(z.string()).superRefine((allAgreements, context) => {
