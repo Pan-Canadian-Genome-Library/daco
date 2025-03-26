@@ -42,8 +42,6 @@ export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
 export const FileExtentionTypes = {
 	PDF: 'application/pdf',
-	DOC: 'application/msword',
-	DOCX: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
 export type FileExtentionType = (typeof FileExtentionTypes)[keyof typeof FileExtentionTypes];

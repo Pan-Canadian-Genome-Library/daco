@@ -894,7 +894,7 @@ paths:
         - multipart/form-data
       requestBody:
         description: |
-          Files must fit a certain set of properties to be accepted by our server. The file cannot be more than `5mb`, has to be of type `'pdf' 'doc' 'docx' ` and only `one` file can be uploaded.
+          Files must fit a certain set of properties to be accepted by our server. The file cannot be more than `5mb`, has to be of type `'pdf'` and only `one` file can be uploaded.
         content:
           multipart/form-data:
             schema:
