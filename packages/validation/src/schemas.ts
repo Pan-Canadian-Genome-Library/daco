@@ -104,7 +104,7 @@ export const ethicsSchema = z.object({
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
 export const requestedStudySchema = z.object({
-	requestedStudy: z.number().nonnegative(),
+	requestedStudy: z.string(),
 });
 export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
