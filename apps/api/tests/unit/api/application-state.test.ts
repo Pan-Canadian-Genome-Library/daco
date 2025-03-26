@@ -18,15 +18,12 @@
  */
 
 import assert from 'node:assert';
-import { after, before, describe, it } from 'node:test';
+import { after, describe, it } from 'node:test';
 
 import { ApplicationStateManager, createApplicationStateManager } from '@/controllers/stateManager.js';
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { type ApplicationActionService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
-import { mockApplicationRepo } from '@tests/utils/mocks.ts';
+import { mockActionRepo, mockApplicationRepo } from '@tests/utils/mocks.ts';
 
 const {
 	APPROVED,
@@ -40,16 +37,7 @@ const {
 	REVOKED,
 } = ApplicationStates;
 
-describe('State Machine', { skip: true }, () => {
-	let db: PostgresDb;
-
-	let testActionRepo: ApplicationActionService;
-
-	before(async () => {
-		db = connectToDb('');
-		testActionRepo = applicationActionSvc(db);
-	});
-
+describe('State Machine', () => {
 	describe('Success path: Create/Edit/Revisions/Submit/Approve', () => {
 		// This test block follows the state transition sequence from Create to Approve, with Edits & Revisions
 		// All tests in this block reference the same Application record
@@ -81,7 +69,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -113,7 +101,7 @@ describe('State Machine', { skip: true }, () => {
 			assert.ok(revisionResult.success);
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -133,7 +121,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -153,7 +141,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -196,7 +184,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -216,7 +204,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -236,7 +224,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, APPROVED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -262,7 +250,7 @@ describe('State Machine', { skip: true }, () => {
 			const stateValue = draftReviewManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 2 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 2 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -286,7 +274,7 @@ describe('State Machine', { skip: true }, () => {
 			const stateValue = repReviewStateManager.getState();
 			assert.strictEqual(stateValue, DRAFT);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 3 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 3 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -311,7 +299,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = repReviewStateManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 3 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 3 });
 			assert.ok(actionResult.success && actionResult.data);
 
 			assert.ok(
@@ -338,7 +326,7 @@ describe('State Machine', { skip: true }, () => {
 			const stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, DRAFT);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 4 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 4 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -364,7 +352,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, REJECTED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 4 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 4 });
 			assert.ok(actionResult.success && actionResult.data);
 
 			assert.ok(
@@ -393,7 +381,7 @@ describe('State Machine', { skip: true }, () => {
 			stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 5 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 5 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(
@@ -416,7 +404,7 @@ describe('State Machine', { skip: true }, () => {
 			const stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, REVOKED);
 
-			const actionResult = await testActionRepo.listActions({ application_id: 1 });
+			const actionResult = await mockActionRepo.listActions({ application_id: 1 });
 			assert.ok(actionResult.success && actionResult.data);
 			assert.ok(
 				actionResult.data.find(

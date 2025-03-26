@@ -21,33 +21,27 @@ import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { ApplicationService, SignatureService } from '@/service/types.js';
+import { SignatureService } from '@/service/types.js';
 
-import { applicationSvc } from '@/service/applicationService.ts';
 import { signatureService } from '@/service/signatureService.ts';
-import { addInitialApplications, initTestMigration, testUserId as user_id } from '@tests/utils/testUtils.ts';
+import { mockApplicationRepo } from '@tests/utils/mocks.ts';
+import { testUserId as user_id } from '@tests/utils/testUtils.ts';
 
 describe('Signature Service', { skip: true }, () => {
 	let db: PostgresDb;
 	let testSignatureService: SignatureService;
-	let testApplicationService: ApplicationService;
 
 	const validBase64Signature =
 		'data:image/png;base64,0ZxJm5HcCop3TCvbnvoHxseg4L0XM5WqylNBdkHKeEmIe4s5s4A7CZYs8TrPUzIuIA0bxD+Ei6764LcM2sPsmxKBuY3REWQ/uEe1j85hUHoiTbQqwln6Kfsd8cGC8sfjrNQD02oZ';
 
 	before(async () => {
 		db = connectToDb('');
-
-		await initTestMigration(db);
-		await addInitialApplications(db);
-
 		testSignatureService = signatureService(db);
-		testApplicationService = applicationSvc(db);
 	});
 
 	describe('Sign Application as Applicant', () => {
 		it('should get an application and sign an application as an applicant', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -76,7 +70,7 @@ describe('Signature Service', { skip: true }, () => {
 
 	describe('Sign Application an Institutional Representative', () => {
 		it('should get an application and sign an application as an Institutional Representative', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -103,7 +97,7 @@ describe('Signature Service', { skip: true }, () => {
 
 	describe('Retrieve Signed Application', () => {
 		it('should retrieve a valid application with signatures', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -141,7 +135,7 @@ describe('Signature Service', { skip: true }, () => {
 
 	describe('Delete Signatures from an Application', () => {
 		it('should get an application and delete signatures of the Institutional Representative', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 
@@ -174,7 +168,7 @@ describe('Signature Service', { skip: true }, () => {
 		});
 
 		it('should get an application and delete signatures of the Applicant', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
 			assert.ok(applicationRecordsResult.success);
 

@@ -18,14 +18,12 @@
  */
 
 import assert from 'node:assert';
-import { after, before, describe, it } from 'node:test';
+import { after, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { type ApplicationActionsColumnName, type ApplicationActionService, type OrderBy } from '@/service/types.js';
+import { type ApplicationActionsColumnName, type OrderBy } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-import { mockApplicationRepo } from '@tests/utils/mocks.ts';
+import { mockActionRepo, mockApplicationRepo } from '@tests/utils/mocks.ts';
 import {
 	testApplicationId as application_id,
 	testActionId as id,
@@ -33,22 +31,13 @@ import {
 } from '@tests/utils/testUtils.ts';
 
 describe('Application Action Service', () => {
-	let db: PostgresDb;
-	let testActionRepo: ApplicationActionService;
-
-	before(async () => {
-		db = connectToDb('');
-
-		testActionRepo = applicationActionSvc(db);
-	});
-
 	describe('All Actions', () => {
 		it('should perform WITHDRAW actions with after state DRAFT', async () => {
 			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.withdraw(testApplication);
+			const result = await mockActionRepo.withdraw(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -66,7 +55,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.close(testApplication);
+			const result = await mockActionRepo.close(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -84,7 +73,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.draftSubmit(testApplication);
+			const result = await mockActionRepo.draftSubmit(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -102,7 +91,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.withdraw(testApplication);
+			const result = await mockActionRepo.withdraw(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -120,7 +109,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.repRevision(testApplication);
+			const result = await mockActionRepo.repRevision(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -138,7 +127,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.repSubmit(testApplication);
+			const result = await mockActionRepo.repSubmit(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -156,7 +145,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.repApproved(testApplication);
+			const result = await mockActionRepo.repApproved(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -174,7 +163,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.dacApproved(testApplication);
+			const result = await mockActionRepo.dacApproved(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -192,7 +181,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.dacRejected(testApplication);
+			const result = await mockActionRepo.dacRejected(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -210,7 +199,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.dacRevision(testApplication);
+			const result = await mockActionRepo.dacRevision(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -228,7 +217,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.dacSubmit(testApplication);
+			const result = await mockActionRepo.dacSubmit(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -246,7 +235,7 @@ describe('Application Action Service', () => {
 			assert.ok(testApplicationResult.success && testApplicationResult.data);
 			const testApplication = testApplicationResult.data;
 
-			const result = await testActionRepo.revoke(testApplication);
+			const result = await mockActionRepo.revoke(testApplication);
 
 			assert.ok(result.success && result.data);
 
@@ -262,7 +251,7 @@ describe('Application Action Service', () => {
 
 	describe('Get Actions', () => {
 		it('should get actions requested by id', async () => {
-			const actionResult = await testActionRepo.getActionById({ id });
+			const actionResult = await mockActionRepo.getActionById({ id });
 
 			assert.ok(actionResult.success && actionResult.data);
 
@@ -272,7 +261,7 @@ describe('Application Action Service', () => {
 		});
 
 		it('should get all actions requested by user id', async () => {
-			const actionResult = await testActionRepo.listActions({ user_id });
+			const actionResult = await mockActionRepo.listActions({ user_id });
 
 			assert.ok(actionResult.success && actionResult.data);
 
@@ -283,7 +272,7 @@ describe('Application Action Service', () => {
 		});
 
 		it('should get all actions requested by application id', async () => {
-			const actionResult = await testActionRepo.listActions({ application_id });
+			const actionResult = await mockActionRepo.listActions({ application_id });
 
 			assert.ok(actionResult.success && actionResult.data);
 
@@ -300,7 +289,7 @@ describe('Application Action Service', () => {
 					column: 'id',
 				},
 			];
-			const actionResult = await testActionRepo.listActions({ application_id, sort });
+			const actionResult = await mockActionRepo.listActions({ application_id, sort });
 
 			assert.ok(actionResult.success && actionResult.data);
 
@@ -322,7 +311,7 @@ describe('Application Action Service', () => {
 					column: 'created_at',
 				},
 			];
-			const actionResult = await testActionRepo.listActions({ application_id, sort });
+			const actionResult = await mockActionRepo.listActions({ application_id, sort });
 
 			assert.ok(actionResult.success && actionResult.data);
 
