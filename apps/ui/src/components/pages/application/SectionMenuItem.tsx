@@ -49,7 +49,10 @@ const SectionMenuItem = ({
 		if (label === SectionRoutes.INTRO) {
 			// do not display intro icon
 			return;
-		} else if (isCurrentSection && isEditMode && !isSectionValid) {
+		} else if (label === SectionRoutes.COLLABORATORS)
+			// Collaborators is an optional field, so it will always be checkmarked
+			return <CheckCircleOutlined />;
+		else if (isCurrentSection && isEditMode && !isSectionValid) {
 			// do not display icon if on currentpage
 			return;
 		} else if (!isEditMode) {

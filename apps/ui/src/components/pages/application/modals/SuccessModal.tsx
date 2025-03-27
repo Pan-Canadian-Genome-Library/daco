@@ -17,11 +17,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { Button, Flex, Modal, Typography } from 'antd';
+
+const { Title } = Typography;
+
+interface SuccessModalProps {
+	isOpen: boolean;
+	okText: string;
+	onOk: () => void;
+	successText: string;
+}
+const SuccessModal = ({ isOpen, onOk, successText, okText }: SuccessModalProps) => {
+	return (
+		<Modal
+			width={'100%'}
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			open={isOpen}
+			onOk={onOk}
+			footer={[]}
+			destroyOnClose
+		>
+			<Flex justify="center" align="center" vertical>
+				<Title level={3} aria-level={1}>
+					{successText}
+				</Title>
+				<Button type="primary" onClick={onOk}>
+					{okText}
+				</Button>
+			</Flex>
+		</Modal>
+	);
+};
+
+export default SuccessModal;

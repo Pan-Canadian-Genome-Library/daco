@@ -668,6 +668,89 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/RequestValidationError'
+  /applications/submit:
+    post:
+      summary: Submit an application
+      description: Retrieves the application by ID, verifies the user and role, and submits it.
+      tags:
+        - Applications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/SubmitApplicationRequest'
+      responses:
+        '200':
+          description: Application submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
+        '400':
+          description: Invalid request or application cannot be submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+  /applications/{applicationId}/revoke:
+    post:
+      tags:
+        - Applications
+      summary: Revoke an approved application
+      description: |
+        Allows revoking an application that is in the `APPROVED` state. Once revoked, the application cannot be reopened or changed.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application to revoke.
+      responses:
+        '200':
+          description: Application successfully revoked.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applications'
+        '400':
+          description: |
+            Invalid request - the application is not in the `APPROVED` state, or the application ID is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '409':
+          description: Conflict - the application is already revoked or in an invalid state for revocation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server error - unable to process revocation request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
 
   /applications/request-revisions:
     post:
@@ -718,6 +801,8 @@ paths:
       consumes:
         - multipart/form-data
       requestBody:
+        description: |
+          Files must fit a certain set of properties to be accepted by our server. The file cannot be more than `5mb`, has to be of type `'pdf' 'doc' 'docx' ` and only `one` file can be uploaded.
         content:
           multipart/form-data:
             schema:
@@ -747,11 +832,12 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+
   /file/{fileId}:
     delete:
       tags:
         - File
-      summary: Delete Upload By file id
+      summary: Delete uploaded by file id
       parameters:
         - in: path
           name: fileId
@@ -832,6 +918,52 @@ paths:
                 $ref: '#/components/responses/ClientErrors'
         '500':
           description: Server error - unable to process closure request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+  /applications/{applicationId}/revisions:
+    get:
+      tags:
+        - Revisions
+      summary: Get all revisions for a specific application
+      description: Fetches all revisions associated with a given application ID.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application to fetch revisions for.
+      responses:
+        '200':
+          description: Revisions fetched successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Revisions fetched successfully.'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RevisionDetails'
+        '400':
+          description: Invalid request - applicationId is missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: No revisions found for the given applicationId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Internal server error while fetching revisions.
           content:
             application/json:
               schema:
@@ -1141,6 +1273,82 @@ components:
           format: date-time
           description: The time the applicant signed at.
           nullable: true
+    RevisionDetails:
+      type: object
+      description: Details of a specific revision request associated with an application.
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the revision request, generated automatically.
+          example: 1
+        applicationId:
+          type: integer
+          description: The ID of the application this revision request pertains to.
+          example: 12345
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the revision request was created, defaults to the current time.
+          example: '2025-03-20T10:00:00Z'
+        comments:
+          type: string
+          description: General comments related to the revision request.
+          nullable: true
+          example: 'Please review the updated ethics section.'
+        applicantNotes:
+          type: string
+          description: Notes specific to the applicant information section.
+          nullable: true
+          example: 'Applicant needs to clarify funding details.'
+        applicantApproved:
+          type: boolean
+          description: Indicates whether the applicant information section is approved.
+          example: true
+        institutionRepApproved:
+          type: boolean
+          description: Indicates whether the institutional representative section is approved.
+          example: false
+        institutionRepNotes:
+          type: string
+          description: Notes specific to the institutional representative section.
+          nullable: true
+          example: 'Missing signature from institutional rep.'
+        collaboratorsApproved:
+          type: boolean
+          description: Indicates whether the collaborators section is approved.
+          example: true
+        collaboratorsNotes:
+          type: string
+          description: Notes specific to the collaborators section.
+          nullable: true
+          example: 'All collaborator details verified.'
+        projectApproved:
+          type: boolean
+          description: Indicates whether the project information section is approved.
+          example: true
+        projectNotes:
+          type: string
+          description: Notes specific to the project information section.
+          nullable: true
+          example: 'Project methodology needs more detail.'
+        requestedStudiesApproved:
+          type: boolean
+          description: Indicates whether the requested studies section is approved.
+          example: true
+        requestedStudiesNotes:
+          type: string
+          description: Notes specific to the requested studies section.
+          nullable: true
+          example: 'Studies align with project goals.'
+      required:
+        - id
+        - applicationId
+        - createdAt
+        - applicantApproved
+        - institutionRepApproved
+        - collaboratorsApproved
+        - projectApproved
+        - requestedStudiesApproved
 
   requests:
     ApplicationCreation:
@@ -1183,6 +1391,23 @@ components:
         applicationId:
           description: The id of the Application
           type: number
+    SubmitApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          description: The id of the Application
+        role:
+          type: string
+          description: The role of the user submitting the application
+        signature:
+          type: string
+          format: base64
+          description: The digital signature of the user
+      required:
+        - userId
+        - role
+        - signature
 
     SignatureSign:
       type: object

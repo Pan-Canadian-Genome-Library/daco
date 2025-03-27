@@ -257,6 +257,39 @@ export const submitRevision = async ({ applicationId }: { applicationId: number 
 	}
 };
 
+export const revokeApplication = async (applicationId: number): AsyncResult<ApplicationRecord> => {
+	try {
+		// Fetch application
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		const appStateManager = new ApplicationStateManager(application);
+
+		const revokeApplicationResult = await appStateManager.revokeApproval();
+
+		if (!revokeApplicationResult.success) {
+			return failure(revokeApplicationResult.message || 'Failed to revove application', 'StateTransitionError');
+		}
+
+		const update = { state: appStateManager.state, approved_at: new Date() };
+		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		return updatedResult;
+	} catch (error) {
+		const message = `Unable to revoke application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
+
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
 	role,
@@ -353,6 +386,47 @@ export const requestApplicationRevisionsByRep = async ({
 	}
 };
 
+export const submitApplication = async ({ applicationId }: { applicationId: number }) => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		// Fetch the application
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		// Ensure the application can be submitted
+		const appStateManager = new ApplicationStateManager(application);
+
+		// Transition application to the next state (e.g., under review)
+		let submissionResult;
+
+		if (appStateManager.state === ApplicationStates.DRAFT) {
+			submissionResult = await appStateManager.submitDraft();
+		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+			submissionResult = await appStateManager.approveRepReview();
+		} else {
+			submissionResult = await appStateManager.submitRepRevision();
+		}
+
+		if (!submissionResult.success) {
+			return failure(submissionResult.message || 'Failed to submit application.', 'StateTransitionError');
+		}
+
+		return submissionResult;
+	} catch (error) {
+		const message = `Unable to submit application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
+
 export const closeApplication = async ({
 	applicationId,
 	requesterId,
@@ -412,6 +486,32 @@ export const closeApplication = async ({
 		return closeResult;
 	} catch (error) {
 		const message = `Unable to close application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
+
+export const getRevisions = async ({ applicationId }: { applicationId: number }): AsyncResult<any> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const revisionsResult = await service.getRevisions({ applicationId });
+
+		if (!revisionsResult.success) {
+			return revisionsResult;
+		}
+
+		const revisions = revisionsResult.data;
+
+		if (!revisions) {
+			return failure('No revisions found for the application.', 'NoRevisionsFound');
+		}
+
+		return success(revisions);
+	} catch (error) {
+		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
 		logger.error(message);
 		logger.error(error);
 		return failure(message, error);

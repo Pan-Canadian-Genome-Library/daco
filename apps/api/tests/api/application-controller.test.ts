@@ -28,8 +28,11 @@ import {
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
+	getRevisions,
 	rejectApplication,
 	requestApplicationRevisionsByDac,
+	revokeApplication,
+	submitApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
@@ -45,7 +48,7 @@ import {
 	PG_USER,
 	testApplicationId,
 	testUserId as user_id,
-} from '../testUtils.js';
+} from '../utils/testUtils.ts';
 
 // Sample revision request data
 const revisionRequestData: RevisionRequestModel = {
@@ -272,6 +275,63 @@ describe('Application API', () => {
 		});
 	});
 
+	describe('Revoke Application', () => {
+		it('should successfully revoke an application in APPROVED state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({
+				id,
+				update: { state: ApplicationStates.APPROVED },
+			});
+
+			const result = await revokeApplication(id);
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.REVOKED);
+
+			// Verify the application state in the database
+			const revokedApplication = await testApplicationRepo.getApplicationById({ id });
+			assert.ok(revokedApplication.success);
+			assert.strictEqual(revokedApplication.data.state, ApplicationStates.REVOKED);
+		});
+
+		it('should fail to revoke an application not in APPROVED state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({
+				id,
+				update: { state: ApplicationStates.DRAFT },
+			});
+
+			const result = await revokeApplication(id);
+
+			// Verify the revocation failed
+			assert.ok(!result.success);
+			assert.strictEqual(result.errors, 'StateTransitionError');
+			assert.strictEqual(result.message, 'Cannot revoke application with state DRAFT');
+		});
+
+		it('should fail if application does not exist', async () => {
+			const nonExistentId = 9999;
+
+			const result = await revokeApplication(nonExistentId);
+
+			// Assert: Verify the revocation failed
+			assert.ok(!result.success);
+			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+		});
+	});
+
 	describe('Close Application', () => {
 		it('should allow applicant to close an application in DRAFT state', async () => {
 			await testApplicationRepo.findOneAndUpdate({
@@ -417,6 +477,80 @@ describe('Application API', () => {
 
 			// Assert: Should return an error message
 			assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
+		});
+	});
+
+	describe('getRevisions', () => {
+		it('should fetch revisions for a valid applicationId where revisions exist', async () => {
+			// Arrange: Add revisions to the database for a specific application
+			const applicationId = testApplicationId;
+			await testApplicationRepo.createRevisionRequest({
+				applicationId,
+				revisionData: {
+					application_id: applicationId,
+					comments: 'Initial revision',
+					applicant_approved: false,
+					institution_rep_approved: false,
+					collaborators_approved: false,
+					project_approved: false,
+					requested_studies_approved: false,
+					created_at: new Date(),
+				},
+			});
+
+			// Act: Call the getRevisions method
+			const result = await getRevisions({ applicationId });
+
+			// Assert: Verify that revisions are fetched successfully
+			assert.ok(result.success, 'Expected revisions to be fetched successfully');
+			assert.ok(Array.isArray(result.data), 'Expected revisions to be an array');
+			assert.strictEqual(result.data.length, 1, 'Expected one revision to be returned');
+		});
+	});
+
+	describe('Submit Application', () => {
+		it('should successfully submit an application in DRAFT state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DRAFT } });
+
+			// Act
+			const result = await submitApplication({ applicationId: id });
+
+			// Assert
+			assert.ok(result.success);
+			assert.ok(result.data);
+
+			// Verify state transition
+			const updatedApplication = await testApplicationRepo.getApplicationById({ id });
+			assert.ok(updatedApplication.success);
+		});
+
+		it('should fail to submit an application not in DRAFT state', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id } = applicationRecordsResult.data.applications[0];
+			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
+
+			// Act
+			const result = await submitApplication({ applicationId: id });
+
+			// Assert
+			assert.ok(!result.success);
+			assert.strictEqual(result.errors, 'StateTransitionError');
+			assert.strictEqual(
+				result.message,
+				'Cannot perform action submit_rep_revisions on application with state DAC_REVIEW',
+			);
 		});
 	});
 
