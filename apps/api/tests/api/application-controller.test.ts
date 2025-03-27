@@ -318,7 +318,7 @@ describe('Application API', () => {
 			// Verify the revocation failed
 			assert.ok(!result.success);
 			assert.strictEqual(result.errors, 'StateTransitionError');
-			assert.strictEqual(result.message, 'Application should be in APPROVED status');
+			assert.strictEqual(result.message, 'Cannot revoke application with state DRAFT');
 		});
 
 		it('should fail if application does not exist', async () => {
@@ -547,7 +547,10 @@ describe('Application API', () => {
 			// Assert
 			assert.ok(!result.success);
 			assert.strictEqual(result.errors, 'StateTransitionError');
-			assert.match(result.message || '', /Application cannot be submitted from state/);
+			assert.strictEqual(
+				result.message,
+				'Cannot perform action submit_rep_revisions on application with state DAC_REVIEW',
+			);
 		});
 	});
 
