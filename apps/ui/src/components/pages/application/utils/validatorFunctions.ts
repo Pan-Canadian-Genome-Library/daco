@@ -18,7 +18,7 @@
  */
 
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import { agreementsSchema, applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
 	return applicantInformationSchema.safeParse({
@@ -57,5 +57,11 @@ export const ValidatorInstitution = (fields: ApplicationContentsResponse): boole
 		institutionalMiddleName: fields?.institutionalRepMiddleName,
 		institutionalSuffix: fields?.institutionalRepSuffix,
 		institutionBuilding: fields?.institutionBuilding,
+	}).success;
+};
+
+export const ValidatorAgreements = (fields: ApplicationContentsResponse): boolean => {
+	return agreementsSchema.safeParse({
+		acceptedAgreements: fields.acceptedAgreements,
 	}).success;
 };

@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { agreementsSchema, type AgreementsSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { type SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -30,7 +30,8 @@ import CheckboxGroup, { type CheckboxGroupOptions } from '@/components/pages/app
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { type ApplicationOutletContext } from '@/global/types';
+import { Nullable, type ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
@@ -39,17 +40,38 @@ const rule = createSchemaFieldRule(agreementsSchema);
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-
-	const { handleSubmit, control } = useForm<AgreementsSchemaType>({
+	const { state, dispatch } = useApplicationContext();
+	const {
+		control,
+		getValues,
+		formState: { isDirty },
+	} = useForm<Nullable<AgreementsSchemaType>>({
+		defaultValues: {
+			acceptedAgreements: state.fields.acceptedAgreements,
+		},
 		resolver: zodResolver(agreementsSchema),
 	});
 
-	const onSubmit: SubmitHandler<AgreementsSchemaType> = (data) => {
-		const submissionData = data.agreements.reduce(
-			(accumulator, currentAgreement) => ({ ...accumulator, [currentAgreement]: true }),
-			{},
-		);
-		console.log(submissionData);
+	const onSubmit = () => {
+		const acceptedAgreements = getValues('acceptedAgreements');
+
+		if (!acceptedAgreements) {
+			return;
+		}
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				fields: {
+					...state.fields,
+					acceptedAgreements,
+				},
+				formState: {
+					...state.formState,
+					isDirty,
+				},
+			},
+		});
 	};
 
 	const agreementOptions: CheckboxGroupOptions[] = Object.keys(ApplicationAgreements).map((agreement, i) => {
@@ -61,7 +83,14 @@ const AccessAgreement = () => {
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle
 					textAbidesNewLines={true}
 					title={translate('data-access-section.title')}
@@ -87,7 +116,7 @@ const AccessAgreement = () => {
 							<CheckboxGroup
 								control={control}
 								rule={rule}
-								name="agreements"
+								name="acceptedAgreements"
 								disabled={!isEditMode}
 								label={translate('data-access-section.section3.description')}
 								options={agreementOptions}

@@ -109,7 +109,7 @@ export const requestedStudySchema = z.object({
 export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
 
 export const agreementsSchema = z.object({
-	agreements: z.array(z.string()).superRefine((allAgreements, context) => {
+	acceptedAgreements: z.array(z.string()).superRefine((allAgreements, context) => {
 		if (allAgreements.length > 9) {
 			context.addIssue({
 				code: z.ZodIssueCode.too_big,

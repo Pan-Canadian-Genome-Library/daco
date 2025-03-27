@@ -17,8 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ValidatorApplicant, ValidatorInstitution } from '@/components/pages/application/utils/validatorFunctions';
-import { isApplicantKey, isInstitutionalKey } from '@/components/pages/application/utils/validatorKeys';
+import {
+	ValidatorAgreements,
+	ValidatorApplicant,
+	ValidatorInstitution,
+} from '@/components/pages/application/utils/validatorFunctions';
+import { isAgreementKey, isApplicantKey, isInstitutionalKey } from '@/components/pages/application/utils/validatorKeys';
 import { SectionRoutes } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
@@ -63,6 +67,11 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 				...sectionTouched,
 				institutional: true,
 			};
+		} else if (isAgreementKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				agreement: true,
+			};
 		}
 	});
 
@@ -85,7 +94,7 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse): Verify
 		[SectionRoutes.PROJECT]: false,
 		[SectionRoutes.STUDY]: false,
 		[SectionRoutes.ETHICS]: false,
-		[SectionRoutes.AGREEMENT]: false,
+		[SectionRoutes.AGREEMENT]: fields ? ValidatorAgreements(fields) : false,
 		[SectionRoutes.APPENDICES]: false,
 		[SectionRoutes.SIGN]: false,
 	};

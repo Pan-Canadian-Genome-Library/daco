@@ -148,6 +148,10 @@ export type ProjectDTO = {
 	projectPublicationUrls?: string[] | null;
 };
 
+export type AgreementDTO = {
+	acceptedAgreements?: string[] | null;
+};
+
 export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
@@ -198,7 +202,8 @@ export type ApplicationContentsResponse = {
 	InstitutionDTO &
 	InstitutionalRepDTO &
 	ProjectDTO &
-	RequestedStudiesDTO;
+	RequestedStudiesDTO &
+	AgreementDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;
@@ -336,3 +341,17 @@ export interface SignatureDTO {
 	institutionalRepSignature?: string | null;
 	institutionalRepSignedAt?: Date | null;
 }
+
+export const agreementEnum = [
+	'dac_agreement_software_updates',
+	'dac_agreement_non_disclosure',
+	'dac_agreement_monitor_individual_access',
+	'dac_agreement_destroy_data',
+	'dac_agreement_familiarize_restrictions',
+	'dac_agreement_provide_it_policy',
+	'dac_agreement_notify_unauthorized_access',
+	'dac_agreement_certify_application',
+	'dac_agreement_read_and_agreed',
+] as const;
+
+export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as const;

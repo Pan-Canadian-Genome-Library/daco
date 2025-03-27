@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { agreementEnum } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
@@ -54,6 +55,7 @@ export const updateEditApplicationRequestSchema = z
 		projectAims: z.string(),
 		projectMethodology: z.string(),
 		projectSummary: z.string(),
+		acceptedAgreements: z.array(z.enum(agreementEnum)),
 	})
 	.partial();
 
