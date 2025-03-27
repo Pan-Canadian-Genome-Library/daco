@@ -281,7 +281,9 @@ export const submitRevision = async ({
 	}
 };
 
-export const revokeApplication = async (applicationId: number): AsyncResult<ApplicationRecord> => {
+export const revokeApplication = async (
+	applicationId: number,
+): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -299,7 +301,7 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 		const revokeApplicationResult = await appStateManager.revokeApproval();
 
 		if (!revokeApplicationResult.success) {
-			return failure(revokeApplicationResult.message || 'Failed to revove application', 'StateTransitionError');
+			return revokeApplicationResult;
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
@@ -308,12 +310,10 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 		return updatedResult;
 	} catch (error) {
 		const message = `Unable to revoke application with id: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };
-
 
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
