@@ -16,6 +16,7 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 import {
 	approveApplication,
 	closeApplication,
@@ -27,6 +28,7 @@ import {
 	getApplicationStateTotals,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByInstitutionalRep,
+	revokeApplication,
 	submitApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
@@ -496,6 +498,88 @@ applicationRouter.post(
 				if (result.success) {
 					response.status(200).send({
 						message: 'Application review submitted successfully.',
+						data: result.data,
+					});
+					return;
+				}
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).send({
+					error: 'SYSTEM_ERROR',
+					message: 'Unexpected error.',
+				});
+			}
+		},
+	),
+);
+
+applicationRouter.post(
+	'/:applicationId/revoke',
+	authMiddleware(),
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (
+			request,
+			response: ResponseWithData<
+				{ message: string; data: ApplicationRecord },
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			const applicationId = Number(request.params.applicationId);
+
+			if (!isPositiveInteger(applicationId)) {
+				response
+					.status(400)
+					.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
+				return;
+			}
+
+			const { user } = request.session;
+			const { userId } = user || {};
+
+			if (!userId) {
+				response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
+			}
+
+			try {
+				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
+				if (!userMayEditResult.success) {
+					switch (userMayEditResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'FORBIDDEN': {
+							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+					}
+				}
+
+				const result = await revokeApplication(applicationId);
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Application revoked successfully.',
 						data: result.data,
 					});
 					return;

@@ -281,6 +281,40 @@ export const submitRevision = async ({
 	}
 };
 
+export const revokeApplication = async (applicationId: number): AsyncResult<ApplicationRecord> => {
+	try {
+		// Fetch application
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+
+		const appStateManager = new ApplicationStateManager(application);
+
+		const revokeApplicationResult = await appStateManager.revokeApproval();
+
+		if (!revokeApplicationResult.success) {
+			return failure(revokeApplicationResult.message || 'Failed to revove application', 'StateTransitionError');
+		}
+
+		const update = { state: appStateManager.state, approved_at: new Date() };
+		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		return updatedResult;
+	} catch (error) {
+		const message = `Unable to revoke application with id: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
+
+
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
 	revisionData,
