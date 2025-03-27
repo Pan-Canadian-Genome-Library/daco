@@ -49,7 +49,8 @@ function getAuthConfig() {
 		throw new EnvironmentConfigError(`db`, parseResult.error);
 	}
 
-	return { enabled, ...parseResult.data, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
+	return { ...parseResult.data, enabled, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
 }
 
 export const authConfig = getAuthConfig();
+export type AuthConfig = typeof authConfig & { enabled: true };

@@ -21,7 +21,7 @@ import { and, eq } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
-import logger from '@/logger.js';
+import BaseLogger from '@/logger.js';
 import { applicationActionsQuery } from '@/service/utils.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import {
@@ -37,6 +37,8 @@ import {
 	type OrderBy,
 	type PostgresTransaction,
 } from './types.js';
+
+const logger = BaseLogger.forModule('applicationActionService');
 
 /**
  * ApplicationActionService provides methods for ApplicationActions DB access

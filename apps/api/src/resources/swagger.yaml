@@ -634,14 +634,14 @@ paths:
     delete:
       tags:
         - Collaborators
-      summary: Create new Collaborators for an application.
+      summary: Remove collaborator from an application.
       parameters:
         - in: path
           name: applicationId
           schema:
             type: integer
           required: true
-          description: Numeric ID of the relevant application to get
+          description: Numeric ID of the relevant application that the collaborator will be removed form.
         - in: path
           name: collaboratorId
           schema:

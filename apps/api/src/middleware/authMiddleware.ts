@@ -42,26 +42,26 @@ export type AuthMiddlewareConfig = {
  * router.get(
  * 	'/path',
  * 	authMiddleware({requiredRoles: ['DAC_MEMBER']}),
- * 	(req, res) => {
+ * 	(request, response) => {
  * 		// Only DAC_MEMBERS will get here.
  * 	}
  * )
  */
 export const authMiddleware =
 	(config: AuthMiddlewareConfig = {}): RequestHandler =>
-	(req, res, next) => {
+	(request, response, next) => {
 		const { requiredRoles } = config;
-		const { user } = req.session;
+		const { user } = request.session;
 
 		if (!user) {
-			res.status(401).send();
+			response.status(401).send();
 			return;
 		}
 
 		if (requiredRoles) {
-			const role = getUserRole(req.session);
+			const role = getUserRole(request.session);
 			if (!requiredRoles.includes(role)) {
-				res.status(403).send();
+				response.status(403).send();
 				return;
 			}
 		}

@@ -25,12 +25,12 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import {
 	closeApplication,
 	createApplication,
+	dacRejectApplication,
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
-	rejectApplication,
-	submitApplication,
 	requestApplicationRevisionsByDac,
+	submitApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
@@ -189,9 +189,8 @@ describe('Application API', () => {
 
 			assert.ok(!result.success);
 
-			const error_message = String(result.errors);
-
-			assert.strictEqual(error_message, 'Error: Application record is undefined');
+			assert.ok(!!result.message, 'No error message provided.');
+			assert.equal(result.error, 'NOT_FOUND');
 		});
 	});
 
@@ -205,7 +204,7 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const result = await getApplicationStateTotals({ userId: user_id });
+			const result = await getApplicationStateTotals();
 
 			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
 				(apps) => apps.state === 'DRAFT',
@@ -244,7 +243,7 @@ describe('Application API', () => {
 			const { id } = applicationRecordsResult.data.applications[0];
 			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
 
-			const result = await rejectApplication({ applicationId: id });
+			const result = await dacRejectApplication({ applicationId: id });
 			assert.ok(result.success);
 
 			const rejectedApplication = await getApplicationById({ applicationId: id });
@@ -269,7 +268,7 @@ describe('Application API', () => {
 			const result = await submitRevision({ applicationId: 9999 });
 
 			assert.ok(!result.success);
-			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+			assert.strictEqual(result.error, 'NOT_FOUND');
 		});
 	});
 
@@ -279,7 +278,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DRAFT },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+			const result = await closeApplication({ applicationId: testApplicationId });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -290,7 +289,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+			const result = await closeApplication({ applicationId: testApplicationId });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -301,7 +300,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+			const result = await closeApplication({ applicationId: testApplicationId });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -312,11 +311,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
 			});
-			const result = await closeApplication({
-				applicationId: testApplicationId,
-				requesterId: 'dac_user',
-				isDacMember: true,
-			});
+			const result = await closeApplication({ applicationId: testApplicationId });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -327,7 +322,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DRAFT },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId, requesterId: 'other_user' });
+			const result = await closeApplication({ applicationId: testApplicationId });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.message, 'Current user is not authorized to close the application');
@@ -338,7 +333,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.CLOSED },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+			const result = await closeApplication({ applicationId: testApplicationId });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.message, 'Application is already closed.');
@@ -349,17 +344,17 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.APPROVED },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId, requesterId: user_id });
+			const result = await closeApplication({ applicationId: testApplicationId });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.message, `Cannot close application in state ${ApplicationStates.APPROVED}.`);
 		});
 
 		it('should fail for non-existent application', async () => {
-			const result = await closeApplication({ applicationId: 9999, requesterId: user_id });
+			const result = await closeApplication({ applicationId: 9999 });
 
 			assert.ok(!result.success);
-			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+			assert.strictEqual(result.error, 'NOT_FOUND');
 		});
 	});
 
@@ -371,12 +366,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
-			const role = 'DAC';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
-				role,
 				revisionData: revisionRequestData,
 			});
 
@@ -391,12 +384,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
-			const role = 'DAC';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
-				role,
 				revisionData: revisionRequestData,
 			});
 
@@ -407,12 +398,10 @@ describe('Application API', () => {
 		it('should handle errors gracefully', async () => {
 			// Arrange: Force an error
 			const invalidApplicationId = -1;
-			const role = 'DAC';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: invalidApplicationId,
-				role,
 				revisionData: revisionRequestData,
 			});
 
@@ -459,8 +448,7 @@ describe('Application API', () => {
 
 			// Assert
 			assert.ok(!result.success);
-			assert.strictEqual(result.errors, 'SubmissionError');
-			assert.match(result.message || '', /Application cannot be submitted from state/);
+			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 		});
 	});
 

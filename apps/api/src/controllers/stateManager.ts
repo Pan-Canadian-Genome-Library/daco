@@ -24,9 +24,9 @@ import { type AddActionMethods, type ApplicationRecord } from '@/service/types.j
 import { type AsyncResult, failure, type Result, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
-import baseLogger from '../logger.js';
+import BaseLogger from '../logger.js';
 import { validateContent } from './validation.js';
-const logger = baseLogger.forModule('stateManager');
+const logger = BaseLogger.forModule('stateManager');
 
 const {
 	DRAFT,
@@ -255,7 +255,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Close
-	async closeDraft() {
+	async closeDraft(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(close);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(close, 'close');
@@ -264,21 +264,21 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async closeRepReview() {
+	async closeRepReview(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(close);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(close, 'close');
 		} else {
-			return failure(`Cannot close application with state ${this.getState()}`);
+			return failure('INVALID_STATE_TRANSITION', `Cannot close application with state ${this.getState()}`);
 		}
 	}
 
-	async closeDacReview() {
+	async closeDacReview(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(close);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(close, 'close');
 		} else {
-			return failure(`Cannot close application with state ${this.getState()}`);
+			return transitionResult;
 		}
 	}
 
@@ -287,7 +287,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Approve
-	async approveRepReview() {
+	async approveRepReview(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(rep_approve_review);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(rep_approve_review, 'repApproved');
@@ -296,7 +296,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async approveDacReview() {
+	async approveDacReview(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(dac_approve_review);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(dac_approve_review, 'dacApproved');
@@ -310,7 +310,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Reject
-	async rejectDacReview() {
+	async rejectDacReview(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(dac_reject);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(dac_reject, 'dacRejected');
@@ -324,7 +324,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Revoke
-	async revokeApproval() {
+	async revokeApproval(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(revoked);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(revoked, 'revoke');
@@ -338,7 +338,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Withdraw
-	async withdrawRepReview() {
+	async withdrawRepReview(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(rep_review_withdraw);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(rep_review_withdraw, 'withdraw');
@@ -347,7 +347,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async withdrawDacReview() {
+	async withdrawDacReview(): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(dac_review_withdraw);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(dac_review_withdraw, 'withdraw');

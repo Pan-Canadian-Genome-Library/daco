@@ -27,8 +27,10 @@ import {
 	deleteSignatureQuerySchema,
 	editSignatureRequestSchema,
 	getSignatureParamsSchema,
+	isPositiveInteger,
+	type EditSignatureResponse,
 } from '@pcgl-daco/validation';
-import express, { type Request, type Response } from 'express';
+import express, { type Request } from 'express';
 
 import {
 	deleteApplicationSignature,
@@ -36,129 +38,178 @@ import {
 	updateApplicationSignature,
 } from '@/controllers/signatureController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
+import type { SignatureDTO } from '@pcgl-daco/data-model';
+import { getApplicationById } from '../controllers/applicationController.ts';
+import { authMiddleware } from '../middleware/authMiddleware.ts';
+import { getUserRole } from '../service/authService.ts';
+import type { ResponseWithData } from './types.ts';
 
 const signatureRouter = express.Router();
 
-signatureRouter.get(
-	'/:applicationId',
-	withParamsSchemaValidation(
-		getSignatureParamsSchema,
-		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId } = request.params;
-
-			if (!applicationId) {
-				response.status(400).send({ message: 'Application ID MUST be a positive number greater than or equal to 1.' });
-				return;
-			}
-
-			const result = await getApplicationSignature({ applicationId: Number(applicationId) });
-
-			if (result.success) {
-				response.status(200).send(result.data);
-				return;
-			}
-
-			switch (String(result.errors)) {
-				case 'Error: Application record is undefined':
-					response.status(404);
-					break;
-				case 'Error: Application ID MUST be a positive number greater than or equal to 1.':
-					response.status(400);
-					break;
-				default:
-					response.status(500);
-					break;
-			}
-
-			response.send({ message: result.message, errors: String(result.errors) });
-		},
-	),
-);
-
 /**
- * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ * Get the Signature for an application by application ID
  */
 signatureRouter.get(
 	'/:applicationId',
+	authMiddleware(),
 	withParamsSchemaValidation(
 		getSignatureParamsSchema,
 		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId } = request.params;
+		async (
+			request,
+			response: ResponseWithData<
+				SignatureDTO,
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			try {
+				const applicationId = Number(request.params.applicationId);
 
-			if (!applicationId) {
-				response.status(400).send({ message: 'Application ID MUST be a positive number greater than or equal to 1.' });
+				if (!isPositiveInteger(applicationId)) {
+					response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+					return;
+				}
+
+				const { userId } = request.session.user || {};
+				if (!userId) {
+					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
+				const userRole = getUserRole(request.session);
+
+				const applicationResult = await getApplicationById({ applicationId });
+				if (!applicationResult.success) {
+					switch (applicationResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
+						}
+					}
+				}
+
+				const isApplicationUser = applicationResult.data.userId === userId;
+				const isDacMember = userRole === 'DAC_MEMBER';
+
+				if (!(isApplicationUser || isDacMember)) {
+					response
+						.status(403)
+						.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
+					return;
+				}
+
+				const result = await getApplicationSignature({ applicationId: Number(applicationId) });
+
+				if (result.success) {
+					response.status(200).send(result.data);
+					return;
+				}
+
+				switch (result.error) {
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 				return;
 			}
-
-			const result = await getApplicationSignature({ applicationId: Number(applicationId) });
-
-			if (result.success) {
-				response.status(200).send(result.data);
-				return;
-			}
-
-			switch (String(result.errors)) {
-				case 'Error: Application record is undefined':
-					response.status(404);
-					break;
-				case 'Error: Application ID MUST be a positive number greater than or equal to 1.':
-					response.status(400);
-					break;
-				default:
-					response.status(500);
-					break;
-			}
-
-			response.send({ message: result.message, errors: String(result.errors) });
 		},
 	),
 );
+
 /**
- * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
+ * Add a signature to an application for a user.
+ *
+ * The body of the request will indicate if the signature is from the applicant or the institutional representative.
+ *
+ * To sign an applciation, the user must be the author of the application, or be the institional rep assinged to the application.
  */
 signatureRouter.post(
 	'/sign',
-	withBodySchemaValidation(editSignatureRequestSchema, apiZodErrorMapping, async (req, res) => {
-		const data = req.body;
-		const { applicationId, signature, signee } = data;
+	authMiddleware(),
+	withBodySchemaValidation(
+		editSignatureRequestSchema,
+		apiZodErrorMapping,
+		async (
+			request,
+			response: ResponseWithData<
+				EditSignatureResponse,
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			try {
+				const data = request.body;
+				const { applicationId, signature, signee } = data;
 
-		const result = await updateApplicationSignature({
-			applicationId,
-			signature,
-			signee,
-		});
+				const { userId } = request.session.user || {};
+				if (!userId) {
+					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
+				const userRole = getUserRole(request.session);
 
-		if (result.success) {
-			if (signee === 'APPLICANT') {
-				res.send({
-					id: result.data.application_id,
-					signature: result.data.applicant_signature,
-					signedAt: result.data.applicant_signed_at,
+				const applicationResult = await getApplicationById({ applicationId });
+				if (!applicationResult.success) {
+					switch (applicationResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
+						}
+					}
+				}
+
+				const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
+				// TODO: Identify if the user role is institutional rep and is the rep for this application
+				const isApplicationInstitutionalRep =
+					signee === 'INSTITUTIONAL_REP' && userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+
+				if (!(isApplicationUser || isApplicationInstitutionalRep)) {
+					response
+						.status(403)
+						.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
+					return;
+				}
+
+				const result = await updateApplicationSignature({
+					applicationId,
+					signature,
+					signee,
 				});
+
+				if (result.success) {
+					response.send(result.data);
+					return;
+				}
+
+				switch (result.error) {
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 				return;
 			}
-
-			res.send({
-				id: result.data.application_id,
-				signature: result.data.institutional_rep_signature,
-				signedAt: result.data.institutional_rep_signed_at,
-			});
-
-			return;
-		}
-
-		if (String(result.errors) === 'Error: Application contents record is undefined') {
-			res.status(404);
-		} else {
-			res.status(500);
-		}
-
-		res.send({ message: result.message, errors: String(result.errors) });
-	}),
+		},
+	),
 );
 
 /**
@@ -167,41 +218,98 @@ signatureRouter.post(
  */
 signatureRouter.delete(
 	'/:applicationId',
+	authMiddleware(),
 	withParamsSchemaValidation(
 		deleteSignatureParamsSchema,
 		apiZodErrorMapping,
 		withQuerySchemaValidation(
 			deleteSignatureQuerySchema,
 			apiZodErrorMapping,
-			async (request: Request, response: Response) => {
-				const { applicationId } = request.params;
-				const { signee } = request.query;
+			async (
+				request: Request,
+				response: ResponseWithData<void, ['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']>,
+			) => {
+				try {
+					// Validate Parameter
+					const applicationId = Number(request.params.applicationId);
 
-				if (!applicationId || !signee || (signee !== 'APPLICANT' && signee !== 'INSTITUTIONAL_REP')) {
-					response.status(400).send({ message: 'Missing Required Parameters.' });
+					if (!isPositiveInteger(applicationId)) {
+						response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+						return;
+					}
+
+					// Validate Query Params
+					const queryValidationResult = deleteSignatureQuerySchema.safeParse(request.query);
+					if (!queryValidationResult.success) {
+						response.status(400).send({
+							error: 'INVALID_REQUEST',
+							message: `5Signee parameter must be either 'APPLICANT' or 'INSTITUTIONAL_REP'.`,
+						});
+						return;
+					}
+					const { signee } = queryValidationResult.data;
+
+					// Get user from session and validate that they can act on this application
+					const { userId } = request.session.user || {};
+					if (!userId) {
+						response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+						return;
+					}
+					const userRole = getUserRole(request.session);
+
+					const applicationResult = await getApplicationById({ applicationId });
+					if (!applicationResult.success) {
+						switch (applicationResult.error) {
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+								return;
+							}
+						}
+					}
+
+					const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
+					// TODO: Identify if the user role is institutional rep and is the rep for this application
+					const isApplicationInstitutionalRep =
+						signee === 'INSTITUTIONAL_REP' && userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+
+					if (!(isApplicationUser || isApplicationInstitutionalRep)) {
+						response
+							.status(403)
+							.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
+						return;
+					}
+
+					// Perform deletion
+					const result = await deleteApplicationSignature({
+						applicationId: Number(applicationId),
+						signee: signee,
+					});
+
+					if (result.success) {
+						/**
+						 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
+						 */
+						response.status(204).send();
+						return;
+					}
+
+					switch (result.error) {
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+					}
+				} catch (error) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 					return;
-				}
-
-				const result = await deleteApplicationSignature({
-					applicationId: Number(applicationId),
-					signee: signee,
-				});
-
-				if (result.success) {
-					/**
-					 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
-					 */
-					response.status(204).send();
-					return;
-				}
-
-				if (
-					String(result.errors) === 'Error: Application contents record is undefined' ||
-					'Application record is undefined'
-				) {
-					response.status(404);
-				} else {
-					response.status(500);
 				}
 			},
 		),

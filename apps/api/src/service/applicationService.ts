@@ -23,7 +23,7 @@ import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
-import logger from '@/logger.js';
+import BaseLogger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import {
@@ -31,6 +31,7 @@ import {
 	type ApplicationListResponse,
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
+import { collaborators } from '../db/schemas/collaborators.ts';
 import {
 	type ApplicationContentModel,
 	type ApplicationContentUpdates,
@@ -44,6 +45,8 @@ import {
 	type RevisionRequestModel,
 	type RevisionRequestRecord,
 } from './types.js';
+
+const logger = BaseLogger.forModule('applicationService');
 
 /**
  * ApplicationService provides methods for Applications DB access
@@ -107,6 +110,7 @@ const applicationSvc = (db: PostgresDb) => ({
 	}: {
 		id: number;
 		update: ApplicationContentUpdates;
+		transaction?: PostgresTransaction;
 	}): AsyncResult<JoinedApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const dbTransaction = transaction ? transaction : db;
@@ -188,6 +192,44 @@ const applicationSvc = (db: PostgresDb) => ({
 		} catch (err) {
 			logger.error(`Error at getApplicationById with id: ${id}`, err);
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred retrieving the application from the database.');
+		}
+	},
+	/** @method getApplicationForCollaboratorId: Find a specific Application record that a collaborator belongs to */
+	getApplicationForCollaboratorId: async ({
+		collaboratorId,
+	}: {
+		collaboratorId: number;
+	}): AsyncResult<ApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			// TODO: These two queries can be combined into 1
+			// Fetch applicationId for the collaborator
+			const applicationIds = await db
+				.select({ application_id: collaborators.application_id })
+				.from(collaborators)
+				.where(eq(collaborators.id, collaboratorId));
+			if (applicationIds.length === 0) {
+				return failure('NOT_FOUND', 'Could not find an collaborator for the provided collaboratorId');
+			}
+
+			// Fetch the applciation by ID
+			const applicationRecords = await db
+				.select()
+				.from(applications)
+				.where(
+					inArray(
+						applications.id,
+						applicationIds.map((value) => value.application_id),
+					),
+				);
+
+			const application = applicationRecords[0];
+			if (!application) {
+				return failure('NOT_FOUND', 'Could not find the application that this collaborator belongs to.');
+			}
+			return success(application);
+		} catch (err) {
+			logger.error(`Error at getApplicationForCollaboratorId with id: ${collaboratorId}`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred fetching application data from the database.');
 		}
 	},
 	/** @method getApplicationWithContents: Find an Application record with Contents included */
@@ -370,7 +412,7 @@ const applicationSvc = (db: PostgresDb) => ({
 	}: {
 		applicationId: number;
 		revisionData: RevisionRequestModel;
-	}): AsyncResult<RevisionRequestRecord> => {
+	}): AsyncResult<RevisionRequestRecord, 'SYSTEM_ERROR'> => {
 		try {
 			// Using transaction for inserting
 			const result = await db.transaction(async (transaction) => {
@@ -383,11 +425,11 @@ const applicationSvc = (db: PostgresDb) => ({
 			});
 
 			return success(result);
-		} catch (err) {
-			const message = `Error at createRevisionRequest for applicationId: ${applicationId}`;
-			logger.error(message);
-			logger.error(err);
-			return failure(message, err);
+		} catch (error) {
+			const message = `Error creating revision request for applicationId: ${applicationId}`;
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 });

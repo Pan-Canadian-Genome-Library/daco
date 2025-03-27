@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import express, { Request, Response } from 'express';
+import express, { Request } from 'express';
 
 import {
 	createCollaborators,
@@ -26,14 +26,18 @@ import {
 	updateCollaborator,
 } from '@/controllers/collaboratorsController.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
+import type { ListCollaboratorResponse } from '@pcgl-daco/data-model/src/types.ts';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	collaboratorsCreateRequestSchema,
 	collaboratorsDeleteParamsSchema,
-	collaboratorsListParamsSchema,
 	collaboratorsUpdateRequestSchema,
+	isPositiveInteger,
 } from '@pcgl-daco/validation';
-import { testUserId } from '../../tests/utils/testUtils.ts';
+import { getApplicationById } from '../controllers/applicationController.ts';
+import { authMiddleware } from '../middleware/authMiddleware.ts';
+import { getUserRole } from '../service/authService.ts';
+import type { ResponseWithData } from './types.ts';
 
 const collaboratorsRouter = express.Router();
 
@@ -42,33 +46,63 @@ const collaboratorsRouter = express.Router();
  */
 collaboratorsRouter.post(
 	'/create',
-	withBodySchemaValidation(collaboratorsCreateRequestSchema, apiZodErrorMapping, async (request, response) => {
-		const { applicationId: application_id, userId: user_id, collaborators } = request.body;
+	authMiddleware(),
+	withBodySchemaValidation(
+		collaboratorsCreateRequestSchema,
+		apiZodErrorMapping,
+		async (
+			request,
+			response: ResponseWithData<
+				ListCollaboratorResponse,
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			try {
+				const { applicationId: application_id, collaborators } = request.body;
 
-		const result = await createCollaborators({
-			application_id,
-			user_id,
-			collaborators,
-		});
+				const { userId } = request.session.user || {};
+				if (!userId) {
+					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
 
-		if (result.success) {
-			response.status(201).send(result.data);
-			return;
-		} else {
-			const { message, errors } = result;
+				const result = await createCollaborators({
+					application_id,
+					user_id: userId,
+					collaborators,
+				});
 
-			if (errors === 'InvalidState' || errors === 'DuplicateRecords') {
-				response.status(400);
-			} else if (errors === 'Unauthorized') {
-				response.status(401);
-			} else {
-				response.status(500);
+				if (result.success) {
+					response.status(201).send(result.data);
+					return;
+				}
+				switch (result.error) {
+					case 'DUPLICATE_RECORD': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'UNAUTHORIZED': {
+						response.status(403).json({ error: 'FORBIDDEN', message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 			}
-
-			response.send({ message, errors });
-			return;
-		}
-	}),
+		},
+	),
 );
 
 /**
@@ -76,48 +110,76 @@ collaboratorsRouter.post(
  */
 collaboratorsRouter.get(
 	'/:applicationId',
-	withParamsSchemaValidation(
-		collaboratorsListParamsSchema,
-		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId } = request.params;
+	authMiddleware(),
+	async (
+		request: Request,
+		response: ResponseWithData<
+			ListCollaboratorResponse,
+			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+		>,
+	) => {
+		try {
+			const applicationId = Number(request.params.applicationId);
 
-			if (!applicationId) {
-				response.status(400).send({ message: 'applicationId is missing, cannot list Collaborators' });
+			if (!isPositiveInteger(applicationId)) {
+				response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 				return;
 			}
 
-			const application_id = parseInt(applicationId);
-			const user_id = testUserId;
+			// TODO: auth check: application belongs to user, or is DAC ADMIN
+			// TODO: Institutional Rep needs to be able to see the collaborators as well, but they don't have a user ID on the application to check...
+			const { userId } = request.session.user || {};
+			if (!userId) {
+				response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
+			}
+			const userRole = getUserRole(request.session);
+
+			const applicationResult = await getApplicationById({ applicationId });
+			if (!applicationResult.success) {
+				switch (applicationResult.error) {
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+						return;
+					}
+				}
+			}
+
+			const isApplicationUser = applicationResult.data.userId === userId;
+			// TODO: Identify if the user role is institutional rep and is the rep for this application
+			const isApplicationInstitutionalRep = userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+			const isDacMember = userRole === 'DAC_MEMBER';
+
+			if (!(isApplicationUser || isApplicationInstitutionalRep || isDacMember)) {
+				response
+					.status(403)
+					.json({ error: 'FORBIDDEN', message: 'User does not have permission to access this application.' });
+				return;
+			}
 
 			const result = await listCollaborators({
-				application_id,
-				user_id,
+				applicationId,
 			});
 
 			if (result.success) {
 				response.status(201).send(result.data);
 				return;
-			} else {
-				const { message, errors } = result;
-
-				switch (String(errors)) {
-					case 'Unauthorized':
-						response.status(401);
-						break;
-					case 'Error: Application record is undefined':
-						response.status(404);
-						break;
-					default:
-						response.status(500);
-						break;
-				}
-
-				response.send({ message, errors });
-				return;
 			}
-		},
-	),
+			switch (result.error) {
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+			}
+		} catch (error) {
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+			return;
+		}
+	},
 );
 
 /**
@@ -125,40 +187,88 @@ collaboratorsRouter.get(
  */
 collaboratorsRouter.delete(
 	'/:applicationId/:collaboratorId',
-	withParamsSchemaValidation(collaboratorsDeleteParamsSchema, apiZodErrorMapping, async (request, response) => {
-		const { applicationId, collaboratorId } = request.params;
+	authMiddleware(),
+	withParamsSchemaValidation(
+		collaboratorsDeleteParamsSchema,
+		apiZodErrorMapping,
+		async (
+			request,
+			response: ResponseWithData<
+				ListCollaboratorResponse,
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			try {
+				const collaboratorId = Number(request.params.collaborator_id);
 
-		if (typeof applicationId === 'undefined' || typeof collaboratorId === 'undefined') {
-			response.status(400).send({ message: 'Missing Request Params' });
-			return;
-		}
+				if (!isPositiveInteger(collaboratorId)) {
+					response.status(400).send({ error: 'INVALID_REQUEST', message: 'Collaborator ID is not a valid number.' });
+					return;
+				}
 
-		const application_id = parseInt(applicationId);
-		const id = parseInt(collaboratorId);
+				const applicationId = Number(request.params.applicationId);
 
-		const result = await deleteCollaborator({
-			application_id,
-			id,
-		});
+				if (!isPositiveInteger(applicationId)) {
+					response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+					return;
+				}
 
-		if (result.success) {
-			response.status(201).send(result.data);
-			return;
-		} else {
-			const { message, errors } = result;
+				const { userId } = request.session.user || {};
+				if (!userId) {
+					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
 
-			if (errors === 'InvalidState') {
-				response.status(400);
-			} else if (errors === 'Unauthorized') {
-				response.status(401);
-			} else {
-				response.status(500);
+				const applicationResult = await getApplicationById({ applicationId });
+				if (!applicationResult.success) {
+					switch (applicationResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
+						}
+					}
+				}
+
+				if (applicationResult.data.userId !== userId) {
+					response.status(403).json({
+						error: 'FORBIDDEN',
+						message: 'User is not authorized to modify collaborators for this application.',
+					});
+					return;
+				}
+
+				const result = await deleteCollaborator({
+					application_id: applicationId,
+					id: collaboratorId,
+				});
+
+				if (result.success) {
+					response.status(201).send(result.data);
+					return;
+				}
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 			}
-
-			response.send({ message, errors });
-			return;
-		}
-	}),
+		},
+	),
 );
 
 /**
@@ -169,30 +279,52 @@ collaboratorsRouter.post(
 	withBodySchemaValidation(
 		collaboratorsUpdateRequestSchema,
 		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId: application_id, userId: user_id, collaboratorUpdates } = request.body;
+		async (
+			request,
+			response: ResponseWithData<
+				ListCollaboratorResponse,
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			try {
+				const { applicationId: application_id, collaboratorUpdates } = request.body;
 
-			const result = await updateCollaborator({
-				application_id,
-				user_id,
-				collaboratorUpdates,
-			});
-
-			if (result.success) {
-				response.status(201).send(result.data);
-				return;
-			} else {
-				const { message, errors } = result;
-
-				if (errors === 'InvalidState') {
-					response.status(400);
-				} else if (errors === 'Unauthorized') {
-					response.status(401);
-				} else {
-					response.status(500);
+				const { userId } = request.session.user || {};
+				if (!userId) {
+					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
 				}
 
-				response.send({ message, errors });
+				const result = await updateCollaborator({
+					application_id,
+					user_id: userId,
+					collaboratorUpdates,
+				});
+
+				if (result.success) {
+					response.status(201).send(result.data);
+					return;
+				}
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'FORBIDDEN': {
+						response.status(403).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 				return;
 			}
 		},

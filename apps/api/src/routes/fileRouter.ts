@@ -46,8 +46,7 @@ fileRouter.post(
 			res.status(200).send(result.data);
 			return;
 		} else {
-			const errorReturn = { message: result.message, errors: String(result.errors) };
-			res.status(500).send(errorReturn);
+			res.status(500).send({ message: result.message, error: 'SYSTEM_ERROR' });
 			return;
 		}
 	}),

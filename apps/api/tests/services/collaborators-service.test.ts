@@ -100,7 +100,7 @@ describe('Application Service', () => {
 			const collaboratorResult = await testCollaboratorsRepo.createCollaborators({ newCollaborators: collaborators });
 
 			assert.ok(!collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.errors, 'DuplicateRecords');
+			assert.strictEqual(collaboratorResult.error, 'DUPLICATE_RECORD');
 		});
 	});
 

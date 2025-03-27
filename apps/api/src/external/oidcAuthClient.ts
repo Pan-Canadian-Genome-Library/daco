@@ -22,27 +22,23 @@ import urlJoin from 'url-join';
 import { z as zod } from 'zod';
 
 import { type AuthConfig } from '@/config/authConfig.js';
-import baseLogger from '@/logger.js';
-import { buildQueryParams } from '@/utils/buildQueryParams.js';
+import BaseLogger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 
-const logger = baseLogger.forModule('oidcAuthClient');
+const logger = BaseLogger.forModule('oidcAuthClient');
 
 /*
  * OIDC Authorization Flow Step 1
  * This is a redirection to the OIDC provider /authorize endpoint
  *  */
-export const getOidcAuthorizeUrl = (authConfig: AuthConfig, redirectUrl: string) => {
-	return urlJoin(
-		authConfig.AUTH_PROVIDER_HOST,
-		`/authorize`,
-		buildQueryParams({
-			client_id: authConfig.AUTH_CLIENT_ID,
-			response_type: `code`,
-			scope: `openid profile email org.cilogon.userinfo`,
-			redirect_uri: redirectUrl,
-		}),
-	);
+export const getOidcAuthorizeUrl = (authConfig: AuthConfig, onSuccessRedirectUrl: string) => {
+	const params = new URLSearchParams({
+		client_id: authConfig.AUTH_CLIENT_ID,
+		response_type: `code`,
+		scope: `openid profile email org.cilogon.userinfo`,
+		redirect_uri: onSuccessRedirectUrl,
+	});
+	return urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize`, params.toString());
 };
 
 /*

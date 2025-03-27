@@ -23,12 +23,12 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
+import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useDeleteCollaborator = () => {
 	return useMutation<
-		CollaboratorsResponse[],
+		ListCollaboratorResponse,
 		ServerError,
 		{ applicationId: number | string; collaboratorId: number | string }
 	>({
