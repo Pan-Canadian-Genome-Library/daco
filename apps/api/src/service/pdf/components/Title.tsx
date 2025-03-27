@@ -23,6 +23,7 @@ import { ReactNode } from 'react';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 interface TitleProps {
 	level?: 'h1' | 'h2';
+	breakLine?: boolean;
 	children: ReactNode;
 }
 
@@ -33,9 +34,10 @@ const styles = StyleSheet.create({
 	},
 });
 
-const Title = ({ level = 'h1', children }: TitleProps) => {
+const Title = ({ level = 'h1', children, breakLine = false }: TitleProps) => {
 	return (
 		<Text
+			break={breakLine}
 			style={{
 				...styles.title,
 				fontSize: level === 'h1' ? standardStyles.textStyles.sizes.xl : standardStyles.textStyles.sizes.lg,

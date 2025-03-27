@@ -30,9 +30,11 @@ const styles = StyleSheet.create({
 		fontSize: standardStyles.textStyles.sizes.md,
 	},
 });
-const Paragraph = ({ children, notice }: { children: ReactNode; notice?: boolean }) => {
+const Paragraph = ({ children, notice, breakLine }: { children: ReactNode; notice?: boolean; breakLine?: boolean }) => {
 	return (
-		<Text style={{ ...styles.paragraph, color: notice ? standardStyles.colours.primary : '#000' }}>{children}</Text>
+		<Text break={breakLine} style={{ ...styles.paragraph, color: notice ? standardStyles.colours.primary : '#000' }}>
+			{children}
+		</Text>
 	);
 };
 

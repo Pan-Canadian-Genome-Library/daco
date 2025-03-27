@@ -47,6 +47,8 @@ const styles = StyleSheet.create({
 		fill: '#fff',
 	},
 	checkboxText: {
+		// This is to fix a bug where text does not respect padding or margin boundaries.
+		flex: 1,
 		fontSize: standardStyles.textStyles.sizes.md,
 	},
 });

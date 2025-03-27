@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
 		/**
 		 * Standardized margins based off of Word & https://www.noslangues-ourlanguages.gc.ca/en/writing-tips-plus/reports-margins
 		 **/
-		padding: '2.5cm 3cm 2.5cm 3cm',
+		padding: '2.5cm 2.5cm 2.5cm 2.5cm',
 		fontFamily: 'OpenSans',
 		fontWeight: 'normal',
 		backgroundColor: '#fff',
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
 	footer: {
 		width: '100vw',
 		left: 0,
-		padding: '0 3cm',
+		padding: '0 2.5cm',
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -111,7 +111,7 @@ const StandardPage = ({
 	fixed = false,
 }: StandardPageProps) => {
 	return (
-		<Page size={'A4'} fixed={fixed} style={ignorePadding ? styles.page__noPadding : styles.page}>
+		<Page size={'LETTER'} fixed={fixed} style={ignorePadding ? styles.page__noPadding : styles.page}>
 			{useVerticalStackLayout ? (
 				<View style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>{children}</View>
 			) : (

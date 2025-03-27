@@ -28,14 +28,17 @@ interface FormDisplay {
 	children: ReactNode;
 	fixed?: boolean;
 	wrap?: boolean;
+	breakLineInTitle?: boolean;
 }
 
 const styles = StyleSheet.create({
 	form: {
 		marginTop: standardStyles.textStyles.sizes.xl,
-		gap: standardStyles.textStyles.sizes.lg,
 		display: 'flex',
 		flexDirection: 'column',
+	},
+	formTitle: {
+		marginBottom: standardStyles.textStyles.sizes.lg,
 	},
 	formItems: {
 		display: 'flex',
@@ -44,11 +47,17 @@ const styles = StyleSheet.create({
 	},
 });
 
-const FormDisplay = ({ title, children, fixed = false, wrap = true }: FormDisplay) => {
+const FormDisplay = ({ title, children, fixed = false, wrap = true, breakLineInTitle = false }: FormDisplay) => {
 	return (
 		<View style={styles.form} fixed={fixed} wrap={wrap}>
-			<Title level="h2">{title}</Title>
-			<View style={styles.formItems}>{children}</View>
+			<View style={styles.formItems} wrap={wrap}>
+				<View style={styles.formTitle}>
+					<Title breakLine={breakLineInTitle} level="h2">
+						{title}
+					</Title>
+				</View>
+				{children}
+			</View>
 		</View>
 	);
 };

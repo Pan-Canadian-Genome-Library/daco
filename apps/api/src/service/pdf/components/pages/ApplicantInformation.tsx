@@ -24,6 +24,8 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
+import { View } from '@react-pdf/renderer';
+import { standardStyles } from '../standardStyling.ts';
 
 const ApplicantInformation = ({
 	applicantFirstName,
@@ -63,7 +65,7 @@ const ApplicantInformation = ({
 		| 'applicantInstitutionPostalCode'
 	>) => {
 	return (
-		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Applicant Information (Principal Investigator)</Title>
 			<Paragraph>
 				Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated
@@ -90,12 +92,40 @@ const ApplicantInformation = ({
 				<DataItem item="Position Title">{applicantPositionTitle}</DataItem>
 			</FormDisplay>
 			<FormDisplay title="Institution/Company Mailing Address">
-				<DataItem item="Country">{applicantInstitutionCountry}</DataItem>
-				<DataItem item="Street Address">{applicantInstitutionStreetAddress}</DataItem>
-				<DataItem item="Building">{applicantInstitutionBuilding}</DataItem>
-				<DataItem item="Province">{applicantInstitutionState}</DataItem>
-				<DataItem item="City">{applicantInstitutionCity}</DataItem>
-				<DataItem item="Postal Code / ZIP Code">{applicantInstitutionPostalCode}</DataItem>
+				<View
+					style={{
+						display: 'flex',
+						justifyContent: 'center',
+						flexDirection: 'row',
+						gap: standardStyles.textStyles.sizes.md,
+						marginTop: standardStyles.textStyles.sizes.md,
+					}}
+				>
+					<View
+						style={{
+							flex: 1.5,
+							display: 'flex',
+							gap: standardStyles.textStyles.sizes.md,
+						}}
+					>
+						<DataItem item="Country">{applicantInstitutionCountry}</DataItem>
+						<DataItem item="Street Address">{applicantInstitutionStreetAddress}</DataItem>
+						<DataItem item="Building">{applicantInstitutionBuilding}</DataItem>
+					</View>
+					<View
+						style={{
+							flex: 1,
+							display: 'flex',
+							justifyContent: 'center',
+							gap: standardStyles.textStyles.sizes.md,
+							marginLeft: standardStyles.textStyles.sizes.md,
+						}}
+					>
+						<DataItem item="Province">{applicantInstitutionState}</DataItem>
+						<DataItem item="City">{applicantInstitutionCity}</DataItem>
+						<DataItem item="Postal Code / ZIP Code">{applicantInstitutionPostalCode}</DataItem>
+					</View>
+				</View>
 			</FormDisplay>
 		</StandardPage>
 	);

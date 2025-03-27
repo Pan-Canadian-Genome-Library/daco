@@ -17,10 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { serverConfig } from '@/config/serverConfig.ts';
 import logger from '@/logger.ts';
 import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
 import { failure, success } from '@/utils/results.ts';
 import { ApplicationResponseData, CollaboratorDTO, FilesDTO, SignatureDTO } from '@pcgl-daco/data-model';
+import { PDFDocument } from 'pdf-lib';
+
+const PDF_CREATOR_PRODUCER = `Pan-Canadian Genome Library DACO (ver. ${serverConfig.npm_package_version})`;
+const PDF_AUTHOR = `Data Access Compliance Office, Pan-Canadian Genome Library`;
 
 const pdfSvc = () => ({
 	renderPCGLApplicationPDF: async ({
@@ -37,18 +42,36 @@ const pdfSvc = () => ({
 		try {
 			const pdfCreationDate = new Date();
 
-			logger.info(applicationContents);
-			logger.info(signatureContents);
-			logger.info(collaboratorsContents);
-			logger.info(fileContents);
-
-			const pdf = await renderApplicationPDF({
+			const applicationPDF = await renderApplicationPDF({
 				applicationContents: applicationContents,
 				signature: signatureContents,
 				collaborators: collaboratorsContents,
 				docCreatedAt: pdfCreationDate,
 			});
-			return success(pdf);
+
+			const finalApplication = await PDFDocument.create();
+
+			finalApplication.setLanguage('en-ca');
+			finalApplication.setTitle(`PCGL-${applicationContents.id} - Application for Access to PCGL Controlled Data`, {
+				showInWindowTitleBar: true,
+			});
+			finalApplication.setSubject('Application for Access to PCGL Controlled Data');
+			finalApplication.setAuthor(PDF_AUTHOR);
+			finalApplication.setCreator(PDF_CREATOR_PRODUCER);
+			finalApplication.setProducer(PDF_CREATOR_PRODUCER);
+			finalApplication.setCreationDate(pdfCreationDate);
+			finalApplication.setModificationDate(pdfCreationDate);
+
+			const baseApplication = await PDFDocument.load(applicationPDF);
+			const ethicsPDF = await PDFDocument.load(fileContents.content);
+
+			const originalPDFPages = await finalApplication.copyPages(baseApplication, baseApplication.getPageIndices());
+			originalPDFPages.forEach((page) => finalApplication.addPage(page));
+
+			const ethicsPages = await finalApplication.copyPages(ethicsPDF, ethicsPDF.getPageIndices());
+			ethicsPages.forEach((page) => finalApplication.addPage(page));
+
+			return success(await finalApplication.save());
 		} catch (err) {
 			const message = `Error Rendering Application to PDF file`;
 

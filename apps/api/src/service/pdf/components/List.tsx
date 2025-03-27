@@ -37,6 +37,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: '.5rem',
 	},
+	listText: {
+		// This is to fix a bug where text does not respect padding or margin boundaries.
+		flex: 1,
+	},
 });
 const List = ({ items, isNumbered }: { items: string[]; isNumbered?: boolean }) => {
 	return (
@@ -44,7 +48,7 @@ const List = ({ items, isNumbered }: { items: string[]; isNumbered?: boolean }) 
 			{items.map((li, index) => (
 				<View style={styles.listItem} key={li} wrap={false}>
 					{isNumbered ? <Text>{`${index + 1}.`}</Text> : <Text>&#x2022;</Text>}
-					<Text>{`${li}`}</Text>
+					<Text style={styles.listText}>{`${li}`}</Text>
 				</View>
 			))}
 		</View>

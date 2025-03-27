@@ -83,8 +83,8 @@ const DataAccessAgreement = () => {
 					]}
 				/>
 			</FormDisplay>
-			<FormDisplay title="Terms and Conditions">
-				<Paragraph>In signing this Agreement:</Paragraph>
+			<FormDisplay breakLineInTitle={true} title="Terms and Conditions">
+				<Paragraph breakLine>In signing this Agreement:</Paragraph>
 				<List
 					items={[
 						'The User and the User Institution(s) agree to use the PCGL Controlled Data in compliance with all PCGL Goals, Structures, Policies and Guidelines including section E. Ethics and Appendix I of this application.',
@@ -114,7 +114,7 @@ const DataAccessAgreement = () => {
 					]}
 				/>
 			</FormDisplay>
-			<FormDisplay title="Agreements">
+			<FormDisplay title="Agreements" wrap={false}>
 				<Paragraph>
 					You MUST agree to the following procedures in order to have access to the PCGL Controlled Data:
 				</Paragraph>

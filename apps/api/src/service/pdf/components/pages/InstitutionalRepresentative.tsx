@@ -24,6 +24,8 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
+import { View } from '@react-pdf/renderer';
+import { standardStyles } from '../standardStyling.ts';
 
 const InstitutionalRepresentative = ({
 	institutionalRepTitle,
@@ -87,12 +89,40 @@ const InstitutionalRepresentative = ({
 				<DataItem item="Position Title">{institutionalRepPositionTitle}</DataItem>
 			</FormDisplay>
 			<FormDisplay title="Institution/Company Mailing Address">
-				<DataItem item="Country">{institutionCountry}</DataItem>
-				<DataItem item="Street Address">{institutionStreetAddress}</DataItem>
-				<DataItem item="Building">{institutionBuilding}</DataItem>
-				<DataItem item="Province">{institutionState}</DataItem>
-				<DataItem item="City">{institutionCity}</DataItem>
-				<DataItem item="Postal Code / ZIP Code">{institutionPostalCode}</DataItem>
+				<View
+					style={{
+						display: 'flex',
+						justifyContent: 'center',
+						flexDirection: 'row',
+						gap: standardStyles.textStyles.sizes.md,
+						marginTop: standardStyles.textStyles.sizes.md,
+					}}
+				>
+					<View
+						style={{
+							flex: 1.5,
+							display: 'flex',
+							gap: standardStyles.textStyles.sizes.md,
+						}}
+					>
+						<DataItem item="Country">{institutionCountry}</DataItem>
+						<DataItem item="Street Address">{institutionStreetAddress}</DataItem>
+						<DataItem item="Building">{institutionBuilding}</DataItem>
+					</View>
+					<View
+						style={{
+							flex: 1,
+							display: 'flex',
+							justifyContent: 'center',
+							gap: standardStyles.textStyles.sizes.md,
+							marginLeft: standardStyles.textStyles.sizes.md,
+						}}
+					>
+						<DataItem item="Province">{institutionState}</DataItem>
+						<DataItem item="City">{institutionCity}</DataItem>
+						<DataItem item="Postal Code / ZIP Code">{institutionPostalCode}</DataItem>
+					</View>
+				</View>
 			</FormDisplay>
 		</StandardPage>
 	);
