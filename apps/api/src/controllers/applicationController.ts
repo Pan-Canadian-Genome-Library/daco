@@ -131,11 +131,6 @@ export const getApplicationById = async ({
 	return result;
 };
 
-// export const getApplicationForCollaboratorId = async ({
-// 	collaboratorId,
-// }: {
-// 	collboratorId: number;
-// }): AsyncResult<ApplicationResponseData, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {};
 /**
  * Gets the total of how many applications are in each state type, including a TOTAL count.
  * @param userId - The ID of the current user.
