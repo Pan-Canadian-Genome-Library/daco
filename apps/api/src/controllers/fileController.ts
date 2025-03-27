@@ -22,7 +22,7 @@ import logger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { type ApplicationRecord, type ApplicationService, type FilesService } from '@/service/types.ts';
-import { failure } from '@/utils/results.ts';
+import { failure, success } from '@/utils/results.ts';
 import { FileTypes } from '@pcgl-daco/data-model';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
@@ -107,7 +107,16 @@ export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; 
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
 
-		const result = await filesService.getFileById({ fileId, withBuffer });
+		const result = await filesService.getFileById({ fileId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		// Strip content
+		if (!withBuffer) {
+			return success({ ...result.data, content: null });
+		}
 
 		return result;
 	} catch (error) {

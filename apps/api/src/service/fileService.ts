@@ -35,11 +35,9 @@ import { PostgresTransaction, type FilesModel, type JoinedApplicationRecord } fr
 const filesSvc = (db: PostgresDb) => ({
 	getFileById: async ({
 		fileId,
-		withBuffer,
 		transaction,
 	}: {
 		fileId: number;
-		withBuffer: boolean;
 		transaction?: PostgresTransaction;
 	}): AsyncResult<FilesModel & { id: number }> => {
 		const dbTransaction = transaction ? transaction : db;
