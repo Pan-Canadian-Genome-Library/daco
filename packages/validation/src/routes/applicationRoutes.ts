@@ -103,7 +103,7 @@ export const closeApplicationSchema = z.object({
 export const submitApplicationRequestSchema = z
 	.object({
 		applicationId: z.number().nonnegative().min(1),
-	      role: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
-	      signature: z.string().regex(BASE64_IMAGE),
+		role: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+		signature: z.string().regex(BASE64_IMAGE),
 	})
 	.strict();
