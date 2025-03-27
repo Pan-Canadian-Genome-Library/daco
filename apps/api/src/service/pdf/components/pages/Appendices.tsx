@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 
 const Appendices = () => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Appendices</Title>
 			<Paragraph>Please review and agree to the following Appendices.</Paragraph>
 			<FormDisplay title="PCGL Policies">

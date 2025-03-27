@@ -41,9 +41,29 @@ const InstitutionalRepresentative = ({
 	institutionBuilding,
 	institutionCity,
 	institutionPostalCode,
-}: InstitutionalRepDTO & InstitutionDTO) => {
+}: Pick<
+	InstitutionalRepDTO,
+	| 'institutionalRepTitle'
+	| 'institutionalRepFirstName'
+	| 'institutionalRepMiddleName'
+	| 'institutionalRepLastName'
+	| 'institutionalRepSuffix'
+	| 'institutionalRepPrimaryAffiliation'
+	| 'institutionalRepEmail'
+	| 'institutionalRepProfileUrl'
+	| 'institutionalRepPositionTitle'
+> &
+	Pick<
+		InstitutionDTO,
+		| 'institutionCountry'
+		| 'institutionState'
+		| 'institutionStreetAddress'
+		| 'institutionBuilding'
+		| 'institutionCity'
+		| 'institutionPostalCode'
+	>) => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Institutional Representative</Title>
 			<Paragraph>
 				An Institutional Representative is a qualified representative of a legal entity who has the administrative power

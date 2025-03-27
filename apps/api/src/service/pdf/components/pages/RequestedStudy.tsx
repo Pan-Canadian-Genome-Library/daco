@@ -29,7 +29,7 @@ import Title from '@/service/pdf/components/Title.tsx';
 
 const RequestedStudy = ({ requestedStudies }: RequestedStudiesDTO) => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Requested Study</Title>
 			<Paragraph>
 				To help the DAC review your data access request more efficiently, please select the study you are requesting

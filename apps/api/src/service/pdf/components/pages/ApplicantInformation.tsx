@@ -41,9 +41,29 @@ const ApplicantInformation = ({
 	applicantInstitutionBuilding,
 	applicantInstitutionCity,
 	applicantInstitutionPostalCode,
-}: ApplicantDTO & InstitutionDTO) => {
+}: Pick<
+	ApplicantDTO,
+	| 'applicantFirstName'
+	| 'applicantLastName'
+	| 'applicantMiddleName'
+	| 'applicantTitle'
+	| 'applicantSuffix'
+	| 'applicantPrimaryAffiliation'
+	| 'applicantInstitutionalEmail'
+	| 'applicantProfileUrl'
+	| 'applicantPositionTitle'
+> &
+	Pick<
+		InstitutionDTO,
+		| 'applicantInstitutionCountry'
+		| 'applicantInstitutionState'
+		| 'applicantInstitutionStreetAddress'
+		| 'applicantInstitutionBuilding'
+		| 'applicantInstitutionCity'
+		| 'applicantInstitutionPostalCode'
+	>) => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Applicant Information (Principal Investigator)</Title>
 			<Paragraph>
 				Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated

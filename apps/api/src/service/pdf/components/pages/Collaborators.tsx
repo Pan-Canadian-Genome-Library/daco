@@ -27,7 +27,7 @@ import Title from '@/service/pdf/components/Title.tsx';
 
 const Collaborators = ({ collaborators }: { collaborators: CollaboratorDTO[] }) => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Collaborators</Title>
 			<Paragraph>
 				Please include the names of all investigators, collaborators, research staff (including post-docs) and students

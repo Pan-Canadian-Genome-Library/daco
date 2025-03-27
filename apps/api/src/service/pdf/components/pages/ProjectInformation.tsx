@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { InstitutionDTO, ProjectDTO } from '@pcgl-daco/data-model';
+import { ProjectDTO } from '@pcgl-daco/data-model';
 
 import DataItem from '@/service/pdf/components/DataItem.tsx';
 import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
@@ -33,9 +33,9 @@ const ProjectInformation = ({
 	projectMethodology,
 	projectSummary,
 	projectPublicationUrls,
-}: ProjectDTO & InstitutionDTO) => {
+}: ProjectDTO) => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Project Information</Title>
 			<Paragraph>
 				Please fill out the following details for your research project, including the website URL if available.

@@ -26,7 +26,7 @@ import Title from '@/service/pdf/components/Title.tsx';
 
 const DataAccessAgreement = () => {
 	return (
-		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
+		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Data Access Agreement</Title>
 			<Paragraph>
 				This application form must be completed by the applicant and the legal entity with which you are affiliated
