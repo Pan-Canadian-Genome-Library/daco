@@ -17,20 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import ApplicantInformation from '@/service/pdf/components/pages/ApplicantInformation.tsx';
-import IntroductionPage from '@/service/pdf/components/pages/IntroductionPage.tsx';
-import TitlePage from '@/service/pdf/components/pages/TitlePage.tsx';
-import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import { ApplicationResponseData, CollaboratorDTO, SignatureDTO } from '@pcgl-daco/data-model';
 import { Document, Font, renderToBuffer, StyleSheet } from '@react-pdf/renderer';
-import Appendices from '../components/pages/Appendices.tsx';
-import Collaborators from '../components/pages/Collaborators.tsx';
-import DataAccessAgreement from '../components/pages/DataAccessAgreement.tsx';
-import Ethics from '../components/pages/Ethics.tsx';
-import InstitutionalRepresentative from '../components/pages/InstitutionalRepresentative.tsx';
-import ProjectInformation from '../components/pages/ProjectInformation.tsx';
-import RequestedStudy from '../components/pages/RequestedStudy.tsx';
-import SignSubmit from '../components/pages/SignSubmit.tsx';
+
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+
+import Appendices from '@/service/pdf/components/pages/Appendices.tsx';
+import ApplicantInformation from '@/service/pdf/components/pages/ApplicantInformation.tsx';
+import Collaborators from '@/service/pdf/components/pages/Collaborators.tsx';
+import DataAccessAgreement from '@/service/pdf/components/pages/DataAccessAgreement.tsx';
+import Ethics from '@/service/pdf/components/pages/Ethics.tsx';
+import InstitutionalRepresentative from '@/service/pdf/components/pages/InstitutionalRepresentative.tsx';
+import IntroductionPage from '@/service/pdf/components/pages/IntroductionPage.tsx';
+import ProjectInformation from '@/service/pdf/components/pages/ProjectInformation.tsx';
+import RequestedStudy from '@/service/pdf/components/pages/RequestedStudy.tsx';
+import SignSubmit from '@/service/pdf/components/pages/SignSubmit.tsx';
+import TitlePage from '@/service/pdf/components/pages/TitlePage.tsx';
 
 interface PCGLApplicationProps {
 	applicationContents: ApplicationResponseData;
