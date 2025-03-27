@@ -68,8 +68,8 @@ const Ethics = ({ ethicsReviewRequired }: EthicsLetterDTO) => {
 						}}
 					>
 						<Paragraph notice>
-							&mdash;&nbsp;Ethics {ethicsReviewRequired === true ? `approval` : 'exemption'} letter attached at end of
-							document.&nbsp;&mdash;
+							&mdash;&nbsp;Ethics {ethicsReviewRequired === true ? `approval` : 'exemption'} letter is attached at end
+							of this document.&nbsp;&mdash;
 						</Paragraph>
 					</View>
 				) : null}

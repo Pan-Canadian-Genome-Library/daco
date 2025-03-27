@@ -32,6 +32,7 @@ interface StandardPageProps extends FooterProps {
 	ignorePadding?: boolean;
 	useVerticalStackLayout?: boolean;
 	fixed?: boolean;
+	bookmark?: string;
 }
 
 const styles = StyleSheet.create({
@@ -109,9 +110,15 @@ const StandardPage = ({
 	alternatingAttribution = false,
 	useVerticalStackLayout = false,
 	fixed = false,
+	bookmark = undefined,
 }: StandardPageProps) => {
 	return (
-		<Page size={'LETTER'} fixed={fixed} style={ignorePadding ? styles.page__noPadding : styles.page}>
+		<Page
+			bookmark={bookmark}
+			size={'LETTER'}
+			fixed={fixed}
+			style={ignorePadding ? styles.page__noPadding : styles.page}
+		>
 			{useVerticalStackLayout ? (
 				<View style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>{children}</View>
 			) : (
