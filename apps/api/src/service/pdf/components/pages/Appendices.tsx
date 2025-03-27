@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import StandardPage from '@/service/pdf/components/StandardPage.tsx';
-import Title from '@/service/pdf/components/Title.tsx';
 import { Link, StyleSheet, Text } from '@react-pdf/renderer';
-import Checkbox from '../Checkbox.tsx';
-import FormDisplay from '../FormDisplay.tsx';
-import Paragraph from '../Paragraph.tsx';
-import { standardStyles } from '../standardStyling.ts';
+
+import Checkbox from '@/service/pdf/components/Checkbox.tsx';
+import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
+import Paragraph from '@/service/pdf/components/Paragraph.tsx';
+import StandardPage from '@/service/pdf/components/StandardPage.tsx';
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+import Title from '@/service/pdf/components/Title.tsx';
 
 const styles = StyleSheet.create({
 	link: {

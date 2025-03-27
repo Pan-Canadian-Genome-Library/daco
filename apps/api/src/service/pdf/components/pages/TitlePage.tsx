@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { StyleSheet, Text, View } from '@react-pdf/renderer';
+
+import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
+
 import Logo from '@/service/pdf/components/Logo/Logo.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { StyleSheet, Text, View } from '@react-pdf/renderer';
 
 interface TitlePageProps extends Pick<ApplicationContentsResponse, 'applicationId' | 'applicantPrimaryAffiliation'> {
 	displayLogo?: boolean;

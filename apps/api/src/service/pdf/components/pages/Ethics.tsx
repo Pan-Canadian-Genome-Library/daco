@@ -17,13 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { View } from '@react-pdf/renderer';
+
+import { EthicsDTO } from '@pcgl-daco/data-model';
+
+import Checkbox from '@/service/pdf/components/Checkbox.tsx';
+import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
+import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { EthicsDTO } from '@pcgl-daco/data-model';
-import { View } from '@react-pdf/renderer';
-import Checkbox from '../Checkbox.tsx';
-import FormDisplay from '../FormDisplay.tsx';
-import Paragraph from '../Paragraph.tsx';
 
 const Ethics = ({ ethicsReviewRequired }: EthicsDTO) => {
 	return (

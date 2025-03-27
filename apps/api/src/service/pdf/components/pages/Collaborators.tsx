@@ -16,13 +16,14 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { View } from '@react-pdf/renderer';
 
+import { CollaboratorDTO } from '@pcgl-daco/data-model';
+
+import CollaboratorsTable from '@/service/pdf/components/CollaboratorsTable.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { CollaboratorDTO } from '@pcgl-daco/data-model';
-import { View } from '@react-pdf/renderer';
-import CollaboratorsTable from '../CollaboratorsTable.tsx';
 
 const Collaborators = ({ collaborators }: { collaborators: CollaboratorDTO[] }) => {
 	return (

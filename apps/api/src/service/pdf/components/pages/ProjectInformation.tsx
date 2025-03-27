@@ -17,12 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { InstitutionDTO, ProjectDTO } from '@pcgl-daco/data-model';
+
 import DataItem from '@/service/pdf/components/DataItem.tsx';
 import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
+import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { InstitutionDTO, ProjectDTO } from '@pcgl-daco/data-model';
-import Paragraph from '../Paragraph.tsx';
 
 const ProjectInformation = ({
 	projectTitle,

@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicantDTO, InstitutionalRepDTO, SignatureDTO } from '@pcgl-daco/data-model';
+
+import DataItem from '@/service/pdf/components/DataItem.tsx';
+import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
+import Paragraph from '@/service/pdf/components/Paragraph.tsx';
+import Signature from '@/service/pdf/components/Signature.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { ApplicantDTO, InstitutionalRepDTO, SignatureDTO } from '@pcgl-daco/data-model';
-import DataItem from '../DataItem.tsx';
-import FormDisplay from '../FormDisplay.tsx';
-import Paragraph from '../Paragraph.tsx';
-import Signature from '../Signature.tsx';
 
 interface SignSubmitProps
 	extends Omit<SignatureDTO, 'applicationId'>,
