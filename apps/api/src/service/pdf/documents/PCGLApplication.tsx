@@ -78,7 +78,10 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 	const contents = applicationContents.contents;
 
 	return (
-		<Document title="PCGL DACO Agreement" style={styles.document}>
+		<Document
+			title={`PCGL-${applicationContents.id} - DACO - Application for Access to PCGL Controlled Data`}
+			style={styles.document}
+		>
 			<TitlePage
 				applicationId={applicationContents.id}
 				docCreatedAt={docCreatedAt}
