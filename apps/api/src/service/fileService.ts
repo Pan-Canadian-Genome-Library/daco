@@ -33,6 +33,38 @@ import { PostgresTransaction, type FilesModel, type JoinedApplicationRecord } fr
  * @param db - Drizzle Postgres DB Instance
  */
 const filesSvc = (db: PostgresDb) => ({
+	getFileById: async ({
+		fileId,
+		withBuffer,
+		transaction,
+	}: {
+		fileId: number;
+		withBuffer: boolean;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<Partial<FilesModel & { id: number }>> => {
+		const dbTransaction = transaction ? transaction : db;
+
+		const result = await dbTransaction.transaction(async (transaction) => {
+			const fileRecord = await transaction
+				.select({
+					id: files.id,
+					application_id: files.application_id,
+					type: files.type,
+					filename: files.filename,
+					submitter_user_id: files.submitter_user_id,
+					submitted_at: files.submitted_at,
+					...(withBuffer ? { content: files.content } : {}),
+				})
+				.from(files)
+				.where(eq(files.id, fileId));
+
+			if (!fileRecord[0]) throw new Error('File record is undefined');
+
+			return fileRecord[0];
+		});
+
+		return success(result);
+	},
 	createFile: async ({
 		file,
 		application,

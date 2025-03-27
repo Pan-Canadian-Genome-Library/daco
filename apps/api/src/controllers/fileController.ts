@@ -98,6 +98,27 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 };
 
 /**
+ * Get a file by application
+ * @param fileId - The target fileId to associate the uploaded file
+ * @returns Success with file data / Failure with Error.
+ */
+export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; withBuffer?: boolean }) => {
+	try {
+		const database = getDbInstance();
+		const filesService: FilesService = filesSvc(database);
+
+		const result = await filesService.getFileById({ fileId, withBuffer });
+
+		return result;
+	} catch (error) {
+		const message = `Unable to retrieve file with id: ${fileId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
+
+/*
  * Delete a file with id
  * @param fileId - The target fileId to associate the uploaded file
  * @returns Success with file data / Failure with Error.

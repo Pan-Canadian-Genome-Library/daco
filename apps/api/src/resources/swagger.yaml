@@ -786,86 +786,6 @@ paths:
         '500':
           description: 'Error in requesting revisions'
 
-  /file/ethics/{applicationId}:
-    post:
-      tags:
-        - File
-      summary: Upload new file or replace old file
-      parameters:
-        - in: path
-          name: applicationId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the associated application upload
-      consumes:
-        - multipart/form-data
-      requestBody:
-        description: |
-          Files must fit a certain set of properties to be accepted by our server. The file cannot be more than `5mb`, has to be of type `'pdf' 'doc' 'docx' ` and only `one` file can be uploaded.
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-      responses:
-        '200':
-          description: 'File uploaded'
-          content:
-            application/json:
-              schema:
-                type: object
-        '500':
-          description: 'Error uploading file to database'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-        '400':
-          description: 'Error uploading file. File must be less than 5mb and only 1 file can be uploaded.'
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/RequestValidationError'
-                  - $ref: '#/components/responses/ClientErrors'
-
-  /file/{fileId}:
-    delete:
-      tags:
-        - File
-      summary: Delete uploaded by file id
-      parameters:
-        - in: path
-          name: fileId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the associated fileId upload
-      responses:
-        '200':
-          description: 'File deleted'
-          content:
-            application/json:
-              schema:
-                type: object
-        '500':
-          description: 'Error deleting file in database'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-        '400':
-          description: 'Invalid fileId.'
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/responses/RequestValidationError'
-                  - $ref: '#/components/responses/ClientErrors'
   /applications/{applicationId}/close:
     post:
       tags:
@@ -922,6 +842,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
   /applications/{applicationId}/revisions:
     get:
       tags:
@@ -968,6 +889,141 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
+  /file/{fileId}/download:
+    get:
+      tags:
+        - File
+      summary: Get file with buffer data
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File retrieved'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/fileDownloadResponse'
+
+        '500':
+          description: 'Error retrieving file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+
+  /file/ethics/{applicationId}:
+    post:
+      tags:
+        - File
+      summary: Upload new file or replace old file
+      description: Numeric ID of the associated application upload
+      consumes:
+        - multipart/form-data
+      requestBody:
+        description: |
+          Files must fit a certain set of properties to be accepted by our server. The file cannot be more than `5mb`, has to be of type `'pdf'` and only `one` file can be uploaded.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: 'File uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/uploadFileResponse'
+        '500':
+          description: 'Error uploading file to database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error uploading file. File must be less than 5mb and only 1 file can be uploaded.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+
+  /file/{fileId}:
+    get:
+      tags:
+        - File
+      summary: Get uploaded file by its id
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File deleted'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/fileGetResponse'
+        '500':
+          description: 'Error deleting file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+    delete:
+      tags:
+        - File
+      summary: Delete file by id
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File deleted'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Error deleting file in database'
+
 components:
   schemas:
     ApplicationWithApplicantInfo:
@@ -1801,6 +1857,76 @@ components:
           type: string
           format: date-time
           description: The the signature was signed.
+
+    uploadFileResponse:
+      type: object
+      description: The contents of the upload file.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+    fileDownloadResponse:
+      type: object
+      description: The contents of the upload file.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        application_id:
+          type: number
+          description: |
+            The associated application id.
+        content:
+          type: object
+          description: |
+            File in the form of a arraylike buffer.
+        submitted_at:
+          type: string
+          description: |
+            Date it was submitted at
+        submitter_user_id:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          description: |
+            The type of the file
+    fileGetResponse:
+      type: object
+      description: The contents of the upload file.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        application_id:
+          type: number
+          description: |
+            The associated application id.
+        submitted_at:
+          type: string
+          description: |
+            Date it was submitted at
+        submitter_user_id:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          description: |
+            The type of the file
 
     RequestValidationError:
       type: object

@@ -295,6 +295,9 @@ importers:
         specifier: ^3.24.1
         version: 3.24.1
     devDependencies:
+      '@pcgl-daco/data-model':
+        specifier: workspace:^
+        version: link:../data-model
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.0
