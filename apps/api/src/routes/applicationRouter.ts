@@ -500,7 +500,7 @@ applicationRouter.post(
 
 			if (result.success) {
 				response.status(200).send({
-					message: 'Application rejected successfully.',
+					message: 'Application submitted successfully.',
 					data: result.data,
 				});
 			} else {
