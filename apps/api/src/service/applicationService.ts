@@ -390,6 +390,22 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure(message, err);
 		}
 	},
+
+	getRevisions: async ({ applicationId }: { applicationId: number }): AsyncResult<RevisionRequestModel[]> => {
+		try {
+			const results = await db
+				.select()
+				.from(revisionRequests)
+				.where(eq(revisionRequests.application_id, applicationId));
+
+			return success(results);
+		} catch (err) {
+			const message = `Error while fetching revisions for applicationId: ${applicationId}`;
+			logger.error(message);
+			logger.error(err);
+			return failure(message, err);
+		}
+	},
 });
 
 export { applicationSvc };
