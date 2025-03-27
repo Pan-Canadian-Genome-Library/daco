@@ -25,7 +25,7 @@ import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Appendices from '@/service/pdf/components/pages/Appendices.tsx';
 import ApplicantInformation from '@/service/pdf/components/pages/ApplicantInformation.tsx';
 import Collaborators from '@/service/pdf/components/pages/Collaborators.tsx';
-import DataAccessAgreement from '@/service/pdf/components/pages/DataAccessAgreement.tsx';
+import DataAccessAgreement from '@/service/pdf/components/pages/DataAccessAgreement/DataAccessAgreement.tsx';
 import Ethics from '@/service/pdf/components/pages/Ethics.tsx';
 import InstitutionalRepresentative from '@/service/pdf/components/pages/InstitutionalRepresentative.tsx';
 import IntroductionPage from '@/service/pdf/components/pages/IntroductionPage.tsx';
@@ -33,6 +33,7 @@ import ProjectInformation from '@/service/pdf/components/pages/ProjectInformatio
 import RequestedStudy from '@/service/pdf/components/pages/RequestedStudy.tsx';
 import SignSubmit from '@/service/pdf/components/pages/SignSubmit.tsx';
 import TitlePage from '@/service/pdf/components/pages/TitlePage.tsx';
+import TermsAndConditions from '../components/pages/DataAccessAgreement/TermsAndCondtions.tsx';
 
 interface PCGLApplicationProps {
 	applicationContents: ApplicationResponseData;
@@ -138,6 +139,7 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 			<RequestedStudy requestedStudies={contents?.requestedStudies} />
 			<Ethics ethicsReviewRequired={contents?.ethicsReviewRequired} />
 			<DataAccessAgreement />
+			<TermsAndConditions />
 			<Appendices />
 			<SignSubmit
 				applicantFirstName={contents?.applicantFirstName}
