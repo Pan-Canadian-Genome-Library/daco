@@ -162,8 +162,8 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 const renderApplicationPDF = async ({
 	applicationContents,
 	signature,
-	docCreatedAt,
 	collaborators,
+	docCreatedAt,
 }: PCGLApplicationProps) => {
 	return await renderToBuffer(
 		<PCGLApplication

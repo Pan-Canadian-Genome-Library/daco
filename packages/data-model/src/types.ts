@@ -338,13 +338,12 @@ export interface AgreementsDTO {
 }
 
 export interface FilesDTO {
-	id: number;
 	applicationId: number;
 	type: FileType;
-	submitterUserId: number;
+	submitterUserId: string;
 	submittedAt: Date;
 	content: any;
-	filename: string;
+	filename?: string | null;
 }
 
 export interface SignatureDTO {

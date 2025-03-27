@@ -18,12 +18,14 @@
  */
 
 import {
+	FilesModel,
 	type ApplicationContentUpdates,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
 import {
+	FilesDTO,
 	type ApplicationContentsResponse,
 	type ApplicationResponseData,
 	type CollaboratorsResponse,
@@ -93,7 +95,6 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				requestedStudies: applicationContents.requested_studies,
 				ethicsReviewRequired: applicationContents.ethics_review_required,
 				ethicsLetter: applicationContents.ethics_letter,
-				signedPDF: applicationContents.signed_pdf,
 			}
 		: null;
 
@@ -198,6 +199,24 @@ export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): Collaborato
 			collaboratorType: value.collaborator_type,
 		});
 	});
+
+	return formattedUpdate;
+};
+
+/**
+ * Helper function to convert FE camelCase to snake_case for applicationContents
+ * @param data type UpdateEditApplicationRequest application contents in camelCase
+ * @returns  type ApplicationContentUpdates in snake_case
+ */
+export const aliasFileRecord = (data: FilesModel): FilesDTO => {
+	const formattedUpdate: FilesDTO = {
+		applicationId: data.application_id,
+		type: data.type,
+		submitterUserId: data.submitter_user_id,
+		submittedAt: data.submitted_at,
+		content: data.content,
+		filename: data.filename,
+	};
 
 	return formattedUpdate;
 };

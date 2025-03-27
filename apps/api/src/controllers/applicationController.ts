@@ -24,10 +24,12 @@ import logger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
+import { filesSvc } from '@/service/fileService.ts';
 import { pdfSvc } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	CollaboratorsService,
+	FilesService,
 	SignatureService,
 	type ApplicationRecord,
 	type ApplicationService,
@@ -40,6 +42,7 @@ import {
 	aliasApplicationContentsRecord,
 	aliasApplicationRecord,
 	aliasCollaboratorRecord,
+	aliasFileRecord,
 	aliasSignatureRecord,
 } from '@/utils/routes.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -150,6 +153,7 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 	const applicationService: ApplicationService = applicationSvc(database);
 	const signatureService: SignatureService = signatureSvc(database);
 	const collaboratorsService: CollaboratorsService = collaboratorsSvc(database);
+	const fileService: FilesService = filesSvc(database);
 
 	const pdfService: PDFService = pdfSvc();
 
@@ -169,6 +173,20 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 		return collaboratorsContents;
 	}
 
+	const ethicsLetterID = applicationContents.data.contents?.ethics_letter;
+
+	let fileContents = undefined;
+
+	if (ethicsLetterID) {
+		fileContents = await fileService.getFileById({ fileId: ethicsLetterID, withBuffer: true });
+	} else {
+		return failure('Unable to get ethics approval or exemption file.');
+	}
+
+	if (!fileContents.success) {
+		return fileContents;
+	}
+
 	/**
 	 * This is a bit odd because we're using the DTO aliases while passing back to the service (usually its the opposite),
 	 * however, given this service is essentially running a React render, we need to.
@@ -177,6 +195,7 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 		applicationContents: aliasApplicationRecord(applicationContents.data),
 		signatureContents: aliasSignatureRecord(signatureContents.data),
 		collaboratorsContents: aliasCollaboratorRecord(collaboratorsContents.data),
+		fileContents: aliasFileRecord(fileContents.data),
 	});
 
 	if (!renderedPDF.success) {

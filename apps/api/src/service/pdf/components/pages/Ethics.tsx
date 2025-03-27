@@ -19,15 +19,14 @@
 
 import { View } from '@react-pdf/renderer';
 
-import { EthicsDTO } from '@pcgl-daco/data-model';
-
 import Checkbox from '@/service/pdf/components/Checkbox.tsx';
 import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
+import { EthicsLetterDTO } from '@pcgl-daco/data-model/src/types.ts';
 
-const Ethics = ({ ethicsReviewRequired }: EthicsDTO) => {
+const Ethics = ({ ethicsReviewRequired }: EthicsLetterDTO) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Ethics</Title>
