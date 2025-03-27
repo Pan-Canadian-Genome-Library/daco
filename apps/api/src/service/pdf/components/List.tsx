@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import { StyleSheet, Text, View } from '@react-pdf/renderer';
+
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 
 const styles = StyleSheet.create({
 	list: {

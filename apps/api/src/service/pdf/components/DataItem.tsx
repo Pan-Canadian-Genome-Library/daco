@@ -19,8 +19,8 @@
 
 import { Link, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { ReactNode } from 'react';
-import { standardStyles } from './standardStyling.ts';
 
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 interface DataItemProps {
 	item: string;
 	children: ReactNode | string;
