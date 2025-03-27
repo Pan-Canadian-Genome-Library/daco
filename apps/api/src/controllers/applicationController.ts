@@ -492,3 +492,29 @@ export const closeApplication = async ({
 		return failure(message, error);
 	}
 };
+
+export const getRevisions = async ({ applicationId }: { applicationId: number }): AsyncResult<any> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const revisionsResult = await service.getRevisions({ applicationId });
+
+		if (!revisionsResult.success) {
+			return revisionsResult;
+		}
+
+		const revisions = revisionsResult.data;
+
+		if (!revisions) {
+			return failure('No revisions found for the application.', 'NoRevisionsFound');
+		}
+
+		return success(revisions);
+	} catch (error) {
+		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
+		logger.error(message);
+		logger.error(error);
+		return failure(message, error);
+	}
+};
