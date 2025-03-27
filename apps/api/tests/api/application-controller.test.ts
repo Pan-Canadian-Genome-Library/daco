@@ -28,6 +28,7 @@ import {
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
+	getRevisions,
 	rejectApplication,
 	requestApplicationRevisionsByDac,
 	revokeApplication,
@@ -316,7 +317,7 @@ describe('Application API', () => {
 
 			// Verify the revocation failed
 			assert.ok(!result.success);
-			assert.strictEqual(result.errors, 'RevokeConflict');
+			assert.strictEqual(result.errors, 'StateTransitionError');
 			assert.strictEqual(result.message, 'Application should be in APPROVED status');
 		});
 
@@ -479,6 +480,34 @@ describe('Application API', () => {
 		});
 	});
 
+	describe('getRevisions', () => {
+		it('should fetch revisions for a valid applicationId where revisions exist', async () => {
+			// Arrange: Add revisions to the database for a specific application
+			const applicationId = testApplicationId;
+			await testApplicationRepo.createRevisionRequest({
+				applicationId,
+				revisionData: {
+					application_id: applicationId,
+					comments: 'Initial revision',
+					applicant_approved: false,
+					institution_rep_approved: false,
+					collaborators_approved: false,
+					project_approved: false,
+					requested_studies_approved: false,
+					created_at: new Date(),
+				},
+			});
+
+			// Act: Call the getRevisions method
+			const result = await getRevisions({ applicationId });
+
+			// Assert: Verify that revisions are fetched successfully
+			assert.ok(result.success, 'Expected revisions to be fetched successfully');
+			assert.ok(Array.isArray(result.data), 'Expected revisions to be an array');
+			assert.strictEqual(result.data.length, 1, 'Expected one revision to be returned');
+		});
+	});
+
 	describe('Submit Application', () => {
 		it('should successfully submit an application in DRAFT state', async () => {
 			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
@@ -517,7 +546,7 @@ describe('Application API', () => {
 
 			// Assert
 			assert.ok(!result.success);
-			assert.strictEqual(result.errors, 'SubmissionError');
+			assert.strictEqual(result.errors, 'StateTransitionError');
 			assert.match(result.message || '', /Application cannot be submitted from state/);
 		});
 	});
