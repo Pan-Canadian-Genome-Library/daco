@@ -494,3 +494,26 @@ export const closeApplication = async ({
 		return failure('SYSTEM_ERROR', message);
 	}
 };
+
+export const getRevisions = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const revisionsResult = await service.getRevisions({ applicationId });
+
+		if (!revisionsResult.success) {
+			return revisionsResult;
+		}
+
+		return success(revisionsResult.data);
+	} catch (error) {
+		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};

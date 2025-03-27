@@ -26,6 +26,7 @@ import {
 	getAllApplications,
 	getApplicationById,
 	getApplicationStateTotals,
+	getRevisions,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByInstitutionalRep,
 	revokeApplication,
@@ -816,7 +817,7 @@ applicationRouter.post(
 			request,
 			response: ResponseWithData<
 				JoinedApplicationRecord,
-				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION', 'SYSTEM_ERROR']
+				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
 			>,
 		) => {
 			try {
@@ -881,4 +882,49 @@ applicationRouter.post(
 		},
 	),
 );
+
+applicationRouter.get(
+	'/:applicationId/revisions',
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (
+			request,
+			response: ResponseWithData<
+				{ message: string; data: RevisionRequestModel[] },
+				['UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']
+			>,
+		) => {
+			const { applicationId } = request.params;
+
+			if (!applicationId || isNaN(Number(applicationId))) {
+				response.status(400).json({
+					error: 'INVALID_REQUEST',
+					message: 'ApplicationId is required and must be a valid number.',
+				});
+				return;
+			}
+
+			try {
+				// Fetch all revisions for the application
+				const result = await getRevisions({ applicationId: Number(applicationId) });
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Revisions fetched successfully.',
+						data: result.data,
+					});
+					return;
+				}
+
+				response.status(500).send({ error: result.error, message: result.message });
+				return;
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				return;
+			}
+		},
+	),
+);
+
 export default applicationRouter;

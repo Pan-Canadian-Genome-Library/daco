@@ -432,6 +432,25 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+
+	getRevisions: async ({
+		applicationId,
+	}: {
+		applicationId: number;
+	}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
+		try {
+			const results = await db
+				.select()
+				.from(revisionRequests)
+				.where(eq(revisionRequests.application_id, applicationId));
+
+			return success(results);
+		} catch (error) {
+			const message = `Error while fetching revisions for applicationId: ${applicationId}`;
+			logger.error(message, error);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 });
 
 export { applicationSvc };
