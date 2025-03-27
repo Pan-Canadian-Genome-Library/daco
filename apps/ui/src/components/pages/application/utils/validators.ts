@@ -19,10 +19,16 @@
 
 import {
 	ValidatorAgreements,
+	ValidatorAppendices,
 	ValidatorApplicant,
 	ValidatorInstitution,
 } from '@/components/pages/application/utils/validatorFunctions';
-import { isAgreementKey, isApplicantKey, isInstitutionalKey } from '@/components/pages/application/utils/validatorKeys';
+import {
+	isAgreementKey,
+	isAppendicesKey,
+	isApplicantKey,
+	isInstitutionalKey,
+} from '@/components/pages/application/utils/validatorKeys';
 import { SectionRoutes } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
@@ -72,6 +78,11 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 				...sectionTouched,
 				agreement: true,
 			};
+		} else if (isAppendicesKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				appendices: true,
+			};
 		}
 	});
 
@@ -95,7 +106,7 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse): Verify
 		[SectionRoutes.STUDY]: false,
 		[SectionRoutes.ETHICS]: false,
 		[SectionRoutes.AGREEMENT]: fields ? ValidatorAgreements(fields) : false,
-		[SectionRoutes.APPENDICES]: false,
+		[SectionRoutes.APPENDICES]: fields ? ValidatorAppendices(fields) : false,
 		[SectionRoutes.SIGN]: false,
 	};
 };

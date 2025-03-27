@@ -86,6 +86,7 @@ export const aliasApplicationRecord = (data: JoinedApplicationRecord): Applicati
 				projectPublicationUrls: applicationContents.project_publication_urls,
 				requestedStudies: applicationContents.requested_studies,
 				acceptedAgreements: applicationContents.accepted_agreements,
+				acceptedAppendices: applicationContents.accepted_appendices,
 			}
 		: null;
 
@@ -138,6 +139,7 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 		project_title: update.projectTitle,
 		project_website: update.projectWebsite,
 		accepted_agreements: update.acceptedAgreements,
+		accepted_appendices: update.acceptedAppendices,
 	};
 
 	return formattedUpdate;

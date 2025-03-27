@@ -19,12 +19,18 @@
 
 import {
 	AgreementDTO,
+	AppendicesDTO,
 	ApplicantDTO,
 	ApplicationContentsResponse,
 	InstitutionalRepDTO,
 	InstitutionDTO,
 } from '@pcgl-daco/data-model';
-import { agreementsSchema, applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import {
+	agreementsSchema,
+	appendicesSchema,
+	applicantInformationSchema,
+	institutionalRepSchema,
+} from '@pcgl-daco/validation';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
 export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
@@ -43,4 +49,8 @@ export function isInstitutionalKey(value: string): value is keyof InstitutionalK
 
 export function isAgreementKey(value: string): value is keyof AgreementDTO {
 	return value in agreementsSchema.keyof().Values;
+}
+
+export function isAppendicesKey(value: string): value is keyof AppendicesDTO {
+	return value in appendicesSchema.keyof().Values;
 }

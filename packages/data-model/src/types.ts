@@ -152,6 +152,10 @@ export type AgreementDTO = {
 	acceptedAgreements?: string[] | null;
 };
 
+export type AppendicesDTO = {
+	acceptedAppendices?: string[] | null;
+};
+
 export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
@@ -203,7 +207,8 @@ export type ApplicationContentsResponse = {
 	InstitutionalRepDTO &
 	ProjectDTO &
 	RequestedStudiesDTO &
-	AgreementDTO;
+	AgreementDTO &
+	AppendicesDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;
