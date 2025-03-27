@@ -66,7 +66,7 @@ const revisionRequestData: RevisionRequestModel = {
 	requested_studies_notes: 'Unclear scope',
 };
 
-describe('Application API', () => {
+describe('Application Controller', () => {
 	let db: PostgresDb;
 	let testApplicationRepo: ApplicationService;
 	let container: StartedPostgreSqlContainer;
