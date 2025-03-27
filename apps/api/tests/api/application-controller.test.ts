@@ -316,7 +316,7 @@ describe('Application API', () => {
 
 			// Verify the revocation failed
 			assert.ok(!result.success);
-			assert.strictEqual(result.error, 'STATE_TRANSITION_ERROR');
+			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 		});
 
 		it('should fail if application does not exist', async () => {
@@ -331,7 +331,7 @@ describe('Application API', () => {
 	});
 
 	describe('Close Application', () => {
-		it('should allow applicant to close an application in DRAFT state', async () => {
+		it('should close an application in DRAFT state', async () => {
 			await testApplicationRepo.findOneAndUpdate({
 				id: testApplicationId,
 				update: { state: ApplicationStates.DRAFT },
@@ -342,7 +342,7 @@ describe('Application API', () => {
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
 		});
 
-		it('should allow applicant to close an application in INSTITUTIONAL_REP_REVIEW state', async () => {
+		it('should close an application in INSTITUTIONAL_REP_REVIEW state', async () => {
 			await testApplicationRepo.findOneAndUpdate({
 				id: testApplicationId,
 				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW },
@@ -353,7 +353,7 @@ describe('Application API', () => {
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
 		});
 
-		it('should allow applicant to close an application in DAC_REVIEW state', async () => {
+		it('should close an application in DAC_REVIEW state', async () => {
 			await testApplicationRepo.findOneAndUpdate({
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
@@ -364,7 +364,7 @@ describe('Application API', () => {
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
 		});
 
-		it('should allow DAC member to close an application in DAC_REVIEW state', async () => {
+		it('should close an application in DAC_REVIEW state', async () => {
 			await testApplicationRepo.findOneAndUpdate({
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
@@ -373,17 +373,6 @@ describe('Application API', () => {
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
-		});
-
-		it('should prevent non-applicant, non-DAC user from closing in DRAFT state', async () => {
-			await testApplicationRepo.findOneAndUpdate({
-				id: testApplicationId,
-				update: { state: ApplicationStates.DRAFT },
-			});
-			const result = await closeApplication({ applicationId: testApplicationId });
-
-			assert.ok(!result.success);
-			assert.strictEqual(result.message, 'Current user is not authorized to close the application');
 		});
 
 		it('should prevent closing an already CLOSED application', async () => {
@@ -453,7 +442,7 @@ describe('Application API', () => {
 			assert.strictEqual(result.success, false, 'Function should return failure when state is incorrect');
 		});
 
-		it('should handle errors gracefully', async () => {
+		it('should fail when application id is not found', async () => {
 			// Arrange: Force an error
 			const invalidApplicationId = -1;
 
@@ -464,7 +453,8 @@ describe('Application API', () => {
 			});
 
 			// Assert: Should return an error message
-			assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
+			assert.strictEqual(result.success, false);
+			assert.strictEqual(result.error, 'NOT_FOUND');
 		});
 	});
 

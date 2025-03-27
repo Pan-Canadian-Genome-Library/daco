@@ -50,18 +50,9 @@ importers:
       '@pcgl-daco/validation':
         specifier: workspace:^
         version: link:../../packages/validation
-      '@types/body-parser':
-        specifier: ^1.19.5
-        version: 1.19.5
-      '@types/formidable':
-        specifier: ^3.4.5
-        version: 3.4.5
       axios:
         specifier: ^1.7.9
         version: 1.7.9
-      body-parser:
-        specifier: ^1.20.3
-        version: 1.20.3
       connect-redis:
         specifier: ^8.0.1
         version: 8.0.1(express-session@1.18.1)
@@ -114,6 +105,9 @@ importers:
       '@types/express-session':
         specifier: ^1.18.1
         version: 1.18.1
+      '@types/formidable':
+        specifier: ^3.4.5
+        version: 3.4.5
       '@types/node':
         specifier: ^22.13.4
         version: 22.13.13
