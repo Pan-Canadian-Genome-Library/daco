@@ -114,7 +114,13 @@ export interface ApplicantDTO {
 	applicantPrimaryAffiliation?: string | null;
 	applicantInstitutionalEmail?: string | null;
 	applicantProfileUrl?: string | null;
+	applicantInstituteCountry?: string | null;
 	applicantPositionTitle?: string | null;
+	applicantInstituteState?: string | null;
+	applicantInstituteCity?: string | null;
+	applicantInstitutePostalCode?: string | null;
+	applicantInstituteStreetAddress?: string | null;
+	applicantInstituteBuilding?: string | null;
 }
 
 export type InstitutionalRepDTO = {

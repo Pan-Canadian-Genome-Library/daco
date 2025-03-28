@@ -25,6 +25,7 @@ export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationR
 
 export const updateEditApplicationRequestSchema = z
 	.object({
+		// Applicant
 		applicantFirstName: z.string(),
 		applicantMiddleName: z.string(),
 		applicantLastName: z.string(),
@@ -34,6 +35,13 @@ export const updateEditApplicationRequestSchema = z
 		applicantPrimaryAffiliation: z.string(),
 		applicantInstitutionalEmail: z.string(),
 		applicantProfileUrl: z.string(),
+		applicantInstituteState: z.string(),
+		applicantInstituteCity: z.string(),
+		applicantInstitutePostalCode: z.string(),
+		applicantInstituteStreetAddress: z.string(),
+		applicantInstituteBuilding: z.string(),
+		applicantInstituteCountry: z.string(),
+		// Institutional
 		institutionalRepTitle: z.string(),
 		institutionalRepFirstName: z.string(),
 		institutionalRepMiddleName: z.string(),
@@ -49,11 +57,14 @@ export const updateEditApplicationRequestSchema = z
 		institutionStreetAddress: z.string(),
 		institutionPostalCode: z.string(),
 		institutionBuilding: z.string(),
+		// Project
 		projectTitle: z.string(),
 		projectWebsite: z.string(),
 		projectAims: z.string(),
 		projectMethodology: z.string(),
 		projectSummary: z.string(),
+		projectBackground: z.string(),
+		projectPublicationUrls: z.array(z.string()),
 	})
 	.partial();
 

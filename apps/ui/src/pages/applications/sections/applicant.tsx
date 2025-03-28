@@ -21,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { applicantInformationSchema, type ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -32,7 +33,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
@@ -41,23 +42,29 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const [form] = Form.useForm();
 
 	const {
 		formState: { isDirty },
 		getValues,
 		control,
-	} = useForm<ApplicantInformationSchemaType>({
+	} = useForm<Nullable<ApplicantInformationSchemaType>>({
 		defaultValues: {
 			applicantInstituteCountry: 'CAN',
-			applicantTitle: state?.fields?.applicantTitle || undefined,
-			applicantFirstName: state?.fields?.applicantFirstName || undefined,
-			applicantMiddleName: state?.fields?.applicantMiddleName || undefined,
-			applicantLastName: state?.fields?.applicantLastName || undefined,
-			applicantSuffix: state?.fields?.applicantSuffix || undefined,
-			applicantPrimaryAffiliation: state?.fields?.applicantPrimaryAffiliation || undefined,
-			applicantInstituteEmail: state?.fields?.applicantInstitutionalEmail || undefined,
-			applicantProfileUrl: state?.fields?.applicantProfileUrl || undefined,
-			applicantPositionTitle: state?.fields?.applicantPositionTitle || undefined,
+			applicantTitle: state.fields.applicantTitle,
+			applicantFirstName: state.fields.applicantFirstName,
+			applicantMiddleName: state.fields.applicantMiddleName,
+			applicantLastName: state.fields.applicantLastName,
+			applicantSuffix: state.fields.applicantSuffix,
+			applicantPrimaryAffiliation: state.fields.applicantPrimaryAffiliation,
+			applicantInstituteEmail: state.fields.applicantInstitutionalEmail,
+			applicantProfileUrl: state.fields.applicantProfileUrl,
+			applicantPositionTitle: state.fields.applicantPositionTitle,
+			applicantInstituteState: state.fields.applicantInstituteState,
+			applicantInstituteCity: state.fields.applicantInstituteCity,
+			applicantInstitutePostalCode: state.fields.applicantInstitutePostalCode,
+			applicantInstituteStreetAddress: state.fields.applicantInstituteStreetAddress,
+			applicantInstituteBuilding: state.fields.applicantInstituteBuilding,
 		},
 		resolver: zodResolver(applicantInformationSchema),
 	});
@@ -69,7 +76,7 @@ const Applicant = () => {
 			type: 'UPDATE_APPLICATION',
 			payload: {
 				fields: {
-					...state?.fields,
+					...state.fields,
 					applicantTitle: data.applicantTitle,
 					applicantFirstName: data.applicantFirstName,
 					applicantMiddleName: data.applicantMiddleName,
@@ -79,7 +86,12 @@ const Applicant = () => {
 					applicantInstitutionalEmail: data.applicantInstituteEmail,
 					applicantProfileUrl: data.applicantProfileUrl,
 					applicantPositionTitle: data.applicantPositionTitle,
-					// TODO: currently database does not have mailing address for applicant section, once fields are migrated into db, add the fields here
+					applicantInstituteCountry: data.applicantInstituteCountry,
+					applicantInstituteState: data.applicantInstituteState,
+					applicantInstituteCity: data.applicantInstituteCity,
+					applicantInstitutePostalCode: data.applicantInstitutePostalCode,
+					applicantInstituteStreetAddress: data.applicantInstituteStreetAddress,
+					applicantInstituteBuilding: data.applicantInstituteBuilding,
 				},
 				formState: {
 					isDirty,
@@ -88,9 +100,15 @@ const Applicant = () => {
 		});
 	};
 
+	// validate fields that have been dirtied on page load
+	useEffect(() => {
+		form.validateFields({ dirty: true });
+	}, [form]);
+
 	return (
 		<SectionWrapper>
 			<Form
+				form={form}
 				layout="vertical"
 				onBlur={() => {
 					if (isEditMode) {
