@@ -248,7 +248,6 @@ export const submitRevision = async ({
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		appStateManager.can(ApplicationStateEvents.submit_dac_revisions);
 		if (
 			appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED ||
 			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
