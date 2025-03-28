@@ -28,11 +28,9 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<ThemeProvider>
-				<UserProvider>
-					<BrowserRouter>
-						<UserProvider>{children}</UserProvider>
-					</BrowserRouter>
-				</UserProvider>
+				<BrowserRouter>
+					<UserProvider>{children}</UserProvider>
+				</BrowserRouter>
 			</ThemeProvider>
 		</QueryClientProvider>
 	);
