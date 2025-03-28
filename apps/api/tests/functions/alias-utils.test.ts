@@ -22,11 +22,11 @@ import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import assert from 'node:assert';
-import { describe } from 'node:test';
+import { describe, it } from 'node:test';
 import { testUserId } from '../utils/testUtils.ts';
 
 describe('Alias Utils', () => {
-	describe('Alias snake_case to camelCase', () => {
+	it('Alias snake_case to camelCase', () => {
 		const testData: JoinedApplicationRecord = {
 			id: 1,
 			user_id: testUserId,
@@ -44,7 +44,7 @@ describe('Alias Utils', () => {
 		assert.ok(aliasResult.data.hasOwnProperty('approvedAt'));
 	});
 
-	describe('Alias camelCase to snake_case', () => {
+	it('Alias camelCase to snake_case', () => {
 		const testData: UpdateEditApplicationRequest = {
 			applicantFirstName: 'Test',
 			applicantLastName: 'User',
@@ -59,7 +59,7 @@ describe('Alias Utils', () => {
 		assert.ok(aliasResult.data.hasOwnProperty('applicant_institutional_email'));
 	});
 
-	describe('Remove keys not in schema', () => {
+	it('Remove keys not in schema', () => {
 		const testData: JoinedApplicationRecord = {
 			id: 1,
 			user_id: testUserId,

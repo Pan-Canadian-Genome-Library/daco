@@ -30,7 +30,7 @@ import {
 	type RevisionRequestModel,
 } from '@/service/types.js';
 import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/aliases.js';
-import { failure, type AsyncResult } from '@/utils/results.js';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
