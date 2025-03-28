@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { SignatureTypes } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { isPositiveInteger } from '../utils/functions.js';
 import { BASE64_IMAGE } from '../utils/regex.js';
@@ -24,7 +25,7 @@ import { BASE64_IMAGE } from '../utils/regex.js';
 export const editSignatureRequestSchema = z.object({
 	applicationId: z.number().nonnegative().min(1),
 	signature: z.string().regex(BASE64_IMAGE),
-	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+	signee: z.nativeEnum(SignatureTypes),
 });
 export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;
 
@@ -44,4 +45,12 @@ export const deleteSignatureParamsSchema = z.object({
 
 export const deleteSignatureQuerySchema = z.object({
 	signee: z.literal('APPLICANT').or(z.literal('INSTITUTIONAL_REP')),
+});
+
+export const signatureResponseSchema = z.object({
+	applicationId: z.number(),
+	applicantSignature: z.string().nullable().optional(),
+	applicantSignedAt: z.date().nullable().optional(),
+	institutionalRepSignature: z.string().nullable().optional(),
+	institutionalRepSignedAt: z.date().nullable().optional(),
 });

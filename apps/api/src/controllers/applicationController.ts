@@ -29,8 +29,8 @@ import {
 	type ApplicationService,
 	type RevisionRequestModel,
 } from '@/service/types.js';
+import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/routes.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
@@ -76,9 +76,11 @@ export const editApplication = async ({ id, update }: { id: number; update: Upda
 		return failure(message);
 	}
 
-	const data = aliasApplicationContentsRecord(update);
+	const formattedResult = aliasApplicationContentsRecord(update);
 
-	return await applicationRepo.editApplication({ id, update: data });
+	if (!formattedResult.success) return formattedResult;
+
+	return await applicationRepo.editApplication({ id, update: formattedResult.data });
 };
 
 /**
@@ -111,8 +113,8 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 	const result = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
 	if (result.success) {
-		const responseData = aliasApplicationRecord(result.data);
-		return success(responseData);
+		const aliasResult = aliasApplicationRecord(result.data);
+		return aliasResult;
 	}
 
 	return result;

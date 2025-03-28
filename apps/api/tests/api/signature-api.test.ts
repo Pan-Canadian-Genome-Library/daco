@@ -22,15 +22,16 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService } from '@/service/types.js';
-
 import {
 	deleteApplicationSignature,
 	getApplicationSignature,
 	updateApplicationSignature,
 } from '@/controllers/signatureController.ts';
+import { connectToDb, type PostgresDb } from '@/db/index.js';
+import { applicationSvc } from '@/service/applicationService.js';
+import { type ApplicationService } from '@/service/types.js';
+import { SignatureTypes } from '@pcgl-daco/data-model';
+
 import {
 	addInitialApplications,
 	initTestMigration,
@@ -79,7 +80,7 @@ describe('Signature API', () => {
 			const result = await updateApplicationSignature({
 				applicationId,
 				signature: validBase64Signature,
-				signee: 'APPLICANT',
+				signee: SignatureTypes.APPLICANT,
 			});
 
 			assert.ok(result.success);
@@ -102,7 +103,7 @@ describe('Signature API', () => {
 			const result = await updateApplicationSignature({
 				applicationId,
 				signature: validBase64Signature,
-				signee: 'INSTITUTIONAL_REP',
+				signee: SignatureTypes.INSTITUTIONAL_REP,
 			});
 
 			assert.ok(result.success);
@@ -184,7 +185,7 @@ describe('Signature API', () => {
 
 			const result = await deleteApplicationSignature({
 				applicationId,
-				signee: 'APPLICANT',
+				signee: SignatureTypes.APPLICANT,
 			});
 
 			assert.ok(result.success);
@@ -213,7 +214,7 @@ describe('Signature API', () => {
 
 			const result = await deleteApplicationSignature({
 				applicationId,
-				signee: 'INSTITUTIONAL_REP',
+				signee: SignatureTypes.INSTITUTIONAL_REP,
 			});
 
 			assert.ok(result.success);
@@ -233,7 +234,7 @@ describe('Signature API', () => {
 
 			const result = await deleteApplicationSignature({
 				applicationId,
-				signee: 'APPLICANT',
+				signee: SignatureTypes.APPLICANT,
 			});
 
 			assert.strictEqual(result.success, false);

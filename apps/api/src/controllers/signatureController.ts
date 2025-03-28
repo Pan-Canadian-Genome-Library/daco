@@ -17,11 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
+import { aliasSignatureRecord } from '@/utils/aliases.ts';
+import { failure } from '@/utils/results.ts';
+
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
-import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
-import { failure, success } from '@/utils/results.ts';
-import { aliasSignatureRecord } from '@/utils/routes.ts';
 import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
 import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
 
@@ -45,7 +46,7 @@ export const getApplicationSignature = async ({ applicationId }: { applicationId
 	}
 
 	const aliasedResponse = aliasSignatureRecord(result.data);
-	return success(aliasedResponse);
+	return aliasedResponse;
 };
 
 /**
