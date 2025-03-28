@@ -1,1 +1,0 @@
-ALTER TABLE "application_contents" ALTER COLUMN "requested_studies" SET DATA TYPE text;
