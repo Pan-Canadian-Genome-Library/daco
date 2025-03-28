@@ -83,6 +83,7 @@ authRouter.get('/logout', async (request, response) => {
 	}
 
 	try {
+		// TODO: move this request to the oidc provider
 		const params = new URLSearchParams({ token: account.accessToken });
 		await axios({
 			url: urlJoin(authConfig.AUTH_PROVIDER_HOST, `/oauth2/revoke`),

@@ -27,7 +27,7 @@ import { failure, success, type AsyncResult } from '@/utils/results.js';
 
 const logger = BaseLogger.forModule('oidcAuthClient');
 
-/*
+/**
  * OIDC Authorization Flow Step 1
  * This is a redirection to the OIDC provider /authorize endpoint
  *  */
@@ -41,7 +41,7 @@ export const getOidcAuthorizeUrl = (authConfig: AuthConfig, onSuccessRedirectUrl
 	return urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize?${params.toString()}`);
 };
 
-/*
+/**
  * OIDC Authorization Flow Step 2
  * Exchange the authorization code for user tokens.
  */
