@@ -16,46 +16,24 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
+
+import { useQuery } from '@tanstack/react-query';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
+import { FilesDTO } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
-const useEditApplication = () => {
-	const { state, dispatch } = useApplicationContext();
-
-	return useMutation<
-		ApplicationResponseData,
-		ServerError,
-		{ id: number | string; update?: Partial<ApplicationContentsResponse> }
-	>({
-		mutationFn: async ({ id, update }) => {
-			const response = await fetch('/applications/edit', {
-				method: 'POST',
-				body: JSON.stringify({
-					id,
-					update: {
-						...state.fields,
-						...update,
-					},
-				}),
-			}).then(withErrorResponseHandler);
+const useGetDownload = ({ fileId }: { fileId?: number | null }) => {
+	return useQuery<FilesDTO, ServerError>({
+		queryKey: [`file-download-${fileId}`],
+		enabled: false,
+		queryFn: async () => {
+			const response = await fetch(`/file/${fileId}/download`).then(withErrorResponseHandler);
 
 			return await response.json();
-		},
-		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
-		},
-		onSuccess: () => {
-			dispatch({ type: 'UPDATE_DIRTY_STATE', payload: false });
 		},
 	});
 };
 
-export default useEditApplication;
+export default useGetDownload;

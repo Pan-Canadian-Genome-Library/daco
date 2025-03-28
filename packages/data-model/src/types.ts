@@ -40,6 +40,12 @@ export const FileTypes = {
 
 export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
+export const FileExtentionTypes = {
+	PDF: 'application/pdf',
+};
+
+export type FileExtentionType = (typeof FileExtentionTypes)[keyof typeof FileExtentionTypes];
+
 export const SignatureTypes = {
 	APPLICANT: 'APPLICANT',
 	INSTITUTIONAL_REP: 'INSTITUTIONAL_REP',
@@ -148,6 +154,11 @@ export type ProjectDTO = {
 	projectPublicationUrls?: string[] | null;
 };
 
+export type EthicsLetterDTO = {
+	ethicsLetter?: number | null;
+	ethicsReviewRequired?: boolean | null;
+};
+
 export interface RequestedStudiesDTO {
 	requestedStudies?: string[] | null;
 }
@@ -198,7 +209,8 @@ export type ApplicationContentsResponse = {
 	InstitutionDTO &
 	InstitutionalRepDTO &
 	ProjectDTO &
-	RequestedStudiesDTO;
+	RequestedStudiesDTO &
+	EthicsLetterDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;

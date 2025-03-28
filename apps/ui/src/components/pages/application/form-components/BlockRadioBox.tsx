@@ -23,13 +23,13 @@ import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProp
 
 import { BasicFormFieldProps } from '@/global/types';
 import { pcglColors } from '@/providers/ThemeProvider';
-import { EthicsFileEnum } from '@pcgl-daco/validation';
 
 const { Item } = Form;
 const { useToken } = theme;
 
 interface CheckboxValues {
-	value: EthicsFileEnum;
+	key: string;
+	value: boolean;
 	label: string | React.ReactElement;
 }
 
@@ -60,7 +60,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 					{props.options.map((item) => {
 						return (
 							<Flex
-								key={item.value}
+								key={item.key}
 								style={{
 									backgroundColor: pcglColors.greyLight,
 									width: '100%',

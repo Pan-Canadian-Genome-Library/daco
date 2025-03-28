@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { FileExtentionTypes } from '@pcgl-daco/data-model';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import formidable from 'formidable';
@@ -156,11 +157,7 @@ function withQuerySchemaValidation<ReqQuery>(
 	};
 }
 
-const validFileTypes = [
-	'application/pdf',
-	'application/msword',
-	'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
+const validFileTypes = [FileExtentionTypes.PDF];
 /**
  * Wrapper for express RequestHandler to provide file validation checks before upload process
  *
