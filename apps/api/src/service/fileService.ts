@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { eq } from 'drizzle-orm';
 import formidable from 'formidable';
 import fs from 'fs';
 
@@ -24,9 +25,8 @@ import { type PostgresDb } from '@/db/index.js';
 import { files } from '@/db/schemas/files.js';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { FileType } from '@pcgl-daco/data-model';
-import { eq } from 'drizzle-orm';
-import { PostgresTransaction, type FilesModel, type FilesRecord, type JoinedApplicationRecord } from './types.ts';
+import { type FileType } from '@pcgl-daco/data-model';
+import { type FilesModel, type FilesRecord, type JoinedApplicationRecord, type PostgresTransaction } from './types.ts';
 
 const logger = BaseLogger.forModule('fileService');
 
