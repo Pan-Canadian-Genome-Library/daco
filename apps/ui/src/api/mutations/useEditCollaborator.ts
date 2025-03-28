@@ -24,12 +24,12 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorUpdateRecord, type CollaboratorsResponse } from '@pcgl-daco/data-model';
+import { type CollaboratorUpdateRecord, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useEditCollaborator = () => {
 	return useMutation<
-		CollaboratorsResponse[],
+		ListCollaboratorResponse,
 		ServerError,
 		{
 			applicationId: number | string;
@@ -57,7 +57,7 @@ const useEditCollaborator = () => {
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the edit collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
+			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
 				return prev.map((value) => {
 					// Replace cached value with response object
 					if (value.id === data[0]?.id) {
