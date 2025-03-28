@@ -167,7 +167,7 @@ export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Signatur
 /**
  * Helper function to convert Postgres snake_case to FE camelCase for CollaboratorRecord
  * @param data type CollaboratorRecord in snake_case
- * @returns  type GetCollaboratorsResponse in camelcase
+ * @returns  type CollaboratorsResponseDTO in camelcase
  */
 
 export const aliasCollaboratorRecord = (data: CollaboratorRecord): CollaboratorsResponseDTO => {

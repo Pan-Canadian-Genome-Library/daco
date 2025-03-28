@@ -46,7 +46,7 @@ const useDeleteCollaborator = () => {
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the delete collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
+			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
 				return prev.filter((value) => value.id !== data[0]?.id);
 			});
 			notification.success({
