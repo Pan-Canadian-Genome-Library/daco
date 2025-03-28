@@ -615,47 +615,55 @@ applicationRouter.post(
 	}),
 );
 
-applicationRouter.get('/:applicationId/revisions', jsonParser, withParamsSchemaValidation (collaboratorsListParamsSchema, apiZodErrorMapping, async (request: Request, response: Response) => {
-	const { applicationId } = request.params;
+applicationRouter.get(
+	'/:applicationId/revisions',
+	jsonParser,
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (request: Request, response: Response) => {
+			const { applicationId } = request.params;
 
-	if (!applicationId || isNaN(Number(applicationId))) {
-		response.status(400).json({
-			message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			errors: 'MissingOrInvalidParameters',
-		});
-		return;
-	}
-
-	try {
-		// Fetch all revisions for the application
-		const result = await getRevisions({ applicationId: Number(applicationId) });
-
-		if (result.success) {
-			response.status(200).send({
-				message: 'Revisions fetched successfully.',
-				data: result.data,
-			});
-		} else {
-			let status = 500;
-			let message = result.message || 'An unexpected error occurred.';
-			let errors = result.errors;
-
-			if (errors === 'RevisionsNotFound' || errors === 'Revisions record is undefined') {
-				status = 404;
-				message = 'Revisions not found.';
-			} else if (errors === 'RevisionsConflict') {
-				status = 409;
-				message = 'Revisions conflict detected.';
-			} else if (errors === 'InvalidState') {
-				status = 400;
-				message = 'Invalid application state.';
+			if (!applicationId || isNaN(Number(applicationId))) {
+				response.status(400).json({
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					errors: 'MissingOrInvalidParameters',
+				});
+				return;
 			}
 
-			response.status(status).send({ message, errors });
-		}
-	} catch (error) {
-		response.status(500).json({ message: 'Internal server error', error: String(error) });
-	}
-}));
+			try {
+				// Fetch all revisions for the application
+				const result = await getRevisions({ applicationId: Number(applicationId) });
+
+				if (result.success) {
+					response.status(200).send({
+						message: 'Revisions fetched successfully.',
+						data: result.data,
+					});
+				} else {
+					let status = 500;
+					let message = result.message || 'An unexpected error occurred.';
+					let errors = result.errors;
+
+					if (errors === 'RevisionsNotFound' || errors === 'Revisions record is undefined') {
+						status = 404;
+						message = 'Revisions not found.';
+					} else if (errors === 'RevisionsConflict') {
+						status = 409;
+						message = 'Revisions conflict detected.';
+					} else if (errors === 'InvalidState') {
+						status = 400;
+						message = 'Invalid application state.';
+					}
+
+					response.status(status).send({ message, errors });
+				}
+			} catch (error) {
+				response.status(500).json({ message: 'Internal server error', error: String(error) });
+			}
+		},
+	),
+);
 
 export default applicationRouter;
