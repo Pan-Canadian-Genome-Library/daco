@@ -38,7 +38,7 @@ export const getOidcAuthorizeUrl = (authConfig: AuthConfig, onSuccessRedirectUrl
 		scope: `openid profile email org.cilogon.userinfo`,
 		redirect_uri: onSuccessRedirectUrl,
 	});
-	return urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize`, params.toString());
+	return urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize?${params.toString()}`);
 };
 
 /*
