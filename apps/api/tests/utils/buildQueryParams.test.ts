@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
-import { buildQueryParams } from '../../src/utils/buildQueryParams.js';
+
+import { buildQueryParams } from '@/utils/buildQueryParams.js';
 
 describe('buildQueryParams', () => {
 	it('Returns a formatted string for various type of inputs', () => {
