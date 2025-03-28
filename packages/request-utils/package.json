@@ -17,7 +17,8 @@
 	"dependencies": {
 		"express": "^4.18.2",
 		"formidable": "^3.5.2",
-		"zod": "^3.24.1"
+		"zod": "^3.24.1",
+		"@pcgl-daco/logger": "workspace:^"
 	},
 	"devDependencies": {
 		"@types/express": "^5.0.0",
