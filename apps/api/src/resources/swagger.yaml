@@ -931,6 +931,13 @@ paths:
         - File
       summary: Upload new file or replace old file
       description: Numeric ID of the associated application upload
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated application upload
       consumes:
         - multipart/form-data
       requestBody:
