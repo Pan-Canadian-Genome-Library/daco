@@ -18,10 +18,11 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { requestedStudySchema, type RequestedStudySchemaType } from '@pcgl-daco/validation';
+import { requestedStudiesSchema, RequestedStudiesSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { type SubmitHandler, useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
@@ -30,12 +31,13 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
 
-const rule = createSchemaFieldRule(requestedStudySchema);
+const rule = createSchemaFieldRule(requestedStudiesSchema);
 
 interface RequestedStudy {
 	studyName: string;
@@ -56,18 +58,55 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { state, dispatch } = useApplicationContext();
+	const [form] = Form.useForm();
 
-	const { handleSubmit, control } = useForm<RequestedStudySchemaType>({
-		resolver: zodResolver(requestedStudySchema),
+	const {
+		formState: { isDirty },
+		control,
+		getValues,
+	} = useForm<Nullable<RequestedStudiesSchemaType>>({
+		defaultValues: {
+			requestedStudies: state.fields.requestedStudies,
+		},
+		resolver: zodResolver(requestedStudiesSchema),
 	});
 
-	const onSubmit: SubmitHandler<RequestedStudySchemaType> = (data) => {
+	const onSubmit = () => {
+		const data = getValues();
 		console.log(data);
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				fields: {
+					...state.fields,
+					requestedStudies: data.requestedStudies,
+				},
+				formState: {
+					...state.formState,
+					isDirty,
+				},
+			},
+		});
 	};
+
+	// validate fields that have been dirtied on page load
+	useEffect(() => {
+		form.validateFields({ dirty: true });
+	}, [form]);
 
 	return (
 		<SectionWrapper>
-			<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+			<Form
+				form={form}
+				layout="vertical"
+				onBlur={() => {
+					if (isEditMode) {
+						onSubmit();
+					}
+				}}
+			>
 				<SectionTitle
 					title={translate('requested-study.title')}
 					text={
@@ -82,12 +121,13 @@ const RequestedStudy = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
 								label={translate('requested-study.section1.form.studyName')}
-								name="requestedStudy"
+								name="requestedStudies"
 								placeholder="Select"
 								control={control}
 								rule={rule}
+								initialValue={getValues('requestedStudies')}
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyID, label: study.studyName };
+									return { value: study.studyName, label: study.studyName };
 								})}
 								required
 								disabled={!isEditMode}
