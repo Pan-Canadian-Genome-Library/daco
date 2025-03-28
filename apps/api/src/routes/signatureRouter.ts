@@ -66,13 +66,13 @@ signatureRouter.get(
 				const applicationId = Number(request.params.applicationId);
 
 				if (!isPositiveInteger(applicationId)) {
-					response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 					return;
 				}
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
-					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
 				const userRole = getUserRole(request.session);
@@ -104,7 +104,7 @@ signatureRouter.get(
 				const result = await getApplicationSignature({ applicationId: Number(applicationId) });
 
 				if (result.success) {
-					response.status(200).send(result.data);
+					response.status(200).json(result.data);
 					return;
 				}
 
@@ -152,7 +152,7 @@ signatureRouter.post(
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
-					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
 				const userRole = getUserRole(request.session);
@@ -190,7 +190,7 @@ signatureRouter.post(
 				});
 
 				if (result.success) {
-					response.send(result.data);
+					response.json(result.data);
 					return;
 				}
 
@@ -234,14 +234,14 @@ signatureRouter.delete(
 					const applicationId = Number(request.params.applicationId);
 
 					if (!isPositiveInteger(applicationId)) {
-						response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+						response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 						return;
 					}
 
 					// Validate Query Params
 					const queryValidationResult = deleteSignatureQuerySchema.safeParse(request.query);
 					if (!queryValidationResult.success) {
-						response.status(400).send({
+						response.status(400).json({
 							error: 'INVALID_REQUEST',
 							message: `5Signee parameter must be either 'APPLICANT' or 'INSTITUTIONAL_REP'.`,
 						});
@@ -252,7 +252,7 @@ signatureRouter.delete(
 					// Get user from session and validate that they can act on this application
 					const { userId } = request.session.user || {};
 					if (!userId) {
-						response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 						return;
 					}
 					const userRole = getUserRole(request.session);
@@ -293,7 +293,7 @@ signatureRouter.delete(
 						/**
 						 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
 						 */
-						response.status(204).send();
+						response.status(204).json();
 						return;
 					}
 

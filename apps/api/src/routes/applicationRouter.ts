@@ -107,16 +107,16 @@ applicationRouter.post(
 		const { userId } = user || {};
 
 		if (!userId) {
-			response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 			return;
 		}
 
 		const result = await createApplication({ user_id: userId });
 
 		if (result.success) {
-			response.status(201).send(result.data);
+			response.status(201).json(result.data);
 		} else {
-			response.status(500).send({ error: 'SYSTEM_ERROR', message: result.message });
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 		}
 	},
 );
@@ -142,7 +142,7 @@ applicationRouter.post(
 			const { userId } = user || {};
 
 			if (!userId) {
-				response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
 			}
 			try {
@@ -166,7 +166,7 @@ applicationRouter.post(
 
 				const result = await editApplication({ id, update });
 				if (result.success) {
-					response.send(result.data);
+					response.json(result.data);
 					return;
 				}
 				switch (result.error) {
@@ -203,7 +203,7 @@ applicationRouter.get(
 		const { userId } = request.session.user || {};
 
 		if (!userId) {
-			response.status(400).send({ error: 'UNAUTHORIZED', message: 'User ID is required' });
+			response.status(400).json({ error: 'UNAUTHORIZED', message: 'User ID is required' });
 			return;
 		}
 
@@ -222,7 +222,7 @@ applicationRouter.get(
 		) {
 			response
 				.status(400)
-				.send({ error: 'INVALID_REQUEST', message: 'Page and/or page size must be a positive integer.' });
+				.json({ error: 'INVALID_REQUEST', message: 'Page and/or page size must be a positive integer.' });
 			return;
 		}
 
@@ -233,7 +233,7 @@ applicationRouter.get(
 			sort = typeof sortQuery === 'string' ? JSON.parse(sortQuery) : [];
 			state = typeof stateQuery === 'string' ? JSON.parse(stateQuery as any) : [];
 		} catch {
-			response.status(400).send({
+			response.status(400).json({
 				error: 'INVALID_REQUEST',
 				message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.',
 			});
@@ -249,7 +249,7 @@ applicationRouter.get(
 		});
 
 		if (result.success) {
-			response.status(200).send(result.data);
+			response.status(200).json(result.data);
 			return;
 		} else {
 			switch (result.error) {
@@ -285,7 +285,7 @@ applicationRouter.get(
 		const { userId } = user || {};
 
 		if (!userId) {
-			response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 			return;
 		}
 
@@ -308,7 +308,7 @@ applicationRouter.get(
 				return;
 			}
 
-			response.status(200).send(data);
+			response.status(200).json(data);
 			return;
 		}
 		switch (result.error) {
@@ -338,10 +338,10 @@ applicationRouter.get(
 		const result = await getApplicationStateTotals();
 
 		if (result.success) {
-			response.status(200).send(result.data);
+			response.status(200).json(result.data);
 			return;
 		} else {
-			response.status(500).send({ error: 'SYSTEM_ERROR', message: result.message });
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 			return;
 		}
 	},
@@ -354,12 +354,12 @@ applicationRouter.post(
 		request,
 		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
 	) => {
-		const { applicationId }: { applicationId?: number } = request.body;
+		const { applicationId }: { applicationId: unknown } = request.body;
 
-		if (typeof applicationId !== 'number' || !applicationId) {
-			response.status(400).send({
+		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
+			response.status(400).json({
 				error: 'INVALID_REQUEST',
-				message: 'Invalid request. ApplicationId must be a valid number and is required.',
+				message: 'ApplicationId must be a valid number and is required.',
 			});
 			return;
 		}
@@ -368,7 +368,7 @@ applicationRouter.post(
 			const result = await approveApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).send({
+				response.status(200).json({
 					message: 'Application approved successfully.',
 					data: result.data,
 				});
@@ -404,9 +404,9 @@ applicationRouter.post(
 			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
 		>,
 	) => {
-		const { applicationId } = request.body;
+		const { applicationId }: { applicationId: unknown } = request.body;
 
-		if (!applicationId || !isPositiveInteger(applicationId)) {
+		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
 			response.status(400).json({
 				error: 'INVALID_REQUEST',
 				message: 'Invalid request. ApplicationId is required and must be a valid number.',
@@ -418,7 +418,7 @@ applicationRouter.post(
 			const result = await dacRejectApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).send({
+				response.status(200).json({
 					message: 'Application rejected successfully.',
 					data: result.data,
 				});
@@ -471,7 +471,7 @@ applicationRouter.post(
 			const { userId } = user || {};
 
 			if (!userId) {
-				response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
 			}
 
@@ -497,7 +497,7 @@ applicationRouter.post(
 				const result = await submitRevision({ applicationId });
 
 				if (result.success) {
-					response.status(200).send({
+					response.status(200).json({
 						message: 'Application review submitted successfully.',
 						data: result.data,
 					});
@@ -518,7 +518,7 @@ applicationRouter.post(
 					}
 				}
 			} catch (error) {
-				response.status(500).send({
+				response.status(500).json({
 					error: 'SYSTEM_ERROR',
 					message: 'Unexpected error.',
 				});
@@ -553,7 +553,7 @@ applicationRouter.post(
 			const { userId } = user || {};
 
 			if (!userId) {
-				response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
 			}
 
@@ -579,7 +579,7 @@ applicationRouter.post(
 				const result = await revokeApplication(applicationId);
 
 				if (result.success) {
-					response.status(200).send({
+					response.status(200).json({
 						message: 'Application revoked successfully.',
 						data: result.data,
 					});
@@ -600,7 +600,7 @@ applicationRouter.post(
 					}
 				}
 			} catch (error) {
-				response.status(500).send({
+				response.status(500).json({
 					error: 'SYSTEM_ERROR',
 					message: 'Unexpected error.',
 				});
@@ -629,7 +629,7 @@ applicationRouter.post(
 			const result = await closeApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).send({
+				response.status(200).json({
 					message: 'Application closed successfully.',
 					data: result.data,
 				});
@@ -650,7 +650,7 @@ applicationRouter.post(
 				}
 			}
 		} catch (error) {
-			response.status(500).send({
+			response.status(500).json({
 				error: 'SYSTEM_ERROR',
 				message: 'Unexpected error.',
 			});
@@ -672,7 +672,7 @@ applicationRouter.post(
 			const applicationId = Number(request.params);
 
 			if (!isPositiveInteger(applicationId)) {
-				response.status(400).send({
+				response.status(400).json({
 					error: 'INVALID_REQUEST',
 					message: 'ApplicationId is required and must be a valid number.',
 				});
@@ -681,7 +681,7 @@ applicationRouter.post(
 
 			const { userId } = request.session.user || {};
 			if (!userId) {
-				response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
 			}
 
@@ -706,7 +706,7 @@ applicationRouter.post(
 			const result = await submitApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).send({
+				response.status(200).json({
 					message: 'Application rejected successfully.',
 					data: result.data,
 				});
@@ -728,7 +728,7 @@ applicationRouter.post(
 				}
 			}
 		} catch (error) {
-			response.status(500).send({
+			response.status(500).json({
 				error: 'SYSTEM_ERROR',
 				message: 'Unexpected error.',
 			});
@@ -747,7 +747,7 @@ applicationRouter.post(
 					const applicationId = Number(request.params.applicationId);
 
 					if (!isPositiveInteger(applicationId)) {
-						response.status(400).send({
+						response.status(400).json({
 							error: 'INVALID_REQUEST',
 							message: 'Invalid request. ApplicationId is required and must be a valid number.',
 						});
@@ -796,7 +796,7 @@ applicationRouter.post(
 						}
 					}
 				} catch (error) {
-					response.status(500).send({
+					response.status(500).json({
 						error: 'SYSTEM_ERROR',
 						message: 'Unexpected error.',
 					});
@@ -824,7 +824,7 @@ applicationRouter.post(
 				const applicationId = Number(request.params.applicationId);
 
 				if (!isPositiveInteger(applicationId)) {
-					response.status(400).send({
+					response.status(400).json({
 						error: 'INVALID_REQUEST',
 						message: 'Invalid request. ApplicationId is required and must be a valid number.',
 					});
@@ -874,7 +874,7 @@ applicationRouter.post(
 					}
 				}
 			} catch (error) {
-				response.status(500).send({
+				response.status(500).json({
 					error: 'SYSTEM_ERROR',
 					message: 'Unexpected error.',
 				});
@@ -910,14 +910,14 @@ applicationRouter.get(
 				const result = await getRevisions({ applicationId: Number(applicationId) });
 
 				if (result.success) {
-					response.status(200).send({
+					response.status(200).json({
 						message: 'Revisions fetched successfully.',
 						data: result.data,
 					});
 					return;
 				}
 
-				response.status(500).send({ error: result.error, message: result.message });
+				response.status(500).json({ error: result.error, message: result.message });
 				return;
 			} catch (error) {
 				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });

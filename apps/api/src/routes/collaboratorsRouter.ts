@@ -62,7 +62,7 @@ collaboratorsRouter.post(
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
-					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
 
@@ -73,7 +73,7 @@ collaboratorsRouter.post(
 				});
 
 				if (result.success) {
-					response.status(201).send(result.data);
+					response.status(201).json(result.data);
 					return;
 				}
 				switch (result.error) {
@@ -122,7 +122,7 @@ collaboratorsRouter.get(
 			const applicationId = Number(request.params.applicationId);
 
 			if (!isPositiveInteger(applicationId)) {
-				response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+				response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 				return;
 			}
 
@@ -130,7 +130,7 @@ collaboratorsRouter.get(
 			// TODO: Institutional Rep needs to be able to see the collaborators as well, but they don't have a user ID on the application to check...
 			const { userId } = request.session.user || {};
 			if (!userId) {
-				response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
 			}
 			const userRole = getUserRole(request.session);
@@ -166,7 +166,7 @@ collaboratorsRouter.get(
 			});
 
 			if (result.success) {
-				response.status(201).send(result.data);
+				response.status(201).json(result.data);
 				return;
 			}
 			switch (result.error) {
@@ -202,20 +202,20 @@ collaboratorsRouter.delete(
 				const collaboratorId = Number(request.params.collaborator_id);
 
 				if (!isPositiveInteger(collaboratorId)) {
-					response.status(400).send({ error: 'INVALID_REQUEST', message: 'Collaborator ID is not a valid number.' });
+					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Collaborator ID is not a valid number.' });
 					return;
 				}
 
 				const applicationId = Number(request.params.applicationId);
 
 				if (!isPositiveInteger(applicationId)) {
-					response.status(400).send({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 					return;
 				}
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
-					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
 
@@ -247,7 +247,7 @@ collaboratorsRouter.delete(
 				});
 
 				if (result.success) {
-					response.status(201).send(result.data);
+					response.status(201).json(result.data);
 					return;
 				}
 				switch (result.error) {
@@ -291,7 +291,7 @@ collaboratorsRouter.post(
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
-					response.status(401).send({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
 
@@ -302,7 +302,7 @@ collaboratorsRouter.post(
 				});
 
 				if (result.success) {
-					response.status(201).send(result.data);
+					response.status(201).json(result.data);
 					return;
 				}
 				switch (result.error) {

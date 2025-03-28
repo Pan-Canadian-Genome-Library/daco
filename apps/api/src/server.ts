@@ -64,7 +64,7 @@ const startServer = async () => {
 	);
 
 	app.get('/', async (req: Request, res: Response) => {
-		res.json({});
+		res.send();
 	});
 
 	app.get('/health', (_req: Request, res: Response) => {
@@ -76,11 +76,11 @@ const startServer = async () => {
 		};
 
 		if (health.all.status != Status.OK) {
-			res.status(500).send(resBody);
+			res.status(500).json(resBody);
 			return;
 		}
 
-		res.status(200).send(resBody);
+		res.status(200).json(resBody);
 	});
 
 	app.listen(serverConfig.PORT, () => {
