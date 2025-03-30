@@ -61,7 +61,8 @@ export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'conten
 }
 
 export type FilesModel = typeof files.$inferInsert;
-export type FilesUpdate = Partial<FilesModel>;
+export type FilesRecord = typeof files.$inferSelect;
+export type FilesUpdate = Partial<FilesRecord>;
 
 export type FilesService = ReturnType<typeof filesSvc>;
 

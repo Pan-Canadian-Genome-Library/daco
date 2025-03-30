@@ -634,14 +634,14 @@ paths:
     delete:
       tags:
         - Collaborators
-      summary: Create new Collaborators for an application.
+      summary: Remove collaborator from an application.
       parameters:
         - in: path
           name: applicationId
           schema:
             type: integer
           required: true
-          description: Numeric ID of the relevant application to get
+          description: Numeric ID of the relevant application that the collaborator will be removed form.
         - in: path
           name: collaboratorId
           schema:
@@ -918,6 +918,52 @@ paths:
                 $ref: '#/components/responses/ClientErrors'
         '500':
           description: Server error - unable to process closure request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+  /applications/{applicationId}/revisions:
+    get:
+      tags:
+        - Revisions
+      summary: Get all revisions for a specific application
+      description: Fetches all revisions associated with a given application ID.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application to fetch revisions for.
+      responses:
+        '200':
+          description: Revisions fetched successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Revisions fetched successfully.'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RevisionDetails'
+        '400':
+          description: Invalid request - applicationId is missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: No revisions found for the given applicationId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Internal server error while fetching revisions.
           content:
             application/json:
               schema:
@@ -1227,6 +1273,82 @@ components:
           format: date-time
           description: The time the applicant signed at.
           nullable: true
+    RevisionDetails:
+      type: object
+      description: Details of a specific revision request associated with an application.
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the revision request, generated automatically.
+          example: 1
+        applicationId:
+          type: integer
+          description: The ID of the application this revision request pertains to.
+          example: 12345
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the revision request was created, defaults to the current time.
+          example: '2025-03-20T10:00:00Z'
+        comments:
+          type: string
+          description: General comments related to the revision request.
+          nullable: true
+          example: 'Please review the updated ethics section.'
+        applicantNotes:
+          type: string
+          description: Notes specific to the applicant information section.
+          nullable: true
+          example: 'Applicant needs to clarify funding details.'
+        applicantApproved:
+          type: boolean
+          description: Indicates whether the applicant information section is approved.
+          example: true
+        institutionRepApproved:
+          type: boolean
+          description: Indicates whether the institutional representative section is approved.
+          example: false
+        institutionRepNotes:
+          type: string
+          description: Notes specific to the institutional representative section.
+          nullable: true
+          example: 'Missing signature from institutional rep.'
+        collaboratorsApproved:
+          type: boolean
+          description: Indicates whether the collaborators section is approved.
+          example: true
+        collaboratorsNotes:
+          type: string
+          description: Notes specific to the collaborators section.
+          nullable: true
+          example: 'All collaborator details verified.'
+        projectApproved:
+          type: boolean
+          description: Indicates whether the project information section is approved.
+          example: true
+        projectNotes:
+          type: string
+          description: Notes specific to the project information section.
+          nullable: true
+          example: 'Project methodology needs more detail.'
+        requestedStudiesApproved:
+          type: boolean
+          description: Indicates whether the requested studies section is approved.
+          example: true
+        requestedStudiesNotes:
+          type: string
+          description: Notes specific to the requested studies section.
+          nullable: true
+          example: 'Studies align with project goals.'
+      required:
+        - id
+        - applicationId
+        - createdAt
+        - applicantApproved
+        - institutionRepApproved
+        - collaboratorsApproved
+        - projectApproved
+        - requestedStudiesApproved
 
   requests:
     ApplicationCreation:
@@ -1610,10 +1732,14 @@ components:
       type: object
       required:
         - message
+        - error
       properties:
+        error:
+          type: string
+          description: Code to identify the cause of the error.
         message:
           type: string
-          description: General description of error with parameters and context
+          description: Short description of the error to provide some context for why the request failed.
 
     CollaboratorsListResponse:
       type: array
@@ -1625,13 +1751,14 @@ components:
       type: object
       required:
         - message
+        - error
       properties:
+        error:
+          type: string
+          description: Code to identify the cause of the error.
         message:
           type: string
-          description: General description of error with parameters and context
-        errors:
-          description: Detailed error data thrown by code failure
-          type: string
+          description: Short description of the error to provide some context for why the request failed.
 
     SignatureRecord:
       type: object
@@ -1689,10 +1816,10 @@ components:
       properties:
         error:
           type: string
-          description: Error code, usually "RequestValidationError"
+          description: Code to identify the cause of the error.
         message:
           type: string
-          description: General description of error with parameters and context
+          description: Short description of the error to provide some context for why the request failed.
         details:
           type: array
           items:

@@ -19,8 +19,10 @@
 
 import { setStatus, Status } from '@/app-health.js';
 import * as schema from '@/db/schemas/index.js';
-import logger from '@/logger.js';
+import BaseLogger from '@/logger.js';
 import { drizzle } from 'drizzle-orm/node-postgres';
+
+const logger = BaseLogger.forModule('index');
 
 export type PostgresDb = ReturnType<typeof drizzle<typeof schema>>;
 
