@@ -17,14 +17,37 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { deleteFile, uploadEthicsFile } from '@/controllers/fileController.ts';
+import { deleteFile, getFile, uploadEthicsFile } from '@/controllers/fileController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.ts';
 import { fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { fileDeleteParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
+import { fileDeleteParamsSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request, type Response } from 'express';
 import formidable from 'formidable';
 
 const fileRouter = express.Router();
+
+fileRouter.get(
+	'/:fileId',
+	withParamsSchemaValidation(getFileByIdParamsSchema, apiZodErrorMapping, async (req, res) => {
+		const { fileId } = req.params;
+
+		const id = parseInt(fileId ? fileId : '');
+
+		if (!isPositiveInteger(id)) {
+			res.status(400).send({ message: 'Invalid fileId' });
+			return;
+		}
+		const result = await getFile({ fileId: id });
+
+		if (!result.success) {
+			res.status(500).send(result);
+			return;
+		}
+
+		res.status(200).send(result.data);
+		return;
+	}),
+);
 
 fileRouter.post(
 	'/ethics/:applicationId',
@@ -41,9 +64,11 @@ fileRouter.post(
 		}
 
 		const result = await uploadEthicsFile({ applicationId: id, file });
-
 		if (result.success) {
-			res.status(200).json(result.data);
+			res.status(200).send({
+				id: result.data.id,
+				filename: result.data.filename,
+			});
 			return;
 		} else {
 			res.status(500).json({ message: result.message, error: 'SYSTEM_ERROR' });
@@ -71,6 +96,29 @@ fileRouter.delete(
 		}
 
 		res.status(204).send();
+		return;
+	}),
+);
+
+fileRouter.get(
+	'/:fileId/download',
+	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
+		const { fileId } = req.params;
+		const id = parseInt(fileId ? fileId : '');
+
+		if (!isPositiveInteger(id)) {
+			res.status(400).send({ message: 'Invalid fileId' });
+			return;
+		}
+
+		const result = await getFile({ fileId: id, withBuffer: true });
+
+		if (!result.success) {
+			res.status(500).send(result);
+			return;
+		}
+
+		res.status(200).send(result.data);
 		return;
 	}),
 );

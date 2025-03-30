@@ -27,7 +27,7 @@ import {
 	type FilesRecord,
 	type FilesService,
 } from '@/service/types.ts';
-import { failure, type AsyncResult, type Result } from '@/utils/results.ts';
+import { failure, success, type AsyncResult, type Result } from '@/utils/results.ts';
 import { FileTypes } from '@pcgl-daco/data-model';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
@@ -111,6 +111,36 @@ export const uploadEthicsFile = async ({
 };
 
 /**
+ * Get a file by application
+ * @param fileId - The target fileId to associate the uploaded file
+ * @returns Success with file data / Failure with Error.
+ */
+export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; withBuffer?: boolean }) => {
+	try {
+		const database = getDbInstance();
+		const filesService: FilesService = filesSvc(database);
+
+		const result = await filesService.getFileById({ fileId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		// Strip content
+		if (!withBuffer) {
+			return success({ ...result.data, content: null });
+		}
+
+		return result;
+	} catch (error) {
+		const message = `Unable to retrieve file with id: ${fileId}`;
+		logger.error(message, error);
+
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+/*
  * Delete a file with id
  * @param fileId - The target fileId to associate the uploaded file
  * @returns Success with file data / Failure with Error.

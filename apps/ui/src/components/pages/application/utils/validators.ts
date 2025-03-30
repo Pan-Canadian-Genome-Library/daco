@@ -19,6 +19,7 @@
 
 import {
 	ValidatorApplicant,
+	ValidatorEthics,
 	ValidatorInstitution,
 	ValidatorProject,
 	ValidatorStudy,
@@ -26,6 +27,7 @@ import {
 
 import {
 	isApplicantKey,
+	isEthicsKey,
 	isInstitutionalKey,
 	isProjectKey,
 	isRequestedStudies,
@@ -84,6 +86,11 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 				...sectionTouched,
 				study: true,
 			};
+		} else if (isEthicsKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				ethics: true,
+			};
 		}
 	});
 
@@ -105,7 +112,7 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse): Verify
 		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
 		[SectionRoutes.STUDY]: fields ? ValidatorStudy(fields) : false,
-		[SectionRoutes.ETHICS]: false,
+		[SectionRoutes.ETHICS]: fields ? ValidatorEthics(fields) : false,
 		[SectionRoutes.AGREEMENT]: false,
 		[SectionRoutes.APPENDICES]: false,
 		[SectionRoutes.SIGN]: false,

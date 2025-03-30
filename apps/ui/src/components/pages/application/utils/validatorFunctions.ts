@@ -20,6 +20,7 @@
 import { type ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import {
 	applicantInformationSchema,
+	ethicsSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
 	requestedStudiesSchema,
@@ -83,5 +84,12 @@ export const ValidatorProject = (fields: ApplicationContentsResponse): boolean =
 export const ValidatorStudy = (fields: ApplicationContentsResponse): boolean => {
 	return requestedStudiesSchema.safeParse({
 		requestedStudies: fields.requestedStudies,
+	}).success;
+};
+
+export const ValidatorEthics = (fields: ApplicationContentsResponse): boolean => {
+	return ethicsSchema.safeParse({
+		ethicsReviewRequired: fields.ethicsReviewRequired,
+		ethicsLetter: fields.ethicsLetter,
 	}).success;
 };

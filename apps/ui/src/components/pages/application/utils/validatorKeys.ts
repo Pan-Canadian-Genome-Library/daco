@@ -25,8 +25,10 @@ import {
 	ProjectDTO,
 	RequestedStudiesDTO,
 } from '@pcgl-daco/data-model';
+import { EthicsLetterDTO } from '@pcgl-daco/data-model/src/types';
 import {
 	applicantInformationSchema,
+	ethicsSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
 	requestedStudiesSchema,
@@ -54,4 +56,9 @@ export function isProjectKey(value: string): value is keyof ProjectDTO {
 // RequestedStudyKey
 export function isRequestedStudies(value: string): value is keyof RequestedStudiesDTO {
 	return value in requestedStudiesSchema.keyof().Values;
+}
+
+// EthicsKey
+export function isEthicsKey(value: string): value is keyof EthicsLetterDTO {
+	return value in ethicsSchema.keyof().Values;
 }
