@@ -21,588 +21,910 @@ import {
 	approveApplication,
 	closeApplication,
 	createApplication,
+	dacRejectApplication,
 	editApplication,
 	getAllApplications,
 	getApplicationById,
 	getApplicationStateTotals,
-	rejectApplication,
-	submitApplication,
-	revokeApplication,
+	getRevisions,
 	requestApplicationRevisionsByDac,
-	requestApplicationRevisionsByRep,
+	requestApplicationRevisionsByInstitutionalRep,
+	revokeApplication,
+	submitApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
-import { RevisionRequestModel } from '@/service/types.ts';
+import {
+	RevisionRequestModel,
+	type ApplicationRecord,
+	type ApplicationStateTotals,
+	type JoinedApplicationRecord,
+} from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
+import type { ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
 	collaboratorsListParamsSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
-	closeApplicationSchema,
+	userRoleSchema,
 } from '@pcgl-daco/validation';
-import bodyParser from 'body-parser';
-import express, { type Request, type Response } from 'express';
+import express, { type Request } from 'express';
+import { authMiddleware } from '../middleware/authMiddleware.ts';
+import { getUserRole } from '../service/authService.ts';
+import { failure, success, type AsyncResult } from '../utils/results.ts';
+import type { ResponseWithData } from './types.ts';
 
 const applicationRouter = express.Router();
-const jsonParser = bodyParser.json();
+
+/**
+ * Ensure that the application requested is owned/created by the user making the request.
+ * This will fetch the application from the database and check that the stored application's
+ * user_id property matches the provided userId parameter, otherwise it will return a Result
+ * of 'FORBIDDEN'.
+ *
+ * This function returns several error cases in order to handle cases where:
+ * - NOT_FOUND: the application id was not found in the database
+ * - SYSTEM_ERROR: somethign unexpected happened fetching the application
+ * - FORBIDEN: the application does not belong to this user
+ * @param param0
+ * @returns
+ */
+async function validateUserPermissionForApplication({
+	userId,
+	applicationId,
+}: {
+	userId: string;
+	applicationId: number;
+}): AsyncResult<void, 'NOT_FOUND' | 'SYSTEM_ERROR' | 'FORBIDDEN'> {
+	try {
+		// We need to get the application to validate that this user can edit it
+		const applicationResult = await getApplicationById({ applicationId });
+		if (!applicationResult.success) {
+			return applicationResult;
+		}
+
+		// ensure application has this user's ID
+		if (applicationResult.data.userId !== userId) {
+			return failure('FORBIDDEN', 'User is not the creater of this application.');
+		}
+
+		return success(undefined);
+	} catch (error) {
+		return failure('SYSTEM_ERROR', 'Unexpected error.');
+	}
+}
 
 /**
  * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
  * 	- Validate request params using Zod.
  */
-applicationRouter.post('/create', jsonParser, async (request: Request<{}, {}, { userId: string }, any>, response) => {
-	const { userId } = request.body;
+applicationRouter.post(
+	'/create',
+	authMiddleware(),
+	async (request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>, next) => {
+		const { user } = request.session;
+		const { userId } = user || {};
 
-	/**
-	 * TODO: Temporary userId check until validation/dto flow is confirmed.
-	 * Reflect changes in swagger once refactored.
-	 **/
-	if (!userId) {
-		response.status(400).send({ message: 'User ID is required.' });
-		return;
-	}
+		if (!userId) {
+			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+			return;
+		}
 
-	const result = await createApplication({ user_id: userId });
+		const result = await createApplication({ user_id: userId });
 
-	if (result.success) {
-		response.status(201).send(result.data);
-	} else {
-		response.status(500).send({ message: result.message, errors: String(result.errors) });
-	}
-});
+		if (result.success) {
+			response.status(201).json(result.data);
+		} else {
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+		}
+	},
+);
 
 applicationRouter.post(
 	'/edit',
-	jsonParser,
+	authMiddleware(),
 	withBodySchemaValidation(
 		editApplicationRequestSchema,
 		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			// TODO: Add Auth
+		async (
+			request,
+			response: ResponseWithData<
+				JoinedApplicationRecord,
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
 			const data = request.body;
 			const { id, update } = data;
-			const result = await editApplication({ id, update });
-			if (result.success) {
-				response.send(result.data);
-			} else {
-				// TODO: System Error Handling
-				if (String(result.errors) === 'Error: Application record is undefined') {
-					response.status(404);
-				} else {
-					response.status(500);
+
+			// Need user ID to validate the user has access to this app.
+			const { user } = request.session;
+			const { userId } = user || {};
+
+			if (!userId) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
+			}
+			try {
+				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId: id });
+				if (!userMayEditResult.success) {
+					switch (userMayEditResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'FORBIDDEN': {
+							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+					}
 				}
-				response.send({ message: result.message, errors: String(result.errors) });
+
+				const result = await editApplication({ id, update });
+				if (result.success) {
+					response.json(result.data);
+					return;
+				}
+				switch (result.error) {
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				return;
 			}
 		},
 	),
 );
 
-// TODO: - Refactor endpoint logic once validation/dto flow is in place
-//       - verify if user can access applications
-//       - validate queryParam options using zod
-applicationRouter.get('/', async (req: Request<{}, {}, {}, any>, res) => {
-	const { userId, state: stateQuery, sort: sortQuery, page, pageSize } = req.query;
+// TODO: create a way for admin to fetch all applications, this is filtering by the requesting user's ID
+// TODO: validate queryParam options using zod
+applicationRouter.get(
+	'/',
+	authMiddleware(),
+	async (
+		request,
+		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
+	) => {
+		const { userId } = request.session.user || {};
 
-	//  Temporary userId check until validation/dto flow is confirmed
-	//  - reflect changes in swagger once refactored
-	if (!userId) {
-		res.status(400).send({ message: 'User Id is required' });
-		return;
-	}
+		if (!userId) {
+			response.status(400).json({ error: 'UNAUTHORIZED', message: 'User ID is required' });
+			return;
+		}
 
-	const pageRequested = page ? Number(page) : undefined;
-	const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
+		const { state: stateQuery, sort: sortQuery, page, pageSize } = request.query;
 
-	/**
-	 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
-	 * If it is, we need to throw a client error, warning them that that's a bad request.
-	 */
-	if (
-		(pageRequested !== undefined && pageRequested !== 0 && !isPositiveInteger(pageRequested)) ||
-		(pageSizeRequested !== undefined && !isPositiveInteger(pageSizeRequested))
-	) {
-		res.status(400).send({ message: 'Page and/or page size must be a positive integer.' });
-		return;
-	}
+		const pageRequested = page ? Number(page) : undefined;
+		const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
 
-	let sort = [];
-	let state = [];
+		/**
+		 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
+		 * If it is, we need to throw a client error, warning them that that's a bad request.
+		 */
+		if (
+			(pageRequested !== undefined && pageRequested !== 0 && !isPositiveInteger(pageRequested)) ||
+			(pageSizeRequested !== undefined && !isPositiveInteger(pageSizeRequested))
+		) {
+			response
+				.status(400)
+				.json({ error: 'INVALID_REQUEST', message: 'Page and/or page size must be a positive integer.' });
+			return;
+		}
 
-	try {
-		sort = sortQuery ? JSON.parse(sortQuery) : [];
-		state = stateQuery ? JSON.parse(stateQuery) : [];
-	} catch {
-		res.status(400).send({ message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.' });
-		return;
-	}
+		let sort = [];
+		let state = [];
 
-	const result = await getAllApplications({
-		userId,
-		state,
-		sort,
-		page: pageRequested,
-		pageSize: pageSizeRequested,
-	});
+		try {
+			sort = typeof sortQuery === 'string' ? JSON.parse(sortQuery) : [];
+			state = typeof stateQuery === 'string' ? JSON.parse(stateQuery as any) : [];
+		} catch {
+			response.status(400).json({
+				error: 'INVALID_REQUEST',
+				message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.',
+			});
+			return;
+		}
 
-	if (result.success) {
-		res.status(200).send(result.data);
-		return;
-	} else {
-		const errorReturn = { message: result.message, errors: String(result.errors) };
-		res.status(500).send(errorReturn);
-		return;
-	}
-});
+		const result = await getAllApplications({
+			userId,
+			state,
+			sort,
+			page: pageRequested,
+			pageSize: pageSizeRequested,
+		});
+
+		if (result.success) {
+			response.status(200).json(result.data);
+			return;
+		} else {
+			switch (result.error) {
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+				case 'INVALID_PARAMETERS': {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+			}
+		}
+	},
+);
 
 /**
  * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can access the specified application. This should be done and refactored.
  * 	- Validate request params using Zod.
  * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
  */
-applicationRouter.get('/:applicationId', async (request: Request<{ applicationId: number }, {}, {}, any>, response) => {
-	const { applicationId } = request.params;
+applicationRouter.get(
+	'/:applicationId',
+	authMiddleware(),
+	async (
+		request,
+		response: ResponseWithData<
+			ApplicationResponseData,
+			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR']
+		>,
+	) => {
+		const { user } = request.session;
+		const { userId } = user || {};
 
-	const result = await getApplicationById({ applicationId });
-
-	if (result.success) {
-		response.status(200).send(result.data);
-	} else {
-		const resultErrors = String(result.errors);
-
-		if (resultErrors === 'Error: Application record is undefined') {
-			response.status(404);
-		} else {
-			response.status(500);
+		if (!userId) {
+			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+			return;
 		}
 
-		response.send({ message: result.message, errors: resultErrors });
-	}
-});
+		const applicationId = Number(request.params.applicationId);
+		if (!isPositiveInteger(applicationId)) {
+			response
+				.status(400)
+				.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
+			return;
+		}
+
+		const result = await getApplicationById({ applicationId });
+
+		if (result.success) {
+			const { data } = result;
+
+			// Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER
+			if (data.userId !== userId || getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER) {
+				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+				return;
+			}
+
+			response.status(200).json(data);
+			return;
+		}
+		switch (result.error) {
+			case 'SYSTEM_ERROR': {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+				return;
+			}
+			case 'NOT_FOUND': {
+				response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
+				return;
+			}
+		}
+	},
+);
 
 /**
  * Gets the total of how many applications are in each state type (APPROVED, REJECTED, etc...),
  * including a TOTAL count.
  *
- * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can access the specified application. This should be done and refactored.
- * 	- Validate request params using Zod.
+ * Auth:
+ * - only accessible by DAC members
  */
-applicationRouter.get('/metadata/counts', async (req: Request<{}, {}, {}, any>, res) => {
-	const { userId } = req.query;
-
-	if (!userId) {
-		res.status(400).send({ message: 'User Id is Required' });
-		return;
-	}
-
-	const result = await getApplicationStateTotals({
-		userId,
-	});
-
-	if (result.success) {
-		res.status(200).send(result.data);
-	} else {
-		res.status(500).send({ message: result.message, errors: String(result.errors) });
-	}
-});
-
-applicationRouter.post('/approve', jsonParser, async (req, res) => {
-	const { applicationId }: { applicationId?: number } = req.body;
-
-	if (typeof applicationId !== 'number' || !applicationId) {
-		res.status(400).send({
-			message: 'Invalid request. ApplicationId must be a valid number and is required.',
-			errors: 'MissingOrInvalidParameters',
-		});
-		return;
-	}
-
-	try {
-		const result = await approveApplication({ applicationId });
+applicationRouter.get(
+	'/metadata/counts',
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	async (request, response: ResponseWithData<ApplicationStateTotals, ['SYSTEM_ERROR']>) => {
+		const result = await getApplicationStateTotals();
 
 		if (result.success) {
-			res.status(200).send({
-				message: 'Application approved successfully.',
-				data: result.data,
-			});
+			response.status(200).json(result.data);
+			return;
 		} else {
-			let status = 500;
-			let message = result.message || 'An unexpected error occurred.';
-			let errors = result.errors;
-
-			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-				status = 404;
-				message = 'Application not found.';
-			} else if (errors === 'ApprovalConflict') {
-				status = 409;
-				message = 'Approval conflict detected.';
-			} else if (errors === 'InvalidState') {
-				status = 400;
-				message = 'Invalid application state.';
-			}
-
-			res.status(status).send({ message, errors });
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+			return;
 		}
-	} catch (error) {
-		res.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-});
+	},
+);
 
-applicationRouter.post('/reject', jsonParser, async (req, res) => {
-	const { applicationId } = req.body;
+applicationRouter.post(
+	'/approve',
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	async (
+		request,
+		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+	) => {
+		const { applicationId }: { applicationId: unknown } = request.body;
 
-	if (!applicationId || !isPositiveInteger(applicationId)) {
-		res.status(400).json({
-			message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			errors: 'MissingOrInvalidParameters',
-		});
-	}
-
-	try {
-		const result = await rejectApplication({ applicationId });
-
-		if (result.success) {
-			res.status(200).send({
-				message: 'Application rejected successfully.',
-				data: result.data,
+		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
+			response.status(400).json({
+				error: 'INVALID_REQUEST',
+				message: 'ApplicationId must be a valid number and is required.',
 			});
-		} else {
-			let status = 500;
-			let message = result.message || 'An unexpected error occurred.';
-			let errors = result.errors;
-
-			if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-				status = 404;
-				message = 'Application not found.';
-			} else if (errors === 'RejectionConflict') {
-				status = 409;
-				message = 'Rejection conflict detected.';
-			} else if (errors === 'InvalidState') {
-				status = 400;
-				message = 'Invalid application state.';
-			}
-
-			res.status(status).send({ message, errors });
+			return;
 		}
-	} catch (error) {
-		res.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-});
 
-/**
- * TODO: NO current Auth rules implemented
- */
-// POST: Submit revisions
+		try {
+			const result = await approveApplication({ applicationId });
+
+			if (result.success) {
+				response.status(200).json({
+					message: 'Application approved successfully.',
+					data: result.data,
+				});
+				return;
+			}
+			switch (result.error) {
+				case 'INVALID_STATE_TRANSITION': {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
+				case 'NOT_FOUND': {
+					response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
+					return;
+				}
+			}
+		} catch (error) {
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
+		}
+	},
+);
+
+applicationRouter.post(
+	'/reject',
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	async (
+		request,
+		response: ResponseWithData<
+			{ message: string; data: ApplicationRecord },
+			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
+		>,
+	) => {
+		const { applicationId }: { applicationId: unknown } = request.body;
+
+		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
+			response.status(400).json({
+				error: 'INVALID_REQUEST',
+				message: 'Invalid request. ApplicationId is required and must be a valid number.',
+			});
+			return;
+		}
+
+		try {
+			const result = await dacRejectApplication({ applicationId });
+
+			if (result.success) {
+				response.status(200).json({
+					message: 'Application rejected successfully.',
+					data: result.data,
+				});
+				return;
+			}
+			switch (result.error) {
+				case 'INVALID_STATE_TRANSITION': {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
+				case 'NOT_FOUND': {
+					response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+			}
+		} catch (error) {
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
+		}
+	},
+);
+
 applicationRouter.post(
 	'/:applicationId/submit-revision',
-	jsonParser,
+	authMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId } = request.params;
+		async (
+			request: Request,
+			response: ResponseWithData<
+				{ message: string; data: ApplicationRecord },
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			const applicationId = Number(request.params.applicationId);
 
-			if (!applicationId || !isPositiveInteger(Number(applicationId))) {
-				response.status(400).json({
-					message: 'Invalid request. ApplicationId is required and must be a valid number.',
-					errors: 'MissingOrInvalidParameters',
-				});
+			if (!isPositiveInteger(applicationId)) {
+				response
+					.status(400)
+					.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
+				return;
+			}
+
+			// Need user ID to validate the user has access to this app.
+			const { user } = request.session;
+			const { userId } = user || {};
+
+			if (!userId) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
 			}
 
 			try {
-				const applicationIdNum = Number(applicationId);
-				const result = await submitRevision({ applicationId: applicationIdNum });
+				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
+				if (!userMayEditResult.success) {
+					switch (userMayEditResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'FORBIDDEN': {
+							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+					}
+				}
+
+				const result = await submitRevision({ applicationId });
 
 				if (result.success) {
-					response.status(200).send({
+					response.status(200).json({
 						message: 'Application review submitted successfully.',
 						data: result.data,
 					});
-				} else {
-					let status = 500;
-					let message = result.message || 'An unexpected error occurred.';
-					let errors = result.errors;
-
-					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-						status = 404;
-						message = 'Application not found.';
-					} else if (errors === 'RevisionConflict') {
-						status = 409;
-						message = 'Revision conflict detected.';
-					} else if (errors === 'InvalidState') {
-						status = 400;
-						message = 'Invalid application state.';
+					return;
+				}
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
 					}
-
-					response.status(status).send({ message, errors });
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						return;
+					}
 				}
 			} catch (error) {
-				response.status(500).send({
-					message: 'Internal server error.',
-					errors: String(error),
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: 'Unexpected error.',
 				});
 			}
 		},
 	),
 );
 
-applicationRouter.post('/:applicationId/revoke', jsonParser, withParamsSchemaValidation (collaboratorsListParamsSchema, apiZodErrorMapping ,async (request: Request, response: Response) => {
-	const { applicationId } = request.params;
-
-	const applicationIdNum = parseInt(applicationId || '');
-	if (isNaN(applicationIdNum)) {
-		response.status(400).json({
-			message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			errors: 'MissingOrInvalidParameters',
-		});
-		return;
-	}
-
-	try {
-		const applicationIdNum = Number(applicationId);
-
-		const result = await revokeApplication(applicationIdNum);
-
-		if (result.success) {
-			response.status(200).send({
-				message: 'Application revoked successfully.',
-				data: result.data,
-			});
-		} else {
-			let status = 500;
-			let message = result.message || 'An unexpected error occurred.';
-			let errors = result.errors;
-			switch(errors) {
-				case "ApplicationNotFound":
-				case "Application record is undefined":
-					status = 404;
-					message = 'Application not found.';
-					break;
-				case "StateConflict":
-					status = 409;
-					message = 'Application is already revoked.';
-					break;
-				case "Unauthorized":
-					status = 403;
-					message = 'Unauthorized to revoke this application.';
-					break;
-				case "InvalidState":
-					status = 400;
-					message = 'Cannot revoke application in its current state.';
-					break;
-
-			}
-			response.status(status).send({ message, errors });
-		}
-	} catch (error) {
-		response.status(500).send({
-			message: 'Internal server error.',
-			errors: String(error),
-		});
-	}
-}));
-
 applicationRouter.post(
-	'/:applicationId/close',
-	jsonParser,
+	'/:applicationId/revoke',
+	authMiddleware(),
 	withParamsSchemaValidation(
-		closeApplicationSchema,
+		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
-		async (request: Request, response: Response) => {
-			const { applicationId } = request.params;
-			const { requesterId, isDacMember } = request.body;
+		async (
+			request,
+			response: ResponseWithData<
+				{ message: string; data: ApplicationRecord },
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+			>,
+		) => {
+			const applicationId = Number(request.params.applicationId);
 
-			if (!applicationId || isNaN(parseInt(applicationId))) {
-				response.status(400).json({
-					message: 'Invalid request. ApplicationId is required and must be a valid number.',
-					errors: 'MissingOrInvalidParameters',
-				});
+			if (!isPositiveInteger(applicationId)) {
+				response
+					.status(400)
+					.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
+				return;
 			}
 
-			if (!requesterId) {
-				response.status(401).json({ message: 'Unauthorized: Requester ID is required.' });
+			const { user } = request.session;
+			const { userId } = user || {};
+
+			if (!userId) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
 			}
 
 			try {
-				const applicationIdNum = Number(applicationId);
-				const result = await closeApplication({ applicationId: applicationIdNum, requesterId, isDacMember });
+				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
+				if (!userMayEditResult.success) {
+					switch (userMayEditResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'FORBIDDEN': {
+							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+					}
+				}
+
+				const result = await revokeApplication(applicationId);
 
 				if (result.success) {
-					response.status(200).send({
-						message: 'Application closed successfully.',
+					response.status(200).json({
+						message: 'Application revoked successfully.',
 						data: result.data,
 					});
-				} else {
-					let status = 500;
-					let message = result.message || 'An unexpected error occurred.';
-					let errors = result.errors;
-
-					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-						status = 404;
-						message = 'Application not found.';
-					} else if (errors === 'StateConflict') {
-						status = 409;
-						message = 'Application is already closed.';
-					} else if (errors === 'Unauthorized') {
-						status = 403;
-						message = 'Unauthorized to close this application.';
-					} else if (errors === 'InvalidState') {
-						status = 400;
-						message = 'Cannot close application in its current state.';
+					return;
+				}
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
 					}
-
-					response.status(status).send({ message, errors });
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						return;
+					}
 				}
 			} catch (error) {
-				response.status(500).send({
-					message: 'Internal server error.',
-					errors: String(error),
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: 'Unexpected error.',
 				});
 			}
 		},
 	),
+);
+
+applicationRouter.post(
+	'/:applicationId/close',
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	async (
+		request: Request,
+		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+	) => {
+		const applicationId = Number(request.params.applicationId);
+
+		if (!isPositiveInteger(applicationId)) {
+			response
+				.status(400)
+				.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
+			return;
+		}
+
+		try {
+			const result = await closeApplication({ applicationId });
+
+			if (result.success) {
+				response.status(200).json({
+					message: 'Application closed successfully.',
+					data: result.data,
+				});
+				return;
+			}
+			switch (result.error) {
+				case 'INVALID_STATE_TRANSITION': {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				case 'NOT_FOUND': {
+					response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
+			}
+		} catch (error) {
+			response.status(500).json({
+				error: 'SYSTEM_ERROR',
+				message: 'Unexpected error.',
+			});
+		}
+	},
 );
 
 applicationRouter.post(
 	'/:applicationId/submit',
-	jsonParser,
-		async (request: Request, response: Response) => {
+	authMiddleware(),
+	async (
+		request: Request,
+		response: ResponseWithData<
+			{ message: string; data: ApplicationRecord },
+			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+		>,
+	) => {
+		try {
+			const applicationId = Number(request.params);
+
+			if (!isPositiveInteger(applicationId)) {
+				response.status(400).json({
+					error: 'INVALID_REQUEST',
+					message: 'ApplicationId is required and must be a valid number.',
+				});
+				return;
+			}
+
+			const { userId } = request.session.user || {};
+			if (!userId) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
+			}
+
+			const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
+			if (!userMayEditResult.success) {
+				switch (userMayEditResult.error) {
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+						return;
+					}
+					case 'FORBIDDEN': {
+						response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+						return;
+					}
+				}
+			}
+
+			const result = await submitApplication({ applicationId });
+
+			if (result.success) {
+				response.status(200).json({
+					message: 'Application rejected successfully.',
+					data: result.data,
+				});
+				return;
+			}
+
+			switch (result.error) {
+				case 'INVALID_STATE_TRANSITION': {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				case 'NOT_FOUND': {
+					response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
+			}
+		} catch (error) {
+			response.status(500).json({
+				error: 'SYSTEM_ERROR',
+				message: 'Unexpected error.',
+			});
+		}
+	},
+
+	// Endpoint for reps to request revisions
+	applicationRouter.post(
+		'/dac/:applicationId/request-revisions',
+		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+		withBodySchemaValidation(
+			applicationRevisionRequestSchema,
+			apiZodErrorMapping,
+			async (request, response: ResponseWithData<JoinedApplicationRecord, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
+				try {
+					const applicationId = Number(request.params.applicationId);
+
+					if (!isPositiveInteger(applicationId)) {
+						response.status(400).json({
+							error: 'INVALID_REQUEST',
+							message: 'Invalid request. ApplicationId is required and must be a valid number.',
+						});
+						return;
+					}
+
+					const revisions = request.body;
+
+					const updatedRevisionData: RevisionRequestModel = {
+						application_id: applicationId,
+						comments: revisions.comments,
+						applicant_approved: revisions.applicantApproved,
+						applicant_notes: revisions.applicantNotes,
+						institution_rep_approved: revisions.institutionRepApproved,
+						institution_rep_notes: revisions.institutionRepNotes,
+						collaborators_approved: revisions.collaboratorsApproved,
+						collaborators_notes: revisions.collaboratorsNotes,
+						project_approved: revisions.projectApproved,
+						project_notes: revisions.projectNotes,
+						requested_studies_approved: revisions.requestedStudiesApproved,
+						requested_studies_notes: revisions.requestedStudiesNotes,
+					};
+
+					// Call service method to handle request
+					const updatedApplication = await requestApplicationRevisionsByDac({
+						applicationId,
+						revisionData: updatedRevisionData,
+					});
+					if (updatedApplication.success) {
+						response.status(200).json(updatedApplication.data);
+						return;
+					}
+
+					switch (updatedApplication.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
+							return;
+						}
+					}
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: 'Unexpected error.',
+					});
+				}
+			},
+		),
+	),
+);
+
+// Endpoint for reps to request revisions
+applicationRouter.post(
+	'/rep/:applicationId/request-revisions',
+	authMiddleware({ requiredRoles: ['INSTITUTIONAL_REP'] }),
+	withBodySchemaValidation(
+		applicationRevisionRequestSchema,
+		apiZodErrorMapping,
+		async (
+			request,
+			response: ResponseWithData<
+				JoinedApplicationRecord,
+				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
+			>,
+		) => {
+			try {
+				const applicationId = Number(request.params.applicationId);
+
+				if (!isPositiveInteger(applicationId)) {
+					response.status(400).json({
+						error: 'INVALID_REQUEST',
+						message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					});
+					return;
+				}
+
+				const revisionData = request.body;
+
+				const updatedRevisionData: RevisionRequestModel = {
+					application_id: applicationId,
+					comments: revisionData.comments,
+					applicant_approved: revisionData.applicantApproved,
+					applicant_notes: revisionData.applicantNotes,
+					institution_rep_approved: revisionData.institutionRepApproved,
+					institution_rep_notes: revisionData.institutionRepNotes,
+					collaborators_approved: revisionData.collaboratorsApproved,
+					collaborators_notes: revisionData.collaboratorsNotes,
+					project_approved: revisionData.projectApproved,
+					project_notes: revisionData.projectNotes,
+					requested_studies_approved: revisionData.requestedStudiesApproved,
+					requested_studies_notes: revisionData.requestedStudiesNotes,
+				};
+
+				// TODO: Check that the institutional rep is the correct rep for this application
+
+				// Call service method to handle request
+				const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
+					applicationId,
+					revisionData: updatedRevisionData,
+				});
+				if (updatedApplication.success) {
+					response.status(200).json(updatedApplication.data);
+					return;
+				}
+				switch (updatedApplication.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: 'Unexpected error.',
+				});
+			}
+		},
+	),
+);
+
+applicationRouter.get(
+	'/:applicationId/revisions',
+	withParamsSchemaValidation(
+		collaboratorsListParamsSchema,
+		apiZodErrorMapping,
+		async (
+			request,
+			response: ResponseWithData<
+				{ message: string; data: RevisionRequestModel[] },
+				['UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']
+			>,
+		) => {
 			const { applicationId } = request.params;
 
-			if (!applicationId || !isPositiveInteger(parseInt(applicationId))) {
-				response.status(400).send({
-					message: 'Invalid request. ApplicationId is required and must be a valid number.',
-					errors: 'MissingOrInvalidParameters',
+			if (!applicationId || isNaN(Number(applicationId))) {
+				response.status(400).json({
+					error: 'INVALID_REQUEST',
+					message: 'ApplicationId is required and must be a valid number.',
 				});
 				return;
 			}
 
 			try {
-				const result = await submitApplication({ applicationId: parseInt(applicationId) });
+				// Fetch all revisions for the application
+				const result = await getRevisions({ applicationId: Number(applicationId) });
 
 				if (result.success) {
-					response.status(200).send({
-						message: 'Application rejected successfully.',
+					response.status(200).json({
+						message: 'Revisions fetched successfully.',
 						data: result.data,
 					});
-				} else {
-					let status = 500;
-					let message = result.message || 'An unexpected error occurred.';
-					let errors = result.errors;
-
-					if (errors === 'ApplicationNotFound' || errors === 'Application record is undefined') {
-						status = 404;
-						message = 'Application not found.';
-					} else if (errors === 'RejectionConflict') {
-						status = 409;
-						message = 'Rejection conflict detected.';
-					} else if (errors === 'InvalidState') {
-						status = 400;
-						message = 'Invalid application state.';
-					}
-
-					response.status(status).send({ message, errors });
 					return;
 				}
+
+				response.status(500).json({ error: result.error, message: result.message });
+				return;
 			} catch (error) {
-				response.status(500).send({
-					message: 'Internal server error.',
-					errors: String(error),
-				});
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				return;
 			}
 		},
-
-// Endpoint for reps to request revisions
-applicationRouter.post(
-	'/dac/request-revisions',
-	jsonParser,
-	withBodySchemaValidation(applicationRevisionRequestSchema, apiZodErrorMapping, async (req, res) => {
-		const { applicationId, revisionData, role } = req.body;
-
-		if (!role && role !== 'DAC_MEMBER') {
-			res.status(400).json({ message: 'Invalid request: Invalid role' });
-		}
-
-		// Validate input
-		if (!revisionData) {
-			res.status(400).json({ message: 'Invalid request: revisionData are required' });
-		}
-
-		const updatedRevisionData: RevisionRequestModel = {
-			application_id: applicationId,
-			comments: revisionData.comments,
-			applicant_approved: revisionData.applicantApproved,
-			applicant_notes: revisionData.applicantNotes,
-			institution_rep_approved: revisionData.institutionRepApproved,
-			institution_rep_notes: revisionData.institutionRepNotes,
-			collaborators_approved: revisionData.collaboratorsApproved,
-			collaborators_notes: revisionData.collaboratorsNotes,
-			project_approved: revisionData.projectApproved,
-			project_notes: revisionData.projectNotes,
-			requested_studies_approved: revisionData.requestedStudiesApproved,
-			requested_studies_notes: revisionData.requestedStudiesNotes,
-		};
-
-		// Call service method to handle request
-		const updatedApplication = await requestApplicationRevisionsByDac({
-			applicationId,
-			role,
-			revisionData: updatedRevisionData,
-		});
-
-		res.status(200).json(updatedApplication);
-	}),
-));
-
-// Endpoint for reps to request revisions
-applicationRouter.post(
-	'/rep/request-revisions',
-	jsonParser,
-	withBodySchemaValidation(applicationRevisionRequestSchema, apiZodErrorMapping, async (req, res) => {
-		const { applicationId, revisionData, role } = req.body;
-
-		if (!role && role !== 'INSTITUTIONAL_REP') {
-			res.status(400).json({ message: 'Invalid request: Invalid role' });
-		}
-
-		// Validate input
-		if (!revisionData) {
-			res.status(400).json({ message: 'Invalid request: revisionData are required' });
-		}
-
-		const updatedRevisionData: RevisionRequestModel = {
-			application_id: applicationId,
-			comments: revisionData.comments,
-			applicant_approved: revisionData.applicantApproved,
-			applicant_notes: revisionData.applicantNotes,
-			institution_rep_approved: revisionData.institutionRepApproved,
-			institution_rep_notes: revisionData.institutionRepNotes,
-			collaborators_approved: revisionData.collaboratorsApproved,
-			collaborators_notes: revisionData.collaboratorsNotes,
-			project_approved: revisionData.projectApproved,
-			project_notes: revisionData.projectNotes,
-			requested_studies_approved: revisionData.requestedStudiesApproved,
-			requested_studies_notes: revisionData.requestedStudiesNotes,
-		};
-
-		// Call service method to handle request
-		const updatedApplication = await requestApplicationRevisionsByRep({
-			applicationId,
-			role,
-			revisionData: updatedRevisionData,
-		});
-
-		res.status(200).json(updatedApplication);
-	}),
+	),
 );
+
 export default applicationRouter;
