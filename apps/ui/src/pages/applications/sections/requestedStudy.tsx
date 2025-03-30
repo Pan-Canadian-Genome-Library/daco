@@ -73,15 +73,14 @@ const RequestedStudy = () => {
 	});
 
 	const onSubmit = () => {
-		const data = getValues();
-		console.log(data);
+		const requestedStudies = getValues('requestedStudies');
 
 		dispatch({
 			type: 'UPDATE_APPLICATION',
 			payload: {
 				fields: {
 					...state.fields,
-					requestedStudies: data.requestedStudies,
+					requestedStudies,
 				},
 				formState: {
 					...state.formState,
@@ -121,11 +120,10 @@ const RequestedStudy = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
 							<SelectBox
 								label={translate('requested-study.section1.form.studyName')}
-								name="requestedStudies"
+								name="requestedStudies.0"
 								placeholder="Select"
 								control={control}
 								rule={rule}
-								initialValue={getValues('requestedStudies')}
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
 									return { value: study.studyName, label: study.studyName };
 								})}

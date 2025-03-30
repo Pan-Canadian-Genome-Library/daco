@@ -45,7 +45,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 						name={`${props.name}`}
 						rules={[props.rule]}
 						required={props.required}
-						initialValue={props.initialValue}
+						initialValue={props.initialValue ?? field.value}
 						validateTrigger="onBlur"
 					>
 						<Select {...field} disabled={props.disabled} options={props.options} placeholder={props.placeholder} />

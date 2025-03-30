@@ -149,7 +149,7 @@ export type ProjectDTO = {
 };
 
 export interface RequestedStudiesDTO {
-	requestedStudies?: string | null;
+	requestedStudies?: string[] | null;
 }
 
 export type ApplicationDTO = {
