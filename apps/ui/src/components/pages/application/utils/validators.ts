@@ -21,8 +21,15 @@ import {
 	ValidatorApplicant,
 	ValidatorInstitution,
 	ValidatorProject,
+	ValidatorStudy,
 } from '@/components/pages/application/utils/validatorFunctions';
-import { isApplicantKey, isInstitutionalKey, isProjectKey } from '@/components/pages/application/utils/validatorKeys';
+
+import {
+	isApplicantKey,
+	isInstitutionalKey,
+	isProjectKey,
+	isRequestedStudies,
+} from '@/components/pages/application/utils/validatorKeys';
 import { SectionRoutes } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
@@ -72,6 +79,11 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 				...sectionTouched,
 				project: true,
 			};
+		} else if (isRequestedStudies(key) && value != null) {
+			sectionTouched = {
+				...sectionTouched,
+				study: true,
+			};
 		}
 	});
 
@@ -92,7 +104,7 @@ export const VerifyFormSections = (fields?: ApplicationContentsResponse): Verify
 		[SectionRoutes.INSTITUTIONAL]: fields ? ValidatorInstitution(fields) : false,
 		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
-		[SectionRoutes.STUDY]: false,
+		[SectionRoutes.STUDY]: fields ? ValidatorStudy(fields) : false,
 		[SectionRoutes.ETHICS]: false,
 		[SectionRoutes.AGREEMENT]: false,
 		[SectionRoutes.APPENDICES]: false,

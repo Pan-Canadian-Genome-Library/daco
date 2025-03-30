@@ -65,6 +65,7 @@ export const updateEditApplicationRequestSchema = z
 		projectSummary: z.string(),
 		projectBackground: z.string(),
 		projectPublicationUrls: z.array(z.string()),
+		requestedStudies: z.array(z.string()),
 	})
 	.partial();
 

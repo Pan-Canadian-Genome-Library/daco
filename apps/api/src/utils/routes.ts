@@ -156,6 +156,7 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 		project_title: update.projectTitle,
 		project_website: update.projectWebsite,
 		project_publication_urls: update.projectPublicationUrls,
+		requested_studies: update.requestedStudies,
 	};
 
 	return formattedUpdate;
