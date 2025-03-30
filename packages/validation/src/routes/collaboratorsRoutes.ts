@@ -18,17 +18,10 @@
  */
 
 import { z } from 'zod';
-import { NonEmptyString } from '../common/strings.js';
 import { collaboratorsSchema } from '../schemas.js';
-import { isPositiveInteger } from '../utils/functions.js';
-
-export const collaboratorsRecordSchema = collaboratorsSchema.extend({
-	id: z.number(),
-});
 
 export const baseCollaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
-	userId: NonEmptyString,
 });
 
 export const collaboratorsCreateRequestSchema = baseCollaboratorsRequestSchema.extend({
@@ -39,25 +32,21 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 	collaboratorId: z.number(),
 });
 
-export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaboratorUpdates: collaboratorsRecordSchema.partial(),
-});
+export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.merge(
+	collaboratorsSchema.extend({
+		collaboratorUpdates: collaboratorsSchema.partial().extend({ id: z.number() }),
+	}),
+);
 
 export const collaboratorsListParamsSchema = z
 	.object({
-		applicationId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+		applicationId: z.coerce.number().int().gt(0),
 	})
 	.required();
 
 export const collaboratorsDeleteParamsSchema = z
 	.object({
-		applicationId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
-		collaboratorId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'collaboratorId MUST be a positive number' }),
+		applicationId: z.coerce.number().int().gt(0),
+		collaboratorId: z.coerce.number().int().gt(0),
 	})
 	.required();

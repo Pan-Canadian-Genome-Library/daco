@@ -18,9 +18,9 @@
  */
 
 import { ApplicationRecord } from '@/service/types.js';
-import { AsyncResult, success } from '@/utils/results.js';
+import { success, type Success } from '@/utils/results.js';
 
-// TODO: Add Validation
-export const validateContent = async (application: ApplicationRecord): AsyncResult<ApplicationRecord> => {
+// TODO: Add Validation, will require a failure case so return type will become an AsyncResult
+export const validateContent = async (application: ApplicationRecord): Promise<Success<ApplicationRecord>> => {
 	return success(application);
 };

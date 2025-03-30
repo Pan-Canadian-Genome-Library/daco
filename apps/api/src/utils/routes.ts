@@ -26,7 +26,7 @@ import {
 import {
 	type ApplicationContentsResponse,
 	type ApplicationResponseData,
-	type CollaboratorsResponse,
+	type CollaboratorsResponseDTO,
 	type SignatureDTO,
 } from '@pcgl-daco/data-model';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -168,27 +168,24 @@ export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Signatur
 /**
  * Helper function to convert Postgres snake_case to FE camelCase for CollaboratorRecord
  * @param data type CollaboratorRecord in snake_case
- * @returns  type GetCollaboratorsResponse in camelcase
+ * @returns  type CollaboratorsResponseDTO in camelcase
  */
 
-export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): CollaboratorsResponse[] => {
-	const formattedUpdate: CollaboratorsResponse[] = [];
-
-	data.forEach((value) => {
-		formattedUpdate.push({
-			id: value.id,
-			applicationId: value.application_id,
-			collaboratorFirstName: value.first_name,
-			collaboratorMiddleName: value.middle_name,
-			collaboratorLastName: value.last_name,
-			collaboratorInstitutionalEmail: value.institutional_email,
-			collaboratorPositionTitle: value.position_title,
-			collaboratorPrimaryAffiliation: value.title,
-			collaboratorResearcherProfileURL: value.profile_url,
-			collaboratorSuffix: value.suffix,
-			collaboratorType: value.collaborator_type,
-		});
-	});
-
-	return formattedUpdate;
+export const aliasCollaboratorRecord = (data: CollaboratorRecord): CollaboratorsResponseDTO => {
+	return {
+		id: data.id,
+		applicationId: data.application_id,
+		collaboratorFirstName: data.first_name,
+		collaboratorMiddleName: data.middle_name,
+		collaboratorLastName: data.last_name,
+		collaboratorInstitutionalEmail: data.institutional_email,
+		collaboratorPositionTitle: data.position_title,
+		collaboratorPrimaryAffiliation: data.title,
+		collaboratorResearcherProfileURL: data.profile_url,
+		collaboratorSuffix: data.suffix,
+		collaboratorType: data.collaborator_type,
+	};
 };
+
+export const aliasCollaboratorRecords = (data: CollaboratorRecord[]): CollaboratorsResponseDTO[] =>
+	data.map(aliasCollaboratorRecord);

@@ -26,7 +26,9 @@ import { fileURLToPath } from 'url';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
-import logger from '@/logger.js';
+import BaseLogger from '@/logger.js';
+
+const logger = BaseLogger.forModule('testUtils');
 
 export const testUserId = 'testUser@oicr.on.ca';
 export const testApplicationId = 1;
