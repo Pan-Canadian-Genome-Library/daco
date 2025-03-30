@@ -57,7 +57,7 @@ function withBodySchemaValidation<ReqBody>(
 	zodErrorMapping: ZodErrorMap | undefined,
 	handler: RequestHandler<ParamsDictionary, any, ReqBody, qs.ParsedQs>,
 ): RequestHandler<ParamsDictionary, any, ReqBody, qs.ParsedQs> {
-	return async (request, response, next: NextFunction) => {
+	return async (request, response, next) => {
 		try {
 			const validationResult = bodySchema.safeParse(request.body, { errorMap: zodErrorMapping });
 			if (validationResult.success) {
@@ -94,12 +94,12 @@ function withBodySchemaValidation<ReqBody>(
  * });
  * ```
  */
-function withParamsSchemaValidation<ReqParams>(
+function withParamsSchemaValidation<ReqParams extends object>(
 	paramsSchema: ZodSchema<ReqParams>,
 	zodErrorMapping: ZodErrorMap | undefined,
 	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
-): RequestHandler {
-	return async (request: Request, response: Response, next: NextFunction) => {
+): RequestHandler<ParamsDictionary, any, any, qs.ParsedQs> {
+	return async (request, response, next) => {
 		try {
 			const validationResult = paramsSchema.safeParse(request.params, { errorMap: zodErrorMapping });
 			if (validationResult.success) {
@@ -136,12 +136,12 @@ function withParamsSchemaValidation<ReqParams>(
  * });
  * ```
  */
-function withQuerySchemaValidation<ReqQuery>(
+function withQuerySchemaValidation<ReqQuery extends object>(
 	querySchema: ZodSchema<ReqQuery>,
 	zodErrorMapping: ZodErrorMap | undefined,
-	handler: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs>,
-): RequestHandler {
-	return async (request: Request, response: Response, next: NextFunction) => {
+	handler: RequestHandler<ParamsDictionary, any, any, ReqQuery>,
+): RequestHandler<ParamsDictionary, any, any, ReqQuery> {
+	return async (request, response, next) => {
 		try {
 			const validationResult = querySchema.safeParse(request.query, { errorMap: zodErrorMapping });
 			if (validationResult.success) {
@@ -177,24 +177,24 @@ function fileUploadValidation(handler: RequestHandler<ParamsDictionary, any, any
 				if (err) {
 					response
 						.status(400)
-						.send({ message: 'Invalid file upload, file must be less than 5mb and only 1 file can be uploaded' });
+						.json({ message: 'Invalid file upload, file must be less than 5mb and only 1 file can be uploaded' });
 					return;
 				}
 
 				if (!files.file || !files.file[0]) {
-					response.status(400).send({ message: 'File does not exist' });
+					response.status(400).json({ message: 'File does not exist' });
 					return;
 				}
 
 				const uploadedFile = files.file[0];
 
 				if (!uploadedFile.mimetype) {
-					response.status(400).send({ message: 'File type was not specified' });
+					response.status(400).json({ message: 'File type was not specified' });
 					return false;
 				}
 
 				if (!validFileTypes.includes(`${uploadedFile.mimetype}`)) {
-					response.status(400).send({ message: 'Invalid file type' });
+					response.status(400).json({ message: 'Invalid file type' });
 					return false;
 				}
 

@@ -22,11 +22,13 @@ import { eq, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.ts';
-import logger from '@/logger.js';
+import BaseLogger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
 import { type ApplicationContentModel, type ApplicationSignatureUpdate } from './types.js';
+
+const logger = BaseLogger.forModule('signatureService');
 
 /**
  * SignatureService provides methods for DB access for the signature columns in Application Contents
@@ -35,7 +37,10 @@ import { type ApplicationContentModel, type ApplicationSignatureUpdate } from '.
 const signatureService = (db: PostgresDb) => ({
 	getApplicationSignature: async ({
 		application_id: id,
-	}: Pick<ApplicationContentModel, 'application_id'>): AsyncResult<ApplicationSignatureUpdate> => {
+	}: Pick<ApplicationContentModel, 'application_id'>): AsyncResult<
+		ApplicationSignatureUpdate,
+		'SYSTEM_ERROR' | 'NOT_FOUND'
+	> => {
 		try {
 			const retrieveSignature = await db
 				.select({
@@ -51,25 +56,24 @@ const signatureService = (db: PostgresDb) => ({
 			if (retrieveSignature[0]) {
 				return success(retrieveSignature[0]);
 			} else {
-				throw new Error('Application record is undefined');
+				return failure('NOT_FOUND', 'No signature found for application.');
 			}
-		} catch (err) {
-			const message = `Error at updateApplicationSignature with id: ${id}`;
+		} catch (error) {
+			const message = `Error retrieving application with id: ${id}`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 	updateApplicationSignature: async ({
 		application_id,
 		applicant_signature,
 		institutional_rep_signature,
-	}: Omit<
+	}: Omit<ApplicationSignatureUpdate, 'applicant_signed_at' | 'institutional_rep_signed_at'>): AsyncResult<
 		ApplicationSignatureUpdate,
-		'applicant_signed_at' | 'institutional_rep_signed_at'
-	>): AsyncResult<ApplicationSignatureUpdate> => {
+		'SYSTEM_ERROR' | 'NOT_FOUND'
+	> => {
 		try {
 			const updatedSignature = await db.transaction(async (transaction) => {
 				const signature_fields = {
@@ -85,7 +89,7 @@ const signatureService = (db: PostgresDb) => ({
 					.where(eq(applicationContents.application_id, application_id))
 					.returning();
 				if (!editedContents[0]) {
-					throw new Error('Error: Application contents record is undefined');
+					return failure('NOT_FOUND', 'Application contents not found.');
 				}
 
 				// Update Related Application
@@ -101,26 +105,25 @@ const signatureService = (db: PostgresDb) => ({
 					.returning();
 
 				if (!editedApplication[0]) {
-					throw new Error('Application record is undefined');
+					return failure('NOT_FOUND', 'Application not found.');
 				}
 
-				return {
+				return success({
 					application_id: editedContents[0].application_id,
 					applicant_signature: editedContents[0].applicant_signature,
 					applicant_signed_at: editedContents[0].applicant_signed_at,
 					institutional_rep_signature: editedContents[0].institutional_rep_signature,
 					institutional_rep_signed_at: editedContents[0].institutional_rep_signed_at,
-				};
+				});
 			});
 
-			return success(updatedSignature);
-		} catch (err) {
-			const message = `Error at updateApplicationSignature with id: ${application_id}`;
+			return updatedSignature;
+		} catch (error) {
+			const message = `Error updating signature for application with id: ${application_id}`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 	deleteApplicationSignature: async ({
@@ -128,7 +131,7 @@ const signatureService = (db: PostgresDb) => ({
 		signature_type,
 	}: Pick<ApplicationContentModel, 'application_id'> & {
 		signature_type: SignatureType;
-	}): AsyncResult<ApplicationSignatureUpdate> => {
+	}): AsyncResult<ApplicationSignatureUpdate, 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
 		try {
 			const updatedSignature = await db.transaction(async (transaction) => {
 				const signature_fields = {
@@ -144,7 +147,7 @@ const signatureService = (db: PostgresDb) => ({
 					.where(eq(applicationContents.application_id, application_id))
 					.returning();
 				if (!editedContents[0]) {
-					throw new Error('Error: Application contents record is undefined');
+					return failure('NOT_FOUND', 'Application contents not found.');
 				}
 
 				// Update Related Application
@@ -160,26 +163,25 @@ const signatureService = (db: PostgresDb) => ({
 					.returning();
 
 				if (!editedApplication[0]) {
-					throw new Error('Application record is undefined');
+					return failure('NOT_FOUND', 'Application not found.');
 				}
 
-				return {
+				return success({
 					application_id: editedContents[0].application_id,
 					applicant_signature: editedContents[0].applicant_signature,
 					applicant_signed_at: editedContents[0].applicant_signed_at,
 					institutional_rep_signature: editedContents[0].institutional_rep_signature,
 					institutional_rep_signed_at: editedContents[0].institutional_rep_signed_at,
-				};
+				});
 			});
 
-			return success(updatedSignature);
-		} catch (err) {
-			const message = `Error at deleteApplicationSignature with id: ${application_id}`;
+			return updatedSignature;
+		} catch (error) {
+			const message = `Error deleting signature for application with id: ${application_id}`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 });

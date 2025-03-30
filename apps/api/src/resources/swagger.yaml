@@ -634,14 +634,14 @@ paths:
     delete:
       tags:
         - Collaborators
-      summary: Create new Collaborators for an application.
+      summary: Remove collaborator from an application.
       parameters:
         - in: path
           name: applicationId
           schema:
             type: integer
           required: true
-          description: Numeric ID of the relevant application to get
+          description: Numeric ID of the relevant application that the collaborator will be removed form.
         - in: path
           name: collaboratorId
           schema:
@@ -1795,10 +1795,14 @@ components:
       type: object
       required:
         - message
+        - error
       properties:
+        error:
+          type: string
+          description: Code to identify the cause of the error.
         message:
           type: string
-          description: General description of error with parameters and context
+          description: Short description of the error to provide some context for why the request failed.
 
     CollaboratorsListResponse:
       type: array
@@ -1810,13 +1814,14 @@ components:
       type: object
       required:
         - message
+        - error
       properties:
+        error:
+          type: string
+          description: Code to identify the cause of the error.
         message:
           type: string
-          description: General description of error with parameters and context
-        errors:
-          description: Detailed error data thrown by code failure
-          type: string
+          description: Short description of the error to provide some context for why the request failed.
 
     SignatureRecord:
       type: object
@@ -1944,10 +1949,10 @@ components:
       properties:
         error:
           type: string
-          description: Error code, usually "RequestValidationError"
+          description: Code to identify the cause of the error.
         message:
           type: string
-          description: General description of error with parameters and context
+          description: Short description of the error to provide some context for why the request failed.
         details:
           type: array
           items:

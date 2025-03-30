@@ -59,7 +59,7 @@ fileRouter.post(
 		const id = parseInt(applicationId ? applicationId : '');
 
 		if (!isPositiveInteger(id)) {
-			res.status(400).send({ message: 'Invalid applicationId' });
+			res.status(400).json({ message: 'Invalid applicationId' });
 			return;
 		}
 
@@ -71,8 +71,7 @@ fileRouter.post(
 			});
 			return;
 		} else {
-			const errorReturn = { message: result.message, errors: String(result.errors) };
-			res.status(500).send(errorReturn);
+			res.status(500).json({ message: result.message, error: 'SYSTEM_ERROR' });
 			return;
 		}
 	}),
@@ -85,18 +84,18 @@ fileRouter.delete(
 		const id = parseInt(fileId ? fileId : '');
 
 		if (!isPositiveInteger(id)) {
-			res.status(400).send({ message: 'Invalid fileId' });
+			res.status(400).json({ message: 'Invalid fileId' });
 			return;
 		}
 
 		const result = await deleteFile({ fileId: id });
 
 		if (!result.success) {
-			res.status(500).send(result);
+			res.status(500).json(result);
 			return;
 		}
 
-		res.status(204).send({});
+		res.status(204).send();
 		return;
 	}),
 );
