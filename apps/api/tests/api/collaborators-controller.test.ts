@@ -141,7 +141,7 @@ describe('Collaborators Controller', () => {
 			const result = await createCollaborators({ application_id: incorrectId, user_id, collaborators });
 
 			assert.ok(!result.success);
-			assert.strictEqual(result.message, `Error at getApplicationById with id: ${incorrectId}`);
+			assert.strictEqual(result.error, 'NOT_FOUND');
 		});
 
 		it('should prevent creating duplicate records', async () => {
@@ -167,7 +167,7 @@ describe('Collaborators Controller', () => {
 			const result = await createCollaborators({ application_id, user_id, collaborators });
 
 			assert.ok(!result.success);
-			assert.strictEqual(result.errors, `DuplicateRecords`);
+			assert.strictEqual(result.error, `DUPLICATE_RECORD`);
 		});
 	});
 

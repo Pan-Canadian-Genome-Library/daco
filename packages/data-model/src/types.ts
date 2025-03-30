@@ -254,10 +254,11 @@ export interface CollaboratorDTO {
 	collaboratorType?: string | null;
 }
 
-export interface CollaboratorsResponse extends CollaboratorDTO {
+export interface CollaboratorsResponseDTO extends CollaboratorDTO {
 	id: number;
 	applicationId: number;
 }
+export type ListCollaboratorResponse = CollaboratorsResponseDTO[];
 
 export type BaseCollaboratorRequest = {
 	applicationId: number;
