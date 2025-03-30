@@ -18,14 +18,17 @@
  */
 
 import {
+	ValidatorAgreements,
+	ValidatorAppendices,
 	ValidatorApplicant,
 	ValidatorEthics,
 	ValidatorInstitution,
 	ValidatorProject,
 	ValidatorStudy,
 } from '@/components/pages/application/utils/validatorFunctions';
-
 import {
+	isAgreementKey,
+	isAppendicesKey,
 	isApplicantKey,
 	isEthicsKey,
 	isInstitutionalKey,
@@ -33,6 +36,7 @@ import {
 	isRequestedStudies,
 } from '@/components/pages/application/utils/validatorKeys';
 import { SectionRoutes } from '@/pages/AppRouter';
+
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
 export type VerifyPageSectionsType<T extends string> = {
@@ -91,6 +95,16 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 				...sectionTouched,
 				ethics: true,
 			};
+		} else if (isAgreementKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				agreement: true,
+			};
+		} else if (isAppendicesKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				appendices: true,
+			};
 		}
 	});
 
@@ -107,14 +121,14 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutes> => {
 	return {
 		[SectionRoutes.INTRO]: false,
+		[SectionRoutes.COLLABORATORS]: false,
+		[SectionRoutes.SIGN]: false,
 		[SectionRoutes.APPLICANT]: fields ? ValidatorApplicant(fields) : false,
 		[SectionRoutes.INSTITUTIONAL]: fields ? ValidatorInstitution(fields) : false,
-		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
 		[SectionRoutes.STUDY]: fields ? ValidatorStudy(fields) : false,
 		[SectionRoutes.ETHICS]: fields ? ValidatorEthics(fields) : false,
-		[SectionRoutes.AGREEMENT]: false,
-		[SectionRoutes.APPENDICES]: false,
-		[SectionRoutes.SIGN]: false,
+		[SectionRoutes.AGREEMENT]: fields ? ValidatorAgreements(fields) : false,
+		[SectionRoutes.APPENDICES]: fields ? ValidatorAppendices(fields) : false,
 	};
 };

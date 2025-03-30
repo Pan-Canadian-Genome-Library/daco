@@ -431,9 +431,33 @@
 					"primaryKey": false,
 					"notNull": false
 				},
+				"accepted_agreements": {
+					"name": "accepted_agreements",
+					"type": "text[]",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"accepted_all_agreements_at": {
+					"name": "accepted_all_agreements_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"accepted_appendices": {
+					"name": "accepted_appendices",
+					"type": "text[]",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"accepted_all_appendices_at": {
+					"name": "accepted_all_appendices_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
 				"requested_studies": {
 					"name": "requested_studies",
-					"type": "text",
+					"type": "text[]",
 					"primaryKey": false,
 					"notNull": false
 				},

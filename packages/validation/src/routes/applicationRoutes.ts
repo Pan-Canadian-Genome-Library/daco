@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { agreementEnum, appendicesEnum } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
@@ -68,6 +69,8 @@ export const updateEditApplicationRequestSchema = z
 		requestedStudies: z.array(z.string()),
 		ethicsReviewRequired: z.boolean(),
 		ethicsLetter: z.number(),
+		acceptedAgreements: z.array(z.enum(agreementEnum)),
+		acceptedAppendices: z.array(z.enum(appendicesEnum)),
 	})
 	.partial();
 

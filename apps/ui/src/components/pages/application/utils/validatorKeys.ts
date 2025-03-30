@@ -18,6 +18,8 @@
  */
 
 import {
+	AgreementDTO,
+	AppendicesDTO,
 	ApplicantDTO,
 	ApplicationContentsResponse,
 	InstitutionalRepDTO,
@@ -26,7 +28,10 @@ import {
 	RequestedStudiesDTO,
 } from '@pcgl-daco/data-model';
 import { EthicsLetterDTO } from '@pcgl-daco/data-model/src/types';
+
 import {
+	agreementsSchema,
+	appendicesSchema,
 	applicantInformationSchema,
 	ethicsSchema,
 	institutionalRepSchema,
@@ -61,4 +66,11 @@ export function isRequestedStudies(value: string): value is keyof RequestedStudi
 // EthicsKey
 export function isEthicsKey(value: string): value is keyof EthicsLetterDTO {
 	return value in ethicsSchema.keyof().Values;
+}
+export function isAgreementKey(value: string): value is keyof AgreementDTO {
+	return value in agreementsSchema.keyof().Values;
+}
+
+export function isAppendicesKey(value: string): value is keyof AppendicesDTO {
+	return value in appendicesSchema.keyof().Values;
 }

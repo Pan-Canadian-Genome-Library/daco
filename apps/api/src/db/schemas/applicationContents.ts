@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { agreementEnum, appendicesEnum } from '@pcgl-daco/data-model';
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { agreements } from './agreements.ts';
 import { applications } from './applications.ts';
 import { collaborators } from './collaborators.ts';
 import { files } from './files.ts';
@@ -30,6 +30,7 @@ export const applicationContents = pgTable('application_contents', {
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 	updated_at: timestamp().notNull(),
+
 	// Applicant
 	applicant_first_name: varchar({ length: 255 }),
 	applicant_middle_name: varchar({ length: 255 }),
@@ -59,6 +60,7 @@ export const applicationContents = pgTable('application_contents', {
 	institutional_rep_email: varchar({ length: 255 }),
 	institutional_rep_profile_url: varchar({ length: 255 }),
 	institutional_rep_position_title: varchar({ length: 255 }),
+
 	// Institution
 	institution_country: varchar({ length: 255 }),
 	institution_state: varchar({ length: 255 }),
@@ -66,6 +68,7 @@ export const applicationContents = pgTable('application_contents', {
 	institution_street_address: text(),
 	institution_postal_code: varchar({ length: 255 }),
 	institution_building: varchar({ length: 255 }),
+
 	// Project
 	project_title: text(),
 	project_website: text(),
@@ -74,14 +77,29 @@ export const applicationContents = pgTable('application_contents', {
 	project_aims: text(),
 	project_summary: text(),
 	project_publication_urls: text().array(),
+
 	// Signature for Sign & Submit
 	applicant_signature: text(),
 	applicant_signed_at: timestamp(),
 	institutional_rep_signature: text(),
 	institutional_rep_signed_at: timestamp(),
+
+	//Agreements
+	accepted_agreements: text({
+		enum: agreementEnum,
+	}).array(),
+	accepted_all_agreements_at: timestamp(),
+
+	//Appendices
+	accepted_appendices: text({
+		enum: appendicesEnum,
+	}).array(),
+	accepted_all_appendices_at: timestamp(),
+
 	// Studies
 	// TODO: requested study information
 	requested_studies: text().array(),
+
 	// Agreements & Ethics
 	ethics_review_required: boolean(),
 	ethics_letter: bigint({ mode: 'number' }),
@@ -93,7 +111,6 @@ export const applicationContentsRelations = relations(applicationContents, ({ ma
 		fields: [applicationContents.application_id],
 		references: [applications.id],
 	}),
-	agreements: many(agreements),
 	collaborators: many(collaborators),
 	revisions: many(revisionRequests),
 	ethics_letter: one(files, {
