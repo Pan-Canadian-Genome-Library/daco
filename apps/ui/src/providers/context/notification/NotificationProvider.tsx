@@ -35,8 +35,7 @@ type NotificationState = {
 };
 
 export const NotificationContext = createContext<NotificationState>({
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	openNotification: function (_: openNotificationParamsType): void {
+	openNotification: function (): void {
 		throw new Error('openNotification has not been initialized.');
 	},
 });
