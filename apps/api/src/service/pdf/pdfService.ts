@@ -80,7 +80,7 @@ const pdfSvc = () => ({
 			logger.error(message);
 			logger.error(err);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 });

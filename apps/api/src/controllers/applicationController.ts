@@ -41,7 +41,7 @@ import { failure, success, type AsyncResult, type Result } from '@/utils/results
 import {
 	aliasApplicationContentsRecord,
 	aliasApplicationRecord,
-	aliasCollaboratorRecord,
+	aliasCollaboratorRecords,
 	aliasFileRecord,
 	aliasSignatureRecord,
 } from '@/utils/routes.js';
@@ -194,7 +194,7 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 	if (ethicsLetterID) {
 		fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
 	} else {
-		return failure('Unable to get ethics approval or exemption file.');
+		return failure('SYSTEM_ERROR', 'Unable to get ethics approval or exemption file.');
 	}
 
 	if (!fileContents.success) {
@@ -208,7 +208,7 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 	const renderedPDF = await pdfService.renderPCGLApplicationPDF({
 		applicationContents: aliasApplicationRecord(applicationContents.data),
 		signatureContents: aliasSignatureRecord(signatureContents.data),
-		collaboratorsContents: aliasCollaboratorRecord(collaboratorsContents.data),
+		collaboratorsContents: aliasCollaboratorRecords(collaboratorsContents.data),
 		fileContents: aliasFileRecord(fileContents.data),
 	});
 
