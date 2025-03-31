@@ -283,7 +283,7 @@ collaboratorsRouter.post(
 			request,
 			response: ResponseWithData<
 				ListCollaboratorResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'DUPLICATE_RECORD']
 			>,
 		) => {
 			try {
@@ -320,6 +320,10 @@ collaboratorsRouter.post(
 					}
 					case 'FORBIDDEN': {
 						response.status(403).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'DUPLICATE_RECORD': {
+						response.status(409).json({ error: result.error, message: result.message });
 						return;
 					}
 				}
