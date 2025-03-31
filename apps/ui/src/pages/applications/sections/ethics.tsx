@@ -37,7 +37,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { FileExtensionTypes } from '@pcgl-daco/data-model';
+import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -111,7 +111,7 @@ const Ethics = () => {
 		URL.revokeObjectURL(url);
 	};
 
-	const handleChange = (info: UploadChangeParam<UploadFile>) => {
+	const handleChange = (info: UploadChangeParam<UploadFile<FilesDTO>>) => {
 		// Handle upload progress
 		if (info.file.status === 'uploading') {
 			setFileList(() => [
@@ -125,7 +125,7 @@ const Ethics = () => {
 			return;
 		}
 
-		if (info.file.status === 'done') {
+		if (info.file.status === 'done' && info.file.response?.id) {
 			dispatch({
 				type: 'UPDATE_APPLICATION',
 				payload: {
