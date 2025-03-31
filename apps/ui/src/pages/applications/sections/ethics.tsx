@@ -37,7 +37,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { FileExtentionTypes } from '@pcgl-daco/data-model';
+import { FileExtensionTypes } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -65,7 +65,7 @@ const Ethics = () => {
 
 	// file meta data check before triggering upload process
 	const beforeUpload = (file: RcFile) => {
-		const isValidImage = new Set(Object.values(FileExtentionTypes)).has(file.type);
+		const isValidImage = new Set(Object.values(FileExtensionTypes)).has(file.type);
 
 		if (!isValidImage) {
 			notification.error({
