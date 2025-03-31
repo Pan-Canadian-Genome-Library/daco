@@ -41,30 +41,46 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { state, dispatch } = useApplicationContext();
+	const {
+		state: { fields, formState },
+		dispatch,
+	} = useApplicationContext();
 	const [form] = Form.useForm();
 
-	const {
-		formState: { isDirty },
-		getValues,
-		control,
-	} = useForm<Nullable<InstitutionalRepSchemaType>>({
+	// When the user comes back after visiting once, it should trigger all of the validation field
+	useEffect(() => {
+		if (formState.sectionsVisited.institutional) {
+			form.validateFields();
+		}
+
+		return () => {
+			dispatch({
+				type: 'UPDATE_SECTION_VISITED',
+				payload: {
+					institutional: true,
+				},
+			});
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form]);
+
+	const { getValues, control } = useForm<Nullable<InstitutionalRepSchemaType>>({
 		defaultValues: {
-			institutionalFirstName: state.fields.institutionalRepFirstName,
-			institutionalMiddleName: state.fields.institutionalRepMiddleName,
-			institutionalLastName: state.fields.institutionalRepLastName,
-			institutionalInstituteAffiliation: state.fields.institutionalRepEmail,
-			institutionalPositionTitle: state.fields.institutionalRepPositionTitle,
-			institutionalPrimaryAffiliation: state.fields.institutionalRepPrimaryAffiliation,
-			institutionalProfileUrl: state.fields.institutionalRepProfileUrl,
-			institutionalSuffix: state.fields.institutionalRepSuffix,
-			institutionalTitle: state.fields.institutionalRepTitle,
-			institutionBuilding: state.fields.institutionBuilding,
-			institutionCity: state.fields.institutionCity,
-			institutionCountry: state.fields.institutionCountry || 'CAN',
-			institutionPostalCode: state.fields.institutionPostalCode,
-			institutionState: state.fields.institutionState,
-			institutionStreetAddress: state.fields.institutionStreetAddress,
+			institutionalFirstName: fields.institutionalRepFirstName,
+			institutionalMiddleName: fields.institutionalRepMiddleName,
+			institutionalLastName: fields.institutionalRepLastName,
+			institutionalInstituteAffiliation: fields.institutionalRepEmail,
+			institutionalPositionTitle: fields.institutionalRepPositionTitle,
+			institutionalPrimaryAffiliation: fields.institutionalRepPrimaryAffiliation,
+			institutionalProfileUrl: fields.institutionalRepProfileUrl,
+			institutionalSuffix: fields.institutionalRepSuffix,
+			institutionalTitle: fields.institutionalRepTitle,
+			institutionBuilding: fields.institutionBuilding,
+			institutionCity: fields.institutionCity,
+			institutionCountry: fields.institutionCountry || 'CAN',
+			institutionPostalCode: fields.institutionPostalCode,
+			institutionState: fields.institutionState,
+			institutionStreetAddress: fields.institutionStreetAddress,
 		},
 		resolver: zodResolver(institutionalRepSchema),
 	});
@@ -76,7 +92,7 @@ const Institutional = () => {
 			type: 'UPDATE_APPLICATION',
 			payload: {
 				fields: {
-					...state.fields,
+					...fields,
 					institutionalRepFirstName: data.institutionalFirstName,
 					institutionalRepMiddleName: data.institutionalMiddleName,
 					institutionalRepLastName: data.institutionalLastName,
@@ -94,17 +110,12 @@ const Institutional = () => {
 					institutionStreetAddress: data.institutionStreetAddress,
 				},
 				formState: {
-					...state.formState,
-					isDirty,
+					...formState,
+					isDirty: true,
 				},
 			},
 		});
 	};
-
-	// validate fields that have been dirtied on page load
-	useEffect(() => {
-		form.validateFields({ dirty: true });
-	}, [form]);
 
 	return (
 		<SectionWrapper>
