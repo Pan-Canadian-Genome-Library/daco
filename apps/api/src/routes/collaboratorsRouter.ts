@@ -199,7 +199,7 @@ collaboratorsRouter.delete(
 			>,
 		) => {
 			try {
-				const collaboratorId = Number(request.params.collaborator_id);
+				const collaboratorId = Number(request.params.collaboratorId);
 
 				if (!isPositiveInteger(collaboratorId)) {
 					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Collaborator ID is not a valid number.' });
