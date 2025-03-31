@@ -35,7 +35,7 @@ import BlockRadioBox from '@/components/pages/application/form-components/BlockR
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/NotificationProvider';
 import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
@@ -53,14 +53,16 @@ const Ethics = () => {
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
-	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
-	const { refetch: getDownload } = useGetDownload({ fileId: state.fields?.ethicsLetter });
+
+	const { refetch: getDownload } = useGetDownload({ fileId: state.fields.ethicsLetter });
+	const { data, isLoading } = useGetFile({ fileId: state.fields.ethicsLetter });
+
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const { token } = useToken();
 
-	const { control, watch, getValues } = useForm<EthicsSchemaType>({
+	const { control, watch, getValues } = useForm<Nullable<EthicsSchemaType>>({
 		defaultValues: {
-			ethicsReviewRequired: state.fields?.ethicsReviewRequired ?? undefined,
+			ethicsReviewRequired: state.fields.ethicsReviewRequired,
 		},
 	});
 	const showFileUpload = watch('ethicsReviewRequired') !== undefined;
@@ -136,11 +138,11 @@ const Ethics = () => {
 				type: 'UPDATE_APPLICATION',
 				payload: {
 					fields: {
-						...state?.fields,
+						...state.fields,
 						ethicsLetter: info.file.response.id,
 					},
 					formState: {
-						...state?.formState,
+						...state.formState,
 					},
 				},
 			});
