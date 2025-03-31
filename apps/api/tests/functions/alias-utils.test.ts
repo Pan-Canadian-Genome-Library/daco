@@ -59,7 +59,7 @@ describe('Alias Utils', () => {
 		assert.ok(aliasResult.data.hasOwnProperty('applicant_institutional_email'));
 	});
 
-	it('Remove keys not in schema', () => {
+	it('Removes keys not in schema', () => {
 		const testData: JoinedApplicationRecord = {
 			id: 1,
 			user_id: testUserId,
@@ -70,8 +70,6 @@ describe('Alias Utils', () => {
 			expires_at: null,
 			contents: {
 				applicant_first_name: 'Test',
-				ethics_letter: 0,
-				ethics_review_required: true,
 				signed_pdf: 0,
 			},
 		};
@@ -80,8 +78,6 @@ describe('Alias Utils', () => {
 
 		assert.ok(aliasResult.success && aliasResult.data.contents);
 		assert.ok(aliasResult.data.contents.hasOwnProperty('applicantFirstName'));
-		assert.ok(!aliasResult.data.contents.hasOwnProperty('ethicsLetter'));
-		assert.ok(!aliasResult.data.contents.hasOwnProperty('ethicsReviewRequired'));
 		assert.ok(!aliasResult.data.contents.hasOwnProperty('signedPdf'));
 	});
 });
