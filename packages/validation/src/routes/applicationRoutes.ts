@@ -55,6 +55,8 @@ export const applicationContentsSchema = z
 		projectAims: z.string().nullable(),
 		projectMethodology: z.string().nullable(),
 		projectSummary: z.string().nullable(),
+		ethicsReviewRequired: z.boolean().nullable(),
+		ethicsLetter: z.number().nullable(),
 	})
 	.partial();
 
