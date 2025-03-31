@@ -178,7 +178,7 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 	let fileContents = undefined;
 
 	if (ethicsLetterID) {
-		fileContents = await fileService.getFileById({ fileId: ethicsLetterID, withBuffer: true });
+		fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
 	} else {
 		return failure('Unable to get ethics approval or exemption file.');
 	}
