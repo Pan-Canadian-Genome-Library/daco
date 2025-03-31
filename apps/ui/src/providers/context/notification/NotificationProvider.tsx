@@ -17,11 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* eslint-disable react-refresh/only-export-components */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { notification } from 'antd';
-import { createContext, PropsWithChildren, ReactNode, useContext } from 'react';
+import { createContext, PropsWithChildren, ReactNode } from 'react';
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
 type PlacementType = 'top' | 'topLeft' | 'topRight' | 'bottom' | 'bottomLeft' | 'bottomRight';
@@ -37,7 +34,8 @@ type NotificationState = {
 	openNotification: (params: openNotificationParamsType) => void;
 };
 
-const NotificationContext = createContext<NotificationState>({
+export const NotificationContext = createContext<NotificationState>({
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	openNotification: function (_: openNotificationParamsType): void {
 		throw new Error('openNotification has not been initialized.');
 	},
@@ -62,12 +60,4 @@ export function NotificationProvider({ children }: PropsWithChildren) {
 			</>
 		</NotificationContext.Provider>
 	);
-}
-
-export function useNotificationContext() {
-	const context = useContext(NotificationContext);
-	if (context === undefined) {
-		throw new Error('useNotificationContext must be used within a NotificationProvider');
-	}
-	return context;
 }
