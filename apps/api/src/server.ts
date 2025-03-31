@@ -28,23 +28,27 @@ import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/applicationRouter.js';
 import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
+import urlJoin from 'url-join';
 import { serverConfig } from './config/serverConfig.js';
-import logger from './logger.js';
+import BaseLogger from './logger.js';
 import authRouter from './routes/authRouter.js';
 import fileRouter from './routes/fileRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
 import sessionMiddleware from './session/sessionMiddleware.js';
 
+const logger = BaseLogger.forModule('server');
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const API_DOCS_PATH = `api-docs`;
+const API_PATH_DOCS = `/api-docs`;
 
 const startServer = async () => {
 	const app = express();
 
 	app.use(ExpressLogger({ logger, excludeURLs: ['/auth/token'] }));
 
+	app.use(express.json());
 	app.use(sessionMiddleware);
 
 	app.use('/collaborators', collaboratorsRouter);
@@ -54,13 +58,13 @@ const startServer = async () => {
 	app.use('/file', fileRouter);
 
 	app.use(
-		`/${API_DOCS_PATH}`,
+		`${API_PATH_DOCS}`,
 		swaggerUi.serve,
 		swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))),
 	);
 
 	app.get('/', async (req: Request, res: Response) => {
-		res.json({});
+		res.send();
 	});
 
 	app.get('/health', (_req: Request, res: Response) => {
@@ -72,17 +76,17 @@ const startServer = async () => {
 		};
 
 		if (health.all.status != Status.OK) {
-			res.status(500).send(resBody);
+			res.status(500).json(resBody);
 			return;
 		}
 
-		res.status(200).send(resBody);
+		res.status(200).json(resBody);
 	});
 
 	app.listen(serverConfig.PORT, () => {
 		logger.info(`Server started - listening on port ${serverConfig.PORT}.`);
 		if (!serverConfig.isProduction) {
-			logger.info(`API Docs available at: http://localhost:${serverConfig.PORT}/${API_DOCS_PATH}`);
+			logger.info(`API Docs available at: ${urlJoin([`http://localhost:${serverConfig.PORT}`, API_PATH_DOCS])}`);
 		}
 	});
 };

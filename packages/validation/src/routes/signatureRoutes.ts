@@ -19,28 +19,33 @@
 
 import { SignatureTypes } from '@pcgl-daco/data-model';
 import { z } from 'zod';
-import { isPositiveInteger } from '../utils/functions.js';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export const editSignatureRequestSchema = z.object({
-	applicationId: z.number().nonnegative().min(1),
+	applicationId: z.number().nonnegative().positive(),
 	signature: z.string().regex(BASE64_IMAGE),
 	signee: z.nativeEnum(SignatureTypes),
 });
 export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;
 
+export const applicationSignatureDTOSchema = z.object({
+	id: z.number().nonnegative().positive(),
+	signature: z.string().regex(BASE64_IMAGE),
+	signedAt: z.string().datetime().optional(),
+});
+export type ApplicationSignatureDTO = z.infer<typeof editSignatureResponseSchema>;
+
+export const editSignatureResponseSchema = applicationSignatureDTOSchema;
+export type EditSignatureResponse = z.infer<typeof editSignatureResponseSchema>;
+
 export const getSignatureParamsSchema = z
 	.object({
-		applicationId: z
-			.string()
-			.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number.' }),
+		applicationId: z.coerce.number().int().gt(0),
 	})
 	.required();
 
 export const deleteSignatureParamsSchema = z.object({
-	applicationId: z
-		.string()
-		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number.' }),
+	applicationId: z.coerce.number().int().gt(0),
 });
 
 export const deleteSignatureQuerySchema = z.object({

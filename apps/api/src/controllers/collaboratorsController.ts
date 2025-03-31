@@ -16,15 +16,23 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 import { getDbInstance } from '@/db/index.js';
+import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
-import { aliasCollaboratorRecord } from '@/utils/aliases.ts';
-import { failure, success } from '@/utils/results.js';
-import { type CollaboratorDTO, type CollaboratorUpdateRecord } from '@pcgl-daco/data-model';
+import { aliasCollaboratorRecords } from '@/utils/aliases.ts';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
+import {
+	type CollaboratorDTO,
+	type CollaboratorsResponseDTO,
+	type CollaboratorUpdateRecord,
+	type ListCollaboratorResponse,
+} from '@pcgl-daco/data-model';
+import { getApplicationById } from './applicationController.ts';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
+
+const logger = BaseLogger.forModule('coillaboratorsController');
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -41,7 +49,10 @@ export const createCollaborators = async ({
 	application_id: number;
 	user_id: string;
 	collaborators: CollaboratorDTO[];
-}) => {
+}): AsyncResult<
+	ListCollaboratorResponse,
+	'UNAUTHORIZED' | 'SYSTEM_ERROR' | 'NOT_FOUND' | 'INVALID_STATE_TRANSITION' | 'DUPLICATE_RECORD'
+> => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
 	const applicationRepo: ApplicationService = applicationSvc(database);
@@ -59,7 +70,7 @@ export const createCollaborators = async ({
 	// TODO: Add Real Auth
 	// Validate User is Applicant
 	if (!(user_id === application.user_id)) {
-		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
+		return failure('UNAUTHORIZED', 'Unauthorized, cannot create Collaborators');
 	}
 
 	if (!canEditResult.success) {
@@ -67,6 +78,7 @@ export const createCollaborators = async ({
 	}
 
 	const hasDuplicateRecords = collaborators.some((collaborator, index) => {
+		// TODO: duplicate for collaborators should be by application + email
 		const matchingRecord = collaborators.find(
 			(record, searchIndex) =>
 				searchIndex !== index &&
@@ -80,7 +92,8 @@ export const createCollaborators = async ({
 	});
 
 	if (hasDuplicateRecords) {
-		return failure(`Cannot create duplicate collaborator records`, 'DuplicateRecords');
+		// TODO: List the duplicate records.
+		return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
 	}
 
 	const newCollaborators: CollaboratorModel[] = collaborators.map((data) => ({
@@ -101,7 +114,7 @@ export const createCollaborators = async ({
 		return collaboratorsResult;
 	}
 
-	const result = aliasCollaboratorRecord(collaboratorsResult.data);
+	const result = aliasCollaboratorRecords(collaboratorsResult.data);
 
 	return success(result);
 };
@@ -113,33 +126,44 @@ export const createCollaborators = async ({
  * @param collaborator_id - ID of Collaborator to delete
  * @returns Success with Collaborator data record / Failure with Error.
  */
-export const deleteCollaborator = async ({ application_id, id }: { application_id: number; id: number }) => {
-	const database = getDbInstance();
-	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
-	const applicationRepo: ApplicationService = applicationSvc(database);
+export const deleteCollaborator = async ({
+	application_id,
+	id,
+}: {
+	application_id: number;
+	id: number;
+}): AsyncResult<CollaboratorsResponseDTO[], 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+		const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+		const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
 
-	if (!applicationResult.success) {
-		return applicationResult;
+		if (!applicationResult.success) {
+			return applicationResult;
+		}
+
+		const application = applicationResult.data;
+
+		// TODO: Valid states for actions should be handled through the appStateManager
+		if (!(application.state === 'DRAFT')) {
+			return failure('INVALID_STATE_TRANSITION', `Can only add Collaborators when Application is in state DRAFT`);
+		}
+
+		const deleteResult = await collaboratorsRepo.deleteCollaborator({
+			id,
+		});
+
+		if (!deleteResult.success) {
+			return deleteResult;
+		}
+		const result = aliasCollaboratorRecords(deleteResult.data);
+
+		return success(result);
+	} catch (error) {
+		return failure('SYSTEM_ERROR', 'Unexpected error.');
 	}
-
-	const application = applicationResult.data;
-
-	if (!(application.state === 'DRAFT')) {
-		return failure(`Can only add Collaborators when Application is in state DRAFT`, 'InvalidState');
-	}
-
-	const deleteResult = await collaboratorsRepo.deleteCollaborator({
-		id,
-	});
-
-	if (!deleteResult.success) {
-		return deleteResult;
-	}
-	const result = aliasCollaboratorRecord(deleteResult.data);
-
-	return success(result);
 };
 
 /*
@@ -148,35 +172,26 @@ export const deleteCollaborator = async ({ application_id, id }: { application_i
  * @param collaborators - Array of new Collaborators to create
  * @returns Success with Collaborator data array / Failure with Error.
  */
-export const listCollaborators = async ({ application_id, user_id }: { application_id: number; user_id: string }) => {
-	const database = getDbInstance();
-	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
-	const applicationRepo: ApplicationService = applicationSvc(database);
+export const listCollaborators = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<CollaboratorsResponseDTO[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
 
-	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+		const collaboratorsResult = await collaboratorsRepo.listCollaborators(applicationId);
 
-	if (!applicationResult.success) {
-		return applicationResult;
+		if (!collaboratorsResult.success) {
+			return collaboratorsResult;
+		}
+
+		return success(aliasCollaboratorRecords(collaboratorsResult.data));
+	} catch (error) {
+		logger.error(`Unable to list collaborators for application with id: ${applicationId}`, error);
+		return failure('SYSTEM_ERROR', 'Unexpected error.');
 	}
-
-	const application = applicationResult.data;
-
-	// TODO: Add Real Auth
-	// Validate User is Applicant
-	if (!(user_id === application.user_id)) {
-		return failure('Unauthorized, cannot create Collaborators', 'Unauthorized');
-	}
-
-	const applicationId = application.id;
-	const collaboratorsResult = await collaboratorsRepo.listCollaborators(applicationId);
-
-	if (!collaboratorsResult.success) {
-		return collaboratorsResult;
-	}
-
-	const result = aliasCollaboratorRecord(collaboratorsResult.data);
-
-	return success(result);
 };
 
 /**
@@ -194,12 +209,14 @@ export const updateCollaborator = async ({
 	application_id: number;
 	user_id: string;
 	collaboratorUpdates: CollaboratorUpdateRecord;
-}) => {
+}): AsyncResult<
+	CollaboratorsResponseDTO[],
+	'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_STATE_TRANSITION' | 'FORBIDDEN'
+> => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
-	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
+	const applicationResult = await getApplicationById({ applicationId: application_id });
 
 	if (!applicationResult.success) {
 		return applicationResult;
@@ -207,14 +224,14 @@ export const updateCollaborator = async ({
 
 	const application = applicationResult.data;
 
-	// TODO: Add Real Auth
 	// Validate User is Applicant
-	if (!(user_id === application.user_id)) {
-		return failure('Unauthorized, cannot update Collaborators', 'Unauthorized');
+	if (!(user_id === application.userId)) {
+		return failure('FORBIDDEN', 'User is not authorized to modify collaborators for this application.');
 	}
 
+	// TODO: should use application state manager
 	if (!(application.state === 'DRAFT')) {
-		return failure(`Can only edit Collaborators when Application is in state DRAFT`, 'InvalidState');
+		return failure('INVALID_STATE_TRANSITION', `Can only edit collaborators when application is in state DRAFT`);
 	}
 
 	const { id } = collaboratorUpdates;
@@ -240,7 +257,7 @@ export const updateCollaborator = async ({
 		return updateResult;
 	}
 
-	const result = aliasCollaboratorRecord(updateResult.data);
+	const result = aliasCollaboratorRecords(updateResult.data);
 
 	return success(result);
 };

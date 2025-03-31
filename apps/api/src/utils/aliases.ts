@@ -23,7 +23,7 @@ import {
 	type CollaboratorRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { ApplicationResponseData, type CollaboratorsResponse, type SignatureDTO } from '@pcgl-daco/data-model';
+import { ApplicationResponseData, type CollaboratorsResponseDTO, type SignatureDTO } from '@pcgl-daco/data-model';
 import {
 	applicationResponseSchema,
 	signatureResponseSchema,
@@ -37,27 +37,35 @@ import { applicationContentUpdateSchema } from './schemas.ts';
  * @param data Joined Application Record - Snake case database Application / ApplicationContents record
  * @returns ApplicationResponseData - Application record with updated keys
  */
-export const aliasApplicationRecord = (data: JoinedApplicationRecord): Result<ApplicationResponseData> => {
+export const aliasApplicationRecord = (
+	data: JoinedApplicationRecord,
+): Result<ApplicationResponseData, 'SYSTEM_ERROR'> => {
 	const aliasedRecord = objectToCamel(data);
 	const validationResult = applicationResponseSchema.safeParse(aliasedRecord);
 	const result = validationResult.success
 		? success(validationResult.data)
-		: failure('Validation Error', validationResult.error);
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at aliasApplicationRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
 	return result;
 };
-
+// '', 'INVALID_REQUEST'
 /** Converts partial Application Content update into database insert snake_case model format
  * @param data type UpdateEditApplicationRequest application contents in camelCase
  * @returns  type ApplicationContentUpdates in snake_case
  */
 export const aliasApplicationContentsRecord = (
 	update: UpdateEditApplicationRequest,
-): Result<ApplicationContentUpdates> => {
+): Result<ApplicationContentUpdates, 'SYSTEM_ERROR'> => {
 	const snakeCaseRecord = objectToSnake(update);
 	const validationResult = applicationContentUpdateSchema.safeParse(snakeCaseRecord);
 	const result = validationResult.success
 		? success(validationResult.data)
-		: failure('Validation Error', validationResult.error);
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at aliasApplicationContentsRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
 	return result;
 };
 
@@ -66,12 +74,15 @@ export const aliasApplicationContentsRecord = (
  * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
  * @returns type `SignatureDTO` - camelCase variation of a Postgres success response.
  */
-export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Result<SignatureDTO> => {
+export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Result<SignatureDTO, 'SYSTEM_ERROR'> => {
 	const camelCaseRecord = objectToCamel(data);
 	const validationResult = signatureResponseSchema.safeParse(camelCaseRecord);
 	const result = validationResult.success
 		? success(validationResult.data)
-		: failure('Validation Error', validationResult.error);
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at aliasApplicationRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
 	return result;
 };
 
@@ -80,8 +91,8 @@ export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Result<S
  * @param data type CollaboratorRecord in snake_case
  * @returns  type GetCollaboratorsResponse in camelCase w/ Collaborator added
  */
-export const aliasCollaboratorRecord = (data: CollaboratorRecord[]): CollaboratorsResponse[] => {
-	const formattedUpdate: CollaboratorsResponse[] = [];
+export const aliasCollaboratorRecords = (data: CollaboratorRecord[]): CollaboratorsResponseDTO[] => {
+	const formattedUpdate: CollaboratorsResponseDTO[] = [];
 
 	data.forEach((value) => {
 		formattedUpdate.push({

@@ -86,7 +86,7 @@ describe('Signature API', () => {
 			assert.ok(result.success);
 
 			const editedSignature = result.data;
-			assert.strictEqual(editedSignature.applicant_signature, validBase64Signature);
+			assert.strictEqual(editedSignature.signature, validBase64Signature);
 		});
 
 		it('Should allow signing an application as an Institutional Rep', async () => {
@@ -110,7 +110,7 @@ describe('Signature API', () => {
 
 			const editedSignature = result.data;
 
-			assert.strictEqual(editedSignature.institutional_rep_signature, validBase64Signature);
+			assert.strictEqual(editedSignature.signature, validBase64Signature);
 		});
 	});
 
