@@ -17,12 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { PDFDocument } from 'pdf-lib';
+
+import { ApplicationResponseData, CollaboratorDTO, FilesDTO, SignatureDTO } from '@pcgl-daco/data-model';
+
 import { serverConfig } from '@/config/serverConfig.ts';
 import logger from '@/logger.ts';
 import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
 import { failure, success } from '@/utils/results.ts';
-import { ApplicationResponseData, CollaboratorDTO, FilesDTO, SignatureDTO } from '@pcgl-daco/data-model';
-import { PDFDocument } from 'pdf-lib';
 
 const PDF_CREATOR_PRODUCER = `Pan-Canadian Genome Library DACO (ver. ${serverConfig.npm_package_version})`;
 const PDF_AUTHOR = `Data Access Compliance Office, Pan-Canadian Genome Library`;
