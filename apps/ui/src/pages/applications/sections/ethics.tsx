@@ -187,7 +187,7 @@ const Ethics = () => {
 						}}
 					>
 						<BlockRadioBox
-							label={translate('ethics-section.pleaseChose')}
+							label={translate('ethics-section.pleaseChoose')}
 							name="ethicsReviewRequired"
 							control={control}
 							rule={rule}
