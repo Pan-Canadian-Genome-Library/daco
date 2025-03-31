@@ -23,12 +23,12 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
+import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useDeleteCollaborator = () => {
 	return useMutation<
-		CollaboratorsResponse[],
+		ListCollaboratorResponse,
 		ServerError,
 		{ applicationId: number | string; collaboratorId: number | string }
 	>({
@@ -46,7 +46,7 @@ const useDeleteCollaborator = () => {
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the delete collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
+			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
 				return prev.filter((value) => value.id !== data[0]?.id);
 			});
 			notification.success({

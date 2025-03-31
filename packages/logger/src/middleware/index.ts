@@ -110,7 +110,9 @@ const swaggerUiPaths = ['api-docs', 'swagger-ui', 'favicon'];
  * ```
  * import express from 'express';
  * import ExpressLogger from 'express-logger';
- * import logger from './logger';
+ * import Logger from './logger';
+ *
+ * const logger = Logger('ServiceName');
  *
  * const app = express();
  * app.use(ExpressLogger({ logger, excludeUrls: ['health'] }));

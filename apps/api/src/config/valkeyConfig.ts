@@ -26,6 +26,7 @@ const serverConfigSchema = z.object({
 	VALKEY_USER: z.string(),
 	VALKEY_PASSWORD: z.string(),
 });
+export type ServerConfig = z.infer<typeof serverConfigSchema>;
 
 const parseResult = serverConfigSchema.safeParse(process.env);
 
