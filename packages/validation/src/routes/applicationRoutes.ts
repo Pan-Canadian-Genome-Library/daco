@@ -84,20 +84,8 @@ export const revisionDataSchema = z
 	})
 	.strict();
 
-export const applicationRevisionRequestSchema = z
-	.object({
-		applicationId: z.number().nonnegative(),
-		revisionData: revisionDataSchema.refine((data) => Object.keys(data).length !== 0, {
-			message: 'revisionData cannot be empty',
-		}),
-		role: z.enum(['DAC_MEMBER', 'INSTITUTIONAL_REP']),
-	})
-	.strict();
-
-export const closeApplicationSchema = z.object({
-	requesterId: z.string().min(1, { message: 'requesterId is required' }),
-	isDacMember: z.boolean({ required_error: 'isDacMember is required' }),
-	applicationId: z.string().min(1, { message: 'applicationId is required' }),
+export const applicationRevisionRequestSchema = revisionDataSchema.refine((data) => Object.keys(data).length !== 0, {
+	message: 'revisionData cannot be empty',
 });
 
 export const submitApplicationRequestSchema = z

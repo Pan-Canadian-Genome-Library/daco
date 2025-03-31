@@ -19,21 +19,25 @@
 
 import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
-import logger from '@/logger.js';
+import BaseLogger from '@/logger.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { and, eq } from 'drizzle-orm';
 import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
+
+const logger = BaseLogger.forModule('collaboratorsService');
 
 const collaboratorsSvc = (db: PostgresDb) => ({
 	createCollaborators: async ({
 		newCollaborators,
 	}: {
 		newCollaborators: CollaboratorModel[];
-	}): AsyncResult<CollaboratorRecord[]> => {
+	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
 			// Check for Duplicates
 			let hasDuplicateCollaborators = false;
 
+			// TODO: Duplicate check needs to be on institutional_email + application_id as the primary identifier, not the entire record.
+			//       This may be enforceable from the DB (composite PK).
 			for await (const collaborator of newCollaborators) {
 				const countExistingCollaborator = await db.$count(
 					collaborators,
@@ -52,7 +56,8 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			}
 
 			if (hasDuplicateCollaborators) {
-				return failure(`Cannot create duplicate collaborator records`, 'DuplicateRecords');
+				// TODO: Duplicate record error message should inform which donors are duplicate.
+				return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
 			}
 
 			// Create Collaborators
@@ -78,16 +83,15 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			}
 
 			return success(collaboratorRecords);
-		} catch (err) {
-			const message = `Error at createCollaborators`;
+		} catch (error) {
+			const message = `Error creating new collaborator records.`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord[]> => {
+	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
 		try {
 			const deletedRecord = await db.delete(collaborators).where(eq(collaborators.id, id)).returning();
 
@@ -96,13 +100,12 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			}
 
 			return success(deletedRecord);
-		} catch (err) {
-			const message = `Error at deleteCollaborators with id ${id}`;
+		} catch (error) {
+			const message = `Error deleting collaborator with id: ${id}`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 	updateCollaborator: async ({
@@ -111,7 +114,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 	}: {
 		id: number;
 		collaborator: Partial<CollaboratorModel>;
-	}): AsyncResult<CollaboratorRecord[]> => {
+	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
 		try {
 			const updatedRecord = await db
 				.update(collaborators)
@@ -124,16 +127,15 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			}
 
 			return success(updatedRecord);
-		} catch (err) {
-			const message = `Error at updateCollaborator`;
+		} catch (error) {
+			const message = `Error updating collaborator with id: ${id}`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	listCollaborators: async (application_id: number) => {
+	listCollaborators: async (application_id: number): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
 		try {
 			const collaboratorRecords = await db
 				.select()
@@ -141,13 +143,12 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 				.where(eq(collaborators.application_id, application_id));
 
 			return success(collaboratorRecords);
-		} catch (err) {
-			const message = `Error at listCollaborators`;
+		} catch (error) {
+			const message = `Error listing collaborators.`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 });

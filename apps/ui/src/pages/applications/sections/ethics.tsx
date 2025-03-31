@@ -19,7 +19,7 @@
 
 import { UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Flex, Form, notification, theme, Typography, Upload, UploadFile } from 'antd';
+import { Button, Flex, Form, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
 import { useEffect, useState } from 'react';
@@ -35,9 +35,10 @@ import BlockRadioBox from '@/components/pages/application/form-components/BlockR
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { FileExtentionTypes } from '@pcgl-daco/data-model';
+import { useNotificationContext } from '@/providers/NotificationProvider';
+import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -47,38 +48,45 @@ const rule = createSchemaFieldRule(ethicsSchema);
 const MAX_FILE_SIZE = 5000000;
 
 const Ethics = () => {
+	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
-	const { data, isLoading } = useGetFile({ fileId: state.fields?.ethicsLetter });
-	const { refetch: getDownload } = useGetDownload({ fileId: state.fields?.ethicsLetter });
+
+	const { refetch: getDownload } = useGetDownload({ fileId: state.fields.ethicsLetter });
+	const { data, isLoading } = useGetFile({ fileId: state.fields.ethicsLetter });
+
 	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const { token } = useToken();
 
-	const { control, watch, getValues } = useForm<EthicsSchemaType>({
+	const { control, watch, getValues } = useForm<Nullable<EthicsSchemaType>>({
 		defaultValues: {
-			ethicsReviewRequired: state.fields?.ethicsReviewRequired ?? undefined,
+			ethicsReviewRequired: state.fields.ethicsReviewRequired,
 		},
 	});
 	const showFileUpload = watch('ethicsReviewRequired') !== undefined;
 
 	// file meta data check before triggering upload process
 	const beforeUpload = (file: RcFile) => {
-		const isValidImage = new Set(Object.values(FileExtentionTypes)).has(file.type);
+		const isValidImage = new Set(Object.values(FileExtensionTypes)).has(file.type);
 
 		if (!isValidImage) {
-			notification.error({
+			notification.openNotification({
+				type: 'error',
 				message: translate('invalidFileTitle'),
 			});
+
 			return isValidImage || Upload.LIST_IGNORE;
 		}
 
 		if (file.size > MAX_FILE_SIZE) {
-			notification.error({
+			notification.openNotification({
+				type: 'error',
 				message: translate('invalidFileSizeTitle'),
 				description: translate('invalidFileSizeDescription'),
 			});
+
 			return false;
 		}
 	};
@@ -111,7 +119,7 @@ const Ethics = () => {
 		URL.revokeObjectURL(url);
 	};
 
-	const handleChange = (info: UploadChangeParam<UploadFile>) => {
+	const handleChange = (info: UploadChangeParam<UploadFile<FilesDTO>>) => {
 		// Handle upload progress
 		if (info.file.status === 'uploading') {
 			setFileList(() => [
@@ -125,16 +133,16 @@ const Ethics = () => {
 			return;
 		}
 
-		if (info.file.status === 'done') {
+		if (info.file.status === 'done' && info.file.response?.id) {
 			dispatch({
 				type: 'UPDATE_APPLICATION',
 				payload: {
 					fields: {
-						...state?.fields,
+						...state.fields,
 						ethicsLetter: info.file.response.id,
 					},
 					formState: {
-						...state?.formState,
+						...state.formState,
 					},
 				},
 			});
@@ -187,7 +195,7 @@ const Ethics = () => {
 						}}
 					>
 						<BlockRadioBox
-							label={translate('ethics-section.pleaseChose')}
+							label={translate('ethics-section.pleaseChoose')}
 							name="ethicsReviewRequired"
 							control={control}
 							rule={rule}

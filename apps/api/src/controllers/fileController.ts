@@ -18,14 +18,21 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
-import logger from '@/logger.ts';
+import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { type ApplicationRecord, type ApplicationService, type FilesService } from '@/service/types.ts';
-import { failure, success } from '@/utils/results.ts';
+import {
+	type ApplicationRecord,
+	type ApplicationService,
+	type FilesRecord,
+	type FilesService,
+} from '@/service/types.ts';
+import { failure, success, type AsyncResult, type Result } from '@/utils/results.ts';
 import { FileTypes } from '@pcgl-daco/data-model';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
+
+const logger = BaseLogger.forModule('fileController');
 
 /**
  * Upload a file with an associated application
@@ -33,7 +40,13 @@ import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.
  * @param file - File blob
  * @returns Success with file data / Failure with Error.
  */
-export const uploadEthicsFile = async ({ applicationId, file }: { applicationId: number; file: formidable.File }) => {
+export const uploadEthicsFile = async ({
+	applicationId,
+	file,
+}: {
+	applicationId: number;
+	file: formidable.File;
+}): AsyncResult<FilesRecord, 'SYSTEM_ERROR' | 'NOT_FOUND' | 'INVALID_STATE_TRANSITION'> => {
 	try {
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
@@ -42,7 +55,7 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 		const applicationResult = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
 		if (!applicationResult.success) {
-			return failure('Failed getting application information');
+			return applicationResult;
 		}
 
 		const application = applicationResult.data;
@@ -51,14 +64,14 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 		const applicationRecord: ApplicationRecord = { ...application, contents: null };
 		const canEditResult = new ApplicationStateManager(applicationRecord)._canPerformAction(edit);
 
-		if (!canEditResult) {
-			return failure('Invalid action, must be in a draft state', 'Invalid action');
+		if (!canEditResult.success) {
+			return canEditResult;
 		}
 
 		const ethicsLetterId = application.contents?.ethics_letter;
 
 		const txResult = await database.transaction(async (tx) => {
-			let result;
+			let result: Result<FilesRecord, 'SYSTEM_ERROR' | 'NOT_FOUND' | 'INVALID_STATE_TRANSITION'>;
 
 			if (ethicsLetterId && ethicsLetterId !== null) {
 				result = await filesService.updateFile({
@@ -91,9 +104,9 @@ export const uploadEthicsFile = async ({ applicationId, file }: { applicationId:
 		return txResult;
 	} catch (error) {
 		const message = `Unable to upload file to application with id: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(message, error);
+
+		return failure('SYSTEM_ERROR', message);
 	}
 };
 
@@ -121,9 +134,9 @@ export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; 
 		return result;
 	} catch (error) {
 		const message = `Unable to retrieve file with id: ${fileId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(message, error);
+
+		return failure('SYSTEM_ERROR', message);
 	}
 };
 
@@ -176,6 +189,6 @@ export const deleteFile = async ({ fileId }: { fileId: number }) => {
 		const message = `Unable to delete file with id: ${fileId}`;
 		logger.error(message);
 		logger.error(error);
-		return failure(message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };

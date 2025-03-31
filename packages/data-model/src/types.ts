@@ -40,11 +40,11 @@ export const FileTypes = {
 
 export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
-export const FileExtentionTypes = {
+export const FileExtensionTypes = {
 	PDF: 'application/pdf',
 };
 
-export type FileExtentionType = (typeof FileExtentionTypes)[keyof typeof FileExtentionTypes];
+export type FileExtensionType = (typeof FileExtensionTypes)[keyof typeof FileExtensionTypes];
 
 export const SignatureTypes = {
 	APPLICANT: 'APPLICANT',
@@ -262,10 +262,11 @@ export interface CollaboratorDTO {
 	collaboratorType?: string | null;
 }
 
-export interface CollaboratorsResponse extends CollaboratorDTO {
+export interface CollaboratorsResponseDTO extends CollaboratorDTO {
 	id: number;
 	applicationId: number;
 }
+export type ListCollaboratorResponse = CollaboratorsResponseDTO[];
 
 export type BaseCollaboratorRequest = {
 	applicationId: number;

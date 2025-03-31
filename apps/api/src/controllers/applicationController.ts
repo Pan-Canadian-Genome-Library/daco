@@ -20,7 +20,7 @@
 import { ApplicationStates, ApproveApplication } from '@pcgl-daco/data-model/src/types.js';
 
 import { getDbInstance } from '@/db/index.js';
-import logger from '@/logger.js';
+import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
@@ -28,16 +28,16 @@ import { filesSvc } from '@/service/fileService.ts';
 import { pdfSvc } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
-	CollaboratorsService,
-	FilesService,
-	SignatureService,
 	type ApplicationRecord,
 	type ApplicationService,
+	type CollaboratorsService,
+	type FilesService,
 	type JoinedApplicationRecord,
 	type PDFService,
 	type RevisionRequestModel,
+	type SignatureService,
 } from '@/service/types.js';
-import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
 import {
 	aliasApplicationContentsRecord,
 	aliasApplicationRecord,
@@ -45,15 +45,18 @@ import {
 	aliasFileRecord,
 	aliasSignatureRecord,
 } from '@/utils/routes.js';
-import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
+import type { ApplicationResponseData } from '@pcgl-daco/data-model';
+import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
+
+const logger = BaseLogger.forModule('applicationController');
 
 /**
  * Creates a new application and returns the created data.
  * @param user_id - The ID of the user requesting the creation of the application.
  * @returns Success with Application data / Failure with Error.
  */
-export const createApplication = async ({ user_id }: { user_id: string }) => {
+export const createApplication = async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -69,7 +72,13 @@ export const createApplication = async ({ user_id }: { user_id: string }) => {
  * @param update - Application Contents details to update
  * @returns Success with Application data / Failure with Error
  */
-export const editApplication = async ({ id, update }: { id: number; update: UpdateEditApplicationRequest }) => {
+export const editApplication = async ({
+	id,
+	update,
+}: {
+	id: number;
+	update: UpdateEditApplicationRequest;
+}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -87,7 +96,7 @@ export const editApplication = async ({ id, update }: { id: number; update: Upda
 	if (!canEditResult.success) {
 		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
-		return failure(message);
+		return failure('INVALID_STATE_TRANSITION', message);
 	}
 
 	const data = aliasApplicationContentsRecord(update);
@@ -118,7 +127,11 @@ export const getAllApplications = async ({ userId, state, sort, page, pageSize }
  * @param applicationId - The ID of the application within the database.
  * @returns Success with the details of the application / Failure with Error.
  */
-export const getApplicationById = async ({ applicationId }: { applicationId: number }) => {
+export const getApplicationById = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationResponseData, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -131,16 +144,17 @@ export const getApplicationById = async ({ applicationId }: { applicationId: num
 
 	return result;
 };
+
 /**
  * Gets the total of how many applications are in each state type, including a TOTAL count.
  * @param userId - The ID of the current user.
  * @returns Success with the details of the application / Failure with Error.
  */
-export const getApplicationStateTotals = async ({ userId }: { userId: string }) => {
+export const getApplicationStateTotals = async () => {
 	const database = getDbInstance();
 	const service: ApplicationService = applicationSvc(database);
 
-	return await service.applicationStateTotals({ user_id: userId });
+	return await service.applicationStateTotals();
 };
 
 /**
@@ -218,7 +232,9 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
  * 	data?: any;
  * }>}
  */
-export const approveApplication = async ({ applicationId }: ApproveApplication): AsyncResult<ApplicationRecord> => {
+export const approveApplication = async ({
+	applicationId,
+}: ApproveApplication): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -234,13 +250,13 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (appStateManager.state === ApplicationStates.APPROVED) {
-			return failure('Application is already approved.', 'ApprovalConflict');
+			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
 		}
 
 		const approvalResult = await appStateManager.approveDacReview();
 
 		if (!approvalResult.success) {
-			return failure(approvalResult.message || 'Failed to approve application.', 'StateTransitionError');
+			return failure('SYSTEM_ERROR', approvalResult.message);
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
@@ -248,14 +264,16 @@ export const approveApplication = async ({ applicationId }: ApproveApplication):
 
 		return updatedResult;
 	} catch (error) {
-		const message = `Unable to approve application with id: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(`Unable to approve application with id: ${applicationId}`, error);
+		return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to approve application.');
 	}
 };
 
-export const rejectApplication = async ({ applicationId }: { applicationId: number }) => {
+export const dacRejectApplication = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -270,14 +288,10 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		if (appStateManager.state === ApplicationStates.REJECTED) {
-			return failure('Application is already rejected.', 'RejectionConflict');
-		}
-
 		const rejectResult = await appStateManager.rejectDacReview();
 
 		if (!rejectResult.success) {
-			return failure(rejectResult.message || 'Failed to reject application.', 'StateTransitionError');
+			return failure('INVALID_STATE_TRANSITION', rejectResult.message || 'Failed to reject application.');
 		}
 
 		const update = { state: appStateManager.state, updated_at: new Date() };
@@ -288,11 +302,15 @@ export const rejectApplication = async ({ applicationId }: { applicationId: numb
 		const message = `Unable to reject application with id: ${applicationId}`;
 		logger.error(message);
 		logger.error(error);
-		return failure(message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };
 
-export const submitRevision = async ({ applicationId }: { applicationId: number }) => {
+export const submitRevision = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -311,7 +329,7 @@ export const submitRevision = async ({ applicationId }: { applicationId: number 
 			appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED ||
 			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
 		) {
-			return failure('Application revision is already submitted.', 'RejectionConflict');
+			return failure('INVALID_STATE_TRANSITION', 'Application revision is already submitted.');
 		}
 
 		let submittedRevision;
@@ -322,19 +340,21 @@ export const submitRevision = async ({ applicationId }: { applicationId: number 
 		}
 
 		if (!submittedRevision.success) {
-			return failure(submittedRevision.message || 'Failed to submit application revision.', 'StateTransitionError');
+			return failure('INVALID_STATE_TRANSITION', submittedRevision.message || 'Failed to submit application revision.');
 		}
 
 		return submittedRevision;
 	} catch (error) {
 		const message = `Unable to submit revision with applicationId: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };
 
-export const revokeApplication = async (applicationId: number): AsyncResult<ApplicationRecord> => {
+export const revokeApplication = async (
+	applicationId: number,
+): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -352,7 +372,7 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 		const revokeApplicationResult = await appStateManager.revokeApproval();
 
 		if (!revokeApplicationResult.success) {
-			return failure(revokeApplicationResult.message || 'Failed to revove application', 'StateTransitionError');
+			return revokeApplicationResult;
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
@@ -361,21 +381,18 @@ export const revokeApplication = async (applicationId: number): AsyncResult<Appl
 		return updatedResult;
 	} catch (error) {
 		const message = `Unable to revoke application with id: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };
 
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
-	role,
 	revisionData,
 }: {
 	applicationId: number;
-	role: string;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord> => {
+}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -389,41 +406,37 @@ export const requestApplicationRevisionsByDac = async ({
 		const application = result.data;
 		const appStateManager = new ApplicationStateManager(application);
 
-		if (role === 'DAC_MEMBER' && application.state !== ApplicationStates.DAC_REVIEW) {
-			return failure('Application is not in the correct status for revisions.');
+		if (application.state !== ApplicationStates.DAC_REVIEW) {
+			return failure('INVALID_STATE_TRANSITION', 'Application is not in the correct status for revisions.');
 		}
 
 		const revisionResult = await appStateManager.reviseDacReview();
 
 		if (!revisionResult.success) {
-			return failure(revisionResult.message || 'Failed to request revisions for application.', 'StateTransitionError');
+			return revisionResult;
 		}
 
 		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
-			return failure(
-				revisionRequestResult.message || 'Failed to request revisions for application.',
-				'StateTransitionError',
-			);
+			return revisionRequestResult;
 		}
 
 		return service.getApplicationWithContents({ id: applicationId });
 	} catch (error) {
-		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
-		return failure('An error occurred while processing the request.', error);
+		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
+
+		return failure('SYSTEM_ERROR', 'An error occurred while processing the request.');
 	}
 };
 
-export const requestApplicationRevisionsByRep = async ({
+export const requestApplicationRevisionsByInstitutionalRep = async ({
 	applicationId,
-	role,
 	revisionData,
 }: {
 	applicationId: number;
-	role: string;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord> => {
+}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -437,33 +450,35 @@ export const requestApplicationRevisionsByRep = async ({
 		const application = result.data;
 		const appStateManager = new ApplicationStateManager(application);
 
-		if (role === 'INSTITUTIONAL_REP' && application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			return failure('Application is not in the correct status for revisions.');
+		if (application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+			return failure('INVALID_STATE_TRANSITION', 'Application is not in the correct status for revisions.');
 		}
 
 		const revisionResult = await appStateManager.reviseRepReview();
 
 		if (!revisionResult.success) {
-			return failure(revisionResult.message || 'Failed to request revisions for application.', 'StateTransitionError');
+			return revisionResult;
 		}
 
 		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
-			return failure(
-				revisionRequestResult.message || 'Failed to request revisions for application.',
-				'StateTransitionError',
-			);
+			return revisionRequestResult;
 		}
 
 		return service.getApplicationWithContents({ id: applicationId });
 	} catch (error) {
-		logger.error(`Failed to request revisions for application ${applicationId}:`, error);
-		return failure('An error occurred while processing the request.', error);
+		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
+
+		return failure('SYSTEM_ERROR', 'An error occurred while processing the request.');
 	}
 };
 
-export const submitApplication = async ({ applicationId }: { applicationId: number }) => {
+export const submitApplication = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -481,7 +496,7 @@ export const submitApplication = async ({ applicationId }: { applicationId: numb
 		const appStateManager = new ApplicationStateManager(application);
 
 		// Transition application to the next state (e.g., under review)
-		let submissionResult;
+		let submissionResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
 			submissionResult = await appStateManager.submitDraft();
@@ -491,28 +506,20 @@ export const submitApplication = async ({ applicationId }: { applicationId: numb
 			submissionResult = await appStateManager.submitRepRevision();
 		}
 
-		if (!submissionResult.success) {
-			return failure(submissionResult.message || 'Failed to submit application.', 'StateTransitionError');
-		}
-
 		return submissionResult;
 	} catch (error) {
 		const message = `Unable to submit application with id: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(message, error);
+
+		return failure('SYSTEM_ERROR', message);
 	}
 };
 
 export const closeApplication = async ({
 	applicationId,
-	requesterId,
-	isDacMember = false,
 }: {
 	applicationId: number;
-	requesterId: string;
-	isDacMember?: boolean;
-}) => {
+}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -527,20 +534,10 @@ export const closeApplication = async ({
 
 		// Check if application is already closed
 		if (appStateManager.state === ApplicationStates.CLOSED) {
-			return failure('Application is already closed.', 'StateConflict');
+			return failure('INVALID_STATE_TRANSITION', 'Application is already closed.');
 		}
 
-		// Authorization logic based on state
-		const isApplicant = application.user_id === requesterId;
-
-		const canCloseDacApplication =
-			(isDacMember && appStateManager.state === ApplicationStates.DAC_REVIEW) || isApplicant;
-
-		if (!canCloseDacApplication) {
-			return failure('Current user is not authorized to close the application', 'Unauthorized');
-		}
-
-		let closeResult;
+		let closeResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
 
 		switch (appStateManager.state) {
 			case ApplicationStates.DRAFT:
@@ -553,23 +550,27 @@ export const closeApplication = async ({
 				closeResult = await appStateManager.closeDacReview();
 				break;
 			default:
-				return failure(`Cannot close application in state ${appStateManager.state}.`, 'InvalidState');
+				return failure('INVALID_STATE_TRANSITION', `Cannot close application in state ${appStateManager.state}.`);
 		}
 
 		if (!closeResult.success) {
-			return failure(closeResult.message || 'Failed to close application.', 'StateTransitionError');
+			return closeResult;
 		}
 
 		return closeResult;
 	} catch (error) {
 		const message = `Unable to close application with id: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(message, error);
+
+		return failure('SYSTEM_ERROR', message);
 	}
 };
 
-export const getRevisions = async ({ applicationId }: { applicationId: number }): AsyncResult<any> => {
+export const getRevisions = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -580,17 +581,10 @@ export const getRevisions = async ({ applicationId }: { applicationId: number })
 			return revisionsResult;
 		}
 
-		const revisions = revisionsResult.data;
-
-		if (!revisions) {
-			return failure('No revisions found for the application.', 'NoRevisionsFound');
-		}
-
-		return success(revisions);
+		return success(revisionsResult.data);
 	} catch (error) {
 		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
-		logger.error(message);
-		logger.error(error);
-		return failure(message, error);
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };
