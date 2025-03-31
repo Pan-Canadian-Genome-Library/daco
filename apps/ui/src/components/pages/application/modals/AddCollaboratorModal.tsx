@@ -51,11 +51,11 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 		});
 	};
 
-	useEffect(()=>{
-		return ()=> {
-			reset()
-		}
-	},[])
+	useEffect(() => {
+		return () => {
+			reset();
+		};
+	}, []);
 
 	return (
 		<Modal
