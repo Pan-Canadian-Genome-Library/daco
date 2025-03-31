@@ -19,7 +19,7 @@
 
 import { UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Flex, Form, notification, theme, Typography, Upload, UploadFile } from 'antd';
+import { Button, Flex, Form, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
 import { useEffect, useState } from 'react';
@@ -37,6 +37,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useNotificationContext } from '@/providers/NotificationProvider';
 import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
@@ -47,6 +48,7 @@ const rule = createSchemaFieldRule(ethicsSchema);
 const MAX_FILE_SIZE = 5000000;
 
 const Ethics = () => {
+	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
@@ -68,17 +70,21 @@ const Ethics = () => {
 		const isValidImage = new Set(Object.values(FileExtensionTypes)).has(file.type);
 
 		if (!isValidImage) {
-			notification.error({
+			notification.openNotification({
+				type: 'error',
 				message: translate('invalidFileTitle'),
 			});
+
 			return isValidImage || Upload.LIST_IGNORE;
 		}
 
 		if (file.size > MAX_FILE_SIZE) {
-			notification.error({
+			notification.openNotification({
+				type: 'error',
 				message: translate('invalidFileSizeTitle'),
 				description: translate('invalidFileSizeDescription'),
 			});
+
 			return false;
 		}
 	};
