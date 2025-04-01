@@ -87,9 +87,7 @@ table application_contents {
   institutional_rep_signature text
   institutional_rep_signed_at timestamp
   accepted_agreements text[]
-  accepted_all_agreements_at timestamp
   accepted_appendices text[]
-  accepted_all_appendices_at timestamp
   requested_studies text[]
   ethics_review_required boolean
   ethics_letter bigint
