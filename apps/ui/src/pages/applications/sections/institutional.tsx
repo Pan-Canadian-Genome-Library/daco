@@ -134,7 +134,6 @@ const Institutional = () => {
 									return { value: titles.en, label: titles.en };
 								})}
 								initialValue={getValues('institutionalTitle')}
-								required
 								disabled={!isEditMode}
 							/>
 						</Col>
