@@ -101,13 +101,11 @@ export const applicationContents = pgTable('application_contents', {
 	accepted_agreements: text({
 		enum: agreementEnum,
 	}).array(),
-	accepted_all_agreements_at: timestamp(),
 
 	//Appendices
 	accepted_appendices: text({
 		enum: appendicesEnum,
 	}).array(),
-	accepted_all_appendices_at: timestamp(),
 
 	// Studies
 	// TODO: requested study information
