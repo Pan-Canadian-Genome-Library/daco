@@ -16,37 +16,35 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
+
+import { useQuery } from '@tanstack/react-query';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from './apiUtils';
+import { UploadFile } from 'antd';
+import { withErrorResponseHandler } from '../apiUtils';
 
-interface ParamsType {
-	applicationId: string | number;
-	formData: FormData;
-}
+const useGetFile = ({ fileId }: { fileId?: number | null }) => {
+	return useQuery<UploadFile[], ServerError>({
+		queryKey: [`file-${fileId}`],
+		enabled: !!fileId,
+		queryFn: async () => {
+			const response = await fetch(`/file/${fileId}`).then(withErrorResponseHandler);
+			const result = await response.json();
 
-const useEthicsUploadApplication = () => {
-	return useMutation<ApplicationResponseData, ServerError, ParamsType>({
-		mutationFn: async ({ applicationId, formData }: ParamsType) => {
-			console.log(applicationId, formData);
+			const formatedFile: UploadFile[] = [
+				{
+					uid: `${result?.id}`,
+					name: `${result?.filename}`,
+					status: 'done',
+					url: '/', // to show red color link after retrieving file
+					response: result,
+				},
+			];
 
-			const response = await fetch('/applications/upload-ethics', {
-				method: 'POST',
-				body: formData,
-			}).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
+			return formatedFile;
 		},
 	});
 };
 
-export default useEthicsUploadApplication;
+export default useGetFile;

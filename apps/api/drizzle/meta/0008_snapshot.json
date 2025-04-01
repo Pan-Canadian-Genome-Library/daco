@@ -1,76 +1,9 @@
 {
-	"id": "a041e198-e1c0-4295-99d6-79c880df0f01",
+	"id": "974371bd-647f-4638-b0b8-6025d6d8688c",
 	"prevId": "be6b7d83-29d9-46cd-a81b-7cb172ae39c9",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
-		"public.agreements": {
-			"name": "agreements",
-			"schema": "",
-			"columns": {
-				"id": {
-					"name": "id",
-					"type": "bigint",
-					"primaryKey": true,
-					"notNull": true,
-					"identity": {
-						"type": "always",
-						"name": "agreements_id_seq",
-						"schema": "public",
-						"increment": "1",
-						"startWith": "1",
-						"minValue": "1",
-						"maxValue": "9223372036854775807",
-						"cache": "1",
-						"cycle": false
-					}
-				},
-				"application_id": {
-					"name": "application_id",
-					"type": "bigint",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"user_id": {
-					"name": "user_id",
-					"type": "varchar(100)",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"name": {
-					"name": "name",
-					"type": "text",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"agreement_text": {
-					"name": "agreement_text",
-					"type": "text",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"agreement_type": {
-					"name": "agreement_type",
-					"type": "agreement_types",
-					"typeSchema": "public",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"agreed_at": {
-					"name": "agreed_at",
-					"type": "timestamp",
-					"primaryKey": false,
-					"notNull": true
-				}
-			},
-			"indexes": {},
-			"foreignKeys": {},
-			"compositePrimaryKeys": {},
-			"uniqueConstraints": {},
-			"policies": {},
-			"checkConstraints": {},
-			"isRLSEnabled": false
-		},
 		"public.application_actions": {
 			"name": "application_actions",
 			"schema": "",
@@ -431,9 +364,21 @@
 					"primaryKey": false,
 					"notNull": false
 				},
+				"accepted_agreements": {
+					"name": "accepted_agreements",
+					"type": "text[]",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"accepted_appendices": {
+					"name": "accepted_appendices",
+					"type": "text[]",
+					"primaryKey": false,
+					"notNull": false
+				},
 				"requested_studies": {
 					"name": "requested_studies",
-					"type": "text",
+					"type": "text[]",
 					"primaryKey": false,
 					"notNull": false
 				},
@@ -806,21 +751,6 @@
 		}
 	},
 	"enums": {
-		"public.agreement_types": {
-			"name": "agreement_types",
-			"schema": "public",
-			"values": [
-				"dac_agreement_software_updates",
-				"dac_agreement_non_disclosure",
-				"dac_agreement_monitor_individual_access",
-				"dac_agreement_destroy_data",
-				"dac_agreement_familiarize_restrictions",
-				"dac_agreement_provide_it_policy",
-				"dac_agreement_notify_unauthorized_access",
-				"dac_agreement_certify_application",
-				"dac_agreement_read_and_agreed"
-			]
-		},
 		"public.application_action_types": {
 			"name": "application_action_types",
 			"schema": "public",
