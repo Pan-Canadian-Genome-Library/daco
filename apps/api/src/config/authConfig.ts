@@ -22,8 +22,7 @@ import EnvironmentConfigError from './EnvironmentConfigError.js';
 import { serverConfig } from './serverConfig.js';
 
 function getAuthConfig() {
-	const flag = process.env.DISABLE_AUTH;
-	const enabled = flag !== 'true';
+	const enabled = process.env.DISABLE_AUTH !== 'true';
 
 	// Enforce enabling auth when running in production
 	if (serverConfig.isProduction && !enabled) {
@@ -50,7 +49,8 @@ function getAuthConfig() {
 		throw new EnvironmentConfigError(`db`, parseResult.error);
 	}
 
-	return { enabled, ...parseResult.data, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
+	return { ...parseResult.data, enabled, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
 }
 
 export const authConfig = getAuthConfig();
+export type AuthConfig = typeof authConfig & { enabled: true };
