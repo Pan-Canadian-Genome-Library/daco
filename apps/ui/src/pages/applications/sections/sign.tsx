@@ -66,7 +66,11 @@ const SignAndSubmit = () => {
 		<>
 			<SectionWrapper>
 				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-					<SectionTitle title={translate('sign-and-submit-section.title')} showDivider={false} />
+					<SectionTitle
+						title={translate('sign-and-submit-section.title')}
+						text={translate('sign-and-submit-section.description')}
+						showDivider={false}
+					/>
 					<SectionContent
 						showDivider={false}
 						title={translate('sign-and-submit-section.section.title')}
