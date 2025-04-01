@@ -87,11 +87,9 @@ const SignAndSubmit = () => {
 									clearErrors={clearErrors}
 									disableSaveButton={!watchSignature}
 									onSaveClicked={onSaveClicked}
-									disablePreviewButton={!watchSignature}
 									downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 									saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
 									clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
-									previewButtonText={translate('sign-and-submit-section.section.buttons.view')}
 								/>
 							</Col>
 						</Row>
