@@ -158,11 +158,15 @@ export const getApplicationStateTotals = async () => {
 };
 
 /**
- * Gets an application by a corresponding application ID
+ * Generates a PDF with the application data provided in the various application tables.
  * @param applicationId - The ID of the application within the database.
- * @returns Success with the details of the application / Failure with Error.
+ * @returns Success with a Buffer containing the PDF / Failure with Error.
  */
-export const getApplicationPDF = async ({ applicationId }: { applicationId: number }) => {
+export const createApplicationPDF = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<Uint8Array<ArrayBufferLike>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
 	const signatureService: SignatureService = signatureSvc(database);
@@ -189,16 +193,18 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 
 	const ethicsLetterID = applicationContents.data.contents?.ethics_letter;
 
+	const filename = `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`;
+
 	let fileContents = undefined;
 
 	if (ethicsLetterID) {
 		fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
 	} else {
-		return failure('SYSTEM_ERROR', 'Unable to get ethics approval or exemption file.');
+		return failure('SYSTEM_ERROR', 'No ethics approval or exemption file was found, unable to generate PDF.');
 	}
 
 	if (!fileContents.success) {
-		return fileContents;
+		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
 	}
 
 	/**
@@ -210,10 +216,26 @@ export const getApplicationPDF = async ({ applicationId }: { applicationId: numb
 		signatureContents: aliasSignatureRecord(signatureContents.data),
 		collaboratorsContents: aliasCollaboratorRecords(collaboratorsContents.data),
 		fileContents: aliasFileRecord(fileContents.data),
+		filename: filename,
 	});
 
 	if (!renderedPDF.success) {
 		return renderedPDF;
+	}
+
+	const createFileRecord = await fileService.createFile({
+		file: {
+			originalFilename: `${filename}.pdf`,
+			filepath: '/', //This doesn't matter as it's not used in the createFile method, however it required by the Formidable.File Type
+		},
+		application: applicationContents.data,
+		readFrom: 'buffer',
+		contentsBuffer: Buffer.from(renderedPDF.data),
+		type: 'SIGNED_APPLICATION',
+	});
+
+	if (!createFileRecord.success) {
+		return createFileRecord;
 	}
 
 	return renderedPDF;

@@ -35,11 +35,13 @@ const pdfSvc = () => ({
 		signatureContents,
 		collaboratorsContents,
 		fileContents,
+		filename,
 	}: {
 		applicationContents: ApplicationResponseData;
 		signatureContents: SignatureDTO;
 		collaboratorsContents: CollaboratorDTO[];
 		fileContents: FilesDTO;
+		filename: string;
 	}) => {
 		try {
 			const pdfCreationDate = new Date();
@@ -54,7 +56,7 @@ const pdfSvc = () => ({
 			const finalApplication = await PDFDocument.create();
 
 			finalApplication.setLanguage('en-ca');
-			finalApplication.setTitle(`PCGL-${applicationContents.id} - Application for Access to PCGL Controlled Data`, {
+			finalApplication.setTitle(filename, {
 				showInWindowTitleBar: true,
 			});
 			finalApplication.setSubject('Application for Access to PCGL Controlled Data');

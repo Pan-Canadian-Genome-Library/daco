@@ -70,17 +70,25 @@ const filesSvc = (db: PostgresDb) => ({
 		application,
 		type,
 		transaction,
+		readFrom = 'filepath',
+		contentsBuffer,
 	}: {
-		file: formidable.File;
+		file: Pick<formidable.File, 'originalFilename' | 'filepath'>;
 		application: JoinedApplicationRecord;
 		type: FileType;
 		transaction?: PostgresTransaction;
+		readFrom?: 'filepath' | 'buffer';
+		contentsBuffer?: Buffer<ArrayBufferLike>;
 	}): AsyncResult<FilesRecord, 'SYSTEM_ERROR'> => {
 		// TODO: Files should only be added to an applciation if the associated application is in an editable (draft) state
 		// TODO: File Service should enforce rules about only one EthicsLetter per application.
 		try {
 			const dbTransaction = transaction ? transaction : db;
-			const buffer = fs.readFileSync(file.filepath);
+			const buffer = readFrom === 'filepath' ? fs.readFileSync(file.filepath) : contentsBuffer;
+
+			if (buffer === undefined) {
+				throw new Error('Buffer is undefined, file path may be invalid, or provided `contentsBuffer` is invalid.');
+			}
 
 			const result = await dbTransaction.transaction(async (transaction) => {
 				const newFiles: typeof files.$inferInsert = {
@@ -94,7 +102,9 @@ const filesSvc = (db: PostgresDb) => ({
 
 				const newFileRecord = await transaction.insert(files).values(newFiles).returning();
 
-				if (!newFileRecord[0]) throw new Error('File record is undefined');
+				if (!newFileRecord[0]) {
+					throw new Error('File record is undefined');
+				}
 
 				return newFileRecord[0];
 			});
