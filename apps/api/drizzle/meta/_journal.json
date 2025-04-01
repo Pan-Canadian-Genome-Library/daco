@@ -57,6 +57,13 @@
 			"when": 1741728267648,
 			"tag": "0007_add_applicant_mailing_address",
 			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "7",
+			"when": 1743515211577,
+			"tag": "0008_remove_agreements_table_add_appendices",
+			"breakpoints": true
 		}
 	]
 }
