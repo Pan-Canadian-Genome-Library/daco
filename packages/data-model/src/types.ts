@@ -40,11 +40,11 @@ export const FileTypes = {
 
 export type FileType = (typeof FileTypes)[keyof typeof FileTypes];
 
-export const FileExtentionTypes = {
+export const FileExtensionTypes = {
 	PDF: 'application/pdf',
 };
 
-export type FileExtentionType = (typeof FileExtentionTypes)[keyof typeof FileExtentionTypes];
+export type FileExtensionType = (typeof FileExtensionTypes)[keyof typeof FileExtensionTypes];
 
 export const SignatureTypes = {
 	APPLICANT: 'APPLICANT',
@@ -226,7 +226,8 @@ export type ApplicationContentsResponse = {
 	RequestedStudiesDTO &
 	EthicsLetterDTO &
 	AgreementDTO &
-	AppendicesDTO;
+	AppendicesDTO&
+	EthicsLetterDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;

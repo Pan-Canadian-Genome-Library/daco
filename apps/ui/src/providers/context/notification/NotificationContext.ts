@@ -17,26 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router';
-import { NotificationProvider } from './context/notification/NotificationProvider';
-import ThemeProvider from './ThemeProvider';
-import { UserProvider } from './UserProvider';
+import { useContext } from 'react';
+import { NotificationContext } from './NotificationProvider';
 
-export const queryClient = new QueryClient();
-
-const Providers = ({ children }: { children: React.ReactNode }) => {
-	return (
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<BrowserRouter>
-					<NotificationProvider>
-						<UserProvider>{children}</UserProvider>
-					</NotificationProvider>
-				</BrowserRouter>
-			</ThemeProvider>
-		</QueryClientProvider>
-	);
-};
-
-export default Providers;
+export function useNotificationContext() {
+	const context = useContext(NotificationContext);
+	if (context === undefined) {
+		throw new Error('useNotificationContext must be used within a NotificationProvider');
+	}
+	return context;
+}
