@@ -37,7 +37,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { useNotificationContext } from '@/providers/NotificationProvider';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
