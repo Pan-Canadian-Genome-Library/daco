@@ -164,7 +164,7 @@ export const aliasApplicationContentsRecord = (update: UpdateEditApplicationRequ
 		ethics_review_required: update.ethicsReviewRequired,
 		accepted_agreements: update.acceptedAgreements,
 		accepted_appendices: update.acceptedAppendices,
-		};
+	};
 
 	return formattedUpdate;
 };

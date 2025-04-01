@@ -226,7 +226,7 @@ export type ApplicationContentsResponse = {
 	RequestedStudiesDTO &
 	EthicsLetterDTO &
 	AgreementDTO &
-	AppendicesDTO&
+	AppendicesDTO &
 	EthicsLetterDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
