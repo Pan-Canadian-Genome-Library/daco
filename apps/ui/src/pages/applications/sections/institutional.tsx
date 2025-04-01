@@ -201,7 +201,7 @@ const Institutional = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.primaryEmail')}
-								subLabel={translate('form.primaryEmailLabel')}
+								subLabel={translate('institutional-section.primaryEmailLabel')}
 								name="institutionalInstituteAffiliation"
 								control={control}
 								rule={rule}
