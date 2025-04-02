@@ -25,7 +25,6 @@ import { collaborators } from './collaborators.ts';
 import { files } from './files.ts';
 import { revisionRequests } from './revisionRequests.ts';
 
-
 export const applicationContents = pgTable('application_contents', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),

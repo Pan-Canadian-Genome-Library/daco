@@ -160,7 +160,7 @@ export type AgreementDTO = {
 
 export type AppendicesDTO = {
 	acceptedAppendices?: string[] | null;
-}
+};
 
 export type EthicsLetterDTO = {
 	ethicsLetter?: number | null;
@@ -219,7 +219,7 @@ export type ApplicationContentsResponse = {
 	ProjectDTO &
 	RequestedStudiesDTO &
 	AgreementDTO &
-	AppendicesDTO&
+	AppendicesDTO &
 	EthicsLetterDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
