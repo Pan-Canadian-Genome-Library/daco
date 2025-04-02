@@ -61,8 +61,7 @@ const Institutional = () => {
 				},
 			});
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form]);
+	}, []);
 
 	const { getValues, control } = useForm<Nullable<InstitutionalRepSchemaType>>({
 		defaultValues: {
