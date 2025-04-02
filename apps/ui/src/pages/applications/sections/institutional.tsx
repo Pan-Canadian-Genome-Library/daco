@@ -21,7 +21,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { institutionalRepSchema, type InstitutionalRepSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -32,6 +31,7 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -45,23 +45,7 @@ const Institutional = () => {
 		state: { fields, formState },
 		dispatch,
 	} = useApplicationContext();
-	const [form] = Form.useForm();
-
-	// When the user comes back after visiting once, it should trigger all of the validation field
-	useEffect(() => {
-		if (formState.sectionsVisited.institutional) {
-			form.validateFields();
-		}
-
-		return () => {
-			dispatch({
-				type: 'UPDATE_SECTION_VISITED',
-				payload: {
-					institutional: true,
-				},
-			});
-		};
-	}, []);
+	const form = useSectionForm({ section: 'institutional', sectionVisited: formState.sectionsVisited.institutional });
 
 	const { getValues, control } = useForm<Nullable<InstitutionalRepSchemaType>>({
 		defaultValues: {
