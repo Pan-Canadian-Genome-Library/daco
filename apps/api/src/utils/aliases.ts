@@ -50,7 +50,7 @@ export const convertToApplicationRecord = (
 			);
 	return result;
 };
-// '', 'INVALID_REQUEST'
+
 /** Converts partial Application Content update into database insert snake_case model format
  * @param data type UpdateEditApplicationRequest application contents in camelCase
  * @returns  type ApplicationContentUpdates in snake_case
