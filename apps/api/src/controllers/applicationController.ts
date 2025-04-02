@@ -27,7 +27,7 @@ import {
 	type JoinedApplicationRecord,
 	type RevisionRequestModel,
 } from '@/service/types.js';
-import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/aliases.js';
+import { convertToApplicationContentsRecord, convertToApplicationRecord } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
 import type { ApplicationResponseData, ApproveApplication } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
@@ -84,7 +84,7 @@ export const editApplication = async ({
 		return failure('INVALID_STATE_TRANSITION', message);
 	}
 
-	const formattedResult = aliasApplicationContentsRecord(update);
+	const formattedResult = convertToApplicationContentsRecord(update);
 
 	if (!formattedResult.success) return formattedResult;
 
@@ -125,7 +125,7 @@ export const getApplicationById = async ({
 	const result = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
 	if (result.success) {
-		const aliasResult = aliasApplicationRecord(result.data);
+		const aliasResult = convertToApplicationRecord(result.data);
 		return aliasResult;
 	}
 

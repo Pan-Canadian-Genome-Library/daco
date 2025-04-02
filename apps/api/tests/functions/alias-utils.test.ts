@@ -18,7 +18,7 @@
  */
 
 import { JoinedApplicationRecord } from '@/service/types.ts';
-import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/aliases.ts';
+import { convertToApplicationContentsRecord, convertToApplicationRecord } from '@/utils/aliases.ts';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { type UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import assert from 'node:assert';
@@ -37,7 +37,7 @@ describe('Alias Utils', () => {
 			expires_at: null,
 			contents: null,
 		};
-		const aliasResult = aliasApplicationRecord(testData);
+		const aliasResult = convertToApplicationRecord(testData);
 		assert.ok(aliasResult.success && aliasResult.data);
 		assert.ok(aliasResult.data.hasOwnProperty('userId'));
 		assert.ok(aliasResult.data.hasOwnProperty('createdAt'));
@@ -51,7 +51,7 @@ describe('Alias Utils', () => {
 			applicantPositionTitle: 'Dr.',
 			applicantInstitutionalEmail: testUserId,
 		};
-		const aliasResult = aliasApplicationContentsRecord(testData);
+		const aliasResult = convertToApplicationContentsRecord(testData);
 		assert.ok(aliasResult.success && aliasResult.data);
 		assert.ok(aliasResult.data.hasOwnProperty('applicant_first_name'));
 		assert.ok(aliasResult.data.hasOwnProperty('applicant_last_name'));
@@ -74,7 +74,7 @@ describe('Alias Utils', () => {
 			},
 		};
 
-		const aliasResult = aliasApplicationRecord(testData);
+		const aliasResult = convertToApplicationRecord(testData);
 
 		assert.ok(aliasResult.success && aliasResult.data.contents);
 		assert.ok(aliasResult.data.contents.hasOwnProperty('applicantFirstName'));
