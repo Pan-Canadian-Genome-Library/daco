@@ -20,32 +20,37 @@
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
 import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
-import { failure, success } from '@/utils/results.ts';
+import { failure, success, type AsyncResult } from '@/utils/results.ts';
 import { aliasSignatureRecord } from '@/utils/routes.ts';
+import type { SignatureDTO } from '@pcgl-daco/data-model';
 import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
-import { isPositiveInteger, type EditSignatureRequest } from '@pcgl-daco/validation';
+import { type ApplicationSignatureDTO, type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
  * Gets a signature for an application.
  * @param application_id - The Application ID
  * @returns Success with the signature and signed at time, properties may be `null` if not yet signed / Failure with Error.
  */
-export const getApplicationSignature = async ({ applicationId }: { applicationId: number }) => {
-	if (!isPositiveInteger(applicationId)) {
-		return failure('InvalidParams', 'Error: Application ID MUST be a positive number greater than or equal to 1.');
+export const getApplicationSignature = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<SignatureDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const signatureRepo: SignatureService = signatureService(database);
+
+		const result = await signatureRepo.getApplicationSignature({ application_id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const aliasedResponse = aliasSignatureRecord(result.data);
+		return success(aliasedResponse);
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching signature for application: ${applicationId}`);
 	}
-
-	const database = getDbInstance();
-	const signatureRepo: SignatureService = signatureService(database);
-
-	const result = await signatureRepo.getApplicationSignature({ application_id: applicationId });
-
-	if (!result.success) {
-		return result;
-	}
-
-	const aliasedResponse = aliasSignatureRecord(result.data);
-	return success(aliasedResponse);
 };
 
 /**
@@ -54,31 +59,43 @@ export const getApplicationSignature = async ({ applicationId }: { applicationId
  * @param signature - The base64-encoded image containing the signature for the Application.
  * @returns Success with the signature and signed at time / Failure with Error
  */
-export const updateApplicationSignature = async ({ applicationId, signature, signee }: EditSignatureRequest) => {
+export const updateApplicationSignature = async ({
+	applicationId,
+	signature,
+	signee,
+}: EditSignatureRequest): AsyncResult<ApplicationSignatureDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const signatureRepo: SignatureService = signatureService(database);
 
-	let update: ApplicationSignatureUpdate = {
-		application_id: applicationId,
-	};
-
-	if (signee === 'APPLICANT') {
-		update = {
-			...update,
-			applicant_signature: signature,
-		};
-	} else if (signee === 'INSTITUTIONAL_REP') {
-		update = {
-			...update,
-			institutional_rep_signature: signature,
-		};
-	} else {
-		throw new Error('Error: Invalid Signee type. Signee can only be an Applicant or a Institutional Rep.');
-	}
+	let update: ApplicationSignatureUpdate =
+		signee === 'APPLICANT'
+			? {
+					application_id: applicationId,
+					applicant_signature: signature,
+				}
+			: {
+					application_id: applicationId,
+					institutional_rep_signature: signature,
+				};
 
 	const result = await signatureRepo.updateApplicationSignature(update);
+	if (!result.success) {
+		return result;
+	}
 
-	return result;
+	const updatedSignature =
+		signee === 'APPLICANT' ? result.data.applicant_signature : result.data.institutional_rep_signature;
+	if (updatedSignature) {
+		return success({
+			id: result.data.application_id,
+			signedAt: (signee === 'APPLICANT'
+				? result.data.applicant_signed_at
+				: result.data.institutional_rep_signed_at
+			)?.toISOString(),
+			signature: updatedSignature,
+		});
+	}
+	return failure('SYSTEM_ERROR', 'Signature missing after update.');
 };
 
 /**

@@ -22,6 +22,7 @@
 	"devDependencies": {
 		"@types/express": "^5.0.0",
 		"@types/express-serve-static-core": "^5.0.6",
-		"@types/formidable": "^3.4.5"
+		"@types/formidable": "^3.4.5",
+		"@pcgl-daco/data-model": "workspace:^"
 	}
 }

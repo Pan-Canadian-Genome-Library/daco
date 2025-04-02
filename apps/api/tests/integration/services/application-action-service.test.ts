@@ -17,10 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
-
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';

@@ -17,22 +17,54 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { eq } from 'drizzle-orm';
 import formidable from 'formidable';
 import fs from 'fs';
 
 import { type PostgresDb } from '@/db/index.js';
 import { files } from '@/db/schemas/files.js';
-import logger from '@/logger.ts';
+import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { FileType } from '@pcgl-daco/data-model';
-import { eq } from 'drizzle-orm';
-import { PostgresTransaction, type FilesModel, type JoinedApplicationRecord } from './types.ts';
+import { type FileType } from '@pcgl-daco/data-model';
+import { type FilesModel, type FilesRecord, type JoinedApplicationRecord, type PostgresTransaction } from './types.ts';
+
+const logger = BaseLogger.forModule('fileService');
 
 /**
  * Upload service provides methods for file DB access
  * @param db - Drizzle Postgres DB Instance
  */
 const filesSvc = (db: PostgresDb) => ({
+	getFileById: async ({
+		fileId,
+		transaction,
+	}: {
+		fileId: number;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<FilesModel & { id: number }> => {
+		const dbTransaction = transaction ? transaction : db;
+
+		const result = await dbTransaction.transaction(async (transaction) => {
+			const fileRecord = await transaction
+				.select({
+					id: files.id,
+					application_id: files.application_id,
+					type: files.type,
+					filename: files.filename,
+					submitter_user_id: files.submitter_user_id,
+					submitted_at: files.submitted_at,
+					content: files.content,
+				})
+				.from(files)
+				.where(eq(files.id, fileId));
+
+			if (!fileRecord[0]) throw new Error('File record is undefined');
+
+			return fileRecord[0];
+		});
+
+		return success(result);
+	},
 	createFile: async ({
 		file,
 		application,
@@ -43,10 +75,12 @@ const filesSvc = (db: PostgresDb) => ({
 		application: JoinedApplicationRecord;
 		type: FileType;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<FilesModel & { id: number }> => {
+	}): AsyncResult<FilesRecord, 'SYSTEM_ERROR'> => {
+		// TODO: Files should only be added to an applciation if the associated application is in an editable (draft) state
+		// TODO: File Service should enforce rules about only one EthicsLetter per application.
 		try {
 			const dbTransaction = transaction ? transaction : db;
-			const buffer = await fs.readFileSync(file.filepath);
+			const buffer = fs.readFileSync(file.filepath);
 
 			const result = await dbTransaction.transaction(async (transaction) => {
 				const newFiles: typeof files.$inferInsert = {
@@ -66,15 +100,15 @@ const filesSvc = (db: PostgresDb) => ({
 			});
 
 			return success(result);
-		} catch (err) {
-			const message = `Error uploading file`;
+		} catch (error) {
+			const message = `Error creating file record.`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
+
 	updateFile: async ({
 		fileId,
 		file,
@@ -87,7 +121,8 @@ const filesSvc = (db: PostgresDb) => ({
 		application: JoinedApplicationRecord;
 		type: FileType;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<FilesModel & { id: number }> => {
+	}): AsyncResult<FilesRecord, 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
+		// TODO: Files should only be updated if the associated application is in an editable (draft) state
 		try {
 			const dbTransaction = transaction ? transaction : db;
 			const buffer = await fs.readFileSync(file.filepath);
@@ -102,21 +137,22 @@ const filesSvc = (db: PostgresDb) => ({
 					content: buffer,
 				};
 
-				const newFileRecord = await transaction.update(files).set(newFiles).where(eq(files.id, fileId)).returning();
+				const updatedFiles = await transaction.update(files).set(newFiles).where(eq(files.id, fileId)).returning();
+				const updatedFileRecord = updatedFiles[0];
 
-				if (!newFileRecord[0]) throw new Error('File record is undefined');
+				if (!updatedFileRecord) {
+					return failure('NOT_FOUND', 'File record is undefined.');
+				}
 
-				return newFileRecord[0];
+				return success(updatedFileRecord);
 			});
 
-			return success(result);
-		} catch (err) {
+			return result;
+		} catch (error) {
 			const message = `Error uploading file`;
+			logger.error(message, error);
 
-			logger.error(message);
-			logger.error(err);
-
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 	deleteFileById: async ({
@@ -125,7 +161,9 @@ const filesSvc = (db: PostgresDb) => ({
 	}: {
 		fileId: number;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<FilesModel & { id: number }> => {
+	}): AsyncResult<FilesModel & { id: number }, 'SYSTEM_ERROR'> => {
+		// TODO: Files should only be deleted if the associated application is in an editable (draft) state
+		// TODO: Currently this does not differentiate a file not found vs unexpected system error
 		try {
 			const dbTransaction = transaction ? transaction : db;
 
@@ -140,13 +178,12 @@ const filesSvc = (db: PostgresDb) => ({
 			});
 
 			return success(deletedResult);
-		} catch (err) {
-			const message = `Error deleting file`;
+		} catch (error) {
+			const message = `Error deleting file.`;
 
-			logger.error(message);
-			logger.error(err);
+			logger.error(message, error);
 
-			return failure(message, err);
+			return failure('SYSTEM_ERROR', message);
 		}
 	},
 });

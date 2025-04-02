@@ -17,10 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
-
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -327,7 +326,7 @@ describe('Application Service', () => {
 
 	describe('Get Application Metadata', () => {
 		it('should list statistics for how many applications are in each state category', async () => {
-			const appStateTotals = await testApplicationService.applicationStateTotals({ user_id });
+			const appStateTotals = await testApplicationService.applicationStateTotals();
 			assert.ok(appStateTotals.success);
 
 			const allStates = appStateTotals.data;

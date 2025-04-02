@@ -4,7 +4,8 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"build": "rimraf ./dist && tsc",
+		"build": "rimraf ./dist && tsc -p './tsconfig.build.json'",
+		"build:tests": "rimraf ./dist && tsc",
 		"dev": "concurrently --names=server,watch \"pnpm dev:server\" \"pnpm dev:watch\"",
 		"dev:server": "tsx watch --clear-screen=false --env-file=.env ./src/main.ts",
 		"dev:watch": "nx watch --projects=@pcgl-daco/api --includeDependentProjects -- nx run-many -t build \\$NX_PROJECT_NAME --exclude=@pcgl-daco/api",
@@ -25,17 +26,18 @@
 		"test:local": "pnpm run test:api && pnpm run test:db && pnpm run test:services"
 	},
 	"devDependencies": {
-		"@testcontainers/postgresql": "^10.14.0",
+		"@testcontainers/postgresql": "^10.18.0",
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
 		"@types/express-session": "^1.18.1",
-		"@types/node": "^22.7.4",
-		"@types/pg": "^8.11.10",
+		"@types/formidable": "^3.4.5",
+		"@types/node": "^22.13.4",
+		"@types/pg": "^8.11.11",
 		"@types/swagger-ui-express": "^4.1.7",
 		"@types/yamljs": "^0.2.34",
 		"drizzle-dbml-generator": "^0.9.0",
-		"drizzle-kit": "^0.30.1",
-		"tsx": "^4.19.1",
+		"drizzle-kit": "^0.30.4",
+		"tsx": "^4.19.2",
 		"typescript": "^5.7.3"
 	},
 	"dependencies": {
@@ -43,10 +45,7 @@
 		"@pcgl-daco/logger": "workspace:^",
 		"@pcgl-daco/request-utils": "workspace:^",
 		"@pcgl-daco/validation": "workspace:^",
-		"@types/body-parser": "^1.19.5",
-		"@types/formidable": "^3.4.5",
 		"axios": "^1.7.9",
-		"body-parser": "^1.20.3",
 		"cors": "^2.8.5",
 		"drizzle-orm": "^0.39.1",
 		"connect-redis": "^8.0.1",
@@ -59,7 +58,7 @@
 		"typescript-fsm": "^1.4.5",
 		"url-join": "^5.0.0",
 		"yamljs": "^0.3.0",
-		"zod": "^3.24.1"
+		"zod": "^3.24.2"
 	},
 	"engines": {
 		"node": "^20.9.0"

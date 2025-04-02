@@ -25,12 +25,12 @@ import { ServerError } from '@/global/types';
 
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
+import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
 
 const useAddCollaborator = () => {
 	return useMutation<
-		CollaboratorsResponse[],
+		ListCollaboratorResponse,
 		ServerError,
 		{ applicationId: number | string; collaborators: CollaboratorsSchemaType[]; userId?: number | string }
 	>({
@@ -54,7 +54,7 @@ const useAddCollaborator = () => {
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the add collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: CollaboratorsResponse[]) => {
+			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
 				return [...prev, ...data];
 			});
 			notification.success({

@@ -17,13 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import formidable from 'formidable';
 import assert from 'node:assert';
+import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-
 import { applicationSvc } from '@/service/applicationService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { ApplicationService, FilesService } from '@/service/types.ts';
@@ -34,8 +34,6 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 } from '@tests/utils/testUtils.ts';
-import formidable from 'formidable';
-import path from 'node:path';
 
 describe('Signature Service', () => {
 	let db: PostgresDb;
