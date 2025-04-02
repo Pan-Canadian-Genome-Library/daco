@@ -176,17 +176,17 @@ export const createApplicationPDF = async ({
 	const pdfService: PDFService = pdfSvc();
 
 	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
-	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
-	const collaboratorsContents = await collaboratorsService.listCollaborators(applicationId);
 
 	if (!applicationContents.success) {
 		return applicationContents;
 	}
 
+	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
 	if (!signatureContents.success) {
 		return signatureContents;
 	}
 
+	const collaboratorsContents = await collaboratorsService.listCollaborators(applicationId);
 	if (!collaboratorsContents.success) {
 		return collaboratorsContents;
 	}
@@ -216,7 +216,7 @@ export const createApplicationPDF = async ({
 		signatureContents: aliasSignatureRecord(signatureContents.data),
 		collaboratorsContents: aliasCollaboratorRecords(collaboratorsContents.data),
 		fileContents: aliasFileRecord(fileContents.data),
-		filename: filename,
+		filename,
 	});
 
 	if (!renderedPDF.success) {
