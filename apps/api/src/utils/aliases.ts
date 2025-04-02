@@ -37,7 +37,7 @@ import { applicationContentUpdateSchema } from './schemas.ts';
  * @param data Joined Application Record - Snake case database Application / ApplicationContents record
  * @returns ApplicationResponseData - Application record with updated keys
  */
-export const aliasApplicationRecord = (
+export const convertToApplicationRecord = (
 	data: JoinedApplicationRecord,
 ): Result<ApplicationResponseData, 'SYSTEM_ERROR'> => {
 	const aliasedRecord = objectToCamel(data);
@@ -55,7 +55,7 @@ export const aliasApplicationRecord = (
  * @param data type UpdateEditApplicationRequest application contents in camelCase
  * @returns  type ApplicationContentUpdates in snake_case
  */
-export const aliasApplicationContentsRecord = (
+export const convertToApplicationContentsRecord = (
 	update: UpdateEditApplicationRequest,
 ): Result<ApplicationContentUpdates, 'SYSTEM_ERROR'> => {
 	const snakeCaseRecord = objectToSnake(update);
@@ -74,7 +74,7 @@ export const aliasApplicationContentsRecord = (
  * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
  * @returns type `SignatureDTO` - camelCase variation of a Postgres success response.
  */
-export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Result<SignatureDTO, 'SYSTEM_ERROR'> => {
+export const convertToSignatureRecord = (data: ApplicationSignatureUpdate): Result<SignatureDTO, 'SYSTEM_ERROR'> => {
 	const camelCaseRecord = objectToCamel(data);
 	const validationResult = signatureResponseSchema.safeParse(camelCaseRecord);
 	const result = validationResult.success
@@ -91,7 +91,7 @@ export const aliasSignatureRecord = (data: ApplicationSignatureUpdate): Result<S
  * @param data type CollaboratorRecord in snake_case
  * @returns  type GetCollaboratorsResponse in camelCase w/ Collaborator added
  */
-export const aliasCollaboratorRecords = (data: CollaboratorRecord[]): CollaboratorsResponseDTO[] => {
+export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): CollaboratorsResponseDTO[] => {
 	const formattedUpdate: CollaboratorsResponseDTO[] = [];
 
 	data.forEach((value) => {
