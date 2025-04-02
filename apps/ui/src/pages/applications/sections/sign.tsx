@@ -31,7 +31,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { type ApplicationOutletContext } from '@/global/types';
-
+import useSubmitApplication from '@/api/queries/useSubmitApplication';
 const { Text } = Typography;
 
 const SignAndSubmit = () => {
@@ -47,6 +47,7 @@ const SignAndSubmit = () => {
 
 	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
 		setOpenModal(true);
+		useSubmitApplication(appId);
 		setValidatedData(data);
 	};
 
