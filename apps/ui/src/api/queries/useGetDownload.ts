@@ -16,37 +16,24 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
+
+import { useQuery } from '@tanstack/react-query';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from './apiUtils';
+import { FilesDTO } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
-interface ParamsType {
-	applicationId: string | number;
-	formData: FormData;
-}
-
-const useEthicsUploadApplication = () => {
-	return useMutation<ApplicationResponseData, ServerError, ParamsType>({
-		mutationFn: async ({ applicationId, formData }: ParamsType) => {
-			console.log(applicationId, formData);
-
-			const response = await fetch('/applications/upload-ethics', {
-				method: 'POST',
-				body: formData,
-			}).then(withErrorResponseHandler);
+const useGetDownload = ({ fileId }: { fileId?: number | null }) => {
+	return useQuery<FilesDTO, ServerError>({
+		queryKey: [`file-download-${fileId}`],
+		enabled: false,
+		queryFn: async () => {
+			const response = await fetch(`/file/${fileId}/download`).then(withErrorResponseHandler);
 
 			return await response.json();
-		},
-		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
 		},
 	});
 };
 
-export default useEthicsUploadApplication;
+export default useGetDownload;

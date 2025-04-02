@@ -21,18 +21,30 @@ import { useQuery } from '@tanstack/react-query';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type CollaboratorsResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from './apiUtils';
+import { UploadFile } from 'antd';
+import { withErrorResponseHandler } from '../apiUtils';
 
-const useGetCollaborators = (applicationId: string | number) => {
-	return useQuery<CollaboratorsResponse[], ServerError>({
-		queryKey: [`collaborators-${applicationId}`],
+const useGetFile = ({ fileId }: { fileId?: number | null }) => {
+	return useQuery<UploadFile[], ServerError>({
+		queryKey: [`file-${fileId}`],
+		enabled: !!fileId,
 		queryFn: async () => {
-			const response = await fetch(`/collaborators/${applicationId}`).then(withErrorResponseHandler);
+			const response = await fetch(`/file/${fileId}`).then(withErrorResponseHandler);
+			const result = await response.json();
 
-			return await response.json();
+			const formatedFile: UploadFile[] = [
+				{
+					uid: `${result?.id}`,
+					name: `${result?.filename}`,
+					status: 'done',
+					url: '/', // to show red color link after retrieving file
+					response: result,
+				},
+			];
+
+			return formatedFile;
 		},
 	});
 };
 
-export default useGetCollaborators;
+export default useGetFile;

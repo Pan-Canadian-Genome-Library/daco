@@ -16,46 +16,47 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { useMutation } from '@tanstack/react-query';
+
 import { notification } from 'antd';
+import { createContext, PropsWithChildren, ReactNode } from 'react';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from '../apiUtils';
+type NotificationType = 'success' | 'info' | 'warning' | 'error';
+type PlacementType = 'top' | 'topLeft' | 'topRight' | 'bottom' | 'bottomLeft' | 'bottomRight';
 
-const useEditApplication = () => {
-	const { state, dispatch } = useApplicationContext();
-
-	return useMutation<
-		ApplicationResponseData,
-		ServerError,
-		{ id: number | string; update?: Partial<ApplicationContentsResponse> }
-	>({
-		mutationFn: async ({ id, update }) => {
-			const response = await fetch('/applications/edit', {
-				method: 'POST',
-				body: JSON.stringify({
-					id,
-					update: {
-						...state.fields,
-						...update,
-					},
-				}),
-			}).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
-		},
-		onSuccess: () => {
-			dispatch({ type: 'UPDATE_DIRTY_STATE', payload: false });
-		},
-	});
+type openNotificationParamsType = {
+	type: NotificationType;
+	message: string | ReactNode;
+	description?: string | ReactNode;
+	placement?: PlacementType;
 };
 
-export default useEditApplication;
+type NotificationState = {
+	openNotification: (params: openNotificationParamsType) => void;
+};
+
+export const NotificationContext = createContext<NotificationState>({
+	openNotification: function (): void {
+		throw new Error('openNotification has not been initialized.');
+	},
+});
+
+export function NotificationProvider({ children }: PropsWithChildren) {
+	const [api, contextHolder] = notification.useNotification();
+
+	const openNotification = ({ type, message, description, placement = 'top' }: openNotificationParamsType) => {
+		api[type]({
+			message,
+			description,
+			placement,
+		});
+	};
+
+	return (
+		<NotificationContext.Provider value={{ openNotification }}>
+			<>
+				{contextHolder}
+				{children}
+			</>
+		</NotificationContext.Provider>
+	);
+}

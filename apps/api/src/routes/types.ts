@@ -24,7 +24,7 @@ import { type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js'
 import type { ErrorResponse } from '@pcgl-daco/validation';
 
 export type ApplicationListRequest = {
-	userId: string;
+	userId?: string;
 	state?: ApplicationStateValues[];
 	sort?: Array<OrderBy<ApplicationsColumnName>>;
 	page?: number;
@@ -43,7 +43,7 @@ export type ApplicationListRequest = {
  * could return.
  *
  * @example
- * someRouter.get('/example', async (req, res: ResponseWithData<ExampleResponse, ['INVALID_PARAMETERS']>) => {
+ * someRouter.get('/example', async (request, response: ResponseWithData<ExampleResponse, ['INVALID_PARAMETERS']>) => {
  * 	if(!req.params.check) {
  * 		// TS will also allow an error message in this format, but only with an error code
  * 		//  specified in the ResponseWithData type.
