@@ -45,7 +45,7 @@ const Appendices = () => {
 					<Text style={styles.text}>
 						You have read APPENDIX I &mdash;{' '}
 						<Link src="#" style={styles.link}>
-							PCGL ARGO Goals and Policies
+							PCGL Goals and Policies
 						</Link>
 					</Text>
 				</Checkbox>
