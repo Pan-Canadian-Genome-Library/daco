@@ -21,7 +21,6 @@ import { z } from 'zod';
 
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
 
-import { EthicsEnum } from './common/enums.js';
 import {
 	Concise200WordCountString,
 	Concise250WordCountString,
@@ -99,8 +98,9 @@ export const projectInformationSchema = z.object({
 export type ProjectInformationSchemaType = z.infer<typeof projectInformationSchema>;
 
 export const ethicsSchema = z.object({
-	ethicsApproval: EthicsEnum,
+	ethicsReviewRequired: z.boolean(),
 });
+
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
 export const requestedStudySchema = z.object({

@@ -57,6 +57,8 @@ export const updateEditApplicationRequestSchema = z
 		projectSummary: z.string(),
 		acceptedAgreements: z.array(z.enum(agreementEnum)),
 		acceptedAppendices: z.array(z.enum(appendicesEnum)),
+		ethicsReviewRequired: z.boolean(),
+		ethicsLetter: z.number(),
 	})
 	.partial();
 

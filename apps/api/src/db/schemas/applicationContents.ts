@@ -25,6 +25,7 @@ import { collaborators } from './collaborators.ts';
 import { files } from './files.ts';
 import { revisionRequests } from './revisionRequests.ts';
 
+
 export const applicationContents = pgTable('application_contents', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
@@ -88,13 +89,11 @@ export const applicationContents = pgTable('application_contents', {
 	accepted_agreements: text({
 		enum: agreementEnum,
 	}).array(),
-	accepted_all_agreements_at: timestamp(),
 
 	//Appendices
 	accepted_appendices: text({
 		enum: appendicesEnum,
 	}).array(),
-	accepted_all_appendices_at: timestamp(),
 
 	// Studies
 	// TODO: requested study information

@@ -1,5 +1,5 @@
 {
-	"id": "5e2eba7b-949f-4d3a-81ce-508310b8927a",
+	"id": "974371bd-647f-4638-b0b8-6025d6d8688c",
 	"prevId": "be6b7d83-29d9-46cd-a81b-7cb172ae39c9",
 	"version": "7",
 	"dialect": "postgresql",
@@ -370,21 +370,9 @@
 					"primaryKey": false,
 					"notNull": false
 				},
-				"accepted_all_agreements_at": {
-					"name": "accepted_all_agreements_at",
-					"type": "timestamp",
-					"primaryKey": false,
-					"notNull": false
-				},
 				"accepted_appendices": {
 					"name": "accepted_appendices",
 					"type": "text[]",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"accepted_all_appendices_at": {
-					"name": "accepted_all_appendices_at",
-					"type": "timestamp",
 					"primaryKey": false,
 					"notNull": false
 				},
