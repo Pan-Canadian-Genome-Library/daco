@@ -35,7 +35,13 @@ import {
 	type RevisionRequestModel,
 	type SignatureService,
 } from '@/service/types.js';
-import { convertToApplicationContentsRecord, convertToApplicationRecord } from '@/utils/aliases.js';
+import {
+	convertToApplicationContentsRecord,
+	convertToApplicationRecord,
+	convertToCollaboratorRecords,
+	convertToFileRecord,
+	convertToSignatureRecord,
+} from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
 import type { ApplicationResponseData, ApproveApplication } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
@@ -202,15 +208,28 @@ export const createApplicationPDF = async ({
 		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
 	}
 
+	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
+	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
+	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
+	const aliasedFileContents = convertToFileRecord(fileContents.data);
+
+	if (
+		!aliasedApplicationContents.success ||
+		!aliasedSignatureContents.success ||
+		!aliasedFileContents.success ||
+		!aliasedFileContents.success
+	) {
+		return failure('SYSTEM_ERROR', 'Error aliasing data records. Unknown keys.');
+	}
 	/**
 	 * This is a bit odd because we're using the DTO aliases while passing back to the service (usually its the opposite),
 	 * however, given this service is essentially running a React render, we need to.
 	 */
 	const renderedPDF = await pdfService.renderPCGLApplicationPDF({
-		applicationContents: aliasApplicationRecord(applicationContents.data),
-		signatureContents: aliasSignatureRecord(signatureContents.data),
-		collaboratorsContents: aliasCollaboratorRecords(collaboratorsContents.data),
-		fileContents: aliasFileRecord(fileContents.data),
+		applicationContents: aliasedApplicationContents.data,
+		signatureContents: aliasedSignatureContents.data,
+		collaboratorsContents: aliasedCollaboratorsContents,
+		fileContents: aliasedFileContents.data,
 		filename,
 	});
 

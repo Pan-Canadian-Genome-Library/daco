@@ -344,7 +344,7 @@ export interface FilesDTO {
 	submitterUserId: string;
 	submittedAt: Date;
 	content: any;
-	filename?: string | null;
+	filename: string | null;
 }
 
 export interface SignatureDTO {

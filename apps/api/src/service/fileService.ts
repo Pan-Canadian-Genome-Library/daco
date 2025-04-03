@@ -41,7 +41,7 @@ const filesSvc = (db: PostgresDb) => ({
 	}: {
 		fileId: number;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<FilesModel & { id: number }> => {
+	}): AsyncResult<FilesRecord & { id: number }> => {
 		const dbTransaction = transaction ? transaction : db;
 
 		const result = await dbTransaction.transaction(async (transaction) => {
@@ -80,7 +80,7 @@ const filesSvc = (db: PostgresDb) => ({
 		readFrom?: 'filepath' | 'buffer';
 		contentsBuffer?: Buffer<ArrayBufferLike>;
 	}): AsyncResult<FilesRecord, 'SYSTEM_ERROR'> => {
-		// TODO: Files should only be added to an applciation if the associated application is in an editable (draft) state
+		// TODO: Files should only be added to an application if the associated application is in an editable (draft) state
 		// TODO: File Service should enforce rules about only one EthicsLetter per application.
 		try {
 			const dbTransaction = transaction ? transaction : db;
