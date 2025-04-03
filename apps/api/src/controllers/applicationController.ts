@@ -252,6 +252,17 @@ export const createApplicationPDF = async ({
 		return createFileRecord;
 	}
 
+	const updatedApplicationRecord = await applicationService.editApplication({
+		id: applicationId,
+		update: {
+			signed_pdf: createFileRecord.data.id,
+		},
+	});
+
+	if (!updatedApplicationRecord.success) {
+		return updatedApplicationRecord;
+	}
+
 	return renderedPDF;
 };
 

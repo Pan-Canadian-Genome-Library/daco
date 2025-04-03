@@ -57,6 +57,7 @@ export const applicationContentsSchema = z
 		projectSummary: z.string().nullable(),
 		ethicsReviewRequired: z.boolean().nullable(),
 		ethicsLetter: z.number().nullable(),
+		signedPdf: z.number().nullable(),
 	})
 	.partial();
 

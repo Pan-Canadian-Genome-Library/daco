@@ -35,6 +35,7 @@ import {
 	submitRevision,
 } from '@/controllers/applicationController.js';
 
+import { getFile } from '@/controllers/fileController.ts';
 import {
 	RevisionRequestModel,
 	type ApplicationRecord,
@@ -305,13 +306,96 @@ applicationRouter.get(
 			const { data } = result;
 
 			// Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER
-			if (data.userId !== userId || getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER) {
+			if (data.userId !== userId || getUserRole(request.session) !== userRoleSchema.Values.DAC_MEMBER) {
 				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 				return;
 			}
 
 			response.status(200).json(data);
 			return;
+		}
+		switch (result.error) {
+			case 'SYSTEM_ERROR': {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+				return;
+			}
+			case 'NOT_FOUND': {
+				response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
+				return;
+			}
+		}
+	},
+);
+
+/**
+ * TODO:
+ * 	- Validate request params using Zod.
+ * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
+ */
+applicationRouter.get(
+	'/:applicationId/pdf',
+	authMiddleware({
+		requiredRoles: ['DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP'],
+	}),
+	async (
+		request,
+		response: ResponseWithData<
+			ApplicationResponseData,
+			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
+		>,
+	) => {
+		const { user } = request.session;
+		const { userId } = user || {};
+
+		const userRole = getUserRole(request.session);
+
+		if (!userId) {
+			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+			return;
+		}
+
+		const applicationId = Number(request.params.applicationId);
+		if (!isPositiveInteger(applicationId)) {
+			response
+				.status(400)
+				.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
+			return;
+		}
+
+		const getApplication = await getApplicationById({ applicationId });
+
+		if (getApplication.success) {
+			const { data: appData } = getApplication;
+
+			// Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER
+			if (appData.userId !== userId || userRole === userRoleSchema.Values.DAC_MEMBER) {
+				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+				return;
+			}
+
+			if (!appData.contents?.signedPdf) {
+				response.status(404).json({ error: 'NOT_FOUND', message: 'No PDF is associated with this application.' });
+				return;
+			}
+
+			const file = await getFile({
+				fileId: appData.contents.signedPdf,
+				withBuffer: true,
+			});
+
+			if (!file.success) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: file.message,
+				});
+				return;
+			}
+
+			if (userRole !== userRoleSchema.Values.DAC_MEMBER || file.data.submitter_user_id !== appData.userId) {
+			}
+
+			// response.status(200).json(data);
+			// return;
 		}
 		switch (result.error) {
 			case 'SYSTEM_ERROR': {
@@ -351,7 +435,7 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/approve',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	async (
 		request,
 		response: ResponseWithData<
