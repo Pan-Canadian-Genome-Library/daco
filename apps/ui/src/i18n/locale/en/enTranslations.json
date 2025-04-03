@@ -101,6 +101,10 @@
 	},
 	"errors": {
 		"http": {
+			"403": {
+				"title": "Unauthorized.",
+				"message": "Sorry, looks you're unauthorized to access the resource you're trying to access."
+			},
 			"404": {
 				"title": "The requested resource could not be found.",
 				"message": "Sorry, looks like the resource you're trying to access does not exist."
