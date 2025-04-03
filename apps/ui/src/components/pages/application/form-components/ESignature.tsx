@@ -79,6 +79,7 @@ const ESignature = <T extends FieldValues>(
 	const SignatureFieldStyle: React.CSSProperties = {
 		height: '10rem',
 		width: '100%',
+		maxWidth: '900px',
 		border: 'solid 2px',
 		borderColor: token.colorBorder,
 		borderRadius: token.borderRadius,

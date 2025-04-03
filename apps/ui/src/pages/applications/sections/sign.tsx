@@ -44,7 +44,7 @@ const SignAndSubmit = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const [validatedData, setValidatedData] = useState<eSignatureSchemaType | undefined>(undefined);
 	const signatureRef = useRef<SignatureCanvas>(null);
-	const { mutate: createSignature } = useCreateSignature();
+	const { mutateAsync: createSignature } = useCreateSignature();
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
 	const { role } = useUserContext();
 
@@ -54,22 +54,8 @@ const SignAndSubmit = () => {
 		});
 
 	useEffect(() => {
-		if (
-			data &&
-			data.applicantSignature &&
-			signatureRef.current &&
-			signatureRef.current.getCanvas().attributes &&
-			signatureRef.current.getCanvas().attributes.getNamedItem('width') &&
-			signatureRef.current.getCanvas().attributes.getNamedItem('height') &&
-			signatureRef.current.getCanvas().attributes.getNamedItem('height')?.nodeValue &&
-			signatureRef.current.getCanvas().attributes.getNamedItem('width')?.nodeValue
-		) {
-			signatureRef.current.clear();
-
-			const height = signatureRef.current.getCanvas().attributes.getNamedItem('height')?.nodeValue;
-			const width = signatureRef.current.getCanvas().attributes.getNamedItem('width')?.nodeValue;
-
-			signatureRef.current.fromDataURL(data.applicantSignature, { height, width });
+		if (data && data.applicantSignature && signatureRef.current) {
+			signatureRef.current.fromDataURL(data.applicantSignature);
 		}
 	}, [data, setValue]);
 
@@ -82,8 +68,11 @@ const SignAndSubmit = () => {
 		const signature = getValues('signature');
 
 		if (signature && role) {
-			await createSignature({ applicationId: appId, signature, signee: 'APPLICANT' });
-			// await createSignature({ applicationId: appId, signature, signee: role });
+			await createSignature({ applicationId: appId, signature, signee: role }).then(() => {
+				if (signatureRef.current) {
+					signatureRef.current.clear();
+				}
+			});
 		}
 	};
 
