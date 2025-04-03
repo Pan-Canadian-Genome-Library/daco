@@ -21,7 +21,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
-import { ApplicationList, ServerError } from '@/global/types';
+import { ServerError } from '@/global/types';
+import { type ApplicationDTO } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 export interface ApplicationListSortingOptions {
@@ -51,7 +52,7 @@ const useGetApplicationList = ({ state, sort, page, pageSize }: ApplicationListP
 		queryParams.set('pageSize', pageSize.toString());
 	}
 
-	return useQuery<ApplicationList, ServerError>({
+	return useQuery<ApplicationDTO[], ServerError>({
 		queryKey: [queryParams],
 		queryFn: async () => {
 			const response = await fetch(`/applications?${queryParams.toString()}`).then(withErrorResponseHandler);
