@@ -17,56 +17,58 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationStates } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
 
-export const updateEditApplicationRequestSchema = z
+export const applicationContentsSchema = z
 	.object({
-		// Applicant
-		applicantFirstName: z.string(),
-		applicantMiddleName: z.string(),
-		applicantLastName: z.string(),
-		applicantTitle: z.string(),
-		applicantSuffix: z.string(),
-		applicantPositionTitle: z.string(),
-		applicantPrimaryAffiliation: z.string(),
-		applicantInstitutionalEmail: z.string(),
-		applicantProfileUrl: z.string(),
-		applicantInstituteState: z.string(),
-		applicantInstituteCity: z.string(),
-		applicantInstitutePostalCode: z.string(),
-		applicantInstituteStreetAddress: z.string(),
-		applicantInstituteBuilding: z.string(),
-		applicantInstituteCountry: z.string(),
-		// Institutional
-		institutionalRepTitle: z.string(),
-		institutionalRepFirstName: z.string(),
-		institutionalRepMiddleName: z.string(),
-		institutionalRepLastName: z.string(),
-		institutionalRepSuffix: z.string(),
-		institutionalRepPrimaryAffiliation: z.string(),
-		institutionalRepEmail: z.string(),
-		institutionalRepProfileUrl: z.string(),
-		institutionalRepPositionTitle: z.string(),
-		institutionCountry: z.string(),
-		institutionState: z.string(),
-		institutionCity: z.string(),
-		institutionStreetAddress: z.string(),
-		institutionPostalCode: z.string(),
-		institutionBuilding: z.string(),
-		// Project
-		projectTitle: z.string(),
-		projectWebsite: z.string(),
-		projectAims: z.string(),
-		projectMethodology: z.string(),
-		projectSummary: z.string(),
-		projectBackground: z.string(),
-		projectPublicationUrls: z.array(z.string()),
-		ethicsReviewRequired: z.boolean(),
-		ethicsLetter: z.number(),
+		applicantFirstName: z.string().nullable(),
+		applicantMiddleName: z.string().nullable(),
+		applicantLastName: z.string().nullable(),
+		applicantTitle: z.string().nullable(),
+		applicantSuffix: z.string().nullable(),
+		applicantPositionTitle: z.string().nullable(),
+		applicantPrimaryAffiliation: z.string().nullable(),
+		applicantInstitutionalEmail: z.string().nullable(),
+		applicantProfileUrl: z.string().nullable(),
+		institutionalRepTitle: z.string().nullable(),
+		institutionalRepFirstName: z.string().nullable(),
+		institutionalRepMiddleName: z.string().nullable(),
+		institutionalRepLastName: z.string().nullable(),
+		institutionalRepSuffix: z.string().nullable(),
+		institutionalRepPrimaryAffiliation: z.string().nullable(),
+		institutionalRepEmail: z.string().nullable(),
+		institutionalRepProfileUrl: z.string().nullable(),
+		institutionalRepPositionTitle: z.string().nullable(),
+		institutionCountry: z.string().nullable(),
+		institutionState: z.string().nullable(),
+		institutionCity: z.string().nullable(),
+		institutionStreetAddress: z.string().nullable(),
+		institutionPostalCode: z.string().nullable(),
+		institutionBuilding: z.string().nullable(),
+		projectTitle: z.string().nullable(),
+		projectWebsite: z.string().nullable(),
+		projectAims: z.string().nullable(),
+		projectMethodology: z.string().nullable(),
+		projectBackground: z.string().nullable(),
+		projectSummary: z.string().nullable(),
+		projectPublicationUrls: z.array(z.string()).nullable(),
+		ethicsReviewRequired: z.boolean().nullable(),
+		ethicsLetter: z.number().nullable(),
+	})
+	.partial();
+
+export const updateEditApplicationRequestSchema = applicationContentsSchema;
+
+export const applicationContentsResponseSchema = applicationContentsSchema
+	.extend({
+		applicationId: z.number(),
+		createdAt: z.date(),
+		updatedAt: z.date(),
 	})
 	.partial();
 
@@ -75,6 +77,17 @@ export const editApplicationRequestSchema = z.object({
 	update: updateEditApplicationRequestSchema.strict().refine((updateObj) => Object.keys(updateObj).length !== 0, {
 		params: { violation: 'noEmptyObject' },
 	}),
+});
+
+export const applicationResponseSchema = z.object({
+	id: z.number(),
+	userId: z.string(),
+	state: z.nativeEnum(ApplicationStates),
+	createdAt: z.date(),
+	approvedAt: z.date().nullable(),
+	updatedAt: z.date().nullable(),
+	expiresAt: z.date().nullable(),
+	contents: applicationContentsResponseSchema.nullable(),
 });
 
 export const revisionDataSchema = z
