@@ -138,6 +138,7 @@ const ESignature = <T extends FieldValues>(
 				render={({ field }) => (
 					<Row>
 						{disabled ? <SignatureFieldCover style={SignatureFieldStyle} /> : null}
+
 						<SignatureCanvas
 							ref={signatureRef}
 							onBegin={onBegin}

@@ -16,43 +16,23 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
 
+import { useQuery } from '@tanstack/react-query';
+
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { queryClient } from '@/providers/Providers';
-import { EditSignatureResponse } from '@pcgl-daco/validation';
-import { withErrorResponseHandler } from '../apiUtils';
+import { type SignatureDTO } from '@pcgl-daco/data-model';
 
-const useCreateSignature = () => {
-	return useMutation<
-		EditSignatureResponse,
-		ServerError,
-		{ applicationId: number | string; signature: string; signee: string }
-	>({
-		mutationFn: async ({ applicationId, signature, signee }) => {
-			const response = await fetch('/signature/sign', {
-				method: 'POST',
-				body: JSON.stringify({
-					applicationId,
-					signature,
-					signee,
-				}),
-			}).then(withErrorResponseHandler);
+const useGetSignatures = ({ applicationId }: { applicationId: number | string }) => {
+	return useQuery<SignatureDTO, ServerError>({
+		queryKey: [`signature-${applicationId}`],
+		queryFn: async () => {
+			const response = await fetch(`/signature/${applicationId}`).then(withErrorResponseHandler);
 
 			return await response.json();
-		},
-		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
-		},
-		onSuccess: async (data) => {
-			// Invalidate previous signature get request
-			await queryClient.invalidateQueries({ queryKey: [`signature-${data.id}`], exact: false });
 		},
 	});
 };
 
-export default useCreateSignature;
+export default useGetSignatures;
