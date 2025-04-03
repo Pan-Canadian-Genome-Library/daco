@@ -25,12 +25,14 @@ import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useCreateSignature from '@/api/mutations/useCreateSignature';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { type ApplicationOutletContext } from '@/global/types';
+import { useUserContext } from '@/providers/UserProvider';
 
 const { Text } = Typography;
 
@@ -40,18 +42,25 @@ const SignAndSubmit = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const [validatedData, setValidatedData] = useState<eSignatureSchemaType | undefined>(undefined);
 	const signatureRef = useRef(null);
+	const { mutate: createSignature } = useCreateSignature();
+	const { role } = useUserContext();
 
-	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
-		resolver: zodResolver(esignatureSchema),
-	});
+	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset, getValues } =
+		useForm<eSignatureSchemaType>({
+			resolver: zodResolver(esignatureSchema),
+		});
 
 	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
 		setOpenModal(true);
 		setValidatedData(data);
 	};
 
-	const onSaveClicked = () => {
-		console.log('saved');
+	const onSaveClicked = async () => {
+		const signature = getValues('signature');
+
+		if (signature && role) {
+			await createSignature({ applicationId: appId, signature, signee: role });
+		}
 	};
 
 	const modalSubmission = () => {
