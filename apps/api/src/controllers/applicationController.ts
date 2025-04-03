@@ -17,8 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates, ApproveApplication } from '@pcgl-daco/data-model/src/types.js';
-
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
@@ -29,9 +27,10 @@ import {
 	type JoinedApplicationRecord,
 	type RevisionRequestModel,
 } from '@/service/types.js';
+import { convertToApplicationContentsRecord, convertToApplicationRecord } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
-import { aliasApplicationContentsRecord, aliasApplicationRecord } from '@/utils/routes.js';
-import type { ApplicationResponseData } from '@pcgl-daco/data-model';
+import type { ApplicationResponseData, ApproveApplication } from '@pcgl-daco/data-model';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
@@ -85,9 +84,11 @@ export const editApplication = async ({
 		return failure('INVALID_STATE_TRANSITION', message);
 	}
 
-	const data = aliasApplicationContentsRecord(update);
+	const formattedResult = convertToApplicationContentsRecord(update);
 
-	return await applicationRepo.editApplication({ id, update: data });
+	if (!formattedResult.success) return formattedResult;
+
+	return await applicationRepo.editApplication({ id, update: formattedResult.data });
 };
 
 /**
@@ -124,8 +125,8 @@ export const getApplicationById = async ({
 	const result = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
 	if (result.success) {
-		const responseData = aliasApplicationRecord(result.data);
-		return success(responseData);
+		const aliasResult = convertToApplicationRecord(result.data);
+		return aliasResult;
 	}
 
 	return result;

@@ -20,10 +20,9 @@
 import { getDbInstance } from '@/db/index.js';
 import { signatureService } from '@/service/signatureService.ts';
 import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
+import { convertToSignatureRecord } from '@/utils/aliases.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.ts';
-import { aliasSignatureRecord } from '@/utils/routes.ts';
-import type { SignatureDTO } from '@pcgl-daco/data-model';
-import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
+import type { SignatureDTO, SignatureType } from '@pcgl-daco/data-model';
 import { type ApplicationSignatureDTO, type EditSignatureRequest } from '@pcgl-daco/validation';
 
 /**
@@ -46,8 +45,8 @@ export const getApplicationSignature = async ({
 			return result;
 		}
 
-		const aliasedResponse = aliasSignatureRecord(result.data);
-		return success(aliasedResponse);
+		const aliasedResponseResult = convertToSignatureRecord(result.data);
+		return aliasedResponseResult;
 	} catch (error) {
 		return failure('SYSTEM_ERROR', `Unexpected error fetching signature for application: ${applicationId}`);
 	}
