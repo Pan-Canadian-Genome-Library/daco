@@ -19,7 +19,6 @@
 
 import useGetApplicationCounts from '@/api/metadata/useGetApplicationCounts';
 import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/queries/useGetApplicationList';
-import { mockUserID } from '@/components/mock/applicationMockData';
 import ErrorPage from '@/components/pages/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { isFilterKey, type FilterKeys } from '@/components/pages/manage/DashboardFilter';
@@ -65,17 +64,12 @@ const ManageApplicationsPage = () => {
 		isFetching: isTableLoading,
 		refetch: tableDataRefetch,
 	} = useGetApplicationList({
-		userId: mockUserID,
 		sort: sorting ? sorting : undefined,
 		state: parseFilters(appliedFilters).filter((filter) => isApplicationStateValue(filter)),
 		page: parsePageNumber(tableParams.pagination?.current, true),
 	});
 
-	const {
-		data: filterMetadata,
-		error: filterMetaDataError,
-		isLoading: areFiltersLoading,
-	} = useGetApplicationCounts(mockUserID);
+	const { data: filterMetadata, error: filterMetaDataError, isLoading: areFiltersLoading } = useGetApplicationCounts();
 
 	/**
 	 * Gets called whenever `DashboardFilter` updates its state.

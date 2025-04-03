@@ -29,15 +29,14 @@ export interface ApplicationListSortingOptions {
 	column: 'user_id' | 'id' | 'created_at' | 'updated_at' | 'state' | 'approved_at' | 'expires_at';
 }
 interface ApplicationListParams {
-	userId: string;
 	state?: ApplicationStateValues[];
 	sort?: ApplicationListSortingOptions[];
 	page?: number;
 	pageSize?: number;
 }
 
-const useGetApplicationList = ({ userId, state, sort, page, pageSize }: ApplicationListParams) => {
-	const queryParams = new URLSearchParams({ userId: userId });
+const useGetApplicationList = ({ state, sort, page, pageSize }: ApplicationListParams) => {
+	const queryParams = new URLSearchParams();
 
 	if (state && state.length) {
 		queryParams.set('state', JSON.stringify(state));
