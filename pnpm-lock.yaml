@@ -77,6 +77,9 @@ importers:
       drizzle-orm:
         specifier: ^0.39.1
         version: 0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(pg@8.13.0)
+      drizzle-zod:
+        specifier: ^0.7.0
+        version: 0.7.0(drizzle-orm@0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(pg@8.13.0))(zod@3.24.2)
       express:
         specifier: ^4.21.0
         version: 4.21.0
@@ -144,6 +147,9 @@ importers:
       drizzle-kit:
         specifier: ^0.30.4
         version: 0.30.5
+      ts-case-convert:
+        specifier: ^2.1.0
+        version: 2.1.0
       tsx:
         specifier: ^4.19.2
         version: 4.19.3
@@ -2372,6 +2378,12 @@ packages:
       sqlite3:
         optional: true
 
+  drizzle-zod@0.7.0:
+    resolution: {integrity: sha512-xgCRYYVEzRkeXTS33GSMgoowe3vKsMNBjSI+cwG1oLQVEhAWWbqtb/AAMlm7tkmV4fG/uJjEmWzdzlEmTgWOoQ==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: '>=3.0.0'
+
   dtrace-provider@0.8.8:
     resolution: {integrity: sha512-b7Z7cNtHPhH9EJhNNbbeqTcXB8LGFFZhq1PGgEvpeHlzd36bhbdTWoE/Ba/YguqpBSlAPKnARWhVlhunCMwfxg==}
     engines: {node: '>=0.10'}
@@ -4415,6 +4427,9 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       typescript: '>=4.2.0'
+
+  ts-case-convert@2.1.0:
+    resolution: {integrity: sha512-Ye79el/pHYXfoew6kqhMwCoxp4NWjKNcm2kBzpmEMIU9dd9aBmHNNFtZ+WTm0rz1ngyDmfqDXDlyUnBXayiD0w==}
 
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
@@ -6680,6 +6695,11 @@ snapshots:
       '@libsql/client-wasm': 0.14.0
       '@types/pg': 8.11.11
       pg: 8.13.0
+
+  drizzle-zod@0.7.0(drizzle-orm@0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(pg@8.13.0))(zod@3.24.2):
+    dependencies:
+      drizzle-orm: 0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(pg@8.13.0)
+      zod: 3.24.2
 
   dtrace-provider@0.8.8:
     dependencies:
@@ -9154,6 +9174,8 @@ snapshots:
   ts-api-utils@1.3.0(typescript@5.7.3):
     dependencies:
       typescript: 5.7.3
+
+  ts-case-convert@2.1.0: {}
 
   tsconfig-paths@3.15.0:
     dependencies:
