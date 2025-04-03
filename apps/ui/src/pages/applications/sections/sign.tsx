@@ -43,7 +43,7 @@ const SignAndSubmit = () => {
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const [openModal, setOpenModal] = useState(false);
 	const [validatedData, setValidatedData] = useState<eSignatureSchemaType | undefined>(undefined);
-	const signatureRef = useRef<SignatureCanvas>(null);
+	const applicantSignatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: createSignature } = useCreateSignature();
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
 	const { role } = useUserContext();
@@ -53,9 +53,10 @@ const SignAndSubmit = () => {
 			resolver: zodResolver(esignatureSchema),
 		});
 
+	// TODO: we have institutional rep signatures to be implemented. Currently only allows APPLICANT roles
 	useEffect(() => {
-		if (data && data.applicantSignature && signatureRef.current) {
-			signatureRef.current.fromDataURL(data.applicantSignature);
+		if (data && data.applicantSignature && applicantSignatureRef.current) {
+			applicantSignatureRef.current.fromDataURL(data.applicantSignature);
 		}
 	}, [data, setValue]);
 
@@ -69,8 +70,8 @@ const SignAndSubmit = () => {
 
 		if (signature && role) {
 			await createSignature({ applicationId: appId, signature, signee: role }).then(() => {
-				if (signatureRef.current) {
-					signatureRef.current.clear();
+				if (applicantSignatureRef.current) {
+					applicantSignatureRef.current.clear();
 				}
 			});
 		}
@@ -100,7 +101,7 @@ const SignAndSubmit = () => {
 								{!isLoading ? (
 									<ESignature
 										disabled={!isEditMode}
-										signatureRef={signatureRef}
+										signatureRef={applicantSignatureRef}
 										name="signature"
 										control={control}
 										watch={watch}
