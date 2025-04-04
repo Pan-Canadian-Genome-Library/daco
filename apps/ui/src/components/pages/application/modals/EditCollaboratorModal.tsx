@@ -138,7 +138,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 								<InputBox
 									label={translate('form.primaryEmail')}
-									subLabel={translate('form.primaryEmailLabel')}
+									subLabel={translate('collab-section.primaryEmailLabel')}
 									name="collaboratorInstitutionalEmail"
 									control={control}
 									rule={rule}

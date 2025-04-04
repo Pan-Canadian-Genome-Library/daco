@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { DownloadOutlined } from '@ant-design/icons';
 import { type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Row, theme } from 'antd';
 import React, { useState, type RefObject } from 'react';
@@ -45,11 +45,9 @@ interface ESignatureFormProps<T extends FieldValues> {
 interface ESignatureProps {
 	signatureRef: RefObject<SignatureCanvas>;
 	downloadButtonText: string;
-	previewButtonText: string;
 	clearButtonText: string;
 	saveButtonText: string;
 	disableSaveButton?: boolean;
-	disablePreviewButton?: boolean;
 	onSaveClicked: () => void;
 }
 
@@ -92,10 +90,8 @@ const ESignature = <T extends FieldValues>(
 		reset,
 		setValue,
 		clearErrors,
-		disablePreviewButton,
 		disableSaveButton,
 		clearButtonText,
-		previewButtonText,
 		downloadButtonText,
 		saveButtonText,
 	} = props;
@@ -148,9 +144,6 @@ const ESignature = <T extends FieldValues>(
 						/>
 						<Flex justify="space-between" style={{ width: '100%', margin: '1rem 0 0 0' }}>
 							<Flex gap={token.margin}>
-								<Button disabled={disablePreviewButton} icon={<EyeOutlined />}>
-									{previewButtonText}
-								</Button>
 								<Button icon={<DownloadOutlined />}>{downloadButtonText}</Button>
 							</Flex>
 							<Flex gap={token.margin}>

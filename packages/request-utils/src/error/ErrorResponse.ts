@@ -17,6 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './validation.js';
-export * from './errors.js';
-export * from './errorHandler.js';
+export enum ErrorName {
+	BAD_REQUEST_ERROR = 'BadRequestError',
+	CONFLICT_ERROR = 'ConflictError',
+	NOT_FOUND_ERROR = 'NotFoundError',
+	RECAPTCHA_ERROR = 'RecaptchaError',
+	REQUEST_VALIDATION_ERROR = 'RequestValidationError',
+	SERVER_ERROR = 'ServerError',
+	UNAUTHORIZED = 'Unauthorized',
+}
+
+export type ErrorResponse = {
+	error: ErrorName | 'NOT_IMPLEMENTED'; // TODO: remove once all routes are implemented
+	message: string;
+};
+
+export const ErrorResponse = (error: ErrorName | 'NOT_IMPLEMENTED', message: string) => ({
+	error,
+	message,
+});
