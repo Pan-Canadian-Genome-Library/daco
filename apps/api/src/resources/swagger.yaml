@@ -668,18 +668,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/RequestValidationError'
-  /applications/submit:
+  /applications/{applicationId}/submit:
     post:
       summary: Submit an application
       description: Retrieves the application by ID, verifies the user and role, and submits it.
       tags:
         - Applications
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requests/SubmitApplicationRequest'
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated application upload
       responses:
         '200':
           description: Application submitted successfully
@@ -752,12 +753,12 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
 
-  /applications/request-revisions:
+  /applications/dac/request-revisions:
     post:
       tags:
         - Applications
       summary: 'Request revisions for an application'
-      description: 'Allows a rep to request revisions for an application, including approval status and comments on various sections.'
+      description: 'Allows a DAC to request revisions for an application, including approval status and comments on various sections.'
       operationId: 'requestRevisions'
       requestBody:
         description: Request body containing revision request details.
@@ -766,6 +767,50 @@ paths:
           application/json:
             schema:
               $ref: '#/components/requests/RequestRevisions'
+      responses:
+        '200':
+          description: 'Revisions request successfully processed'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'Indicates if the revision request was successful.'
+                  updatedApplication:
+                    allOf:
+                      - description: 'Details of the updated application after revisions.'
+                      - $ref: '#/components/responses/ApplicationResponse'
+        '400':
+          description: 'Error in requesting revisions. Invalid input, missing required fields.'
+        '500':
+          description: 'Error in requesting revisions'
+          
+  /applications/rep/request-revisions:
+    post:
+      tags:
+        - Applications
+      summary: 'Request revisions for an application'
+      description: 'Allows a rep to request revisions for an application, including approval status and comments on various sections.'
+      operationId: 'requestRevisions'
+      requestBody:
+        description: Information about the requester
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requesterId:
+                  type: string
+                  description: The ID of the user making the request
+                isDacMember:
+                  type: boolean
+                  description: Indicates if the requester is a DAC member
+              required:
+                - requesterId
+                - isDacMember
       responses:
         '200':
           description: 'Revisions request successfully processed'
