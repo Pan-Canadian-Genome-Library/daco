@@ -669,7 +669,7 @@ applicationRouter.post(
 		>,
 	) => {
 		try {
-			const applicationId = Number(request.params.applicationId);
+			const applicationId = Number(request.params);
 
 			if (!isPositiveInteger(applicationId)) {
 				response.status(400).json({
@@ -707,7 +707,7 @@ applicationRouter.post(
 
 			if (result.success) {
 				response.status(200).json({
-					message: 'Application submitted successfully.',
+					message: 'Application rejected successfully.',
 					data: result.data,
 				});
 				return;

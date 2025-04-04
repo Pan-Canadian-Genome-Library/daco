@@ -28,6 +28,7 @@ export interface FormState {
 export interface ApplicationFormState {
 	fields: Partial<ApplicationContentsResponse>;
 	formState: FormState;
+	applicationStatus?: string;
 }
 
 export type ApplicationContextType = {
