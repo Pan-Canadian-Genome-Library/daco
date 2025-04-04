@@ -33,6 +33,7 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { appendicesSchema, type AppendicesSchemaType } from '@pcgl-daco/validation';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const rule = createSchemaFieldRule(appendicesSchema);
 
@@ -50,6 +51,7 @@ const Appendices = () => {
 		},
 		resolver: zodResolver(appendicesSchema),
 	});
+	const form = useSectionForm({ section: "appendices", sectionVisited: state.formState.sectionsVisited.appendices });
 
 	const onSubmit = () => {
 		const acceptedAppendices = getValues('acceptedAppendices');
@@ -83,6 +85,7 @@ const Appendices = () => {
 				/>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>
 					<Form
+						form={form}
 						onBlur={() => {
 							if (isEditMode) {
 								onSubmit();

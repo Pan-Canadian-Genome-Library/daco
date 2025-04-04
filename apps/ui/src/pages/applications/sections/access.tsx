@@ -33,6 +33,7 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { Nullable, type ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const { Text } = Typography;
 const rule = createSchemaFieldRule(agreementsSchema);
@@ -41,6 +42,7 @@ const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const form = useSectionForm({ section: "agreement", sectionVisited: state.formState.sectionsVisited.agreement });
 	const {
 		control,
 		getValues,
@@ -51,6 +53,7 @@ const AccessAgreement = () => {
 		},
 		resolver: zodResolver(agreementsSchema),
 	});
+	
 
 	const onSubmit = () => {
 		const acceptedAgreements = getValues('acceptedAgreements');
@@ -84,6 +87,7 @@ const AccessAgreement = () => {
 	return (
 		<SectionWrapper>
 			<Form
+				form={form}
 				layout="vertical"
 				onBlur={() => {
 					if (isEditMode) {
