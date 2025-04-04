@@ -81,7 +81,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 					maxHeight: '70vh',
 					maxWidth: '1000px',
 					overflowX: 'hidden',
-					overflowY: 'scroll',
+					overflowY: 'auto',
 					paddingLeft: '1rem',
 					paddingRight: '1rem',
 				},
@@ -94,7 +94,8 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 					left: 0,
 					border: 'transparent',
 					borderRadius: token.borderRadiusLG,
-					background: 'linear-gradient(360deg, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)',
+					background: 'linear-gradient(360deg, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 90%)',
+					zIndex: 2, //Fixes a weird issue where selected textboxes overlapped the gradient and caused it to disappear.
 				},
 			}}
 			open={isOpen}

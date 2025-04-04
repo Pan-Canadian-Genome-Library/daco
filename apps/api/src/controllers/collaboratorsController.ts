@@ -21,14 +21,14 @@ import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
+import { convertToCollaboratorRecords } from '@/utils/aliases.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { aliasCollaboratorRecords } from '@/utils/routes.ts';
 import {
 	type CollaboratorDTO,
+	type CollaboratorsResponseDTO,
 	type CollaboratorUpdateRecord,
 	type ListCollaboratorResponse,
 } from '@pcgl-daco/data-model';
-import type { CollaboratorsResponseDTO } from '@pcgl-daco/data-model/src/types.ts';
 import { getApplicationById } from './applicationController.ts';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
@@ -114,7 +114,7 @@ export const createCollaborators = async ({
 		return collaboratorsResult;
 	}
 
-	const result = aliasCollaboratorRecords(collaboratorsResult.data);
+	const result = convertToCollaboratorRecords(collaboratorsResult.data);
 
 	return success(result);
 };
@@ -158,7 +158,7 @@ export const deleteCollaborator = async ({
 		if (!deleteResult.success) {
 			return deleteResult;
 		}
-		const result = aliasCollaboratorRecords(deleteResult.data);
+		const result = convertToCollaboratorRecords(deleteResult.data);
 
 		return success(result);
 	} catch (error) {
@@ -187,7 +187,7 @@ export const listCollaborators = async ({
 			return collaboratorsResult;
 		}
 
-		return success(aliasCollaboratorRecords(collaboratorsResult.data));
+		return success(convertToCollaboratorRecords(collaboratorsResult.data));
 	} catch (error) {
 		logger.error(`Unable to list collaborators for application with id: ${applicationId}`, error);
 		return failure('SYSTEM_ERROR', 'Unexpected error.');
@@ -257,7 +257,7 @@ export const updateCollaborator = async ({
 		return updateResult;
 	}
 
-	const result = aliasCollaboratorRecords(updateResult.data);
+	const result = convertToCollaboratorRecords(updateResult.data);
 
 	return success(result);
 };
