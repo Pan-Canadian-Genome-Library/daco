@@ -18,32 +18,40 @@
  */
 
 import { SectionRoutesValues } from '@/pages/AppRouter';
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { Dispatch } from 'react';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { Form } from 'antd';
+import { useEffect } from 'react';
 
-export interface FormState {
-	isFormCompleted?: boolean;
-	isDirty: boolean;
-	sectionsVisited: SectionsVisited<SectionRoutesValues>;
-}
-export type SectionsVisited<T extends string> = {
-	[section in T]: boolean;
-};
-
-export interface ApplicationFormState {
-	fields: Partial<ApplicationContentsResponse>;
-	formState: FormState;
+interface Props {
+	section: SectionRoutesValues;
+	sectionVisited: boolean;
 }
 
-export type ApplicationContextType = {
-	state: ApplicationFormState;
-	dispatch: Dispatch<ApplicationAction>;
-};
+// custom hook for Antd form related logic
+export const useSectionForm = ({ section, sectionVisited = false }: Props) => {
+	const { dispatch } = useApplicationContext();
+	const [form] = Form.useForm();
 
-export type ApplicationAction =
-	| { type: 'UPDATE_APPLICATION'; payload: ApplicationFormState }
-	| { type: 'UPDATE_DIRTY_STATE'; payload: boolean }
-	| {
-			type: 'UPDATE_SECTION_VISITED';
-			payload: Partial<{ [K in SectionRoutesValues]: boolean }>;
-	  };
+	/**
+	 * Trigger error validation on revisit to the section
+	 * NOTE: Eslint is disabled because for this specific instance, we actually want old state and dont want the useEffect to rerun after the dispatch.
+	 */
+	useEffect(() => {
+		if (sectionVisited) {
+			form.validateFields();
+		}
+
+		return () => {
+			dispatch({
+				type: 'UPDATE_SECTION_VISITED',
+				payload: {
+					[`${section}`]: true,
+				},
+			});
+		};
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	return form;
+};
