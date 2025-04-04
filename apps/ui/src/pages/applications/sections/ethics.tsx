@@ -35,6 +35,7 @@ import BlockRadioBox from '@/components/pages/application/form-components/BlockR
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
@@ -53,6 +54,10 @@ const Ethics = () => {
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
+	const form = useSectionForm({
+		section: "ethics",
+		sectionVisited: state.formState.sectionsVisited.ethics,
+	});
 
 	const { refetch: getDownload } = useGetDownload({ fileId: state.fields.ethicsLetter });
 	const { data, isLoading } = useGetFile({ fileId: state.fields.ethicsLetter });
@@ -168,6 +173,7 @@ const Ethics = () => {
 				/>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>
 					<Form
+						form={form}
 						layout="vertical"
 						onChange={() => {
 							const ethicsReviewReq = getValues('ethicsReviewRequired');

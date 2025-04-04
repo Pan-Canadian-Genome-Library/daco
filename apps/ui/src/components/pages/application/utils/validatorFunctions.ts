@@ -18,7 +18,7 @@
  */
 
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import { applicantInformationSchema, ethicsSchema, institutionalRepSchema } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
 	return applicantInformationSchema.safeParse({
@@ -57,5 +57,12 @@ export const ValidatorInstitution = (fields: ApplicationContentsResponse): boole
 		institutionalMiddleName: fields?.institutionalRepMiddleName,
 		institutionalSuffix: fields?.institutionalRepSuffix,
 		institutionBuilding: fields?.institutionBuilding,
+	}).success;
+};
+
+export const ValidatorEthics = (fields: ApplicationContentsResponse): boolean => {
+	return ethicsSchema.safeParse({
+		ethicsReviewRequired: fields.ethicsReviewRequired,
+		ethicsLetter: fields.ethicsLetter,
 	}).success;
 };
