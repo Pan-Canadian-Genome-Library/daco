@@ -41,7 +41,7 @@ import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { SignatureDTO } from '@pcgl-daco/data-model';
 import { getApplicationById } from '../controllers/applicationController.ts';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
-import { getUserRole } from '../service/authService.ts';
+import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
 
 const signatureRouter = express.Router();
@@ -174,7 +174,7 @@ signatureRouter.post(
 				const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
 				// TODO: Identify if the user role is institutional rep and is the rep for this application
 				const isApplicationInstitutionalRep =
-					signee === 'INSTITUTIONAL_REP' && userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+					signee === 'INSTITUTIONAL_REP' && isAssociatedRep({ session: request.session, applicationId });
 
 				if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 					response
@@ -274,7 +274,7 @@ signatureRouter.delete(
 					const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
 					// TODO: Identify if the user role is institutional rep and is the rep for this application
 					const isApplicationInstitutionalRep =
-						signee === 'INSTITUTIONAL_REP' && userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+						signee === 'INSTITUTIONAL_REP' && isAssociatedRep({ session: request.session, applicationId });
 
 					if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 						response
