@@ -17,6 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './validation.js';
-export * from './errors.js';
-export * from './errorHandler.js';
+import {type LoggerType } from '@pcgl-daco/logger';
+import { ServerErrorResponse } from './error/ServerErrorResponse.js';
+import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
+
+export const errorHandler =
+	(params: { logger?: LoggerType }): ErrorRequestHandler =>
+	(err: any, req: Request, res: Response, next: NextFunction) => {
+		const { logger } = params;
+
+		if (res.headersSent) {
+			return next(err);
+		}
+
+		logger?.error('Unhandled error thrown from request', req.url, err);
+
+		const errorMessage = err.message || 'An error occurred.';
+
+		 res.status(500).json(ServerErrorResponse(errorMessage));
+	};

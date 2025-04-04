@@ -17,6 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './validation.js';
-export * from './errors.js';
-export * from './errorHandler.js';
+import { ErrorName, ErrorResponse } from '../error/ErrorResponse.js';
+
+const { SERVER_ERROR } = ErrorName;
+
+/**
+ * Creates a ServerError Response containing a message detailing the problem.
+ * @param customMessage
+ * @returns
+ */
+export const ServerErrorResponse = (customMessage?: string): ErrorResponse => ({
+	error: SERVER_ERROR,
+	message: customMessage ?? "Sorry, something went wrong. We're unable to process your request, please try again later.",
+});
