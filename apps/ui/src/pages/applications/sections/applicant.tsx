@@ -35,6 +35,7 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
 
@@ -42,8 +43,8 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const [form] = Form.useForm();
-
+	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
+	
 	const {
 		formState: { isDirty },
 		getValues,
@@ -100,11 +101,6 @@ const Applicant = () => {
 			},
 		});
 	};
-
-	// validate fields that have been dirtied on page load
-	useEffect(() => {
-		form.validateFields({ dirty: true });
-	}, [form]);
 
 	return (
 		<SectionWrapper>

@@ -21,6 +21,7 @@ import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema, projectInformationSchema } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
+	
 	return applicantInformationSchema.safeParse({
 		applicantTitle: fields.applicantTitle,
 		applicantFirstName: fields.applicantFirstName,
@@ -31,12 +32,12 @@ export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean
 		applicantInstituteEmail: fields.applicantInstitutionalEmail,
 		applicantProfileUrl: fields.applicantProfileUrl,
 		applicantPositionTitle: fields.applicantPositionTitle,
-		applicantInstituteCountry: fields.applicantInstituteCountry,
-		applicantInstituteState: fields.applicantInstituteState,
-		applicantInstituteCity: fields.applicantInstituteCity,
-		applicantInstitutePostalCode: fields.applicantInstitutePostalCode,
-		applicantInstituteStreetAddress: fields.applicantInstituteStreetAddress,
-		applicantInstituteBuilding: fields.applicantInstituteBuilding,
+		applicantInstitutionCountry: fields.applicantInstitutionCountry,
+		applicantInstitutionState: fields.applicantInstitutionState,
+		applicantInstitutionCity: fields.applicantInstitutionCity,
+		applicantInstitutionPostalCode: fields.applicantInstitutionPostalCode,
+		applicantInstitutionStreetAddress: fields.applicantInstitutionStreetAddress,
+		applicantInstitutionBuilding: fields.applicantInstitutionBuilding,
 	}).success;
 };
 

@@ -23,7 +23,7 @@ import {
 	ValidatorProject,
 } from '@/components/pages/application/utils/validatorFunctions';
 import { isApplicantKey, isInstitutionalKey, isProjectKey } from '@/components/pages/application/utils/validatorKeys';
-import { SectionRoutes } from '@/pages/AppRouter';
+import { SectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
 export type VerifyPageSectionsType<T extends string> = {
@@ -39,7 +39,7 @@ export type VerifyPageSectionsType<T extends string> = {
  *
  */
 export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
-	let sectionTouched: VerifyPageSectionsType<SectionRoutes> = {
+	let sectionTouched: VerifyPageSectionsType<SectionRoutesValues> = {
 		[SectionRoutes.APPLICANT]: false,
 		[SectionRoutes.INSTITUTIONAL]: false,
 		[SectionRoutes.INTRO]: false,
@@ -85,7 +85,8 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
  *
  *  Verify each section with zod if there are errors on their fields using
  */
-export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutes> => {
+export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutesValues> => {
+	
 	return {
 		[SectionRoutes.INTRO]: false,
 		[SectionRoutes.APPLICANT]: fields ? ValidatorApplicant(fields) : false,
