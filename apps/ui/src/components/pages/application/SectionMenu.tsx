@@ -22,6 +22,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/mutations/useEditApplication';
+import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
@@ -37,6 +38,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId }: SectionMenuProps) =>
 	const navigate = useNavigate();
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
+	const { data, isLoading } = useGetCollaborators(appId);
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		if (state?.formState?.isDirty) {
@@ -60,22 +62,27 @@ const SectionMenu = ({ currentSection, isEditMode, appId }: SectionMenuProps) =>
 			style={{ width: '100%', height: '100%' }}
 			selectedKeys={[currentSection]}
 			mode="inline"
-			items={ApplicationSectionRoutes.map((item) => {
-				const route = item.route;
+			items={
+				!isLoading
+					? ApplicationSectionRoutes.map((item) => {
+							const route = item.route;
 
-				return {
-					key: item.route,
-					label: (
-						<SectionMenuItem
-							isCurrentSection={currentSection === route}
-							isSectionTouched={SectionTouched[route]}
-							isSectionValid={SectionValidator[route]}
-							label={item.route}
-							isEditMode={isEditMode}
-						/>
-					),
-				};
-			})}
+							return {
+								key: item.route,
+								label: (
+									<SectionMenuItem
+										isCurrentSection={currentSection === route}
+										isSectionTouched={SectionTouched[route]}
+										isSectionValid={SectionValidator[route]}
+										label={item.route}
+										isEditMode={isEditMode}
+										hasCollaborators={data && data.length > 0}
+									/>
+								),
+							};
+						})
+					: []
+			}
 			onClick={handleNavigation}
 		/>
 	);

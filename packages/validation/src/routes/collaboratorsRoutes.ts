@@ -32,11 +32,9 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 	collaboratorId: z.number(),
 });
 
-export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.merge(
-	collaboratorsSchema.extend({
-		collaboratorUpdates: collaboratorsSchema.partial().extend({ id: z.number() }),
-	}),
-);
+export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
+	collaboratorUpdates: collaboratorsSchema.partial().extend({ id: z.number() }),
+});
 
 export const collaboratorsListParamsSchema = z
 	.object({

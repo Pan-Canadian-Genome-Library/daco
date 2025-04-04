@@ -211,7 +211,7 @@ export const updateCollaborator = async ({
 	collaboratorUpdates: CollaboratorUpdateRecord;
 }): AsyncResult<
 	CollaboratorsResponseDTO[],
-	'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_STATE_TRANSITION' | 'FORBIDDEN'
+	'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_STATE_TRANSITION' | 'FORBIDDEN' | 'DUPLICATE_RECORD'
 > => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
@@ -232,6 +232,26 @@ export const updateCollaborator = async ({
 	// TODO: should use application state manager
 	if (!(application.state === 'DRAFT')) {
 		return failure('INVALID_STATE_TRANSITION', `Can only edit collaborators when application is in state DRAFT`);
+	}
+
+	const collaboratorsListResult = await collaboratorsRepo.listCollaborators(application.id);
+
+	if (!collaboratorsListResult.success) {
+		return collaboratorsListResult;
+	}
+
+	const hasDuplicateRecords = collaboratorsListResult.data.some((collaborator) => {
+		return (
+			collaboratorUpdates.collaboratorFirstName === collaborator.first_name &&
+			collaboratorUpdates.collaboratorLastName === collaborator.last_name &&
+			collaboratorUpdates.collaboratorInstitutionalEmail === collaborator.institutional_email &&
+			collaboratorUpdates.collaboratorPositionTitle === collaborator.position_title
+		);
+	});
+
+	if (hasDuplicateRecords) {
+		// TODO: List the duplicate records.
+		return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
 	}
 
 	const { id } = collaboratorUpdates;
