@@ -120,13 +120,13 @@ export interface ApplicantDTO {
 	applicantPrimaryAffiliation?: string | null;
 	applicantInstitutionalEmail?: string | null;
 	applicantProfileUrl?: string | null;
-	applicantInstituteCountry?: string | null;
+	applicantInstitutionCountry?: string | null;
 	applicantPositionTitle?: string | null;
-	applicantInstituteState?: string | null;
-	applicantInstituteCity?: string | null;
-	applicantInstitutePostalCode?: string | null;
-	applicantInstituteStreetAddress?: string | null;
-	applicantInstituteBuilding?: string | null;
+	applicantInstitutionState?: string | null;
+	applicantInstitutionCity?: string | null;
+	applicantInstitutionPostalCode?: string | null;
+	applicantInstitutionStreetAddress?: string | null;
+	applicantInstitutionBuilding?: string | null;
 }
 
 export type InstitutionalRepDTO = {

@@ -50,7 +50,7 @@ const Applicant = () => {
 		control,
 	} = useForm<Nullable<ApplicantInformationSchemaType>>({
 		defaultValues: {
-			applicantInstituteCountry: 'CAN',
+			applicantInstitutionCountry: 'CAN',
 			applicantTitle: state.fields.applicantTitle,
 			applicantFirstName: state.fields.applicantFirstName,
 			applicantMiddleName: state.fields.applicantMiddleName,
@@ -60,11 +60,11 @@ const Applicant = () => {
 			applicantInstituteEmail: state.fields.applicantInstitutionalEmail,
 			applicantProfileUrl: state.fields.applicantProfileUrl,
 			applicantPositionTitle: state.fields.applicantPositionTitle,
-			applicantInstituteState: state.fields.applicantInstituteState,
-			applicantInstituteCity: state.fields.applicantInstituteCity,
-			applicantInstitutePostalCode: state.fields.applicantInstitutePostalCode,
-			applicantInstituteStreetAddress: state.fields.applicantInstituteStreetAddress,
-			applicantInstituteBuilding: state.fields.applicantInstituteBuilding,
+			applicantInstitutionState: state.fields.applicantInstitutionState,
+			applicantInstitutionCity: state.fields.applicantInstitutionCity,
+			applicantInstitutionPostalCode: state.fields.applicantInstitutionPostalCode,
+			applicantInstitutionStreetAddress: state.fields.applicantInstitutionStreetAddress,
+			applicantInstitutionBuilding: state.fields.applicantInstitutionBuilding,
 		},
 		resolver: zodResolver(applicantInformationSchema),
 	});
@@ -86,14 +86,15 @@ const Applicant = () => {
 					applicantInstitutionalEmail: data.applicantInstituteEmail,
 					applicantProfileUrl: data.applicantProfileUrl,
 					applicantPositionTitle: data.applicantPositionTitle,
-					applicantInstituteCountry: data.applicantInstituteCountry,
-					applicantInstituteState: data.applicantInstituteState,
-					applicantInstituteCity: data.applicantInstituteCity,
-					applicantInstitutePostalCode: data.applicantInstitutePostalCode,
-					applicantInstituteStreetAddress: data.applicantInstituteStreetAddress,
-					applicantInstituteBuilding: data.applicantInstituteBuilding,
+					applicantInstitutionCountry: data.applicantInstitutionCountry,
+					applicantInstitutionState: data.applicantInstitutionState,
+					applicantInstitutionCity: data.applicantInstitutionCity,
+					applicantInstitutionPostalCode: data.applicantInstitutionPostalCode,
+					applicantInstitutionStreetAddress: data.applicantInstitutionStreetAddress,
+					applicantInstitutionBuilding: data.applicantInstitutionBuilding,
 				},
 				formState: {
+					...state.formState,
 					isDirty,
 				},
 			},
@@ -237,7 +238,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
 								label={translate('form.country')}
-								name="applicantInstituteCountry"
+								name="applicantInstitutionCountry"
 								control={control}
 								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
 									return { value: areas.iso, label: areas.en };
@@ -253,7 +254,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.streetAddress')}
-								name="applicantInstituteStreetAddress"
+								name="applicantInstitutionStreetAddress"
 								control={control}
 								rule={rule}
 								required
@@ -263,7 +264,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.building')}
-								name="applicantInstituteBuilding"
+								name="applicantInstitutionBuilding"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -274,7 +275,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.state')}
-								name="applicantInstituteState"
+								name="applicantInstitutionState"
 								control={control}
 								rule={rule}
 								required
@@ -284,7 +285,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.city')}
-								name="applicantInstituteCity"
+								name="applicantInstitutionCity"
 								control={control}
 								rule={rule}
 								required
@@ -296,7 +297,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.postalCode')}
-								name="applicantInstitutePostalCode"
+								name="applicantInstitutionPostalCode"
 								control={control}
 								rule={rule}
 								required

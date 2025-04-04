@@ -42,12 +42,12 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteEmail: NonEmptyString.email(),
 	applicantProfileUrl: NonEmptyString.url(),
 	applicantPositionTitle: NonEmptyString,
-	applicantInstituteCountry: NonEmptyString,
-	applicantInstituteState: NonEmptyString,
-	applicantInstituteCity: NonEmptyString,
-	applicantInstitutePostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
-	applicantInstituteStreetAddress: NonEmptyString,
-	applicantInstituteBuilding: EmptyOrOptionalString,
+	applicantInstitutionCountry: NonEmptyString,
+	applicantInstitutionState: NonEmptyString,
+	applicantInstitutionCity: NonEmptyString,
+	applicantInstitutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	applicantInstitutionStreetAddress: NonEmptyString,
+	applicantInstitutionBuilding: EmptyOrOptionalString,
 });
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 
