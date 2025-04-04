@@ -21,7 +21,6 @@ import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema, projectInformationSchema } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
-	
 	return applicantInformationSchema.safeParse({
 		applicantTitle: fields.applicantTitle,
 		applicantFirstName: fields.applicantFirstName,

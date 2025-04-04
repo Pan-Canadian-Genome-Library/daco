@@ -85,8 +85,9 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
  *
  *  Verify each section with zod if there are errors on their fields using
  */
-export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutesValues> => {
-	
+export const VerifyFormSections = (
+	fields?: ApplicationContentsResponse,
+): VerifyPageSectionsType<SectionRoutesValues> => {
 	return {
 		[SectionRoutes.INTRO]: false,
 		[SectionRoutes.APPLICANT]: fields ? ValidatorApplicant(fields) : false,

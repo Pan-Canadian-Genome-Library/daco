@@ -118,10 +118,10 @@ export interface ApplicantDTO {
 	applicantTitle?: string | null;
 	applicantSuffix?: string | null;
 	applicantPrimaryAffiliation?: string | null;
-	applicantInstitutionalEmail?: string | null;
-	applicantProfileUrl?: string | null;
-	applicantInstitutionCountry?: string | null;
 	applicantPositionTitle?: string | null;
+	applicantProfileUrl?: string | null;
+	applicantInstitutionalEmail?: string | null;
+	applicantInstitutionCountry?: string | null;
 	applicantInstitutionState?: string | null;
 	applicantInstitutionCity?: string | null;
 	applicantInstitutionPostalCode?: string | null;
