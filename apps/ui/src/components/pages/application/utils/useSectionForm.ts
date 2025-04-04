@@ -17,37 +17,41 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationAction, type ApplicationFormState } from '@/providers/context/application/types';
+import { SectionRoutesValues } from '@/pages/AppRouter';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { Form } from 'antd';
+import { useEffect } from 'react';
 
-function ApplicationReducer(state: ApplicationFormState, action: ApplicationAction) {
-	switch (action.type) {
-		case 'UPDATE_APPLICATION': {
-			return { ...state, ...action.payload };
-		}
-		case 'UPDATE_DIRTY_STATE': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					isDirty: action.payload,
-				},
-			};
-		}
-		case 'UPDATE_SECTION_VISITED': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					sectionsVisited: {
-						...state.formState.sectionsVisited,
-						...action.payload,
-					},
-				},
-			};
-		}
-		default:
-			return { ...state };
-	}
+interface Props {
+	section: SectionRoutesValues;
+	sectionVisited: boolean;
 }
 
-export default ApplicationReducer;
+// custom hook for Antd form related logic
+export const useSectionForm = ({ section, sectionVisited = false }: Props) => {
+	const { dispatch } = useApplicationContext();
+	const [form] = Form.useForm();
+
+	/**
+	 * Trigger error validation on revisit to the section
+	 * NOTE: Eslint is disabled because for this specific instance, we actually want old state and dont want the useEffect to rerun after the dispatch.
+	 */
+	useEffect(() => {
+		if (sectionVisited) {
+			form.validateFields();
+		}
+
+		return () => {
+			dispatch({
+				type: 'UPDATE_SECTION_VISITED',
+				payload: {
+					[`${section}`]: true,
+				},
+			});
+		};
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	return form;
+};

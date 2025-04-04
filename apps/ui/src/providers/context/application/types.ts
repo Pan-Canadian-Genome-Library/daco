@@ -17,13 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import { Dispatch } from 'react';
 
 export interface FormState {
 	isFormCompleted?: boolean;
 	isDirty: boolean;
+	sectionsVisited: SectionsVisited<SectionRoutesValues>;
 }
+export type SectionsVisited<T extends string> = {
+	[section in T]: boolean;
+};
 
 export interface ApplicationFormState {
 	fields: Partial<ApplicationContentsResponse>;
@@ -38,4 +43,8 @@ export type ApplicationContextType = {
 
 export type ApplicationAction =
 	| { type: 'UPDATE_APPLICATION'; payload: ApplicationFormState }
-	| { type: 'UPDATE_DIRTY_STATE'; payload: boolean };
+	| { type: 'UPDATE_DIRTY_STATE'; payload: boolean }
+	| {
+			type: 'UPDATE_SECTION_VISITED';
+			payload: Partial<{ [K in SectionRoutesValues]: boolean }>;
+	  };

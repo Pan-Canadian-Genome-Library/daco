@@ -114,7 +114,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 								<InputBox
 									label={translate('form.primaryEmail')}
 									name="collaboratorInstitutionalEmail"
-									subLabel={translate('form.primaryEmailLabel')}
+									subLabel={translate('collab-section.primaryEmailLabel')}
 									control={control}
 									rule={rule}
 									required

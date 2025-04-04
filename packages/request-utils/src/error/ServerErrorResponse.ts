@@ -17,37 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationAction, type ApplicationFormState } from '@/providers/context/application/types';
+import { ErrorName, ErrorResponse } from '../error/ErrorResponse.js';
 
-function ApplicationReducer(state: ApplicationFormState, action: ApplicationAction) {
-	switch (action.type) {
-		case 'UPDATE_APPLICATION': {
-			return { ...state, ...action.payload };
-		}
-		case 'UPDATE_DIRTY_STATE': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					isDirty: action.payload,
-				},
-			};
-		}
-		case 'UPDATE_SECTION_VISITED': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					sectionsVisited: {
-						...state.formState.sectionsVisited,
-						...action.payload,
-					},
-				},
-			};
-		}
-		default:
-			return { ...state };
-	}
-}
+const { SERVER_ERROR } = ErrorName;
 
-export default ApplicationReducer;
+/**
+ * Creates a ServerError Response containing a message detailing the problem.
+ * @param customMessage
+ * @returns
+ */
+export const ServerErrorResponse = (customMessage?: string): ErrorResponse => ({
+	error: SERVER_ERROR,
+	message: customMessage ?? "Sorry, something went wrong. We're unable to process your request, please try again later.",
+});

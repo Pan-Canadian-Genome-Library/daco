@@ -17,37 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationAction, type ApplicationFormState } from '@/providers/context/application/types';
+import {type LoggerType } from '@pcgl-daco/logger';
+import { ServerErrorResponse } from './error/ServerErrorResponse.js';
+import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 
-function ApplicationReducer(state: ApplicationFormState, action: ApplicationAction) {
-	switch (action.type) {
-		case 'UPDATE_APPLICATION': {
-			return { ...state, ...action.payload };
-		}
-		case 'UPDATE_DIRTY_STATE': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					isDirty: action.payload,
-				},
-			};
-		}
-		case 'UPDATE_SECTION_VISITED': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					sectionsVisited: {
-						...state.formState.sectionsVisited,
-						...action.payload,
-					},
-				},
-			};
-		}
-		default:
-			return { ...state };
-	}
-}
+export const errorHandler =
+	(params: { logger?: LoggerType }): ErrorRequestHandler =>
+	(err: any, req: Request, res: Response, next: NextFunction) => {
+		const { logger } = params;
 
-export default ApplicationReducer;
+		if (res.headersSent) {
+			return next(err);
+		}
+
+		logger?.error('Unhandled error thrown from request', req.url, err);
+
+		const errorMessage = err.message || 'An error occurred.';
+
+		 res.status(500).json(ServerErrorResponse(errorMessage));
+	};

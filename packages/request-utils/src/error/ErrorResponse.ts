@@ -17,37 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type ApplicationAction, type ApplicationFormState } from '@/providers/context/application/types';
-
-function ApplicationReducer(state: ApplicationFormState, action: ApplicationAction) {
-	switch (action.type) {
-		case 'UPDATE_APPLICATION': {
-			return { ...state, ...action.payload };
-		}
-		case 'UPDATE_DIRTY_STATE': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					isDirty: action.payload,
-				},
-			};
-		}
-		case 'UPDATE_SECTION_VISITED': {
-			return {
-				...state,
-				formState: {
-					...state.formState,
-					sectionsVisited: {
-						...state.formState.sectionsVisited,
-						...action.payload,
-					},
-				},
-			};
-		}
-		default:
-			return { ...state };
-	}
+export enum ErrorName {
+	BAD_REQUEST_ERROR = 'BadRequestError',
+	CONFLICT_ERROR = 'ConflictError',
+	NOT_FOUND_ERROR = 'NotFoundError',
+	RECAPTCHA_ERROR = 'RecaptchaError',
+	REQUEST_VALIDATION_ERROR = 'RequestValidationError',
+	SERVER_ERROR = 'ServerError',
+	UNAUTHORIZED = 'Unauthorized',
 }
 
-export default ApplicationReducer;
+export type ErrorResponse = {
+	error: ErrorName | 'NOT_IMPLEMENTED'; // TODO: remove once all routes are implemented
+	message: string;
+};
+
+export const ErrorResponse = (error: ErrorName | 'NOT_IMPLEMENTED', message: string) => ({
+	error,
+	message,
+});
