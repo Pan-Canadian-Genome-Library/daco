@@ -18,10 +18,9 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { requestedStudiesSchema, RequestedStudiesSchemaType } from '@pcgl-daco/validation';
+import { requestedStudiesSchema, type RequestedStudiesSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -34,6 +33,7 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import Link from 'antd/es/typography/Link';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const { Text } = Typography;
 
@@ -59,8 +59,8 @@ const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const [form] = Form.useForm();
-
+	const form = useSectionForm({ section: "study", sectionVisited: state.formState.sectionsVisited.study });
+	
 	const {
 		formState: { isDirty },
 		control,
@@ -90,10 +90,6 @@ const RequestedStudy = () => {
 		});
 	};
 
-	// validate fields that have been dirtied on page load
-	useEffect(() => {
-		form.validateFields({ dirty: true });
-	}, [form]);
 
 	return (
 		<SectionWrapper>
