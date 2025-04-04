@@ -27,6 +27,18 @@ const initialState: ApplicationFormState = {
 	formState: {
 		isFormCompleted: false,
 		isDirty: false,
+		sectionsVisited: {
+			institutional: false,
+			intro: false,
+			applicant: false,
+			collaborators: false,
+			project: false,
+			study: false,
+			ethics: false,
+			agreement: false,
+			appendices: false,
+			sign: false,
+		},
 	},
 };
 
