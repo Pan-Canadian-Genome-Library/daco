@@ -33,6 +33,7 @@ export type SectionsVisited<T extends string> = {
 export interface ApplicationFormState {
 	fields: Partial<ApplicationContentsResponse>;
 	formState: FormState;
+	applicationStatus?: string;
 }
 
 export type ApplicationContextType = {
