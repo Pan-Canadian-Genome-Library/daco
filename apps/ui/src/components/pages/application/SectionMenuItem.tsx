@@ -51,7 +51,7 @@ const SectionMenuItem = ({
 		if (label === SectionRoutes.INTRO) {
 			// do not display intro icon
 			return;
-		} else if (label === SectionRoutes.COLLABORATORS) {
+		} else if (label === SectionRoutes.COLLABORATORS && isEditMode) {
 			// If has collaborators, show checkmark otherwise return null
 			return hasCollaborators ? <CheckCircleOutlined /> : null;
 		} else if (isCurrentSection && isEditMode && !isSectionValid) {
