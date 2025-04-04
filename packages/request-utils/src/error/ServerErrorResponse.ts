@@ -17,33 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SectionRoutesValues } from '@/pages/AppRouter';
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { Dispatch } from 'react';
+import { ErrorName, ErrorResponse } from '../error/ErrorResponse.js';
 
-export interface FormState {
-	isFormCompleted?: boolean;
-	isDirty: boolean;
-	sectionsVisited: SectionsVisited<SectionRoutesValues>;
-}
-export type SectionsVisited<T extends string> = {
-	[section in T]: boolean;
-};
+const { SERVER_ERROR } = ErrorName;
 
-export interface ApplicationFormState {
-	fields: Partial<ApplicationContentsResponse>;
-	formState: FormState;
-}
-
-export type ApplicationContextType = {
-	state: ApplicationFormState;
-	dispatch: Dispatch<ApplicationAction>;
-};
-
-export type ApplicationAction =
-	| { type: 'UPDATE_APPLICATION'; payload: ApplicationFormState }
-	| { type: 'UPDATE_DIRTY_STATE'; payload: boolean }
-	| {
-			type: 'UPDATE_SECTION_VISITED';
-			payload: Partial<{ [K in SectionRoutesValues]: boolean }>;
-	  };
+/**
+ * Creates a ServerError Response containing a message detailing the problem.
+ * @param customMessage
+ * @returns
+ */
+export const ServerErrorResponse = (customMessage?: string): ErrorResponse => ({
+	error: SERVER_ERROR,
+	message: customMessage ?? "Sorry, something went wrong. We're unable to process your request, please try again later.",
+});
