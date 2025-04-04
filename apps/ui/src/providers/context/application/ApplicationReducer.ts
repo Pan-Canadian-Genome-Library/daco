@@ -25,7 +25,25 @@ function ApplicationReducer(state: ApplicationFormState, action: ApplicationActi
 			return { ...state, ...action.payload };
 		}
 		case 'UPDATE_DIRTY_STATE': {
-			return { ...state, formState: { ...state.formState, isDirty: action.payload } };
+			return {
+				...state,
+				formState: {
+					...state.formState,
+					isDirty: action.payload,
+				},
+			};
+		}
+		case 'UPDATE_SECTION_VISITED': {
+			return {
+				...state,
+				formState: {
+					...state.formState,
+					sectionsVisited: {
+						...state.formState.sectionsVisited,
+						...action.payload,
+					},
+				},
+			};
 		}
 		default:
 			return { ...state };
