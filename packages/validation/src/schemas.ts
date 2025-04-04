@@ -26,13 +26,14 @@ import {
 	Concise250WordCountString,
 	EmptyOrOptionalString,
 	NonEmptyString,
+	OptionalString,
 	OptionalURLString,
 } from './common/strings.js';
 
 import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
-	applicantTitle: NonEmptyString,
+	applicantTitle: OptionalString,
 	applicantFirstName: NonEmptyString,
 	applicantMiddleName: EmptyOrOptionalString,
 	applicantLastName: NonEmptyString,
@@ -65,7 +66,7 @@ export const collaboratorsSchema = z.object({
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const institutionalRepSchema = z.object({
-	institutionalTitle: NonEmptyString,
+	institutionalTitle: OptionalString,
 	institutionalFirstName: NonEmptyString,
 	institutionalMiddleName: EmptyOrOptionalString,
 	institutionalLastName: NonEmptyString,
