@@ -30,15 +30,50 @@ import { LabelWithLink } from '@/components/pages/application/form-components/la
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { appendicesSchema, type AppendicesSchemaType } from '@pcgl-daco/validation';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { control } = useForm<AppendicesSchemaType>({ resolver: zodResolver(appendicesSchema) });
+	const { state, dispatch } = useApplicationContext();
+	const {
+		control,
+		getValues,
+		formState: { isDirty },
+	} = useForm<Nullable<AppendicesSchemaType>>({
+		defaultValues: {
+			acceptedAppendices: state.fields.acceptedAppendices,
+		},
+		resolver: zodResolver(appendicesSchema),
+	});
+	const form = useSectionForm({ section: "appendices", sectionVisited: state.formState.sectionsVisited.appendices });
+
+	const onSubmit = () => {
+		const acceptedAppendices = getValues('acceptedAppendices');
+
+		if (!acceptedAppendices) {
+			return;
+		}
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				fields: {
+					...state.fields,
+					acceptedAppendices,
+				},
+				formState: {
+					...state.formState,
+					isDirty,
+				},
+			},
+		});
+	};
 
 	return (
 		<SectionWrapper>
@@ -49,11 +84,18 @@ const Appendices = () => {
 					text={[translate('appendices.description')]}
 				/>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>
-					<Form>
+					<Form
+						form={form}
+						onBlur={() => {
+							if (isEditMode) {
+								onSubmit();
+							}
+						}}
+					>
 						<CheckboxGroup
 							control={control}
 							rule={rule}
-							name="appendices"
+							name="acceptedAppendices"
 							disabled={!isEditMode}
 							gap={50}
 							options={[
@@ -65,7 +107,7 @@ const Appendices = () => {
 										/>
 									),
 									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX I' }),
-									value: 'appendix-1',
+									value: 'appendix_1',
 								},
 								{
 									description: (
@@ -75,7 +117,7 @@ const Appendices = () => {
 										/>
 									),
 									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX II' }),
-									value: 'appendix-2',
+									value: 'appendix_2',
 								},
 								{
 									description: (
@@ -85,7 +127,7 @@ const Appendices = () => {
 										/>
 									),
 									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX III' }),
-									value: 'appendix-3',
+									value: 'appendix_3',
 								},
 							]}
 						/>

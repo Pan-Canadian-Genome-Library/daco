@@ -53,6 +53,7 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 						rules={[props.rule]}
 						required={props.required}
 						validateTrigger="onChange"
+						initialValue={field.value}
 					>
 						<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
 							{props.options.map((checkbox) => (

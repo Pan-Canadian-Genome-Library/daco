@@ -17,26 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { agreementEnum, appendicesEnum } from '@pcgl-daco/data-model';
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { applications } from './applications.ts';
 import { collaborators } from './collaborators.ts';
 import { files } from './files.ts';
 import { revisionRequests } from './revisionRequests.ts';
-
-export const agreementEnum = [
-	'dac_agreement_software_updates',
-	'dac_agreement_non_disclosure',
-	'dac_agreement_monitor_individual_access',
-	'dac_agreement_destroy_data',
-	'dac_agreement_familiarize_restrictions',
-	'dac_agreement_provide_it_policy',
-	'dac_agreement_notify_unauthorized_access',
-	'dac_agreement_certify_application',
-	'dac_agreement_read_and_agreed',
-] as const;
-
-export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as const;
 
 export const applicationContents = pgTable('application_contents', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
