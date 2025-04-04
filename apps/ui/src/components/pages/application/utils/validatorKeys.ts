@@ -18,11 +18,11 @@
  */
 
 import {
-	ApplicantDTO,
-	ApplicationContentsResponse,
-	InstitutionalRepDTO,
-	InstitutionDTO,
-	ProjectDTO,
+	type ApplicantDTO,
+	type ApplicationContentsResponse,
+	type InstitutionalRepDTO,
+	type InstitutionDTO,
+	type ProjectDTO,
 } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, institutionalRepSchema, projectInformationSchema } from '@pcgl-daco/validation';
 
