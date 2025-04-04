@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {type LoggerType } from '@pcgl-daco/logger';
+import { type LoggerType } from '@pcgl-daco/logger';
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { ServerErrorResponse } from './error/ServerErrorResponse.js';
-import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 
 export const errorHandler =
 	(params: { logger?: LoggerType }): ErrorRequestHandler =>
@@ -34,5 +34,5 @@ export const errorHandler =
 
 		const errorMessage = err.message || 'An error occurred.';
 
-		 res.status(500).json(ServerErrorResponse(errorMessage));
+		res.status(500).json(ServerErrorResponse(errorMessage));
 	};

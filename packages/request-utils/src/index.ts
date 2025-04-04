@@ -17,6 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './validation.js';
-export * from './errors.js';
 export * from './errorHandler.js';
+export * from './errors.js';
+export * from './validation.js';
