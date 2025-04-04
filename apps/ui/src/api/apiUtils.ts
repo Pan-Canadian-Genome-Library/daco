@@ -33,6 +33,10 @@ export const withErrorResponseHandler = (response: Response) => {
 				error.message = i18n.t('errors.fetchError.title');
 				error.errors = i18n.t('errors.fetchError.message');
 				break;
+			case 403:
+				error.message = i18n.t('errors.http.403.title');
+				error.errors = i18n.t('errors.http.403.message');
+				break;
 			case 404:
 				error.message = i18n.t('errors.http.404.title');
 				error.errors = i18n.t('errors.http.404.message');

@@ -207,6 +207,8 @@ applicationRouter.get(
 			return;
 		}
 
+		const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+
 		const { state: stateQuery, sort: sortQuery, page, pageSize } = request.query;
 
 		const pageRequested = page ? Number(page) : undefined;
@@ -246,6 +248,7 @@ applicationRouter.get(
 			sort,
 			page: pageRequested,
 			pageSize: pageSizeRequested,
+			isDACMember,
 		});
 
 		if (result.success) {

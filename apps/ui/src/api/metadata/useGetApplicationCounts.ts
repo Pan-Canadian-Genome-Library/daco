@@ -23,12 +23,12 @@ import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ApplicationCountMetadata, ServerError } from '@/global/types';
 
-const useGetApplicationCounts = (id?: string | number) => {
+const useGetApplicationCounts = () => {
 	return useQuery<ApplicationCountMetadata, ServerError>({
-		queryKey: [id],
+		queryKey: [],
 
 		queryFn: async () => {
-			const response = await fetch(`/applications/metadata/counts?userId=${id}`).then(withErrorResponseHandler);
+			const response = await fetch(`/applications/metadata/counts`).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
