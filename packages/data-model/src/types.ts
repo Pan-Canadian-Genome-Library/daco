@@ -136,6 +136,12 @@ export type InstitutionalRepDTO = {
 };
 
 export type InstitutionDTO = {
+	applicantInstitutionCountry?: string | null;
+	applicantInstitutionState?: string | null;
+	applicantInstitutionStreetAddress?: string | null;
+	applicantInstitutionBuilding?: string | null;
+	applicantInstitutionCity?: string | null;
+	applicantInstitutionPostalCode?: string | null;
 	institutionCountry?: string | null;
 	institutionState?: string | null;
 	institutionStreetAddress?: string | null;
@@ -333,13 +339,12 @@ export interface AgreementsDTO {
 }
 
 export interface FilesDTO {
-	id: number;
 	applicationId: number;
 	type: FileType;
-	submitterUserId: number;
+	submitterUserId: string;
 	submittedAt: Date;
 	content: any;
-	filename: string;
+	filename: string | null;
 }
 
 export interface SignatureDTO {

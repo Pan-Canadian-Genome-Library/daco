@@ -17,27 +17,49 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import { isPositiveInteger } from '../utils/functions.js';
+import { StyleSheet, View } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
 
-export const getFileByIdParamsSchema = z.object({
-	fileId: z
-		.string()
-		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+import Title from '@/service/pdf/components/Title.tsx';
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+
+interface FormDisplay {
+	title: string;
+	children: ReactNode;
+	fixed?: boolean;
+	wrap?: boolean;
+	breakLineInTitle?: boolean;
+}
+
+const styles = StyleSheet.create({
+	form: {
+		marginTop: standardStyles.textStyles.sizes.xl,
+		display: 'flex',
+		flexDirection: 'column',
+	},
+	formTitle: {
+		marginBottom: standardStyles.textStyles.sizes.lg,
+	},
+	formItems: {
+		display: 'flex',
+		flexDirection: 'column',
+		gap: standardStyles.textStyles.sizes.md,
+	},
 });
 
-export const fileDeleteParamsSchema = z
-	.object({
-		fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
-	})
-	.required();
+const FormDisplay = ({ title, children, fixed = false, wrap = true, breakLineInTitle = false }: FormDisplay) => {
+	return (
+		<View style={styles.form} fixed={fixed} wrap={wrap}>
+			<View style={styles.formItems} wrap={wrap}>
+				<View style={styles.formTitle}>
+					<Title breakLine={breakLineInTitle} level="h2">
+						{title}
+					</Title>
+				</View>
+				{children}
+			</View>
+		</View>
+	);
+};
 
-export const fileResponseSchema = z.object({
-	id: z.number(),
-	filename: z.string().nullable(),
-	applicationId: z.number(),
-	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)),
-	submittedAt: z.date(),
-	submitterUserId: z.string(),
-	type: z.literal('SIGNED_APPLICATION').or(z.literal('ETHICS_LETTER')),
-});
+export default FormDisplay;

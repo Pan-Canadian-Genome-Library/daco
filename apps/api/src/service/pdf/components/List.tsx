@@ -17,27 +17,42 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import { isPositiveInteger } from '../utils/functions.js';
+import { StyleSheet, Text, View } from '@react-pdf/renderer';
 
-export const getFileByIdParamsSchema = z.object({
-	fileId: z
-		.string()
-		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+
+const styles = StyleSheet.create({
+	list: {
+		fontFamily: 'OpenSans',
+		fontWeight: 'normal',
+		lineHeight: '1rem',
+		fontSize: standardStyles.textStyles.sizes.md,
+		display: 'flex',
+		flexDirection: 'column',
+		gap: '.3rem',
+		padding: '0 0 0 0.7cm',
+	},
+	listItem: {
+		display: 'flex',
+		flexDirection: 'row',
+		gap: '.5rem',
+	},
+	listText: {
+		// This is to fix a bug where text does not respect padding or margin boundaries.
+		flex: 1,
+	},
 });
+const List = ({ items, isNumbered }: { items: string[]; isNumbered?: boolean }) => {
+	return (
+		<View style={styles.list}>
+			{items.map((li, index) => (
+				<View style={styles.listItem} key={li} wrap={false}>
+					{isNumbered ? <Text>{`${index + 1}.`}</Text> : <Text>&#x2022;</Text>}
+					<Text style={styles.listText}>{`${li}`}</Text>
+				</View>
+			))}
+		</View>
+	);
+};
 
-export const fileDeleteParamsSchema = z
-	.object({
-		fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
-	})
-	.required();
-
-export const fileResponseSchema = z.object({
-	id: z.number(),
-	filename: z.string().nullable(),
-	applicationId: z.number(),
-	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)),
-	submittedAt: z.date(),
-	submitterUserId: z.string(),
-	type: z.literal('SIGNED_APPLICATION').or(z.literal('ETHICS_LETTER')),
-});
+export default List;

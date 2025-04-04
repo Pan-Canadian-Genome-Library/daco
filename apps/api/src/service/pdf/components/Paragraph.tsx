@@ -17,27 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import { isPositiveInteger } from '../utils/functions.js';
+import { StyleSheet, Text } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
 
-export const getFileByIdParamsSchema = z.object({
-	fileId: z
-		.string()
-		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+
+const styles = StyleSheet.create({
+	paragraph: {
+		fontFamily: 'OpenSans',
+		fontWeight: 'normal',
+		lineHeight: '1rem',
+		fontSize: standardStyles.textStyles.sizes.md,
+	},
 });
+const Paragraph = ({ children, notice, breakLine }: { children: ReactNode; notice?: boolean; breakLine?: boolean }) => {
+	return (
+		<Text break={breakLine} style={{ ...styles.paragraph, color: notice ? standardStyles.colours.primary : '#000' }}>
+			{children}
+		</Text>
+	);
+};
 
-export const fileDeleteParamsSchema = z
-	.object({
-		fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
-	})
-	.required();
-
-export const fileResponseSchema = z.object({
-	id: z.number(),
-	filename: z.string().nullable(),
-	applicationId: z.number(),
-	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)),
-	submittedAt: z.date(),
-	submitterUserId: z.string(),
-	type: z.literal('SIGNED_APPLICATION').or(z.literal('ETHICS_LETTER')),
-});
+export default Paragraph;

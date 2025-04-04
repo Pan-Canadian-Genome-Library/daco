@@ -17,27 +17,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import { isPositiveInteger } from '../utils/functions.js';
+import { StyleSheet, Text } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
 
-export const getFileByIdParamsSchema = z.object({
-	fileId: z
-		.string()
-		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+interface TitleProps {
+	level?: 'h1' | 'h2';
+	breakLine?: boolean;
+	children: ReactNode;
+}
+
+const styles = StyleSheet.create({
+	title: {
+		fontFamily: 'LeagueSpartan',
+		fontWeight: 'bold',
+	},
 });
 
-export const fileDeleteParamsSchema = z
-	.object({
-		fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
-	})
-	.required();
+const Title = ({ level = 'h1', children, breakLine = false }: TitleProps) => {
+	return (
+		<Text
+			break={breakLine}
+			style={{
+				...styles.title,
+				fontSize: level === 'h1' ? standardStyles.textStyles.sizes.xl : standardStyles.textStyles.sizes.lg,
+			}}
+		>
+			{children}
+		</Text>
+	);
+};
 
-export const fileResponseSchema = z.object({
-	id: z.number(),
-	filename: z.string().nullable(),
-	applicationId: z.number(),
-	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)),
-	submittedAt: z.date(),
-	submitterUserId: z.string(),
-	type: z.literal('SIGNED_APPLICATION').or(z.literal('ETHICS_LETTER')),
-});
+export default Title;

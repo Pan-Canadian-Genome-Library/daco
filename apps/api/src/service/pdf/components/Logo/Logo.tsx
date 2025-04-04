@@ -17,27 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import { isPositiveInteger } from '../utils/functions.js';
+import { Image, NodeProps } from '@react-pdf/renderer';
 
-export const getFileByIdParamsSchema = z.object({
-	fileId: z
-		.string()
-		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
-});
+const Logo = ({ style }: Pick<NodeProps, 'style'>) => {
+	return <Image style={{ ...style }} src={'./src/service/pdf/components/Logo/pcgl-logo.png'} />;
+};
 
-export const fileDeleteParamsSchema = z
-	.object({
-		fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
-	})
-	.required();
-
-export const fileResponseSchema = z.object({
-	id: z.number(),
-	filename: z.string().nullable(),
-	applicationId: z.number(),
-	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)),
-	submittedAt: z.date(),
-	submitterUserId: z.string(),
-	type: z.literal('SIGNED_APPLICATION').or(z.literal('ETHICS_LETTER')),
-});
+export default Logo;
