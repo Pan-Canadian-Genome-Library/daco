@@ -18,6 +18,14 @@ services:
       - '6379:6379'
     volumes:
       - 'valkey:/bitnami/valkey/data'
+  mailhog:
+    # Using this image over mailhog/mailhog due to incompatibility with apple silicon chips
+    # This is the same image used in OHCRN
+    image: docker.io/jcalonso/mailhog:latest
+    container_name: mailhog
+    ports:
+      - '1025:1025'
+      - '8025:8025'
 
 volumes:
   daco-api-db:
