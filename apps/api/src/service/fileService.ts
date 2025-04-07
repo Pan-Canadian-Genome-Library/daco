@@ -41,29 +41,38 @@ const filesSvc = (db: PostgresDb) => ({
 	}: {
 		fileId: number;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<FilesRecord & { id: number }> => {
+	}): AsyncResult<FilesRecord, 'SYSTEM_ERROR'> => {
 		const dbTransaction = transaction ? transaction : db;
 
-		const result = await dbTransaction.transaction(async (transaction) => {
-			const fileRecord = await transaction
-				.select({
-					id: files.id,
-					application_id: files.application_id,
-					type: files.type,
-					filename: files.filename,
-					submitter_user_id: files.submitter_user_id,
-					submitted_at: files.submitted_at,
-					content: files.content,
-				})
-				.from(files)
-				.where(eq(files.id, fileId));
+		try {
+			const result = await dbTransaction.transaction(async (transaction) => {
+				const fileRecord = await transaction
+					.select({
+						id: files.id,
+						application_id: files.application_id,
+						type: files.type,
+						filename: files.filename,
+						submitter_user_id: files.submitter_user_id,
+						submitted_at: files.submitted_at,
+						content: files.content,
+					})
+					.from(files)
+					.where(eq(files.id, fileId));
 
-			if (!fileRecord[0]) throw new Error('File record is undefined');
+				if (!fileRecord[0]) {
+					throw new Error(`File record ${fileId} is undefined.`);
+				}
+				return fileRecord[0];
+			});
 
-			return fileRecord[0];
-		});
+			return success(result);
+		} catch (error) {
+			const message = 'Error at getFileById';
 
-		return success(result);
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
 	},
 	createFile: async ({
 		file,

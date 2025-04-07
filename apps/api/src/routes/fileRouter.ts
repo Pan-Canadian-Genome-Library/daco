@@ -18,39 +18,88 @@
  */
 
 import { deleteFile, getFile, uploadEthicsFile } from '@/controllers/fileController.ts';
+import { authMiddleware } from '@/middleware/authMiddleware.ts';
+import { getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { apiZodErrorMapping } from '@/utils/validation.ts';
+import { FilesDTO } from '@pcgl-daco/data-model';
 import { fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import { fileDeleteParamsSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request, type Response } from 'express';
 import formidable from 'formidable';
+import { ResponseWithData } from './types.ts';
 
 const fileRouter = express.Router();
 
 fileRouter.get(
 	'/:fileId',
-	withParamsSchemaValidation(getFileByIdParamsSchema, apiZodErrorMapping, async (req, res) => {
-		const { fileId } = req.params;
-
-		const id = parseInt(fileId ? fileId : '');
-
-		if (!isPositiveInteger(id)) {
-			res.status(400).send({ message: 'Invalid fileId' });
-			return;
-		}
-		const result = await getFile({ fileId: id });
-
-		if (!result.success) {
-			res.status(500).send(result);
-			return;
-		}
-
-		res.status(200).send(result.data);
-		return;
+	authMiddleware({
+		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
 	}),
+	withParamsSchemaValidation(
+		getFileByIdParamsSchema,
+		apiZodErrorMapping,
+		async (
+			req: Request,
+			res: ResponseWithData<FilesDTO, ['NOT_FOUND', 'UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+		) => {
+			const { fileId } = req.params;
+			const id = parseInt(fileId ? fileId : '');
+
+			const userRole = getUserRole(req.session);
+			const userInfo = req.session.user;
+
+			if (!isPositiveInteger(id)) {
+				res.status(400).send({ error: 'INVALID_REQUEST', message: 'Invalid fileId' });
+				return;
+			}
+
+			const result = await getFile({ fileId: id });
+
+			if (!result.success) {
+				switch (result.error) {
+					case 'NOT_FOUND':
+						res.status(404);
+						break;
+					case 'SYSTEM_ERROR':
+						res.status(500);
+						break;
+					default:
+						res.status(500);
+				}
+				res.send({
+					error: result.error,
+					message: result.message,
+				});
+				return;
+			}
+
+			const isApplicationInstitutionalRep = await isAssociatedRep({
+				session: req.session,
+				applicationId: result.data.applicationId,
+			});
+
+			if (
+				!isApplicationInstitutionalRep ||
+				(userRole === 'APPLICANT' && userInfo?.userId !== result.data.submitterUserId)
+			) {
+				res.status(403).json({
+					error: 'UNAUTHORIZED',
+					message: 'Looks like you do not own, or have the rights to access to this file.',
+				});
+				return;
+			}
+
+			res.status(200).send(result.data);
+			return;
+		},
+	),
 );
 
 fileRouter.post(
 	'/ethics/:applicationId',
+	authMiddleware({
+		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
+	}),
 	fileUploadValidation(async (req: Request<any, { file: formidable.File }>, res: Response) => {
 		const { applicationId } = req.params;
 
@@ -79,6 +128,9 @@ fileRouter.post(
 
 fileRouter.delete(
 	'/:fileId',
+	authMiddleware({
+		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
+	}),
 	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
 		const { fileId } = req.params;
 		const id = parseInt(fileId ? fileId : '');
@@ -102,6 +154,9 @@ fileRouter.delete(
 
 fileRouter.get(
 	'/:fileId/download',
+	authMiddleware({
+		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
+	}),
 	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
 		const { fileId } = req.params;
 		const id = parseInt(fileId ? fileId : '');

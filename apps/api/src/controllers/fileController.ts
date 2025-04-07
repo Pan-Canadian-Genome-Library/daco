@@ -27,8 +27,9 @@ import {
 	type FilesRecord,
 	type FilesService,
 } from '@/service/types.ts';
+import { convertToFileRecord } from '@/utils/aliases.ts';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.ts';
-import { FileTypes } from '@pcgl-daco/data-model';
+import { FilesDTO, FileTypes } from '@pcgl-daco/data-model';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
@@ -115,7 +116,13 @@ export const uploadEthicsFile = async ({
  * @param fileId - The target fileId to associate the uploaded file
  * @returns Success with file data / Failure with Error.
  */
-export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; withBuffer?: boolean }) => {
+export const getFile = async ({
+	fileId,
+	withBuffer = false,
+}: {
+	fileId: number;
+	withBuffer?: boolean;
+}): AsyncResult<FilesDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
@@ -123,15 +130,21 @@ export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; 
 		const result = await filesService.getFileById({ fileId });
 
 		if (!result.success) {
-			return result;
+			return failure('NOT_FOUND', `Unable to retrieve file with id: ${fileId}`);
+		}
+
+		const aliasedFileRecord = convertToFileRecord(result.data);
+
+		if (!aliasedFileRecord.success) {
+			return aliasedFileRecord;
 		}
 
 		// Strip content
 		if (!withBuffer) {
-			return success({ ...result.data, content: null });
+			return success({ ...aliasedFileRecord.data, content: null });
 		}
 
-		return result;
+		return aliasedFileRecord;
 	} catch (error) {
 		const message = `Unable to retrieve file with id: ${fileId}`;
 		logger.error(message, error);
