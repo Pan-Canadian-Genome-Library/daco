@@ -31,8 +31,9 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
-import { ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
@@ -41,23 +42,29 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 
 	const {
 		formState: { isDirty },
 		getValues,
 		control,
-	} = useForm<ApplicantInformationSchemaType>({
+	} = useForm<Nullable<ApplicantInformationSchemaType>>({
 		defaultValues: {
-			applicantInstituteCountry: 'CAN',
-			applicantTitle: state?.fields?.applicantTitle || undefined,
-			applicantFirstName: state?.fields?.applicantFirstName || undefined,
-			applicantMiddleName: state?.fields?.applicantMiddleName || undefined,
-			applicantLastName: state?.fields?.applicantLastName || undefined,
-			applicantSuffix: state?.fields?.applicantSuffix || undefined,
-			applicantPrimaryAffiliation: state?.fields?.applicantPrimaryAffiliation || undefined,
-			applicantInstituteEmail: state?.fields?.applicantInstitutionalEmail || undefined,
-			applicantProfileUrl: state?.fields?.applicantProfileUrl || undefined,
-			applicantPositionTitle: state?.fields?.applicantPositionTitle || undefined,
+			applicantInstitutionCountry: 'CAN',
+			applicantTitle: state.fields.applicantTitle,
+			applicantFirstName: state.fields.applicantFirstName,
+			applicantMiddleName: state.fields.applicantMiddleName,
+			applicantLastName: state.fields.applicantLastName,
+			applicantSuffix: state.fields.applicantSuffix,
+			applicantPrimaryAffiliation: state.fields.applicantPrimaryAffiliation,
+			applicantInstituteEmail: state.fields.applicantInstitutionalEmail,
+			applicantProfileUrl: state.fields.applicantProfileUrl,
+			applicantPositionTitle: state.fields.applicantPositionTitle,
+			applicantInstitutionState: state.fields.applicantInstitutionState,
+			applicantInstitutionCity: state.fields.applicantInstitutionCity,
+			applicantInstitutionPostalCode: state.fields.applicantInstitutionPostalCode,
+			applicantInstitutionStreetAddress: state.fields.applicantInstitutionStreetAddress,
+			applicantInstitutionBuilding: state.fields.applicantInstitutionBuilding,
 		},
 		resolver: zodResolver(applicantInformationSchema),
 	});
@@ -69,7 +76,7 @@ const Applicant = () => {
 			type: 'UPDATE_APPLICATION',
 			payload: {
 				fields: {
-					...state?.fields,
+					...state.fields,
 					applicantTitle: data.applicantTitle,
 					applicantFirstName: data.applicantFirstName,
 					applicantMiddleName: data.applicantMiddleName,
@@ -79,9 +86,15 @@ const Applicant = () => {
 					applicantInstitutionalEmail: data.applicantInstituteEmail,
 					applicantProfileUrl: data.applicantProfileUrl,
 					applicantPositionTitle: data.applicantPositionTitle,
-					// TODO: currently database does not have mailing address for applicant section, once fields are migrated into db, add the fields here
+					applicantInstitutionCountry: data.applicantInstitutionCountry,
+					applicantInstitutionState: data.applicantInstitutionState,
+					applicantInstitutionCity: data.applicantInstitutionCity,
+					applicantInstitutionPostalCode: data.applicantInstitutionPostalCode,
+					applicantInstitutionStreetAddress: data.applicantInstitutionStreetAddress,
+					applicantInstitutionBuilding: data.applicantInstitutionBuilding,
 				},
 				formState: {
+					...state.formState,
 					isDirty,
 				},
 			},
@@ -91,6 +104,7 @@ const Applicant = () => {
 	return (
 		<SectionWrapper>
 			<Form
+				form={form}
 				layout="vertical"
 				onBlur={() => {
 					if (isEditMode) {
@@ -114,7 +128,6 @@ const Applicant = () => {
 								options={PERSONAL_TITLES.map((titles) => {
 									return { value: titles.en, label: titles.en };
 								})}
-								required
 								initialValue={getValues('applicantTitle')}
 								disabled={!isEditMode}
 							/>
@@ -220,7 +233,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
 								label={translate('form.country')}
-								name="applicantInstituteCountry"
+								name="applicantInstitutionCountry"
 								control={control}
 								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
 									return { value: areas.iso, label: areas.en };
@@ -236,7 +249,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.streetAddress')}
-								name="applicantInstituteStreetAddress"
+								name="applicantInstitutionStreetAddress"
 								control={control}
 								rule={rule}
 								required
@@ -246,7 +259,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.building')}
-								name="applicantInstituteBuilding"
+								name="applicantInstitutionBuilding"
 								control={control}
 								rule={rule}
 								disabled={!isEditMode}
@@ -257,7 +270,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.state')}
-								name="applicantInstituteState"
+								name="applicantInstitutionState"
 								control={control}
 								rule={rule}
 								required
@@ -267,7 +280,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.city')}
-								name="applicantInstituteCity"
+								name="applicantInstitutionCity"
 								control={control}
 								rule={rule}
 								required
@@ -279,7 +292,7 @@ const Applicant = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<InputBox
 								label={translate('form.postalCode')}
-								name="applicantInstitutePostalCode"
+								name="applicantInstitutionPostalCode"
 								control={control}
 								rule={rule}
 								required

@@ -17,33 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SectionRoutesValues } from '@/pages/AppRouter';
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { Dispatch } from 'react';
+import {type LoggerType } from '@pcgl-daco/logger';
+import { ServerErrorResponse } from './error/ServerErrorResponse.js';
+import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 
-export interface FormState {
-	isFormCompleted?: boolean;
-	isDirty: boolean;
-	sectionsVisited: SectionsVisited<SectionRoutesValues>;
-}
-export type SectionsVisited<T extends string> = {
-	[section in T]: boolean;
-};
+export const errorHandler =
+	(params: { logger?: LoggerType }): ErrorRequestHandler =>
+	(err: any, req: Request, res: Response, next: NextFunction) => {
+		const { logger } = params;
 
-export interface ApplicationFormState {
-	fields: Partial<ApplicationContentsResponse>;
-	formState: FormState;
-}
+		if (res.headersSent) {
+			return next(err);
+		}
 
-export type ApplicationContextType = {
-	state: ApplicationFormState;
-	dispatch: Dispatch<ApplicationAction>;
-};
+		logger?.error('Unhandled error thrown from request', req.url, err);
 
-export type ApplicationAction =
-	| { type: 'UPDATE_APPLICATION'; payload: ApplicationFormState }
-	| { type: 'UPDATE_DIRTY_STATE'; payload: boolean }
-	| {
-			type: 'UPDATE_SECTION_VISITED';
-			payload: Partial<{ [K in SectionRoutesValues]: boolean }>;
-	  };
+		const errorMessage = err.message || 'An error occurred.';
+
+		 res.status(500).json(ServerErrorResponse(errorMessage));
+	};

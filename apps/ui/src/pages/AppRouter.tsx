@@ -37,21 +37,23 @@ import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
 
-export enum SectionRoutes {
-	INTRO = 'intro',
-	APPLICANT = 'applicant',
-	INSTITUTIONAL = 'institutional',
-	COLLABORATORS = 'collaborators',
-	PROJECT = 'project',
-	STUDY = 'study',
-	ETHICS = 'ethics',
-	AGREEMENT = 'agreement',
-	APPENDICES = 'appendices',
-	SIGN = 'sign',
-}
+export const SectionRoutes = {
+	INTRO: 'intro',
+	APPLICANT: 'applicant',
+	INSTITUTIONAL: 'institutional',
+	COLLABORATORS: 'collaborators',
+	PROJECT: 'project',
+	STUDY: 'study',
+	ETHICS: 'ethics',
+	AGREEMENT: 'agreement',
+	APPENDICES: 'appendices',
+	SIGN: 'sign',
+} as const;
+
+export type SectionRoutesValues = (typeof SectionRoutes)[keyof typeof SectionRoutes];
 
 export interface ApplicationSectionRouteTypes {
-	route: SectionRoutes;
+	route: SectionRoutesValues;
 	path: string;
 	element: React.ReactElement;
 }

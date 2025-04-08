@@ -17,33 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SectionRoutesValues } from '@/pages/AppRouter';
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { Dispatch } from 'react';
-
-export interface FormState {
-	isFormCompleted?: boolean;
-	isDirty: boolean;
-	sectionsVisited: SectionsVisited<SectionRoutesValues>;
-}
-export type SectionsVisited<T extends string> = {
-	[section in T]: boolean;
-};
-
-export interface ApplicationFormState {
-	fields: Partial<ApplicationContentsResponse>;
-	formState: FormState;
+export enum ErrorName {
+	BAD_REQUEST_ERROR = 'BadRequestError',
+	CONFLICT_ERROR = 'ConflictError',
+	NOT_FOUND_ERROR = 'NotFoundError',
+	RECAPTCHA_ERROR = 'RecaptchaError',
+	REQUEST_VALIDATION_ERROR = 'RequestValidationError',
+	SERVER_ERROR = 'ServerError',
+	UNAUTHORIZED = 'Unauthorized',
 }
 
-export type ApplicationContextType = {
-	state: ApplicationFormState;
-	dispatch: Dispatch<ApplicationAction>;
+export type ErrorResponse = {
+	error: ErrorName | 'NOT_IMPLEMENTED'; // TODO: remove once all routes are implemented
+	message: string;
 };
 
-export type ApplicationAction =
-	| { type: 'UPDATE_APPLICATION'; payload: ApplicationFormState }
-	| { type: 'UPDATE_DIRTY_STATE'; payload: boolean }
-	| {
-			type: 'UPDATE_SECTION_VISITED';
-			payload: Partial<{ [K in SectionRoutesValues]: boolean }>;
-	  };
+export const ErrorResponse = (error: ErrorName | 'NOT_IMPLEMENTED', message: string) => ({
+	error,
+	message,
+});

@@ -26,13 +26,14 @@ import {
 	Concise250WordCountString,
 	EmptyOrOptionalString,
 	NonEmptyString,
+	OptionalString,
 	OptionalURLString,
 } from './common/strings.js';
 
 import { BASE64_IMAGE, ONLY_ALPHANUMERIC } from './utils/regex.js';
 
 export const applicantInformationSchema = z.object({
-	applicantTitle: NonEmptyString,
+	applicantTitle: OptionalString,
 	applicantFirstName: NonEmptyString,
 	applicantMiddleName: EmptyOrOptionalString,
 	applicantLastName: NonEmptyString,
@@ -41,12 +42,12 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteEmail: NonEmptyString.email(),
 	applicantProfileUrl: NonEmptyString.url(),
 	applicantPositionTitle: NonEmptyString,
-	applicantInstituteCountry: NonEmptyString,
-	applicantInstituteState: NonEmptyString,
-	applicantInstituteCity: NonEmptyString,
-	applicantInstitutePostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
-	applicantInstituteStreetAddress: NonEmptyString,
-	applicantInstituteBuilding: EmptyOrOptionalString,
+	applicantInstitutionCountry: NonEmptyString,
+	applicantInstitutionState: NonEmptyString,
+	applicantInstitutionCity: NonEmptyString,
+	applicantInstitutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	applicantInstitutionStreetAddress: NonEmptyString,
+	applicantInstitutionBuilding: EmptyOrOptionalString,
 });
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 
@@ -65,7 +66,7 @@ export const collaboratorsSchema = z.object({
 export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const institutionalRepSchema = z.object({
-	institutionalTitle: NonEmptyString,
+	institutionalTitle: OptionalString,
 	institutionalFirstName: NonEmptyString,
 	institutionalMiddleName: EmptyOrOptionalString,
 	institutionalLastName: NonEmptyString,
@@ -88,9 +89,9 @@ export const projectInformationSchema = z.object({
 	projectWebsite: OptionalURLString,
 	projectBackground: Concise200WordCountString,
 	projectAims: Concise200WordCountString,
-	projectDataUse: Concise200WordCountString,
 	projectMethodology: Concise200WordCountString,
-	projectLaySummary: Concise250WordCountString,
+	projectSummary: Concise250WordCountString,
+	projectPublicationUrls: z.array(z.string()).max(3),
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
