@@ -22,7 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { type CollaboratorsSchemaType, collaboratorsSchema } from '@pcgl-daco/validation';
 import { Button, Col, Flex, Form, Modal, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -50,6 +50,12 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 			setIsOpen({ isOpen: false });
 		});
 	};
+
+	useEffect(() => {
+		return () => {
+			reset();
+		};
+	}, []);
 
 	return (
 		<Modal
