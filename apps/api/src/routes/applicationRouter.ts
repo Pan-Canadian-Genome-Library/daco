@@ -707,7 +707,6 @@ applicationRouter.post(
 
 			if (result.success) {
 				response.status(200).json({
-					message: 'Application submitted successfully.',
 					data: result.data,
 				});
 				return;
