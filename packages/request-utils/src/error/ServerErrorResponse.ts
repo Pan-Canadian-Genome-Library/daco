@@ -28,5 +28,6 @@ const { SERVER_ERROR } = ErrorName;
  */
 export const ServerErrorResponse = (customMessage?: string): ErrorResponse => ({
 	error: SERVER_ERROR,
-	message: customMessage ?? "Sorry, something went wrong. We're unable to process your request, please try again later.",
+	message:
+		customMessage ?? "Sorry, something went wrong. We're unable to process your request, please try again later.",
 });
