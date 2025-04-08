@@ -18,44 +18,59 @@
  */
 
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import { applicantInformationSchema, institutionalRepSchema, projectInformationSchema } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
 	return applicantInformationSchema.safeParse({
-		applicantTitle: fields?.applicantTitle,
-		applicantFirstName: fields?.applicantFirstName,
-		applicantMiddleName: fields?.applicantMiddleName,
-		applicantLastName: fields?.applicantLastName,
-		applicantSuffix: fields?.applicantSuffix,
-		applicantPrimaryAffiliation: fields?.applicantPrimaryAffiliation,
-		applicantInstituteEmail: fields?.applicantInstitutionalEmail,
-		applicantProfileUrl: fields?.applicantProfileUrl,
-		applicantPositionTitle: fields?.applicantPositionTitle,
-		applicantInstituteCountry: 'test', // NO mailing field in db
-		applicantInstituteState: 'test', // NO mailing field in db
-		applicantInstituteCity: 'test', // NO mailing field in db
-		applicantInstitutePostalCode: 'test', // NO mailing field in db
-		applicantInstituteStreetAddress: 'test', // NO mailing field in db
-		applicantInstituteBuilding: 'test', // NO mailing field in db
+		applicantTitle: fields.applicantTitle,
+		applicantFirstName: fields.applicantFirstName,
+		applicantMiddleName: fields.applicantMiddleName,
+		applicantLastName: fields.applicantLastName,
+		applicantSuffix: fields.applicantSuffix,
+		applicantPrimaryAffiliation: fields.applicantPrimaryAffiliation,
+		applicantInstituteEmail: fields.applicantInstitutionalEmail,
+		applicantProfileUrl: fields.applicantProfileUrl,
+		applicantPositionTitle: fields.applicantPositionTitle,
+		applicantInstitutionCountry: fields.applicantInstitutionCountry,
+		applicantInstitutionState: fields.applicantInstitutionState,
+		applicantInstitutionCity: fields.applicantInstitutionCity,
+		applicantInstitutionPostalCode: fields.applicantInstitutionPostalCode,
+		applicantInstitutionStreetAddress: fields.applicantInstitutionStreetAddress,
+		applicantInstitutionBuilding: fields.applicantInstitutionBuilding,
 	}).success;
 };
 
 export const ValidatorInstitution = (fields: ApplicationContentsResponse): boolean => {
 	return institutionalRepSchema.safeParse({
-		institutionalTitle: fields?.institutionalRepTitle,
-		institutionalFirstName: fields?.institutionalRepFirstName,
-		institutionalLastName: fields?.institutionalRepLastName,
-		institutionalPrimaryAffiliation: fields?.institutionalRepPrimaryAffiliation,
-		institutionalInstituteAffiliation: fields?.institutionalRepEmail,
-		institutionalProfileUrl: fields?.institutionalRepProfileUrl,
-		institutionalPositionTitle: fields?.institutionalRepPositionTitle,
-		institutionCountry: fields?.institutionCountry,
-		institutionState: fields?.institutionState,
-		institutionCity: fields?.institutionCity,
-		institutionStreetAddress: fields?.institutionStreetAddress,
-		institutionPostalCode: fields?.institutionPostalCode,
-		institutionalMiddleName: fields?.institutionalRepMiddleName,
-		institutionalSuffix: fields?.institutionalRepSuffix,
-		institutionBuilding: fields?.institutionBuilding,
+		institutionalTitle: fields.institutionalRepTitle,
+		institutionalFirstName: fields.institutionalRepFirstName,
+		institutionalLastName: fields.institutionalRepLastName,
+		institutionalPrimaryAffiliation: fields.institutionalRepPrimaryAffiliation,
+		institutionalInstituteAffiliation: fields.institutionalRepEmail,
+		institutionalProfileUrl: fields.institutionalRepProfileUrl,
+		institutionalPositionTitle: fields.institutionalRepPositionTitle,
+		institutionCountry: fields.institutionCountry,
+		institutionState: fields.institutionState,
+		institutionCity: fields.institutionCity,
+		institutionStreetAddress: fields.institutionStreetAddress,
+		institutionPostalCode: fields.institutionPostalCode,
+		institutionalMiddleName: fields.institutionalRepMiddleName,
+		institutionalSuffix: fields.institutionalRepSuffix,
+		institutionBuilding: fields.institutionBuilding,
+	}).success;
+};
+
+export const ValidatorProject = (fields: ApplicationContentsResponse): boolean => {
+	return projectInformationSchema.safeParse({
+		projectTitle: fields.projectTitle,
+		projectWebsite: fields.projectWebsite,
+		projectBackground: fields.projectBackground, // Abstract
+		projectAims: fields.projectAims,
+		projectMethodology: fields.projectMethodology,
+		projectSummary: fields.projectSummary,
+		projectPublicationUrls: fields.projectPublicationUrls,
+		relevantPublicationURL1: fields.projectPublicationUrls ? fields.projectPublicationUrls[0] : null,
+		relevantPublicationURL2: fields.projectPublicationUrls ? fields.projectPublicationUrls[1] : null,
+		relevantPublicationURL3: fields.projectPublicationUrls ? fields.projectPublicationUrls[2] : null,
 	}).success;
 };
