@@ -1671,6 +1671,7 @@ components:
         comments:
           type: string
           description: 'Additional comments'
+         
 
   responses:
     ApplicationResponse:

@@ -19,10 +19,7 @@
 
 export class BadRequest extends Error {
 	constructor(msg: string, details?: unknown) {
-		super(
-			msg ||
-				'Sorry, looks like you sent a sent bad request. Please check the request and try again, or refer to our API documentation.',
-		);
+		super(msg || "Sorry, looks like you sent a sent bad request. Please check the request and try again, or refer to our API documentation.");
 		this.name = 'Bad Request';
 		this.cause = details;
 	}
@@ -37,30 +34,21 @@ export class NotFound extends Error {
 
 export class StatusConflict extends Error {
 	constructor(msg: string) {
-		super(
-			msg ||
-				"Sorry, we're unable to process this request because the server has detected a conflict between the expected state of this resource and the state you attempted to apply. Please try again.",
-		);
+		super(msg || "Sorry, we're unable to process this request because the server has detected a conflict between the expected state of this resource and the state you attempted to apply. Please try again.");
 		this.name = 'Conflict';
 	}
 }
 
 export class NotImplemented extends Error {
 	constructor(msg?: string) {
-		super(
-			msg ||
-				'Sorry, looks like you may have tried to access functionality which has not been implemented yet. Please try again later.',
-		);
+		super(msg || "Sorry, looks like you may have tried to access functionality which has not been implemented yet. Please try again later.");
 		this.name = 'Not Implemented';
 	}
 }
 
 export class ServiceUnavailable extends Error {
 	constructor(msg?: string) {
-		super(
-			msg ||
-				'Sorry, this service is currently unavailable and is not able to process your request. Please try again at later time. We apologize for the inconvenience.',
-		);
+		super(msg || "Sorry, this service is currently unavailable and is not able to process your request. Please try again at later time. We apologize for the inconvenience.");
 		this.name = 'Service unavailable';
 	}
 }
@@ -73,8 +61,6 @@ export class InternalServerError extends Error {
 }
 
 export const getErrorMessage = (error: unknown) => {
-	if (error instanceof Error) {
-		return error.message;
-	}
+	if (error instanceof Error) { return error.message; }
 	return String(error);
 };
