@@ -155,7 +155,6 @@ signatureRouter.post(
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
-				const userRole = getUserRole(request.session);
 
 				const applicationResult = await getApplicationById({ applicationId });
 				if (!applicationResult.success) {
@@ -255,7 +254,6 @@ signatureRouter.delete(
 						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 						return;
 					}
-					const userRole = getUserRole(request.session);
 
 					const applicationResult = await getApplicationById({ applicationId });
 					if (!applicationResult.success) {

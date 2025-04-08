@@ -47,7 +47,7 @@ export const uploadEthicsFile = async ({
 }: {
 	applicationId: number;
 	file: formidable.File;
-}): AsyncResult<FilesRecord, 'SYSTEM_ERROR' | 'NOT_FOUND' | 'INVALID_STATE_TRANSITION'> => {
+}): AsyncResult<FilesDTO, 'SYSTEM_ERROR' | 'NOT_FOUND' | 'INVALID_STATE_TRANSITION'> => {
 	try {
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
@@ -83,7 +83,7 @@ export const uploadEthicsFile = async ({
 					transaction: tx,
 				});
 			} else {
-				result = await filesService.createFile({ file, application, type: 'ETHICS_LETTER' });
+				result = await filesService.createFile({ file, transaction: tx, application, type: 'ETHICS_LETTER' });
 			}
 
 			if (!result.success) {
@@ -102,7 +102,17 @@ export const uploadEthicsFile = async ({
 
 			return result;
 		});
-		return txResult;
+		if (!txResult.success) {
+			return txResult;
+		}
+
+		const fileRecord = convertToFileRecord(txResult.data);
+
+		if (!fileRecord.success) {
+			return fileRecord;
+		}
+
+		return fileRecord;
 	} catch (error) {
 		const message = `Unable to upload file to application with id: ${applicationId}`;
 		logger.error(message, error);

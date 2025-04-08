@@ -89,8 +89,6 @@ const filesSvc = (db: PostgresDb) => ({
 		readFrom?: 'filepath' | 'buffer';
 		contentsBuffer?: Buffer<ArrayBufferLike>;
 	}): AsyncResult<FilesRecord, 'SYSTEM_ERROR'> => {
-		// TODO: Files should only be added to an application if the associated application is in an editable (draft) state
-		// TODO: File Service should enforce rules about only one EthicsLetter per application.
 		try {
 			const dbTransaction = transaction ? transaction : db;
 			const buffer = readFrom === 'filepath' ? fs.readFileSync(file.filepath) : contentsBuffer;
@@ -112,7 +110,7 @@ const filesSvc = (db: PostgresDb) => ({
 				const newFileRecord = await transaction.insert(files).values(newFiles).returning();
 
 				if (!newFileRecord[0]) {
-					throw new Error('File record is undefined');
+					throw new Error('File record is undefined despite attempting to create a new record.');
 				}
 
 				return newFileRecord[0];
@@ -181,8 +179,6 @@ const filesSvc = (db: PostgresDb) => ({
 		fileId: number;
 		transaction?: PostgresTransaction;
 	}): AsyncResult<FilesModel & { id: number }, 'SYSTEM_ERROR'> => {
-		// TODO: Files should only be deleted if the associated application is in an editable (draft) state
-		// TODO: Currently this does not differentiate a file not found vs unexpected system error
 		try {
 			const dbTransaction = transaction ? transaction : db;
 
@@ -190,7 +186,7 @@ const filesSvc = (db: PostgresDb) => ({
 				const deletedRecord = await transaction.delete(files).where(eq(files.id, fileId)).returning();
 
 				if (!deletedRecord[0]) {
-					throw new Error('Error: deleting file record has failed');
+					throw new Error('Error: deleting file record has failed, record is undefined.');
 				}
 
 				return deletedRecord[0];

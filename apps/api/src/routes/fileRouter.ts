@@ -17,18 +17,83 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getApplicationById } from '@/controllers/applicationController.ts';
 import { deleteFile, getFile, uploadEthicsFile } from '@/controllers/fileController.ts';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { apiZodErrorMapping } from '@/utils/validation.ts';
 import { FilesDTO } from '@pcgl-daco/data-model';
-import { fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { ErrorType, fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import { fileDeleteParamsSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
-import express, { type Request, type Response } from 'express';
+import express, { type Request } from 'express';
 import formidable from 'formidable';
 import { ResponseWithData } from './types.ts';
 
 const fileRouter = express.Router();
+
+/**
+ * Creates a response for retrieving a file, this logic is the same whether we're including the download content
+ * or not, so it's better to standardise this.
+ * @param req The standard Express request object.
+ * @param res A `ResponseWithData`, returns a `FilesDTO` object, containing the file response.
+ * @param hasContent If set to `true` will include `content` into the `FilesDTO` object, if set to `false` it will be omitted
+ * @returns a `TSuccessData` on success, `TErrorCodes` on failure.
+ */
+async function retrieveFile(
+	req: Request,
+	res: ResponseWithData<FilesDTO, ['NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+	hasContent?: boolean,
+) {
+	const { fileId } = req.params;
+	const id = parseInt(fileId ? fileId : '');
+
+	const userRole = getUserRole(req.session);
+	const userInfo = req.session.user;
+
+	if (!isPositiveInteger(id)) {
+		res.status(400).send({ error: ErrorType.INVALID_REQUEST, message: 'Invalid fileId' });
+		return;
+	}
+
+	const result = await getFile({ fileId: id, withBuffer: hasContent });
+
+	if (!result.success) {
+		switch (result.error) {
+			case ErrorType.NOT_FOUND:
+				res.status(404);
+				break;
+			case ErrorType.SYSTEM_ERROR:
+				res.status(500);
+				break;
+			default:
+				res.status(500);
+		}
+		res.send({
+			error: result.error,
+			message: result.message,
+		});
+		return;
+	}
+
+	const isApplicationInstitutionalRep = await isAssociatedRep({
+		session: req.session,
+		applicationId: result.data.applicationId,
+	});
+
+	if (
+		!isApplicationInstitutionalRep ||
+		(userRole === 'APPLICANT' && userInfo?.userId !== result.data.submitterUserId)
+	) {
+		res.status(403).json({
+			error: ErrorType.FORBIDDEN,
+			message: 'Looks like you do not own, or have the rights to access to this file.',
+		});
+		return;
+	}
+
+	res.status(200).send(result.data);
+	return;
+}
 
 fileRouter.get(
 	'/:fileId',
@@ -40,57 +105,26 @@ fileRouter.get(
 		apiZodErrorMapping,
 		async (
 			req: Request,
-			res: ResponseWithData<FilesDTO, ['NOT_FOUND', 'UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			res: ResponseWithData<FilesDTO, ['NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
-			const { fileId } = req.params;
-			const id = parseInt(fileId ? fileId : '');
+			return retrieveFile(req, res, false);
+		},
+	),
+);
 
-			const userRole = getUserRole(req.session);
-			const userInfo = req.session.user;
-
-			if (!isPositiveInteger(id)) {
-				res.status(400).send({ error: 'INVALID_REQUEST', message: 'Invalid fileId' });
-				return;
-			}
-
-			const result = await getFile({ fileId: id });
-
-			if (!result.success) {
-				switch (result.error) {
-					case 'NOT_FOUND':
-						res.status(404);
-						break;
-					case 'SYSTEM_ERROR':
-						res.status(500);
-						break;
-					default:
-						res.status(500);
-				}
-				res.send({
-					error: result.error,
-					message: result.message,
-				});
-				return;
-			}
-
-			const isApplicationInstitutionalRep = await isAssociatedRep({
-				session: req.session,
-				applicationId: result.data.applicationId,
-			});
-
-			if (
-				!isApplicationInstitutionalRep ||
-				(userRole === 'APPLICANT' && userInfo?.userId !== result.data.submitterUserId)
-			) {
-				res.status(403).json({
-					error: 'UNAUTHORIZED',
-					message: 'Looks like you do not own, or have the rights to access to this file.',
-				});
-				return;
-			}
-
-			res.status(200).send(result.data);
-			return;
+fileRouter.get(
+	'/:fileId/download',
+	authMiddleware({
+		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
+	}),
+	withParamsSchemaValidation(
+		fileDeleteParamsSchema,
+		apiZodErrorMapping,
+		async (
+			req: Request,
+			res: ResponseWithData<FilesDTO, ['NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+		) => {
+			return retrieveFile(req, res, true);
 		},
 	),
 );
@@ -100,30 +134,76 @@ fileRouter.post(
 	authMiddleware({
 		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
 	}),
-	fileUploadValidation(async (req: Request<any, { file: formidable.File }>, res: Response) => {
-		const { applicationId } = req.params;
+	fileUploadValidation(
+		async (
+			req: Request<any, { file: formidable.File }>,
+			res: ResponseWithData<
+				Pick<FilesDTO, 'filename' | 'id'>,
+				['SYSTEM_ERROR', 'FORBIDDEN', 'NOT_FOUND', 'INVALID_REQUEST']
+			>,
+		) => {
+			const { applicationId } = req.params;
+			const { file } = req.body;
+			const id = parseInt(applicationId ? applicationId : '');
+			const userSession = req.session;
 
-		const { file } = req.body;
+			if (!isPositiveInteger(id)) {
+				res.status(400).json({ error: ErrorType.INVALID_REQUEST, message: 'Invalid applicationId' });
+				return;
+			}
+			const applicationResult = await getApplicationById({ applicationId: id });
 
-		const id = parseInt(applicationId ? applicationId : '');
+			if (!applicationResult.success) {
+				switch (applicationResult.error) {
+					case ErrorType.NOT_FOUND:
+						res.status(404);
+						break;
+					case ErrorType.SYSTEM_ERROR:
+						res.status(500);
+						break;
+				}
+				res.json({
+					message: applicationResult.message,
+					error: applicationResult.error,
+				});
+				return;
+			}
 
-		if (!isPositiveInteger(id)) {
-			res.status(400).json({ message: 'Invalid applicationId' });
-			return;
-		}
+			if (applicationResult.data.userId !== userSession.user?.userId) {
+				res.status(403).send({
+					error: ErrorType.FORBIDDEN,
+					message: 'You do not own, or are not authorized to upload to this application.',
+				});
+				return;
+			}
 
-		const result = await uploadEthicsFile({ applicationId: id, file });
-		if (result.success) {
-			res.status(200).send({
-				id: result.data.id,
-				filename: result.data.filename,
-			});
-			return;
-		} else {
-			res.status(500).json({ message: result.message, error: 'SYSTEM_ERROR' });
-			return;
-		}
-	}),
+			const result = await uploadEthicsFile({ applicationId: id, file });
+			if (result.success) {
+				res.status(200).send({
+					id: result.data.id,
+					filename: result.data.filename,
+				});
+				return;
+			} else {
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION':
+						res.status(400);
+						break;
+					case ErrorType.NOT_FOUND:
+						res.status(404);
+						break;
+					case ErrorType.SYSTEM_ERROR:
+						res.status(500);
+						break;
+				}
+				res.json({
+					message: result.message,
+					error: result.error !== 'INVALID_STATE_TRANSITION' ? result.error : ErrorType.INVALID_REQUEST,
+				});
+				return;
+			}
+		},
+	),
 );
 
 fileRouter.delete(
@@ -131,51 +211,51 @@ fileRouter.delete(
 	authMiddleware({
 		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
 	}),
-	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
-		const { fileId } = req.params;
-		const id = parseInt(fileId ? fileId : '');
+	withParamsSchemaValidation(
+		fileDeleteParamsSchema,
+		apiZodErrorMapping,
+		async (req: Request, res: ResponseWithData<void, ['FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']>) => {
+			const { fileId } = req.params;
+			const id = parseInt(fileId ? fileId : '');
+			const userSession = req.session;
 
-		if (!isPositiveInteger(id)) {
-			res.status(400).json({ message: 'Invalid fileId' });
+			const file = await getFile({ fileId: id });
+
+			if (!file.success) {
+				if (file.error === ErrorType.NOT_FOUND) {
+					res.status(404);
+				} else {
+					res.status(500);
+				}
+				res.send({
+					error: file.error,
+					message: file.message,
+				});
+				return;
+			}
+
+			if (getUserRole(userSession) !== 'DAC_MEMBER' && file.data.submitterUserId !== userSession.user?.userId) {
+				res.status(403).send({
+					error: ErrorType.FORBIDDEN,
+					message: 'Looks like you do not own, or have the rights to modify this file.',
+				});
+				return;
+			}
+
+			const result = await deleteFile({ fileId: id });
+
+			if (!result.success) {
+				res.status(500).json({
+					error: ErrorType.SYSTEM_ERROR,
+					message: result.message,
+				});
+				return;
+			}
+
+			res.status(204).send();
 			return;
-		}
-
-		const result = await deleteFile({ fileId: id });
-
-		if (!result.success) {
-			res.status(500).json(result);
-			return;
-		}
-
-		res.status(204).send();
-		return;
-	}),
-);
-
-fileRouter.get(
-	'/:fileId/download',
-	authMiddleware({
-		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
-	}),
-	withParamsSchemaValidation(fileDeleteParamsSchema, apiZodErrorMapping, async (req: Request, res: Response) => {
-		const { fileId } = req.params;
-		const id = parseInt(fileId ? fileId : '');
-
-		if (!isPositiveInteger(id)) {
-			res.status(400).send({ message: 'Invalid fileId' });
-			return;
-		}
-
-		const result = await getFile({ fileId: id, withBuffer: true });
-
-		if (!result.success) {
-			res.status(500).send(result);
-			return;
-		}
-
-		res.status(200).send(result.data);
-		return;
-	}),
+		},
+	),
 );
 
 export default fileRouter;
