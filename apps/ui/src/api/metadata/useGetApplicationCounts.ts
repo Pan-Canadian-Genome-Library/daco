@@ -25,7 +25,7 @@ import { ApplicationCountMetadata, ServerError } from '@/global/types';
 
 const useGetApplicationCounts = () => {
 	return useQuery<ApplicationCountMetadata, ServerError>({
-		queryKey: [],
+		queryKey: ['counts'],
 
 		queryFn: async () => {
 			const response = await fetch(`/applications/metadata/counts`).then(withErrorResponseHandler);
