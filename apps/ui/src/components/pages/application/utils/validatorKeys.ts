@@ -24,12 +24,14 @@ import {
 	ApplicationContentsResponse,
 	InstitutionalRepDTO,
 	InstitutionDTO,
+	ProjectDTO,
 } from '@pcgl-daco/data-model';
 import {
 	agreementsSchema,
 	appendicesSchema,
 	applicantInformationSchema,
 	institutionalRepSchema,
+	projectInformationSchema,
 } from '@pcgl-daco/validation';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
@@ -53,4 +55,8 @@ export function isAgreementKey(value: string): value is keyof AgreementDTO {
 
 export function isAppendicesKey(value: string): value is keyof AppendicesDTO {
 	return value in appendicesSchema.keyof().Values;
+}
+// ProjectKey
+export function isProjectKey(value: string): value is keyof ProjectDTO {
+	return value in projectInformationSchema.keyof().Values;
 }
