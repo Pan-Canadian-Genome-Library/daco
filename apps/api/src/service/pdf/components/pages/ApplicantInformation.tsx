@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicantDTO, InstitutionDTO } from '@pcgl-daco/data-model';
+import { ApplicantDTO } from '@pcgl-daco/data-model';
 
 import DataItem from '@/service/pdf/components/DataItem.tsx';
 import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
@@ -54,16 +54,13 @@ const ApplicantInformation = ({
 	| 'applicantInstitutionalEmail'
 	| 'applicantProfileUrl'
 	| 'applicantPositionTitle'
-> &
-	Pick<
-		InstitutionDTO,
-		| 'applicantInstitutionCountry'
-		| 'applicantInstitutionState'
-		| 'applicantInstitutionStreetAddress'
-		| 'applicantInstitutionBuilding'
-		| 'applicantInstitutionCity'
-		| 'applicantInstitutionPostalCode'
-	>) => {
+	| 'applicantInstitutionCountry'
+	| 'applicantInstitutionState'
+	| 'applicantInstitutionStreetAddress'
+	| 'applicantInstitutionBuilding'
+	| 'applicantInstitutionCity'
+	| 'applicantInstitutionPostalCode'
+>) => {
 	return (
 		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Applicant Information (Principal Investigator)</Title>
