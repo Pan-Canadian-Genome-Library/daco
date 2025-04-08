@@ -17,25 +17,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodIssue } from 'zod';
-
-export const ErrorType = {
-	INVALID_REQUEST: 'INVALID_REQUEST',
-	CONFLICT_DETECTED: 'CONFLICT_DETECTED',
-	NOT_FOUND: 'NOT_FOUND',
-	SYSTEM_ERROR: 'SYSTEM_ERROR',
-	UNAUTHORIZED: 'UNAUTHORIZED',
-	FORBIDDEN: 'FORBIDDEN',
-	NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
-} as const;
-
-export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];
-
-export type ErrorResponse = {
-	error: ErrorTypes;
-	message: string;
+const colours = {
+	primary: '#C41D7F',
+	secondary: '#520339',
+	tertiary: '#FFF0F6',
+	grey: '#D9D9D9',
+	lightGrey: '#FAFAFA',
 };
 
-export type RequestValidationError = ErrorResponse & {
-	details: ZodIssue[];
+const textStyles = {
+	fonts: {
+		openSansLight: './src/service/pdf/components/fonts/OpenSans-Light.ttf',
+		openSansRegular: './src/service/pdf/components/fonts/OpenSans-Regular.ttf',
+		openSansBold: './src/service/pdf/components/fonts/OpenSans-Bold.ttf',
+		leagueSpartanLight: './src/service/pdf/components/fonts/LeagueSpartan-Light.ttf',
+		leagueSpartanRegular: './src/service/pdf/components/fonts/LeagueSpartan-Regular.ttf',
+		leagueSpartanBold: './src/service/pdf/components/fonts/LeagueSpartan-Bold.ttf',
+	},
+	sizes: {
+		sm: '8.75pt',
+		md: '10.5pt',
+		lg: '15.12pt',
+		xl: '18.14pt',
+		xxl: '21.77pt',
+	},
 };
+
+const standardStyles = {
+	textStyles,
+	colours,
+};
+
+export { standardStyles };

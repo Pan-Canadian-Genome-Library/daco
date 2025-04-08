@@ -17,25 +17,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodIssue } from 'zod';
+import { StyleSheet, Text } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
 
-export const ErrorType = {
-	INVALID_REQUEST: 'INVALID_REQUEST',
-	CONFLICT_DETECTED: 'CONFLICT_DETECTED',
-	NOT_FOUND: 'NOT_FOUND',
-	SYSTEM_ERROR: 'SYSTEM_ERROR',
-	UNAUTHORIZED: 'UNAUTHORIZED',
-	FORBIDDEN: 'FORBIDDEN',
-	NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
-} as const;
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+interface TitleProps {
+	level?: 'h1' | 'h2';
+	breakLine?: boolean;
+	children: ReactNode;
+}
 
-export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];
+const styles = StyleSheet.create({
+	title: {
+		fontFamily: 'LeagueSpartan',
+		fontWeight: 'bold',
+	},
+});
 
-export type ErrorResponse = {
-	error: ErrorTypes;
-	message: string;
+const Title = ({ level = 'h1', children, breakLine = false }: TitleProps) => {
+	return (
+		<Text
+			break={breakLine}
+			style={{
+				...styles.title,
+				fontSize: level === 'h1' ? standardStyles.textStyles.sizes.xl : standardStyles.textStyles.sizes.lg,
+			}}
+		>
+			{children}
+		</Text>
+	);
 };
 
-export type RequestValidationError = ErrorResponse & {
-	details: ZodIssue[];
-};
+export default Title;

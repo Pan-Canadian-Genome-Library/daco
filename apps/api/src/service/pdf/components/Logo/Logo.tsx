@@ -17,25 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodIssue } from 'zod';
+import { Image, NodeProps } from '@react-pdf/renderer';
 
-export const ErrorType = {
-	INVALID_REQUEST: 'INVALID_REQUEST',
-	CONFLICT_DETECTED: 'CONFLICT_DETECTED',
-	NOT_FOUND: 'NOT_FOUND',
-	SYSTEM_ERROR: 'SYSTEM_ERROR',
-	UNAUTHORIZED: 'UNAUTHORIZED',
-	FORBIDDEN: 'FORBIDDEN',
-	NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
-} as const;
-
-export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];
-
-export type ErrorResponse = {
-	error: ErrorTypes;
-	message: string;
+const Logo = ({ style }: Pick<NodeProps, 'style'>) => {
+	return <Image style={{ ...style }} src={'./src/service/pdf/components/Logo/pcgl-logo.png'} />;
 };
 
-export type RequestValidationError = ErrorResponse & {
-	details: ZodIssue[];
-};
+export default Logo;

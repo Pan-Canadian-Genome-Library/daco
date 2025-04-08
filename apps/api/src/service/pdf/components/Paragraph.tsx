@@ -17,25 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodIssue } from 'zod';
+import { StyleSheet, Text } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
 
-export const ErrorType = {
-	INVALID_REQUEST: 'INVALID_REQUEST',
-	CONFLICT_DETECTED: 'CONFLICT_DETECTED',
-	NOT_FOUND: 'NOT_FOUND',
-	SYSTEM_ERROR: 'SYSTEM_ERROR',
-	UNAUTHORIZED: 'UNAUTHORIZED',
-	FORBIDDEN: 'FORBIDDEN',
-	NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
-} as const;
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 
-export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];
-
-export type ErrorResponse = {
-	error: ErrorTypes;
-	message: string;
+const styles = StyleSheet.create({
+	paragraph: {
+		fontFamily: 'OpenSans',
+		fontWeight: 'normal',
+		lineHeight: '1rem',
+		fontSize: standardStyles.textStyles.sizes.md,
+	},
+});
+const Paragraph = ({ children, notice, breakLine }: { children: ReactNode; notice?: boolean; breakLine?: boolean }) => {
+	return (
+		<Text break={breakLine} style={{ ...styles.paragraph, color: notice ? standardStyles.colours.primary : '#000' }}>
+			{children}
+		</Text>
+	);
 };
 
-export type RequestValidationError = ErrorResponse & {
-	details: ZodIssue[];
-};
+export default Paragraph;

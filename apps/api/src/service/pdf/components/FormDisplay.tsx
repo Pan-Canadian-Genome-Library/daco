@@ -17,25 +17,49 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ZodIssue } from 'zod';
+import { StyleSheet, View } from '@react-pdf/renderer';
+import { ReactNode } from 'react';
 
-export const ErrorType = {
-	INVALID_REQUEST: 'INVALID_REQUEST',
-	CONFLICT_DETECTED: 'CONFLICT_DETECTED',
-	NOT_FOUND: 'NOT_FOUND',
-	SYSTEM_ERROR: 'SYSTEM_ERROR',
-	UNAUTHORIZED: 'UNAUTHORIZED',
-	FORBIDDEN: 'FORBIDDEN',
-	NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
-} as const;
+import Title from '@/service/pdf/components/Title.tsx';
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 
-export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];
+interface FormDisplay {
+	title: string;
+	children: ReactNode;
+	fixed?: boolean;
+	wrap?: boolean;
+	breakLineInTitle?: boolean;
+}
 
-export type ErrorResponse = {
-	error: ErrorTypes;
-	message: string;
+const styles = StyleSheet.create({
+	form: {
+		marginTop: standardStyles.textStyles.sizes.xl,
+		display: 'flex',
+		flexDirection: 'column',
+	},
+	formTitle: {
+		marginBottom: standardStyles.textStyles.sizes.lg,
+	},
+	formItems: {
+		display: 'flex',
+		flexDirection: 'column',
+		gap: standardStyles.textStyles.sizes.md,
+	},
+});
+
+const FormDisplay = ({ title, children, fixed = false, wrap = true, breakLineInTitle = false }: FormDisplay) => {
+	return (
+		<View style={styles.form} fixed={fixed} wrap={wrap}>
+			<View style={styles.formItems} wrap={wrap}>
+				<View style={styles.formTitle}>
+					<Title breakLine={breakLineInTitle} level="h2">
+						{title}
+					</Title>
+				</View>
+				{children}
+			</View>
+		</View>
+	);
 };
 
-export type RequestValidationError = ErrorResponse & {
-	details: ZodIssue[];
-};
+export default FormDisplay;

@@ -163,6 +163,7 @@ export type ProjectDTO = {
 export type EthicsLetterDTO = {
 	ethicsLetter?: number | null;
 	ethicsReviewRequired?: boolean | null;
+	signedPdf?: number | null;
 };
 
 export interface RequestedStudiesDTO {
@@ -342,10 +343,10 @@ export interface FilesDTO {
 	id: number;
 	applicationId: number;
 	type: FileType;
-	submitterUserId: number;
+	submitterUserId: string;
 	submittedAt: Date;
 	content: any;
-	filename: string;
+	filename: string | null;
 }
 
 export interface SignatureDTO {

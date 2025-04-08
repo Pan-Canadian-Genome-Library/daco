@@ -18,11 +18,11 @@
  */
 
 import { ZodError } from 'zod';
-import { ErrorName, RequestValidationError } from './types.js';
+import { ErrorType, RequestValidationError } from './types.js';
 
 /**
  * Convert a ZodError from ZodSchema validation into an HTTP Error response message
- * of type `REQUEST_VALIDATION_ERROR`.
+ * of type `INVALID_REQUEST`.
  * @param error Zod Error from parse
  * @returns
  */
@@ -30,7 +30,7 @@ export const RequestValidationErrorResponse = <T>(
 	error: ZodError<T>,
 	customMessage?: string,
 ): RequestValidationError => ({
-	error: ErrorName.REQUEST_VALIDATION_ERROR,
+	error: ErrorType.INVALID_REQUEST,
 	message: customMessage ?? 'The request is invalid.',
 	details: error.issues,
 });

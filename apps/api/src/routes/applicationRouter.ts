@@ -21,6 +21,7 @@ import {
 	approveApplication,
 	closeApplication,
 	createApplication,
+	createApplicationPDF,
 	dacRejectApplication,
 	editApplication,
 	getAllApplications,
@@ -33,6 +34,7 @@ import {
 	submitApplication,
 	submitRevision,
 } from '@/controllers/applicationController.js';
+
 import {
 	RevisionRequestModel,
 	type ApplicationRecord,
@@ -303,7 +305,7 @@ applicationRouter.get(
 			const { data } = result;
 
 			// Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER
-			if (data.userId !== userId || getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER) {
+			if (data.userId !== userId || getUserRole(request.session) !== userRoleSchema.Values.DAC_MEMBER) {
 				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 				return;
 			}
@@ -349,10 +351,13 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/approve',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	async (
 		request,
-		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+		response: ResponseWithData<
+			{ message: string; data: ApplicationRecord },
+			['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']
+		>,
 	) => {
 		const { applicationId }: { applicationId: unknown } = request.body;
 
@@ -365,22 +370,45 @@ applicationRouter.post(
 		}
 
 		try {
-			const result = await approveApplication({ applicationId });
+			const approvalResult = await approveApplication({ applicationId });
 
-			if (result.success) {
-				response.status(200).json({
-					message: 'Application approved successfully.',
-					data: result.data,
-				});
-				return;
+			if (approvalResult.success) {
+				/**
+				 * We want to auto generate a PDF on successful approval, as such call the local createApplicationPDF function.
+				 */
+				const pdfGenerate = await createApplicationPDF({ applicationId });
+				if (pdfGenerate.success) {
+					response.status(200).json({
+						message: 'Application was successfully approved and its corresponding PDF was successfully generated.',
+						data: approvalResult.data,
+					});
+					return;
+				}
+
+				switch (pdfGenerate.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({
+							error: 'NOT_FOUND',
+							message:
+								'Application was approved, but PDF was unable to be generated because required data was not found.',
+						});
+						return;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({
+							error: 'SYSTEM_ERROR',
+							message: `Application was successfully approved, however, a PDF generation error occurred. ${pdfGenerate.message}`,
+						});
+						return;
+				}
 			}
-			switch (result.error) {
+
+			switch (approvalResult.error) {
 				case 'INVALID_STATE_TRANSITION': {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					response.status(400).json({ error: 'INVALID_REQUEST', message: approvalResult.message });
 					return;
 				}
 				case 'SYSTEM_ERROR': {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: approvalResult.message });
 					return;
 				}
 				case 'NOT_FOUND': {
