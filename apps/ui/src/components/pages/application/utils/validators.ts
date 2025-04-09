@@ -22,6 +22,7 @@ import {
 	ValidatorEthics,
 	ValidatorInstitution,
 	ValidatorProject,
+	ValidatorStudy,
 } from '@/components/pages/application/utils/validatorFunctions';
 import {
 	isApplicantKey,
@@ -111,7 +112,7 @@ export const VerifyFormSections = (
 		[SectionRoutes.INSTITUTIONAL]: fields ? ValidatorInstitution(fields) : false,
 		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
-		[SectionRoutes.STUDY]: false,
+		[SectionRoutes.STUDY]: fields ? ValidatorStudy(fields) : false,
 		[SectionRoutes.ETHICS]: fields ? ValidatorEthics(fields) : false,
 		[SectionRoutes.AGREEMENT]: false,
 		[SectionRoutes.APPENDICES]: false,
