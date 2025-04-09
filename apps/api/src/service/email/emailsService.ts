@@ -20,19 +20,21 @@
 import BaseLogger from '@/logger.ts';
 import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
-import { EmailSubjectsType } from './types.ts';
+import { createPlainTextEmail } from './layouts/renderPlainText.ts';
+import { GenerateEmailApplicantDisapproval } from './layouts/templates/GenerateEmailApplicantDisapproval.ts';
 
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
-	sendEmail: async ({}: { from?: string; to?: string; subject?: EmailSubjectsType; template?: any }) => {
+	sendEmailApplicantDisapproval: async ({ from, to, lang = 'en' }: { from: string; to: string; lang?: string }) => {
 		try {
 			emailClient.sendMail({
-				from: 'sender@example.com',
-				to: 'recipient@example.com',
-				subject: 'Yurrh Email',
-				text: 'Hello from MailHog!',
-				html: '<p>Hello from MailHog!</p>',
+				from,
+				to,
+				subject: 'DACO Application Status',
+				html: GenerateEmailApplicantDisapproval(),
+				text: createPlainTextEmail(),
+				// TODO: figure out how to insert image?
 			});
 		} catch (error) {
 			const message = `Error sending email to recipient.`;

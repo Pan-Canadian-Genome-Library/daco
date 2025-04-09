@@ -3,6 +3,12 @@
 </mj-style>
 <!-- Header -->
 <mj-style inline="inline">
+  * {
+    box-sizing: border-box;
+    font-size: 1rem !important;
+    line-height: 1.625 !important;
+  }
+
   .logo img {
     margin: 0 auto;
     width: 12.75rem !important;
@@ -25,5 +31,24 @@
 
   .footer-text div a {
     color: #ffffff !important;
+  }
+
+
+  .section-wrapper {
+    margin: auto;
+    padding: 1.25rem
+  }
+
+  .main-content {
+    padding: 2.3125rem 2rem !important;
+  }
+
+  .main-content-text div {
+    text-align: left !important;
+    margin-bottom: 1.5rem;
+  }
+
+  .main-content-text div a {
+    color: #286c77 !important;
   }
 </mj-style>
