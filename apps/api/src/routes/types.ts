@@ -29,6 +29,7 @@ export type ApplicationListRequest = {
 	sort?: Array<OrderBy<ApplicationsColumnName>>;
 	page?: number;
 	pageSize?: number;
+	isDACMember?: boolean;
 };
 
 /**
