@@ -886,19 +886,19 @@ applicationRouter.post(
 	),
 );
 
+//TODO: Auth validation.
 applicationRouter.get(
 	'/:applicationId/revisions',
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
 		async (
 			request,
-			response: ResponseWithData<
-				RevisionRequestModel[],
-				['UNAUTHORIZED', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']
-			>,
+			response: ResponseWithData<RevisionRequestModel[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const { applicationId } = request.params;
+			const userSession = request.session;
 
 			if (!applicationId || isNaN(Number(applicationId))) {
 				response.status(400).json({
@@ -909,19 +909,52 @@ applicationRouter.get(
 			}
 
 			try {
-				// Fetch all revisions for the application
-				const result = await getRevisions({ applicationId: Number(applicationId) });
+				const applicationInfo = await getApplicationById({ applicationId: Number(applicationId) });
 
-				if (!result.success) {
-					response.json({ error: result.error, message: result.message });
+				if (!applicationInfo.success) {
+					switch (applicationInfo.error) {
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						case 'SYSTEM_ERROR':
+						default:
+							response.status(500);
+							break;
+					}
+					response.send({
+						error: applicationInfo.error,
+						message: applicationInfo.message,
+					});
 					return;
 				}
 
+				if (getUserRole(userSession) === 'APPLICANT' && applicationInfo.data.userId !== userSession.user?.userId) {
+					response.status(403).send({
+						error: 'FORBIDDEN',
+						message: 'You do not own, or have the rights to access this application.',
+					});
+					return;
+				}
+
+				const result = await getRevisions({ applicationId: Number(applicationId) });
+
+				//Service only returns this if a SYSTEM_ERROR occurs, set to HTTP code 500 and bail if this is the case.
+				if (!result.success) {
+					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+
+				/**
+				 * If the controller and service are successful but returns us an empty array,
+				 * this means that there are no associated revisions to this application.
+				 * we should thus let the client know by returning a 404.
+				 **/
 				if (!result.data.length) {
 					response.status(404).send({
 						error: 'NOT_FOUND',
 						message: 'No revisions related to this application could be found.',
 					});
+					return;
 				}
 
 				response.status(200).json(result.data);
