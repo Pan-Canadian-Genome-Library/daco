@@ -199,7 +199,7 @@ collaboratorsRouter.delete(
 			>,
 		) => {
 			try {
-				const collaboratorId = Number(request.params.collaborator_id);
+				const collaboratorId = Number(request.params.collaboratorId);
 
 				if (!isPositiveInteger(collaboratorId)) {
 					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Collaborator ID is not a valid number.' });
@@ -283,7 +283,7 @@ collaboratorsRouter.post(
 			request,
 			response: ResponseWithData<
 				ListCollaboratorResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'DUPLICATE_RECORD']
 			>,
 		) => {
 			try {
@@ -320,6 +320,10 @@ collaboratorsRouter.post(
 					}
 					case 'FORBIDDEN': {
 						response.status(403).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'DUPLICATE_RECORD': {
+						response.status(409).json({ error: result.error, message: result.message });
 						return;
 					}
 				}

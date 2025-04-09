@@ -21,9 +21,15 @@ import {
 	ValidatorApplicant,
 	ValidatorEthics,
 	ValidatorInstitution,
+	ValidatorProject,
 } from '@/components/pages/application/utils/validatorFunctions';
-import { isApplicantKey, isEthicsKey, isInstitutionalKey } from '@/components/pages/application/utils/validatorKeys';
-import { SectionRoutes } from '@/pages/AppRouter';
+import {
+	isApplicantKey,
+	isEthicsKey,
+	isInstitutionalKey,
+	isProjectKey,
+} from '@/components/pages/application/utils/validatorKeys';
+import { SectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
 export type VerifyPageSectionsType<T extends string> = {
@@ -39,7 +45,7 @@ export type VerifyPageSectionsType<T extends string> = {
  *
  */
 export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
-	let sectionTouched: VerifyPageSectionsType<SectionRoutes> = {
+	let sectionTouched: VerifyPageSectionsType<SectionRoutesValues> = {
 		[SectionRoutes.APPLICANT]: false,
 		[SectionRoutes.INSTITUTIONAL]: false,
 		[SectionRoutes.INTRO]: false,
@@ -72,6 +78,11 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 				...sectionTouched,
 				ethics: true,
 			};
+		} else if (isProjectKey(key) && value !== null) {
+			sectionTouched = {
+				...sectionTouched,
+				project: true,
+			};
 		}
 	});
 
@@ -85,13 +96,15 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
  *
  *  Verify each section with zod if there are errors on their fields using
  */
-export const VerifyFormSections = (fields?: ApplicationContentsResponse): VerifyPageSectionsType<SectionRoutes> => {
+export const VerifyFormSections = (
+	fields?: ApplicationContentsResponse,
+): VerifyPageSectionsType<SectionRoutesValues> => {
 	return {
+		[SectionRoutes.INTRO]: false,
 		[SectionRoutes.APPLICANT]: fields ? ValidatorApplicant(fields) : false,
 		[SectionRoutes.INSTITUTIONAL]: fields ? ValidatorInstitution(fields) : false,
-		[SectionRoutes.INTRO]: false,
 		[SectionRoutes.COLLABORATORS]: false,
-		[SectionRoutes.PROJECT]: false,
+		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
 		[SectionRoutes.STUDY]: false,
 		[SectionRoutes.ETHICS]: fields ? ValidatorEthics(fields) : false,
 		[SectionRoutes.AGREEMENT]: false,

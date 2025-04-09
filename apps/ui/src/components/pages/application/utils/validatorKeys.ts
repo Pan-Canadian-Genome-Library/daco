@@ -18,13 +18,19 @@
  */
 
 import {
-	ApplicantDTO,
-	ApplicationContentsResponse,
-	EthicsLetterDTO,
-	InstitutionalRepDTO,
-	InstitutionDTO,
+	type ApplicantDTO,
+	type ApplicationContentsResponse,
+	type EthicsLetterDTO,
+	type InstitutionalRepDTO,
+	type InstitutionDTO,
+	type ProjectDTO,
 } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, ethicsSchema, institutionalRepSchema } from '@pcgl-daco/validation';
+import {
+	applicantInformationSchema,
+	ethicsSchema,
+	institutionalRepSchema,
+	projectInformationSchema,
+} from '@pcgl-daco/validation';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
 export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
@@ -44,4 +50,9 @@ export function isInstitutionalKey(value: string): value is keyof InstitutionalK
 // EthicsKey
 export function isEthicsKey(value: string): value is keyof EthicsLetterDTO {
 	return value in ethicsSchema.keyof().Values;
+}
+
+// ProjectKey
+export function isProjectKey(value: string): value is keyof ProjectDTO {
+	return value in projectInformationSchema.keyof().Values;
 }
