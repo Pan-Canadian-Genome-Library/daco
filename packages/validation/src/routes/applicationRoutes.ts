@@ -65,6 +65,7 @@ export const applicationContentsSchema = z
 		projectPublicationUrls: z.array(z.string()).nullable(),
 		ethicsReviewRequired: z.boolean().nullable(),
 		ethicsLetter: z.number().nullable(),
+		requestedStudies: z.array(z.string()).nullable(),
 	})
 	.partial();
 
