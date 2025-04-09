@@ -23,6 +23,7 @@ import {
 	ethicsSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
+	requestedStudiesSchema,
 } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
@@ -84,5 +85,11 @@ export const ValidatorEthics = (fields: ApplicationContentsResponse): boolean =>
 	return ethicsSchema.safeParse({
 		ethicsReviewRequired: fields.ethicsReviewRequired,
 		ethicsLetter: fields.ethicsLetter,
+	}).success;
+};
+
+export const ValidatorStudy = (fields: ApplicationContentsResponse): boolean => {
+	return requestedStudiesSchema.safeParse({
+		requestedStudies: fields.requestedStudies,
 	}).success;
 };

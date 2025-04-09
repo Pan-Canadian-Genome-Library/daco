@@ -24,12 +24,14 @@ import {
 	type InstitutionalRepDTO,
 	type InstitutionDTO,
 	type ProjectDTO,
+	type RequestedStudiesDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicantInformationSchema,
 	ethicsSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
+	requestedStudiesSchema,
 } from '@pcgl-daco/validation';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
@@ -50,6 +52,10 @@ export function isInstitutionalKey(value: string): value is keyof InstitutionalK
 // EthicsKey
 export function isEthicsKey(value: string): value is keyof EthicsLetterDTO {
 	return value in ethicsSchema.keyof().Values;
+}
+// RequestedStudyKey
+export function isRequestedStudies(value: string): value is keyof RequestedStudiesDTO {
+	return value in requestedStudiesSchema.keyof().Values;
 }
 
 // ProjectKey
