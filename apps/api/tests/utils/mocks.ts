@@ -23,12 +23,11 @@ import {
 	type ApplicationActionService,
 	type ApplicationRecord,
 	type ApplicationService,
-	type ApplicationStateTotals,
 	type JoinedApplicationRecord,
 	type RevisionRequestRecord,
 } from '@/service/types.ts';
-import { success, type AsyncResult } from '@/utils/results.ts';
-import { ApplicationListResponse, ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { success } from '@/utils/results.ts';
+import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { testApplicationId, testUserId } from '@tests/utils/testUtils.ts';
 import { mock, type Mock } from 'node:test';
 
@@ -85,33 +84,32 @@ const baseTestActionRecord: ApplicationActionRecord = {
 };
 
 export const mockApplicationRepo: ApplicationService = {
-	createApplication: (): AsyncResult<ApplicationRecord> => new Promise(() => success(testApplicationRecord)),
-	editApplication: (): AsyncResult<JoinedApplicationRecord> => new Promise(() => success(testJoinedApplicationRecord)),
-	findOneAndUpdate: (): AsyncResult<ApplicationRecord> => new Promise(() => success(testApplicationRecord)),
-	getApplicationById: (): AsyncResult<ApplicationRecord> => new Promise(() => success(testApplicationRecord)),
-	getApplicationWithContents: (): AsyncResult<JoinedApplicationRecord> =>
-		new Promise(() => success(testJoinedApplicationRecord)),
-	listApplications: (): AsyncResult<ApplicationListResponse> => new Promise(() => success(testJoinedApplicationRecord)),
-	applicationStateTotals: (): AsyncResult<ApplicationStateTotals> =>
-		new Promise(() => success(testJoinedApplicationRecord)),
-	createRevisionRequest: (): AsyncResult<RevisionRequestRecord> =>
-		new Promise(() => success(testRevisionRequestRecord)),
+	createApplication: () => new Promise(() => success(testApplicationRecord)),
+	editApplication: () => new Promise(() => success(testJoinedApplicationRecord)),
+	findOneAndUpdate: () => new Promise(() => success(testApplicationRecord)),
+	getApplicationById: () => new Promise(() => success(testApplicationRecord)),
+	getApplicationWithContents: () => new Promise(() => success(testJoinedApplicationRecord)),
+	listApplications: () => new Promise(() => success(testJoinedApplicationRecord)),
+	applicationStateTotals: () => new Promise(() => success(testJoinedApplicationRecord)),
+	createRevisionRequest: () => new Promise(() => success(testRevisionRequestRecord)),
+	getApplicationForCollaboratorId: () => new Promise(() => success(testApplicationRecord)),
+	getRevisions: () => new Promise(() => success([testRevisionRequestRecord])),
 };
 
 export const mockActionRepo: ApplicationActionService = {
-	close: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	draftSubmit: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	dacApproved: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	dacRejected: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	dacRevision: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	dacSubmit: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	repRevision: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	repSubmit: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	repApproved: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	revoke: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	withdraw: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	getActionById: async (): AsyncResult<ApplicationActionRecord> => new Promise(() => success(baseTestActionRecord)),
-	listActions: async (): AsyncResult<ApplicationActionRecord[]> => new Promise(() => success([baseTestActionRecord])),
+	close: async () => new Promise(() => success(baseTestActionRecord)),
+	draftSubmit: async () => new Promise(() => success(baseTestActionRecord)),
+	dacApproved: async () => new Promise(() => success(baseTestActionRecord)),
+	dacRejected: async () => new Promise(() => success(baseTestActionRecord)),
+	dacRevision: async () => new Promise(() => success(baseTestActionRecord)),
+	dacSubmit: async () => new Promise(() => success(baseTestActionRecord)),
+	repRevision: async () => new Promise(() => success(baseTestActionRecord)),
+	repSubmit: async () => new Promise(() => success(baseTestActionRecord)),
+	repApproved: async () => new Promise(() => success(baseTestActionRecord)),
+	revoke: async () => new Promise(() => success(baseTestActionRecord)),
+	withdraw: async () => new Promise(() => success(baseTestActionRecord)),
+	getActionById: async () => new Promise(() => success(baseTestActionRecord)),
+	listActions: async () => new Promise(() => success([baseTestActionRecord])),
 };
 
 export const mockApplicationDb = Object.keys(applicationSvc).reduce(

@@ -146,7 +146,7 @@ describe('Collaborators Controller', { skip: true }, () => {
 			const result = await createCollaborators({ application_id, user_id, collaborators });
 
 			assert.ok(!result.success);
-			assert.strictEqual(result.errors, `DuplicateRecords`);
+			assert.strictEqual(result, `DUPLICATE_RECORD`);
 		});
 	});
 

@@ -98,7 +98,7 @@ describe('File API', () => {
 				const result = await submitRevision({ applicationId: 9999 });
 
 				assert.ok(!result.success);
-				assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+				assert.strictEqual(result, 'NOT_FOUND');
 			});
 		});
 	});

@@ -25,7 +25,7 @@ import {
 	editApplication,
 	getApplicationById,
 	getApplicationStateTotals,
-	rejectApplication,
+	// rejectApplication,
 	requestApplicationRevisionsByDac,
 	submitRevision,
 } from '@/controllers/applicationController.js';
@@ -156,9 +156,7 @@ describe('Application API', () => {
 
 			assert.ok(!result.success);
 
-			const error_message = String(result.errors);
-
-			assert.strictEqual(error_message, 'Error: Application record is undefined');
+			assert.strictEqual(result.message, 'Error: Application record is undefined');
 		});
 	});
 
@@ -172,7 +170,7 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const result = await getApplicationStateTotals({ userId: user_id });
+			const result = await getApplicationStateTotals();
 
 			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
 				(apps) => apps.state === 'DRAFT',
@@ -201,23 +199,20 @@ describe('Application API', () => {
 	});
 
 	describe('Reject Application', { skip: true }, () => {
-		it('should successfully reject an application in DAC_REVIEW state', async () => {
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-
-			const { id } = applicationRecordsResult.data.applications[0];
-			await mockApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
-
-			const result = await rejectApplication({ applicationId: id });
-			assert.ok(result.success);
-
-			const rejectedApplication = await getApplicationById({ applicationId: id });
-			assert.ok(rejectedApplication.success);
-			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
-		});
+		// it('should successfully reject an application in DAC_REVIEW state', async () => {
+		// 	const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+		// 	assert.ok(applicationRecordsResult.success);
+		// 	assert.ok(
+		// 		Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+		// 	);
+		// 	const { id } = applicationRecordsResult.data.applications[0];
+		// 	await mockApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
+		// 	const result = await rejectApplication({ applicationId: id });
+		// 	assert.ok(result.success);
+		// 	const rejectedApplication = await getApplicationById({ applicationId: id });
+		// 	assert.ok(rejectedApplication.success);
+		// 	assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
+		// });
 	});
 
 	describe('Submit Revision', { skip: true }, () => {
@@ -236,7 +231,7 @@ describe('Application API', () => {
 			const result = await submitRevision({ applicationId: 9999 });
 
 			assert.ok(!result.success);
-			assert.strictEqual(String(result.errors), 'Error: Application record is undefined');
+			assert.strictEqual(result.message, 'SYSTEM_ERROR');
 		});
 	});
 
@@ -248,12 +243,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
-			const role = 'DAC';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
-				role,
 				revisionData: revisionRequestData,
 			});
 
@@ -268,12 +261,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 			const { id } = applicationRecordsResult.data.applications[0];
-			const role = 'DAC';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
-				role,
 				revisionData: revisionRequestData,
 			});
 
@@ -284,12 +275,10 @@ describe('Application API', () => {
 		it('should handle errors gracefully', async () => {
 			// Arrange: Force an error
 			const invalidApplicationId = -1;
-			const role = 'DAC';
 
 			// Act: Call the function
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: invalidApplicationId,
-				role,
 				revisionData: revisionRequestData,
 			});
 
