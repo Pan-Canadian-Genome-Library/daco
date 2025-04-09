@@ -894,8 +894,8 @@ applicationRouter.get(
 		async (
 			request,
 			response: ResponseWithData<
-				{ message: string; data: RevisionRequestModel[] },
-				['UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']
+				RevisionRequestModel[],
+				['UNAUTHORIZED', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']
 			>,
 		) => {
 			const { applicationId } = request.params;
@@ -912,18 +912,25 @@ applicationRouter.get(
 				// Fetch all revisions for the application
 				const result = await getRevisions({ applicationId: Number(applicationId) });
 
-				if (result.success) {
-					response.status(200).json({
-						message: 'Revisions fetched successfully.',
-						data: result.data,
-					});
+				if (!result.success) {
+					response.json({ error: result.error, message: result.message });
 					return;
 				}
 
-				response.status(500).json({ error: result.error, message: result.message });
+				if (!result.data.length) {
+					response.status(404).send({
+						error: 'NOT_FOUND',
+						message: 'No revisions related to this application could be found.',
+					});
+				}
+
+				response.status(200).json(result.data);
 				return;
 			} catch (error) {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: "We're sorry, an unexpected error occurred. Please try again later.",
+				});
 				return;
 			}
 		},
