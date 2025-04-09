@@ -42,12 +42,12 @@ export const applicantInformationSchema = z.object({
 	applicantInstituteEmail: NonEmptyString.email(),
 	applicantProfileUrl: NonEmptyString.url(),
 	applicantPositionTitle: NonEmptyString,
-	applicantInstituteCountry: NonEmptyString,
-	applicantInstituteState: NonEmptyString,
-	applicantInstituteCity: NonEmptyString,
-	applicantInstitutePostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
-	applicantInstituteStreetAddress: NonEmptyString,
-	applicantInstituteBuilding: EmptyOrOptionalString,
+	applicantInstitutionCountry: NonEmptyString,
+	applicantInstitutionState: NonEmptyString,
+	applicantInstitutionCity: NonEmptyString,
+	applicantInstitutionPostalCode: NonEmptyString.regex(ONLY_ALPHANUMERIC),
+	applicantInstitutionStreetAddress: NonEmptyString,
+	applicantInstitutionBuilding: EmptyOrOptionalString,
 });
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 
@@ -89,9 +89,9 @@ export const projectInformationSchema = z.object({
 	projectWebsite: OptionalURLString,
 	projectBackground: Concise200WordCountString,
 	projectAims: Concise200WordCountString,
-	projectDataUse: Concise200WordCountString,
 	projectMethodology: Concise200WordCountString,
-	projectLaySummary: Concise250WordCountString,
+	projectSummary: Concise250WordCountString,
+	projectPublicationUrls: z.array(z.string()).max(3),
 	relevantPublicationURL1: NonEmptyString.url(),
 	relevantPublicationURL2: NonEmptyString.url(),
 	relevantPublicationURL3: NonEmptyString.url(),
@@ -104,10 +104,17 @@ export const ethicsSchema = z.object({
 
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
-export const requestedStudySchema = z.object({
-	requestedStudy: z.number().nonnegative(),
+export const requestedStudiesSchema = z.object({
+	requestedStudies: z.array(z.string()).superRefine((study, context) => {
+		if (study.length !== 1) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'requiredField' },
+			});
+		}
+	}),
 });
-export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+export type RequestedStudiesSchemaType = z.infer<typeof requestedStudiesSchema>;
 
 export const agreementsSchema = z.object({
 	agreements: z.array(z.string()).superRefine((allAgreements, context) => {

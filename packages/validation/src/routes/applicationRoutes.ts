@@ -35,6 +35,12 @@ export const applicationContentsSchema = z
 		applicantPrimaryAffiliation: z.string().nullable(),
 		applicantInstitutionalEmail: z.string().nullable(),
 		applicantProfileUrl: z.string().nullable(),
+		applicantInstitutionCountry: z.string().nullable(),
+		applicantInstitutionStreetAddress: z.string().nullable(),
+		applicantInstitutionState: z.string().nullable(),
+		applicantInstitutionCity: z.string().nullable(),
+		applicantInstitutionPostalCode: z.string().nullable(),
+		applicantInstitutionBuilding: z.string().nullable(),
 		institutionalRepTitle: z.string().nullable(),
 		institutionalRepFirstName: z.string().nullable(),
 		institutionalRepMiddleName: z.string().nullable(),
@@ -54,9 +60,12 @@ export const applicationContentsSchema = z
 		projectWebsite: z.string().nullable(),
 		projectAims: z.string().nullable(),
 		projectMethodology: z.string().nullable(),
+		projectBackground: z.string().nullable(),
 		projectSummary: z.string().nullable(),
+		projectPublicationUrls: z.array(z.string()).nullable(),
 		ethicsReviewRequired: z.boolean().nullable(),
 		ethicsLetter: z.number().nullable(),
+		requestedStudies: z.array(z.string()).nullable(),
 	})
 	.partial();
 

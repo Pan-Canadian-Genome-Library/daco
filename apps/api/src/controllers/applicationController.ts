@@ -98,11 +98,24 @@ export const editApplication = async ({
  * @param sort - sorting options
  * @param page - page offset
  * @param pageSize - page limit
+ * @param isDACMember - Boolean which represents if the user is a DAC Member (they can see all applications)
  * @returns Success with list of Applications / Failure with Error
  */
-export const getAllApplications = async ({ userId, state, sort, page, pageSize }: ApplicationListRequest) => {
+export const getAllApplications = async ({
+	userId,
+	state,
+	sort,
+	page,
+	pageSize,
+	isDACMember,
+}: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
+
+	if (isDACMember) {
+		//If we set UserID to undefined, it will not add in the where clause for limiting by userID.
+		userId = undefined;
+	}
 
 	const result = await applicationRepo.listApplications({ user_id: userId, state, sort, page, pageSize });
 

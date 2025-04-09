@@ -21,6 +21,7 @@ import { Col, Layout, Row } from 'antd';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { ServerError } from '@/global/types';
+import React from 'react';
 
 const { Content } = Layout;
 
@@ -29,10 +30,15 @@ type ErrorProps = {
 	error: ServerError | null;
 };
 
+const errorStyles: React.CSSProperties = {
+	paddingLeft: '1.5rem',
+	paddingTop: '1.5rem',
+};
+
 const ErrorPage = ({ error, loading }: ErrorProps) => {
 	return (
 		<Content>
-			<Row style={{ ...contentWrapperStyles }}>
+			<Row style={{ ...contentWrapperStyles, ...errorStyles }}>
 				{loading ? (
 					<SkeletonLoader />
 				) : (
