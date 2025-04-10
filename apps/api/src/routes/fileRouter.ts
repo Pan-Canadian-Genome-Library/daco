@@ -27,7 +27,7 @@ import { ErrorType, fileUploadValidation, withParamsSchemaValidation } from '@pc
 import { fileDeleteParamsSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
 import formidable from 'formidable';
-import { ResponseWithData } from './types.ts';
+import type { ResponseWithData } from './types.ts';
 
 const fileRouter = express.Router();
 
@@ -77,18 +77,15 @@ async function retrieveFile(
 
 	const isApplicationInstitutionalRep = await isAssociatedRep(req.session, result.data.applicationId);
 
-	if (
-		!isApplicationInstitutionalRep ||
-		(userRole === 'APPLICANT' && userInfo?.userId !== result.data.submitterUserId)
-	) {
-		res.status(403).json({
-			error: ErrorType.FORBIDDEN,
-			message: 'Looks like you do not own, or have the rights to access to this file.',
-		});
+	if (isApplicationInstitutionalRep || userRole === 'DAC_MEMBER' || userInfo?.userId === result.data.submitterUserId) {
+		res.status(200).send(result.data);
 		return;
 	}
 
-	res.status(200).send(result.data);
+	res.status(403).json({
+		error: ErrorType.FORBIDDEN,
+		message: 'Looks like you do not own, or have sufficient privileges to access to this file.',
+	});
 	return;
 }
 
@@ -175,6 +172,7 @@ fileRouter.post(
 			}
 
 			const result = await uploadEthicsFile({ applicationId: id, file });
+
 			if (result.success) {
 				res.status(200).send({
 					id: result.data.id,
