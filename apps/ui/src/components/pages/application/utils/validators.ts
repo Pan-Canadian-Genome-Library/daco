@@ -66,32 +66,36 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 	}
 
 	Object.entries(fields).forEach(([key, value]) => {
-		if (isApplicantKey(key) && value !== null) {
+		if (value === null) {
+			return sectionTouched;
+		}
+
+		if (isApplicantKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				applicant: true,
 			};
-		} else if (isInstitutionalKey(key) && value !== null) {
+		} else if (isInstitutionalKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				institutional: true,
 			};
-		} else if (isAgreementKey(key) && value !== null) {
+		} else if (isAgreementKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				agreement: true,
 			};
-		} else if (isAppendicesKey(key) && value !== null) {
+		} else if (isAppendicesKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				appendices: true,
 			};
-		} else if (isRequestedStudies(key) && value != null) {
+		} else if (isRequestedStudies(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				study: true,
 			};
-		} else if (isProjectKey(key) && value !== null) {
+		} else if (isProjectKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				project: true,
