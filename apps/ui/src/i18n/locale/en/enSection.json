@@ -196,6 +196,11 @@
 			"description": "Are you sure you want to submit Application: PCGL-{{id}}? If so, the application will be locked for editing and the institutional Representative will be notified to begin the review process.",
 			"submit": "Proceed with submission",
 			"cancel": "Cancel"
+		},
+		"notifications": {
+			"submitApplicationSuccess": "Your application has been submitted for review.",
+			"submitApplicationFailed": "Sorry, there was an unexpected error while submitting your application for review. Please try again later."
 		}
+
 	}
 }
