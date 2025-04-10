@@ -39,7 +39,6 @@ const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const [openModal, setOpenModal] = useState(false);
-	const [setValidatedData] = useState<eSignatureSchemaType | undefined>(undefined);
 	const signatureRef = useRef(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
 	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
@@ -48,7 +47,6 @@ const SignAndSubmit = () => {
 
 	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
 		setOpenModal(true);
-		setValidatedData(data);
 	};
 
 	const onSaveClicked = () => {

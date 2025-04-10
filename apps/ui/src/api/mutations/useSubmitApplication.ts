@@ -24,20 +24,15 @@ import { useNotificationContext } from '@/providers/context/notification/Notific
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+import {type ApplicationResponseData } from '@pcgl-daco/data-model';
 
-type SubmitApplicationResponse = {
-	success: boolean;
-	message: string;
-	errors?: string;
-};
 
 const useSubmitApplication = () => {
-	useApplicationContext(); // Access context
 	const navigation = useNavigate();
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 
-	return useMutation<SubmitApplicationResponse, ServerError, { applicationId?: string | number }>({
+	return useMutation<ApplicationResponseData, ServerError, { applicationId?: string | number }>({
 		mutationFn: async ({ applicationId }) => {
 			const response = await fetch(`/applications/${applicationId}/submit`, {
 				method: 'POST',
@@ -48,17 +43,17 @@ const useSubmitApplication = () => {
 
 			return await response.json();
 		},
-		onSuccess: (data) => {
+		onSuccess: () => {
 			notification.openNotification({
 				type: 'success',
-				message: translate('submitApplicationSuccess'),
+				message: translate('sign-and-submit-section.notifications.submitApplicationSuccess'),
 			});
 			navigation(`/dashboard`);
 		},
-		onError: (error) => {
+		onError: () => {
 			notification.openNotification({
 				type: 'error',
-				message: translate('submitApplicationFailed'),
+				message: translate('sign-and-submit-section.notifications.submitApplicationFailed'),
 			});
 		},
 	});

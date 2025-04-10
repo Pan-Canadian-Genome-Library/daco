@@ -198,8 +198,8 @@
 			"cancel": "Cancel"
 		},
 		"notifications": {
-			"submitApplicationSuccess": "Successfully submitted",
-			"submitApplicationFailed": "Failed to submit application"
+			"submitApplicationSuccess": "Your application has been submitted successfully.",
+			"submitApplicationFailed": "Sorry, there was an unexpected error while submitting your application for review. Please try again later."
 		}
 
 	}
