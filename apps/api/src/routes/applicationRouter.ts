@@ -277,7 +277,7 @@ applicationRouter.get(
 	'/:applicationId',
 	authMiddleware(),
 	async (
-		request,
+		request: Request,
 		response: ResponseWithData<
 			ApplicationResponseData,
 			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR']
@@ -305,7 +305,7 @@ applicationRouter.get(
 			const { data } = result;
 
 			// Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER
-			if (data.userId !== userId || getUserRole(request.session) !== userRoleSchema.Values.DAC_MEMBER) {
+			if (data.userId !== userId && getUserRole(request.session) !== userRoleSchema.Values.DAC_MEMBER) {
 				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 				return;
 			}
