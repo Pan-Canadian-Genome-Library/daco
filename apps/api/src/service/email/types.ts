@@ -17,8 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// TODO: Likely to be refactored once we add translations
 export const EmailSubjects = {
 	INSTITUTIONAL_REP_REVIEW_REQUEST: 'Review Request for PCGL DACO Application',
+	DACO_APPLICATION_STATUS: 'DACO Application Status',
 } as const;
 
 export type EmailSubjectsType = (typeof EmailSubjects)[keyof typeof EmailSubjects];
+
+export type BaseEmailType = {
+	to: string;
+	lang?: string;
+};

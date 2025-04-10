@@ -22,20 +22,20 @@ import mjml2html from 'mjml';
 export const basicLayout = ({ body }: { body?: string; lang?: string }) => {
 	const template = mjml2html(
 		`<mjml>
-				<mj-head>
-					<mj-include path="./head.mjml" />
-					<mj-include path="./styles.mjml" />
-				</mj-head>
-				<mj-body background-color="lightgrey">
-				${HeaderRender()}
-				<mj-wrapper mj-class="section-background">
-	      			<mj-section css-class="main-content">
-d						${body}
-					</mj-section>
-				</mj-wrapper>
-				${FooterRender()}
-				</mj-body>
-			</mjml>`,
+			<mj-head>
+				<mj-include path="./head.mjml" />
+				<mj-include path="./styles.mjml" />
+			</mj-head>
+			<mj-body background-color="lightgrey">
+			${HeaderRender()}
+			<mj-wrapper mj-class="section-background">
+				<mj-section css-class="main-content">
+d					${body}
+				</mj-section>
+			</mj-wrapper>
+			${FooterRender()}
+			</mj-body>
+		</mjml>`,
 		{ filePath: './src/service/email/layouts/mjml' },
 	);
 
@@ -44,26 +44,26 @@ d						${body}
 
 const HeaderRender = () => {
 	return `
-	<mj-wrapper mj-class="header-background">
-		<mj-section>
-			<mj-column css-class="logo-wrapper">
-			<mj-image css-class="logo" src="cid:PCGL_LOGO" alt="PCGL-LOGO" />
-			</mj-column>
-		</mj-section>
-	</mj-wrapper>
+		<mj-wrapper mj-class="header-background">
+			<mj-section>
+				<mj-column css-class="logo-wrapper">
+				<mj-image css-class="logo" src="cid:PCGL_LOGO" alt="PCGL-LOGO" />
+				</mj-column>
+			</mj-section>
+		</mj-wrapper>
 	`;
 };
 
 const FooterRender = () => {
 	return `
-	<mj-wrapper mj-class="footer-background">
-		<mj-section>
-			<mj-column css-class="footer-wrapper">
-			<mj-text css-class="footer-text">© 2024 PCGL DACO. All rights reserved. |<a href="" target="_blank"> Privacy Policy </a>
-				| <a href="" target="_blank">Terms and Conditions </a>
-			</mj-text>
-			</mj-column>
-		</mj-section>
-	</mj-wrapper>
+		<mj-wrapper mj-class="footer-background">
+			<mj-section>
+				<mj-column css-class="footer-wrapper">
+				<mj-text css-class="footer-text">© 2024 PCGL DACO. All rights reserved. |<a href="" target="_blank"> Privacy Policy </a>
+					| <a href="" target="_blank">Terms and Conditions </a>
+				</mj-text>
+				</mj-column>
+			</mj-section>
+		</mj-wrapper>
 	`;
 };

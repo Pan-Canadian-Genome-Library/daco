@@ -17,27 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getEmailConfig } from '@/config/emailConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
 import { createPlainTextEmail } from './layouts/renderPlainText.ts';
 import { GenerateEmailApplicantDisapproval } from './layouts/templates/GenerateEmailApplicantDisapproval.ts';
+import { BaseEmailType, EmailSubjects } from './types.ts';
 
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
-	sendEmailApplicantDisapproval: async ({ from, to, lang = 'en' }: { from: string; to: string; lang?: string }) => {
+	sendEmailApplicantDisapproval: async ({ name, to, comment }: BaseEmailType & { name: string; comment: string }) => {
 		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
 			emailClient.sendMail({
-				from,
+				from: fromAddress,
 				to,
-				subject: 'DACO Application Status',
-				html: GenerateEmailApplicantDisapproval(),
+				subject: EmailSubjects.DACO_APPLICATION_STATUS,
+				html: GenerateEmailApplicantDisapproval({ name, comment }),
 				text: createPlainTextEmail(),
-				// TODO: figure out how to insert image?
 			});
 		} catch (error) {
-			const message = `Error sending email to recipient.`;
+			const message = `Error sending email to recipient: ${to}`;
 
 			logger.error(message, error);
 

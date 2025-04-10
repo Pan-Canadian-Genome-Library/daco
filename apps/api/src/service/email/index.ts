@@ -25,7 +25,13 @@ const config = getEmailConfig();
 const emailClient = createTransport({
 	host: config.email.host,
 	port: config.email.port,
-	// TODO: fix this type
+	auth: config.email.auth.user
+		? {
+				user: config.email.auth?.user,
+				pass: config.email.auth?.password,
+			}
+		: undefined,
+	// TODO: type this
 } as any);
 
 export default emailClient;
