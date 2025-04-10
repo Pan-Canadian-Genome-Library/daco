@@ -41,7 +41,7 @@ import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { SignatureDTO } from '@pcgl-daco/data-model';
 import { getApplicationById } from '../controllers/applicationController.ts';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
-import { getUserRole } from '../service/authService.ts';
+import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
 
 const signatureRouter = express.Router();
@@ -155,7 +155,6 @@ signatureRouter.post(
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
-				const userRole = getUserRole(request.session);
 
 				const applicationResult = await getApplicationById({ applicationId });
 				if (!applicationResult.success) {
@@ -174,7 +173,7 @@ signatureRouter.post(
 				const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
 				// TODO: Identify if the user role is institutional rep and is the rep for this application
 				const isApplicationInstitutionalRep =
-					signee === 'INSTITUTIONAL_REP' && userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+					signee === 'INSTITUTIONAL_REP' && (await isAssociatedRep(request.session, applicationId));
 
 				if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 					response
@@ -243,7 +242,7 @@ signatureRouter.delete(
 					if (!queryValidationResult.success) {
 						response.status(400).json({
 							error: 'INVALID_REQUEST',
-							message: `5Signee parameter must be either 'APPLICANT' or 'INSTITUTIONAL_REP'.`,
+							message: `Signee parameter must be either 'APPLICANT' or 'INSTITUTIONAL_REP'.`,
 						});
 						return;
 					}
@@ -255,7 +254,6 @@ signatureRouter.delete(
 						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 						return;
 					}
-					const userRole = getUserRole(request.session);
 
 					const applicationResult = await getApplicationById({ applicationId });
 					if (!applicationResult.success) {
@@ -274,7 +272,7 @@ signatureRouter.delete(
 					const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
 					// TODO: Identify if the user role is institutional rep and is the rep for this application
 					const isApplicationInstitutionalRep =
-						signee === 'INSTITUTIONAL_REP' && userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+						signee === 'INSTITUTIONAL_REP' && (await isAssociatedRep(request.session, applicationId));
 
 					if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 						response
