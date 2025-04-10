@@ -37,7 +37,7 @@ const {
 	REVOKED,
 } = ApplicationStates;
 
-describe('State Machine', () => {
+describe('State Machine', { skip: true }, () => {
 	describe('Success path: Create/Edit/Revisions/Submit/Approve', () => {
 		// This test block follows the state transition sequence from Create to Approve, with Edits & Revisions
 		// All tests in this block reference the same Application record

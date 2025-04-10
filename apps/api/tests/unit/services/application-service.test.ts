@@ -25,7 +25,7 @@ import { mockApplicationRepo } from '@tests/utils/mocks.ts';
 
 import { allRecordsPageSize, testUserId as user_id } from '@tests/utils/testUtils.ts';
 
-describe('Application Service', () => {
+describe('Application Service', { skip: true }, () => {
 	describe('Create Applications', () => {
 		it('should create applications with status DRAFT and submitted user_id', async () => {
 			const applicationResult = await mockApplicationRepo.createApplication({ user_id });

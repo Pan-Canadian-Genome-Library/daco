@@ -31,6 +31,7 @@ import {
 	type ApplicationListResponse,
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
+import { type MockDb } from '@tests/utils/mocks.ts';
 import { collaborators } from '../db/schemas/collaborators.ts';
 import {
 	type ApplicationContentModel,
@@ -52,7 +53,7 @@ const logger = BaseLogger.forModule('applicationService');
  * ApplicationService provides methods for Applications DB access
  * @param db - Drizzle Postgres DB Instance
  */
-const applicationSvc = (db: PostgresDb) => ({
+const applicationSvc = (db: PostgresDb | MockDb) => ({
 	/** @method createApplication: Create new Application record */
 	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR'> => {
 		const newApplication: typeof applications.$inferInsert = {
@@ -453,4 +454,4 @@ const applicationSvc = (db: PostgresDb) => ({
 	},
 });
 
-export { applicationSvc };
+export default { applicationSvc };

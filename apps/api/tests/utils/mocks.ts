@@ -17,8 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { applicationSvc } from '@/service/applicationService.js';
+import dbUtils from '@/db/index.js';
+import * as schema from '@/db/schemas/index.js';
+import applicationService from '@/service/applicationService.js';
 import {
+	ApplicationStateTotals,
 	type ApplicationActionRecord,
 	type ApplicationActionService,
 	type ApplicationRecord,
@@ -29,9 +32,10 @@ import {
 import { success } from '@/utils/results.ts';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { testApplicationId, testUserId } from '@tests/utils/testUtils.ts';
-import { mock, type Mock } from 'node:test';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import sinon from 'sinon';
 
-type ApplicationServiceKeys = keyof ApplicationService;
+// type ApplicationServiceKeys = keyof ApplicationService;
 
 const testApplicationRecord: ApplicationRecord = {
 	id: testApplicationId,
@@ -44,7 +48,7 @@ const testApplicationRecord: ApplicationRecord = {
 	contents: null,
 };
 
-const testJoinedApplicationRecord: JoinedApplicationRecord = {
+export const testJoinedApplicationRecord: JoinedApplicationRecord = {
 	id: testApplicationId,
 	user_id: testUserId,
 	created_at: new Date(),
@@ -53,6 +57,19 @@ const testJoinedApplicationRecord: JoinedApplicationRecord = {
 	approved_at: null,
 	expires_at: null,
 	contents: {},
+};
+
+const testApplicationTotals: ApplicationStateTotals = {
+	APPROVED: 0,
+	CLOSED: 0,
+	DAC_REVIEW: 0,
+	DAC_REVISIONS_REQUESTED: 0,
+	DRAFT: 1,
+	INSTITUTIONAL_REP_REVIEW: 0,
+	REJECTED: 0,
+	INSTITUTIONAL_REP_REVISION_REQUESTED: 0,
+	REVOKED: 0,
+	TOTAL: 1,
 };
 
 const testRevisionRequestRecord: RevisionRequestRecord = {
@@ -83,18 +100,26 @@ const baseTestActionRecord: ApplicationActionRecord = {
 	state_after: 'INSTITUTIONAL_REP',
 };
 
+export type MockDb = ReturnType<typeof drizzle.mock<typeof schema>>;
+export const testDb: MockDb = drizzle.mock({ schema });
+export const mockDbInstance = sinon.stub(dbUtils, 'getDbInstance').callsFake(() => testDb);
+
 export const mockApplicationRepo: ApplicationService = {
-	createApplication: () => new Promise(() => success(testApplicationRecord)),
-	editApplication: () => new Promise(() => success(testJoinedApplicationRecord)),
-	findOneAndUpdate: () => new Promise(() => success(testApplicationRecord)),
-	getApplicationById: () => new Promise(() => success(testApplicationRecord)),
-	getApplicationWithContents: () => new Promise(() => success(testJoinedApplicationRecord)),
-	listApplications: () => new Promise(() => success(testJoinedApplicationRecord)),
-	applicationStateTotals: () => new Promise(() => success(testJoinedApplicationRecord)),
-	createRevisionRequest: () => new Promise(() => success(testRevisionRequestRecord)),
-	getApplicationForCollaboratorId: () => new Promise(() => success(testApplicationRecord)),
-	getRevisions: () => new Promise(() => success([testRevisionRequestRecord])),
+	createApplication: async () => success(testApplicationRecord),
+	editApplication: async () => success(testJoinedApplicationRecord),
+	findOneAndUpdate: async () => success(testApplicationRecord),
+	getApplicationById: async ({ id: number }) => success(testApplicationRecord),
+	getApplicationWithContents: async () => success(testJoinedApplicationRecord),
+	listApplications: async () =>
+		success({ applications: [], pagingMetadata: { totalRecords: 1, page: 0, pageSize: 20 } }),
+	applicationStateTotals: async () => success(testApplicationTotals),
+	createRevisionRequest: async () => success(testRevisionRequestRecord),
+	getApplicationForCollaboratorId: async () => success(testApplicationRecord),
+	getRevisions: async () => success([testRevisionRequestRecord]),
 };
+export const appSvcSpy = sinon.spy(mockApplicationRepo);
+// Sinon cannot stub ESM https://sinonjs.org/how-to/stub-dependency/
+export const mockService = sinon.stub(applicationService, 'applicationSvc').callsFake(() => appSvcSpy);
 
 export const mockActionRepo: ApplicationActionService = {
 	close: async () => new Promise(() => success(baseTestActionRecord)),
@@ -112,17 +137,17 @@ export const mockActionRepo: ApplicationActionService = {
 	listActions: async () => new Promise(() => success([baseTestActionRecord])),
 };
 
-export const mockApplicationDb = Object.keys(applicationSvc).reduce(
-	(acc, key) => {
-		return {
-			...acc,
-			[key]: mock.fn(() => {
-				return success({ user_id: testUserId, application_id: testApplicationId });
-			}),
-		};
-	},
-	{} as { [K in ApplicationServiceKeys]: Mock<Function> },
-);
+// export const mockApplicationDb = Object.keys(applicationSvc).reduce(
+// 	(acc, key) => {
+// 		return {
+// 			...acc,
+// 			[key]: mock.fn(() => {
+// 				return success({ user_id: testUserId, application_id: testApplicationId });
+// 			}),
+// 		};
+// 	},
+// 	{} as { [K in ApplicationServiceKeys]: Mock<Function> },
+// );
 
 // TODO: Add Mocks
 // testCollaboratorsRepo

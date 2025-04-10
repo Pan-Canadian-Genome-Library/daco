@@ -17,7 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getDbInstance } from '@/db/index.js';
+import dbUtils from '@/db/index.js';
+
 import { signatureService } from '@/service/signatureService.ts';
 import { type ApplicationSignatureUpdate, type SignatureService } from '@/service/types.js';
 import { convertToSignatureRecord } from '@/utils/aliases.ts';
@@ -36,7 +37,7 @@ export const getApplicationSignature = async ({
 	applicationId: number;
 }): AsyncResult<SignatureDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
+		const database = dbUtils.getDbInstance();
 		const signatureRepo: SignatureService = signatureService(database);
 
 		const result = await signatureRepo.getApplicationSignature({ application_id: applicationId });
@@ -63,7 +64,7 @@ export const updateApplicationSignature = async ({
 	signature,
 	signee,
 }: EditSignatureRequest): AsyncResult<ApplicationSignatureDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
-	const database = getDbInstance();
+	const database = dbUtils.getDbInstance();
 	const signatureRepo: SignatureService = signatureService(database);
 
 	let update: ApplicationSignatureUpdate =
@@ -111,7 +112,7 @@ export const deleteApplicationSignature = async ({
 	applicationId: number;
 	signee: SignatureType;
 }) => {
-	const database = getDbInstance();
+	const database = dbUtils.getDbInstance();
 	const signatureRepo: SignatureService = signatureService(database);
 
 	const result = await signatureRepo.deleteApplicationSignature({

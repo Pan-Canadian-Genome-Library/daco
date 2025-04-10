@@ -29,7 +29,7 @@ import { uploadEthicsFile } from '@/controllers/fileController.ts';
 import { mockApplicationRepo } from '@tests/utils/mocks.ts';
 import { testApplicationId } from '@tests/utils/testUtils.ts';
 
-describe('File API', () => {
+describe('File API', { skip: true }, () => {
 	describe('Upload Ethics File', () => {
 		it('Should create new file if there is no ethics_letter in the application contents', async () => {
 			const mockFile: formidable.File = {

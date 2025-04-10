@@ -21,12 +21,13 @@ import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import BaseLogger from '@/logger.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
+import { type MockDb } from '@tests/utils/mocks.ts';
 import { and, eq } from 'drizzle-orm';
 import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
 
 const logger = BaseLogger.forModule('collaboratorsService');
 
-const collaboratorsSvc = (db: PostgresDb) => ({
+const collaboratorsSvc = (db: PostgresDb | MockDb) => ({
 	createCollaborators: async ({
 		newCollaborators,
 	}: {

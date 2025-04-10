@@ -20,6 +20,7 @@
 import { setStatus, Status } from '@/app-health.js';
 import * as schema from '@/db/schemas/index.js';
 import BaseLogger from '@/logger.js';
+import { MockDb } from '@tests/utils/mocks.ts';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
 const logger = BaseLogger.forModule('index');
@@ -28,12 +29,12 @@ export type PostgresDb = ReturnType<typeof drizzle<typeof schema>>;
 
 let pgDatabase: PostgresDb;
 
-export const getDbInstance = (): PostgresDb => {
+const getDbInstance = (): PostgresDb | MockDb => {
 	if (!pgDatabase) throw new Error('Not connected to Postgres database');
 	return pgDatabase;
 };
 
-export const connectToDb = (connectionString: string): PostgresDb => {
+const connectToDb = (connectionString: string): PostgresDb => {
 	try {
 		const db = drizzle<typeof schema>(connectionString);
 		pgDatabase = db;
@@ -51,3 +52,8 @@ export const connectToDb = (connectionString: string): PostgresDb => {
 		throw err;
 	}
 };
+
+// Default Export used for Sinon Test Mocking
+const dbUtils = { connectToDb, getDbInstance };
+
+export default dbUtils;

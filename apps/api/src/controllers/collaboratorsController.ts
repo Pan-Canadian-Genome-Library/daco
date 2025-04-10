@@ -16,9 +16,10 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { getDbInstance } from '@/db/index.js';
+
+import dbUtils from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
-import { applicationSvc } from '@/service/applicationService.js';
+import appSvc from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { convertToCollaboratorRecords } from '@/utils/aliases.ts';
@@ -53,9 +54,9 @@ export const createCollaborators = async ({
 	ListCollaboratorResponse,
 	'UNAUTHORIZED' | 'SYSTEM_ERROR' | 'NOT_FOUND' | 'INVALID_STATE_TRANSITION' | 'DUPLICATE_RECORD'
 > => {
-	const database = getDbInstance();
+	const database = dbUtils.getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
 
@@ -134,9 +135,9 @@ export const deleteCollaborator = async ({
 	id: number;
 }): AsyncResult<CollaboratorsResponseDTO[], 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
+		const database = dbUtils.getDbInstance();
 		const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
-		const applicationRepo: ApplicationService = applicationSvc(database);
+		const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 		const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
 
@@ -178,7 +179,7 @@ export const listCollaborators = async ({
 	applicationId: number;
 }): AsyncResult<CollaboratorsResponseDTO[], 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
+		const database = dbUtils.getDbInstance();
 		const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
 
 		const collaboratorsResult = await collaboratorsRepo.listCollaborators(applicationId);
@@ -213,7 +214,7 @@ export const updateCollaborator = async ({
 	CollaboratorsResponseDTO[],
 	'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_STATE_TRANSITION' | 'FORBIDDEN' | 'DUPLICATE_RECORD'
 > => {
-	const database = getDbInstance();
+	const database = dbUtils.getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
 
 	const applicationResult = await getApplicationById({ applicationId: application_id });

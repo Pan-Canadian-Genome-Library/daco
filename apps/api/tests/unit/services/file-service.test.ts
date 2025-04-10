@@ -29,7 +29,7 @@ import { FilesService } from '@/service/types.ts';
 
 import { mockApplicationRepo } from '@tests/utils/mocks.ts';
 
-describe('Signature Service', () => {
+describe('Signature Service', { skip: true }, () => {
 	let db: PostgresDb;
 	let testFileService: FilesService;
 

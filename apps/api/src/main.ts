@@ -18,8 +18,8 @@
  */
 
 import { dbConfig } from '@/config/dbConfig.js';
-import { connectToDb } from '@/db/index.js';
+import dbUtils from '@/db/index.js';
 import startServer from '@/server.js';
 
-connectToDb(dbConfig.connectionString);
+dbUtils.connectToDb(dbConfig.connectionString);
 startServer();

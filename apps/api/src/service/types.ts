@@ -29,8 +29,8 @@ import { files } from '@/db/schemas/index.js';
 
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import appSvc from './applicationService.js';
 import { filesSvc } from './fileService.js';
 import { signatureService } from './signatureService.ts';
 
@@ -41,7 +41,7 @@ export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
 export type ApplicationModel = typeof applications.$inferInsert;
 export type ApplicationRecord = typeof applications.$inferSelect;
 export type ApplicationUpdates = Partial<ApplicationModel>;
-export type ApplicationService = ReturnType<typeof applicationSvc>;
+export type ApplicationService = ReturnType<typeof appSvc.applicationSvc>;
 
 export type ApplicationContentModel = typeof applicationContents.$inferInsert;
 export type ApplicationContentUpdates = Omit<

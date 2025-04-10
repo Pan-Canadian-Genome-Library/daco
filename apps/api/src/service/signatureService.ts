@@ -26,6 +26,7 @@ import BaseLogger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import { type SignatureType } from '@pcgl-daco/data-model/src/types.ts';
+import { type MockDb } from '@tests/utils/mocks.ts';
 import { type ApplicationContentModel, type ApplicationSignatureUpdate } from './types.js';
 
 const logger = BaseLogger.forModule('signatureService');
@@ -34,7 +35,7 @@ const logger = BaseLogger.forModule('signatureService');
  * SignatureService provides methods for DB access for the signature columns in Application Contents
  * @param db - Drizzle Postgres DB Instance
  */
-const signatureService = (db: PostgresDb) => ({
+const signatureService = (db: PostgresDb | MockDb) => ({
 	getApplicationSignature: async ({
 		application_id: id,
 	}: Pick<ApplicationContentModel, 'application_id'>): AsyncResult<

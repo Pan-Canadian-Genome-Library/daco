@@ -22,7 +22,7 @@ import { after, before, describe, it } from 'node:test';
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { connectToDb, getDbInstance, type PostgresDb } from '@/db/index.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 
 import { PG_DATABASE, PG_PASSWORD, PG_USER } from '@tests/utils/testUtils.ts';
 
@@ -41,13 +41,13 @@ describe('Postgres Database', () => {
 	describe('Connection', () => {
 		it('should connect successfully', () => {
 			const connectionString = container.getConnectionUri();
-			db = connectToDb(connectionString);
+			db = dbUtils.connectToDb(connectionString);
 
 			assert.notEqual(db, undefined);
 		});
 
 		it('should provide a method for db instance retrieval', () => {
-			const database = getDbInstance();
+			const database = dbUtils.getDbInstance();
 
 			assert.notEqual(database, undefined);
 			assert.ok(database.hasOwnProperty('$client'));

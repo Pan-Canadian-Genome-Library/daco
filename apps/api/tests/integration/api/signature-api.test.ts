@@ -28,7 +28,6 @@ import {
 	updateApplicationSignature,
 } from '@/controllers/signatureController.ts';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { SignatureTypes } from '@pcgl-daco/data-model';
 
@@ -62,7 +61,7 @@ describe('Signature API', () => {
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		testApplicationRepo = applicationSvc(db);
+		testApplicationRepo = appSvc.applicationSvc(db);
 	});
 
 	describe('Sign Application', () => {

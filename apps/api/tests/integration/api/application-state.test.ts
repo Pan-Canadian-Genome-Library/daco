@@ -22,9 +22,9 @@ import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { ApplicationStateManager, createApplicationStateManager } from '@/controllers/stateManager.js';
-import { connectToDb, type PostgresDb } from '@/db/index.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { applicationSvc } from '@/service/applicationService.js';
+import appSvc from '@/service/applicationService.js';
 import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 import {
@@ -62,13 +62,13 @@ describe('State Machine', () => {
 			.start();
 
 		const connectionString = container.getConnectionUri();
-		db = connectToDb(connectionString);
+		db = dbUtils.connectToDb(connectionString);
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
 		testActionRepo = applicationActionSvc(db);
-		testApplicationRepo = applicationSvc(db);
+		testApplicationRepo = appSvc.applicationSvc(db);
 	});
 
 	describe('Success path: Create/Edit/Revisions/Submit/Approve', () => {

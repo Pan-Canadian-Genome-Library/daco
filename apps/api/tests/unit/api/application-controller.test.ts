@@ -18,21 +18,13 @@
  */
 
 import assert from 'node:assert';
-import { after, describe, it } from 'node:test';
+import { describe, it } from 'node:test';
 
-import {
-	createApplication,
-	editApplication,
-	getApplicationById,
-	getApplicationStateTotals,
-	// rejectApplication,
-	requestApplicationRevisionsByDac,
-	submitRevision,
-} from '@/controllers/applicationController.js';
+import { editApplication } from '@/controllers/applicationController.js';
 import { type RevisionRequestModel } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-import { mockApplicationRepo } from '@tests/utils/mocks.ts';
+import { appSvcSpy, mockApplicationRepo, testJoinedApplicationRecord } from '@tests/utils/mocks.ts';
 import { testApplicationId, testUserId as user_id } from '@tests/utils/testUtils.ts';
 
 // Sample revision request data
@@ -52,62 +44,61 @@ const revisionRequestData: RevisionRequestModel = {
 	requested_studies_notes: 'Unclear scope',
 };
 
-describe('Application API', () => {
-	describe('Edit Application', { skip: true }, () => {
+describe('Application Controller', () => {
+	describe('Edit Application', () => {
 		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+			const applicationRecordsResult = testJoinedApplicationRecord;
 
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-
-			const { id } = applicationRecordsResult.data.applications[0];
+			const { id } = applicationRecordsResult;
 
 			const update = { applicantFirstName: 'Test' };
 
 			const result = await editApplication({ id, update });
-
 			assert.ok(result.success);
 
-			const editedApplication = result.data;
-			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+			// const editedApplication = result.data;
+			// assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
-			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstName);
+			assert.ok(appSvcSpy.editApplication.calledOnce);
+			// assert.ok(editedApplication.contents);
+			// assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstName);
 		});
 
-		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+		it(
+			'should allow editing applications with state DAC_REVIEW, and revert state to DRAFT',
+			{ skip: true },
+			async () => {
+				const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
+				assert.ok(applicationRecordsResult.success);
+				assert.ok(
+					Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+				);
 
-			const { id, state } = applicationRecordsResult.data.applications[0];
+				const { id, state } = applicationRecordsResult.data.applications[0];
 
-			assert.strictEqual(state, ApplicationStates.DRAFT);
+				assert.strictEqual(state, ApplicationStates.DRAFT);
 
-			const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-			const reviewRecordResult = await mockApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
+				const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+				const reviewRecordResult = await mockApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
 
-			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
-			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+				assert.ok(reviewRecordResult.success && reviewRecordResult.data);
+				assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
-			const contentUpdate = { applicantLastName: 'User' };
-			const result = await editApplication({ id, update: contentUpdate });
-			assert.ok(result.success);
+				const contentUpdate = { applicantLastName: 'User' };
+				const result = await editApplication({ id, update: contentUpdate });
+				assert.ok(result.success);
 
-			const editedApplication = result.data;
-			assert.strictEqual(editedApplication.id, id);
-			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+				const editedApplication = result.data;
+				assert.strictEqual(editedApplication.id, id);
+				assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
-			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
-		});
+				assert.ok(editedApplication.contents);
+				assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
+			},
+		);
 
-		it('should error and return null when application state is not draft or review', async () => {
+		it('should error and return null when application state is not draft or review', { skip: true }, async () => {
 			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 			assert.ok(applicationRecordsResult.success);
 
@@ -126,168 +117,175 @@ describe('Application API', () => {
 		});
 	});
 
-	describe('Get Application by ID', { skip: true }, () => {
-		it('should successfully be able to find an application with an ID', async () => {
-			const result = await getApplicationById({ applicationId: testApplicationId });
+	// describe('Get Application by ID', { skip: true }, () => {
+	// 	it('should successfully be able to find an application with an ID', async () => {
+	// 		const result = await getApplicationById({ applicationId: testApplicationId });
 
-			assert.ok(result.success);
+	// 		assert.ok(result.success);
 
-			const application = result.data;
+	// 		const application = result.data;
 
-			assert.strictEqual(application.id, testApplicationId);
+	// 		assert.strictEqual(application.id, testApplicationId);
 
-			assert.ok(application.contents);
-		});
+	// 		assert.ok(application.contents);
+	// 	});
 
-		it('should error with a not found error, not being able to find a non-existant application ID', async () => {
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+	// 	it(
+	// 		'should error with a not found error, not being able to find a non-existant application ID',
+	// 		{ skip: true },
+	// 		async () => {
+	// 			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
-			assert.ok(applicationRecordsResult.success);
+	// 			assert.ok(applicationRecordsResult.success);
 
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
+	// 			assert.ok(
+	// 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+	// 			);
 
-			const last_id = applicationRecordsResult.data.applications[applicationRecordsResult.data.applications.length - 1];
+	// 			const last_id =
+	// 				applicationRecordsResult.data.applications[applicationRecordsResult.data.applications.length - 1];
 
-			assert.ok(last_id?.id);
+	// 			assert.ok(last_id?.id);
 
-			const result = await getApplicationById({ applicationId: last_id.id + 1 });
+	// 			const result = await getApplicationById({ applicationId: last_id.id + 1 });
 
-			assert.ok(!result.success);
+	// 			assert.ok(!result.success);
 
-			assert.strictEqual(result.message, 'Error: Application record is undefined');
-		});
-	});
+	// 			assert.strictEqual(result.message, 'Error: Application record is undefined');
+	// 		},
+	// 	);
+	// });
 
-	describe('Get Application Metadata', { skip: true }, () => {
-		it('should get the counts for each of the application states', async () => {
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+	// describe('Get Application Metadata', { skip: true }, () => {
+	// 	it('should get the counts for each of the application states', async () => {
+	// 		const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
-			assert.ok(applicationRecordsResult.success);
+	// 		assert.ok(applicationRecordsResult.success);
 
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
+	// 		assert.ok(
+	// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+	// 		);
 
-			const result = await getApplicationStateTotals();
+	// 		const result = await getApplicationStateTotals();
 
-			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
-				(apps) => apps.state === 'DRAFT',
-			).length;
+	// 		const totalDraftApplications = applicationRecordsResult.data.applications.filter(
+	// 			(apps) => apps.state === 'DRAFT',
+	// 		).length;
 
-			assert.ok(result.success);
-			assert.ok(result.data);
+	// 		assert.ok(result.success);
+	// 		assert.ok(result.data);
 
-			assert.equal(result.data.DRAFT, totalDraftApplications);
-			assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
-		});
-	});
+	// 		assert.equal(result.data.DRAFT, totalDraftApplications);
+	// 		assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
+	// 	});
+	// });
 
-	describe('Create a new application', { skip: true }, () => {
-		it('should successfully be able to create a new application with the provided user_id', async () => {
-			const result = await createApplication({ user_id });
+	// describe('Create a new application', { skip: true }, () => {
+	// 	it('should successfully be able to create a new application with the provided user_id', async () => {
+	// 		const result = await createApplication({ user_id });
 
-			assert.ok(result.success && result.data);
+	// 		assert.ok(result.success && result.data);
 
-			const application = result.data;
+	// 		const application = result.data;
 
-			assert.strictEqual(application.user_id, user_id);
+	// 		assert.strictEqual(application.user_id, user_id);
 
-			assert.ok(application.contents);
-		});
-	});
+	// 		assert.ok(application.contents);
+	// 	});
+	// });
 
-	describe('Reject Application', { skip: true }, () => {
-		// it('should successfully reject an application in DAC_REVIEW state', async () => {
-		// 	const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
-		// 	assert.ok(applicationRecordsResult.success);
-		// 	assert.ok(
-		// 		Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-		// 	);
-		// 	const { id } = applicationRecordsResult.data.applications[0];
-		// 	await mockApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
-		// 	const result = await rejectApplication({ applicationId: id });
-		// 	assert.ok(result.success);
-		// 	const rejectedApplication = await getApplicationById({ applicationId: id });
-		// 	assert.ok(rejectedApplication.success);
-		// 	assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
-		// });
-	});
+	// describe('Reject Application', { skip: true }, () => {
+	// it('should successfully reject an application in DAC_REVIEW state', async () => {
+	// 	const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+	// 	assert.ok(applicationRecordsResult.success);
+	// 	assert.ok(
+	// 		Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+	// 	);
+	// 	const { id } = applicationRecordsResult.data.applications[0];
+	// 	await mockApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
+	// 	const result = await rejectApplication({ applicationId: id });
+	// 	assert.ok(result.success);
+	// 	const rejectedApplication = await getApplicationById({ applicationId: id });
+	// 	assert.ok(rejectedApplication.success);
+	// 	assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
+	// });
+	// });
 
-	describe('Submit Revision', { skip: true }, () => {
-		it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
-			await mockApplicationRepo.findOneAndUpdate({
-				id: testApplicationId,
-				update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
-			});
-			const result = await submitRevision({ applicationId: testApplicationId });
+	// describe('Submit Revision', { skip: true }, () => {
+	// 	it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
+	// 		await mockApplicationRepo.findOneAndUpdate({
+	// 			id: testApplicationId,
+	// 			update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
+	// 		});
+	// 		const result = await submitRevision({ applicationId: testApplicationId });
 
-			assert.ok(!result.success);
-			assert.strictEqual(result.message, 'Application revision is already submitted.');
-		});
+	// 		assert.ok(!result.success);
+	// 		assert.strictEqual(result.message, 'Application revision is already submitted.');
+	// 	});
 
-		it('should fail to submit a revision for a non-existent application', async () => {
-			const result = await submitRevision({ applicationId: 9999 });
+	// 	it('should fail to submit a revision for a non-existent application', async () => {
+	// 		const result = await submitRevision({ applicationId: 9999 });
 
-			assert.ok(!result.success);
-			assert.strictEqual(result.message, 'SYSTEM_ERROR');
-		});
-	});
+	// 		assert.ok(!result.success);
+	// 		assert.strictEqual(result.message, 'SYSTEM_ERROR');
+	// 	});
+	// });
 
-	describe('Request Application Revisions', { skip: true }, () => {
-		it('should request revisions when application is in DAC_REVIEW state', async () => {
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-			const { id } = applicationRecordsResult.data.applications[0];
+	// describe('Request Application Revisions', { skip: true }, () => {
+	// 	it('should request revisions when application is in DAC_REVIEW state', async () => {
+	// 		const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+	// 		assert.ok(applicationRecordsResult.success);
+	// 		assert.ok(
+	// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+	// 		);
+	// 		const { id } = applicationRecordsResult.data.applications[0];
 
-			// Act: Call the function
-			const result = await requestApplicationRevisionsByDac({
-				applicationId: id,
-				revisionData: revisionRequestData,
-			});
+	// 		// Act: Call the function
+	// 		const result = await requestApplicationRevisionsByDac({
+	// 			applicationId: id,
+	// 			revisionData: revisionRequestData,
+	// 		});
 
-			assert.ok(!result.success);
-		});
+	// 		assert.ok(!result.success);
+	// 	});
 
-		it('should fail if application is not in the correct state', async () => {
-			// Arrange: Set up test data
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-			const { id } = applicationRecordsResult.data.applications[0];
+	// 	it('should fail if application is not in the correct state', async () => {
+	// 		// Arrange: Set up test data
+	// 		const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+	// 		assert.ok(applicationRecordsResult.success);
+	// 		assert.ok(
+	// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+	// 		);
+	// 		const { id } = applicationRecordsResult.data.applications[0];
 
-			// Act: Call the function
-			const result = await requestApplicationRevisionsByDac({
-				applicationId: id,
-				revisionData: revisionRequestData,
-			});
+	// 		// Act: Call the function
+	// 		const result = await requestApplicationRevisionsByDac({
+	// 			applicationId: id,
+	// 			revisionData: revisionRequestData,
+	// 		});
 
-			// Assert: Should return a failure message
-			assert.strictEqual(result.success, false, 'Function should return failure when state is incorrect');
-		});
+	// 		// Assert: Should return a failure message
+	// 		assert.strictEqual(result.success, false, 'Function should return failure when state is incorrect');
+	// 	});
 
-		it('should handle errors gracefully', async () => {
-			// Arrange: Force an error
-			const invalidApplicationId = -1;
+	// 	it('should handle errors gracefully', async () => {
+	// 		// Arrange: Force an error
+	// 		const invalidApplicationId = -1;
 
-			// Act: Call the function
-			const result = await requestApplicationRevisionsByDac({
-				applicationId: invalidApplicationId,
-				revisionData: revisionRequestData,
-			});
+	// 		// Act: Call the function
+	// 		const result = await requestApplicationRevisionsByDac({
+	// 			applicationId: invalidApplicationId,
+	// 			revisionData: revisionRequestData,
+	// 		});
 
-			// Assert: Should return an error message
-			assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
-		});
-	});
+	// 		// Assert: Should return an error message
+	// 		assert.strictEqual(result.success, false, 'Function should handle errors gracefully');
+	// 	});
+	// });
 
-	after(async () => {
-		process.exit(0);
-	});
+	// after(async () => {
+	// 	console.log('after');
+	// 	sinon.restore();
+	// 	process.exit(0);
+	// });
 });

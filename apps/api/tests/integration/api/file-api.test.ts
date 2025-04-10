@@ -25,8 +25,8 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { submitRevision } from '@/controllers/applicationController.js';
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationSvc } from '@/service/applicationService.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
+import appSvc from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
@@ -53,12 +53,12 @@ describe('File API', () => {
 			.start();
 
 		const connectionString = container.getConnectionUri();
-		db = connectToDb(connectionString);
+		db = dbUtils.connectToDb(connectionString);
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
-		testApplicationRepo = applicationSvc(db);
+		testApplicationRepo = appSvc.applicationSvc(db);
 	});
 
 	describe('Upload Ethics File', () => {

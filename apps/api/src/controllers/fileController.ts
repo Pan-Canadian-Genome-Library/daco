@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getDbInstance } from '@/db/index.js';
+import dbUtils from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
-import { applicationSvc } from '@/service/applicationService.ts';
+import appSvc from '@/service/applicationService.js';
 import { filesSvc } from '@/service/fileService.ts';
 import {
 	type ApplicationRecord,
@@ -48,9 +48,9 @@ export const uploadEthicsFile = async ({
 	file: formidable.File;
 }): AsyncResult<FilesRecord, 'SYSTEM_ERROR' | 'NOT_FOUND' | 'INVALID_STATE_TRANSITION'> => {
 	try {
-		const database = getDbInstance();
+		const database = dbUtils.getDbInstance();
 		const filesService: FilesService = filesSvc(database);
-		const applicationRepo: ApplicationService = applicationSvc(database);
+		const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 		const applicationResult = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
@@ -117,7 +117,7 @@ export const uploadEthicsFile = async ({
  */
 export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; withBuffer?: boolean }) => {
 	try {
-		const database = getDbInstance();
+		const database = dbUtils.getDbInstance();
 		const filesService: FilesService = filesSvc(database);
 
 		const result = await filesService.getFileById({ fileId });
@@ -147,9 +147,9 @@ export const getFile = async ({ fileId, withBuffer = false }: { fileId: number; 
  */
 export const deleteFile = async ({ fileId }: { fileId: number }) => {
 	try {
-		const database = getDbInstance();
+		const database = dbUtils.getDbInstance();
 		const filesService: FilesService = filesSvc(database);
-		const applicationRepo: ApplicationService = applicationSvc(database);
+		const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 		const txResult = await database.transaction(async (tx) => {
 			const deleteResult = await filesService.deleteFileById({ fileId, transaction: tx });

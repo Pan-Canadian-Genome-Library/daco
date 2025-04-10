@@ -23,8 +23,8 @@ import assert from 'node:assert';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { applicationSvc } from '@/service/applicationService.ts';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
+import appSvc from '@/service/applicationService.js';
 import { filesSvc } from '@/service/fileService.ts';
 import { ApplicationService, FilesService } from '@/service/types.ts';
 import {
@@ -61,13 +61,13 @@ describe('Signature Service', () => {
 			.start();
 
 		const connectionString = container.getConnectionUri();
-		db = connectToDb(connectionString);
+		db = dbUtils.connectToDb(connectionString);
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
 		testFileService = filesSvc(db);
-		testApplicationRepo = applicationSvc(db);
+		testApplicationRepo = appSvc.applicationSvc(db);
 	});
 
 	describe('File Create', () => {

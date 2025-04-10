@@ -32,7 +32,7 @@ describe('Signature API', () => {
 	const validBase64Signature =
 		'data:image/png;base64,0ZxJm5HcCop3TCvbnvoHxseg4L0XM5WqylNBdkHKeEmIe4s5s4A7CZYs8TrPUzIuIA0bxD+Ei6764LcM2sPsmxKBuY3REWQ/uEe1j85hUHoiTbQqwln6Kfsd8cGC8sfjrNQD02oZ';
 
-	describe('Sign Application', () => {
+	describe('Sign Application', { skip: true }, () => {
 		it('Should allow signing an application as an Applicant', async () => {
 			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 

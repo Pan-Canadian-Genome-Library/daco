@@ -26,6 +26,7 @@ import { files } from '@/db/schemas/files.js';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { type FileType } from '@pcgl-daco/data-model';
+import { type MockDb } from '@tests/utils/mocks.ts';
 import { type FilesModel, type FilesRecord, type JoinedApplicationRecord, type PostgresTransaction } from './types.ts';
 
 const logger = BaseLogger.forModule('fileService');
@@ -34,7 +35,7 @@ const logger = BaseLogger.forModule('fileService');
  * Upload service provides methods for file DB access
  * @param db - Drizzle Postgres DB Instance
  */
-const filesSvc = (db: PostgresDb) => ({
+const filesSvc = (db: PostgresDb | MockDb) => ({
 	getFileById: async ({
 		fileId,
 		transaction,

@@ -25,7 +25,7 @@ import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
 import { createApplication } from '@/controllers/applicationController.js';
 import { createCollaborators, updateCollaborator } from '@/controllers/collaboratorsController.js';
-import { connectToDb, type PostgresDb } from '@/db/index.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 
 import { testApplicationId as application_id, testUserId as user_id } from '@tests/utils/testUtils.ts';
@@ -34,7 +34,7 @@ describe('Collaborators Controller', { skip: true }, () => {
 	let db: PostgresDb;
 
 	before(async () => {
-		db = connectToDb('');
+		db = dbUtils.connectToDb('');
 	});
 
 	describe('Create new collaborators', () => {

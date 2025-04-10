@@ -21,9 +21,9 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { applicationSvc } from '@/service/applicationService.js';
+import appSvc from '@/service/applicationService.js';
 import {
 	type ApplicationActionsColumnName,
 	type ApplicationActionService,
@@ -57,13 +57,13 @@ describe('Application Action Service', () => {
 			.start();
 
 		const connectionString = container.getConnectionUri();
-		db = connectToDb(connectionString);
+		db = dbUtils.connectToDb(connectionString);
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
 
 		testActionRepo = applicationActionSvc(db);
-		testApplicationRepo = applicationSvc(db);
+		testApplicationRepo = appSvc.applicationSvc(db);
 	});
 
 	describe('All Actions', () => {

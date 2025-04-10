@@ -30,6 +30,7 @@ import {
 	ApplicationStates,
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
+import { type MockDb } from '@tests/utils/mocks.ts';
 import {
 	type ApplicationActionRecord,
 	type ApplicationActionsColumnName,
@@ -44,7 +45,7 @@ const logger = BaseLogger.forModule('applicationActionService');
  * ApplicationActionService provides methods for ApplicationActions DB access
  * @param db - Drizzle Postgres DB Instance
  */
-const applicationActionSvc = (db: PostgresDb) => {
+const applicationActionSvc = (db: PostgresDb | MockDb) => {
 	/** @method addActionRecord: Template method for adding an Action record */
 	/** New actions are created on every transition from one state to the next */
 	const addActionRecord = async (

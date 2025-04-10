@@ -17,10 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getDbInstance } from '@/db/index.js';
+import dbUtils from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
-import { applicationSvc } from '@/service/applicationService.js';
+import appSvc from '@/service/applicationService.js';
 import {
 	type ApplicationRecord,
 	type ApplicationService,
@@ -42,8 +42,8 @@ const logger = BaseLogger.forModule('applicationController');
  * @returns Success with Application data / Failure with Error.
  */
 export const createApplication = async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
-	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const database = dbUtils.getDbInstance();
+	const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 	const result = await applicationRepo.createApplication({ user_id });
 
@@ -64,8 +64,8 @@ export const editApplication = async ({
 	id: number;
 	update: UpdateEditApplicationRequest;
 }): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
-	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const database = dbUtils.getDbInstance();
+	const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 	const result = await applicationRepo.getApplicationById({ id });
 
@@ -109,8 +109,8 @@ export const getAllApplications = async ({
 	pageSize,
 	isDACMember,
 }: ApplicationListRequest) => {
-	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const database = dbUtils.getDbInstance();
+	const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 	if (isDACMember) {
 		//If we set UserID to undefined, it will not add in the where clause for limiting by userID.
@@ -132,8 +132,8 @@ export const getApplicationById = async ({
 }: {
 	applicationId: number;
 }): AsyncResult<ApplicationResponseData, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
-	const database = getDbInstance();
-	const applicationRepo: ApplicationService = applicationSvc(database);
+	const database = dbUtils.getDbInstance();
+	const applicationRepo: ApplicationService = appSvc.applicationSvc(database);
 
 	const result = await applicationRepo.getApplicationWithContents({ id: applicationId });
 
@@ -151,8 +151,8 @@ export const getApplicationById = async ({
  * @returns Success with the details of the application / Failure with Error.
  */
 export const getApplicationStateTotals = async () => {
-	const database = getDbInstance();
-	const service: ApplicationService = applicationSvc(database);
+	const database = dbUtils.getDbInstance();
+	const service: ApplicationService = appSvc.applicationSvc(database);
 
 	return await service.applicationStateTotals();
 };
@@ -174,8 +174,8 @@ export const approveApplication = async ({
 }: ApproveApplication): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -213,8 +213,8 @@ export const dacRejectApplication = async ({
 }): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -250,8 +250,8 @@ export const submitRevision = async ({
 }): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -294,8 +294,8 @@ export const revokeApplication = async (
 ): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -331,8 +331,8 @@ export const requestApplicationRevisionsByDac = async ({
 	revisionData: RevisionRequestModel;
 }): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 
 		const result = await service.getApplicationById({ id: applicationId });
 
@@ -375,8 +375,8 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 	revisionData: RevisionRequestModel;
 }): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 
 		const result = await service.getApplicationById({ id: applicationId });
 
@@ -417,8 +417,8 @@ export const submitApplication = async ({
 	applicationId: number;
 }): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 
 		// Fetch the application
 		const result = await service.getApplicationById({ id: applicationId });
@@ -458,8 +458,8 @@ export const closeApplication = async ({
 	applicationId: number;
 }): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -509,8 +509,8 @@ export const getRevisions = async ({
 	applicationId: number;
 }): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
 	try {
-		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const database = dbUtils.getDbInstance();
+		const service: ApplicationService = appSvc.applicationSvc(database);
 
 		const revisionsResult = await service.getRevisions({ applicationId });
 

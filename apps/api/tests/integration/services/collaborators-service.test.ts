@@ -22,7 +22,7 @@ import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
@@ -49,7 +49,7 @@ describe('Application Service', () => {
 			.start();
 
 		const connectionString = container.getConnectionUri();
-		db = connectToDb(connectionString);
+		db = dbUtils.connectToDb(connectionString);
 
 		await initTestMigration(db);
 		await addInitialApplications(db);

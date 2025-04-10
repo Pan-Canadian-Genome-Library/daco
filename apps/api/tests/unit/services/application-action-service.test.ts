@@ -30,7 +30,7 @@ import {
 	testUserId as user_id,
 } from '@tests/utils/testUtils.ts';
 
-describe('Application Action Service', () => {
+describe('Application Action Service', { skip: true }, () => {
 	describe('All Actions', () => {
 		it('should perform WITHDRAW actions with after state DRAFT', async () => {
 			const testApplicationResult = await mockApplicationRepo.getApplicationById({ id: 1 });

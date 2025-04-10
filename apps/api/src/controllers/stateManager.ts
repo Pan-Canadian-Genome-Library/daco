@@ -17,9 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getDbInstance } from '@/db/index.js';
+import dbUtils from '@/db/index.js';
+import appSvc from '@/service/applicationService.js';
+
 import { applicationActionSvc } from '@/service/applicationActionService.js';
-import { applicationSvc } from '@/service/applicationService.js';
 import { type AddActionMethods, type ApplicationRecord } from '@/service/types.js';
 import { type AsyncResult, failure, type Result, success } from '@/utils/results.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
@@ -117,8 +118,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async _updateRecords(method: AddActionMethods): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
-		const db = getDbInstance();
-		const applicationRepo = applicationSvc(db);
+		const db = dbUtils.getDbInstance();
+		const applicationRepo = appSvc.applicationSvc(db);
 		const applicationActionRepo = applicationActionSvc(db);
 
 		return await db.transaction(async (tx) => {
@@ -463,8 +464,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 }
 
 export const createApplicationStateManager = async ({ id }: { id: number }) => {
-	const database = getDbInstance();
-	const service: ReturnType<typeof applicationSvc> = applicationSvc(database);
+	const database = dbUtils.getDbInstance();
+	const service: ReturnType<typeof appSvc.applicationSvc> = appSvc.applicationSvc(database);
 
 	const result = await service.getApplicationById({ id });
 	if (!result.success) {
