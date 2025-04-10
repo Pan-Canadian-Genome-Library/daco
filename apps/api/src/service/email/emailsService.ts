@@ -21,8 +21,10 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
-import { createPlainTextEmail } from './layouts/renderPlainText.ts';
-import { GenerateEmailApplicantDisapproval } from './layouts/templates/GenerateEmailApplicantDisapproval.ts';
+import {
+	GenerateEmailApplicantDisapproval,
+	GenerateEmailApplicantDisapprovalPlain,
+} from './layouts/templates/GenerateEmailApplicantDisapproval.ts';
 import { BaseEmailType, EmailSubjects } from './types.ts';
 
 const logger = BaseLogger.forModule('emailService');
@@ -39,7 +41,7 @@ const emailSvc = () => ({
 				to,
 				subject: EmailSubjects.DACO_APPLICATION_STATUS,
 				html: GenerateEmailApplicantDisapproval({ name, comment }),
-				text: createPlainTextEmail(),
+				text: GenerateEmailApplicantDisapprovalPlain({ name, comment }),
 			});
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;

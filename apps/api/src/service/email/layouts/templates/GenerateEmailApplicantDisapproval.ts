@@ -25,7 +25,7 @@ type GenerateDisapprovalProp = {
 	lang?: string;
 };
 
-// TODO: english and french gittranslations
+// TODO: english and french translations
 export const GenerateEmailApplicantDisapproval = ({ name, comment }: GenerateDisapprovalProp) => {
 	const template = `  
             <mj-column css-class="section-wrapper">
@@ -35,12 +35,14 @@ export const GenerateEmailApplicantDisapproval = ({ name, comment }: GenerateDis
                 <mj-text>
                     <br />
                 </mj-text>
-                <mj-text>Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
+                <mj-text>
+                    Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
                 </mj-text>
-                <mj-text>This is the Data Access Committee's comments on your application: ${comment}.
+                <mj-text>
+                    This is the Data Access Committee's comments on your application: ${comment}.
                 </mj-text>
-                <mj-text>We appreciate your interest in the PCGL controlled data, thank you again for your time!
-        
+                <mj-text>
+                    We appreciate your interest in the PCGL controlled data, thank you again for your time!        
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -50,4 +52,16 @@ export const GenerateEmailApplicantDisapproval = ({ name, comment }: GenerateDis
 `;
 
 	return basicLayout({ body: template }).html;
+};
+
+export const GenerateEmailApplicantDisapprovalPlain = ({ name, comment }: GenerateDisapprovalProp) => {
+	return `
+    Dear ${name},
+    \n Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
+    \n This is the Data Access Committee's comments on your application: ${comment}
+    \n We appreciate your interest in the PCGL controlled data, thank you again for your time!
+    \n \n
+    Best regards, 
+    \n The PCGL Data Access Compliance Office 
+    `;
 };

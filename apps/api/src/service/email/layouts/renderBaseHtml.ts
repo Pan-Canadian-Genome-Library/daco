@@ -30,7 +30,7 @@ export const basicLayout = ({ body }: { body?: string; lang?: string }) => {
 			${HeaderRender()}
 			<mj-wrapper mj-class="section-background">
 				<mj-section css-class="main-content">
-d					${body}
+					${body}
 				</mj-section>
 			</mj-wrapper>
 			${FooterRender()}
