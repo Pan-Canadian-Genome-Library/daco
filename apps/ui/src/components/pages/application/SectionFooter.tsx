@@ -31,10 +31,11 @@ const { useToken } = theme;
 type SectionFooterProps = {
 	currentRoute: string;
 	isEditMode: boolean;
+	submitDisabled?: boolean;
 	signSubmitHandler?: () => void;
 };
 
-const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler }: SectionFooterProps) => {
+const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisabled = false }: SectionFooterProps) => {
 	const { token } = useToken();
 	const { t: translate } = useTranslation();
 	const navigate = useNavigate();
@@ -91,7 +92,7 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler }: SectionF
 					{translate('button.next')}
 				</Button>
 			) : (
-				<Button onClick={submitApplication} type="primary">
+				<Button onClick={submitApplication} disabled={submitDisabled} type="primary">
 					{translate('button.submitApplication')}
 				</Button>
 			)}
