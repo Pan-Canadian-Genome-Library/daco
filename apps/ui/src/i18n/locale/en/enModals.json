@@ -13,7 +13,11 @@
 		},
 		"closeApplication": {
 			"title": "Are you sure you want to close Application: PCGL-{{id}}",
-			"description": "Closed application cannot be reopened."
+			"description": "Closed application cannot be reopened.",
+			"notifications": {
+				"closeApplicationSuccess": "Application Closed Successfullt",
+				"closeApplicationFailed": "Close Application Failed"
+			}
 		},
 		"authorization": {
 			"description": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access."
