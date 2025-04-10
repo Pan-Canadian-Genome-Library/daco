@@ -25,6 +25,7 @@ import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useSubmitApplication from '@/api/mutations/useSubmitApplication';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -38,16 +39,14 @@ const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const [openModal, setOpenModal] = useState(false);
-	const [validatedData, setValidatedData] = useState<eSignatureSchemaType | undefined>(undefined);
 	const signatureRef = useRef(null);
-
+	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
 	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),
 	});
 
 	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
 		setOpenModal(true);
-		setValidatedData(data);
 	};
 
 	const onSaveClicked = () => {
@@ -55,9 +54,9 @@ const SignAndSubmit = () => {
 	};
 
 	const modalSubmission = () => {
-		console.log('Submit Clicked!');
-		console.log(validatedData);
-		setOpenModal(false);
+		submitApplication({ applicationId: appId }).then(() => {
+			setOpenModal(false);
+		});
 	};
 
 	const watchSignature = watch('signature');
@@ -110,6 +109,7 @@ const SignAndSubmit = () => {
 				style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 				open={openModal}
 				onOk={modalSubmission}
+				okButtonProps={{ disabled: isSubmitting }}
 				onCancel={() => setOpenModal(false)}
 			>
 				<Flex style={{ height: '100%', marginTop: 20 }}>
