@@ -6,7 +6,7 @@
     <mj-include path="./styles.mjml" />
   </mj-head>
 
-  <mj-body background-color="lightgrey">
+  <mj-body background-color="#F0F0F0">
     <!-- Header -->
     <mj-include path="./components/header.mjml" />
     <!-- Content -->

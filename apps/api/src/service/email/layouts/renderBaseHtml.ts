@@ -26,7 +26,7 @@ export const basicLayout = ({ body }: { body?: string; lang?: string }) => {
 				<mj-include path="./head.mjml" />
 				<mj-include path="./styles.mjml" />
 			</mj-head>
-			<mj-body background-color="lightgrey">
+			<mj-body background-color="#F0F0F0">
 			${HeaderRender()}
 			<mj-wrapper mj-class="section-background">
 				<mj-section css-class="main-content">
