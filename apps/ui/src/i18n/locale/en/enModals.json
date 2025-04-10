@@ -15,8 +15,8 @@
 			"title": "Are you sure you want to close Application: PCGL-{{id}}",
 			"description": "Closed application cannot be reopened.",
 			"notifications": {
-				"closeApplicationSuccess": "Application Closed Successfullt",
-				"closeApplicationFailed": "Close Application Failed"
+				"closeApplicationSuccess": "Application Closed Successfully",
+				"closeApplicationFailed": "Failed to Close Application. Please Try Again."
 			}
 		},
 		"authorization": {
