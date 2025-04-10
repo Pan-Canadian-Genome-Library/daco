@@ -16,50 +16,47 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { useQuery } from '@tanstack/react-query';
-
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type ApplicationDTO } from '@pcgl-daco/data-model';
-import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
+import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
+import {type ApplicationResponseData } from '@pcgl-daco/data-model';
 
-export interface ApplicationListSortingOptions {
-	direction: 'desc' | 'asc';
-	column: 'user_id' | 'id' | 'created_at' | 'updated_at' | 'state' | 'approved_at' | 'expires_at';
-}
-interface ApplicationListParams {
-	state?: ApplicationStateValues[];
-	sort?: ApplicationListSortingOptions[];
-	page?: number;
-	pageSize?: number;
-}
 
-const useGetApplicationList = ({ state, sort, page, pageSize }: ApplicationListParams) => {
-	const queryParams = new URLSearchParams();
+const useSubmitApplication = () => {
+	const navigation = useNavigate();
+	const notification = useNotificationContext();
+	const { t: translate } = useTranslation();
 
-	if (state && state.length) {
-		queryParams.set('state', JSON.stringify(state));
-	}
-	if (sort && sort.length) {
-		queryParams.set('sort', JSON.stringify(sort));
-	}
-	if (page !== undefined) {
-		queryParams.set('page', page.toString());
-	}
-	if (pageSize !== undefined) {
-		queryParams.set('pageSize', pageSize.toString());
-	}
-
-	return useQuery<ApplicationDTO[], ServerError>({
-		queryKey: [queryParams],
-		queryFn: async () => {
-			const response = await fetch(`/applications?${queryParams.toString()}`).then(withErrorResponseHandler);
+	return useMutation<ApplicationResponseData, ServerError, { applicationId?: string | number }>({
+		mutationFn: async ({ applicationId }) => {
+			const response = await fetch(`/applications/${applicationId}/submit`, {
+				method: 'POST',
+				body: JSON.stringify({
+					applicationId: applicationId,
+				}),
+			}).then(withErrorResponseHandler);
 
 			return await response.json();
+		},
+		onSuccess: () => {
+			notification.openNotification({
+				type: 'success',
+				message: translate('sign-and-submit-section.notifications.submitApplicationSuccess'),
+			});
+			navigation(`/dashboard`);
+		},
+		onError: () => {
+			notification.openNotification({
+				type: 'error',
+				message: translate('sign-and-submit-section.notifications.submitApplicationFailed'),
+			});
 		},
 	});
 };
 
-export default useGetApplicationList;
+export default useSubmitApplication;

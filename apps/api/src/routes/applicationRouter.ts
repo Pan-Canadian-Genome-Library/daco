@@ -207,6 +207,8 @@ applicationRouter.get(
 			return;
 		}
 
+		const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+
 		const { state: stateQuery, sort: sortQuery, page, pageSize } = request.query;
 
 		const pageRequested = page ? Number(page) : undefined;
@@ -246,6 +248,7 @@ applicationRouter.get(
 			sort,
 			page: pageRequested,
 			pageSize: pageSizeRequested,
+			isDACMember,
 		});
 
 		if (result.success) {
@@ -664,7 +667,7 @@ applicationRouter.post(
 	async (
 		request: Request,
 		response: ResponseWithData<
-			{ message: string; data: ApplicationRecord },
+			ApplicationRecord,
 			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 		>,
 	) => {
@@ -706,10 +709,7 @@ applicationRouter.post(
 			const result = await submitApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).json({
-					message: 'Application submitted successfully.',
-					data: result.data,
-				});
+				response.status(200).json(result.data);
 				return;
 			}
 
