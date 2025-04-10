@@ -32,9 +32,9 @@ import TextAreaBox from '@/components/pages/application/form-components/TextArea
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { useEffect } from 'react';
 
 const rule = createSchemaFieldRule(projectInformationSchema);
 
@@ -42,12 +42,9 @@ const Project = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const [form] = Form.useForm();
-	const {
-		control,
-		getValues,
-		formState: { isDirty },
-	} = useForm<Nullable<ProjectInformationSchemaType>>({
+	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
+
+	const { control, getValues } = useForm<Nullable<ProjectInformationSchemaType>>({
 		defaultValues: {
 			projectTitle: state.fields.projectTitle,
 			projectWebsite: state.fields.projectWebsite,
@@ -91,16 +88,12 @@ const Project = () => {
 					projectPublicationUrls,
 				},
 				formState: {
-					isDirty,
+					...state.formState,
+					isDirty: true,
 				},
 			},
 		});
 	};
-
-	// validate fields that have been dirtied on page load
-	useEffect(() => {
-		form.validateFields({ dirty: true });
-	}, [form]);
 
 	return (
 		<SectionWrapper>

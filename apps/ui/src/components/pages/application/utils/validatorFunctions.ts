@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
+import { type ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import {
 	agreementsSchema,
 	appendicesSchema,
 	applicantInformationSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
+	requestedStudiesSchema,
 } from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
@@ -90,5 +91,10 @@ export const ValidatorAgreements = (fields: ApplicationContentsResponse): boolea
 export const ValidatorAppendices = (fields: ApplicationContentsResponse): boolean => {
 	return appendicesSchema.safeParse({
 		acceptedAppendices: fields.acceptedAppendices,
+	}).success;
+};
+export const ValidatorStudy = (fields: ApplicationContentsResponse): boolean => {
+	return requestedStudiesSchema.safeParse({
+		requestedStudies: fields.requestedStudies,
 	}).success;
 };

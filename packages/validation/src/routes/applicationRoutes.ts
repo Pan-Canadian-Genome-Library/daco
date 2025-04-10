@@ -67,6 +67,7 @@ export const applicationContentsSchema = z
 		ethicsLetter: z.number().nullable(),
 		acceptedAgreements: z.array(z.enum(agreementEnum)).nullable(),
 		acceptedAppendices: z.array(z.enum(appendicesEnum)).nullable(),
+		requestedStudies: z.array(z.string()).nullable(),
 	})
 	.partial();
 

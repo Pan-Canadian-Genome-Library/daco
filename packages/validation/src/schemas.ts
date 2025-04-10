@@ -104,10 +104,17 @@ export const ethicsSchema = z.object({
 
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
-export const requestedStudySchema = z.object({
-	requestedStudy: z.number().nonnegative(),
+export const requestedStudiesSchema = z.object({
+	requestedStudies: z.array(z.string()).superRefine((study, context) => {
+		if (study.length !== 1) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'requiredField' },
+			});
+		}
+	}),
 });
-export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+export type RequestedStudiesSchemaType = z.infer<typeof requestedStudiesSchema>;
 
 export const agreementsSchema = z.object({
 	acceptedAgreements: z.array(z.string()).superRefine((allAgreements, context) => {
