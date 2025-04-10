@@ -198,7 +198,7 @@
 			"cancel": "Cancel"
 		},
 		"notifications": {
-			"submitApplicationSuccess": "Your application has been submitted successfully.",
+			"submitApplicationSuccess": "Your application has been submitted for review.",
 			"submitApplicationFailed": "Sorry, there was an unexpected error while submitting your application for review. Please try again later."
 		}
 
