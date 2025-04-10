@@ -84,7 +84,7 @@ async function retrieveFile(
 
 	res.status(403).json({
 		error: ErrorType.FORBIDDEN,
-		message: 'Looks like you do not own, or have sufficient privileges to access to this file.',
+		message: 'Looks like you do not own, or have the rights to retrieve this file.',
 	});
 	return;
 }
