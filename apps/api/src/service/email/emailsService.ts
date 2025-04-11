@@ -22,15 +22,46 @@ import BaseLogger from '@/logger.ts';
 import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
 import {
-	GenerateEmailApplicantDisapproval,
-	GenerateEmailApplicantDisapprovalPlain,
-} from './layouts/templates/GenerateEmailApplicantDisapproval.ts';
+	GenerateEmailApplicantApprove,
+	GenerateEmailApplicantApprovePlain,
+} from './layouts/templates/GenerateEmailApplicantApprove.ts';
+
+import {
+	GenerateEmailApplicantRejection,
+	GenerateEmailApplicantRejectionPlain,
+} from './layouts/templates/GenerateEmailApplicantRejection.ts';
 import { BaseEmailType, EmailSubjects } from './types.ts';
 
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
-	sendEmailApplicantDisapproval: async ({ name, to, comment }: BaseEmailType & { name: string; comment: string }) => {
+	sendEmailApplicantApprove: async ({ id, name, to }: BaseEmailType & { id: string | number; name: string }) => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
+			emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.NOTIFY_APPROVAL,
+				html: GenerateEmailApplicantApprove({ id, name }),
+				text: GenerateEmailApplicantApprovePlain({ id, name }),
+			});
+		} catch (error) {
+			const message = `Error sending email to recipient: ${to}`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	sendEmailApplicantReject: async ({
+		id,
+		name,
+		to,
+		comment,
+	}: BaseEmailType & { id: string | number; name: string; comment: string }) => {
 		try {
 			const {
 				email: { fromAddress },
@@ -40,8 +71,8 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.DACO_APPLICATION_STATUS,
-				html: GenerateEmailApplicantDisapproval({ name, comment }),
-				text: GenerateEmailApplicantDisapprovalPlain({ name, comment }),
+				html: GenerateEmailApplicantRejection({ id, name, comment }),
+				text: GenerateEmailApplicantRejectionPlain({ name, comment }),
 			});
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;

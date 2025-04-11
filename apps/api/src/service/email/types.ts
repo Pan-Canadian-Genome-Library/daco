@@ -20,6 +20,11 @@
 // TODO: Likely to be refactored once we add translations
 export const EmailSubjects = {
 	INSTITUTIONAL_REP_REVIEW_REQUEST: 'Review Request for PCGL DACO Application',
+	REVISIONS_REQUESTED_REP_APPLICANT: 'Revisions Requested on Your PCGL DACO Application',
+	NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW: ' Your PCGL DACO Application Has Been Submitted for DAC Review',
+	NOTIFY_DAC_REVIEW_REVISIONS: 'Request for DAC Review of PCGL DACO Application',
+	NOTIFY_APPLICANT_FOR_DAC_REVISION: 'Revisions Requested on Your PCGL DACO Application',
+	NOTIFY_APPROVAL: 'Congratulations! Your DACO Application Has Been Approved',
 	DACO_APPLICATION_STATUS: 'DACO Application Status',
 } as const;
 

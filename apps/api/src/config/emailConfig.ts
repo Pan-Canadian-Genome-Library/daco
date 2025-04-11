@@ -49,6 +49,7 @@ export const getEmailConfig = () => {
 		isProduction: (process.env.NODE_ENV || 'production') === 'production',
 		express: {
 			port: process.env.PORT || '8087',
+			ui: process.env.UI_HOST || 'http://localhost:5173',
 		},
 		email: {
 			host: process.env.EMAIL_HOST || 'localhost',
@@ -62,10 +63,6 @@ export const getEmailConfig = () => {
 			},
 			imageBaseUrl: process.env.IMAGE_BASE_URL || '',
 			frenchEnabled: (process.env.FRENCH_EMAILS_ENABLED || 'false') === 'true',
-		},
-		pcgl: {
-			registryUrl: process.env.PCGL_REGISTRY_URL || 'https://pcgl.ca',
-			consentUiBaseUrl: process.env.CONSENT_UI_BASE_URL || 'http://localhost:3000',
 		},
 	};
 };
