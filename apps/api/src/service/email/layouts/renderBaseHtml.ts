@@ -52,7 +52,7 @@ const HeaderRender = () => {
 		<mj-wrapper mj-class="header-background">
 			<mj-section>
 				<mj-column css-class="logo-wrapper">
-				<mj-image css-class="logo" src="${imageBaseUrl}" alt="PCGL-LOGO" />
+				<mj-image css-class="logo" src="${imageBaseUrl}/pcgl_logo.png" alt="PCGL-LOGO" />
 				</mj-column>
 			</mj-section>
 		</mj-wrapper>
