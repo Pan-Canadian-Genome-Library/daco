@@ -17,29 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateRejectType } from '../../types.ts';
+import { GenerateInstitutionalRepType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
-	const {
-		express: { ui },
-	} = getEmailConfig();
-
+export const GenerateEmailInstitutionalRepReview = ({
+	applicantName,
+	repName,
+}: Omit<GenerateInstitutionalRepType, 'to'>) => {
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear ${name},
+                    Dear ${repName},
                 </mj-text>
                 <mj-text>
-                    Thank you for submitting <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
+                    We hope this message finds you well.
                 </mj-text>
                 <mj-text>
-                    This is the Data Access Committee's comments on your application: ${comment}.
+                    A new PCGL <a href="" target="_blank" rel="nofollow">DACO application</a> has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
                 </mj-text>
                 <mj-text>
-                    We appreciate your interest in the PCGL controlled data, thank you again for your time!        
+                    Here are the details of the application: <br/>
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -51,10 +49,10 @@ export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejec
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailRejectionPlain = ({ name, comment }: Omit<GenerateRejectType, 'id' | 'to'>) => {
-	return ` Dear ${name},
-    \n Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
-    \n This is the Data Access Committee's comments on your application: ${comment}
-    \n We appreciate your interest in the PCGL controlled data, thank you again for your time! 
-    \n Best regards, \n The PCGL Data Access Compliance Office`;
+export const GenerateEmailInstitutionalRepReviewPlain = ({ repName }: Omit<GenerateInstitutionalRepType, 'to'>) => {
+	return ` Dear ${repName},
+    \n I am pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. 
+    \n Should you have any questions or need assistance, feel free to reach out to us. 
+    \n Best regards, \n The PCGL Data Access Compliance Office 
+    `;
 };

@@ -21,15 +21,46 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
-import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
 
+import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
+import {
+	GenerateEmailInstitutionalRepReview,
+	GenerateEmailInstitutionalRepReviewPlain,
+} from './layouts/templates/EmailInstitutionalRepReview.ts';
 import { GenerateEmailRejection, GenerateEmailRejectionPlain } from './layouts/templates/EmailRejection.ts';
-import { BaseEmailType, EmailSubjects } from './types.ts';
+import { EmailSubjects, GenerateApproveType, GenerateInstitutionalRepType, GenerateRejectType } from './types.ts';
 
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
-	sendEmailApproval: async ({ id, name, to }: BaseEmailType & { id: string | number; name: string }) => {
+	sendEmailInstitutionalRepReview: async ({
+		id,
+		applicantName,
+		repName,
+		submittedDate,
+		to,
+	}: GenerateInstitutionalRepType) => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
+			emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
+				html: GenerateEmailInstitutionalRepReview({ id, applicantName, repName, submittedDate }),
+				text: GenerateEmailInstitutionalRepReviewPlain({ id, applicantName, repName, submittedDate }),
+			});
+		} catch (error) {
+			const message = `Error sending email to recipient: ${to}`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	sendEmailApproval: async ({ id, name, to }: GenerateApproveType) => {
 		try {
 			const {
 				email: { fromAddress },
@@ -50,12 +81,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	sendEmailReject: async ({
-		id,
-		name,
-		to,
-		comment,
-	}: BaseEmailType & { id: string | number; name: string; comment: string }) => {
+	sendEmailReject: async ({ id, name, to, comment }: GenerateRejectType) => {
 		try {
 			const {
 				email: { fromAddress },

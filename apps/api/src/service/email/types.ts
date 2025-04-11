@@ -34,3 +34,22 @@ export type BaseEmailType = {
 	to: string;
 	lang?: string;
 };
+
+export type GenerateInstitutionalRepType = {
+	id: string | number;
+	repName: string;
+	applicantName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
+
+export type GenerateRejectType = {
+	id: string | number;
+	name: string;
+	comment: string;
+} & BaseEmailType;
+
+export type GenerateApproveType = {
+	id: string | number;
+	name: string;
+	lang?: string;
+} & BaseEmailType;

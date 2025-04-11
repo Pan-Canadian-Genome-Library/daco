@@ -17,16 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { GenerateApproveType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-type GenerateApproveProp = {
-	id: string | number;
-	name: string;
-	lang?: string;
-};
-
 // TODO: english and french translations
-export const GenerateEmailApproval = ({ name }: GenerateApproveProp) => {
+export const GenerateEmailApproval = ({ name }: Omit<GenerateApproveType, 'to'>) => {
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
@@ -47,7 +42,7 @@ export const GenerateEmailApproval = ({ name }: GenerateApproveProp) => {
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApprovalPlain = ({ name }: GenerateApproveProp) => {
+export const GenerateEmailApprovalPlain = ({ name }: Omit<GenerateApproveType, 'to'>) => {
 	return ` Dear ${name},
     \n I am pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. 
     \n Should you have any questions or need assistance, feel free to reach out to us. 
