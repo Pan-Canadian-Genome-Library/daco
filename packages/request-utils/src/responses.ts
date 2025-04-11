@@ -33,7 +33,7 @@ export const RequestValidationErrorResponse = <T>(
 	error: ErrorType.INVALID_REQUEST,
 	message:
 		customMessage ??
-		'Sorry, looks like you sent a sent bad request. Please check the request and try again, or refer to our API documentation.',
+		'Sorry, looks like you sent a bad request. Please double check the request and try again, or refer to our API documentation.',
 	details: error.issues,
 });
 
