@@ -30,6 +30,7 @@ import {
 	isAgreementKey,
 	isAppendicesKey,
 	isApplicantKey,
+	isEthicsKey,
 	isInstitutionalKey,
 	isProjectKey,
 	isRequestedStudies,
@@ -102,6 +103,11 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 				...sectionTouched,
 				project: true,
 			};
+		} else if (isEthicsKey(key)) {
+			sectionTouched = {
+				...sectionTouched,
+				ethics: true,
+			};
 		}
 	});
 
@@ -120,14 +126,14 @@ export const VerifyFormSections = (
 ): VerifyPageSectionsType<SectionRoutesValues> => {
 	return {
 		[SectionRoutes.INTRO]: false,
+		[SectionRoutes.SIGN]: false,
+		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.APPLICANT]: fields ? ValidatorApplicant(fields) : false,
 		[SectionRoutes.INSTITUTIONAL]: fields ? ValidatorInstitution(fields) : false,
-		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
 		[SectionRoutes.STUDY]: fields ? ValidatorStudy(fields) : false,
 		[SectionRoutes.ETHICS]: fields ? ValidatorEthics(fields) : false,
 		[SectionRoutes.AGREEMENT]: fields ? ValidatorAgreements(fields) : false,
 		[SectionRoutes.APPENDICES]: fields ? ValidatorAppendices(fields) : false,
-		[SectionRoutes.SIGN]: false,
 	};
 };
