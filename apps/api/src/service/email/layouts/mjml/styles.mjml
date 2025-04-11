@@ -19,18 +19,21 @@
   }
 
   .footer-wrapper {
-    margin: auto;
+    width: "100%";
+    margin: 0 auto;
     padding: 1.25rem
   }
 
   .footer-text div {
-
+    margin: 0 auto;
+    text-align: center !important;
     color: #ffffff !important;
-    font-size: 0.8125rem !important;
+    font-size: 0.7125rem !important;
   }
 
   .footer-text div a {
     color: #ffffff !important;
+    font-size: 0.7125rem !important;
   }
 
 

@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getEmailConfig } from '@/config/emailConfig.ts';
 import mjml2html from 'mjml';
 
 export const basicLayout = ({ body }: { body?: string; lang?: string }) => {
@@ -43,11 +44,15 @@ export const basicLayout = ({ body }: { body?: string; lang?: string }) => {
 };
 
 const HeaderRender = () => {
+	const {
+		email: { imageBaseUrl },
+	} = getEmailConfig();
+
 	return `
 		<mj-wrapper mj-class="header-background">
 			<mj-section>
 				<mj-column css-class="logo-wrapper">
-				<mj-image css-class="logo" src="cid:PCGL_LOGO" alt="PCGL-LOGO" />
+				<mj-image css-class="logo" src="${imageBaseUrl}" alt="PCGL-LOGO" />
 				</mj-column>
 			</mj-section>
 		</mj-wrapper>

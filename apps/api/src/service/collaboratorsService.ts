@@ -20,6 +20,7 @@
 import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import BaseLogger from '@/logger.js';
+import { emailSvc } from '@/service/email/emailsService.ts';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { and, eq } from 'drizzle-orm';
 import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
@@ -33,6 +34,13 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		newCollaborators: CollaboratorModel[];
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
+			const emailService = await emailSvc();
+			emailService.sendEmailApplicantDisapproval({
+				to: 'test@gmail.com',
+				name: 'tom',
+				comment: 'Maybe maybe Maybe maybe Maybe maybe',
+			});
+
 			// Check for Duplicates
 			let hasDuplicateCollaborators = false;
 
