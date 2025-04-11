@@ -118,7 +118,7 @@ export const requestedStudiesSchema = z.object({
 export type RequestedStudiesSchemaType = z.infer<typeof requestedStudiesSchema>;
 
 export const agreementsSchema = z.object({
-	agreements: z.array(z.string()).superRefine((allAgreements, context) => {
+	acceptedAgreements: z.array(z.string()).superRefine((allAgreements, context) => {
 		if (allAgreements.length > 9) {
 			context.addIssue({
 				code: z.ZodIssueCode.too_big,
@@ -130,10 +130,8 @@ export const agreementsSchema = z.object({
 
 		if (allAgreements.length < 9) {
 			context.addIssue({
-				code: z.ZodIssueCode.too_small,
-				minimum: 9,
-				type: 'array',
-				inclusive: true,
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'checkboxesNotFilledOut' },
 			});
 		}
 
@@ -155,7 +153,7 @@ export const agreementsSchema = z.object({
 export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
 
 export const appendicesSchema = z.object({
-	appendices: z.array(z.string()).superRefine((policies, context) => {
+	acceptedAppendices: z.array(z.string()).superRefine((policies, context) => {
 		if (policies.length !== 3) {
 			context.addIssue({
 				code: z.ZodIssueCode.custom,

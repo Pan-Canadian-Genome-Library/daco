@@ -18,6 +18,8 @@
  */
 
 import {
+	ValidatorAgreements,
+	ValidatorAppendices,
 	ValidatorApplicant,
 	ValidatorEthics,
 	ValidatorInstitution,
@@ -25,8 +27,9 @@ import {
 	ValidatorStudy,
 } from '@/components/pages/application/utils/validatorFunctions';
 import {
+	isAgreementKey,
+	isAppendicesKey,
 	isApplicantKey,
-	isEthicsKey,
 	isInstitutionalKey,
 	isProjectKey,
 	isRequestedStudies,
@@ -65,27 +68,36 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 	}
 
 	Object.entries(fields).forEach(([key, value]) => {
-		if (isApplicantKey(key) && value !== null) {
+		if (value === null) {
+			return sectionTouched;
+		}
+
+		if (isApplicantKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				applicant: true,
 			};
-		} else if (isInstitutionalKey(key) && value !== null) {
+		} else if (isInstitutionalKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				institutional: true,
 			};
-		} else if (isEthicsKey(key) && value !== null) {
+		} else if (isAgreementKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
-				ethics: true,
+				agreement: true,
 			};
-		} else if (isRequestedStudies(key) && value != null) {
+		} else if (isAppendicesKey(key)) {
+			sectionTouched = {
+				...sectionTouched,
+				appendices: true,
+			};
+		} else if (isRequestedStudies(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				study: true,
 			};
-		} else if (isProjectKey(key) && value !== null) {
+		} else if (isProjectKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				project: true,
@@ -114,8 +126,8 @@ export const VerifyFormSections = (
 		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
 		[SectionRoutes.STUDY]: fields ? ValidatorStudy(fields) : false,
 		[SectionRoutes.ETHICS]: fields ? ValidatorEthics(fields) : false,
-		[SectionRoutes.AGREEMENT]: false,
-		[SectionRoutes.APPENDICES]: false,
+		[SectionRoutes.AGREEMENT]: fields ? ValidatorAgreements(fields) : false,
+		[SectionRoutes.APPENDICES]: fields ? ValidatorAppendices(fields) : false,
 		[SectionRoutes.SIGN]: false,
 	};
 };
