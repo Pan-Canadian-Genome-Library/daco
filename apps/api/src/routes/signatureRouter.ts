@@ -131,7 +131,7 @@ signatureRouter.get(
  *
  * The body of the request will indicate if the signature is from the applicant or the institutional representative.
  *
- * To sign an applciation, the user must be the author of the application, or be the institional rep assinged to the application.
+ * To sign an application, the user must be the author of the application, or be the institutional rep assigned to the application.
  */
 signatureRouter.post(
 	'/sign',
@@ -171,7 +171,7 @@ signatureRouter.post(
 				}
 
 				const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
-				// TODO: Identify if the user role is institutional rep and is the rep for this application
+
 				const isApplicationInstitutionalRep =
 					signee === 'INSTITUTIONAL_REP' && (await isAssociatedRep(request.session, applicationId));
 
@@ -211,10 +211,6 @@ signatureRouter.post(
 	),
 );
 
-/**
- * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
- */
 signatureRouter.delete(
 	'/:applicationId',
 	authMiddleware(),
@@ -270,7 +266,7 @@ signatureRouter.delete(
 					}
 
 					const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
-					// TODO: Identify if the user role is institutional rep and is the rep for this application
+
 					const isApplicationInstitutionalRep =
 						signee === 'INSTITUTIONAL_REP' && (await isAssociatedRep(request.session, applicationId));
 

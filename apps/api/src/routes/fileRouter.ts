@@ -24,7 +24,7 @@ import { getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { apiZodErrorMapping } from '@/utils/validation.ts';
 import { FilesDTO } from '@pcgl-daco/data-model';
 import { ErrorType, fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { fileDeleteParamsSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
+import { deleteFileByIdSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
 import formidable from 'formidable';
 import type { ResponseWithData } from './types.ts';
@@ -112,7 +112,7 @@ fileRouter.get(
 		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
 	}),
 	withParamsSchemaValidation(
-		fileDeleteParamsSchema,
+		getFileByIdParamsSchema,
 		apiZodErrorMapping,
 		async (
 			req: Request,
@@ -207,7 +207,7 @@ fileRouter.delete(
 		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
 	}),
 	withParamsSchemaValidation(
-		fileDeleteParamsSchema,
+		deleteFileByIdSchema,
 		apiZodErrorMapping,
 		async (req: Request, res: ResponseWithData<void, ['FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']>) => {
 			const { fileId } = req.params;
