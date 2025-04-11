@@ -18,14 +18,18 @@
  */
 
 import {
-	ApplicantDTO,
-	ApplicationContentsResponse,
-	InstitutionalRepDTO,
-	InstitutionDTO,
-	ProjectDTO,
-	RequestedStudiesDTO,
+	type AgreementDTO,
+	type AppendicesDTO,
+	type ApplicantDTO,
+	type ApplicationContentsResponse,
+	type InstitutionalRepDTO,
+	type InstitutionDTO,
+	type ProjectDTO,
 } from '@pcgl-daco/data-model';
+
 import {
+	agreementsSchema,
+	appendicesSchema,
 	applicantInformationSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
@@ -47,6 +51,13 @@ export function isInstitutionalKey(value: string): value is keyof InstitutionalK
 	return value in institutionalRepSchema.keyof().Values;
 }
 
+export function isAgreementKey(value: string): value is keyof AgreementDTO {
+	return value in agreementsSchema.keyof().Values;
+}
+
+export function isAppendicesKey(value: string): value is keyof AppendicesDTO {
+	return value in appendicesSchema.keyof().Values;
+}
 // RequestedStudyKey
 export function isRequestedStudies(value: string): value is keyof RequestedStudiesDTO {
 	return value in requestedStudiesSchema.keyof().Values;

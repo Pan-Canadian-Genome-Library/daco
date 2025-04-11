@@ -19,6 +19,8 @@
 
 import { type ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import {
+	agreementsSchema,
+	appendicesSchema,
 	applicantInformationSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
@@ -80,6 +82,17 @@ export const ValidatorProject = (fields: ApplicationContentsResponse): boolean =
 	}).success;
 };
 
+export const ValidatorAgreements = (fields: ApplicationContentsResponse): boolean => {
+	return agreementsSchema.safeParse({
+		acceptedAgreements: fields.acceptedAgreements,
+	}).success;
+};
+
+export const ValidatorAppendices = (fields: ApplicationContentsResponse): boolean => {
+	return appendicesSchema.safeParse({
+		acceptedAppendices: fields.acceptedAppendices,
+	}).success;
+};
 export const ValidatorStudy = (fields: ApplicationContentsResponse): boolean => {
 	return requestedStudiesSchema.safeParse({
 		requestedStudies: fields.requestedStudies,
