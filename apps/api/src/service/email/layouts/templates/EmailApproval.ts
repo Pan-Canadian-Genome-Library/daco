@@ -26,7 +26,7 @@ type GenerateApproveProp = {
 };
 
 // TODO: english and french translations
-export const GenerateEmailApplicantApprove = ({ name }: GenerateApproveProp) => {
+export const GenerateEmailApproval = ({ name }: GenerateApproveProp) => {
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
@@ -47,7 +47,7 @@ export const GenerateEmailApplicantApprove = ({ name }: GenerateApproveProp) => 
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApplicantApprovePlain = ({ name }: GenerateApproveProp) => {
+export const GenerateEmailApprovalPlain = ({ name }: GenerateApproveProp) => {
 	return ` Dear ${name},
     \n I am pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. 
     \n Should you have any questions or need assistance, feel free to reach out to us. 

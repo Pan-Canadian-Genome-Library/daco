@@ -21,15 +21,9 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
-import {
-	GenerateEmailApplicantApprove,
-	GenerateEmailApplicantApprovePlain,
-} from './layouts/templates/GenerateEmailApplicantApprove.ts';
+import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
 
-import {
-	GenerateEmailApplicantRejection,
-	GenerateEmailApplicantRejectionPlain,
-} from './layouts/templates/GenerateEmailApplicantRejection.ts';
+import { GenerateEmailRejection, GenerateEmailRejectionPlain } from './layouts/templates/EmailRejection.ts';
 import { BaseEmailType, EmailSubjects } from './types.ts';
 
 const logger = BaseLogger.forModule('emailService');
@@ -45,8 +39,8 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_APPROVAL,
-				html: GenerateEmailApplicantApprove({ id, name }),
-				text: GenerateEmailApplicantApprovePlain({ id, name }),
+				html: GenerateEmailApproval({ id, name }),
+				text: GenerateEmailApprovalPlain({ id, name }),
 			});
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
@@ -71,8 +65,8 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.DACO_APPLICATION_STATUS,
-				html: GenerateEmailApplicantRejection({ id, name, comment }),
-				text: GenerateEmailApplicantRejectionPlain({ name, comment }),
+				html: GenerateEmailRejection({ id, name, comment }),
+				text: GenerateEmailRejectionPlain({ name, comment }),
 			});
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;

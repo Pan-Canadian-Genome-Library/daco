@@ -28,7 +28,7 @@ type GenerateRejectProp = {
 };
 
 // TODO: english and french translations
-export const GenerateEmailApplicantRejection = ({ id, name, comment }: GenerateRejectProp) => {
+export const GenerateEmailRejection = ({ id, name, comment }: GenerateRejectProp) => {
 	const {
 		express: { ui },
 	} = getEmailConfig();
@@ -57,7 +57,7 @@ export const GenerateEmailApplicantRejection = ({ id, name, comment }: GenerateR
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApplicantRejectionPlain = ({ name, comment }: Omit<GenerateRejectProp, 'id'>) => {
+export const GenerateEmailRejectionPlain = ({ name, comment }: Omit<GenerateRejectProp, 'id'>) => {
 	return ` Dear ${name},
     \n Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
     \n This is the Data Access Committee's comments on your application: ${comment}
