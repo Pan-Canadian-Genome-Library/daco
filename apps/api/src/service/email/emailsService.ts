@@ -29,7 +29,7 @@ import { BaseEmailType, EmailSubjects } from './types.ts';
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
-	sendEmailApplicantApprove: async ({ id, name, to }: BaseEmailType & { id: string | number; name: string }) => {
+	sendEmailApproval: async ({ id, name, to }: BaseEmailType & { id: string | number; name: string }) => {
 		try {
 			const {
 				email: { fromAddress },
@@ -50,7 +50,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	sendEmailApplicantReject: async ({
+	sendEmailReject: async ({
 		id,
 		name,
 		to,
