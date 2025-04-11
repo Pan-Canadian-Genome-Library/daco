@@ -30,10 +30,11 @@ import { LabelWithLink } from '@/components/pages/application/form-components/la
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { appendicesEnum } from '@pcgl-daco/data-model';
 import { appendicesSchema, type AppendicesSchemaType } from '@pcgl-daco/validation';
-import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const rule = createSchemaFieldRule(appendicesSchema);
 
@@ -51,7 +52,7 @@ const Appendices = () => {
 		},
 		resolver: zodResolver(appendicesSchema),
 	});
-	const form = useSectionForm({ section: "appendices", sectionVisited: state.formState.sectionsVisited.appendices });
+	const form = useSectionForm({ section: 'appendices', sectionVisited: state.formState.sectionsVisited.appendices });
 
 	const onSubmit = () => {
 		const acceptedAppendices = getValues('acceptedAppendices');
@@ -107,7 +108,7 @@ const Appendices = () => {
 										/>
 									),
 									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX I' }),
-									value: 'appendix_1',
+									value: appendicesEnum[0],
 								},
 								{
 									description: (
@@ -117,7 +118,7 @@ const Appendices = () => {
 										/>
 									),
 									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX II' }),
-									value: 'appendix_2',
+									value: appendicesEnum[1],
 								},
 								{
 									description: (
@@ -127,7 +128,7 @@ const Appendices = () => {
 										/>
 									),
 									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX III' }),
-									value: 'appendix_3',
+									value: appendicesEnum[2],
 								},
 							]}
 						/>

@@ -129,10 +129,8 @@ export const agreementsSchema = z.object({
 
 		if (allAgreements.length < 9) {
 			context.addIssue({
-				code: z.ZodIssueCode.too_small,
-				minimum: 9,
-				type: 'array',
-				inclusive: true,
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'checkboxesNotFilledOut' },
 			});
 		}
 

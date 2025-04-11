@@ -30,10 +30,10 @@ import CheckboxGroup, { type CheckboxGroupOptions } from '@/components/pages/app
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { Nullable, type ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
-import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const { Text } = Typography;
 const rule = createSchemaFieldRule(agreementsSchema);
@@ -42,7 +42,7 @@ const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const form = useSectionForm({ section: "agreement", sectionVisited: state.formState.sectionsVisited.agreement });
+	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {
 		control,
 		getValues,
@@ -53,7 +53,6 @@ const AccessAgreement = () => {
 		},
 		resolver: zodResolver(agreementsSchema),
 	});
-	
 
 	const onSubmit = () => {
 		const acceptedAgreements = getValues('acceptedAgreements');
