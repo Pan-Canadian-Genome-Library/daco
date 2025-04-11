@@ -28,6 +28,7 @@ import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/applicationRouter.js';
 import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
+import { errorHandler } from '@pcgl-daco/request-utils';
 import urlJoin from 'url-join';
 import { serverConfig } from './config/serverConfig.js';
 import BaseLogger from './logger.js';
@@ -35,7 +36,6 @@ import authRouter from './routes/authRouter.js';
 import fileRouter from './routes/fileRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
 import sessionMiddleware from './session/sessionMiddleware.js';
-import { errorHandler } from '@pcgl-daco/request-utils';
 
 const logger = BaseLogger.forModule('server');
 
@@ -90,7 +90,7 @@ const startServer = async () => {
 			logger.info(`API Docs available at: ${urlJoin([`http://localhost:${serverConfig.PORT}`, API_PATH_DOCS])}`);
 		}
 	});
-	app.use(errorHandler({logger}));
+	app.use(errorHandler({ logger }));
 };
 
 export default startServer;

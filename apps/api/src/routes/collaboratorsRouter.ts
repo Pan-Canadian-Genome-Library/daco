@@ -36,7 +36,7 @@ import {
 } from '@pcgl-daco/validation';
 import { getApplicationById } from '../controllers/applicationController.ts';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
-import { getUserRole } from '../service/authService.ts';
+import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
 
 const collaboratorsRouter = express.Router();
@@ -151,7 +151,8 @@ collaboratorsRouter.get(
 
 			const isApplicationUser = applicationResult.data.userId === userId;
 			// TODO: Identify if the user role is institutional rep and is the rep for this application
-			const isApplicationInstitutionalRep = userRole === 'INSTITUTIONAL_REP' && false; // && applicationResult.data.contents?.institutionalRepEmail === something.from.session;
+			const isApplicationInstitutionalRep = await isAssociatedRep(request.session, applicationId);
+
 			const isDacMember = userRole === 'DAC_MEMBER';
 
 			if (!(isApplicationUser || isApplicationInstitutionalRep || isDacMember)) {

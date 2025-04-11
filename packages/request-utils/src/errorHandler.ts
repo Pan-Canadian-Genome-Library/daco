@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {type LoggerType } from '@pcgl-daco/logger';
-import { ServerErrorResponse } from './error/ServerErrorResponse.js';
-import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
+import { type LoggerType } from '@pcgl-daco/logger';
+import { type ErrorRequestHandler, type NextFunction, type Request, type Response } from 'express';
+import { UnhandledServerErrorResponse } from './responses.js';
 
 export const errorHandler =
 	(params: { logger?: LoggerType }): ErrorRequestHandler =>
@@ -30,9 +30,7 @@ export const errorHandler =
 			return next(err);
 		}
 
-		logger?.error('Unhandled error thrown from request', req.url, err);
+		logger?.error('An unhandled error was thrown from request:', req.url, err);
 
-		const errorMessage = err.message || 'An error occurred.';
-
-		 res.status(500).json(ServerErrorResponse(errorMessage));
+		res.status(500).json(UnhandledServerErrorResponse());
 	};

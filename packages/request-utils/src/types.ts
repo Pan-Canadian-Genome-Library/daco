@@ -19,20 +19,20 @@
 
 import { ZodIssue } from 'zod';
 
-export const ErrorName = {
-	BAD_REQUEST_ERROR: 'BadRequestError',
-	CONFLICT_ERROR: 'ConflictError',
-	NOT_FOUND_ERROR: 'NotFoundError',
-	REQUEST_VALIDATION_ERROR: 'RequestValidationError',
-	SERVER_ERROR: 'ServerError',
-	UNAUTHORIZED: 'Unauthorized',
-	NOT_IMPLEMENTED: 'NotImplemented',
+export const ErrorType = {
+	INVALID_REQUEST: 'INVALID_REQUEST',
+	CONFLICT_DETECTED: 'CONFLICT_DETECTED',
+	NOT_FOUND: 'NOT_FOUND',
+	SYSTEM_ERROR: 'SYSTEM_ERROR',
+	UNAUTHORIZED: 'UNAUTHORIZED',
+	FORBIDDEN: 'FORBIDDEN',
+	NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
 } as const;
 
-export type ErrorNames = (typeof ErrorName)[keyof typeof ErrorName];
+export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];
 
 export type ErrorResponse = {
-	error: ErrorNames;
+	error: ErrorTypes | 'NOT_IMPLEMENTED';
 	message: string;
 };
 
