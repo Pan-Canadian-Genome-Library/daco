@@ -22,6 +22,7 @@ import {
 	agreementsSchema,
 	appendicesSchema,
 	applicantInformationSchema,
+	ethicsSchema,
 	institutionalRepSchema,
 	projectInformationSchema,
 	requestedStudiesSchema,
@@ -79,6 +80,13 @@ export const ValidatorProject = (fields: ApplicationContentsResponse): boolean =
 		relevantPublicationURL1: fields.projectPublicationUrls ? fields.projectPublicationUrls[0] : null,
 		relevantPublicationURL2: fields.projectPublicationUrls ? fields.projectPublicationUrls[1] : null,
 		relevantPublicationURL3: fields.projectPublicationUrls ? fields.projectPublicationUrls[2] : null,
+	}).success;
+};
+
+export const ValidatorEthics = (fields: ApplicationContentsResponse): boolean => {
+	return ethicsSchema.safeParse({
+		ethicsReviewRequired: fields.ethicsReviewRequired,
+		ethicsLetter: fields.ethicsLetter,
 	}).success;
 };
 

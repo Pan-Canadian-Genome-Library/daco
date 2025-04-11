@@ -100,6 +100,7 @@ export type ProjectInformationSchemaType = z.infer<typeof projectInformationSche
 
 export const ethicsSchema = z.object({
 	ethicsReviewRequired: z.boolean(),
+	ethicsLetter: z.number().nonnegative(),
 });
 
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
