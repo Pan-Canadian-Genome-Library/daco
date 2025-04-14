@@ -379,3 +379,19 @@ export const agreementEnum = [
 ] as const;
 
 export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as const;
+export interface RevisionsDTO {
+	id: number;
+	applicationId: number;
+	createdAt: Date;
+	comments?: String | null;
+	applicantNotes?: string | null;
+	applicantApproved?: boolean;
+	institutionRepApproved?: boolean;
+	institutionRepNotes?: string | null;
+	collaboratorsApproved: boolean;
+	collaboratorsNotes?: string | null;
+	projectApproved?: boolean;
+	projectNotes?: string | null;
+	requestedStudiesApproved?: boolean;
+	requestedStudiesNotes?: string | null;
+}

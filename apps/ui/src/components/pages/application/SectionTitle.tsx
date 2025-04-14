@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { LockFilled } from '@ant-design/icons';
 import { Divider, Flex, Typography } from 'antd';
 import { PropsWithChildren, ReactNode } from 'react';
 
@@ -27,12 +28,31 @@ interface SectionTitleProps extends PropsWithChildren {
 	text?: string[] | ReactNode;
 	textAbidesNewLines?: boolean;
 	showDivider?: boolean;
+	showLockIcon?: boolean;
 }
 
-const SectionTitle = ({ title, text, showDivider = true, textAbidesNewLines = false, children }: SectionTitleProps) => {
+const SectionTitle = ({
+	title,
+	text,
+	showDivider = true,
+	textAbidesNewLines = false,
+	showLockIcon = false,
+	children,
+}: SectionTitleProps) => {
 	return (
 		<Flex vertical>
-			<Title level={2}>{title}</Title>
+			<Flex align="center" gap={'1rem'}>
+				<Title level={2}>{title}</Title>
+				{!showLockIcon ? (
+					<LockFilled
+						style={{
+							opacity: '45%',
+							marginTop: '.5rem',
+							fontSize: '1.75rem',
+						}}
+					/>
+				) : null}
+			</Flex>
 			<Flex vertical gap={'middle'}>
 				{text && Array.isArray(text)
 					? text.map((text) => {

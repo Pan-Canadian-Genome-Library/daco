@@ -46,7 +46,7 @@ export interface ApplicationCountMetadata {
 
 export interface ServerError {
 	message: string;
-	errors?: string;
+	error?: string;
 }
 
 export interface FetchError extends ServerError {
@@ -57,6 +57,7 @@ export interface FetchError extends ServerError {
 export interface ApplicationOutletContext {
 	appId: string | number;
 	isEditMode: boolean;
+	isLocked: boolean;
 }
 
 export interface BasicFormFieldProps {

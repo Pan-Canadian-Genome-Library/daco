@@ -52,7 +52,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId }: SectionMenuProps) =>
 		return VerifyFormSections(state?.fields);
 	}, [state]);
 
-	// Check if the form has beed dirtied at all
+	// Check if the form has been dirtied at all
 	const SectionTouched = useMemo(() => {
 		return VerifySectionsTouched(state?.fields);
 	}, [state]);

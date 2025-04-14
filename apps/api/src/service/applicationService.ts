@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
@@ -442,7 +442,8 @@ const applicationSvc = (db: PostgresDb) => ({
 			const results = await db
 				.select()
 				.from(revisionRequests)
-				.where(eq(revisionRequests.application_id, applicationId));
+				.where(eq(revisionRequests.application_id, applicationId))
+				.orderBy(desc(revisionRequests.created_at));
 
 			return success(results);
 		} catch (error) {

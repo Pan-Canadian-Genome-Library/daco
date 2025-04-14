@@ -86,7 +86,7 @@ async function validateUserPermissionForApplication({
 
 		// ensure application has this user's ID
 		if (applicationResult.data.userId !== userId) {
-			return failure('FORBIDDEN', 'User is not the creater of this application.');
+			return failure('FORBIDDEN', 'User is not the creator of this application.');
 		}
 
 		return success(undefined);
@@ -281,7 +281,7 @@ applicationRouter.get(
 		request,
 		response: ResponseWithData<
 			ApplicationResponseData,
-			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR']
+			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
 		>,
 	) => {
 		const { user } = request.session;
@@ -320,7 +320,7 @@ applicationRouter.get(
 				return;
 			}
 			case 'NOT_FOUND': {
-				response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
+				response.status(404).json({ error: 'NOT_FOUND', message: 'Application not found.' });
 				return;
 			}
 		}
@@ -938,19 +938,6 @@ applicationRouter.get(
 				//Service only returns this if a SYSTEM_ERROR occurs, set to HTTP code 500 and bail if this is the case.
 				if (!result.success) {
 					response.status(500).json({ error: result.error, message: result.message });
-					return;
-				}
-
-				/**
-				 * If the controller and service are successful but returns us an empty array,
-				 * this means that there are no associated revisions to this application.
-				 * we should thus let the client know by returning a 404.
-				 **/
-				if (!result.data.length) {
-					response.status(404).send({
-						error: 'NOT_FOUND',
-						message: 'No revisions related to this application could be found.',
-					});
 					return;
 				}
 
