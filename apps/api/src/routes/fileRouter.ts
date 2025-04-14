@@ -126,7 +126,7 @@ fileRouter.get(
 fileRouter.post(
 	'/ethics/:applicationId',
 	authMiddleware({
-		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
+		requiredRoles: ['APPLICANT'],
 	}),
 	fileUploadValidation(
 		async (
@@ -204,7 +204,7 @@ fileRouter.post(
 fileRouter.delete(
 	'/:fileId',
 	authMiddleware({
-		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
+		requiredRoles: ['APPLICANT'],
 	}),
 	withParamsSchemaValidation(
 		deleteFileByIdSchema,
@@ -229,7 +229,7 @@ fileRouter.delete(
 				return;
 			}
 
-			if (getUserRole(userSession) !== 'DAC_MEMBER' && file.data.submitterUserId !== userSession.user?.userId) {
+			if (file.data.submitterUserId !== userSession.user?.userId) {
 				res.status(403).send({
 					error: ErrorType.FORBIDDEN,
 					message: 'Looks like you do not own, or have the rights to modify this file.',
