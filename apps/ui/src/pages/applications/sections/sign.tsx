@@ -24,8 +24,11 @@ import { useEffect, useRef, useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router';
+import SignatureCanvas from 'react-signature-canvas';
 
+import useCreateSignature from '@/api/mutations/useCreateSignature';
 import useSubmitApplication from '@/api/mutations/useSubmitApplication';
+import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -34,6 +37,7 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { type ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useUserContext } from '@/providers/UserProvider';
 
 const { Text } = Typography;
 
@@ -45,18 +49,30 @@ const SignAndSubmit = () => {
 		state: { fields },
 	} = useApplicationContext();
 	const navigation = useNavigate();
-	const signatureRef = useRef(null);
+	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
-	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
-		resolver: zodResolver(esignatureSchema),
-	});
+	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset, getValues } =
+		useForm<eSignatureSchemaType>({
+			resolver: zodResolver(esignatureSchema),
+		});
+	const { mutateAsync: createSignature } = useCreateSignature();
+	const { data, isLoading } = useGetSignatures({ applicationId: appId });
+	const { role } = useUserContext();
 
 	const onSubmit: SubmitHandler<eSignatureSchemaType> = () => {
 		setOpenModal(true);
 	};
 
-	const onSaveClicked = () => {
-		console.log('saved');
+	const onSaveClicked = async () => {
+		const signature = getValues('signature');
+
+		if (signature && role) {
+			await createSignature({ applicationId: appId, signature, signee: 'APPLICANT' }).then(() => {
+				if (signatureRef.current) {
+					signatureRef.current.clear();
+				}
+			});
+		}
 	};
 
 	const modalSubmission = () => {
@@ -64,6 +80,13 @@ const SignAndSubmit = () => {
 			setOpenModal(false);
 		});
 	};
+
+	// TODO: we have institutional rep signatures to be implemented. Currently only allows APPLICANT roles
+	useEffect(() => {
+		if (data && data.applicantSignature && signatureRef.current) {
+			signatureRef.current.fromDataURL(data.applicantSignature);
+		}
+	}, [data, setValue]);
 
 	// Push user back to intro if they did not complete the remaning sections
 	useEffect(() => {
@@ -91,22 +114,24 @@ const SignAndSubmit = () => {
 						<Row>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 								<input disabled type="hidden" name="createdAt" />
-								<ESignature
-									disabled={!isEditMode}
-									signatureRef={signatureRef}
-									name="signature"
-									control={control}
-									watch={watch}
-									formState={formState}
-									setValue={setValue}
-									reset={reset}
-									clearErrors={clearErrors}
-									disableSaveButton={!watchSignature}
-									onSaveClicked={onSaveClicked}
-									downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
-									saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
-									clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
-								/>
+								{!isLoading ? (
+									<ESignature
+										disabled={!isEditMode}
+										signatureRef={signatureRef}
+										name="signature"
+										control={control}
+										watch={watch}
+										formState={formState}
+										setValue={setValue}
+										reset={reset}
+										clearErrors={clearErrors}
+										disableSaveButton={!watchSignature}
+										onSaveClicked={onSaveClicked}
+										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
+										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
+										clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
+									/>
+								) : null}
 							</Col>
 						</Row>
 						<Row style={{ minHeight: '40vh' }} />
