@@ -41,7 +41,7 @@ export const GenerateEmailApplicanRepRevision = ({
                     Dear ${applicantName},
                 </mj-text>
                 <mj-text>                    
-                    We hope you are doing well. <br/> <br/>
+                    We hope you are doing well. <br/>
                 </mj-text>
                 <mj-text>
                     We want to inform you that the institutional representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.                

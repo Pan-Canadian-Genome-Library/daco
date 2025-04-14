@@ -19,9 +19,10 @@
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import BaseLogger from '@/logger.ts';
-import { failure } from '@/utils/results.ts';
+import { AsyncResult, failure, success } from '@/utils/results.ts';
 import emailClient from './index.ts';
 
+import SMTPPool from 'nodemailer/lib/smtp-pool/index.js';
 import {
 	GenerateEmailApplicantAppSubmitted,
 	GenerateEmailApplicantAppSubmittedPlain,
@@ -65,13 +66,13 @@ const emailSvc = () => ({
 		repName,
 		submittedDate,
 		to,
-	}: GenerateInstitutionalRepType) => {
+	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
@@ -88,6 +89,8 @@ const emailSvc = () => ({
 					submittedDate,
 				}),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 
@@ -104,13 +107,13 @@ const emailSvc = () => ({
 		institutionalRepLastName,
 		comments,
 		to,
-	}: GenerateApplicantRepRevisionType) => {
+	}: GenerateApplicantRepRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_REVISION,
@@ -129,6 +132,8 @@ const emailSvc = () => ({
 					comments,
 				}),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 
@@ -138,19 +143,25 @@ const emailSvc = () => ({
 		}
 	},
 	// Email to notify Applicant that application is submitted by Rep for DAC review
-	sendEmailApplicantApplicationSubmitted: async ({ id, name, to }: GenerateApproveType) => {
+	sendEmailApplicantApplicationSubmitted: async ({
+		id,
+		name,
+		to,
+	}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW,
 				html: GenerateEmailApplicantAppSubmitted({ id, name }),
 				text: GenerateEmailApplicantAppSubmittedPlain({ id, name }),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 
@@ -160,19 +171,26 @@ const emailSvc = () => ({
 		}
 	},
 	// Email to notify DAC for review
-	sendEmailDacForReview: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
+	sendEmailDacForReview: async ({
+		id,
+		applicantName,
+		submittedDate,
+		to,
+	}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
 				html: GenerateEmailDacForReview({ id, applicantName, submittedDate }),
 				text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate }),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 
@@ -182,19 +200,26 @@ const emailSvc = () => ({
 		}
 	},
 	// Email to Applicant about DAC Revisions
-	sendEmailApplicantForRevisions: async ({ id, applicantName, comments, to }: GenerateApplicantRevisionType) => {
+	sendEmailApplicantForRevisions: async ({
+		id,
+		applicantName,
+		comments,
+		to,
+	}: GenerateApplicantRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_REVISION,
 				html: GenerateEmailApplicantRevision({ id, applicantName, comments }),
 				text: GenerateEmailApplicantRevisionPlain({ id, applicantName, comments }),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 
@@ -204,19 +229,26 @@ const emailSvc = () => ({
 		}
 	},
 	// Email to DAC about Submitted Revisions
-	sendEmailDacForSubmittedRevisions: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
+	sendEmailDacForSubmittedRevisions: async ({
+		id,
+		applicantName,
+		submittedDate,
+		to,
+	}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
 				html: GenerateEmailDacForSubmittedRevision({ id, applicantName, submittedDate }),
 				text: GenerateEmailDacForSubmittedRevisionPlain({ id, applicantName, submittedDate }),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 
@@ -227,19 +259,25 @@ const emailSvc = () => ({
 	},
 	// Email to Collaborators & Notify Approval
 	// Email to Applicant & Notify Approval
-	sendEmailApproval: async ({ id, name, to }: GenerateApproveType) => {
+	sendEmailApproval: async ({
+		id,
+		name,
+		to,
+	}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_APPROVAL,
 				html: GenerateEmailApproval({ id, name }),
 				text: GenerateEmailApprovalPlain({ id, name }),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 
@@ -249,19 +287,26 @@ const emailSvc = () => ({
 		}
 	},
 	// Email to Applicant & Notify Disapproval
-	sendEmailReject: async ({ id, name, to, comment }: GenerateRejectType) => {
+	sendEmailReject: async ({
+		id,
+		name,
+		to,
+		comment,
+	}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
 
-			emailClient.sendMail({
+			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.DACO_APPLICATION_STATUS,
 				html: GenerateEmailRejection({ id, name, comment }),
 				text: GenerateEmailRejectionPlain({ name, comment }),
 			});
+
+			return success(response);
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;
 

@@ -12,7 +12,7 @@
     <!-- Content -->
     <mj-wrapper mj-class="section-background">
       <mj-section css-class="main-content">
-        <mj-include path="./templates/ApplicantDisapproval.mjml" />
+        <!-- TEST TEMPLATE HERE -->
       </mj-section>
     </mj-wrapper>
     <!-- Footer -->
