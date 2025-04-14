@@ -32,7 +32,7 @@ export const ErrorType = {
 export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];
 
 export type ErrorResponse = {
-	error: ErrorTypes | 'NOT_IMPLEMENTED';
+	error: ErrorTypes;
 	message: string;
 };
 
