@@ -26,17 +26,34 @@ export const revisionRequests = pgTable('revision_requests', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull().defaultNow(),
-	comments: text(),
+	comments: text(), //Referred to as "General Comments" in the UI.
+
 	applicant_notes: text(),
 	applicant_approved: boolean().notNull(),
+
 	institution_rep_approved: boolean().notNull(),
 	institution_rep_notes: text(),
+
 	collaborators_approved: boolean().notNull(),
 	collaborators_notes: text(),
+
 	project_approved: boolean().notNull(),
 	project_notes: text(),
+
 	requested_studies_approved: boolean().notNull(),
 	requested_studies_notes: text(),
+
+	ethics_approved: boolean().notNull(),
+	ethics_notes: text(),
+
+	agreements_approved: boolean().notNull(),
+	agreements_notes: text(),
+
+	appendices_approved: boolean().notNull(),
+	appendices_notes: text(),
+
+	sign_and_submit_approved: boolean().notNull(),
+	sign_and_submit_notes: text(),
 });
 
 export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
