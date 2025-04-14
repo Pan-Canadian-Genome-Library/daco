@@ -23,7 +23,10 @@ import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
 
 import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
-import { GenerateEmailDacRevision, GenerateEmailDacRevisionPlain } from './layouts/templates/EmailDacRevision.ts';
+import {
+	GenerateEmailDacForSubmittedRevision,
+	GenerateEmailDacForSubmittedRevisionPlain,
+} from './layouts/templates/EmailDacRevision.ts';
 import {
 	GenerateEmailInstitutionalRepReview,
 	GenerateEmailInstitutionalRepReviewPlain,
@@ -40,7 +43,7 @@ import {
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
-	sendEmailDacSubmittedRevisions: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
+	sendEmailDacForSubmittedRevisions: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
 		try {
 			const {
 				email: { fromAddress },
@@ -50,8 +53,8 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
-				html: GenerateEmailDacRevision({ id, applicantName, submittedDate }),
-				text: GenerateEmailDacRevisionPlain({ id, applicantName, submittedDate }),
+				html: GenerateEmailDacForSubmittedRevision({ id, applicantName, submittedDate }),
+				text: GenerateEmailDacForSubmittedRevisionPlain({ id, applicantName, submittedDate }),
 			});
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;

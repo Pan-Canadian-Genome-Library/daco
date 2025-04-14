@@ -22,7 +22,11 @@ import { GenerateDacRevisionType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailDacRevision = ({ id, applicantName, submittedDate }: Omit<GenerateDacRevisionType, 'to'>) => {
+export const GenerateEmailDacForSubmittedRevision = ({
+	id,
+	applicantName,
+	submittedDate,
+}: Omit<GenerateDacRevisionType, 'to'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig();
@@ -59,7 +63,7 @@ export const GenerateEmailDacRevision = ({ id, applicantName, submittedDate }: O
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailDacRevisionPlain = ({
+export const GenerateEmailDacForSubmittedRevisionPlain = ({
 	id,
 	applicantName,
 	submittedDate,
