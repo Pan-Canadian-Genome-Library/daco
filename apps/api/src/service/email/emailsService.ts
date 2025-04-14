@@ -23,16 +23,44 @@ import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
 
 import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
+import { GenerateEmailDacRevision, GenerateEmailDacRevisionPlain } from './layouts/templates/EmailDacRevision.ts';
 import {
 	GenerateEmailInstitutionalRepReview,
 	GenerateEmailInstitutionalRepReviewPlain,
 } from './layouts/templates/EmailInstitutionalRepReview.ts';
 import { GenerateEmailRejection, GenerateEmailRejectionPlain } from './layouts/templates/EmailRejection.ts';
-import { EmailSubjects, GenerateApproveType, GenerateInstitutionalRepType, GenerateRejectType } from './types.ts';
+import {
+	EmailSubjects,
+	type GenerateApproveType,
+	type GenerateDacRevisionType,
+	type GenerateInstitutionalRepType,
+	type GenerateRejectType,
+} from './types.ts';
 
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
+	sendEmailDacSubmittedRevisions: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
+			emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
+				html: GenerateEmailDacRevision({ id, applicantName, submittedDate }),
+				text: GenerateEmailDacRevisionPlain({ id, applicantName, submittedDate }),
+			});
+		} catch (error) {
+			const message = `Error sending email to recipient: ${to}`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 	sendEmailInstitutionalRepReview: async ({
 		id,
 		applicantName,

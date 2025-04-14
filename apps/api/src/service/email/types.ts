@@ -53,3 +53,9 @@ export type GenerateApproveType = {
 	name: string;
 	lang?: string;
 } & BaseEmailType;
+
+export type GenerateDacRevisionType = {
+	id: string | number;
+	applicantName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
