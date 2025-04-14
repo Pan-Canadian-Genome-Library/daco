@@ -50,16 +50,18 @@ export const GenerateEmailApplicanRepRevision = ({
                     The following revisions have been requested: <br />
                 </mj-text>
                 <mj-text>
-                    A. Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} <br /> 
-                    B. Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} <br /> 
-                    C. Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} <br /> 
-                    D. Project Information: ${comments.projectNotes ?? defaultRevisionText} <br /> 
-                    E. Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText} <br /> 
-                    F. Ethics: ${comments.ethicsNotes ?? defaultRevisionText} <br /> 
-                    G. Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} <br /> 
-                    H. Appendices: ${comments.appendicesNotes ?? defaultRevisionText} <br /> 
-                    I. Sign & Submit: ${comments.signNotes ?? defaultRevisionText} <br /> 
-                    J. General Comments: ${comments.generalComments ?? defaultRevisionText} <br />  
+                    <ol type="A">
+                        <li> Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} </li>
+                        <li> Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} <br /> </li>
+                        <li> Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} </li>
+                        <li> Project Information: ${comments.projectNotes ?? defaultRevisionText} </li>
+                        <li> Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText} </li> 
+                        <li> Ethics: ${comments.ethicsNotes ?? defaultRevisionText} </li>
+                        <li> Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} </li> 
+                        <li> Appendices: ${comments.appendicesNotes ?? defaultRevisionText} </li>
+                        <li> Sign & Submit: ${comments.signNotes ?? defaultRevisionText} </li> 
+                        <li> General Comments: ${comments.generalComments ?? defaultRevisionText} </li>  
+                    </ol>
                 </mj-text>
                 <mj-text>
                     Please go to <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to revise the revisions. <br/>

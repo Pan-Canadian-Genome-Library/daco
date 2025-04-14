@@ -47,17 +47,17 @@ export const GenerateEmailInstitutionalRepReview = ({
                     Here are the details of the application:
                 </mj-text>
                 <mj-text>
-                <ul>
-                    <li>
-                        Applicant Name: ${applicantName} <br/>
-                    </li>
-                    <li>
-                        Application ID: ${id} <br/>
-                    </li>
-                    <li>
-                        Submission Date: ${submittedDate} <br/>
-                    </li>
-                </ul>
+                    <ul>
+                        <li>
+                            Applicant Name: ${applicantName} <br/>
+                        </li>
+                        <li>
+                            Application ID: ${id} <br/>
+                        </li>
+                        <li>
+                            Submission Date: ${submittedDate} <br/>
+                        </li>
+                    </ul>
                 </mj-text>
                 <mj-text css-class="bold">
                     Action Required

@@ -37,15 +37,17 @@ export const GenerateEmailDacForReview = ({
                     Dear DAC Members,
                 </mj-text>
                 <mj-text>                    
-                    We are writing to inform you that a <a href="" target="_blank" rel="nofollow">PCGL DACO application</a> is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience. <br/> <br/>
+                    We are writing to inform you that a <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience. <br/> <br/>
                 <mj-text>
-                    Here are the application details: <br /> <br />
+                    Here are the application details:
                 </mj-text>
                 <mj-text>
-                    Applicant Name: ${applicantName}<br />
-                    Application ID: ${id}<br />
-                    Submission Date: ${submittedDate}<br />
-                    Link to the application: <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Application-${id}</a> <br /> <br />
+                    <ul>
+                        <li>Applicant Name: ${applicantName}</li>
+                        <li>Application ID: ${id}</li>
+                        <li> Submission Date: ${submittedDate}</li>
+                        <li>Link to the application: <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Application-${id}</a> </li>
+                    </ul>
                 </mj-text>
                 <mj-text>
                     Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.

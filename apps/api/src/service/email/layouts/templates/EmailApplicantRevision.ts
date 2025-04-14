@@ -39,31 +39,33 @@ export const GenerateEmailApplicantRevision = ({
                     Dear ${applicantName},
                 </mj-text>
                 <mj-text>                    
-                    We hope you are doing well. <br/> <br/>
+                    We hope you are doing well. <br/>
                 </mj-text>
                 <mj-text>
-                    We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed. <br/> <br/>
+                    We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed. <br/>
                 </mj-text>
                 <mj-text>
-                    The following revisions have been requested: <br /> <br />
+                    The following revisions have been requested:
                 </mj-text>
                 <mj-text>
-                    A. Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} <br /> 
-                    B. Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} <br /> 
-                    C. Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} <br /> 
-                    D. Project Information: ${comments.projectNotes ?? defaultRevisionText} <br /> 
-                    E. Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText} <br /> 
-                    F. Ethics: ${comments.ethicsNotes ?? defaultRevisionText} <br /> 
-                    G. Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} <br /> 
-                    H. Appendices: ${comments.appendicesNotes ?? defaultRevisionText} <br /> 
-                    I. Sign & Submit: ${comments.signNotes ?? defaultRevisionText} <br /> 
-                    J. General Comments: ${comments.generalComments ?? defaultRevisionText} <br /> <br /> 
+                    <ol type="A">
+                        <li> Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} </li>
+                        <li> Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} <br /> </li>
+                        <li> Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} </li>
+                        <li> Project Information: ${comments.projectNotes ?? defaultRevisionText} </li>
+                        <li> Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText} </li> 
+                        <li> Ethics: ${comments.ethicsNotes ?? defaultRevisionText} </li>
+                        <li> Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} </li> 
+                        <li> Appendices: ${comments.appendicesNotes ?? defaultRevisionText} </li>
+                        <li> Sign & Submit: ${comments.signNotes ?? defaultRevisionText} </li> 
+                        <li> General Comments: ${comments.generalComments ?? defaultRevisionText} </li>  
+                    </ol>
                 </mj-text>
                 <mj-text>
-                    Please go to <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to review the revisions. <br/> <br/>
+                    Please go to <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to review the revisions. <br/>
                 </mj-text>
                 <mj-text>
-                    Please make the necessary updates to your application and resubmit it through the <a href="${ui}" target="_blank" rel="nofollow">DACO portal</a>. If you have any questions or need clarification on the requested changes, feel free to reach out to us.<br /><br />
+                    Please make the necessary updates to your application and resubmit it through the <a href="${ui}" target="_blank" rel="nofollow">DACO portal</a>. If you have any questions or need clarification on the requested changes, feel free to reach out to us. <br/>
                 </mj-text>
                 <mj-text>
                     We appreciate your attention to these revisions and your timely response. <br/><br/>
