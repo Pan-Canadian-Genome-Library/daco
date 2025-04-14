@@ -114,6 +114,12 @@ export const revisionDataSchema = z
 		requestedStudiesNotes: z.string().optional(),
 		ethicsApproved: z.boolean(),
 		ethicsNotes: z.string().optional(),
+		agreementsApproved: z.boolean(),
+		agreementsNotes: z.string().optional(),
+		appendicesApproved: z.boolean(),
+		appendicesNotes: z.string().optional(),
+		signAndSubmitApproved: z.boolean(),
+		signAndSubmitNotes: z.string().optional(),
 	})
 	.strict();
 
