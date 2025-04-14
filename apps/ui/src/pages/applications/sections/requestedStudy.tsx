@@ -30,10 +30,10 @@ import SelectBox from '@/components/pages/application/form-components/SelectBox'
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import Link from 'antd/es/typography/Link';
-import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 
 const { Text } = Typography;
 
@@ -59,8 +59,8 @@ const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const form = useSectionForm({ section: "study", sectionVisited: state.formState.sectionsVisited.study });
-	
+	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
+
 	const {
 		formState: { isDirty },
 		control,
@@ -89,7 +89,6 @@ const RequestedStudy = () => {
 			},
 		});
 	};
-
 
 	return (
 		<SectionWrapper>
