@@ -27,7 +27,6 @@ const defaultRevisionText = 'No revisions needed';
 export const GenerateEmailApplicantRevision = ({
 	id,
 	applicantName,
-	submittedDate,
 	comments,
 }: Omit<GenerateApplicantRevisionType, 'to'>) => {
 	const {
@@ -82,7 +81,6 @@ export const GenerateEmailApplicantRevision = ({
 export const GenerateEmailApplicantRevisionPlain = ({
 	id,
 	applicantName,
-	submittedDate,
 	comments,
 }: Omit<GenerateApplicantRevisionType, 'to'>) => {
 	const {
@@ -94,18 +92,18 @@ export const GenerateEmailApplicantRevisionPlain = ({
     \n\n We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.
     \n\n The following revisions have been requested:
     \n
-    \n A. Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} <br /> 
-    \n B. Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} <br /> 
-    \n C. Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} <br /> 
-    \n D. Project Information: ${comments.projectNotes ?? defaultRevisionText} <br /> 
-    \n E. Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText} <br /> 
-    \n F. Ethics: ${comments.ethicsNotes ?? defaultRevisionText} <br /> 
-    \n G. Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} <br /> 
-    \n H. Appendices: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} <br /> 
-    \n I. Sign & Submit: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} <br /> 
-    \n J. General Comments: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} <br /> <br /> 
+    \n A. Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} 
+    \n B. Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} 
+    \n C. Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} 
+    \n D. Project Information: ${comments.projectNotes ?? defaultRevisionText} 
+    \n E. Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText}
+    \n F. Ethics: ${comments.ethicsNotes ?? defaultRevisionText} 
+    \n G. Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText}
+    \n H. Appendices: ${comments.dataAccessAgreementNotes ?? defaultRevisionText}
+    \n I. Sign & Submit: ${comments.dataAccessAgreementNotes ?? defaultRevisionText}
+    \n J. General Comments: ${comments.dataAccessAgreementNotes ?? defaultRevisionText}
     \n\n
-    \n Please go to your application to review the revisions.
+    \n Please go to ${ui}/application/${id} to review the revisions.
     \n 
     \n Please make the necessary updates to your application and resubmit it through the DACO Portal. If you have any questions or need clarification on the requested changes, feel free to reach out to us.
     \n

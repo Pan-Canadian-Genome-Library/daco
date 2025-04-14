@@ -48,13 +48,7 @@ import {
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
-	sendEmailApplicantForRevisions: async ({
-		id,
-		applicantName,
-		submittedDate,
-		comments,
-		to,
-	}: GenerateApplicantRevisionType) => {
+	sendEmailApplicantForRevisions: async ({ id, applicantName, comments, to }: GenerateApplicantRevisionType) => {
 		try {
 			const {
 				email: { fromAddress },
@@ -64,8 +58,8 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_REVISION,
-				html: GenerateEmailApplicantRevision({ id, applicantName, submittedDate, comments }),
-				text: GenerateEmailApplicantRevisionPlain({ id, applicantName, submittedDate, comments }),
+				html: GenerateEmailApplicantRevision({ id, applicantName, comments }),
+				text: GenerateEmailApplicantRevisionPlain({ id, applicantName, comments }),
 			});
 		} catch (error) {
 			const message = `Error sending email to recipient: ${to}`;

@@ -75,6 +75,5 @@ type RevisionsType = {
 export type GenerateApplicantRevisionType = {
 	id: string | number;
 	applicantName: string;
-	submittedDate: Date | string;
 	comments: RevisionsType;
 } & BaseEmailType;
