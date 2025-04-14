@@ -22,6 +22,10 @@ import BaseLogger from '@/logger.ts';
 import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
 
+import {
+	GenerateEmailApplicantRevision,
+	GenerateEmailApplicantRevisionPlain,
+} from './layouts/templates/EmailApplicantRevision.ts';
 import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
 import {
 	GenerateEmailDacForSubmittedRevision,
@@ -34,6 +38,7 @@ import {
 import { GenerateEmailRejection, GenerateEmailRejectionPlain } from './layouts/templates/EmailRejection.ts';
 import {
 	EmailSubjects,
+	type GenerateApplicantRevisionType,
 	type GenerateApproveType,
 	type GenerateDacRevisionType,
 	type GenerateInstitutionalRepType,
@@ -43,6 +48,33 @@ import {
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
+	sendEmailApplicantForRevisions: async ({
+		id,
+		applicantName,
+		submittedDate,
+		comments,
+		to,
+	}: GenerateApplicantRevisionType) => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
+			emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.NOTIFY_REVISION,
+				html: GenerateEmailApplicantRevision({ id, applicantName, submittedDate, comments }),
+				text: GenerateEmailApplicantRevisionPlain({ id, applicantName, submittedDate, comments }),
+			});
+		} catch (error) {
+			const message = `Error sending email to recipient: ${to}`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 	sendEmailDacForSubmittedRevisions: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
 		try {
 			const {
@@ -52,7 +84,7 @@ const emailSvc = () => ({
 			emailClient.sendMail({
 				from: fromAddress,
 				to,
-				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
+				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
 				html: GenerateEmailDacForSubmittedRevision({ id, applicantName, submittedDate }),
 				text: GenerateEmailDacForSubmittedRevisionPlain({ id, applicantName, submittedDate }),
 			});
