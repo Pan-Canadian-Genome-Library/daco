@@ -667,7 +667,7 @@ applicationRouter.post(
 	async (
 		request: Request,
 		response: ResponseWithData<
-			{ message: string; data: ApplicationRecord },
+			ApplicationRecord,
 			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 		>,
 	) => {
@@ -709,10 +709,7 @@ applicationRouter.post(
 			const result = await submitApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).json({
-					message: 'Application submitted successfully.',
-					data: result.data,
-				});
+				response.status(200).json(result.data);
 				return;
 			}
 
