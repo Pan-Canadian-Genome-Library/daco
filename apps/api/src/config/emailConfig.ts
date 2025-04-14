@@ -18,31 +18,9 @@
  */
 
 /**
- * Checks if a required config value is defined.
- * If the val is present, the val is returned. If the val is null, undefined or an empty string, an error is thrown.
- *
- * @param val value being checked
- * @param configType AppConfig or AuthConfig
- * @param keyName string path of config value
- * @returns val
- */
-export function checkConfigValueIsDefined<T>(
-	val: T | undefined | null,
-	configType: 'AppConfig' | 'AuthConfig',
-	keyName: string,
-): T {
-	if (val === undefined || val === null || val === '') {
-		throw new Error(
-			`A required configuration value is missing for [${configType}]. No value is provided for [${keyName}].`,
-		);
-	}
-	return val;
-}
-
-/**
  * Synchronous function to retrieve static config values from process.env
  * Intended for use in non-async functions that require config values (i.e. logger.ts)
- * @returns AppConfig
+ * @returns emailConfig
  */
 export const getEmailConfig = () => {
 	return {
