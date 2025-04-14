@@ -39,6 +39,8 @@ export type GenerateInstitutionalRepType = {
 	repName: string;
 	applicantName: string;
 	submittedDate: Date | string;
+	// NOTE: sign up url for the institutional rep, subject to change
+	registerUrl?: string;
 } & BaseEmailType;
 
 export type GenerateRejectType = {

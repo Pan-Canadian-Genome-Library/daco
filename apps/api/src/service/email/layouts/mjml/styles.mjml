@@ -54,4 +54,9 @@
   .main-content-text div a {
     color: #286c77 !important;
   }
+
+  .bold div {
+    line-height: 1.25 !important;
+    font-weight: bold;
+  }
 </mj-style>

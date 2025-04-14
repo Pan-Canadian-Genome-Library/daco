@@ -58,6 +58,45 @@ import {
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
+	// Email to the Institutional Rep to Review Application
+	sendEmailInstitutionalRepReviewRequest: async ({
+		id,
+		applicantName,
+		repName,
+		submittedDate,
+		to,
+	}: GenerateInstitutionalRepType) => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
+			emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
+				html: GenerateEmailInstitutionalRepReview({
+					id,
+					applicantName,
+					repName,
+					submittedDate,
+				}),
+				text: GenerateEmailInstitutionalRepReviewPlain({
+					id,
+					applicantName,
+					repName,
+					submittedDate,
+				}),
+			});
+		} catch (error) {
+			const message = `Error sending email to recipient: ${to}`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	// Email to Applicant & Notify Institutional Rep Revisions
 	sendEmailApplicantRepRevisions: async ({
 		id,
 		applicantName,
@@ -98,6 +137,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	// Email to notify Applicant that application is submitted by Rep for DAC review
 	sendEmailApplicantApplicationSubmitted: async ({ id, name, to }: GenerateApproveType) => {
 		try {
 			const {
@@ -107,7 +147,7 @@ const emailSvc = () => ({
 			emailClient.sendMail({
 				from: fromAddress,
 				to,
-				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
+				subject: EmailSubjects.NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW,
 				html: GenerateEmailApplicantAppSubmitted({ id, name }),
 				text: GenerateEmailApplicantAppSubmittedPlain({ id, name }),
 			});
@@ -119,6 +159,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	// Email to notify DAC for review
 	sendEmailDacForReview: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
 		try {
 			const {
@@ -140,6 +181,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	// Email to Applicant about DAC Revisions
 	sendEmailApplicantForRevisions: async ({ id, applicantName, comments, to }: GenerateApplicantRevisionType) => {
 		try {
 			const {
@@ -161,6 +203,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	// Email to DAC about Submitted Revisions
 	sendEmailDacForSubmittedRevisions: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
 		try {
 			const {
@@ -182,33 +225,8 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	sendEmailInstitutionalRepReview: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType) => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig();
-
-			emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
-				html: GenerateEmailInstitutionalRepReview({ id, applicantName, repName, submittedDate }),
-				text: GenerateEmailInstitutionalRepReviewPlain({ id, applicantName, repName, submittedDate }),
-			});
-		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
-
-			logger.error(message, error);
-
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
+	// Email to Collaborators & Notify Approval
+	// Email to Applicant & Notify Approval
 	sendEmailApproval: async ({ id, name, to }: GenerateApproveType) => {
 		try {
 			const {
@@ -230,6 +248,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	// Email to Applicant & Notify Disapproval
 	sendEmailReject: async ({ id, name, to, comment }: GenerateRejectType) => {
 		try {
 			const {
