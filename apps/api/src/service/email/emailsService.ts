@@ -23,6 +23,10 @@ import { failure } from '@/utils/results.ts';
 import emailClient from './index.ts';
 
 import {
+	GenerateEmailApplicantAppSubmitted,
+	GenerateEmailApplicantAppSubmittedPlain,
+} from './layouts/templates/EmailApplicantAppSubmitted.ts';
+import {
 	GenerateEmailApplicantRevision,
 	GenerateEmailApplicantRevisionPlain,
 } from './layouts/templates/EmailApplicantRevision.ts';
@@ -49,6 +53,27 @@ import {
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
+	sendEmailApplicantApplicationSubmitted: async ({ id, name, to }: GenerateApproveType) => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
+			emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
+				html: GenerateEmailApplicantAppSubmitted({ id, name }),
+				text: GenerateEmailApplicantAppSubmittedPlain({ id, name }),
+			});
+		} catch (error) {
+			const message = `Error sending email to recipient: ${to}`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 	sendEmailDacForReview: async ({ id, applicantName, submittedDate, to }: GenerateDacRevisionType) => {
 		try {
 			const {
