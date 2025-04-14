@@ -27,6 +27,10 @@ import {
 	GenerateEmailApplicantAppSubmittedPlain,
 } from './layouts/templates/EmailApplicantAppSubmitted.ts';
 import {
+	GenerateEmailApplicanRepRevision,
+	GenerateEmailApplicanRepRevisionPlain,
+} from './layouts/templates/EmailApplicantRepRevision.ts';
+import {
 	GenerateEmailApplicantRevision,
 	GenerateEmailApplicantRevisionPlain,
 } from './layouts/templates/EmailApplicantRevision.ts';
@@ -43,6 +47,7 @@ import {
 import { GenerateEmailRejection, GenerateEmailRejectionPlain } from './layouts/templates/EmailRejection.ts';
 import {
 	EmailSubjects,
+	type GenerateApplicantRepRevisionType,
 	type GenerateApplicantRevisionType,
 	type GenerateApproveType,
 	type GenerateDacRevisionType,
@@ -53,6 +58,46 @@ import {
 const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
+	sendEmailApplicantRepRevisions: async ({
+		id,
+		applicantName,
+		institutionalRepFirstName,
+		institutionalRepLastName,
+		comments,
+		to,
+	}: GenerateApplicantRepRevisionType) => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig();
+
+			emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.NOTIFY_REVISION,
+				html: GenerateEmailApplicanRepRevision({
+					id,
+					applicantName,
+					institutionalRepFirstName,
+					institutionalRepLastName,
+					comments,
+				}),
+				text: GenerateEmailApplicanRepRevisionPlain({
+					id,
+					applicantName,
+					institutionalRepFirstName,
+					institutionalRepLastName,
+					comments,
+				}),
+			});
+		} catch (error) {
+			const message = `Error sending email to recipient: ${to}`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 	sendEmailApplicantApplicationSubmitted: async ({ id, name, to }: GenerateApproveType) => {
 		try {
 			const {

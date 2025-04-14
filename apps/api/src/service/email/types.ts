@@ -77,3 +77,11 @@ export type GenerateApplicantRevisionType = {
 	applicantName: string;
 	comments: RevisionsType;
 } & BaseEmailType;
+
+export type GenerateApplicantRepRevisionType = {
+	id: string | number;
+	applicantName: string;
+	institutionalRepFirstName: string;
+	institutionalRepLastName: string;
+	comments: RevisionsType;
+} & BaseEmailType;

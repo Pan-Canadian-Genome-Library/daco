@@ -18,17 +18,19 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateApplicantRevisionType } from '../../types.ts';
+import { GenerateApplicantRepRevisionType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 const defaultRevisionText = 'No revisions needed';
 
 // TODO: english and french translations
-export const GenerateEmailApplicantRevision = ({
+export const GenerateEmailApplicanRepRevision = ({
 	id,
 	applicantName,
+	institutionalRepFirstName,
+	institutionalRepLastName,
 	comments,
-}: Omit<GenerateApplicantRevisionType, 'to'>) => {
+}: Omit<GenerateApplicantRepRevisionType, 'to'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig();
@@ -42,10 +44,10 @@ export const GenerateEmailApplicantRevision = ({
                     We hope you are doing well. <br/> <br/>
                 </mj-text>
                 <mj-text>
-                    We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed. <br/> <br/>
+                    We want to inform you that the institutional representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.                
                 </mj-text>
                 <mj-text>
-                    The following revisions have been requested: <br /> <br />
+                    The following revisions have been requested: <br />
                 </mj-text>
                 <mj-text>
                     A. Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} <br /> 
@@ -57,13 +59,13 @@ export const GenerateEmailApplicantRevision = ({
                     G. Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} <br /> 
                     H. Appendices: ${comments.appendicesNotes ?? defaultRevisionText} <br /> 
                     I. Sign & Submit: ${comments.signNotes ?? defaultRevisionText} <br /> 
-                    J. General Comments: ${comments.generalComments ?? defaultRevisionText} <br /> <br /> 
+                    J. General Comments: ${comments.generalComments ?? defaultRevisionText} <br />  
                 </mj-text>
                 <mj-text>
-                    Please go to <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to review the revisions. <br/> <br/>
+                    Please go to <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to revise the revisions. <br/>
                 </mj-text>
                 <mj-text>
-                    Please make the necessary updates to your application and resubmit it through the <a href="${ui}" target="_blank" rel="nofollow">DACO portal</a>. If you have any questions or need clarification on the requested changes, feel free to reach out to us.<br /><br />
+                    Please make the necessary updates to your application and resubmit it through the <a href="${ui}" target="_blank" rel="nofollow">DACO portal</a>. If you have any questions or need clarification on the requested changes, feel free to reach out to us.<br />
                 </mj-text>
                 <mj-text>
                     We appreciate your attention to these revisions and your timely response. <br/><br/>
@@ -78,18 +80,20 @@ export const GenerateEmailApplicantRevision = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApplicantRevisionPlain = ({
+export const GenerateEmailApplicanRepRevisionPlain = ({
 	id,
 	applicantName,
+	institutionalRepFirstName,
+	institutionalRepLastName,
 	comments,
-}: Omit<GenerateApplicantRevisionType, 'to'>) => {
+}: Omit<GenerateApplicantRepRevisionType, 'to'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig();
 
 	return ` Dear ${applicantName},
     \n We hope you are doing well. 
-    \n\n We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.
+    \n\n We want to inform you that the institutional representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.  
     \n\n The following revisions have been requested:
     \n
     \n A. Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} 
