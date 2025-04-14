@@ -21,7 +21,7 @@ export class BadRequest extends Error {
 	constructor(msg: string, details?: unknown) {
 		super(
 			msg ||
-				'Sorry, looks like you sent a sent bad request. Please check the request and try again, or refer to our API documentation.',
+				'Sorry, looks like you sent a bad request. Please double check the request and try again, or refer to our API documentation.',
 		);
 		this.name = 'Bad Request';
 		this.cause = details;

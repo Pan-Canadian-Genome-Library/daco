@@ -21,13 +21,21 @@ import { z } from 'zod';
 import { isPositiveInteger } from '../utils/functions.js';
 
 export const getFileByIdParamsSchema = z.object({
-	fileId: z
-		.string()
-		.refine((id) => isPositiveInteger(Number(id)), { message: 'applicationId MUST be a positive number' }),
+	fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
 });
 
-export const fileDeleteParamsSchema = z
+export const deleteFileByIdSchema = z
 	.object({
 		fileId: z.string().refine((id) => isPositiveInteger(Number(id)), { message: 'fileId MUST be a positive number' }),
 	})
 	.required();
+
+export const fileResponseSchema = z.object({
+	id: z.number(),
+	filename: z.string().nullable(),
+	applicationId: z.number(),
+	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)),
+	submittedAt: z.date(),
+	submitterUserId: z.string(),
+	type: z.literal('SIGNED_APPLICATION').or(z.literal('ETHICS_LETTER')),
+});

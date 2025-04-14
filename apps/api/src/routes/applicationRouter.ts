@@ -667,7 +667,7 @@ applicationRouter.post(
 	async (
 		request: Request,
 		response: ResponseWithData<
-			{ message: string; data: ApplicationRecord },
+			ApplicationRecord,
 			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 		>,
 	) => {
@@ -709,10 +709,7 @@ applicationRouter.post(
 			const result = await submitApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).json({
-					message: 'Application submitted successfully.',
-					data: result.data,
-				});
+				response.status(200).json(result.data);
 				return;
 			}
 
@@ -772,6 +769,14 @@ applicationRouter.post(
 						project_notes: revisions.projectNotes,
 						requested_studies_approved: revisions.requestedStudiesApproved,
 						requested_studies_notes: revisions.requestedStudiesNotes,
+						ethics_approved: revisions.ethicsApproved,
+						ethics_notes: revisions.ethicsNotes,
+						agreements_approved: revisions.agreementsApproved,
+						agreements_notes: revisions.agreementsNotes,
+						appendices_approved: revisions.appendicesApproved,
+						appendices_notes: revisions.appendicesNotes,
+						sign_and_submit_approved: revisions.signAndSubmitApproved,
+						sign_and_submit_notes: revisions.signAndSubmitNotes,
 					};
 
 					// Call service method to handle request
@@ -849,6 +854,14 @@ applicationRouter.post(
 					project_notes: revisionData.projectNotes,
 					requested_studies_approved: revisionData.requestedStudiesApproved,
 					requested_studies_notes: revisionData.requestedStudiesNotes,
+					ethics_approved: revisionData.ethicsApproved,
+					ethics_notes: revisionData.ethicsNotes,
+					agreements_approved: revisionData.agreementsApproved,
+					agreements_notes: revisionData.agreementsNotes,
+					appendices_approved: revisionData.appendicesApproved,
+					appendices_notes: revisionData.appendicesNotes,
+					sign_and_submit_approved: revisionData.signAndSubmitApproved,
+					sign_and_submit_notes: revisionData.signAndSubmitNotes,
 				};
 
 				// TODO: Check that the institutional rep is the correct rep for this application

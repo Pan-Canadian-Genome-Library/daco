@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates } from '@pcgl-daco/data-model';
+import { agreementEnum, appendicesEnum, ApplicationStates } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
@@ -65,6 +65,8 @@ export const applicationContentsSchema = z
 		projectPublicationUrls: z.array(z.string()).nullable(),
 		ethicsReviewRequired: z.boolean().nullable(),
 		ethicsLetter: z.number().nullable(),
+		acceptedAgreements: z.array(z.enum(agreementEnum)).nullable(),
+		acceptedAppendices: z.array(z.enum(appendicesEnum)).nullable(),
 		requestedStudies: z.array(z.string()).nullable(),
 	})
 	.partial();
@@ -112,6 +114,12 @@ export const revisionDataSchema = z
 		requestedStudiesNotes: z.string().optional(),
 		ethicsApproved: z.boolean(),
 		ethicsNotes: z.string().optional(),
+		agreementsApproved: z.boolean(),
+		agreementsNotes: z.string().optional(),
+		appendicesApproved: z.boolean(),
+		appendicesNotes: z.string().optional(),
+		signAndSubmitApproved: z.boolean(),
+		signAndSubmitNotes: z.string().optional(),
 	})
 	.strict();
 

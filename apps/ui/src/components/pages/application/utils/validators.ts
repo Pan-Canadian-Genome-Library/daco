@@ -18,12 +18,19 @@
  */
 
 import {
+	ValidatorAgreements,
+	ValidatorAppendices,
 	ValidatorApplicant,
+	ValidatorEthics,
 	ValidatorInstitution,
 	ValidatorProject,
+	ValidatorStudy,
 } from '@/components/pages/application/utils/validatorFunctions';
 import {
+	isAgreementKey,
+	isAppendicesKey,
 	isApplicantKey,
+	isEthicsKey,
 	isInstitutionalKey,
 	isProjectKey,
 	isRequestedStudies,
@@ -62,25 +69,44 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 	}
 
 	Object.entries(fields).forEach(([key, value]) => {
-		if (isApplicantKey(key) && value !== null) {
+		if (value === null) {
+			return sectionTouched;
+		}
+
+		if (isApplicantKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				applicant: true,
 			};
-		} else if (isInstitutionalKey(key) && value !== null) {
+		} else if (isInstitutionalKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				institutional: true,
 			};
-		} else if (isRequestedStudies(key) && value != null) {
+		} else if (isAgreementKey(key)) {
+			sectionTouched = {
+				...sectionTouched,
+				agreement: true,
+			};
+		} else if (isAppendicesKey(key)) {
+			sectionTouched = {
+				...sectionTouched,
+				appendices: true,
+			};
+		} else if (isRequestedStudies(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				study: true,
 			};
-		} else if (isProjectKey(key) && value !== null) {
+		} else if (isProjectKey(key)) {
 			sectionTouched = {
 				...sectionTouched,
 				project: true,
+			};
+		} else if (isEthicsKey(key)) {
+			sectionTouched = {
+				...sectionTouched,
+				ethics: true,
 			};
 		}
 	});
@@ -100,14 +126,14 @@ export const VerifyFormSections = (
 ): VerifyPageSectionsType<SectionRoutesValues> => {
 	return {
 		[SectionRoutes.INTRO]: false,
+		[SectionRoutes.SIGN]: false,
+		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.APPLICANT]: fields ? ValidatorApplicant(fields) : false,
 		[SectionRoutes.INSTITUTIONAL]: fields ? ValidatorInstitution(fields) : false,
-		[SectionRoutes.COLLABORATORS]: false,
 		[SectionRoutes.PROJECT]: fields ? ValidatorProject(fields) : false,
-		[SectionRoutes.STUDY]: false,
-		[SectionRoutes.ETHICS]: false,
-		[SectionRoutes.AGREEMENT]: false,
-		[SectionRoutes.APPENDICES]: false,
-		[SectionRoutes.SIGN]: false,
+		[SectionRoutes.STUDY]: fields ? ValidatorStudy(fields) : false,
+		[SectionRoutes.ETHICS]: fields ? ValidatorEthics(fields) : false,
+		[SectionRoutes.AGREEMENT]: fields ? ValidatorAgreements(fields) : false,
+		[SectionRoutes.APPENDICES]: fields ? ValidatorAppendices(fields) : false,
 	};
 };
