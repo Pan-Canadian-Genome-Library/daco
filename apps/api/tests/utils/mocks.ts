@@ -87,6 +87,14 @@ const testRevisionRequestRecord: RevisionRequestRecord = {
 	project_notes: null,
 	requested_studies_approved: false,
 	requested_studies_notes: null,
+	ethics_approved: false,
+	ethics_notes: null,
+	agreements_approved: false,
+	agreements_notes: null,
+	appendices_approved: false,
+	appendices_notes: null,
+	sign_and_submit_approved: false,
+	sign_and_submit_notes: null,
 };
 
 const baseTestActionRecord: ApplicationActionRecord = {

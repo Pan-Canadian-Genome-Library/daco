@@ -1,8 +1,8 @@
-import { getDbInstance } from '@/db/index.ts';
+import dbUtils from '@/db/index.ts';
 import logger from '@/logger.ts';
 import { userRoleSchema, type UserRole } from '@pcgl-daco/validation';
 import type { SessionData } from 'express-session';
-import { applicationSvc } from './applicationService.ts';
+import service from './applicationService.ts';
 import type { ApplicationService } from './types.ts';
 
 /**
@@ -22,8 +22,8 @@ export function getUserRole(session: Partial<SessionData>): UserRole {
  * This is temporarily returning `true` for all applications.
  */
 export async function isAssociatedRep(session: Partial<SessionData>, applicationId: number): Promise<Boolean> {
-	const database = getDbInstance();
-	const applicationService: ApplicationService = applicationSvc(database);
+	const database = dbUtils.getDbInstance();
+	const applicationService: ApplicationService = service.applicationSvc(database);
 
 	const app = await applicationService.getApplicationWithContents({ id: applicationId });
 
