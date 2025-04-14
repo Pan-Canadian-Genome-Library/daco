@@ -20,10 +20,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { esignatureSchema, type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router';
+import { useNavigate, useOutletContext } from 'react-router';
 
 import useSubmitApplication from '@/api/mutations/useSubmitApplication';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
@@ -31,7 +31,9 @@ import ESignature from '@/components/pages/application/form-components/ESignatur
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { type ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const { Text } = Typography;
 
@@ -39,13 +41,17 @@ const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const [openModal, setOpenModal] = useState(false);
+	const {
+		state: { fields },
+	} = useApplicationContext();
+	const navigation = useNavigate();
 	const signatureRef = useRef(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
 	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),
 	});
 
-	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
+	const onSubmit: SubmitHandler<eSignatureSchemaType> = () => {
 		setOpenModal(true);
 	};
 
@@ -58,6 +64,13 @@ const SignAndSubmit = () => {
 			setOpenModal(false);
 		});
 	};
+
+	// Push user back to intro if they did not complete the remaning sections
+	useEffect(() => {
+		if (!ValidateAllSections(fields)) {
+			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
+		}
+	}, [appId, fields, isEditMode, navigation]);
 
 	const watchSignature = watch('signature');
 
