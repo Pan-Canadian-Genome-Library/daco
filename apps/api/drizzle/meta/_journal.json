@@ -64,6 +64,13 @@
 			"when": 1743515211577,
 			"tag": "0008_remove_agreements_table_add_appendices",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1744639348029,
+			"tag": "0009_add_missing_revision_fields",
+			"breakpoints": true
 		}
 	]
 }
