@@ -5,7 +5,7 @@
 <mj-style inline="inline">
   * {
     box-sizing: border-box;
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
     line-height: 1.625 !important;
   }
 
@@ -28,12 +28,12 @@
     margin: 0 auto;
     text-align: center !important;
     color: #ffffff !important;
-    font-size: 0.7125rem !important;
+    font-size: 0.6125rem !important;
   }
 
   .footer-text div a {
     color: #ffffff !important;
-    font-size: 0.7125rem !important;
+    font-size: 0.6125rem !important;
   }
 
 
