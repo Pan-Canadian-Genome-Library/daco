@@ -59,7 +59,7 @@ export interface FetchError extends ServerError {
 export interface ApplicationOutletContext {
 	appId: string | number;
 	isEditMode: boolean;
-	revisionsData: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
+	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
 }
 
 export interface BasicFormFieldProps {

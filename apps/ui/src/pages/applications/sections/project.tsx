@@ -40,7 +40,8 @@ const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = !revisions.project?.isApproved || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 
@@ -101,7 +102,7 @@ const Project = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
@@ -109,7 +110,7 @@ const Project = () => {
 				<SectionTitle
 					title={translate('project-section.title')}
 					text={[translate('project-section.description')]}
-					showLockIcon={revisionsData.project?.isApproved}
+					showLockIcon={revisions.project?.isApproved}
 				/>
 				<Row gutter={26}>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -119,7 +120,7 @@ const Project = () => {
 							control={control}
 							rule={rule}
 							required
-							disabled={!isEditMode}
+							disabled={!canEdit}
 						/>
 					</Col>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -130,7 +131,7 @@ const Project = () => {
 							placeHolder="https://"
 							control={control}
 							rule={rule}
-							disabled={!isEditMode}
+							disabled={!canEdit}
 						/>
 					</Col>
 				</Row>
@@ -157,7 +158,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -181,7 +182,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -196,7 +197,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -223,7 +224,7 @@ const Project = () => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>
@@ -245,7 +246,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -261,7 +262,7 @@ const Project = () => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Col>
@@ -278,13 +279,13 @@ const Project = () => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="project" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="project" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

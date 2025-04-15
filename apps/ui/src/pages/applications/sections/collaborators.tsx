@@ -48,7 +48,8 @@ export interface ModalStateProps extends ModalState {
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = !revisions.collaborators?.isApproved || isEditMode;
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);
 
@@ -114,7 +115,7 @@ const Collaborators = () => {
 			<>
 				<SectionTitle
 					title={translate('collab-section.title')}
-					showLockIcon={revisionsData.collaborators?.isApproved}
+					showLockIcon={revisions.collaborators?.isApproved}
 					text={[
 						translate('collab-section.description1'),
 						translate('collab-section.optional'),
@@ -130,7 +131,7 @@ const Collaborators = () => {
 								onClick={() => setAddModalState({ isOpen: true })}
 								style={{ borderRadius: 100 }}
 								type="primary"
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							>
 								<Flex align="center" justify="center" gap={'small'}>
 									<PlusCircleOutlined />
@@ -152,7 +153,7 @@ const Collaborators = () => {
 					setIsOpen={setEditModalState}
 					isOpen={editModalState.isOpen}
 				/>
-				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="collaborators" isEditMode={canEdit} />
 			</>
 		</SectionWrapper>
 	);

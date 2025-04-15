@@ -51,7 +51,8 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = !revisions.ethics?.isApproved || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 	const form = useSectionForm({
@@ -167,7 +168,7 @@ const Ethics = () => {
 		<SectionWrapper>
 			<>
 				<SectionTitle
-					showLockIcon={revisionsData.ethics?.isApproved}
+					showLockIcon={revisions.ethics?.isApproved}
 					title={translate('ethics-section.title')}
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}
@@ -207,7 +208,7 @@ const Ethics = () => {
 							control={control}
 							rule={rule}
 							required
-							disabled={!isEditMode}
+							disabled={!canEdit}
 							options={[
 								{
 									key: 'exemption',
@@ -242,14 +243,14 @@ const Ethics = () => {
 												beforeUpload={beforeUpload}
 												fileList={fileList}
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
-												disabled={!isEditMode}
+												disabled={!canEdit}
 												onChange={handleChange}
 												showUploadList={{
 													showDownloadIcon: false,
 													showRemoveIcon: false,
 												}}
 											>
-												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
+												<Button type="primary" icon={<UploadOutlined />} disabled={!canEdit}>
 													{translate('button.upload')}
 												</Button>
 											</Upload>
@@ -260,7 +261,7 @@ const Ethics = () => {
 						) : null}
 					</Form>
 				</SectionContent>
-				<SectionFooter currentRoute="ethics" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="ethics" isEditMode={canEdit} />
 			</>
 		</SectionWrapper>
 	);

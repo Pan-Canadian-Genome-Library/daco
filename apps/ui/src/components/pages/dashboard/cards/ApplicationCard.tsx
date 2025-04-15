@@ -69,7 +69,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 	};
 
 	const handleEditClick = (id: string, state: string, openEdit: (id: string) => void) => {
-		if (state === ApplicationStates.DRAFT) {
+		if (state === ApplicationStates.DRAFT || state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
 			navigate(`/application/${id}/intro/edit`);
 		} else {
 			openEdit(id);

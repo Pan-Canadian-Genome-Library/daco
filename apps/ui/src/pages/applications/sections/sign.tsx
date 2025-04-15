@@ -37,7 +37,8 @@ const { Text } = Typography;
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, appId, revisionsData } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, appId, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = !revisions.sign?.isApproved || isEditMode;
 	const [openModal, setOpenModal] = useState(false);
 	const signatureRef = useRef(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
@@ -67,7 +68,7 @@ const SignAndSubmit = () => {
 				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
 					<SectionTitle
 						title={translate('sign-and-submit-section.title')}
-						showLockIcon={revisionsData.sign?.isApproved}
+						showLockIcon={revisions.sign?.isApproved}
 						text={translate('sign-and-submit-section.description')}
 						showDivider={false}
 					/>
@@ -80,7 +81,7 @@ const SignAndSubmit = () => {
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 								<input disabled type="hidden" name="createdAt" />
 								<ESignature
-									disabled={!isEditMode}
+									disabled={!canEdit}
 									signatureRef={signatureRef}
 									name="signature"
 									control={control}
@@ -99,7 +100,7 @@ const SignAndSubmit = () => {
 						</Row>
 						<Row style={{ minHeight: '40vh' }} />
 					</SectionContent>
-					<SectionFooter currentRoute="sign" isEditMode={isEditMode} signSubmitHandler={handleSubmit(onSubmit)} />
+					<SectionFooter currentRoute="sign" isEditMode={canEdit} signSubmitHandler={handleSubmit(onSubmit)} />
 				</Form>
 			</SectionWrapper>
 			<Modal

@@ -40,7 +40,8 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = !revisions.institutional?.isApproved || isEditMode;
 	const {
 		state: { fields, formState },
 		dispatch,
@@ -106,14 +107,14 @@ const Institutional = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					title={translate('institutional-section.title')}
-					showLockIcon={revisionsData.institutional?.isApproved}
+					showLockIcon={revisions.institutional?.isApproved}
 					text={[translate('institutional-section.description1')]}
 				/>
 				<SectionContent title={translate('institutional-section.section1')}>
@@ -129,7 +130,7 @@ const Institutional = () => {
 									return { value: titles.en, label: titles.en };
 								})}
 								initialValue={getValues('institutionalTitle')}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -142,7 +143,7 @@ const Institutional = () => {
 								autoComplete="given-name"
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -152,7 +153,7 @@ const Institutional = () => {
 								autoComplete="additional-name"
 								control={control}
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -165,7 +166,7 @@ const Institutional = () => {
 								autoComplete="family-name"
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -175,7 +176,7 @@ const Institutional = () => {
 								control={control}
 								autoComplete="honorific-suffix"
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -188,7 +189,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -201,7 +202,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -216,7 +217,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -228,7 +229,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -246,7 +247,7 @@ const Institutional = () => {
 								})}
 								initialValue={'CAN'}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -258,7 +259,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -267,7 +268,7 @@ const Institutional = () => {
 								name="institutionBuilding"
 								control={control}
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -279,7 +280,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -289,7 +290,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -301,12 +302,12 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="institutional" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

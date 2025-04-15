@@ -40,7 +40,8 @@ const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = !revisions.appendices?.isApproved || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const {
 		control,
@@ -82,14 +83,14 @@ const Appendices = () => {
 				<SectionTitle
 					title={translate('appendices.title')}
 					showDivider={true}
-					showLockIcon={revisionsData.appendices?.isApproved}
+					showLockIcon={revisions.appendices?.isApproved}
 					text={[translate('appendices.description')]}
 				/>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>
 					<Form
 						form={form}
 						onBlur={() => {
-							if (isEditMode) {
+							if (canEdit) {
 								onSubmit();
 							}
 						}}
@@ -98,7 +99,7 @@ const Appendices = () => {
 							control={control}
 							rule={rule}
 							name="acceptedAppendices"
-							disabled={!isEditMode}
+							disabled={!canEdit}
 							gap={50}
 							options={[
 								{
@@ -136,7 +137,7 @@ const Appendices = () => {
 					</Form>
 				</SectionContent>
 
-				<SectionFooter currentRoute="appendices" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="appendices" isEditMode={canEdit} />
 			</>
 		</SectionWrapper>
 	);

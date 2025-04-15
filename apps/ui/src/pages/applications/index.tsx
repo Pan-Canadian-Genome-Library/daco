@@ -64,7 +64,11 @@ const ApplicationViewer = () => {
 			 *
 			 * In the future, this should also check user ability (can they edit?)
 			 */
-			if (applicationData.state !== ApplicationStates.DRAFT && isEditMode) {
+			if (
+				applicationData.state !== ApplicationStates.DRAFT &&
+				applicationData.state !== ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED &&
+				isEditMode
+			) {
 				navigation(`/application/${applicationData.id}/`, { replace: true });
 			}
 		}
@@ -99,7 +103,7 @@ const ApplicationViewer = () => {
 										appId={applicationData.id}
 										currentSection={currentSection}
 										isEditMode={isEditMode}
-										revisionsData={revisionsData}
+										revisions={revisionsData}
 									/>
 								</Col>
 							</Row>
@@ -109,7 +113,7 @@ const ApplicationViewer = () => {
 										context={{
 											appId: applicationData.id,
 											isEditMode,
-											revisionsData,
+											revisions: revisionsData,
 										}}
 									/>
 								</Col>

@@ -57,7 +57,8 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = !revisions.study?.isApproved || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
@@ -96,14 +97,14 @@ const RequestedStudy = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					title={translate('requested-study.title')}
-					showLockIcon={revisionsData.ethics?.isApproved}
+					showLockIcon={revisions.ethics?.isApproved}
 					text={
 						<Col>
 							<Text>{translate('requested-study.description1') + ' '}</Text>
@@ -124,12 +125,12 @@ const RequestedStudy = () => {
 									return { value: study.studyName, label: study.studyName };
 								})}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="study" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="study" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

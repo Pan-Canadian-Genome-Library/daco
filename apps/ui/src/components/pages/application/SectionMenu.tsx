@@ -33,10 +33,10 @@ type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
 	appId: string | number;
-	revisionsData: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
+	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
 };
 
-const SectionMenu = ({ currentSection, isEditMode, appId, revisionsData }: SectionMenuProps) => {
+const SectionMenu = ({ currentSection, isEditMode, appId, revisions }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
@@ -68,7 +68,6 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisionsData }: Secti
 				!isLoading
 					? ApplicationSectionRoutes.map((item) => {
 							const route = item.route;
-							console.log(route, revisionsData[route]?.isApproved ?? false);
 
 							return {
 								key: item.route,
@@ -79,7 +78,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisionsData }: Secti
 										isSectionValid={SectionValidator[route]}
 										label={item.route}
 										isEditMode={isEditMode}
-										isLocked={revisionsData[route]?.isApproved ?? false}
+										isLocked={revisions[route]?.isApproved ?? false}
 										hasCollaborators={data && data.length > 0}
 									/>
 								),

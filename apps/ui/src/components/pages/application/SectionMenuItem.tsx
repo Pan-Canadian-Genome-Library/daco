@@ -50,7 +50,7 @@ const SectionMenuItem = ({
 	 * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
 	 */
 	const renderIcon = () => {
-		if (!isLocked) {
+		if (label === SectionRoutes.INTRO) {
 			// do not display intro icon
 			return;
 		} else if (label === SectionRoutes.COLLABORATORS && isEditMode && isLocked) {
