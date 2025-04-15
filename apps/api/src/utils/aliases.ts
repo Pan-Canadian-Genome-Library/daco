@@ -21,11 +21,18 @@ import {
 	type ApplicationContentUpdates,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
+	type FilesRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { ApplicationResponseData, type CollaboratorsResponseDTO, type SignatureDTO } from '@pcgl-daco/data-model';
+import {
+	ApplicationResponseData,
+	type CollaboratorsResponseDTO,
+	type FilesDTO,
+	type SignatureDTO,
+} from '@pcgl-daco/data-model';
 import {
 	applicationResponseSchema,
+	fileResponseSchema,
 	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
@@ -46,7 +53,7 @@ export const convertToApplicationRecord = (
 		? success(validationResult.data)
 		: failure(
 				'SYSTEM_ERROR',
-				`Validation Error while aliasing data at aliasApplicationRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+				`Validation Error while aliasing data at convertToApplicationRecord: \n${validationResult.error.issues[0]?.message || ''}`,
 			);
 	return result;
 };
@@ -64,7 +71,7 @@ export const convertToApplicationContentsRecord = (
 		? success(validationResult.data)
 		: failure(
 				'SYSTEM_ERROR',
-				`Validation Error while aliasing data at aliasApplicationContentsRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+				`Validation Error while aliasing data at convertToApplicationContentsRecord: \n${validationResult.error.issues[0]?.message || ''}`,
 			);
 	return result;
 };
@@ -81,7 +88,24 @@ export const convertToSignatureRecord = (data: ApplicationSignatureUpdate): Resu
 		? success(validationResult.data)
 		: failure(
 				'SYSTEM_ERROR',
-				`Validation Error while aliasing data at aliasApplicationRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+				`Validation Error while aliasing data at convertToSignatureRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
+
+/**
+ * Helper function to convert Postgres snake_case to FE camelCase for the File Service
+ * @param data type `FileRecord` - File fields from the DB
+ * @returns type `FileDTO` - camelCase variation of a Postgres success response.
+ */
+export const convertToFileRecord = (data: FilesRecord): Result<FilesDTO, 'SYSTEM_ERROR'> => {
+	const camelCaseRecord = objectToCamel(data);
+	const validationResult = fileResponseSchema.safeParse(camelCaseRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToFileRecord: \n${validationResult.error.issues[0]?.message || ''}`,
 			);
 	return result;
 };

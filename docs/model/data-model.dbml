@@ -172,6 +172,14 @@ Table revision_requests {
   project_notes text
   requested_studies_approved boolean [not null]
   requested_studies_notes text
+  ethics_approved boolean [not null]
+  ethics_notes text
+  agreements_approved boolean [not null]
+  agreements_notes text
+  appendices_approved boolean [not null]
+  appendices_notes text
+  sign_and_submit_approved boolean [not null]
+  sign_and_submit_notes text
 }
 
 table collaborators {
