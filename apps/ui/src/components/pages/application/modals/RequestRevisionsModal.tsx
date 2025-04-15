@@ -26,6 +26,7 @@ import { memo } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import useRepRevisions from '@/api/mutations/useRepRevisions';
 import { RevisionModalStateProps } from '@/components/pages/application/ApplicationViewerHeader';
 import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
@@ -41,6 +42,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 	const minWidth = useMinWidth();
 
 	const isLowResDevice = minWidth <= token.screenLGMax;
+	const { mutateAsync: repRevision } = useRepRevisions();
 
 	const { handleSubmit, control, reset, formState } = useForm<RevisionsModalSchemaType>({
 		defaultValues: {
@@ -57,8 +59,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 	});
 
 	const onSubmit: SubmitHandler<RevisionsModalSchemaType> = (data) => {
-		onSubmitCallback(data);
-		reset();
+		repRevision(data);
 	};
 
 	return (
