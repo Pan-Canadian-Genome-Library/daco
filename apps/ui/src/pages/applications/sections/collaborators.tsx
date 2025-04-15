@@ -115,7 +115,7 @@ const Collaborators = () => {
 			<>
 				<SectionTitle
 					title={translate('collab-section.title')}
-					showLockIcon={revisions.collaborators?.isApproved}
+					showLockIcon={!canEdit}
 					text={[
 						translate('collab-section.description1'),
 						translate('collab-section.optional'),

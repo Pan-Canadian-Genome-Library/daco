@@ -83,7 +83,7 @@ const Appendices = () => {
 				<SectionTitle
 					title={translate('appendices.title')}
 					showDivider={true}
-					showLockIcon={revisions.appendices?.isApproved}
+					showLockIcon={!canEdit}
 					text={[translate('appendices.description')]}
 				/>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>

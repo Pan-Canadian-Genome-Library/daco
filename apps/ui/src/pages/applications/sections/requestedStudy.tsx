@@ -104,7 +104,7 @@ const RequestedStudy = () => {
 			>
 				<SectionTitle
 					title={translate('requested-study.title')}
-					showLockIcon={revisions.ethics?.isApproved}
+					showLockIcon={!canEdit}
 					text={
 						<Col>
 							<Text>{translate('requested-study.description1') + ' '}</Text>

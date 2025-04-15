@@ -168,7 +168,7 @@ const Ethics = () => {
 		<SectionWrapper>
 			<>
 				<SectionTitle
-					showLockIcon={revisions.ethics?.isApproved}
+					showLockIcon={!canEdit}
 					title={translate('ethics-section.title')}
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}

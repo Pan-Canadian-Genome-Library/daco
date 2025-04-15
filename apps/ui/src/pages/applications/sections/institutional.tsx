@@ -114,7 +114,7 @@ const Institutional = () => {
 			>
 				<SectionTitle
 					title={translate('institutional-section.title')}
-					showLockIcon={revisions.institutional?.isApproved}
+					showLockIcon={!canEdit}
 					text={[translate('institutional-section.description1')]}
 				/>
 				<SectionContent title={translate('institutional-section.section1')}>

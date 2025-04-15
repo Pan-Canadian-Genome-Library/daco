@@ -97,7 +97,7 @@ const AccessAgreement = () => {
 			>
 				<SectionTitle
 					textAbidesNewLines={true}
-					showLockIcon={revisions.agreement?.isApproved}
+					showLockIcon={!canEdit}
 					title={translate('data-access-section.title')}
 					text={[translate('data-access-section.description1')]}
 				/>

@@ -115,7 +115,7 @@ const Applicant = () => {
 			>
 				<SectionTitle
 					title={translate('applicant-section.title')}
-					showLockIcon={revisions.appendices?.isApproved}
+					showLockIcon={!canEdit}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
 				<SectionContent title={translate('applicant-section.section1')}>

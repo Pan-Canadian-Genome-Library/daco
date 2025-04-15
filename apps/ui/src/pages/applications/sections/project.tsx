@@ -110,7 +110,7 @@ const Project = () => {
 				<SectionTitle
 					title={translate('project-section.title')}
 					text={[translate('project-section.description')]}
-					showLockIcon={revisions.project?.isApproved}
+					showLockIcon={!canEdit}
 				/>
 				<Row gutter={26}>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>

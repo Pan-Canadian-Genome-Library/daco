@@ -68,7 +68,7 @@ const SignAndSubmit = () => {
 				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
 					<SectionTitle
 						title={translate('sign-and-submit-section.title')}
-						showLockIcon={revisions.sign?.isApproved}
+						showLockIcon={!canEdit}
 						text={translate('sign-and-submit-section.description')}
 						showDivider={false}
 					/>
