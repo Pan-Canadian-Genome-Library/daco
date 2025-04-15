@@ -21,6 +21,7 @@ import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useRepRevisions from '@/api/mutations/useRepRevisions';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
@@ -28,6 +29,7 @@ import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
+import { useNavigate } from 'react-router';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -51,12 +53,16 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const { mutateAsync: repRevision } = useRepRevisions();
+	const navigate = useNavigate();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
 		//TODO: Add logic to this to actually submit the revisions.
 		console.log('Submission Handled', data);
-		setOpenRevisionsModal(false);
-		setShowSuccessModal(true);
+		repRevision(data).then(() => {
+			setOpenRevisionsModal(false);
+			navigate('/dashboard');
+		});
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
