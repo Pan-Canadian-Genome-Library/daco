@@ -28,22 +28,28 @@ import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { ApplicationStateValues } from '@pcgl-daco/data-model';
 
 type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
 	appId: string | number;
+	applicationState: ApplicationStateValues;
 	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
 };
 
-const SectionMenu = ({ currentSection, isEditMode, appId, revisions }: SectionMenuProps) => {
+const SectionMenu = ({ currentSection, isEditMode, appId, revisions, applicationState }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetCollaborators(appId);
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
-		if (state?.formState?.isDirty) {
+		if (
+			state?.formState?.isDirty &&
+			applicationState !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' &&
+			applicationState !== 'DAC_REVISIONS_REQUESTED'
+		) {
 			editApplication({ id: appId });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
