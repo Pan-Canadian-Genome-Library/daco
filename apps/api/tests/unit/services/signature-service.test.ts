@@ -20,7 +20,7 @@
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 import { SignatureService } from '@/service/types.js';
 
 import { signatureService } from '@/service/signatureService.ts';
@@ -35,7 +35,7 @@ describe('Signature Service', { skip: true }, () => {
 		'data:image/png;base64,0ZxJm5HcCop3TCvbnvoHxseg4L0XM5WqylNBdkHKeEmIe4s5s4A7CZYs8TrPUzIuIA0bxD+Ei6764LcM2sPsmxKBuY3REWQ/uEe1j85hUHoiTbQqwln6Kfsd8cGC8sfjrNQD02oZ';
 
 	before(async () => {
-		db = connectToDb('');
+		db = dbUtils.connectToDb('');
 		testSignatureService = signatureService(db);
 	});
 

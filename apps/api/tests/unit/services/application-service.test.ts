@@ -293,7 +293,7 @@ describe('Application Service', { skip: true }, () => {
 
 	describe('Get Application Metadata', () => {
 		it('should list statistics for how many applications are in each state category', async () => {
-			const appStateTotals = await mockApplicationRepo.applicationStateTotals({ user_id });
+			const appStateTotals = await mockApplicationRepo.applicationStateTotals();
 			assert.ok(appStateTotals.success);
 
 			const allStates = appStateTotals.data;

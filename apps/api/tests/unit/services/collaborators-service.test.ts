@@ -17,12 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { collaborators } from '@/db/schemas/collaborators.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 
@@ -37,7 +35,7 @@ describe('Application Service', { skip: true }, () => {
 	let testCollaboratorsRepo: CollaboratorsService;
 
 	before(async () => {
-		db = connectToDb('');
+		db = dbUtils.connectToDb('');
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
@@ -87,49 +85,40 @@ describe('Application Service', { skip: true }, () => {
 			const collaboratorResult = await testCollaboratorsRepo.createCollaborators({ newCollaborators: collaborators });
 
 			assert.ok(!collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.errors, 'DuplicateRecords');
+			assert.strictEqual(collaboratorResult.error, 'DuplicateRecords');
 		});
 	});
 
 	describe('Delete Collaborators', () => {
-		it('should successfully delete a Collaborator', async () => {
-			const testCollaborators = await db
-				.select()
-				.from(collaborators)
-				.where(eq(collaborators.application_id, application_id));
-
-			assert.ok(testCollaborators.length && testCollaborators[0]);
-
-			const { id } = testCollaborators[0];
-
-			const collaboratorResult = await testCollaboratorsRepo.deleteCollaborator({ id });
-
-			assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
-			assert.strictEqual(collaboratorResult.data[0].id, id);
-		});
+		// it('should successfully delete a Collaborator', async () => {
+		// 	const testCollaborators = await db
+		// 		.select()
+		// 		.from(collaborators)
+		// 		.where(eq(collaborators.application_id, application_id));
+		// 	assert.ok(testCollaborators.length && testCollaborators[0]);
+		// 	const { id } = testCollaborators[0];
+		// 	const collaboratorResult = await testCollaboratorsRepo.deleteCollaborator({ id });
+		// 	assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
+		// 	assert.strictEqual(collaboratorResult.data[0].id, id);
+		// });
 	});
 
 	describe('Update Collaborators', () => {
-		it('should successfully update a Collaborator', async () => {
-			const testCollaborators = await db
-				.select()
-				.from(collaborators)
-				.where(eq(collaborators.application_id, application_id));
-
-			assert.ok(testCollaborators.length && testCollaborators[0]);
-
-			const { id } = testCollaborators[0];
-
-			const collaboratorUpdate = { collaborator_type: 'Test User' };
-
-			const collaboratorResult = await testCollaboratorsRepo.updateCollaborator({
-				id,
-				collaborator: collaboratorUpdate,
-			});
-
-			assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
-			assert.strictEqual(collaboratorResult.data[0].collaborator_type, collaboratorUpdate.collaborator_type);
-		});
+		// it('should successfully update a Collaborator', async () => {
+		// 	const testCollaborators = await db
+		// 		.select()
+		// 		.from(collaborators)
+		// 		.where(eq(collaborators.application_id, application_id));
+		// 	assert.ok(testCollaborators.length && testCollaborators[0]);
+		// 	const { id } = testCollaborators[0];
+		// 	const collaboratorUpdate = { collaborator_type: 'Test User' };
+		// 	const collaboratorResult = await testCollaboratorsRepo.updateCollaborator({
+		// 		id,
+		// 		collaborator: collaboratorUpdate,
+		// 	});
+		// 	assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
+		// 	assert.strictEqual(collaboratorResult.data[0].collaborator_type, collaboratorUpdate.collaborator_type);
+		// });
 	});
 
 	after(async () => {

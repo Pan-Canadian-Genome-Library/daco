@@ -21,6 +21,7 @@ import assert from 'node:assert';
 import { describe, it } from 'node:test';
 
 import { editApplication, getApplicationById } from '@/controllers/applicationController.js';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 // import { type RevisionRequestModel } from '@/service/types.js';
 
 import { appSvcSpy, testJoinedApplicationRecord } from '@tests/utils/mocks.ts';
@@ -54,13 +55,13 @@ describe('Application Controller', () => {
 
 			const result = await editApplication({ id, update });
 			assert.ok(result.success);
+			assert.ok(appSvcSpy.getApplicationById.calledOnce);
 
-			// const editedApplication = result.data;
-			// assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
-
-			assert.ok(appSvcSpy.editApplication.calledOnce);
-			// assert.ok(editedApplication.contents);
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+			assert.ok(editedApplication.contents);
 			// assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstName);
+			assert.ok(appSvcSpy.editApplication.calledOnce);
 		});
 
 		// it(
@@ -116,7 +117,7 @@ describe('Application Controller', () => {
 		// });
 	});
 
-	describe('Get Application by ID', { skip: true }, () => {
+	describe('Get Application by ID', () => {
 		it('should successfully be able to find an application with an ID', async () => {
 			const result = await getApplicationById({ applicationId: testApplicationId });
 

@@ -22,7 +22,7 @@ import assert from 'node:assert';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 
-import { connectToDb, type PostgresDb } from '@/db/index.js';
+import dbUtils, { type PostgresDb } from '@/db/index.js';
 
 import { filesSvc } from '@/service/fileService.ts';
 import { FilesService } from '@/service/types.ts';
@@ -46,7 +46,7 @@ describe('Signature Service', { skip: true }, () => {
 	};
 
 	before(async () => {
-		db = connectToDb('');
+		db = dbUtils.connectToDb('');
 		testFileService = filesSvc(db);
 	});
 

@@ -35,8 +35,6 @@ import { testApplicationId, testUserId } from '@tests/utils/testUtils.ts';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import sinon from 'sinon';
 
-// type ApplicationServiceKeys = keyof ApplicationService;
-
 const testApplicationRecord: ApplicationRecord = {
 	id: testApplicationId,
 	user_id: testUserId,
@@ -112,6 +110,8 @@ export type MockDb = ReturnType<typeof drizzle.mock<typeof schema>>;
 export const testDb: MockDb = drizzle.mock({ schema });
 export const mockDbInstance = sinon.stub(dbUtils, 'getDbInstance').callsFake(() => testDb);
 
+// getApplicationById
+
 export const mockApplicationRepo: ApplicationService = {
 	createApplication: async () => success(testApplicationRecord),
 	editApplication: async () => success(testJoinedApplicationRecord),
@@ -126,6 +126,7 @@ export const mockApplicationRepo: ApplicationService = {
 	getRevisions: async () => success([testRevisionRequestRecord]),
 };
 export const appSvcSpy = sinon.spy(mockApplicationRepo);
+
 // Sinon cannot stub ESM https://sinonjs.org/how-to/stub-dependency/
 export const mockService = sinon.stub(applicationService, 'applicationSvc').callsFake(() => appSvcSpy);
 
