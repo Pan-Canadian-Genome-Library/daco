@@ -50,7 +50,7 @@ const useCreateSignature = () => {
 		},
 		onSuccess: async (data) => {
 			// Invalidate previous signature get request
-			await queryClient.invalidateQueries({ queryKey: [`signature-${data.id}`], exact: false });
+			await queryClient.invalidateQueries({ queryKey: [`signature-${data.id}`] });
 		},
 	});
 };

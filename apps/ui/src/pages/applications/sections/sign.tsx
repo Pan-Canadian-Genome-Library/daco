@@ -85,10 +85,11 @@ const SignAndSubmit = () => {
 	useEffect(() => {
 		if (data && data.applicantSignature && signatureRef.current) {
 			signatureRef.current.fromDataURL(data.applicantSignature);
+			setValue('signature', data.applicantSignature);
 		}
 	}, [data, setValue]);
 
-	// Push user back to intro if they did not complete the remaning sections
+	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
 		if (!ValidateAllSections(fields)) {
 			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
@@ -125,7 +126,7 @@ const SignAndSubmit = () => {
 										setValue={setValue}
 										reset={reset}
 										clearErrors={clearErrors}
-										disableSaveButton={!watchSignature}
+										disableSaveButton={!watchSignature || !isEditMode}
 										onSaveClicked={onSaveClicked}
 										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
@@ -140,7 +141,7 @@ const SignAndSubmit = () => {
 						currentRoute="sign"
 						isEditMode={isEditMode}
 						signSubmitHandler={handleSubmit(onSubmit)}
-						submitDisabled={!data?.applicantSignature}
+						submitDisabled={!data?.applicantSignature || !getValues('signature') || !isEditMode}
 					/>
 				</Form>
 			</SectionWrapper>
