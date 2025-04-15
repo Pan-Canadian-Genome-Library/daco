@@ -65,6 +65,10 @@ const revisionRequestData: RevisionRequestModel = {
 	project_notes: 'Not sufficient justification',
 	requested_studies_approved: false,
 	requested_studies_notes: 'Unclear scope',
+	ethics_approved: false,
+	agreements_approved: false,
+	appendices_approved: false,
+	sign_and_submit_approved: false,
 };
 
 describe('Application Controller', () => {
@@ -473,6 +477,10 @@ describe('Application Controller', () => {
 					project_approved: false,
 					requested_studies_approved: false,
 					created_at: new Date(),
+					ethics_approved: false,
+					agreements_approved: false,
+					appendices_approved: false,
+					sign_and_submit_approved: false,
 				},
 			});
 
