@@ -20,29 +20,28 @@
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
 
-import { editApplication } from '@/controllers/applicationController.js';
-import { type RevisionRequestModel } from '@/service/types.js';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
+import { editApplication, getApplicationById } from '@/controllers/applicationController.js';
+// import { type RevisionRequestModel } from '@/service/types.js';
 
-import { appSvcSpy, mockApplicationRepo, testJoinedApplicationRecord } from '@tests/utils/mocks.ts';
-import { testApplicationId, testUserId as user_id } from '@tests/utils/testUtils.ts';
+import { appSvcSpy, testJoinedApplicationRecord } from '@tests/utils/mocks.ts';
+import { testApplicationId } from '@tests/utils/testUtils.ts';
 
 // Sample revision request data
-const revisionRequestData: RevisionRequestModel = {
-	application_id: testApplicationId,
-	created_at: new Date(),
-	comments: 'Please provide additional documentation.',
-	applicant_notes: 'Needs more details',
-	applicant_approved: false,
-	institution_rep_approved: false,
-	institution_rep_notes: 'Incomplete information',
-	collaborators_approved: false,
-	collaborators_notes: 'Requires additional clarification',
-	project_approved: false,
-	project_notes: 'Not sufficient justification',
-	requested_studies_approved: false,
-	requested_studies_notes: 'Unclear scope',
-};
+// const revisionRequestData: RevisionRequestModel = {
+// 	application_id: testApplicationId,
+// 	created_at: new Date(),
+// 	comments: 'Please provide additional documentation.',
+// 	applicant_notes: 'Needs more details',
+// 	applicant_approved: false,
+// 	institution_rep_approved: false,
+// 	institution_rep_notes: 'Incomplete information',
+// 	collaborators_approved: false,
+// 	collaborators_notes: 'Requires additional clarification',
+// 	project_approved: false,
+// 	project_notes: 'Not sufficient justification',
+// 	requested_studies_approved: false,
+// 	requested_studies_notes: 'Unclear scope',
+// };
 
 describe('Application Controller', () => {
 	describe('Edit Application', () => {
@@ -64,97 +63,97 @@ describe('Application Controller', () => {
 			// assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstName);
 		});
 
-		it(
-			'should allow editing applications with state DAC_REVIEW, and revert state to DRAFT',
-			{ skip: true },
-			async () => {
-				const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+		// it(
+		// 	'should allow editing applications with state DAC_REVIEW, and revert state to DRAFT',
+		// 	{ skip: true },
+		// 	async () => {
+		// 		const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
-				assert.ok(applicationRecordsResult.success);
-				assert.ok(
-					Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-				);
+		// 		assert.ok(applicationRecordsResult.success);
+		// 		assert.ok(
+		// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+		// 		);
 
-				const { id, state } = applicationRecordsResult.data.applications[0];
+		// 		const { id, state } = applicationRecordsResult.data.applications[0];
 
-				assert.strictEqual(state, ApplicationStates.DRAFT);
+		// 		assert.strictEqual(state, ApplicationStates.DRAFT);
 
-				const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-				const reviewRecordResult = await mockApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
+		// 		const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+		// 		const reviewRecordResult = await mockApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
 
-				assert.ok(reviewRecordResult.success && reviewRecordResult.data);
-				assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+		// 		assert.ok(reviewRecordResult.success && reviewRecordResult.data);
+		// 		assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
-				const contentUpdate = { applicantLastName: 'User' };
-				const result = await editApplication({ id, update: contentUpdate });
-				assert.ok(result.success);
+		// 		const contentUpdate = { applicantLastName: 'User' };
+		// 		const result = await editApplication({ id, update: contentUpdate });
+		// 		assert.ok(result.success);
 
-				const editedApplication = result.data;
-				assert.strictEqual(editedApplication.id, id);
-				assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+		// 		const editedApplication = result.data;
+		// 		assert.strictEqual(editedApplication.id, id);
+		// 		assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
-				assert.ok(editedApplication.contents);
-				assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
-			},
-		);
+		// 		assert.ok(editedApplication.contents);
+		// 		assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
+		// 	},
+		// );
 
-		it('should error and return null when application state is not draft or review', { skip: true }, async () => {
-			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
-			assert.ok(applicationRecordsResult.success);
+		// it('should error and return null when application state is not draft or review', { skip: true }, async () => {
+		// 	const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+		// 	assert.ok(applicationRecordsResult.success);
 
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-			const { id } = applicationRecordsResult.data.applications[0];
+		// 	assert.ok(
+		// 		Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+		// 	);
+		// 	const { id } = applicationRecordsResult.data.applications[0];
 
-			const stateUpdate = { state: ApplicationStates.CLOSED };
-			await mockApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
+		// 	const stateUpdate = { state: ApplicationStates.CLOSED };
+		// 	await mockApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
 
-			const contentUpdate = { applicantTitle: 'Dr.' };
-			const result = await editApplication({ id, update: contentUpdate });
+		// 	const contentUpdate = { applicantTitle: 'Dr.' };
+		// 	const result = await editApplication({ id, update: contentUpdate });
 
-			assert.ok(!result.success);
-		});
+		// 	assert.ok(!result.success);
+		// });
 	});
 
-	// describe('Get Application by ID', { skip: true }, () => {
-	// 	it('should successfully be able to find an application with an ID', async () => {
-	// 		const result = await getApplicationById({ applicationId: testApplicationId });
+	describe('Get Application by ID', { skip: true }, () => {
+		it('should successfully be able to find an application with an ID', async () => {
+			const result = await getApplicationById({ applicationId: testApplicationId });
 
-	// 		assert.ok(result.success);
+			assert.ok(result.success);
 
-	// 		const application = result.data;
+			const application = result.data;
 
-	// 		assert.strictEqual(application.id, testApplicationId);
+			assert.strictEqual(application.id, testApplicationId);
 
-	// 		assert.ok(application.contents);
-	// 	});
+			assert.ok(application.contents);
+		});
 
-	// 	it(
-	// 		'should error with a not found error, not being able to find a non-existant application ID',
-	// 		{ skip: true },
-	// 		async () => {
-	// 			const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+		// it(
+		// 	'should error with a not found error, not being able to find a non-existant application ID',
+		// 	{ skip: true },
+		// 	async () => {
+		// 		const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
 
-	// 			assert.ok(applicationRecordsResult.success);
+		// 		assert.ok(applicationRecordsResult.success);
 
-	// 			assert.ok(
-	// 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-	// 			);
+		// 		assert.ok(
+		// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+		// 		);
 
-	// 			const last_id =
-	// 				applicationRecordsResult.data.applications[applicationRecordsResult.data.applications.length - 1];
+		// 		const last_id =
+		// 			applicationRecordsResult.data.applications[applicationRecordsResult.data.applications.length - 1];
 
-	// 			assert.ok(last_id?.id);
+		// 		assert.ok(last_id?.id);
 
-	// 			const result = await getApplicationById({ applicationId: last_id.id + 1 });
+		// 		const result = await getApplicationById({ applicationId: last_id.id + 1 });
 
-	// 			assert.ok(!result.success);
+		// 		assert.ok(!result.success);
 
-	// 			assert.strictEqual(result.message, 'Error: Application record is undefined');
-	// 		},
-	// 	);
-	// });
+		// 		assert.strictEqual(result.message, 'Error: Application record is undefined');
+		// 	},
+		// );
+	});
 
 	// describe('Get Application Metadata', { skip: true }, () => {
 	// 	it('should get the counts for each of the application states', async () => {
