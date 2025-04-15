@@ -40,7 +40,7 @@ import {
 	type JoinedApplicationRecord,
 } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import type { ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
+import type { ApplicationListResponse, ApplicationResponseData, RevisionsDTO } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
@@ -899,7 +899,6 @@ applicationRouter.post(
 	),
 );
 
-//TODO: Auth validation.
 applicationRouter.get(
 	'/:applicationId/revisions',
 	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
@@ -908,7 +907,7 @@ applicationRouter.get(
 		apiZodErrorMapping,
 		async (
 			request,
-			response: ResponseWithData<RevisionRequestModel[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<RevisionsDTO[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const { applicationId } = request.params;
 			const userSession = request.session;
@@ -938,6 +937,7 @@ applicationRouter.get(
 						error: applicationInfo.error,
 						message: applicationInfo.message,
 					});
+
 					return;
 				}
 

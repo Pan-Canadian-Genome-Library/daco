@@ -43,7 +43,7 @@ const SectionTitle = ({
 		<Flex vertical>
 			<Flex align="center" gap={'1rem'}>
 				<Title level={2}>{title}</Title>
-				{!showLockIcon ? (
+				{showLockIcon ? (
 					<LockFilled
 						style={{
 							opacity: '45%',

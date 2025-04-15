@@ -31,6 +31,7 @@ type SectionMenuItemProps = {
 	isSectionValid?: boolean;
 	label: string;
 	isEditMode?: boolean;
+	isLocked?: boolean;
 	hasCollaborators?: boolean;
 };
 
@@ -39,25 +40,27 @@ const SectionMenuItem = ({
 	isSectionTouched,
 	isSectionValid,
 	label,
+	isLocked,
 	isEditMode,
 	hasCollaborators,
 }: SectionMenuItemProps) => {
 	const { t: translate } = useTranslation();
 
+	console.log('here', isLocked);
 	/**
 	 * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
 	 */
 	const renderIcon = () => {
-		if (label === SectionRoutes.INTRO) {
+		if (!isLocked) {
 			// do not display intro icon
 			return;
-		} else if (label === SectionRoutes.COLLABORATORS && isEditMode) {
+		} else if (label === SectionRoutes.COLLABORATORS && isEditMode && isLocked) {
 			// If has collaborators, show checkmark otherwise return null
 			return hasCollaborators ? <CheckCircleOutlined /> : null;
 		} else if (isCurrentSection && isEditMode && !isSectionValid) {
 			// do not display icon if on currentpage
 			return;
-		} else if (!isEditMode) {
+		} else if (isLocked ?? !isEditMode) {
 			// display lock on edit mode
 			return <LockOutlined />;
 		} else if (!isSectionTouched) {

@@ -31,10 +31,11 @@ import { useApplicationContext } from '@/providers/context/application/Applicati
 type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
+	isLocked: boolean;
 	appId: string | number;
 };
 
-const SectionMenu = ({ currentSection, isEditMode, appId }: SectionMenuProps) => {
+const SectionMenu = ({ currentSection, isEditMode, appId, isLocked }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
@@ -76,6 +77,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId }: SectionMenuProps) =>
 										isSectionValid={SectionValidator[route]}
 										label={item.route}
 										isEditMode={isEditMode}
+										isLocked={isLocked}
 										hasCollaborators={data && data.length > 0}
 									/>
 								),

@@ -308,26 +308,6 @@ export interface EthicsDataDTO {
 	signedPdf?: number | null;
 }
 
-export type RevisionRequestDTO = {
-	id: number;
-	applicationId: number;
-	createdAt: Date;
-	createdBy: string;
-	version: number;
-	changes: ApplicationActionDTO[];
-	comments?: string;
-	applicantApproved: Boolean;
-	applicantNotes?: string;
-	institutionRepApproved: boolean;
-	institutionRepNotes?: string;
-	collaboratorsApproved: boolean;
-	collaboratorsNotes?: string;
-	projectApproved: boolean;
-	projectNotes?: string;
-	requestedStudiesApproved: boolean;
-	requestedStudiesNotes?: string;
-};
-
 export type ApplicationActionDTO = {
 	id: number;
 	applicationId: number;
@@ -382,16 +362,24 @@ export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as cons
 export interface RevisionsDTO {
 	id: number;
 	applicationId: number;
-	createdAt: Date;
+	createdAt?: Date;
 	comments?: String | null;
+	applicantApproved: boolean;
 	applicantNotes?: string | null;
-	applicantApproved?: boolean;
-	institutionRepApproved?: boolean;
+	institutionRepApproved: boolean;
 	institutionRepNotes?: string | null;
 	collaboratorsApproved: boolean;
 	collaboratorsNotes?: string | null;
-	projectApproved?: boolean;
+	projectApproved: boolean;
 	projectNotes?: string | null;
-	requestedStudiesApproved?: boolean;
+	requestedStudiesApproved: boolean;
 	requestedStudiesNotes?: string | null;
+	ethicsApproved: boolean;
+	ethicsNotes?: string | null;
+	agreementsApproved: boolean;
+	agreementsNotes?: string | null;
+	appendicesApproved: boolean;
+	appendicesNotes?: string | null;
+	signAndSubmitApproved: boolean;
+	signAndSubmitNotes?: string | null;
 }

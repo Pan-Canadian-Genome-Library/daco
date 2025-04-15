@@ -40,7 +40,7 @@ const rule = createSchemaFieldRule(agreementsSchema);
 
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, isLocked } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {
@@ -96,6 +96,7 @@ const AccessAgreement = () => {
 			>
 				<SectionTitle
 					textAbidesNewLines={true}
+					showLockIcon={isLocked}
 					title={translate('data-access-section.title')}
 					text={[translate('data-access-section.description1')]}
 				/>
