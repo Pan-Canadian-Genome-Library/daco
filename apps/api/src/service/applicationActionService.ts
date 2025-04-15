@@ -199,4 +199,4 @@ const applicationActionSvc = (db: PostgresDb | MockDb) => {
 	};
 };
 
-export { applicationActionSvc };
+export default { applicationActionSvc };

@@ -25,7 +25,8 @@ import { createApplication, editApplication, getApplicationById } from '@/contro
 import { ApplicationStates } from '@pcgl-daco/data-model';
 // import { type RevisionRequestModel } from '@/service/types.js';
 
-import { appSvcSpy, testJoinedApplicationRecord } from '@tests/utils/mocks.ts';
+import { appSvcSpy } from '@tests/utils/mocks.ts';
+import { testJoinedApplicationRecord } from '@tests/utils/testData.ts';
 import { testApplicationId as applicationId, testUserId as user_id } from '@tests/utils/testUtils.ts';
 
 // Sample revision request data

@@ -28,8 +28,8 @@ import * as schema from '@/db/schemas/index.js';
 import { files } from '@/db/schemas/index.js';
 
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
-import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import actionSvc from './applicationActionService.js';
 import appSvc from './applicationService.js';
 import { filesSvc } from './fileService.js';
 import { signatureService } from './signatureService.ts';
@@ -72,7 +72,7 @@ export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'conten
 
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
-export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
+export type ApplicationActionService = ReturnType<typeof actionSvc.applicationActionSvc>;
 
 export type CollaboratorModel = typeof collaborators.$inferInsert;
 export type CollaboratorRecord = typeof collaborators.$inferSelect;
@@ -80,7 +80,7 @@ export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
 export type SignatureService = ReturnType<typeof signatureService>;
 
-export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
+export type AddActionMethods = Exclude<keyof ReturnType<typeof actionSvc.applicationActionSvc>, 'listActions'>;
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
