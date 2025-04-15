@@ -79,10 +79,16 @@ export const editApplication = async ({
 
 	const application = result.data;
 
-	const { edit } = ApplicationStateEvents;
-	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
+	const { edit, dac_revision_request, rep_revision_request } = ApplicationStateEvents;
 
-	if (!canEditResult.success) {
+	/**
+	 * FIXME: This does not prevent editing of fields that have already been approved. This needs to be added.
+	 */
+	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
+	const canReviseResultRep = new ApplicationStateManager(application)._canPerformAction(rep_revision_request);
+	const canReviseResultDAC = new ApplicationStateManager(application)._canPerformAction(dac_revision_request);
+
+	if (!canEditResult.success && !canReviseResultDAC && !canReviseResultRep) {
 		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
 		return failure('INVALID_STATE_TRANSITION', message);

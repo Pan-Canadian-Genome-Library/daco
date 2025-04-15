@@ -104,7 +104,6 @@ const ApplicationViewer = () => {
 										currentSection={currentSection}
 										isEditMode={isEditMode}
 										revisions={revisionsData}
-										applicationState={applicationData.state}
 									/>
 								</Col>
 							</Row>
