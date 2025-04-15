@@ -28,7 +28,6 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 import useGetApplication from '@/api/queries/useGetApplication';
 import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
 import ErrorPage from '@/components/pages/ErrorPage';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 
 const { Content } = Layout;
 
@@ -64,11 +63,7 @@ const ApplicationViewer = () => {
 			 *
 			 * In the future, this should also check user ability (can they edit?)
 			 */
-			if (
-				applicationData.state !== ApplicationStates.DRAFT &&
-				applicationData.state !== ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED &&
-				isEditMode
-			) {
+			if (isEditMode) {
 				navigation(`/application/${applicationData.id}/`, { replace: true });
 			}
 		}
