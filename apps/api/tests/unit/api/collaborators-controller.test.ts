@@ -17,16 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { after, before, describe, it } from 'node:test';
 
 import { CollaboratorDTO } from '@pcgl-daco/data-model';
 
 import { createApplication } from '@/controllers/applicationController.js';
-import { createCollaborators, updateCollaborator } from '@/controllers/collaboratorsController.js';
+import { createCollaborators } from '@/controllers/collaboratorsController.js';
 import dbUtils, { type PostgresDb } from '@/db/index.js';
-import { collaborators } from '@/db/schemas/collaborators.js';
 
 import { testApplicationId as application_id, testUserId as user_id } from '@tests/utils/testUtils.ts';
 
@@ -151,29 +149,23 @@ describe('Collaborators Controller', { skip: true }, () => {
 	});
 
 	describe('Update Collaborators', () => {
-		it('should successfully update a Collaborator', async () => {
-			const testCollaborators = await db
-				.select()
-				.from(collaborators)
-				.where(eq(collaborators.application_id, application_id));
-
-			assert.ok(testCollaborators.length && testCollaborators[0]);
-
-			const { id } = testCollaborators[0];
-
-			const collaboratorUpdates = { id, collaboratorType: 'Test User' };
-
-			const collaboratorResult = await updateCollaborator({
-				application_id,
-				user_id,
-				collaboratorUpdates,
-			});
-
-			assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
-
-			const collaboratorRecord = collaboratorResult.data[0];
-			assert.strictEqual(collaboratorRecord.collaboratorType, collaboratorUpdates.collaboratorType);
-		});
+		// it('should successfully update a Collaborator', async () => {
+		// 	const testCollaborators = await db
+		// 		.select()
+		// 		.from(collaborators)
+		// 		.where(eq(collaborators.application_id, application_id));
+		// 	assert.ok(testCollaborators.length && testCollaborators[0]);
+		// 	const { id } = testCollaborators[0];
+		// 	const collaboratorUpdates = { id, collaboratorType: 'Test User' };
+		// 	const collaboratorResult = await updateCollaborator({
+		// 		application_id,
+		// 		user_id,
+		// 		collaboratorUpdates,
+		// 	});
+		// 	assert.ok(collaboratorResult.success && collaboratorResult.data[0]);
+		// 	const collaboratorRecord = collaboratorResult.data[0];
+		// 	assert.strictEqual(collaboratorRecord.collaboratorType, collaboratorUpdates.collaboratorType);
+		// });
 	});
 
 	after(async () => {

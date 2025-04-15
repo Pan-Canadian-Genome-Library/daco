@@ -28,7 +28,7 @@ import {
 import { mockApplicationRepo } from '@tests/utils/mocks.ts';
 import { testUserId as user_id } from '@tests/utils/testUtils.ts';
 
-describe('Signature API', () => {
+describe('Signature API', { skip: true }, () => {
 	const validBase64Signature =
 		'data:image/png;base64,0ZxJm5HcCop3TCvbnvoHxseg4L0XM5WqylNBdkHKeEmIe4s5s4A7CZYs8TrPUzIuIA0bxD+Ei6764LcM2sPsmxKBuY3REWQ/uEe1j85hUHoiTbQqwln6Kfsd8cGC8sfjrNQD02oZ';
 

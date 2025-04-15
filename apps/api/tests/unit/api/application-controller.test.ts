@@ -18,14 +18,15 @@
  */
 
 import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { after, describe, it } from 'node:test';
+import sinon from 'sinon';
 
-import { editApplication, getApplicationById } from '@/controllers/applicationController.js';
+import { createApplication, editApplication, getApplicationById } from '@/controllers/applicationController.js';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 // import { type RevisionRequestModel } from '@/service/types.js';
 
 import { appSvcSpy, testJoinedApplicationRecord } from '@tests/utils/mocks.ts';
-import { testApplicationId } from '@tests/utils/testUtils.ts';
+import { testApplicationId as applicationId, testUserId as user_id } from '@tests/utils/testUtils.ts';
 
 // Sample revision request data
 // const revisionRequestData: RevisionRequestModel = {
@@ -60,43 +61,25 @@ describe('Application Controller', () => {
 			const editedApplication = result.data;
 			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 			assert.ok(editedApplication.contents);
-			// assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicantFirstName);
 			assert.ok(appSvcSpy.editApplication.calledOnce);
 		});
 
-		// it(
-		// 	'should allow editing applications with state DAC_REVIEW, and revert state to DRAFT',
-		// 	{ skip: true },
-		// 	async () => {
-		// 		const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
+		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
+			const testRecord = { ...testJoinedApplicationRecord, state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
 
-		// 		assert.ok(applicationRecordsResult.success);
-		// 		assert.ok(
-		// 			Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-		// 		);
+			const contentUpdate = { applicantLastName: 'User' };
+			const result = await editApplication({ id: testRecord.id, update: contentUpdate });
 
-		// 		const { id, state } = applicationRecordsResult.data.applications[0];
+			assert.ok(result.success);
+			assert.ok(appSvcSpy.editApplication.calledOnce);
 
-		// 		assert.strictEqual(state, ApplicationStates.DRAFT);
-
-		// 		const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
-		// 		const reviewRecordResult = await mockApplicationRepo.findOneAndUpdate({ id, update: stateUpdate });
-
-		// 		assert.ok(reviewRecordResult.success && reviewRecordResult.data);
-		// 		assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
-
-		// 		const contentUpdate = { applicantLastName: 'User' };
-		// 		const result = await editApplication({ id, update: contentUpdate });
-		// 		assert.ok(result.success);
-
-		// 		const editedApplication = result.data;
-		// 		assert.strictEqual(editedApplication.id, id);
-		// 		assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
-
-		// 		assert.ok(editedApplication.contents);
-		// 		assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
-		// 	},
-		// );
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+			// actionSvcSpy;
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.id, testRecord.id);
+			assert.strictEqual(editedApplication.contents.applicant_last_name, contentUpdate.applicantLastName);
+		});
 
 		// it('should error and return null when application state is not draft or review', { skip: true }, async () => {
 		// 	const applicationRecordsResult = await mockApplicationRepo.listApplications({ user_id });
@@ -119,13 +102,13 @@ describe('Application Controller', () => {
 
 	describe('Get Application by ID', () => {
 		it('should successfully be able to find an application with an ID', async () => {
-			const result = await getApplicationById({ applicationId: testApplicationId });
+			const result = await getApplicationById({ applicationId });
 
 			assert.ok(result.success);
 
 			const application = result.data;
 
-			assert.strictEqual(application.id, testApplicationId);
+			assert.strictEqual(application.id, applicationId);
 
 			assert.ok(application.contents);
 		});
@@ -180,19 +163,19 @@ describe('Application Controller', () => {
 	// 	});
 	// });
 
-	// describe('Create a new application', { skip: true }, () => {
-	// 	it('should successfully be able to create a new application with the provided user_id', async () => {
-	// 		const result = await createApplication({ user_id });
+	describe('Create a new application', () => {
+		it('should successfully be able to create a new application with the provided user_id', async () => {
+			const result = await createApplication({ user_id });
 
-	// 		assert.ok(result.success && result.data);
+			assert.ok(result.success && result.data);
 
-	// 		const application = result.data;
+			const application = result.data;
 
-	// 		assert.strictEqual(application.user_id, user_id);
+			assert.strictEqual(application.user_id, user_id);
 
-	// 		assert.ok(application.contents);
-	// 	});
-	// });
+			assert.ok(application.contents);
+		});
+	});
 
 	// describe('Reject Application', { skip: true }, () => {
 	// it('should successfully reject an application in DAC_REVIEW state', async () => {
@@ -283,9 +266,8 @@ describe('Application Controller', () => {
 	// 	});
 	// });
 
-	// after(async () => {
-	// 	console.log('after');
-	// 	sinon.restore();
-	// 	process.exit(0);
-	// });
+	after(async () => {
+		sinon.restore();
+		process.exit(0);
+	});
 });

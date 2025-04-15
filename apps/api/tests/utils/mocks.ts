@@ -54,7 +54,7 @@ export const testJoinedApplicationRecord: JoinedApplicationRecord = {
 	state: ApplicationStates.DRAFT,
 	approved_at: null,
 	expires_at: null,
-	contents: {},
+	contents: { applicant_first_name: 'Test' },
 };
 
 const testApplicationTotals: ApplicationStateTotals = {
@@ -125,26 +125,29 @@ export const mockApplicationRepo: ApplicationService = {
 	getApplicationForCollaboratorId: async () => success(testApplicationRecord),
 	getRevisions: async () => success([testRevisionRequestRecord]),
 };
+
 export const appSvcSpy = sinon.spy(mockApplicationRepo);
 
 // Sinon cannot stub ESM https://sinonjs.org/how-to/stub-dependency/
-export const mockService = sinon.stub(applicationService, 'applicationSvc').callsFake(() => appSvcSpy);
+export const mockApplicationService = sinon.stub(applicationService, 'applicationSvc').callsFake(() => appSvcSpy);
 
 export const mockActionRepo: ApplicationActionService = {
-	close: async () => new Promise(() => success(baseTestActionRecord)),
-	draftSubmit: async () => new Promise(() => success(baseTestActionRecord)),
-	dacApproved: async () => new Promise(() => success(baseTestActionRecord)),
-	dacRejected: async () => new Promise(() => success(baseTestActionRecord)),
-	dacRevision: async () => new Promise(() => success(baseTestActionRecord)),
-	dacSubmit: async () => new Promise(() => success(baseTestActionRecord)),
-	repRevision: async () => new Promise(() => success(baseTestActionRecord)),
-	repSubmit: async () => new Promise(() => success(baseTestActionRecord)),
-	repApproved: async () => new Promise(() => success(baseTestActionRecord)),
-	revoke: async () => new Promise(() => success(baseTestActionRecord)),
-	withdraw: async () => new Promise(() => success(baseTestActionRecord)),
-	getActionById: async () => new Promise(() => success(baseTestActionRecord)),
-	listActions: async () => new Promise(() => success([baseTestActionRecord])),
+	close: async () => success(baseTestActionRecord),
+	draftSubmit: async () => success(baseTestActionRecord),
+	dacApproved: async () => success(baseTestActionRecord),
+	dacRejected: async () => success(baseTestActionRecord),
+	dacRevision: async () => success(baseTestActionRecord),
+	dacSubmit: async () => success(baseTestActionRecord),
+	repRevision: async () => success(baseTestActionRecord),
+	repSubmit: async () => success(baseTestActionRecord),
+	repApproved: async () => success(baseTestActionRecord),
+	revoke: async () => success(baseTestActionRecord),
+	withdraw: async () => success(baseTestActionRecord),
+	getActionById: async () => success(baseTestActionRecord),
+	listActions: async () => success([baseTestActionRecord]),
 };
+
+export const actionSvcSpy = sinon.spy(mockActionRepo);
 
 // export const mockApplicationDb = Object.keys(applicationSvc).reduce(
 // 	(acc, key) => {
