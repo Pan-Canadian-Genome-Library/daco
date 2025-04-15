@@ -46,7 +46,6 @@ const SectionMenuItem = ({
 }: SectionMenuItemProps) => {
 	const { t: translate } = useTranslation();
 
-	console.log('here', isLocked);
 	/**
 	 * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
 	 */

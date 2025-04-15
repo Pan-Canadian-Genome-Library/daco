@@ -51,11 +51,11 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 	const form = useSectionForm({
-		section: "ethics",
+		section: 'ethics',
 		sectionVisited: state.formState.sectionsVisited.ethics,
 	});
 
@@ -167,6 +167,7 @@ const Ethics = () => {
 		<SectionWrapper>
 			<>
 				<SectionTitle
+					showLockIcon={revisionsData.ethics?.isApproved}
 					title={translate('ethics-section.title')}
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}

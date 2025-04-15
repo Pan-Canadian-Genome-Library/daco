@@ -40,7 +40,7 @@ const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, isLocked } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const {
 		control,
@@ -82,7 +82,7 @@ const Appendices = () => {
 				<SectionTitle
 					title={translate('appendices.title')}
 					showDivider={true}
-					showLockIcon={isLocked}
+					showLockIcon={revisionsData.appendices?.isApproved}
 					text={[translate('appendices.description')]}
 				/>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>

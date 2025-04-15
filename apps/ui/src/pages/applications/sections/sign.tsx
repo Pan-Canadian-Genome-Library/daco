@@ -37,7 +37,7 @@ const { Text } = Typography;
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, appId, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const [openModal, setOpenModal] = useState(false);
 	const signatureRef = useRef(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
@@ -67,6 +67,7 @@ const SignAndSubmit = () => {
 				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
 					<SectionTitle
 						title={translate('sign-and-submit-section.title')}
+						showLockIcon={revisionsData.sign?.isApproved}
 						text={translate('sign-and-submit-section.description')}
 						showDivider={false}
 					/>

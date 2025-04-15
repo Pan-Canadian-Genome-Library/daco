@@ -18,7 +18,7 @@
  */
 
 import { Col, Flex, Layout, Row } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
 
 import ContentWrapper from '@/components/layouts/ContentWrapper';
@@ -29,7 +29,6 @@ import useGetApplication from '@/api/queries/useGetApplication';
 import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
-import { SectionRoutes } from '../AppRouter';
 
 const { Content } = Layout;
 
@@ -41,7 +40,6 @@ const ApplicationViewer = () => {
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
-	const [isLocked, setIsLocked] = useState(true);
 
 	const {
 		data: applicationData,
@@ -72,56 +70,19 @@ const ApplicationViewer = () => {
 		}
 	}, [applicationData, applicationError, isEditMode, navigation]);
 
-	useEffect(() => {
-		const mostRecentData = revisionsData ? revisionsData[0] : undefined;
-
-		if (!mostRecentData) {
-			return;
-		}
-
-		switch (currentSection) {
-			case SectionRoutes.APPLICANT:
-				setIsLocked(!mostRecentData.applicantApproved);
-				break;
-			case SectionRoutes.INSTITUTIONAL:
-				setIsLocked(!mostRecentData.institutionRepApproved);
-				break;
-			case SectionRoutes.COLLABORATORS:
-				setIsLocked(!mostRecentData.collaboratorsApproved);
-				break;
-			case SectionRoutes.PROJECT:
-				setIsLocked(!mostRecentData.projectApproved);
-				break;
-			case SectionRoutes.STUDY:
-				setIsLocked(!mostRecentData.requestedStudiesApproved);
-				break;
-			case SectionRoutes.ETHICS:
-				setIsLocked(!mostRecentData.ethicsApproved);
-				break;
-			case SectionRoutes.AGREEMENT:
-				setIsLocked(!mostRecentData.agreementsApproved);
-				break;
-			case SectionRoutes.APPENDICES:
-				setIsLocked(!mostRecentData.appendicesApproved);
-				break;
-			case SectionRoutes.SIGN:
-				setIsLocked(!mostRecentData.signAndSubmitApproved);
-				break;
-			default:
-				setIsLocked(!isEditMode);
-		}
-	}, [currentSection, isEditMode, revisionsData]);
-
-	useEffect(() => {
-		console.log(isLocked);
-	});
-
 	// scroll to top on page change
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, [match]);
 
-	if (!applicationData || applicationIsErrored || applicationIsLoading || revisionsLoading || revisionsIsErrored)
+	if (
+		!applicationData ||
+		!revisionsData ||
+		applicationIsErrored ||
+		applicationIsLoading ||
+		revisionsLoading ||
+		revisionsIsErrored
+	)
 		return <ErrorPage loading={applicationIsLoading || revisionsLoading} error={applicationError || revisionsError} />;
 
 	return (
@@ -138,7 +99,7 @@ const ApplicationViewer = () => {
 										appId={applicationData.id}
 										currentSection={currentSection}
 										isEditMode={isEditMode}
-										isLocked={isLocked}
+										revisionsData={revisionsData}
 									/>
 								</Col>
 							</Row>
@@ -148,7 +109,7 @@ const ApplicationViewer = () => {
 										context={{
 											appId: applicationData.id,
 											isEditMode,
-											isLocked,
+											revisionsData,
 										}}
 									/>
 								</Col>

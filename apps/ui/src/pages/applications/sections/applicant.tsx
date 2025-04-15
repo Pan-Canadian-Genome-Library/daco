@@ -40,7 +40,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, isLocked } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 
@@ -114,7 +114,7 @@ const Applicant = () => {
 			>
 				<SectionTitle
 					title={translate('applicant-section.title')}
-					showLockIcon={isLocked}
+					showLockIcon={revisionsData.appendices?.isApproved}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
 				<SectionContent title={translate('applicant-section.section1')}>

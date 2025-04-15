@@ -40,7 +40,7 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const {
 		state: { fields, formState },
 		dispatch,
@@ -113,6 +113,7 @@ const Institutional = () => {
 			>
 				<SectionTitle
 					title={translate('institutional-section.title')}
+					showLockIcon={revisionsData.institutional?.isApproved}
 					text={[translate('institutional-section.description1')]}
 				/>
 				<SectionContent title={translate('institutional-section.section1')}>

@@ -22,20 +22,21 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/mutations/useEditApplication';
+import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback';
 import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
-import { ApplicationSectionRoutes } from '@/pages/AppRouter';
+import { ApplicationSectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
-	isLocked: boolean;
 	appId: string | number;
+	revisionsData: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
 };
 
-const SectionMenu = ({ currentSection, isEditMode, appId, isLocked }: SectionMenuProps) => {
+const SectionMenu = ({ currentSection, isEditMode, appId, revisionsData }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
@@ -67,6 +68,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, isLocked }: SectionMen
 				!isLoading
 					? ApplicationSectionRoutes.map((item) => {
 							const route = item.route;
+							console.log(route, revisionsData[route]?.isApproved ?? false);
 
 							return {
 								key: item.route,
@@ -77,7 +79,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, isLocked }: SectionMen
 										isSectionValid={SectionValidator[route]}
 										label={item.route}
 										isEditMode={isEditMode}
-										isLocked={isLocked}
+										isLocked={revisionsData[route]?.isApproved ?? false}
 										hasCollaborators={data && data.length > 0}
 									/>
 								),

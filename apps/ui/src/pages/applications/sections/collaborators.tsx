@@ -48,7 +48,7 @@ export interface ModalStateProps extends ModalState {
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);
 
@@ -114,6 +114,7 @@ const Collaborators = () => {
 			<>
 				<SectionTitle
 					title={translate('collab-section.title')}
+					showLockIcon={revisionsData.collaborators?.isApproved}
 					text={[
 						translate('collab-section.description1'),
 						translate('collab-section.optional'),

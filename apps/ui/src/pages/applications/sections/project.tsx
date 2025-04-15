@@ -40,7 +40,7 @@ const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 
@@ -106,7 +106,11 @@ const Project = () => {
 					}
 				}}
 			>
-				<SectionTitle title={translate('project-section.title')} text={[translate('project-section.description')]} />
+				<SectionTitle
+					title={translate('project-section.title')}
+					text={[translate('project-section.description')]}
+					showLockIcon={revisionsData.project?.isApproved}
+				/>
 				<Row gutter={26}>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<InputBox

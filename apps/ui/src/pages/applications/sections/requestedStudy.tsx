@@ -57,7 +57,7 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisionsData } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
@@ -103,6 +103,7 @@ const RequestedStudy = () => {
 			>
 				<SectionTitle
 					title={translate('requested-study.title')}
+					showLockIcon={revisionsData.ethics?.isApproved}
 					text={
 						<Col>
 							<Text>{translate('requested-study.description1') + ' '}</Text>
