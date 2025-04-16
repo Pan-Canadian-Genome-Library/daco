@@ -23,12 +23,10 @@ import { useNotificationContext } from '@/providers/context/notification/Notific
 import { type ApplicationResponseData } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 const useCloseApplication = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	const navigate = useNavigate();
 
 	return useMutation<ApplicationResponseData, ServerError, { applicationId?: string | number }>({
 		mutationFn: async ({ applicationId }) => {
