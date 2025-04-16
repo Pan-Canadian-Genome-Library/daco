@@ -36,16 +36,18 @@ const useCloseApplication = () => {
 
 			return await response.json();
 		},
-		onSuccess: (applicationId) => {
+		onSuccess: (data, applicationId) => {
 			notification.openNotification({
 				type: 'success',
-				message: translate('modals.closeApplication.notifications.closeApplicationSuccess', { id: applicationId }),
+				message: translate('modals.closeApplication.notifications.closeApplicationSuccess', {
+					id: applicationId.applicationId,
+				}),
 			});
 		},
 		onError: (applicationId) => {
 			notification.openNotification({
 				type: 'error',
-				message: translate('modals.closeApplication.notifications.closeApplicationFailed', { id: applicationId }),
+				message: translate('modals.closeApplication.notifications.closeApplicationFailed'),
 			});
 		},
 	});
