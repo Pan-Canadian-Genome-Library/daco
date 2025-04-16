@@ -529,9 +529,6 @@ paths:
                 applicationId:
                   type: number
                   description: ID of the related Application record that new Collaborators are associated with
-                userId:
-                  type: string
-                  description: Temporary, Applicant's User Id, required for authorization
                 collaborators:
                   $ref: '#/components/requests/CreateCollaborators'
       responses:

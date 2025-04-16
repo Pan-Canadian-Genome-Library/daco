@@ -84,8 +84,7 @@ export const createCollaborators = async ({
 				searchIndex !== index &&
 				record.collaboratorFirstName === collaborator.collaboratorFirstName &&
 				record.collaboratorLastName === collaborator.collaboratorLastName &&
-				record.collaboratorInstitutionalEmail === collaborator.collaboratorInstitutionalEmail &&
-				record.collaboratorPositionTitle === collaborator.collaboratorPositionTitle,
+				record.collaboratorInstitutionalEmail === collaborator.collaboratorInstitutionalEmail,
 		);
 
 		return matchingRecord;

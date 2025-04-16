@@ -1,0 +1,1 @@
+ALTER TABLE "collaborators" ALTER COLUMN "position_title" DROP NOT NULL;
