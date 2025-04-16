@@ -21,11 +21,8 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type JoinedApplicationRecord, type RevisionRequestModel } from '@/service/types.js';
 import { useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
 
 const useRepRevisions = () => {
-	const navigate = useNavigate();
-
 	return useMutation<JoinedApplicationRecord, ServerError, RevisionRequestModel>({
 		mutationFn: async (payload) => {
 			const response = await fetch(`/applications/rep/${payload.applicationId}/request-revisions`, {
@@ -55,9 +52,7 @@ const useRepRevisions = () => {
 
 			return await response.json();
 		},
-		onSuccess: () => {
-			navigate('/dashboard');
-		},
+		onSuccess: () => {},
 	});
 };
 
