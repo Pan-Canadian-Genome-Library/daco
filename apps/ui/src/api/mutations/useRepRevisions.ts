@@ -19,17 +19,11 @@
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { type JoinedApplicationRecord, type RevisionRequestModel } from '@/service/types.js';
 import { useMutation } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 const useRepRevisions = () => {
-	useApplicationContext();
-	const notification = useNotificationContext();
-	const { t: translate } = useTranslation();
 	const navigate = useNavigate();
 
 	return useMutation<JoinedApplicationRecord, ServerError, RevisionRequestModel>({
@@ -62,17 +56,7 @@ const useRepRevisions = () => {
 			return await response.json();
 		},
 		onSuccess: () => {
-			notification.openNotification({
-				type: 'success',
-				message: translate('modals.applications.global.success.text'),
-			});
 			navigate('/dashboard');
-		},
-		onError: () => {
-			notification.openNotification({
-				type: 'error',
-				message: translate('modals.applications.global.failure.text'),
-			});
 		},
 	});
 };

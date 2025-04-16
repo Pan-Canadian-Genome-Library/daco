@@ -27,9 +27,9 @@ import RequestRevisionsModal from '@/components/pages/application/modals/Request
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
-import { useNavigate } from 'react-router';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -54,15 +54,24 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const { mutateAsync: repRevision } = useRepRevisions();
-	const navigate = useNavigate();
+	const notification = useNotificationContext();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
 		//TODO: Add logic to this to actually submit the revisions.
 		console.log('Submission Handled', data);
-		repRevision(data).then(() => {
-			setOpenRevisionsModal(false);
-			navigate('/dashboard');
-		});
+		repRevision(data)
+			.then(() => {
+				setOpenRevisionsModal(false);
+				setShowSuccessModal(true);
+			})
+			.catch((error) => {
+				notification.openNotification({
+					type: 'error',
+					message: 'Submission Failed',
+					description:
+						error?.response?.data?.message || error?.message || 'An unexpected error occurred. Please try again.',
+				});
+			});
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
