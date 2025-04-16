@@ -43,7 +43,6 @@ const useCloseApplication = () => {
 				type: 'success',
 				message: translate('modals.closeApplication.notifications.closeApplicationSuccess', { id: applicationId }),
 			});
-			navigate('/dashboard');
 		},
 		onError: (applicationId) => {
 			notification.openNotification({
