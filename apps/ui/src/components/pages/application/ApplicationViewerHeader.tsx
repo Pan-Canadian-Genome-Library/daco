@@ -51,12 +51,40 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const { mutateAsync: repRevision } = useRepRevisions();
+	const { mutateAsync: dacRevision } = useDacRevisions();
+	const notification = useNotificationContext();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
-		//TODO: Add logic to this to actually submit the revisions.
 		console.log('Submission Handled', data);
-		setOpenRevisionsModal(false);
-		setShowSuccessModal(true);
+
+		if (state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') {
+			repRevision(data)
+				.then(() => {
+					setOpenRevisionsModal(false);
+					setShowSuccessModal(true);
+				})
+				.catch((error) => {
+					notification.openNotification({
+						type: 'error',
+						message: 'Submission Failed',
+						description: translate('modals.applications.global.failure'),
+					});
+				});
+		} else {
+			dacRevision(data)
+				.then(() => {
+					setOpenRevisionsModal(false);
+					setShowSuccessModal(true);
+				})
+				.catch((error) => {
+					notification.openNotification({
+						type: 'error',
+						message: 'Submission Failed',
+						description: translate('modals.applications.global.failure'),
+					});
+				});
+		}
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
