@@ -26,18 +26,13 @@ import { EditSignatureResponse } from '@pcgl-daco/validation';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useCreateSignature = () => {
-	return useMutation<
-		EditSignatureResponse,
-		ServerError,
-		{ applicationId: number | string; signature: string; signee: string }
-	>({
-		mutationFn: async ({ applicationId, signature, signee }) => {
+	return useMutation<EditSignatureResponse, ServerError, { applicationId: number | string; signature: string }>({
+		mutationFn: async ({ applicationId, signature }) => {
 			const response = await fetch('/signature/sign', {
 				method: 'POST',
 				body: JSON.stringify({
 					applicationId,
 					signature,
-					signee,
 				}),
 			}).then(withErrorResponseHandler);
 

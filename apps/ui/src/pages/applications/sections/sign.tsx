@@ -66,8 +66,8 @@ const SignAndSubmit = () => {
 	const onSaveClicked = async () => {
 		const signature = getValues('signature');
 
-		if (signature && role) {
-			await createSignature({ applicationId: appId, signature, signee: 'APPLICANT' }).then(() => {
+		if (signature) {
+			await createSignature({ applicationId: appId, signature }).then(() => {
 				if (signatureRef.current) {
 					signatureRef.current.clear();
 				}
@@ -97,6 +97,14 @@ const SignAndSubmit = () => {
 	}, [appId, fields, isEditMode, navigation]);
 
 	const watchSignature = watch('signature');
+
+	// differentiate between which signature we are validating against as we have two different types of signatures
+	const determineSignatureDisabled = () => {
+		if (role === 'APPLICANT') {
+			return data?.applicantSignature !== getValues('signature');
+		}
+		return data?.institutionalRepSignature !== getValues('signature');
+	};
 
 	return (
 		<>
@@ -141,7 +149,7 @@ const SignAndSubmit = () => {
 						currentRoute="sign"
 						isEditMode={isEditMode}
 						signSubmitHandler={handleSubmit(onSubmit)}
-						submitDisabled={!data?.applicantSignature || !getValues('signature') || !isEditMode}
+						submitDisabled={determineSignatureDisabled() || !isEditMode} // ensure the signature is synced with saved applicant signature
 					/>
 				</Form>
 			</SectionWrapper>
