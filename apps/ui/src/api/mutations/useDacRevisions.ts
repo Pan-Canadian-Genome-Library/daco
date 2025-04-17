@@ -22,10 +22,10 @@ import { ServerError } from '@/global/types';
 import { type JoinedApplicationRecord, type RevisionRequestModel } from '@/service/types.js';
 import { useMutation } from '@tanstack/react-query';
 
-const useRepRevisions = () => {
+const useDacRevisions = () => {
 	return useMutation<JoinedApplicationRecord, ServerError, RevisionRequestModel>({
 		mutationFn: async (payload) => {
-			const response = await fetch(`/applications/rep/${payload.applicationId}/request-revisions`, {
+			const response = await fetch(`/applications/dac/${payload.applicationId}/request-revisions`, {
 				method: 'POST',
 				body: JSON.stringify({
 					comments: payload.comments,
@@ -55,4 +55,4 @@ const useRepRevisions = () => {
 	});
 };
 
-export default useRepRevisions;
+export default useDacRevisions;

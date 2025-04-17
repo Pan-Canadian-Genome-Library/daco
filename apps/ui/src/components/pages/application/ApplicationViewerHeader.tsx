@@ -56,19 +56,17 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const notification = useNotificationContext();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
-		console.log('Submission Handled', data);
-
 		if (state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') {
 			repRevision(data)
 				.then(() => {
 					setOpenRevisionsModal(false);
 					setShowSuccessModal(true);
 				})
-				.catch((error) => {
+				.catch(() => {
 					notification.openNotification({
 						type: 'error',
 						message: 'Submission Failed',
-						description: translate('modals.applications.global.failure'),
+						description: translate('modals.applications.global.failure.text'),
 					});
 				});
 		} else {
@@ -77,11 +75,11 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 					setOpenRevisionsModal(false);
 					setShowSuccessModal(true);
 				})
-				.catch((error) => {
+				.catch(() => {
 					notification.openNotification({
 						type: 'error',
 						message: 'Submission Failed',
-						description: translate('modals.applications.global.failure'),
+						description: translate('modals.applications.global.failure.text'),
 					});
 				});
 		}
