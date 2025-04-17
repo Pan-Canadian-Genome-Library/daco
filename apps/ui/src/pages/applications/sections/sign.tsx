@@ -98,7 +98,8 @@ const SignAndSubmit = () => {
 
 	const watchSignature = watch('signature');
 
-	// differentiate between which signature we are validating against as we have two different types of signatures
+	// - differentiate between which signature we are validating against as we have two different types of signatures
+	// - ensure the local signature is synced with saved api signature
 	const determineSignatureDisabled = () => {
 		if (role === 'APPLICANT') {
 			return data?.applicantSignature !== getValues('signature');
@@ -149,7 +150,7 @@ const SignAndSubmit = () => {
 						currentRoute="sign"
 						isEditMode={isEditMode}
 						signSubmitHandler={handleSubmit(onSubmit)}
-						submitDisabled={determineSignatureDisabled() || !isEditMode} // ensure the signature is synced with saved applicant signature
+						submitDisabled={determineSignatureDisabled() || !isEditMode}
 					/>
 				</Form>
 			</SectionWrapper>
