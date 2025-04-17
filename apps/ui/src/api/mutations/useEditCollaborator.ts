@@ -18,42 +18,61 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
 
 import { queryClient } from '@/providers/Providers';
 import { type CollaboratorUpdateRecord, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from '../apiUtils';
 
 const useEditCollaborator = () => {
+	const { t: translate } = useTranslation();
 	return useMutation<
 		ListCollaboratorResponse,
-		ServerError,
+		Error,
 		{
 			applicationId: number | string;
 			collaboratorUpdates: CollaboratorUpdateRecord;
-			userId?: number | string;
 		}
 	>({
 		mutationFn: async ({ applicationId, collaboratorUpdates }) => {
 			const response = await fetch('/collaborators/update', {
 				method: 'POST',
 				body: JSON.stringify({
-					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
 					applicationId,
 					collaboratorUpdates,
 				}),
-			}).then(withErrorResponseHandler);
+			});
 
+			/**
+			 * OnError only triggers when an error is rethrown, this is not ideal,
+			 * but it's one way we can make do with how useMutation works for our
+			 * setup.
+			 */
+			if (!response.ok) {
+				switch (response.status) {
+					case 400:
+						throw new Error('INVALID_REQUEST');
+					case 409:
+						throw new Error('DUPLICATE');
+					default:
+						throw new Error('SYSTEM_ERROR');
+				}
+			}
 			return await response.json();
 		},
 		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
+			if (error.message === 'DUPLICATE') {
+				notification.error({
+					message: translate('collab-section.notifications.duplicate.duplicateCollaboratorTitle'),
+					description: translate('collab-section.notifications.duplicate.duplicateCollaborator'),
+				});
+			} else {
+				notification.error({
+					message: translate('errors.generic.title'),
+					description: translate('errors.generic.message'),
+				});
+			}
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the edit collaborator request is successful to prevent refetching data
@@ -67,7 +86,10 @@ const useEditCollaborator = () => {
 				});
 			});
 			notification.success({
-				message: 'Update collaborator was successful',
+				message: translate('collab-section.notifications.edit.successfullyUpdatedTitle'),
+				description: translate('collab-section.notifications.edit.successfullyUpdated', {
+					firstName: data[0]?.collaboratorFirstName,
+				}),
 			});
 		},
 	});

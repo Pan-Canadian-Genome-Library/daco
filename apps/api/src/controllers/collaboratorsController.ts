@@ -29,10 +29,9 @@ import {
 	type CollaboratorUpdateRecord,
 	type ListCollaboratorResponse,
 } from '@pcgl-daco/data-model';
-import { getApplicationById } from './applicationController.ts';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
-const logger = BaseLogger.forModule('coillaboratorsController');
+const logger = BaseLogger.forModule('collaboratorsController');
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -67,7 +66,6 @@ export const createCollaborators = async ({
 	const { edit } = ApplicationStateEvents;
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
-	// TODO: Add Real Auth
 	// Validate User is Applicant
 	if (!(user_id === application.user_id)) {
 		return failure('UNAUTHORIZED', 'Unauthorized, cannot create Collaborators');
@@ -145,9 +143,11 @@ export const deleteCollaborator = async ({
 
 		const application = applicationResult.data;
 
-		// TODO: Valid states for actions should be handled through the appStateManager
-		if (!(application.state === 'DRAFT')) {
-			return failure('INVALID_STATE_TRANSITION', `Can only add Collaborators when Application is in state DRAFT`);
+		const appStateManager = new ApplicationStateManager(application);
+		const canEdit = appStateManager._canPerformAction(ApplicationStateEvents.edit);
+
+		if (!canEdit.success) {
+			return failure('INVALID_STATE_TRANSITION', 'Cannot edit application in its current state');
 		}
 
 		const deleteResult = await collaboratorsRepo.deleteCollaborator({
@@ -214,8 +214,9 @@ export const updateCollaborator = async ({
 > => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const applicationResult = await getApplicationById({ applicationId: application_id });
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
 
 	if (!applicationResult.success) {
 		return applicationResult;
@@ -224,13 +225,15 @@ export const updateCollaborator = async ({
 	const application = applicationResult.data;
 
 	// Validate User is Applicant
-	if (!(user_id === application.userId)) {
+	if (!(user_id === application.user_id)) {
 		return failure('FORBIDDEN', 'User is not authorized to modify collaborators for this application.');
 	}
 
-	// TODO: should use application state manager
-	if (!(application.state === 'DRAFT')) {
-		return failure('INVALID_STATE_TRANSITION', `Can only edit collaborators when application is in state DRAFT`);
+	const appStateManager = new ApplicationStateManager(application);
+	const canEdit = appStateManager._canPerformAction(ApplicationStateEvents.edit);
+
+	if (!canEdit.success) {
+		return failure('INVALID_STATE_TRANSITION', 'Cannot edit application in its current state');
 	}
 
 	const collaboratorsListResult = await collaboratorsRepo.listCollaborators(application.id);
@@ -243,8 +246,7 @@ export const updateCollaborator = async ({
 		return (
 			collaboratorUpdates.collaboratorFirstName === collaborator.first_name &&
 			collaboratorUpdates.collaboratorLastName === collaborator.last_name &&
-			collaboratorUpdates.collaboratorInstitutionalEmail === collaborator.institutional_email &&
-			collaboratorUpdates.collaboratorPositionTitle === collaborator.position_title
+			collaboratorUpdates.collaboratorInstitutionalEmail === collaborator.institutional_email
 		);
 	});
 

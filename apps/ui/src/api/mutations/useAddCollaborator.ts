@@ -49,7 +49,7 @@ const useAddCollaborator = () => {
 			 * but it's one way we can make do with how useMutation works for our
 			 * setup.
 			 */
-			if (response.status !== 200) {
+			if (!response.ok) {
 				switch (response.status) {
 					case 400: {
 						const error: ServerError = await response.json();

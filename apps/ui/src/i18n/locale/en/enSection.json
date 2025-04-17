@@ -47,11 +47,15 @@
 			},
 			"duplicate": {
 				"duplicateCollaboratorTitle": "Duplicate Collaborator",
-				"duplicateCollaborator": "This collaborator was already added into this application and cannot be added again. Please edit or delete their entry."
+				"duplicateCollaborator": "This collaborator already exists within this application and cannot be added again. Please edit or delete their entry."
 			},
 			"deleted": {
-				"successfullyDeletedTitle": "Collaborator Deleted",
+				"successfullyDeletedTitle": "Collaborator Removed",
 				"successfullyDeleted": "{{firstName}} was removed as a collaborator for this Application."
+			},
+			"edit": {
+				"successfullyUpdatedTitle": "Collaborator Updated",
+				"successfullyUpdated": "{{firstName}}'s information was successfully updated."
 			}
 		}
 	},
