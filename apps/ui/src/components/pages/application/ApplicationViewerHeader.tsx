@@ -65,7 +65,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 			.catch(() => {
 				notification.openNotification({
 					type: 'error',
-					message: translate('modals.applications.global.failure.text'),
+					message: translate('errors.generic.title'),
 					description: translate('modals.applications.global.failure.text'),
 				});
 			});
