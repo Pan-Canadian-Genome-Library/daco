@@ -62,10 +62,10 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 				setOpenRevisionsModal(false);
 				setShowSuccessModal(true);
 			})
-			.catch((error) => {
+			.catch(() => {
 				notification.openNotification({
 					type: 'error',
-					message: 'Submission Failed',
+					message: translate('modals.applications.global.failure.text'),
 					description: translate('modals.applications.global.failure.text'),
 				});
 			});
