@@ -6,3 +6,4 @@
 **/package-lock.json
 **/.gitignore
 **/pnpm-lock.yaml
+**/apps/api/src/service/email/layouts/mjml

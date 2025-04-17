@@ -57,6 +57,7 @@ const startServer = async () => {
 	app.use('/signature', signatureRouter);
 	app.use('/auth', authRouter);
 	app.use('/file', fileRouter);
+	app.use('/assets', express.static(path.join(__dirname, 'public')));
 
 	app.use(
 		`${API_PATH_DOCS}`,
