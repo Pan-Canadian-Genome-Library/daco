@@ -18,39 +18,52 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
-import { withErrorResponseHandler } from '@/api/apiUtils';
 import { queryClient } from '@/providers/Providers';
 import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
 
 const useAddCollaborator = () => {
+	const { t: translate } = useTranslation();
+
 	return useMutation<
 		ListCollaboratorResponse,
-		ServerError,
+		Error,
 		{ applicationId: number | string; collaborators: CollaboratorsSchemaType[]; userId?: number | string }
 	>({
 		mutationFn: async ({ applicationId, collaborators }) => {
 			const response = await fetch('/collaborators/create', {
 				method: 'POST',
 				body: JSON.stringify({
-					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
 					applicationId,
 					collaborators,
 				}),
-			}).then(withErrorResponseHandler);
+			});
+
+			/**
+			 * OnError only triggers when an error is rethrown, this is not ideal,
+			 * but it's one way we can make do with how useMutation works for our
+			 * setup.
+			 */
+			if (response.status !== 200) {
+				switch (response.status) {
+					case 400: {
+						const error: ServerError = await response.json();
+						if (error.message.includes('duplicate')) {
+							throw new Error('DUPLICATE');
+						}
+						throw new Error('INVALID_REQUEST');
+					}
+					default:
+						throw new Error('OTHER');
+				}
+			}
 
 			return await response.json();
-		},
-		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the add collaborator request is successful to prevent refetching data
@@ -58,8 +71,24 @@ const useAddCollaborator = () => {
 				return [...prev, ...data];
 			});
 			notification.success({
-				message: `User ${data[0]?.collaboratorFirstName} was added successfully`,
+				message: translate('collab-section.notifications.added.successfullyAddedTitle'),
+				description: translate('collab-section.notifications.added.successfullyAdded', {
+					firstName: data[0]?.collaboratorFirstName,
+				}),
 			});
+		},
+		onError: (error) => {
+			if (error.message === 'DUPLICATE') {
+				notification.error({
+					message: translate('collab-section.notifications.duplicate.duplicateCollaboratorTitle'),
+					description: translate('collab-section.notifications.duplicate.duplicateCollaborator'),
+				});
+			} else {
+				notification.error({
+					message: translate('errors.generic.title'),
+					description: translate('errors.generic.message'),
+				});
+			}
 		},
 	});
 };
