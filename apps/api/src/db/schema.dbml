@@ -113,7 +113,7 @@ table collaborators {
   last_name varchar(255) [not null]
   title varchar(255)
   suffix varchar(255)
-  position_title varchar(255) [not null]
+  position_title varchar(255)
   institutional_email varchar(320) [not null]
   profile_url text
   collaborator_type text

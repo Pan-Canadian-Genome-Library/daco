@@ -71,6 +71,13 @@
 			"when": 1744639348029,
 			"tag": "0009_add_missing_revision_fields",
 			"breakpoints": true
+		},
+		{
+			"idx": 10,
+			"version": "7",
+			"when": 1744818344620,
+			"tag": "0010_make_collaborators_postition_optional",
+			"breakpoints": true
 		}
 	]
 }

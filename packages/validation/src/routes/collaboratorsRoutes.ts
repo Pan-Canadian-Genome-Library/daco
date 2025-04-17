@@ -18,7 +18,21 @@
  */
 
 import { z } from 'zod';
-import { collaboratorsSchema } from '../schemas.js';
+import { EmptyOrOptionalString, NonEmptyString } from '../common/strings.js';
+
+export const collaboratorsSchema = z.object({
+	collaboratorFirstName: NonEmptyString,
+	collaboratorMiddleName: EmptyOrOptionalString,
+	collaboratorLastName: NonEmptyString,
+	collaboratorSuffix: EmptyOrOptionalString,
+	collaboratorInstitutionalEmail: NonEmptyString.email(),
+	collaboratorPositionTitle: EmptyOrOptionalString,
+	collaboratorPrimaryAffiliation: EmptyOrOptionalString,
+	collaboratorResearcherProfileURL: EmptyOrOptionalString,
+	collaboratorType: EmptyOrOptionalString,
+});
+
+export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const baseCollaboratorsRequestSchema = z.object({
 	applicationId: z.number(),

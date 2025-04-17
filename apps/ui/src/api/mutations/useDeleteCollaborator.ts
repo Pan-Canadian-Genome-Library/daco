@@ -18,6 +18,7 @@
  */
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
@@ -27,6 +28,8 @@ import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useDeleteCollaborator = () => {
+	const { t: translate } = useTranslation();
+
 	return useMutation<
 		ListCollaboratorResponse,
 		ServerError,
@@ -50,7 +53,10 @@ const useDeleteCollaborator = () => {
 				return prev.filter((value) => value.id !== data[0]?.id);
 			});
 			notification.success({
-				message: `User ${data[0]?.collaboratorFirstName} was deleted successfully`,
+				message: translate('collab-section.notifications.deleted.successfullyDeletedTitle'),
+				description: translate('collab-section.notifications.deleted.successfullyDeleted', {
+					firstName: data[0]?.collaboratorFirstName,
+				}),
 			});
 		},
 	});

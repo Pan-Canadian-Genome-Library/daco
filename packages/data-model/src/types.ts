@@ -265,7 +265,7 @@ export interface CollaboratorDTO {
 	collaboratorInstitutionalEmail: string;
 	collaboratorLastName: string;
 	collaboratorMiddleName?: string | null;
-	collaboratorPositionTitle: string;
+	collaboratorPositionTitle?: string | null;
 	collaboratorPrimaryAffiliation?: string | null;
 	collaboratorResearcherProfileURL?: string | null;
 	collaboratorSuffix?: string | null;

@@ -29,7 +29,7 @@ export const collaborators = pgTable('collaborators', {
 	last_name: varchar({ length: 255 }).notNull(),
 	title: varchar({ length: 255 }),
 	suffix: varchar({ length: 255 }),
-	position_title: varchar({ length: 255 }).notNull(),
+	position_title: varchar({ length: 255 }),
 	institutional_email: varchar({ length: 320 }).notNull(),
 	profile_url: text(),
 	collaborator_type: text(),

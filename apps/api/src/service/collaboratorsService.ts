@@ -45,7 +45,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 						eq(collaborators.first_name, collaborator.first_name),
 						eq(collaborators.last_name, collaborator.last_name),
 						eq(collaborators.institutional_email, collaborator.institutional_email),
-						eq(collaborators.position_title, collaborator.position_title),
+						collaborator.position_title ? eq(collaborators.position_title, collaborator.position_title) : undefined,
 						eq(collaborators.application_id, collaborator.application_id),
 					),
 				);
