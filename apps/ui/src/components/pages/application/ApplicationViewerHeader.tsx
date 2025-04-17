@@ -57,8 +57,6 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const notification = useNotificationContext();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
-		//TODO: Add logic to this to actually submit the revisions.
-		console.log('Submission Handled', data);
 		repRevision(data)
 			.then(() => {
 				setOpenRevisionsModal(false);
@@ -68,8 +66,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 				notification.openNotification({
 					type: 'error',
 					message: 'Submission Failed',
-					description:
-						error?.response?.data?.message || error?.message || 'An unexpected error occurred. Please try again.',
+					description: translate('modals.applications.global.failure.text'),
 				});
 			});
 	};

@@ -52,7 +52,6 @@ const useRepRevisions = () => {
 
 			return await response.json();
 		},
-		onSuccess: () => {},
 	});
 };
 
