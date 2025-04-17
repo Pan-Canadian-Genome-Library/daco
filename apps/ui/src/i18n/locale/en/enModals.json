@@ -36,6 +36,9 @@
 				},
 				"success": {
 					"text": "Request for revisions has been sent to Application PCGL-{{id}}"
+				},
+				"failure": {
+					"text": "Request for revisions has failed"
 				}
 			}
 		}
