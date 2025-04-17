@@ -601,9 +601,6 @@ paths:
                 applicationId:
                   type: number
                   description: ID of the related Application record that Collaborator records are associated with
-                userId:
-                  type: string
-                  description: Temporary, Applicant's User Id, required for authorization
                 collaboratorUpdates:
                   $ref: '#/components/requests/UpdatedCollaborators'
       responses:
@@ -1332,25 +1329,34 @@ components:
         id:
           type: number
           description: The unique ID of the collaborator in the database.
-        application_id:
+        applicationId:
           type: number
           description: The Application ID associated with the Collaborator.
-        first_name:
+        collaboratorFirstName:
           type: string
           description: The collaborator's first name
-        middle_name:
+        collaboratorMiddleName:
           type: string
           description: The collaborator's middle name
-        last_name:
+        collaboratorLastName:
           type: string
           description: The collaborator's last name
-        suffix:
+        collaboratorSuffix:
           type: string
           description: The collaborator's additional name suffix
-        position_title:
+        collaboratorType:
+          type: string
+          description: The type of collaborator. This field is not used.
+        collaboratorResearcherProfileURL:
+          type: string
+          description: The URL containing the researcher's profile.
+        collaboratorPrimaryAffiliation:
+          type: string
+          description: The primary research institution that a researcher is affiliated with.
+        collaboratorPositionTitle:
           type: string
           description: The collaborator's job title
-        institutional_email:
+        collaboratorInstitutionalEmail:
           type: string
           description: The collaborator's contact email
 
@@ -1599,15 +1605,11 @@ components:
       type: object
       required:
         - applicationId
-        - userId
         - collaboratorId
       properties:
         applicationId:
           type: number
           description: The id of the relevant Application record
-        userId:
-          type: string
-          description: The user ID belonging to the currently signed in user.
         collaboratorId:
           type: number
           description: The ID of the Collaborator to delete.
