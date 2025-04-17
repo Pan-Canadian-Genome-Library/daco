@@ -2,7 +2,7 @@
 
 ## Summary
 
-The DACO API application provides a email service that will trigger on specific events after each change to the statemodel. PCGL will point directly to the email provider to send emails. PCGL implementation utilizes a couple of key technologies to enhance both the developer experience as well as client facing UI/UX design. 
+The DACO API application provides a email service that will trigger on specific events after each change to the application state. PCGL will point directly to the email provider to send emails. PCGL implementation utilizes a couple of key technologies to enhance both the developer experience as well as client facing UI/UX design. 
 
 # Usage of libraries with PCGL API
 
@@ -11,7 +11,7 @@ Some core technologies to note will be the following:
  
  1. Nodemailer
  2. MJML
- 3. Mailhog (Localtesting tool for sending emails)
+ 3. Mailhog (Local testing tool for sending emails)
 
 ## Nodemailer
 
@@ -25,7 +25,7 @@ Benefits to using nodemailer is setup process is extremely simple, well document
 Documentation: https://github.com/mailhog/MailHog
 Image: docker.io/jcalonso/mailhog:latest
 
-Mailhog is a email testing provider that will run as a seperate service within the docker container. Locally, when email events are triggered, and the configurations for nodemailer are implemented properly, Mailhog will recieve 
+Mailhog is a email testing provider that will run as a separate service within the docker container. Locally, when email events are triggered, and the configurations for nodemailer are implemented properly, Mailhog will receive 
 the email and display its contents.
 
 NOTE: mailhog/mailhog image has outstanding issues with apple silicon chips, this forked image is an alternative
@@ -44,14 +44,14 @@ NOTE: mailhog/mailhog image has outstanding issues with apple silicon chips, thi
 
 Documentation: https://mjml.io/
 
-Mjml is a markup language that is designed to help the developer experience of writing email friendly templates. This language will complie down to html, but in a way that is responsive so it helps removes the headaches that
+Mjml is a markup language that is designed to help the developer experience of writing email friendly templates. This language will complie down to responsive html code, so it helps removes the headaches that
 comes with writing email compatible html code.
 
-### Methods of Creating generatinc HTML code with MJML
+### Methods of Generating HTML code with MJML
 
-MJML Preview vs-code Extenstion: https://marketplace.visualstudio.com/items?itemName=mjmlio.vscode-mjml
+MJML Preview vs-code Extension: https://marketplace.visualstudio.com/items?itemName=mjmlio.vscode-mjml
 
-Creating a mjml file has many benefits. For instance if using vscode, you can visiualy preview the mjml code without actually sending the email. This helps the development experience, as developers won't have to worry about triggering an event to see the changes in mailhog and any email provider services. The method of actually converting mjml syntax to html is were things get a little bit complex/opinonated.
+Creating a mjml file has many benefits. For instance if using vscode, you can visually preview the mjml code without actually sending the email. This helps the development experience, as developers won't have to worry about triggering an event to see the changes in mailhog and any email provider services. The method of actually converting mjml syntax to html is were things get a little bit complex/opinionated.
 
 There are many ways of creating html code with mjml.
 
@@ -62,10 +62,10 @@ There are many ways of creating html code with mjml.
 For PCGL, the current solution is option 3 of creating mjml syntax directly into the string. The reason for this is that point 1 and 2 has some downsides to consider for the future development:
 
 For point 1, generating templates locally will create more files, so if we had 9 mjml templates, we'd have to generate 9 html files and then read those files into our nodemailer.
-For point 2, it is a more cleaner and reduces files, but has a issue with inserting dynamimc variables into the mjml template, which does have a solution to that, but with a cavet which leads into the next point.
+For point 2, it is a more cleaner and reduces files, but has a issue with inserting dynamic variables into the mjml template, which does have a solution to that, but with a caveat which leads into the next point.
 
-Translations is a big consideration when picking which method of converting mjml code into html. For points 1 and 2, the text would be hardcoded into the actual mjml file vs just a string with point 3. It would be
-added complexity to switch text from french to english, on top of dynamicly adding variables to each of the templates. Since we do not have a translation solution pre-mvp for the backend service, point 3 will provide a 
+Translations is a consideration when picking which method of converting mjml code into html. For points 1 and 2, the text would be hardcoded into the actual mjml file vs just a string with point 3. It would be
+added complexity to switch text from french to english, on top of dynamically adding variables to each of the templates. Since we do not have a translation solution pre-mvp for the backend service, point 3 will provide a 
 generic enough solution that will work for our needs and simple enough to handle refactors when translations is introduced post-mvp.
 
 ### Creating a Template
@@ -110,8 +110,8 @@ but more classic styles with css can be added to `styles.mjml` and apply the rel
 
 ## Alternative solutions
 
-OHCRN has a alternative solution for their email service. OHCRN has a microservice architecture, as such they have many different services that may or may not need emails. So instead of creating a email service directly into the service that needed it. They created a seperate microservice to handle their emails. Since PCGL's architecture is not a microservice type application, it was more fitting to just have emails apart of the backend. 
+OHCRN has a alternative solution for their email service. OHCRN has a microservice architecture, as such they have many different services that may or may not need emails. So instead of creating a email service directly into the service that needed it. They created a separate microservice to handle their emails. Since PCGL's architecture is not a microservice type application, it was more fitting to just have emails apart of the backend. 
 
 ## Translations
 
-As of 04-16-2025, translations into other langauges other than english is not implemented. As such the current solution reflects a generic and clean enough implementation that will allow easy refactoring post MVP.
+As of 04-16-2025, translations into other languages other than english is not implemented. As such the current solution reflects a generic and clean enough implementation that will allow easy refactoring post MVP.
