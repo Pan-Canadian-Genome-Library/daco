@@ -17,15 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
 import { EditSignatureResponse } from '@pcgl-daco/validation';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useCreateSignature = () => {
+	const notification = useNotificationContext();
+
 	return useMutation<EditSignatureResponse, ServerError, { applicationId: number | string; signature: string }>({
 		mutationFn: async ({ applicationId, signature }) => {
 			const response = await fetch('/signature/sign', {
@@ -39,8 +41,10 @@ const useCreateSignature = () => {
 			return await response.json();
 		},
 		onError: (error) => {
-			notification.error({
+			notification.openNotification({
+				type: 'error',
 				message: error.message,
+				description: error.errors,
 			});
 		},
 		onSuccess: async (data) => {
