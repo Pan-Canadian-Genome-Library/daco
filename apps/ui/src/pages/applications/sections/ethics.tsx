@@ -55,7 +55,7 @@ const Ethics = () => {
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 	const form = useSectionForm({
-		section: "ethics",
+		section: 'ethics',
 		sectionVisited: state.formState.sectionsVisited.ethics,
 	});
 

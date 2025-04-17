@@ -17,14 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SignatureTypes } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export const editSignatureRequestSchema = z.object({
 	applicationId: z.number().nonnegative().positive(),
 	signature: z.string().regex(BASE64_IMAGE),
-	signee: z.nativeEnum(SignatureTypes),
 });
 export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;
 

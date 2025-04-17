@@ -101,8 +101,21 @@ export const ValidatorAppendices = (fields: ApplicationContentsResponse): boolea
 		acceptedAppendices: fields.acceptedAppendices,
 	}).success;
 };
+
 export const ValidatorStudy = (fields: ApplicationContentsResponse): boolean => {
 	return requestedStudiesSchema.safeParse({
 		requestedStudies: fields.requestedStudies,
 	}).success;
+};
+
+export const ValidateAllSections = (fields: ApplicationContentsResponse): boolean => {
+	return (
+		ValidatorAppendices(fields) &&
+		ValidatorAgreements(fields) &&
+		ValidatorEthics(fields) &&
+		ValidatorStudy(fields) &&
+		ValidatorProject(fields) &&
+		ValidatorInstitution(fields) &&
+		ValidatorApplicant(fields)
+	);
 };
