@@ -22,11 +22,11 @@ import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Form, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useDeleteEthicsFile from '@/api/mutations/useDeleteEthicsFile';
 import useEditApplication from '@/api/mutations/useEditApplication';
 import useGetDownload from '@/api/queries/useGetDownload';
 import useGetFile from '@/api/queries/useGetFile';
@@ -54,15 +54,16 @@ const Ethics = () => {
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
+	const { mutateAsync: deleteFile } = useDeleteEthicsFile();
+
 	const form = useSectionForm({
-		section: "ethics",
+		section: 'ethics',
 		sectionVisited: state.formState.sectionsVisited.ethics,
 	});
 
 	const { refetch: getDownload } = useGetDownload({ fileId: state.fields.ethicsLetter });
 	const { data, isLoading } = useGetFile({ fileId: state.fields.ethicsLetter });
 
-	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const { token } = useToken();
 
 	const { control, watch, getValues } = useForm<Nullable<EthicsSchemaType>>({
@@ -102,7 +103,8 @@ const Ethics = () => {
 
 		const { data: responseData } = response;
 
-		if (!responseData) {
+		// If there is not response date OR the file name does not exist, fail the download procedure
+		if (!responseData || responseData.filename === null) {
 			return;
 		}
 
@@ -124,20 +126,31 @@ const Ethics = () => {
 		URL.revokeObjectURL(url);
 	};
 
+	const onRemove = async () => {
+		if (state.fields.ethicsLetter) {
+			deleteFile({ fileId: state.fields.ethicsLetter });
+		}
+	};
+
 	const handleChange = (info: UploadChangeParam<UploadFile<FilesDTO>>) => {
-		// Handle upload progress
-		if (info.file.status === 'uploading') {
-			setFileList(() => [
-				{
-					uid: `${info.file.uid}`,
-					name: `${info.file.name}`,
-					status: 'done',
-					url: '/',
+		// remove ethicsLetter id once file is deleted
+		if (info.file.status === 'removed') {
+			dispatch({
+				type: 'UPDATE_APPLICATION',
+				payload: {
+					fields: {
+						...state.fields,
+						ethicsLetter: null,
+					},
+					formState: {
+						...state.formState,
+					},
 				},
-			]);
+			});
 			return;
 		}
 
+		// Update store once file is uploaded
 		if (info.file.status === 'done' && info.file.response?.id) {
 			dispatch({
 				type: 'UPDATE_APPLICATION',
@@ -155,13 +168,6 @@ const Ethics = () => {
 			return;
 		}
 	};
-
-	useEffect(() => {
-		// Transform and update fileList when data arrives
-		if (!isLoading && data) {
-			setFileList(data);
-		}
-	}, [data, fileList.length, isLoading]);
 
 	return (
 		<SectionWrapper>
@@ -189,11 +195,11 @@ const Ethics = () => {
 									type: 'UPDATE_APPLICATION',
 									payload: {
 										fields: {
-											...state?.fields,
+											...state.fields,
 											ethicsReviewRequired: ethicsReviewReq,
 										},
 										formState: {
-											...state?.formState,
+											...state.formState,
 										},
 									},
 								});
@@ -237,15 +243,17 @@ const Ethics = () => {
 										{!isLoading ? (
 											<Upload
 												action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
+												multiple={false}
 												maxCount={1}
 												beforeUpload={beforeUpload}
-												fileList={fileList}
+												fileList={data}
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
 												disabled={!isEditMode}
 												onChange={handleChange}
+												onRemove={onRemove}
 												showUploadList={{
 													showDownloadIcon: false,
-													showRemoveIcon: false,
+													showRemoveIcon: true,
 												}}
 											>
 												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
