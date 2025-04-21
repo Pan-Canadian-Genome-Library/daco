@@ -18,24 +18,24 @@
  */
 
 import {
-	RevisionRequestModel,
 	type ApplicationContentUpdates,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
 	type FilesRecord,
 	type JoinedApplicationRecord,
+	type RevisionRequestModel,
 } from '@/service/types.js';
 import {
-	ApplicationResponseData,
-	RevisionsDTO,
+	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
 	type FilesDTO,
+	type RevisionsDTO,
 	type SignatureDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicationResponseSchema,
 	fileResponseSchema,
-	revisionDataSchema,
+	revisionDataResponseSchema,
 	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
@@ -147,7 +147,7 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
  */
 export const convertToRevisionsRecord = (data: RevisionRequestModel): Result<RevisionsDTO, 'SYSTEM_ERROR'> => {
 	const camelCaseRecord = objectToCamel(data);
-	const validationResult = revisionDataSchema.safeParse(camelCaseRecord);
+	const validationResult = revisionDataResponseSchema.safeParse(camelCaseRecord);
 	const result = validationResult.success
 		? success(validationResult.data)
 		: failure(

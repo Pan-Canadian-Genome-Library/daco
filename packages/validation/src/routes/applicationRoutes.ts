@@ -101,9 +101,6 @@ export const applicationResponseSchema = z.object({
 
 export const revisionDataSchema = z
 	.object({
-		id: z.number().nonnegative(),
-		applicationId: z.number().nonnegative(),
-		createdAt: z.date(),
 		comments: z.string().optional().nullish(),
 		applicantNotes: z.string().optional().nullish(),
 		applicantApproved: z.boolean(),
@@ -123,6 +120,14 @@ export const revisionDataSchema = z
 		appendicesNotes: z.string().optional().nullish(),
 		signAndSubmitApproved: z.boolean(),
 		signAndSubmitNotes: z.string().optional().nullish(),
+	})
+	.strict();
+
+export const revisionDataResponseSchema = revisionDataSchema
+	.extend({
+		id: z.number().nonnegative(),
+		applicationId: z.number().nonnegative(),
+		createdAt: z.date(),
 	})
 	.strict();
 

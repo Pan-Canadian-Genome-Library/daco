@@ -43,6 +43,7 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 	const { mutate: editApplication } = useEditApplication();
 	const { state } = useApplicationContext();
 	const { appId, state: appLifecycleStep } = useOutletContext<ApplicationOutletContext>();
+	const shouldNavigateToEditMode = appLifecycleStep === 'DRAFT' && isEditMode;
 
 	// Determine the next and previous route
 	const { previousRoute, nextRoute } = useMemo(() => {
@@ -61,14 +62,14 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 		if (state?.formState?.isDirty) {
 			editApplication({ id: appId });
 		}
-		navigate(`/application/${id}/${previousRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
+		navigate(`/application/${id}/${previousRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const nextSection = () => {
 		if (state?.formState?.isDirty) {
 			editApplication({ id: appId });
 		}
-		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
+		navigate(`/application/${id}/${nextRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const submitApplication = () => {
