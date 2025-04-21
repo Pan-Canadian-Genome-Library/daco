@@ -46,7 +46,7 @@ const SignAndSubmit = () => {
 		resolver: zodResolver(esignatureSchema),
 	});
 
-	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
+	const onSubmit: SubmitHandler<eSignatureSchemaType> = () => {
 		setOpenModal(true);
 	};
 

@@ -109,6 +109,7 @@ const ApplicationViewer = () => {
 											appId: applicationData.id,
 											isEditMode,
 											revisions: revisionsData,
+											state: applicationData.state,
 										}}
 									/>
 								</Col>

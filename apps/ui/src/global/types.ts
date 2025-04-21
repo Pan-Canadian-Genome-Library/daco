@@ -60,6 +60,7 @@ export interface ApplicationOutletContext {
 	appId: string | number;
 	isEditMode: boolean;
 	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
+	state: ApplicationStateValues;
 }
 
 export interface BasicFormFieldProps {
