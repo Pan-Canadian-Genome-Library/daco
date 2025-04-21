@@ -448,7 +448,7 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/:applicationId/submit-revision',
+	'/:applicationId/revisions/submit',
 	authMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
