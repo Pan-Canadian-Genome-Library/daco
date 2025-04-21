@@ -21,6 +21,7 @@ import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useCloseApplication from '@/api/mutations/useCloseApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
@@ -28,6 +29,7 @@ import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
+import { useNavigate } from 'react-router';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -51,6 +53,8 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
+	const navigate = useNavigate();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
 		//TODO: Add logic to this to actually submit the revisions.
@@ -61,7 +65,10 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleCloseApplicationRequest = () => {
-		setShowCloseApplicationModal(false);
+		closeApplication({ applicationId: id }).then(() => {
+			setOpenRevisionsModal(false);
+			navigate('/dashboard');
+		});
 	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
@@ -133,6 +140,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 					open={showCloseApplicationModal}
 					onOk={handleCloseApplicationRequest}
+					okButtonProps={{ disabled: isClosing }}
 					onCancel={() => setShowCloseApplicationModal(false)}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
