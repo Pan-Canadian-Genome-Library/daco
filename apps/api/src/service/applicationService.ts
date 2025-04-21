@@ -107,10 +107,12 @@ const applicationSvc = (db: PostgresDb) => ({
 		id,
 		update,
 		transaction,
+		shouldKeepState = false,
 	}: {
 		id: number;
 		update: ApplicationContentUpdates;
 		transaction?: PostgresTransaction;
+		shouldKeepState?: boolean;
 	}): AsyncResult<JoinedApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const dbTransaction = transaction ? transaction : db;
@@ -128,10 +130,12 @@ const applicationSvc = (db: PostgresDb) => ({
 				}
 
 				// Update Related Application
-				const applicationUpdates = {
-					updated_at: sql`NOW()`,
-					state: ApplicationStates.DRAFT,
-				};
+				const applicationUpdates = shouldKeepState
+					? { updated_at: sql`NOW()` }
+					: {
+							updated_at: sql`NOW()`,
+							state: ApplicationStates.DRAFT,
+						};
 				const editedApplication = await transaction
 					.update(applications)
 					.set(applicationUpdates)

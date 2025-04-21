@@ -78,17 +78,21 @@ export const editApplication = async ({
 	}
 
 	const application = result.data;
-
-	const { edit, dac_revision_request, rep_revision_request } = ApplicationStateEvents;
+	const { edit } = ApplicationStateEvents;
 
 	/**
 	 * FIXME: This does not prevent editing of fields that have already been approved. This needs to be added.
 	 */
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
-	const canReviseResultRep = new ApplicationStateManager(application)._canPerformAction(rep_revision_request);
-	const canReviseResultDAC = new ApplicationStateManager(application)._canPerformAction(dac_revision_request);
 
-	if (!canEditResult.success && !canReviseResultDAC && !canReviseResultRep) {
+	/**
+	 * By default the application service will reset an applications state to DRAFT when edited. We need to avoid this
+	 * behaviour for any applications within the REP_REV or DAC_REV states.
+	 */
+	const shouldKeepState =
+		application.state === 'INSTITUTIONAL_REP_REVISION_REQUESTED' || application.state === 'DAC_REVISIONS_REQUESTED';
+
+	if (!canEditResult.success) {
 		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
 		return failure('INVALID_STATE_TRANSITION', message);
@@ -98,7 +102,7 @@ export const editApplication = async ({
 
 	if (!formattedResult.success) return formattedResult;
 
-	return await applicationRepo.editApplication({ id, update: formattedResult.data });
+	return await applicationRepo.editApplication({ id, update: formattedResult.data, shouldKeepState: shouldKeepState });
 };
 
 /**
