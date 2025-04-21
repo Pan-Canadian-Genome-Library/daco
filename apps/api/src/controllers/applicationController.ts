@@ -538,7 +538,6 @@ export const getRevisions = async ({
 		const filteredSuccesses = aliasedRevs.filter((results) => results.success).map((results) => results.data);
 
 		if (filteredFailures.length) {
-			console.log(filteredFailures);
 			throw new Error('Failed to alias Revisions Record');
 		} else {
 			return success(filteredSuccesses);

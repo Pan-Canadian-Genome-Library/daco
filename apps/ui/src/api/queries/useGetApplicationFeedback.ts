@@ -26,7 +26,7 @@ import { SectionRoutesValues } from '@/pages/AppRouter';
 import { RevisionsDTO } from '@pcgl-daco/data-model';
 
 export type RevisionType = {
-	isApproved: boolean;
+	isApproved: boolean | undefined;
 	comment: string | null;
 };
 
@@ -44,39 +44,39 @@ const useGetApplicationFeedback = (id?: string | number) => {
 			return await response.json().then((data: RevisionsDTO[]) => {
 				const result: Partial<VerifyPageRevisionType<SectionRoutesValues>> = {
 					applicant: {
-						isApproved: data[0]?.applicantApproved ? data[0]?.applicantApproved : false,
+						isApproved: data[0]?.applicantApproved,
 						comment: data[0]?.applicantNotes ?? null,
 					},
 					institutional: {
-						isApproved: data[0]?.institutionRepApproved ? data[0]?.institutionRepApproved : false,
+						isApproved: data[0]?.institutionRepApproved,
 						comment: data[0]?.institutionRepNotes ?? null,
 					},
 					collaborators: {
-						isApproved: data[0]?.collaboratorsApproved ? data[0]?.collaboratorsApproved : false,
+						isApproved: data[0]?.collaboratorsApproved,
 						comment: data[0]?.collaboratorsNotes ?? null,
 					},
 					project: {
-						isApproved: data[0]?.projectApproved ? data[0]?.projectApproved : false,
+						isApproved: data[0]?.projectApproved,
 						comment: data[0]?.projectNotes ?? null,
 					},
 					study: {
-						isApproved: data[0]?.requestedStudiesApproved ? data[0]?.requestedStudiesApproved : false,
+						isApproved: data[0]?.requestedStudiesApproved,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					ethics: {
-						isApproved: data[0]?.requestedStudiesApproved ? data[0]?.requestedStudiesApproved : false,
+						isApproved: data[0]?.requestedStudiesApproved,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					agreement: {
-						isApproved: data[0]?.agreementsApproved ? data[0]?.agreementsApproved : false,
+						isApproved: data[0]?.agreementsApproved,
 						comment: data[0]?.agreementsNotes ?? null,
 					},
 					appendices: {
-						isApproved: data[0]?.appendicesApproved ? data[0]?.appendicesApproved : false,
+						isApproved: data[0]?.appendicesApproved,
 						comment: data[0]?.appendicesNotes ?? null,
 					},
 					sign: {
-						isApproved: data[0]?.signAndSubmitApproved ? data[0]?.signAndSubmitApproved : false,
+						isApproved: data[0]?.signAndSubmitApproved,
 						comment: data[0]?.signAndSubmitNotes ?? null,
 					},
 				};

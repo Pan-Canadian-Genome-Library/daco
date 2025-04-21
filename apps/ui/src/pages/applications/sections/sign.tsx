@@ -37,8 +37,12 @@ const { Text } = Typography;
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, appId, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = !revisions.sign?.isApproved || isEditMode;
+	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = (revisions.sign?.isApproved !== undefined && !revisions.sign?.isApproved) || isEditMode;
+	const canSubmitRevisions =
+		(Object.values(revisions).find((rev) => rev.isApproved === false) &&
+			state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') ||
+		state === 'DAC_REVISIONS_REQUESTED';
 	const [openModal, setOpenModal] = useState(false);
 	const signatureRef = useRef(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
@@ -100,7 +104,11 @@ const SignAndSubmit = () => {
 						</Row>
 						<Row style={{ minHeight: '40vh' }} />
 					</SectionContent>
-					<SectionFooter currentRoute="sign" isEditMode={canEdit} signSubmitHandler={handleSubmit(onSubmit)} />
+					<SectionFooter
+						currentRoute="sign"
+						isEditMode={canSubmitRevisions || canEdit}
+						signSubmitHandler={handleSubmit(onSubmit)}
+					/>
 				</Form>
 			</SectionWrapper>
 			<Modal

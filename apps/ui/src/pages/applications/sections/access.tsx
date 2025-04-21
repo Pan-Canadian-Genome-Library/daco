@@ -41,7 +41,7 @@ const rule = createSchemaFieldRule(agreementsSchema);
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = !revisions.agreement?.isApproved || isEditMode;
+	const canEdit = (revisions.agreement?.isApproved !== undefined && !revisions.agreement?.isApproved) || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {

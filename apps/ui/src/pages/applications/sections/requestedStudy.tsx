@@ -58,7 +58,7 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = !revisions.study?.isApproved || isEditMode;
+	const canEdit = (revisions.study?.isApproved !== undefined && !revisions.study?.isApproved) || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 

@@ -78,7 +78,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions }: SectionMe
 										isSectionValid={SectionValidator[route]}
 										label={item.route}
 										isEditMode={isEditMode}
-										isLocked={revisions[route]?.isApproved ?? false}
+										isLocked={!(revisions[route]?.isApproved !== undefined && revisions[route]?.isApproved === false)}
 										hasCollaborators={data && data.length > 0}
 									/>
 								),

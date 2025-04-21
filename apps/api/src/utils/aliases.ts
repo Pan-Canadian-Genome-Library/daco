@@ -146,7 +146,6 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
  * @returns type `RevisionsDTO` - camelCase variation of a Postgres success response.
  */
 export const convertToRevisionsRecord = (data: RevisionRequestModel): Result<RevisionsDTO, 'SYSTEM_ERROR'> => {
-	console.log(data);
 	const camelCaseRecord = objectToCamel(data);
 	const validationResult = revisionDataSchema.safeParse(camelCaseRecord);
 	const result = validationResult.success

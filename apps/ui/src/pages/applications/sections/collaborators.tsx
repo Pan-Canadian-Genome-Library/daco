@@ -49,7 +49,8 @@ export interface ModalStateProps extends ModalState {
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = !revisions.collaborators?.isApproved || isEditMode;
+	const canEdit =
+		(revisions.collaborators?.isApproved !== undefined && !revisions.collaborators?.isApproved) || isEditMode;
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);
 

@@ -41,7 +41,8 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = !revisions.institutional?.isApproved || isEditMode;
+	const canEdit =
+		(revisions.institutional?.isApproved !== undefined && !revisions.institutional?.isApproved) || isEditMode;
 	const {
 		state: { fields, formState },
 		dispatch,

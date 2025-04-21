@@ -41,7 +41,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = !revisions.applicant?.isApproved || isEditMode;
+	const canEdit = (revisions.applicant?.isApproved !== undefined && !revisions.applicant?.isApproved) || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 

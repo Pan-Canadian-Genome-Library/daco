@@ -28,6 +28,7 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 import useGetApplication from '@/api/queries/useGetApplication';
 import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
 import ErrorPage from '@/components/pages/ErrorPage';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const { Content } = Layout;
 
@@ -56,6 +57,11 @@ const ApplicationViewer = () => {
 
 	useEffect(() => {
 		if (applicationData && !applicationError) {
+			const isNotInEditLifecycle =
+				applicationData.state !== ApplicationStates.DRAFT &&
+				applicationData.state !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' &&
+				applicationData.state !== 'DAC_REVISIONS_REQUESTED';
+
 			/**
 			 * This likely means that the user directly linked the edit page somehow
 			 * when the application was no longer in DRAFT mode. We redirect back to
@@ -63,7 +69,7 @@ const ApplicationViewer = () => {
 			 *
 			 * In the future, this should also check user ability (can they edit?)
 			 */
-			if (isEditMode) {
+			if (isNotInEditLifecycle && isEditMode) {
 				navigation(`/application/${applicationData.id}/`, { replace: true });
 			}
 		}

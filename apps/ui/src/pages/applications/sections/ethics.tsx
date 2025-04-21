@@ -52,7 +52,7 @@ const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = !revisions.ethics?.isApproved || isEditMode;
+	const canEdit = (revisions.ethics?.isApproved !== undefined && !revisions.ethics?.isApproved) || isEditMode;
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 	const form = useSectionForm({
