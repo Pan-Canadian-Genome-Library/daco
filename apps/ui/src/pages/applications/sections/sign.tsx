@@ -28,6 +28,7 @@ import SignatureCanvas from 'react-signature-canvas';
 
 import useCreateSignature from '@/api/mutations/useCreateSignature';
 import useSubmitApplication from '@/api/mutations/useSubmitApplication';
+import useSubmitRevisions from '@/api/mutations/useSubmitRevisions';
 import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
@@ -45,10 +46,6 @@ const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
 	const canEdit = (revisions.sign?.isApproved !== undefined && !revisions.sign?.isApproved) || isEditMode;
-	const canSubmitRevisions =
-		(Object.values(revisions).find((rev) => rev.isApproved === false) &&
-			state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') ||
-		state === 'DAC_REVISIONS_REQUESTED';
 	const [openModal, setOpenModal] = useState(false);
 	const {
 		state: { fields },
@@ -56,6 +53,8 @@ const SignAndSubmit = () => {
 	const navigation = useNavigate();
 	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
+	const { mutateAsync: submitRevisions, isPending: isSubmittingRevs } = useSubmitRevisions();
+
 	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset, getValues } =
 		useForm<eSignatureSchemaType>({
 			resolver: zodResolver(esignatureSchema),
@@ -81,9 +80,18 @@ const SignAndSubmit = () => {
 	};
 
 	const modalSubmission = () => {
-		submitApplication({ applicationId: appId }).then(() => {
-			setOpenModal(false);
-		});
+		switch (state) {
+			case 'INSTITUTIONAL_REP_REVISION_REQUESTED':
+			case 'DAC_REVISIONS_REQUESTED':
+				submitRevisions({ applicationId: appId }).then(() => {
+					setOpenModal(false);
+				});
+				break;
+			default:
+				submitApplication({ applicationId: appId }).then(() => {
+					setOpenModal(false);
+				});
+		}
 	};
 
 	// TODO: we have institutional rep signatures to be implemented. Currently only allows APPLICANT roles
@@ -96,22 +104,29 @@ const SignAndSubmit = () => {
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
-		if (!ValidateAllSections(fields)) {
+		if (!ValidateAllSections(fields) && state === 'DRAFT') {
 			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
 		}
-	}, [appId, fields, isEditMode, navigation]);
+	}, [appId, fields, isEditMode, navigation, state]);
 
 	const watchSignature = watch('signature');
 
 	// - differentiate between which signature we are validating against as we have two different types of signatures
 	// - ensure the local signature is synced with saved api signature
-	const determineSignatureDisabled = () => {
-		if (role === 'APPLICANT') {
-			return data?.applicantSignature !== getValues('signature');
-		}
-		return data?.institutionalRepSignature !== getValues('signature');
-	};
+	const determineCanSubmit = () => {
+		const hasRevisions =
+			(Object.values(revisions).find((rev) => rev.isApproved === false) &&
+				state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') ||
+			state === 'DAC_REVISIONS_REQUESTED';
 
+		if (hasRevisions || canEdit) {
+			return true;
+		} else if (role === 'APPLICANT') {
+			return data?.applicantSignature !== getValues('signature');
+		} else {
+			return data?.institutionalRepSignature !== getValues('signature');
+		}
+	};
 	return (
 		<>
 			<SectionWrapper>
@@ -154,9 +169,9 @@ const SignAndSubmit = () => {
 					</SectionContent>
 					<SectionFooter
 						currentRoute="sign"
-						isEditMode={canSubmitRevisions || canEdit}
+						isEditMode={determineCanSubmit()}
 						signSubmitHandler={handleSubmit(onSubmit)}
-						submitDisabled={determineSignatureDisabled() || !isEditMode}
+						submitDisabled={!determineCanSubmit()}
 					/>
 				</Form>
 			</SectionWrapper>
@@ -168,7 +183,7 @@ const SignAndSubmit = () => {
 				style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 				open={openModal}
 				onOk={modalSubmission}
-				okButtonProps={{ disabled: isSubmitting }}
+				okButtonProps={{ disabled: isSubmitting || isSubmittingRevs }}
 				onCancel={() => setOpenModal(false)}
 			>
 				<Flex style={{ height: '100%', marginTop: 20 }}>

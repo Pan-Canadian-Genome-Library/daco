@@ -44,7 +44,7 @@ const useSubmitRevisions = () => {
 		onSuccess: () => {
 			notification.openNotification({
 				type: 'success',
-				message: translate('sign-and-submit-section.notifications.submitApplicationSuccess'),
+				message: translate('sign-and-submit-section.notifications.submitApplicationWithRevisionsSuccess'),
 			});
 			navigation(`/dashboard`);
 		},

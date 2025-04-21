@@ -277,14 +277,14 @@ export const submitRevision = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (
-			appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED ||
-			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
+			appStateManager.state === ApplicationStates.DAC_REVIEW ||
+			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW
 		) {
-			return failure('INVALID_STATE_TRANSITION', 'Application revision is already submitted.');
+			return failure('INVALID_STATE_TRANSITION', 'Application is already submitted for revisions.');
 		}
 
 		let submittedRevision;
-		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+		if (appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
 			submittedRevision = await appStateManager.submitDacRevision();
 		} else {
 			submittedRevision = await appStateManager.submitRepRevision();

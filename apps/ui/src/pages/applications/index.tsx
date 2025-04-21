@@ -53,14 +53,18 @@ const ApplicationViewer = () => {
 		isError: revisionsIsErrored,
 		error: revisionsError,
 		isLoading: revisionsLoading,
-	} = useGetApplicationFeedback(params.id);
+	} = useGetApplicationFeedback(
+		params.id,
+		applicationData?.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
+			applicationData?.state === ApplicationStates.DAC_REVISIONS_REQUESTED,
+	);
 
 	useEffect(() => {
 		if (applicationData && !applicationError) {
 			const isNotInEditLifecycle =
 				applicationData.state !== ApplicationStates.DRAFT &&
-				applicationData.state !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' &&
-				applicationData.state !== 'DAC_REVISIONS_REQUESTED';
+				applicationData.state !== ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED &&
+				applicationData.state !== ApplicationStates.DAC_REVISIONS_REQUESTED;
 
 			/**
 			 * This likely means that the user directly linked the edit page somehow

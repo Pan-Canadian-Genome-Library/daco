@@ -34,7 +34,7 @@ export type VerifyPageRevisionType<T extends string> = {
 	[section in T]: RevisionType;
 };
 
-const useGetApplicationFeedback = (id?: string | number) => {
+const useGetApplicationFeedback = (id?: string | number, isInReviewState?: boolean) => {
 	return useQuery<Partial<VerifyPageRevisionType<SectionRoutesValues>>, ServerError>({
 		queryKey: [`revisions-${id}`],
 		retry: 0,
@@ -44,39 +44,39 @@ const useGetApplicationFeedback = (id?: string | number) => {
 			return await response.json().then((data: RevisionsDTO[]) => {
 				const result: Partial<VerifyPageRevisionType<SectionRoutesValues>> = {
 					applicant: {
-						isApproved: data[0]?.applicantApproved,
+						isApproved: isInReviewState ? data[0]?.applicantApproved : undefined,
 						comment: data[0]?.applicantNotes ?? null,
 					},
 					institutional: {
-						isApproved: data[0]?.institutionRepApproved,
+						isApproved: isInReviewState ? data[0]?.institutionRepApproved : undefined,
 						comment: data[0]?.institutionRepNotes ?? null,
 					},
 					collaborators: {
-						isApproved: data[0]?.collaboratorsApproved,
+						isApproved: isInReviewState ? data[0]?.collaboratorsApproved : undefined,
 						comment: data[0]?.collaboratorsNotes ?? null,
 					},
 					project: {
-						isApproved: data[0]?.projectApproved,
+						isApproved: isInReviewState ? data[0]?.projectApproved : undefined,
 						comment: data[0]?.projectNotes ?? null,
 					},
 					study: {
-						isApproved: data[0]?.requestedStudiesApproved,
+						isApproved: isInReviewState ? data[0]?.requestedStudiesApproved : undefined,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					ethics: {
-						isApproved: data[0]?.requestedStudiesApproved,
+						isApproved: isInReviewState ? data[0]?.requestedStudiesApproved : undefined,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					agreement: {
-						isApproved: data[0]?.agreementsApproved,
+						isApproved: isInReviewState ? data[0]?.agreementsApproved : undefined,
 						comment: data[0]?.agreementsNotes ?? null,
 					},
 					appendices: {
-						isApproved: data[0]?.appendicesApproved,
+						isApproved: isInReviewState ? data[0]?.appendicesApproved : undefined,
 						comment: data[0]?.appendicesNotes ?? null,
 					},
 					sign: {
-						isApproved: data[0]?.signAndSubmitApproved,
+						isApproved: isInReviewState ? data[0]?.signAndSubmitApproved : undefined,
 						comment: data[0]?.signAndSubmitNotes ?? null,
 					},
 				};
