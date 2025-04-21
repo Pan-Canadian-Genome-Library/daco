@@ -143,8 +143,8 @@ const DashboardPage = () => {
 					onOk={handleOk}
 					onCancel={() => setOpenModal(false)}
 				>
-					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modals.editApplication.description')}</Text>
+					<Flex style={{ height: '100%', marginTop: 20, minHeight: '100px' }}>
+						<Text>{translate('modals.editApplication.description', { id: modalAppId })}</Text>
 					</Flex>
 				</Modal>
 			</Content>
