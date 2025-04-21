@@ -153,7 +153,7 @@ signatureRouter.post(
 				const role = getUserRole(request.session);
 
 				if (role !== userRoleSchema.Values.APPLICANT && role !== userRoleSchema.Values.INSTITUTIONAL_REP) {
-					response.status(401).json({
+					response.status(403).json({
 						error: 'FORBIDDEN',
 						message: 'User role is not allowed to create a signature for this application',
 					});
