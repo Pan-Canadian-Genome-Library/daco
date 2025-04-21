@@ -25,13 +25,11 @@ import { useNavigate } from 'react-router';
 import useGetApplicationList from '@/api/queries/useGetApplicationList';
 
 import ContentWrapper, { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { mockUserID } from '@/components/mock/applicationMockData';
 import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatusBar';
 import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { Application } from '@/global/types';
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -40,15 +38,15 @@ const DashboardPage = () => {
 	const { useToken } = theme;
 	const { t: translate } = useTranslation();
 	const [openModal, setOpenModal] = useState(false);
-	const [modalAppId, setModalAppId] = useState('');
+	const [modalAppId, setModalAppId] = useState<number | string>('');
 
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
 	const navigate = useNavigate();
-	const { data: applicationData, error } = useGetApplicationList({ userId: mockUserID });
+	const { data: applicationData, error } = useGetApplicationList({});
 
-	const showEditApplicationModal = (id: string) => {
+	const showEditApplicationModal = (id: number | string) => {
 		setModalAppId(id);
 		setOpenModal(true);
 	};
@@ -120,7 +118,7 @@ const DashboardPage = () => {
 										<Col xs={24} md={24} lg={12}>
 											<NewApplicationCard />
 										</Col>
-										{applicationData.applications.map((applicationItem: Application) => {
+										{applicationData.applications.map((applicationItem) => {
 											return (
 												<Col key={applicationItem.id} xs={24} md={24} lg={12}>
 													<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />

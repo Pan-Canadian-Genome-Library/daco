@@ -23,8 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { Application } from '@/global/types';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
+import { ApplicationListSummary, ApplicationStates } from '@pcgl-daco/data-model/src/types';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -32,8 +31,8 @@ const { Title, Text } = Typography;
 const { useToken } = theme;
 
 type ApplicationCardProps = {
-	openEdit: (id: string) => void;
-	application: Application;
+	openEdit: (id: number | string) => void;
+	application: ApplicationListSummary;
 };
 
 const ApplicationCard = (props: ApplicationCardProps) => {
@@ -48,7 +47,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
-	const formatDate = (createdAt: string, expiresAt: string) => {
+	const formatDate = (createdAt: Date | string, expiresAt?: Date | string | null) => {
 		const createdDate = translate('date.intlDateTime', {
 			val: new Date(createdAt),
 			formatParams: {
@@ -68,7 +67,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
 	};
 
-	const handleEditClick = (id: string, state: string, openEdit: (id: string) => void) => {
+	const handleEditClick = (id: number | string, state: string, openEdit: (id: number | string) => void) => {
 		if (state === ApplicationStates.DRAFT) {
 			navigate(`/application/${id}/intro/edit`);
 		} else {
