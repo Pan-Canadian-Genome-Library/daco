@@ -26,8 +26,9 @@ import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback'
 import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
-import { ApplicationSectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
+import { ApplicationSectionRoutes, SectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { ValidateAllSections } from './utils/validatorFunctions';
 
 type SectionMenuProps = {
 	currentSection: string;
@@ -82,6 +83,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions }: SectionMe
 										hasCollaborators={data && data.length > 0}
 									/>
 								),
+								disabled: route === SectionRoutes.SIGN && !ValidateAllSections(state.fields),
 							};
 						})
 					: []

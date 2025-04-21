@@ -50,18 +50,18 @@ const SectionMenuItem = ({
 	 * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
 	 */
 	const renderIcon = () => {
-		if (label === SectionRoutes.INTRO) {
+		if (isLocked ?? !isEditMode) {
+			// display lock on edit mode
+			return <LockOutlined />;
+		} else if (label === SectionRoutes.INTRO) {
 			// do not display intro icon
-			return;
-		} else if (label === SectionRoutes.COLLABORATORS && isEditMode && isLocked) {
+			return <CheckCircleOutlined />;
+		} else if (label === SectionRoutes.COLLABORATORS && isEditMode) {
 			// If has collaborators, show checkmark otherwise return null
 			return hasCollaborators ? <CheckCircleOutlined /> : null;
 		} else if (isCurrentSection && isEditMode && !isSectionValid) {
 			// do not display icon if on currentpage
 			return;
-		} else if (isLocked ?? !isEditMode) {
-			// display lock on edit mode
-			return <LockOutlined />;
 		} else if (!isSectionTouched) {
 			// do not display icon if the section has not been worked on
 			return;
