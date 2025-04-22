@@ -46,7 +46,7 @@ export interface ApplicationCountMetadata {
 
 export interface ServerError {
 	message: string;
-	errors?: string;
+	error?: string;
 }
 
 export interface FetchError extends ServerError {
