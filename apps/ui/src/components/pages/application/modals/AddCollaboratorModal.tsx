@@ -134,7 +134,6 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									control={control}
 									rule={rule}
-									required
 									disabled={!isEditMode}
 								/>
 							</Col>
