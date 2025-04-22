@@ -503,6 +503,44 @@ export const closeApplication = async ({
 	}
 };
 
+export const withdrawApplication = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		let withdrawalRequest;
+		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+			withdrawalRequest = await appStateManager.withdrawDacReview();
+		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+			withdrawalRequest = await appStateManager.withdrawRepReview();
+		} else {
+			return failure(
+				'INVALID_STATE_TRANSITION',
+				"The application cannot be withdrawn because it's in an inappropriate state. Only applications in DAC_REVIEW or INSTITUTIONAL_REP_REVIEW may be withdrawn.",
+			);
+		}
+
+		return withdrawalRequest;
+	} catch (error) {
+		const message = `Unable to withdraw application with id: ${applicationId}`;
+		logger.error(message, error);
+
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
 export const getRevisions = async ({
 	applicationId,
 }: {

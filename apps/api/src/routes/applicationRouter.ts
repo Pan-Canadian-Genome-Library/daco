@@ -32,6 +32,7 @@ import {
 	revokeApplication,
 	submitApplication,
 	submitRevision,
+	withdrawApplication,
 } from '@/controllers/applicationController.js';
 import {
 	RevisionRequestModel,
@@ -39,8 +40,9 @@ import {
 	type ApplicationStateTotals,
 	type JoinedApplicationRecord,
 } from '@/service/types.ts';
+import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import type { ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
+import type { ApplicationDTO, ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
@@ -656,6 +658,59 @@ applicationRouter.post(
 			response.status(500).json({
 				error: 'SYSTEM_ERROR',
 				message: 'Unexpected error.',
+			});
+		}
+	},
+);
+
+applicationRouter.post(
+	'/:applicationId/withdraw',
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
+	async (
+		request: Request,
+		response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+	) => {
+		const applicationId = Number(request.params.applicationId);
+
+		if (!isPositiveInteger(applicationId)) {
+			response
+				.status(400)
+				.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
+			return;
+		}
+
+		try {
+			const result = await withdrawApplication({ applicationId });
+
+			if (result.success) {
+				const dtoFriendlyData = convertToBasicApplicationRecord(result.data);
+
+				if (!dtoFriendlyData.success) {
+					throw new Error(dtoFriendlyData.message);
+				} else {
+					response.status(200).json(dtoFriendlyData.data);
+				}
+				return;
+			}
+
+			switch (result.error) {
+				case 'INVALID_STATE_TRANSITION': {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				case 'NOT_FOUND': {
+					response.status(404).json({ error: 'NOT_FOUND', message: result.message });
+					return;
+				}
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
+			}
+		} catch (error) {
+			response.status(500).json({
+				error: 'SYSTEM_ERROR',
+				message: 'Something went wrong, please try again later.',
 			});
 		}
 	},
