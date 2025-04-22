@@ -17,21 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { UploadOutlined } from '@ant-design/icons';
+import { CloseOutlined, UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Form, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
-import useDeleteEthicsFile from '@/api/mutations/useDeleteEthicsFile';
 import useEditApplication from '@/api/mutations/useEditApplication';
 import useGetDownload from '@/api/queries/useGetDownload';
 import useGetFile from '@/api/queries/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
+import DeleteEthicsFileModal from '@/components/pages/application/modals/DeleteEthicsFileModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -51,10 +52,10 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
-	const { mutateAsync: deleteFile } = useDeleteEthicsFile();
 
 	const form = useSectionForm({
 		section: 'ethics',
@@ -126,30 +127,7 @@ const Ethics = () => {
 		URL.revokeObjectURL(url);
 	};
 
-	const onRemove = async () => {
-		if (state.fields.ethicsLetter) {
-			deleteFile({ fileId: state.fields.ethicsLetter });
-		}
-	};
-
 	const handleChange = (info: UploadChangeParam<UploadFile<FilesDTO>>) => {
-		// remove ethicsLetter id once file is deleted
-		if (info.file.status === 'removed') {
-			dispatch({
-				type: 'UPDATE_APPLICATION',
-				payload: {
-					fields: {
-						...state.fields,
-						ethicsLetter: null,
-					},
-					formState: {
-						...state.formState,
-					},
-				},
-			});
-			return;
-		}
-
 		// Update store once file is uploaded
 		if (info.file.status === 'done' && info.file.response?.id) {
 			dispatch({
@@ -250,10 +228,18 @@ const Ethics = () => {
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
 												disabled={!isEditMode}
 												onChange={handleChange}
-												onRemove={onRemove}
+												onRemove={() => {
+													setIsDeleteModalOpen(true);
+													return false;
+												}}
+												itemRender={(element) => {
+													// Make sure the file element doesn't expand entire width
+													return <Flex>{element}</Flex>;
+												}}
 												showUploadList={{
 													showDownloadIcon: false,
 													showRemoveIcon: true,
+													removeIcon: <CloseOutlined />,
 												}}
 											>
 												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
@@ -268,6 +254,11 @@ const Ethics = () => {
 					</Form>
 				</SectionContent>
 				<SectionFooter currentRoute="ethics" isEditMode={isEditMode} />
+				<DeleteEthicsFileModal
+					filename={data && data[0] ? data[0].name : ''}
+					setIsOpen={setIsDeleteModalOpen}
+					isOpen={isDeleteModalOpen}
+				/>
 			</>
 		</SectionWrapper>
 	);
