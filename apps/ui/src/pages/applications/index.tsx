@@ -40,7 +40,6 @@ const ApplicationViewer = () => {
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
-
 	const {
 		data: applicationData,
 		isError: applicationIsErrored,
@@ -53,11 +52,7 @@ const ApplicationViewer = () => {
 		isError: revisionsIsErrored,
 		error: revisionsError,
 		isLoading: revisionsLoading,
-	} = useGetApplicationFeedback(
-		params.id,
-		applicationData?.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
-			applicationData?.state === ApplicationStates.DAC_REVISIONS_REQUESTED,
-	);
+	} = useGetApplicationFeedback(params.id, applicationData?.state);
 
 	useEffect(() => {
 		if (applicationData && !applicationError) {
@@ -66,13 +61,6 @@ const ApplicationViewer = () => {
 				applicationData.state !== ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED &&
 				applicationData.state !== ApplicationStates.DAC_REVISIONS_REQUESTED;
 
-			/**
-			 * This likely means that the user directly linked the edit page somehow
-			 * when the application was no longer in DRAFT mode. We redirect back to
-			 * the view mode as protection.
-			 *
-			 * In the future, this should also check user ability (can they edit?)
-			 */
 			if (isNotInEditLifecycle && isEditMode) {
 				navigation(`/application/${applicationData.id}/`, { replace: true });
 			}

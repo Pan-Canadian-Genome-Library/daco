@@ -23,7 +23,7 @@ import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { SectionRoutesValues } from '@/pages/AppRouter';
-import { RevisionsDTO } from '@pcgl-daco/data-model';
+import { ApplicationStates, ApplicationStateValues, RevisionsDTO } from '@pcgl-daco/data-model';
 
 export type RevisionType = {
 	isApproved: boolean | undefined;
@@ -34,49 +34,56 @@ export type VerifyPageRevisionType<T extends string> = {
 	[section in T]: RevisionType;
 };
 
-const useGetApplicationFeedback = (id?: string | number, isInReviewState?: boolean) => {
+const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStateValues) => {
 	return useQuery<Partial<VerifyPageRevisionType<SectionRoutesValues>>, ServerError>({
 		queryKey: [`revisions-${id}`],
 		retry: 0,
+		enabled: state !== undefined,
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}/revisions`).then(withErrorResponseHandler);
+			/**
+			 * We only want to display the approval status if we're in one of these status'
+			 */
+			const revisionDependant =
+				state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
+				state === ApplicationStates.DAC_REVISIONS_REQUESTED;
 
 			return await response.json().then((data: RevisionsDTO[]) => {
 				const result: Partial<VerifyPageRevisionType<SectionRoutesValues>> = {
 					applicant: {
-						isApproved: isInReviewState ? data[0]?.applicantApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.applicantApproved : undefined,
 						comment: data[0]?.applicantNotes ?? null,
 					},
 					institutional: {
-						isApproved: isInReviewState ? data[0]?.institutionRepApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.institutionRepApproved : undefined,
 						comment: data[0]?.institutionRepNotes ?? null,
 					},
 					collaborators: {
-						isApproved: isInReviewState ? data[0]?.collaboratorsApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.collaboratorsApproved : undefined,
 						comment: data[0]?.collaboratorsNotes ?? null,
 					},
 					project: {
-						isApproved: isInReviewState ? data[0]?.projectApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.projectApproved : undefined,
 						comment: data[0]?.projectNotes ?? null,
 					},
 					study: {
-						isApproved: isInReviewState ? data[0]?.requestedStudiesApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.requestedStudiesApproved : undefined,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					ethics: {
-						isApproved: isInReviewState ? data[0]?.requestedStudiesApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.requestedStudiesApproved : undefined,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					agreement: {
-						isApproved: isInReviewState ? data[0]?.agreementsApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.agreementsApproved : undefined,
 						comment: data[0]?.agreementsNotes ?? null,
 					},
 					appendices: {
-						isApproved: isInReviewState ? data[0]?.appendicesApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.appendicesApproved : undefined,
 						comment: data[0]?.appendicesNotes ?? null,
 					},
 					sign: {
-						isApproved: isInReviewState ? data[0]?.signAndSubmitApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.signAndSubmitApproved : undefined,
 						comment: data[0]?.signAndSubmitNotes ?? null,
 					},
 				};
