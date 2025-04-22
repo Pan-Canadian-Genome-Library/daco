@@ -42,20 +42,20 @@
 		"primaryEmailLabel": "The collaborator must be affiliated with the same institution as the Principal Investigator.",
 		"notifications": {
 			"added": {
-				"successfullyAddedTitle": "New Collaborator Added",
-				"successfullyAdded": "{{firstName}} has been added as a collaborator to this Application."
+				"successTitle": "New Collaborator Added",
+				"successMessage": "{{firstName}} has been added as a collaborator to this Application."
 			},
 			"duplicate": {
-				"duplicateCollaboratorTitle": "Duplicate Collaborator",
-				"duplicateCollaborator": "This collaborator already exists within this application and cannot be added again. Please edit or delete their entry."
+				"duplicateTitle": "Duplicate Collaborator",
+				"duplicateMessage": "This collaborator already exists within this application and cannot be added again. Please edit or delete their entry."
 			},
 			"deleted": {
-				"successfullyDeletedTitle": "Collaborator Removed",
-				"successfullyDeleted": "{{firstName}} was removed as a collaborator for this Application."
+				"successTitle": "Collaborator Removed",
+				"successMessage": "{{firstName}} was removed as a collaborator for this Application."
 			},
 			"edit": {
-				"successfullyUpdatedTitle": "Collaborator Updated",
-				"successfullyUpdated": "{{firstName}}'s information was successfully updated."
+				"successTitle": "Collaborator Updated",
+				"successMessage": "{{firstName}}'s information was successfully updated."
 			}
 		}
 	},

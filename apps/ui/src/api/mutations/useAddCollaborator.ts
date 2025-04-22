@@ -17,18 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
 import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { CollaboratorsSchemaType } from '@pcgl-daco/validation';
 
 const useAddCollaborator = () => {
 	const { t: translate } = useTranslation();
+	const notification = useNotificationContext();
 
 	return useMutation<
 		ListCollaboratorResponse,
@@ -70,21 +71,24 @@ const useAddCollaborator = () => {
 			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
 				return [...prev, ...data];
 			});
-			notification.success({
-				message: translate('collab-section.notifications.added.successfullyAddedTitle'),
-				description: translate('collab-section.notifications.added.successfullyAdded', {
+			notification.openNotification({
+				type: 'success',
+				message: translate('collab-section.notifications.added.successTitle'),
+				description: translate('collab-section.notifications.added.successMessage', {
 					firstName: data[0]?.collaboratorFirstName,
 				}),
 			});
 		},
 		onError: (error) => {
 			if (error.message === 'DUPLICATE') {
-				notification.error({
-					message: translate('collab-section.notifications.duplicate.duplicateCollaboratorTitle'),
-					description: translate('collab-section.notifications.duplicate.duplicateCollaborator'),
+				notification.openNotification({
+					type: 'error',
+					message: translate('collab-section.notifications.duplicate.duplicateTitle'),
+					description: translate('collab-section.notifications.duplicate.duplicateMessage'),
 				});
 			} else {
-				notification.error({
+				notification.openNotification({
+					type: 'error',
 					message: translate('errors.generic.title'),
 					description: translate('errors.generic.message'),
 				});

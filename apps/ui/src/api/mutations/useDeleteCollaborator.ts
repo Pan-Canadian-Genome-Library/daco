@@ -17,18 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
 import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useDeleteCollaborator = () => {
 	const { t: translate } = useTranslation();
+	const notification = useNotificationContext();
 
 	return useMutation<
 		ListCollaboratorResponse,
@@ -43,8 +44,10 @@ const useDeleteCollaborator = () => {
 			return await response.json();
 		},
 		onError: (error) => {
-			notification.error({
-				message: error.message,
+			notification.openNotification({
+				type: 'error',
+				message: translate('errors.generic.title'),
+				description: error.message,
 			});
 		},
 		onSuccess: async (data) => {
@@ -52,9 +55,10 @@ const useDeleteCollaborator = () => {
 			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
 				return prev.filter((value) => value.id !== data[0]?.id);
 			});
-			notification.success({
-				message: translate('collab-section.notifications.deleted.successfullyDeletedTitle'),
-				description: translate('collab-section.notifications.deleted.successfullyDeleted', {
+			notification.openNotification({
+				type: 'success',
+				message: translate('collab-section.notifications.deleted.successTitle'),
+				description: translate('collab-section.notifications.deleted.successMessage', {
 					firstName: data[0]?.collaboratorFirstName,
 				}),
 			});

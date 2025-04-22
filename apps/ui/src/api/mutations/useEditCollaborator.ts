@@ -17,16 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
 import { type CollaboratorUpdateRecord, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 
 const useEditCollaborator = () => {
 	const { t: translate } = useTranslation();
+	const notification = useNotificationContext();
+
 	return useMutation<
 		ListCollaboratorResponse,
 		Error,
@@ -63,12 +65,14 @@ const useEditCollaborator = () => {
 		},
 		onError: (error) => {
 			if (error.message === 'DUPLICATE') {
-				notification.error({
-					message: translate('collab-section.notifications.duplicate.duplicateCollaboratorTitle'),
-					description: translate('collab-section.notifications.duplicate.duplicateCollaborator'),
+				notification.openNotification({
+					type: 'error',
+					message: translate('collab-section.notifications.duplicate.duplicateTitle'),
+					description: translate('collab-section.notifications.duplicate.duplicateMessage'),
 				});
 			} else {
-				notification.error({
+				notification.openNotification({
+					type: 'error',
 					message: translate('errors.generic.title'),
 					description: translate('errors.generic.message'),
 				});
@@ -85,9 +89,10 @@ const useEditCollaborator = () => {
 					return value;
 				});
 			});
-			notification.success({
-				message: translate('collab-section.notifications.edit.successfullyUpdatedTitle'),
-				description: translate('collab-section.notifications.edit.successfullyUpdated', {
+			notification.openNotification({
+				type: 'success',
+				message: translate('collab-section.notifications.edit.successTitle'),
+				description: translate('collab-section.notifications.edit.successMessage', {
 					firstName: data[0]?.collaboratorFirstName,
 				}),
 			});
