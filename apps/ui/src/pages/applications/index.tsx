@@ -85,7 +85,11 @@ const ApplicationViewer = () => {
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<ApplicationViewerHeader id={applicationData.id} state={applicationData.state} />
+				<ApplicationViewerHeader
+					currentSection={currentSection}
+					id={applicationData.id}
+					state={applicationData.state}
+				/>
 				{/* Multipart form Viewer */}
 				<Flex style={{ width: '100%', paddingInline: '52px' }}>
 					<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
