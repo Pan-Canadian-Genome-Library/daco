@@ -242,7 +242,7 @@ const Ethics = () => {
 													removeIcon: <CloseOutlined />,
 												}}
 											>
-												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
+												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode || !!data?.length}>
 													{translate('button.upload')}
 												</Button>
 											</Upload>
