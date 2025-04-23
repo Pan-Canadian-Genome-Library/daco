@@ -40,7 +40,6 @@ import {
 	type ApplicationStateTotals,
 	type JoinedApplicationRecord,
 } from '@/service/types.ts';
-import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ApplicationDTO, ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
 import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
@@ -722,13 +721,7 @@ applicationRouter.post(
 			const result = await withdrawApplication({ applicationId });
 
 			if (result.success) {
-				const dtoFriendlyData = convertToBasicApplicationRecord(result.data);
-
-				if (!dtoFriendlyData.success) {
-					throw new Error(dtoFriendlyData.message);
-				} else {
-					response.status(200).json(dtoFriendlyData.data);
-				}
+				response.status(200).json(result.data);
 				return;
 			}
 

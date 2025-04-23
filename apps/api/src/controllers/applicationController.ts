@@ -27,9 +27,13 @@ import {
 	type JoinedApplicationRecord,
 	type RevisionRequestModel,
 } from '@/service/types.js';
-import { convertToApplicationContentsRecord, convertToApplicationRecord } from '@/utils/aliases.js';
+import {
+	convertToApplicationContentsRecord,
+	convertToApplicationRecord,
+	convertToBasicApplicationRecord,
+} from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
-import type { ApplicationResponseData, ApproveApplication } from '@pcgl-daco/data-model';
+import type { ApplicationDTO, ApplicationResponseData, ApproveApplication } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
@@ -507,7 +511,7 @@ export const withdrawApplication = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -532,7 +536,13 @@ export const withdrawApplication = async ({
 			);
 		}
 
-		return withdrawalRequest;
+		if (!withdrawalRequest.success) {
+			return withdrawalRequest;
+		}
+
+		const dtoFriendlyData = convertToBasicApplicationRecord(withdrawalRequest.data);
+
+		return dtoFriendlyData;
 	} catch (error) {
 		const message = `Unable to withdraw application with id: ${applicationId}`;
 		logger.error(message, error);
