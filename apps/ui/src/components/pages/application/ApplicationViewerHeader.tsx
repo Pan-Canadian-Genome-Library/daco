@@ -40,6 +40,7 @@ type AppHeaderProps = {
 	id: number;
 	state: ApplicationStateValues;
 	currentSection: string;
+	isEditMode: boolean;
 };
 
 export interface RevisionModalStateProps {
@@ -48,7 +49,7 @@ export interface RevisionModalStateProps {
 	onSubmit: (data: RevisionsModalSchemaType) => void;
 }
 
-const ApplicationViewerHeader = ({ id, state, currentSection }: AppHeaderProps) => {
+const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -61,7 +62,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection }: AppHeaderProps) 
 	const { mutateAsync: withdrawApplication, isPending: isWithdrawing } = useWithdrawApplication();
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
-	const canShowEdit = state === ApplicationStates.DRAFT || isWithdrawable;
+	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
 
 	const navigate = useNavigate();
 
