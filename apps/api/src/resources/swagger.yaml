@@ -918,7 +918,7 @@ paths:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
         '403':
-          description: Unauthorized - requester lacks permission to withdraw the application in its current state.
+          description: Unauthorized - You do not own, or have the correct permissions to modify the application.
           content:
             application/json:
               schema:
