@@ -23,10 +23,10 @@ import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { ApplicationStates, ApplicationStateValues, RevisionsDTO } from '@pcgl-daco/data-model';
-import { SectionRoutesValues, VerifyPageRevisionType } from '@pcgl-daco/validation';
+import { SectionRevision } from '@pcgl-daco/validation';
 
 const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStateValues) => {
-	return useQuery<Partial<VerifyPageRevisionType<SectionRoutesValues>>, ServerError>({
+	return useQuery<Partial<SectionRevision>, ServerError>({
 		queryKey: [`revisions-${id}`],
 		retry: 0,
 		enabled: state !== undefined,
@@ -40,7 +40,7 @@ const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStat
 				state === ApplicationStates.DAC_REVISIONS_REQUESTED;
 
 			return await response.json().then((data: RevisionsDTO[]) => {
-				const result: Partial<VerifyPageRevisionType<SectionRoutesValues>> = {
+				const result: Partial<SectionRevision> = {
 					applicant: {
 						isApproved: revisionDependant ? data[0]?.applicantApproved : undefined,
 						comment: data[0]?.applicantNotes ?? null,

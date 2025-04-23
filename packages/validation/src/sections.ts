@@ -37,6 +37,8 @@ export type RevisionType = {
 	comment: string | null;
 };
 
-export type VerifyPageRevisionType<T extends string> = {
+export type VerifySectionRevisionType<T extends string> = {
 	[section in T]: RevisionType;
 };
+
+export type SectionRevision = VerifySectionRevisionType<SectionRoutesValues>;
