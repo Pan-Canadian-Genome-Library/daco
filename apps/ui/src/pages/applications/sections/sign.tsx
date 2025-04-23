@@ -20,18 +20,24 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { esignatureSchema, type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router';
+import { useNavigate, useOutletContext } from 'react-router';
+import SignatureCanvas from 'react-signature-canvas';
 
+import useCreateSignature from '@/api/mutations/useCreateSignature';
 import useSubmitApplication from '@/api/mutations/useSubmitApplication';
+import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { type ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useUserContext } from '@/providers/UserProvider';
 
 const { Text } = Typography;
 
@@ -39,18 +45,34 @@ const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const [openModal, setOpenModal] = useState(false);
-	const signatureRef = useRef(null);
+	const {
+		state: { fields },
+	} = useApplicationContext();
+	const navigation = useNavigate();
+	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
-	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset } = useForm<eSignatureSchemaType>({
-		resolver: zodResolver(esignatureSchema),
-	});
+	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset, getValues } =
+		useForm<eSignatureSchemaType>({
+			resolver: zodResolver(esignatureSchema),
+		});
+	const { mutateAsync: createSignature } = useCreateSignature();
+	const { data, isLoading } = useGetSignatures({ applicationId: appId });
+	const { role } = useUserContext();
 
-	const onSubmit: SubmitHandler<eSignatureSchemaType> = (data) => {
+	const onSubmit: SubmitHandler<eSignatureSchemaType> = () => {
 		setOpenModal(true);
 	};
 
-	const onSaveClicked = () => {
-		console.log('saved');
+	const onSaveClicked = async () => {
+		const signature = getValues('signature');
+
+		if (signature) {
+			await createSignature({ applicationId: appId, signature }).then(() => {
+				if (signatureRef.current) {
+					signatureRef.current.clear();
+				}
+			});
+		}
 	};
 
 	const modalSubmission = () => {
@@ -59,7 +81,31 @@ const SignAndSubmit = () => {
 		});
 	};
 
+	// TODO: we have institutional rep signatures to be implemented. Currently only allows APPLICANT roles
+	useEffect(() => {
+		if (data && data.applicantSignature && signatureRef.current) {
+			signatureRef.current.fromDataURL(data.applicantSignature);
+			setValue('signature', data.applicantSignature);
+		}
+	}, [data, setValue]);
+
+	// Push user back to intro if they did not complete/fix all the sections
+	useEffect(() => {
+		if (!ValidateAllSections(fields)) {
+			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
+		}
+	}, [appId, fields, isEditMode, navigation]);
+
 	const watchSignature = watch('signature');
+
+	// - differentiate between which signature we are validating against as we have two different types of signatures
+	// - ensure the local signature is synced with saved api signature
+	const determineSignatureDisabled = () => {
+		if (role === 'APPLICANT') {
+			return data?.applicantSignature !== getValues('signature');
+		}
+		return data?.institutionalRepSignature !== getValues('signature');
+	};
 
 	return (
 		<>
@@ -78,27 +124,34 @@ const SignAndSubmit = () => {
 						<Row>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 								<input disabled type="hidden" name="createdAt" />
-								<ESignature
-									disabled={!isEditMode}
-									signatureRef={signatureRef}
-									name="signature"
-									control={control}
-									watch={watch}
-									formState={formState}
-									setValue={setValue}
-									reset={reset}
-									clearErrors={clearErrors}
-									disableSaveButton={!watchSignature}
-									onSaveClicked={onSaveClicked}
-									downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
-									saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
-									clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
-								/>
+								{!isLoading ? (
+									<ESignature
+										disabled={!isEditMode}
+										signatureRef={signatureRef}
+										name="signature"
+										control={control}
+										watch={watch}
+										formState={formState}
+										setValue={setValue}
+										reset={reset}
+										clearErrors={clearErrors}
+										disableSaveButton={!watchSignature || !isEditMode}
+										onSaveClicked={onSaveClicked}
+										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
+										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
+										clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
+									/>
+								) : null}
 							</Col>
 						</Row>
 						<Row style={{ minHeight: '40vh' }} />
 					</SectionContent>
-					<SectionFooter currentRoute="sign" isEditMode={isEditMode} signSubmitHandler={handleSubmit(onSubmit)} />
+					<SectionFooter
+						currentRoute="sign"
+						isEditMode={isEditMode}
+						signSubmitHandler={handleSubmit(onSubmit)}
+						submitDisabled={determineSignatureDisabled() || !isEditMode}
+					/>
 				</Form>
 			</SectionWrapper>
 			<Modal

@@ -16,54 +16,41 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { withErrorResponseHandler } from '@/api/apiUtils';
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
+import { type ApplicationResponseData } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-
-import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
-import { queryClient } from '@/providers/Providers';
-import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from '../apiUtils';
-
-const useDeleteCollaborator = () => {
-	const { t: translate } = useTranslation();
+const useCloseApplication = () => {
 	const notification = useNotificationContext();
+	const { t: translate } = useTranslation();
 
-	return useMutation<
-		ListCollaboratorResponse,
-		ServerError,
-		{ applicationId: number | string; collaboratorId: number | string }
-	>({
-		mutationFn: async ({ applicationId, collaboratorId }) => {
-			const response = await fetch(`/collaborators/${applicationId}/${collaboratorId}`, {
-				method: 'DELETE',
+	return useMutation<ApplicationResponseData, ServerError, { applicationId?: string | number }>({
+		mutationFn: async ({ applicationId }) => {
+			const response = await fetch(`/applications/${applicationId}/close`, {
+				method: 'POST',
 			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
-		onError: (error) => {
-			notification.openNotification({
-				type: 'error',
-				message: translate('errors.generic.title'),
-				description: error.message,
-			});
-		},
-		onSuccess: async (data) => {
-			//  Update the cache if the delete collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
-				return prev.filter((value) => value.id !== data[0]?.id);
-			});
+		onSuccess: (data, applicationId) => {
 			notification.openNotification({
 				type: 'success',
-				message: translate('collab-section.notifications.deleted.successTitle'),
-				description: translate('collab-section.notifications.deleted.successMessage', {
-					firstName: data[0]?.collaboratorFirstName,
+				message: translate('modals.closeApplication.notifications.closeApplicationSuccess', {
+					id: applicationId.applicationId,
 				}),
+			});
+		},
+		onError: (applicationId) => {
+			notification.openNotification({
+				type: 'error',
+				message: translate('modals.closeApplication.notifications.closeApplicationFailed'),
 			});
 		},
 	});
 };
 
-export default useDeleteCollaborator;
+export default useCloseApplication;
