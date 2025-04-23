@@ -22,17 +22,8 @@ import { useQuery } from '@tanstack/react-query';
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationStates, ApplicationStateValues, RevisionsDTO } from '@pcgl-daco/data-model';
-
-export type RevisionType = {
-	isApproved: boolean | undefined;
-	comment: string | null;
-};
-
-export type VerifyPageRevisionType<T extends string> = {
-	[section in T]: RevisionType;
-};
+import { SectionRoutesValues, VerifyPageRevisionType } from '@pcgl-daco/validation';
 
 const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStateValues) => {
 	return useQuery<Partial<VerifyPageRevisionType<SectionRoutesValues>>, ServerError>({

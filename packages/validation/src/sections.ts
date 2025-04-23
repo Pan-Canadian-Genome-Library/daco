@@ -17,13 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './modals/rejectApplicationModal.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './sections.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+export const SectionRoutes = {
+	INTRO: 'intro',
+	APPLICANT: 'applicant',
+	INSTITUTIONAL: 'institutional',
+	COLLABORATORS: 'collaborators',
+	PROJECT: 'project',
+	STUDY: 'study',
+	ETHICS: 'ethics',
+	AGREEMENT: 'agreement',
+	APPENDICES: 'appendices',
+	SIGN: 'sign',
+} as const;
+
+export type SectionRoutesValues = (typeof SectionRoutes)[keyof typeof SectionRoutes];
+
+export type RevisionType = {
+	isApproved: boolean | undefined;
+	comment: string | null;
+};
+
+export type VerifyPageRevisionType<T extends string> = {
+	[section in T]: RevisionType;
+};

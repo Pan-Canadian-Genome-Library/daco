@@ -22,12 +22,12 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/mutations/useEditApplication';
-import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback';
 import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
-import { ApplicationSectionRoutes, SectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
+import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { SectionRoutes, SectionRoutesValues, VerifyPageRevisionType } from '@pcgl-daco/validation';
 import { ValidateAllSections } from './utils/validatorFunctions';
 
 type SectionMenuProps = {
@@ -44,7 +44,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions }: SectionMe
 	const { data, isLoading } = useGetCollaborators(appId);
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
-		if (state?.formState?.isDirty) {
+		if (state?.formState.isDirty) {
 			editApplication({ id: appId });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
