@@ -26,7 +26,6 @@ import ApplicationViewerHeader from '@/components/pages/application/ApplicationV
 import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/queries/useGetApplication';
-import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
@@ -47,13 +46,6 @@ const ApplicationViewer = () => {
 		isLoading: applicationIsLoading,
 	} = useGetApplication(params.id);
 
-	const {
-		data: revisionsData,
-		isError: revisionsIsErrored,
-		error: revisionsError,
-		isLoading: revisionsLoading,
-	} = useGetApplicationFeedback(params.id, applicationData?.state);
-
 	useEffect(() => {
 		if (applicationData && !applicationError) {
 			const isNotInEditLifecycle =
@@ -72,15 +64,8 @@ const ApplicationViewer = () => {
 		window.scrollTo(0, 0);
 	}, [match]);
 
-	if (
-		!applicationData ||
-		!revisionsData ||
-		applicationIsErrored ||
-		applicationIsLoading ||
-		revisionsLoading ||
-		revisionsIsErrored
-	)
-		return <ErrorPage loading={applicationIsLoading || revisionsLoading} error={applicationError || revisionsError} />;
+	if (!applicationData || applicationIsErrored || applicationIsLoading)
+		return <ErrorPage loading={applicationIsLoading} error={applicationError} />;
 
 	return (
 		<Content>
@@ -97,12 +82,7 @@ const ApplicationViewer = () => {
 						<>
 							<Row style={{ width: '25%' }}>
 								<Col style={{ width: '100%' }}>
-									<SectionMenu
-										appId={applicationData.id}
-										currentSection={currentSection}
-										isEditMode={isEditMode}
-										revisions={revisionsData}
-									/>
+									<SectionMenu appId={applicationData.id} currentSection={currentSection} isEditMode={isEditMode} />
 								</Col>
 							</Row>
 							<Row style={{ width: '75%' }}>
@@ -111,7 +91,6 @@ const ApplicationViewer = () => {
 										context={{
 											appId: applicationData.id,
 											isEditMode,
-											revisions: revisionsData,
 											state: applicationData.state,
 										}}
 									/>
