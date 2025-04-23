@@ -35,8 +35,8 @@ import {
 	isProjectKey,
 	isRequestedStudies,
 } from '@/components/pages/application/utils/validatorKeys';
-import { SectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
+import { SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 
 export type VerifyPageSectionsType<T extends string> = {
 	[section in T]: boolean;

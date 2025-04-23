@@ -17,41 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { SectionRoutesValues } from '@pcgl-daco/validation';
-import { Form } from 'antd';
-import { useEffect } from 'react';
+export const SectionRoutes = {
+	INTRO: 'intro',
+	APPLICANT: 'applicant',
+	INSTITUTIONAL: 'institutional',
+	COLLABORATORS: 'collaborators',
+	PROJECT: 'project',
+	STUDY: 'study',
+	ETHICS: 'ethics',
+	AGREEMENT: 'agreement',
+	APPENDICES: 'appendices',
+	SIGN: 'sign',
+} as const;
 
-interface Props {
-	section: SectionRoutesValues;
-	sectionVisited: boolean;
-}
+export type SectionRoutesValues = (typeof SectionRoutes)[keyof typeof SectionRoutes];
 
-// custom hook for Antd form related logic
-export const useSectionForm = ({ section, sectionVisited = false }: Props) => {
-	const { dispatch } = useApplicationContext();
-	const [form] = Form.useForm();
+export type RevisionType = {
+	isApproved: boolean | undefined;
+	comment: string | null;
+};
 
-	/**
-	 * Trigger error validation on revisit to the section
-	 * NOTE: Eslint is disabled because for this specific instance, we actually want old state and dont want the useEffect to rerun after the dispatch.
-	 */
-	useEffect(() => {
-		if (sectionVisited) {
-			form.validateFields();
-		}
-
-		return () => {
-			dispatch({
-				type: 'UPDATE_SECTION_VISITED',
-				payload: {
-					[`${section}`]: true,
-				},
-			});
-		};
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	return form;
+export type VerifyPageRevisionType<T extends string> = {
+	[section in T]: RevisionType;
 };
