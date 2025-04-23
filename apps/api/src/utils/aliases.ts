@@ -18,6 +18,7 @@
  */
 
 import {
+	ApplicationRecord,
 	type ApplicationContentUpdates,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
@@ -26,6 +27,7 @@ import {
 	type RevisionRequestModel,
 } from '@/service/types.js';
 import {
+	type ApplicationDTO,
 	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
 	type FilesDTO,
@@ -34,6 +36,7 @@ import {
 } from '@pcgl-daco/data-model';
 import {
 	applicationResponseSchema,
+	basicApplicationResponseSchema,
 	fileResponseSchema,
 	revisionDataResponseSchema,
 	signatureResponseSchema,
@@ -42,6 +45,22 @@ import {
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
 import { failure, Result, success } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
+
+/** Converts database Application Record into camelCase response record
+ * @param data Joined Application Record - Snake case database Application / ApplicationContents record
+ * @returns ApplicationResponseData - Application record with updated keys
+ */
+export const convertToBasicApplicationRecord = (data: ApplicationRecord): Result<ApplicationDTO, 'SYSTEM_ERROR'> => {
+	const aliasedRecord = objectToCamel(data);
+	const validationResult = basicApplicationResponseSchema.safeParse(aliasedRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToBasicApplicationRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
 
 /** Converts database Application Record + Contents into camelCase response record
  * @param data Joined Application Record - Snake case database Application / ApplicationContents record
