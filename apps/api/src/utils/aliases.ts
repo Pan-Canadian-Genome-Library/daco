@@ -18,16 +18,16 @@
  */
 
 import {
-	ApplicationRecord,
 	type ApplicationContentUpdates,
+	type ApplicationRecord,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
 	type FilesRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
 import {
-	ApplicationDTO,
-	ApplicationResponseData,
+	type ApplicationDTO,
+	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
 	type FilesDTO,
 	type SignatureDTO,
