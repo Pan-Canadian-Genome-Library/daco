@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
+import useWithdrawApplication from '@/api/mutations/useWithdrawApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
@@ -57,6 +58,8 @@ const ApplicationViewerHeader = ({ id, state, currentSection }: AppHeaderProps) 
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
+	const { mutateAsync: withdrawApplication, isPending: isWithdrawing } = useWithdrawApplication();
+
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 	const canShowEdit = state === ApplicationStates.DRAFT || isWithdrawable;
 
@@ -74,6 +77,13 @@ const ApplicationViewerHeader = ({ id, state, currentSection }: AppHeaderProps) 
 		closeApplication({ applicationId: id }).then(() => {
 			setOpenRevisionsModal(false);
 			navigate('/dashboard');
+		});
+	};
+
+	const handleWithdrawApplication = () => {
+		withdrawApplication({ applicationId: id }).then(() => {
+			setShowEditModal(false);
+			navigate(`${currentSection}/edit`, { replace: true });
 		});
 	};
 
@@ -154,7 +164,11 @@ const ApplicationViewerHeader = ({ id, state, currentSection }: AppHeaderProps) 
 					width={'100%'}
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 					open={showEditModal}
+					onOk={handleWithdrawApplication}
 					okType="default"
+					okButtonProps={{
+						disabled: isWithdrawing,
+					}}
 					cancelButtonProps={{
 						type: 'primary',
 					}}
