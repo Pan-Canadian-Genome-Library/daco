@@ -86,6 +86,7 @@ const ApplicationViewer = () => {
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
 				<ApplicationViewerHeader
+					isEditMode={isEditMode}
 					currentSection={currentSection}
 					id={applicationData.id}
 					state={applicationData.state}
