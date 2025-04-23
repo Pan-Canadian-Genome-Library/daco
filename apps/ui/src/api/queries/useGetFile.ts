@@ -37,7 +37,7 @@ const useGetFile = ({ fileId }: { fileId?: number | null }) => {
 					uid: `${result?.id}`,
 					name: `${result?.filename}`,
 					status: 'done',
-					url: '/', // Shows our primary link colour when retrieving the file.
+					url: '#', // Shows our primary link colour when retrieving the file.
 					response: result,
 				},
 			];
