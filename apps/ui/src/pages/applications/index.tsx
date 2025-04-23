@@ -91,7 +91,6 @@ const ApplicationViewer = () => {
 										context={{
 											appId: applicationData.id,
 											isEditMode,
-											state: applicationData.state,
 										}}
 									/>
 								</Col>
