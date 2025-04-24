@@ -18,7 +18,7 @@
  */
 
 import useCreateApplication from '@/api/mutations/useCreateApplication';
-import { Button, Card, Flex, theme, Typography } from 'antd';
+import { Card, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
@@ -30,13 +30,49 @@ const NewApplicationCard = () => {
 
 	const { mutate: createNewApplication } = useCreateApplication();
 
+	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+		/**
+		 * For keyboard navigation we need to make sure we abide by AIRA best practices. Check for the
+		 * enter key or the space bar.
+		 *
+		 * See for more info: https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/
+		 */
+		if (('key' in event && (event.key === 'Enter' || event.key === ' ')) || event.type === 'click') {
+			event.stopPropagation();
+			createNewApplication();
+		}
+	};
+
 	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200 }} hoverable>
-			<Flex justify="center" align="center" vertical gap="middle">
-				<Title level={3}>{translate('dashboard.startNewApp')}</Title>
-				<Button color="default" variant="outlined" onClick={() => createNewApplication()}>
-					{translate('button.getStarted')}
-				</Button>
+		<Card
+			tabIndex={0} //Required for making the cards keyboard navigable
+			onClick={handleCardClick}
+			onKeyDown={handleCardClick}
+			hoverable
+			styles={{
+				body: {
+					height: '100%',
+				},
+			}}
+			style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200 }}
+		>
+			<Flex
+				justify="center"
+				align="center"
+				vertical
+				style={{
+					height: '100%',
+					width: '100%',
+				}}
+			>
+				<Title
+					style={{
+						margin: 0,
+					}}
+					level={3}
+				>
+					{translate('dashboard.startNewApp')}
+				</Title>
 			</Flex>
 		</Card>
 	);
