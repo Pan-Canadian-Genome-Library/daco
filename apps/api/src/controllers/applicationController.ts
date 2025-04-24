@@ -33,6 +33,7 @@ import {
 	convertToRevisionsRecord,
 } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
+import { validateRevisedFields } from '@/utils/validation.ts';
 import type { ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -96,6 +97,26 @@ export const editApplication = async ({
 		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
 		return failure('INVALID_STATE_TRANSITION', message);
+	}
+
+	// If the application state is in revision, then we need to verify that only fields that require revision has been sent to the backend
+	if (shouldKeepState) {
+		const revisionsResult = await getRevisions({ applicationId: id });
+		if (!revisionsResult.success) {
+			return revisionsResult;
+		}
+
+		if (!revisionsResult.data[0]) {
+			const message = `Cannot verify most recent application revision data`;
+
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		if (!validateRevisedFields(update, revisionsResult.data[0])) {
+			const message = `Upload data contains illegal fields`;
+
+			return failure('SYSTEM_ERROR', message);
+		}
 	}
 
 	const formattedResult = convertToApplicationContentsRecord(update);
