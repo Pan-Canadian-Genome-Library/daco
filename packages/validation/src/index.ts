@@ -22,6 +22,7 @@ export * from './modals/rejectApplicationModal.js';
 export * from './modals/requestRevisionsModal.js';
 export * from './routes/index.js';
 export * from './schemas.js';
+export * from './section/sectionKeys.js';
 export * from './section/sections.js';
 export * from './types.js';
 export * from './user.js';
