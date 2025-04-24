@@ -28,8 +28,8 @@ import {
 	GenerateEmailApplicantAppSubmittedPlain,
 } from './layouts/templates/EmailApplicantAppSubmitted.ts';
 import {
-	GenerateEmailApplicanRepRevision,
-	GenerateEmailApplicanRepRevisionPlain,
+	GenerateEmailApplicantRepRevision,
+	GenerateEmailApplicantRepRevisionPlain,
 } from './layouts/templates/EmailApplicantRepRevision.ts';
 import {
 	GenerateEmailApplicantRevision,
@@ -117,14 +117,14 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_REVISION,
-				html: GenerateEmailApplicanRepRevision({
+				html: GenerateEmailApplicantRepRevision({
 					id,
 					applicantName,
 					institutionalRepFirstName,
 					institutionalRepLastName,
 					comments,
 				}),
-				text: GenerateEmailApplicanRepRevisionPlain({
+				text: GenerateEmailApplicantRepRevisionPlain({
 					id,
 					applicantName,
 					institutionalRepFirstName,

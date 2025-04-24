@@ -24,7 +24,7 @@ import { basicLayout } from '../renderBaseHtml.ts';
 const defaultRevisionText = 'No revisions needed';
 
 // TODO: english and french translations
-export const GenerateEmailApplicanRepRevision = ({
+export const GenerateEmailApplicantRepRevision = ({
 	id,
 	applicantName,
 	institutionalRepFirstName,
@@ -82,7 +82,7 @@ export const GenerateEmailApplicanRepRevision = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApplicanRepRevisionPlain = ({
+export const GenerateEmailApplicantRepRevisionPlain = ({
 	id,
 	applicantName,
 	institutionalRepFirstName,
