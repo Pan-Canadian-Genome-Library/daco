@@ -103,6 +103,26 @@ export const editApplication = async ({
 		return failure('INVALID_STATE_TRANSITION', message);
 	}
 
+	// If the application state is in revision, then we need to verify that only fields that require revision has been sent to the backend
+	if (shouldKeepState) {
+		const revisionsResult = await getRevisions({ applicationId: id });
+		if (!revisionsResult.success) {
+			return revisionsResult;
+		}
+
+		if (!revisionsResult.data[0]) {
+			const message = `Cannot verify most recent application revision data`;
+
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		if (!validateRevisedFields(update, revisionsResult.data[0])) {
+			const message = `Upload data contains illegal fields`;
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	}
+
 	const formattedResult = convertToApplicationContentsRecord(update);
 
 	if (!formattedResult.success) return formattedResult;

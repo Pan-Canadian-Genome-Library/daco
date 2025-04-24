@@ -17,6 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationContentsResponse, RevisionsDTO } from '@pcgl-daco/data-model';
+import {
+	isAgreementKey,
+	isAppendicesKey,
+	isApplicantKey,
+	isEthicsKey,
+	isInstitutionalKey,
+	isProjectKey,
+	isRequestedStudies,
+} from '@pcgl-daco/validation';
 import { z } from 'zod';
 
 const apiZodErrorMapping: z.ZodErrorMap = (issue, ctx) => {
@@ -39,4 +49,35 @@ const apiZodErrorMapping: z.ZodErrorMap = (issue, ctx) => {
 	return { message: ctx.defaultError };
 };
 
-export { apiZodErrorMapping };
+/**
+ *
+ * @param fields ApplicationContent fields sent from the frontend
+ * @param revisions Most recent revision data
+ * @returns true or false if fields contains a key that is not apart of the revisions
+ */
+const validateRevisedFields = (fields: ApplicationContentsResponse, revisions: RevisionsDTO): boolean => {
+	const result = Object.entries(fields).every((item) => {
+		const [key, _] = item;
+
+		if (!revisions.applicantApproved && isApplicantKey(key)) {
+			return true;
+		} else if (!revisions.institutionRepApproved && isInstitutionalKey(key)) {
+			return true;
+		} else if (!revisions.projectApproved && isProjectKey(key)) {
+			return true;
+		} else if (!revisions.ethicsApproved && isEthicsKey(key)) {
+			return true;
+		} else if (!revisions.agreementsApproved && isAgreementKey(key)) {
+			return true;
+		} else if (!revisions.appendicesApproved && isAppendicesKey(key)) {
+			return true;
+		} else if (!revisions.requestedStudiesApproved && isRequestedStudies(key)) {
+			return true;
+		}
+		return false;
+	});
+
+	return result;
+};
+
+export { apiZodErrorMapping, validateRevisedFields };
