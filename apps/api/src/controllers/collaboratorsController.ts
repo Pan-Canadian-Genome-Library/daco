@@ -26,7 +26,6 @@ import { failure, success, type AsyncResult } from '@/utils/results.js';
 import {
 	type CollaboratorDTO,
 	type CollaboratorsResponseDTO,
-	type CollaboratorUpdateRecord,
 	type ListCollaboratorResponse,
 } from '@pcgl-daco/data-model';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
@@ -74,24 +73,6 @@ export const createCollaborators = async ({
 	if (!canEditResult.success) {
 		return canEditResult;
 	}
-
-	// const hasDuplicateRecords = collaborators.some((collaborator, index) => {
-	// 	// TODO: duplicate for collaborators should be by application + email
-	// 	const matchingRecord = collaborators.find(
-	// 		(record, searchIndex) =>
-	// 			searchIndex !== index &&
-	// 			record.collaboratorFirstName === collaborator.collaboratorFirstName &&
-	// 			record.collaboratorLastName === collaborator.collaboratorLastName &&
-	// 			record.collaboratorInstitutionalEmail === collaborator.collaboratorInstitutionalEmail,
-	// 	);
-
-	// 	return matchingRecord;
-	// });
-
-	// if (hasDuplicateRecords) {
-	// 	// TODO: List the duplicate records.
-	// 	return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-	// }
 
 	const newCollaborators: CollaboratorModel[] = collaborators.map((data) => ({
 		first_name: data.collaboratorFirstName,
@@ -207,7 +188,7 @@ export const updateCollaborator = async ({
 }: {
 	application_id: number;
 	user_id: string;
-	collaboratorUpdates: CollaboratorUpdateRecord;
+	collaboratorUpdates: CollaboratorDTO;
 }): AsyncResult<
 	CollaboratorsResponseDTO[],
 	'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_STATE_TRANSITION' | 'FORBIDDEN' | 'DUPLICATE_RECORD'
@@ -242,20 +223,7 @@ export const updateCollaborator = async ({
 		return collaboratorsListResult;
 	}
 
-	// const hasDuplicateRecords = collaboratorsListResult.data.some((collaborator) => {
-	// 	return (
-	// 		collaboratorUpdates.collaboratorFirstName === collaborator.first_name &&
-	// 		collaboratorUpdates.collaboratorLastName === collaborator.last_name &&
-	// 		collaboratorUpdates.collaboratorInstitutionalEmail === collaborator.institutional_email
-	// 	);
-	// });
-
-	// if (hasDuplicateRecords) {
-	// 	// TODO: List the duplicate records.
-	// 	return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-	// }
-
-	const { id } = collaboratorUpdates;
+	const { collaboratorInstitutionalEmail } = collaboratorUpdates;
 
 	const collaborator: Partial<CollaboratorModel> = {
 		first_name: collaboratorUpdates.collaboratorFirstName,
@@ -270,7 +238,8 @@ export const updateCollaborator = async ({
 	};
 
 	const updateResult = await collaboratorsRepo.updateCollaborator({
-		id,
+		email: collaboratorInstitutionalEmail,
+		applicationId: application_id,
 		collaborator,
 	});
 

@@ -47,7 +47,7 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 });
 
 export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaboratorUpdates: collaboratorsSchema.partial().extend({ id: z.number() }),
+	collaboratorUpdates: collaboratorsSchema,
 });
 
 export const collaboratorsListParamsSchema = z
