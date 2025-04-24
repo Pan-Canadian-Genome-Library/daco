@@ -21,7 +21,7 @@ import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import BaseLogger from '@/logger.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { type CollaboratorModel, type CollaboratorRecord } from './types.js';
 
 const logger = BaseLogger.forModule('collaboratorsService');
@@ -33,32 +33,32 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		newCollaborators: CollaboratorModel[];
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
-			// Check for Duplicates
-			let hasDuplicateCollaborators = false;
+			// // Check for Duplicates
+			// let hasDuplicateCollaborators = false;
 
-			// TODO: Duplicate check needs to be on institutional_email + application_id as the primary identifier, not the entire record.
-			//       This may be enforceable from the DB (composite PK).
-			for await (const collaborator of newCollaborators) {
-				const countExistingCollaborator = await db.$count(
-					collaborators,
-					and(
-						eq(collaborators.first_name, collaborator.first_name),
-						eq(collaborators.last_name, collaborator.last_name),
-						eq(collaborators.institutional_email, collaborator.institutional_email),
-						collaborator.position_title ? eq(collaborators.position_title, collaborator.position_title) : undefined,
-						eq(collaborators.application_id, collaborator.application_id),
-					),
-				);
+			// // TODO: Duplicate check needs to be on institutional_email + application_id as the primary identifier, not the entire record.
+			// //       This may be enforceable from the DB (composite PK).
+			// for await (const collaborator of newCollaborators) {
+			// 	const countExistingCollaborator = await db.$count(
+			// 		collaborators,
+			// 		and(
+			// 			eq(collaborators.first_name, collaborator.first_name),
+			// 			eq(collaborators.last_name, collaborator.last_name),
+			// 			eq(collaborators.institutional_email, collaborator.institutional_email),
+			// 			collaborator.position_title ? eq(collaborators.position_title, collaborator.position_title) : undefined,
+			// 			eq(collaborators.application_id, collaborator.application_id),
+			// 		),
+			// 	);
 
-				if (countExistingCollaborator > 0) {
-					hasDuplicateCollaborators = true;
-				}
-			}
+			// 	if (countExistingCollaborator > 0) {
+			// 		hasDuplicateCollaborators = true;
+			// 	}
+			// }
 
-			if (hasDuplicateCollaborators) {
-				// TODO: Duplicate record error message should inform which donors are duplicate.
-				return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-			}
+			// if (hasDuplicateCollaborators) {
+			// 	// TODO: Duplicate record error message should inform which donors are duplicate.
+			// 	return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
+			// }
 
 			// Create Collaborators
 			const collaboratorRecords = await db.transaction(async (transaction) => {

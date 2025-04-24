@@ -75,23 +75,23 @@ export const createCollaborators = async ({
 		return canEditResult;
 	}
 
-	const hasDuplicateRecords = collaborators.some((collaborator, index) => {
-		// TODO: duplicate for collaborators should be by application + email
-		const matchingRecord = collaborators.find(
-			(record, searchIndex) =>
-				searchIndex !== index &&
-				record.collaboratorFirstName === collaborator.collaboratorFirstName &&
-				record.collaboratorLastName === collaborator.collaboratorLastName &&
-				record.collaboratorInstitutionalEmail === collaborator.collaboratorInstitutionalEmail,
-		);
+	// const hasDuplicateRecords = collaborators.some((collaborator, index) => {
+	// 	// TODO: duplicate for collaborators should be by application + email
+	// 	const matchingRecord = collaborators.find(
+	// 		(record, searchIndex) =>
+	// 			searchIndex !== index &&
+	// 			record.collaboratorFirstName === collaborator.collaboratorFirstName &&
+	// 			record.collaboratorLastName === collaborator.collaboratorLastName &&
+	// 			record.collaboratorInstitutionalEmail === collaborator.collaboratorInstitutionalEmail,
+	// 	);
 
-		return matchingRecord;
-	});
+	// 	return matchingRecord;
+	// });
 
-	if (hasDuplicateRecords) {
-		// TODO: List the duplicate records.
-		return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-	}
+	// if (hasDuplicateRecords) {
+	// 	// TODO: List the duplicate records.
+	// 	return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
+	// }
 
 	const newCollaborators: CollaboratorModel[] = collaborators.map((data) => ({
 		first_name: data.collaboratorFirstName,
@@ -242,18 +242,18 @@ export const updateCollaborator = async ({
 		return collaboratorsListResult;
 	}
 
-	const hasDuplicateRecords = collaboratorsListResult.data.some((collaborator) => {
-		return (
-			collaboratorUpdates.collaboratorFirstName === collaborator.first_name &&
-			collaboratorUpdates.collaboratorLastName === collaborator.last_name &&
-			collaboratorUpdates.collaboratorInstitutionalEmail === collaborator.institutional_email
-		);
-	});
+	// const hasDuplicateRecords = collaboratorsListResult.data.some((collaborator) => {
+	// 	return (
+	// 		collaboratorUpdates.collaboratorFirstName === collaborator.first_name &&
+	// 		collaboratorUpdates.collaboratorLastName === collaborator.last_name &&
+	// 		collaboratorUpdates.collaboratorInstitutionalEmail === collaborator.institutional_email
+	// 	);
+	// });
 
-	if (hasDuplicateRecords) {
-		// TODO: List the duplicate records.
-		return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-	}
+	// if (hasDuplicateRecords) {
+	// 	// TODO: List the duplicate records.
+	// 	return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
+	// }
 
 	const { id } = collaboratorUpdates;
 

@@ -78,6 +78,13 @@
 			"when": 1744818344620,
 			"tag": "0010_make_collaborators_postition_optional",
 			"breakpoints": true
+		},
+		{
+			"idx": 11,
+			"version": "7",
+			"when": 1745517492938,
+			"tag": "0011_make_appID_email_pk_collaborators",
+			"breakpoints": true
 		}
 	]
 }
