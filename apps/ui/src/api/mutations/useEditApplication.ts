@@ -38,8 +38,9 @@ const useEditApplication = () => {
 		mutationFn: async ({ id, update, revisions }) => {
 			let fields = state.fields;
 
+			// If applications state is in revisions, then send only relevant fields in each sections
 			if (
-				(state.applicationState == 'DAC_REVISIONS_REQUESTED' ||
+				(state.applicationState === 'DAC_REVISIONS_REQUESTED' ||
 					state.applicationState === 'INSTITUTIONAL_REP_REVISION_REQUESTED') &&
 				revisions
 			) {
