@@ -39,7 +39,25 @@
 		"addModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL. This email will also be associated with their access to PCGL Controlled Data.",
 		"editModalTitle": "Edit Collaborator",
 		"editModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL. This email will also be associated with their access to PCGL Controlled Data.",
-		"primaryEmailLabel": "The collaborator must be affiliated with the same institution as the Principal Investigator."
+		"primaryEmailLabel": "The collaborator must be affiliated with the same institution as the Principal Investigator.",
+		"notifications": {
+			"added": {
+				"successTitle": "New Collaborator Added",
+				"successMessage": "{{firstName}} has been added as a collaborator to this Application."
+			},
+			"duplicate": {
+				"duplicateTitle": "Duplicate Collaborator",
+				"duplicateMessage": "This collaborator already exists within this application and cannot be added again. Please edit or delete their entry."
+			},
+			"deleted": {
+				"successTitle": "Collaborator Removed",
+				"successMessage": "{{firstName}} was removed as a collaborator for this Application."
+			},
+			"edit": {
+				"successTitle": "Collaborator Updated",
+				"successMessage": "{{firstName}}'s information was successfully updated."
+			}
+		}
 	},
 	"form": {
 		"firstName": "First Name:",
