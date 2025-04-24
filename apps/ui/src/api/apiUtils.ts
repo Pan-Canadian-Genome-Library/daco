@@ -30,8 +30,8 @@ export const withErrorResponseHandler = (response: Response) => {
 
 		switch (response.status) {
 			case 400:
-				error.message = i18n.t('errors.fetchError.title');
-				error.errors = i18n.t('errors.fetchError.message');
+				error.message = i18n.t('errors.http.400.title');
+				error.errors = i18n.t('errors.http.400.message');
 				break;
 			case 403:
 				error.message = i18n.t('errors.http.403.title');
@@ -45,6 +45,9 @@ export const withErrorResponseHandler = (response: Response) => {
 				error.message = i18n.t('errors.http.500.title');
 				error.errors = i18n.t('errors.http.500.message');
 				break;
+			default:
+				error.message = i18n.t('errors.fetchError.title');
+				error.errors = i18n.t('errors.fetchError.message');
 		}
 
 		throw error;
