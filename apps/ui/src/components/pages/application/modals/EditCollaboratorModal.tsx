@@ -67,7 +67,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 	}, [rowData, reset]);
 
 	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
-		if (!!rowData?.id) {
+		if (rowData?.id) {
 			editCollaborator({
 				applicationId: appId,
 				collaboratorUpdates: { ...data, id: rowData?.id },
@@ -153,7 +153,6 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 									name="collaboratorPositionTitle"
 									control={control}
 									rule={rule}
-									required
 									disabled={!isEditMode}
 								/>
 							</Col>
