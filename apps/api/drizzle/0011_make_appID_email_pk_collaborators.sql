@@ -1,17 +1,10 @@
-/* 
-    Unfortunately in current drizzle-kit version we can't automatically get name for primary key.
-    We are working on making it available!
 
-    Meanwhile you can:
-        1. Check pk name in your database, by running
-            SELECT constraint_name FROM information_schema.table_constraints
-            WHERE table_schema = 'public'
-                AND table_name = 'collaborators'
-                AND constraint_type = 'PRIMARY KEY';
-        2. Uncomment code below and paste pk name manually
-        
-    Hope to release this update as soon as possible
-*/
+/**
+    IMPORTANT NOTE: 
+    
+    This migration will NOT work if there are any existing duplicates with the same email address and application ID in the DB.
+    Please ensure that all duplicates are dealt with prior to running this migration, otherwise this migration will fail.
+**/
 
 ALTER TABLE "collaborators" DROP CONSTRAINT "collaborators_pkey";--> statement-breakpoint
 ALTER TABLE "collaborators" ADD CONSTRAINT "collaborators_application_id_institutional_email_pk" PRIMARY KEY("application_id","institutional_email");

@@ -24,7 +24,6 @@ import { applicationContents } from './applicationContents.ts';
 export const collaborators = pgTable(
 	'collaborators',
 	{
-		id: bigint({ mode: 'number' }).generatedAlwaysAsIdentity(),
 		application_id: bigint({ mode: 'number' }).notNull(),
 		first_name: varchar({ length: 255 }).notNull(),
 		middle_name: varchar({ length: 255 }),
