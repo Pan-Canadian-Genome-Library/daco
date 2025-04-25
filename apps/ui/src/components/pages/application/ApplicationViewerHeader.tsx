@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
+import useRejectApplication from '@/api/mutations/useRejectApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
@@ -54,6 +55,8 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
+	const { mutateAsync: rejectApplication } = useRejectApplication();
+	const [showRejectModal, setShowRejectModal] = useState(false);
 	const navigate = useNavigate();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
@@ -66,6 +69,13 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleCloseApplicationRequest = () => {
 		closeApplication({ applicationId: id }).then(() => {
+			setOpenRevisionsModal(false);
+			navigate('/dashboard');
+		});
+	};
+
+	const handleRejectApplicationRequest = () => {
+		rejectApplication({ applicationId: id }).then(() => {
 			setOpenRevisionsModal(false);
 			navigate('/dashboard');
 		});
@@ -145,6 +155,20 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>
 						<Text>{translate('modals.closeApplication.description')}</Text>
+					</Flex>
+				</Modal>
+				<Modal
+					title={translate('modals.rejectApplication.title', { id })}
+					okText={translate('button.closeApp')}
+					cancelText={translate('modals.buttons.cancel')}
+					width={'100%'}
+					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+					open={showRejectModal}
+					onOk={handleRejectApplicationRequest}
+					onCancel={() => setShowRejectModal(false)}
+				>
+					<Flex style={{ height: '100%', marginTop: 20 }}>
+						<Text>{translate('modals.rejectApplication.description')}</Text>
 					</Flex>
 				</Modal>
 				<RequestRevisionsModal

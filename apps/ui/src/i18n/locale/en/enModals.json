@@ -19,6 +19,14 @@
 				"closeApplicationFailed": "Sorry, there was an unexpected error while closing your application. Please try again later."
 			}
 		},
+		"rejectApplication": {
+			"title": "Are you sure you want to reject Application: PCGL-{{id}}",
+			"description": "Rejected applications cannot be reopened.",
+			"notifications": {
+				"closeApplicationSuccess": "Your application, PCGL-{{id}}, has been rejected.",
+				"closeApplicationFailed": "Sorry, there was an unexpected error while rejecting your application. Please try again later."
+			}
+		},
 		"authorization": {
 			"description": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access."
 		},
