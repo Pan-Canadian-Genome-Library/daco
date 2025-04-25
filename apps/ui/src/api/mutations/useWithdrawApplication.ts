@@ -21,7 +21,7 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
-import { ApplicationDTO } from '@pcgl-daco/data-model';
+import { type ApplicationDTO } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -45,7 +45,7 @@ const useWithdrawApplication = () => {
 			 * Used to invalidate our current application data to pull it fresh from the server,
 			 * we need to do this to have react rerender things in edit mode correctly.
 			 */
-			await queryClient.invalidateQueries({ queryKey: [`${data.id}`] }).then(() => {
+			await queryClient.invalidateQueries({ queryKey: [`Application-${data.id}`] }).then(() => {
 				notification.openNotification({
 					type: 'success',
 					message: translate('modals.editApplication.notifications.successTitle'),

@@ -30,7 +30,7 @@ const useGetApplication = (id?: string | number) => {
 	const { state, dispatch } = useApplicationContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
-		queryKey: [id],
+		queryKey: [`Application-${id}`],
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}`).then(withErrorResponseHandler);
 
