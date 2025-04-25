@@ -45,7 +45,7 @@ const useWithdrawApplication = () => {
 			 * Used to invalidate our current application data to pull it fresh from the server,
 			 * we need to do this to have react rerender things in edit mode correctly.
 			 */
-			await queryClient.invalidateQueries({ queryKey: [`${data.id}`] }).then(() => {
+			await queryClient.invalidateQueries({ queryKey: [`Application-${data.id}`] }).then(() => {
 				notification.openNotification({
 					type: 'success',
 					message: translate('modals.editApplication.notifications.successTitle'),

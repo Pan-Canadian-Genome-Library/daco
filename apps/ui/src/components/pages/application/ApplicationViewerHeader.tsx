@@ -22,7 +22,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
-import useWithdrawApplication from '@/api/mutations/useWithdrawApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
@@ -32,6 +31,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useNavigate } from 'react-router';
+import WithdrawModal from './modals/WithdrawModal';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -59,7 +59,6 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
-	const { mutateAsync: withdrawApplication, isPending: isWithdrawing } = useWithdrawApplication();
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
@@ -78,13 +77,6 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 		closeApplication({ applicationId: id }).then(() => {
 			setOpenRevisionsModal(false);
 			navigate('/dashboard');
-		});
-	};
-
-	const handleWithdrawApplication = () => {
-		withdrawApplication({ applicationId: id }).then(() => {
-			setShowEditModal(false);
-			navigate(`${currentSection}/edit`, { replace: true });
 		});
 	};
 
@@ -158,27 +150,12 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				</Flex>
-				<Modal
-					title={translate('modals.editApplication.title', { id: id })}
-					okText={translate('modals.editApplication.buttons.edit')}
-					cancelText={translate('modals.buttons.cancel')}
-					width={'100%'}
-					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-					open={showEditModal}
-					onOk={handleWithdrawApplication}
-					okType="default"
-					okButtonProps={{
-						disabled: isWithdrawing,
-					}}
-					cancelButtonProps={{
-						type: 'primary',
-					}}
-					onCancel={() => setShowEditModal(false)}
-				>
-					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modals.editApplication.description', { id: id })}</Text>
-					</Flex>
-				</Modal>
+				<WithdrawModal
+					applicationId={id}
+					currentSection={currentSection}
+					showEditModal={showEditModal}
+					setShowEditModal={setShowEditModal}
+				/>
 				<Modal
 					title={translate('modals.closeApplication.title', { id })}
 					okText={translate('button.closeApp')}
