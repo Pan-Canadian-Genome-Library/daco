@@ -25,7 +25,6 @@ import { useNavigate } from 'react-router';
 import useGetApplicationList from '@/api/queries/useGetApplicationList';
 
 import ContentWrapper, { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { mockUserID } from '@/components/mock/applicationMockData';
 import ApplicationStatusBar from '@/components/pages/dashboard/ApplicationStatusBar';
 import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard';
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
@@ -46,7 +45,19 @@ const DashboardPage = () => {
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
 	const navigate = useNavigate();
-	const { data: applicationData, error } = useGetApplicationList({ userId: mockUserID });
+	const { data: applicationData, error } = useGetApplicationList({
+		sort: [
+			{
+				column: 'state',
+				direction: 'desc',
+			},
+			{
+				column: 'updated_at',
+				direction: 'asc',
+			},
+		],
+		pageSize: 100,
+	});
 
 	const showEditApplicationModal = (id: string) => {
 		setModalAppId(id);
