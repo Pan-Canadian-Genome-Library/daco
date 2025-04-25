@@ -99,6 +99,8 @@ export const applicationResponseSchema = z.object({
 	contents: applicationContentsResponseSchema.nullable(),
 });
 
+export const basicApplicationResponseSchema = applicationResponseSchema.omit({ contents: true });
+
 export const revisionDataSchema = z
 	.object({
 		comments: z.string().optional(),

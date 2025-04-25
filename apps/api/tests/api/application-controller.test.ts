@@ -34,6 +34,7 @@ import {
 	revokeApplication,
 	submitApplication,
 	submitRevision,
+	withdrawApplication,
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -330,6 +331,86 @@ describe('Application API', () => {
 		});
 	});
 
+	describe('Withdraw Application', () => {
+		it('should withdraw an application in DAC_REVIEW state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DAC_REVIEW },
+			});
+			const result = await withdrawApplication({ applicationId: testApplicationId });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.DRAFT);
+		});
+
+		it('should withdraw an application in INSTITUTIONAL_REP_REVIEW state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW },
+			});
+			const result = await withdrawApplication({ applicationId: testApplicationId });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.state, ApplicationStates.DRAFT);
+		});
+
+		it('should fail to withdraw an application in DRAFT state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DRAFT },
+			});
+			const result = await withdrawApplication({ applicationId: testApplicationId });
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail to withdraw an application in REJECTED state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.REJECTED },
+			});
+			const result = await withdrawApplication({ applicationId: testApplicationId });
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail to withdraw an application in INSTITUTIONAL_REP_REVISION_REQUESTED state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED },
+			});
+			const result = await withdrawApplication({ applicationId: testApplicationId });
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail to withdraw an application in DAC_REVISIONS_REQUESTED state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
+			});
+			const result = await withdrawApplication({ applicationId: testApplicationId });
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail to withdraw an application in APPROVED state', async () => {
+			await testApplicationRepo.findOneAndUpdate({
+				id: testApplicationId,
+				update: { state: ApplicationStates.APPROVED },
+			});
+			const result = await withdrawApplication({ applicationId: testApplicationId });
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail for non-existent application', async () => {
+			const result = await withdrawApplication({ applicationId: 9999 });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'NOT_FOUND');
+		});
+	});
 	describe('Close Application', () => {
 		it('should close an application in DRAFT state', async () => {
 			await testApplicationRepo.findOneAndUpdate({
@@ -477,6 +558,10 @@ describe('Application API', () => {
 					project_approved: false,
 					requested_studies_approved: false,
 					created_at: new Date(),
+					ethics_approved: false,
+					agreements_approved: false,
+					appendices_approved: false,
+					sign_and_submit_approved: false,
 				},
 			});
 
