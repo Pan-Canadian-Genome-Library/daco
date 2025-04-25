@@ -49,16 +49,16 @@ export const GenerateEmailApplicantRevision = ({
                 </mj-text>
                 <mj-text>
                     <ol type="A">
-                        <li> Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} </li>
-                        <li> Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} <br /> </li>
-                        <li> Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} </li>
-                        <li> Project Information: ${comments.projectNotes ?? defaultRevisionText} </li>
-                        <li> Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText} </li> 
-                        <li> Ethics: ${comments.ethicsNotes ?? defaultRevisionText} </li>
-                        <li> Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText} </li> 
-                        <li> Appendices: ${comments.appendicesNotes ?? defaultRevisionText} </li>
-                        <li> Sign & Submit: ${comments.signNotes ?? defaultRevisionText} </li> 
-                        <li> General Comments: ${comments.generalComments ?? defaultRevisionText} </li>  
+                        <li> Applicant Information: ${comments.applicant_notes ?? defaultRevisionText} </li>
+                        <li> Institutional Representative: ${comments.institution_rep_notes ?? defaultRevisionText} <br /> </li>
+                        <li> Collaborator: ${comments.collaborators_notes ?? defaultRevisionText} </li>
+                        <li> Project Information: ${comments.project_notes ?? defaultRevisionText} </li>
+                        <li> Requested Study: ${comments.requested_studies_notes ?? defaultRevisionText} </li> 
+                        <li> Ethics: ${comments.ethics_notes ?? defaultRevisionText} </li>
+                        <li> Data Access Agreement: ${comments.agreements_notes ?? defaultRevisionText} </li> 
+                        <li> Appendices: ${comments.appendices_notes ?? defaultRevisionText} </li>
+                        <li> Sign & Submit: ${comments.sign_and_submit_notes ?? defaultRevisionText} </li> 
+                        <li> General Comments: ${comments.comments ?? defaultRevisionText} </li>  
                     </ol>
                 </mj-text>
                 <mj-text>
@@ -94,16 +94,16 @@ export const GenerateEmailApplicantRevisionPlain = ({
     \n\n We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.
     \n\n The following revisions have been requested:
     \n
-    \n A. Applicant Information: ${comments.applicantNotes ?? defaultRevisionText} 
-    \n B. Institutional Representative: ${comments.institutionalNotes ?? defaultRevisionText} 
-    \n C. Collaborator: ${comments.collaboratorNotes ?? defaultRevisionText} 
-    \n D. Project Information: ${comments.projectNotes ?? defaultRevisionText} 
-    \n E. Requested Study: ${comments.requestedStudiesNotes ?? defaultRevisionText}
-    \n F. Ethics: ${comments.ethicsNotes ?? defaultRevisionText} 
-    \n G. Data Access Agreement: ${comments.dataAccessAgreementNotes ?? defaultRevisionText}
-    \n H. Appendices: ${comments.appendicesNotes ?? defaultRevisionText}
-    \n I. Sign & Submit: ${comments.signNotes ?? defaultRevisionText}
-    \n J. General Comments: ${comments.generalComments ?? defaultRevisionText}
+    \n A. Applicant Information: ${comments.applicant_notes ?? defaultRevisionText} 
+    \n B. Institutional Representative: ${comments.institution_rep_notes ?? defaultRevisionText} 
+    \n C. Collaborator: ${comments.collaborators_notes ?? defaultRevisionText} 
+    \n D. Project Information: ${comments.project_notes ?? defaultRevisionText} 
+    \n E. Requested Study: ${comments.requested_studies_notes ?? defaultRevisionText}
+    \n F. Ethics: ${comments.ethics_notes ?? defaultRevisionText} 
+    \n G. Data Access Agreement: ${comments.agreements_notes ?? defaultRevisionText}
+    \n H. Appendices: ${comments.appendices_notes ?? defaultRevisionText}
+    \n I. Sign & Submit: ${comments.sign_and_submit_notes ?? defaultRevisionText}
+    \n J. General Comments: ${comments.comments ?? defaultRevisionText}
     \n\n
     \n Please go to ${ui}/application/${id} to review the revisions.
     \n 

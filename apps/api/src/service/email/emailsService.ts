@@ -200,7 +200,7 @@ const emailSvc = () => ({
 		}
 	},
 	// Email to Applicant about DAC Revisions
-	sendEmailApplicantForRevisions: async ({
+	sendEmailApplicantDacRevisions: async ({
 		id,
 		applicantName,
 		comments,

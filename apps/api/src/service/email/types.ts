@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { RevisionRequestModel } from '../types.ts';
+
 // TODO: Likely to be refactored once we add translations
 export const EmailSubjects = {
 	INSTITUTIONAL_REP_REVIEW_REQUEST: 'Review Request for PCGL DACO Application',
@@ -77,7 +79,7 @@ type RevisionsType = {
 export type GenerateApplicantRevisionType = {
 	id: string | number;
 	applicantName: string;
-	comments: RevisionsType;
+	comments: RevisionRequestModel;
 } & BaseEmailType;
 
 export type GenerateApplicantRepRevisionType = {
@@ -85,5 +87,5 @@ export type GenerateApplicantRepRevisionType = {
 	applicantName: string;
 	institutionalRepFirstName: string;
 	institutionalRepLastName: string;
-	comments: RevisionsType;
+	comments: RevisionRequestModel;
 } & BaseEmailType;
