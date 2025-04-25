@@ -112,12 +112,15 @@ describe('Application Service', () => {
 
 			assert.ok(testCollaborators.length && testCollaborators[0]);
 
-			const { id } = testCollaborators[0];
+			const { institutional_email } = testCollaborators[0];
 
-			const collaboratorResult = await testCollaboratorsRepo.deleteCollaborator({ id });
+			const collaboratorResult = await testCollaboratorsRepo.deleteCollaborator({
+				application_id: application_id,
+				institutional_email: institutional_email,
+			});
 
 			assert.ok(collaboratorResult.success);
-			assert.strictEqual(collaboratorResult.data[0]?.id, id);
+			assert.strictEqual(collaboratorResult.data[0]?.institutional_email, institutional_email);
 		});
 	});
 
@@ -130,12 +133,18 @@ describe('Application Service', () => {
 
 			assert.ok(testCollaborators.length && testCollaborators[0]);
 
-			const { id } = testCollaborators[0];
+			const { institutional_email } = testCollaborators[0];
 
-			const collaboratorUpdate = { collaborator_type: 'Test User' };
+			const collaboratorUpdate = {
+				institutional_email,
+				collaborator_type: 'Test User',
+				first_name: 'Test',
+				last_name: 'User',
+			};
 
 			const collaboratorResult = await testCollaboratorsRepo.updateCollaborator({
-				id,
+				institutional_email: institutional_email,
+				application_id: application_id,
 				collaborator: collaboratorUpdate,
 			});
 

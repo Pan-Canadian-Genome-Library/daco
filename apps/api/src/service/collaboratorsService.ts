@@ -69,27 +69,32 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		}
 	},
 	deleteCollaborator: async ({
-		email,
+		institutional_email,
 		application_id,
 	}: {
-		email: string;
+		institutional_email: string;
 		application_id: number;
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
 		try {
 			const deletedRecord = await db
 				.delete(collaborators)
-				.where(and(eq(collaborators.institutional_email, email), eq(collaborators.application_id, application_id)))
+				.where(
+					and(
+						eq(collaborators.institutional_email, institutional_email),
+						eq(collaborators.application_id, application_id),
+					),
+				)
 				.returning();
 
 			if (!deletedRecord[0]) {
 				throw new Error(
-					`Error deleting collaborator with ${email} in application ${application_id}, no record deleted`,
+					`Error deleting collaborator with ${institutional_email} in application ${application_id}, no record deleted`,
 				);
 			}
 
 			return success(deletedRecord);
 		} catch (error) {
-			const message = `Error deleting collaborator with ${email} in application ${application_id}, no record deleted`;
+			const message = `Error deleting collaborator with ${institutional_email} in application ${application_id}, no record deleted`;
 
 			logger.error(message, error);
 
@@ -97,24 +102,29 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		}
 	},
 	updateCollaborator: async ({
-		email,
-		applicationId,
+		institutional_email,
+		application_id,
 		collaborator,
 	}: {
-		email: string;
-		applicationId: number;
+		institutional_email: string;
+		application_id: number;
 		collaborator: Partial<CollaboratorModel>;
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
 			const updatedRecord = await db
 				.update(collaborators)
 				.set(collaborator)
-				.where(and(eq(collaborators.institutional_email, email), eq(collaborators.application_id, applicationId)))
+				.where(
+					and(
+						eq(collaborators.institutional_email, institutional_email),
+						eq(collaborators.application_id, application_id),
+					),
+				)
 				.returning();
 
 			if (!updatedRecord[0]) {
 				throw new Error(
-					`Error updating collaborator with ${email} in application ID ${applicationId}, no record updated`,
+					`Error updating collaborator with ${institutional_email} in application ID ${application_id}, no record updated`,
 				);
 			}
 
@@ -126,7 +136,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 				return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
 			}
 
-			const message = `Error updating collaborator with ${email} in application ID ${applicationId}.`;
+			const message = `Error updating collaborator with ${institutional_email} in application ID ${application_id}.`;
 
 			logger.error(message, error);
 

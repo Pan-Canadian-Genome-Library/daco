@@ -132,7 +132,7 @@ export const deleteCollaborator = async ({
 
 		const deleteResult = await collaboratorsRepo.deleteCollaborator({
 			application_id,
-			email: collaborator_email,
+			institutional_email: collaborator_email,
 		});
 
 		if (!deleteResult.success) {
@@ -238,8 +238,8 @@ export const updateCollaborator = async ({
 	};
 
 	const updateResult = await collaboratorsRepo.updateCollaborator({
-		email: collaboratorInstitutionalEmail,
-		applicationId: application_id,
+		institutional_email: collaboratorInstitutionalEmail,
+		application_id: application_id,
 		collaborator,
 	});
 

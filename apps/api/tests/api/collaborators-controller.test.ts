@@ -180,9 +180,14 @@ describe('Collaborators Controller', () => {
 
 			assert.ok(testCollaborators.length && testCollaborators[0]);
 
-			const { id } = testCollaborators[0];
+			const { institutional_email } = testCollaborators[0];
 
-			const collaboratorUpdates = { id, collaboratorType: 'Test User' };
+			const collaboratorUpdates: CollaboratorDTO = {
+				collaboratorFirstName: 'Test',
+				collaboratorLastName: 'User',
+				collaboratorInstitutionalEmail: institutional_email,
+				collaboratorType: 'Test User',
+			};
 
 			const collaboratorResult = await updateCollaborator({
 				application_id,
