@@ -100,16 +100,15 @@ export const createCollaborators = async ({
 /**
  * Delete a selected collaborator by ID
  * @param application_id - ID of related application record to associate with Collaborators
- * @param user_id - ID of Applicant updating the application
- * @param collaborator_id - ID of Collaborator to delete
+ * @param collaborator_email - Institutional Email of Collaborator to delete
  * @returns Success with Collaborator data record / Failure with Error.
  */
 export const deleteCollaborator = async ({
 	application_id,
-	id,
+	collaborator_email,
 }: {
 	application_id: number;
-	id: number;
+	collaborator_email: string;
 }): AsyncResult<CollaboratorsResponseDTO[], 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -132,7 +131,8 @@ export const deleteCollaborator = async ({
 		}
 
 		const deleteResult = await collaboratorsRepo.deleteCollaborator({
-			id,
+			application_id,
+			email: collaborator_email,
 		});
 
 		if (!deleteResult.success) {

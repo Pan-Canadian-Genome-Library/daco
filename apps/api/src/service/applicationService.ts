@@ -194,11 +194,11 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred retrieving the application from the database.');
 		}
 	},
-	/** @method getApplicationForCollaboratorId: Find a specific Application record that a collaborator belongs to */
-	getApplicationForCollaboratorId: async ({
-		collaboratorId,
+	/** @method getApplicationForCollaboratorEmail: Find a specific Application record that a collaborator belongs to */
+	getApplicationForCollaboratorEmail: async ({
+		collaboratorEmail,
 	}: {
-		collaboratorId: number;
+		collaboratorEmail: string;
 	}): AsyncResult<ApplicationRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			// TODO: These two queries can be combined into 1
@@ -206,7 +206,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			const applicationIds = await db
 				.select({ application_id: collaborators.application_id })
 				.from(collaborators)
-				.where(eq(collaborators.id, collaboratorId));
+				.where(eq(collaborators.institutional_email, collaboratorEmail));
 			if (applicationIds.length === 0) {
 				return failure('NOT_FOUND', 'Could not find an collaborator for the provided collaboratorId');
 			}
@@ -228,7 +228,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			}
 			return success(application);
 		} catch (err) {
-			logger.error(`Error at getApplicationForCollaboratorId with id: ${collaboratorId}`, err);
+			logger.error(`Error at getApplicationForCollaboratorId with email: ${collaboratorEmail}`, err);
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred fetching application data from the database.');
 		}
 	},

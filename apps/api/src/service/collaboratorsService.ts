@@ -68,17 +68,28 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
+	deleteCollaborator: async ({
+		email,
+		application_id,
+	}: {
+		email: string;
+		application_id: number;
+	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
 		try {
-			const deletedRecord = await db.delete(collaborators).where(eq(collaborators.id, id)).returning();
+			const deletedRecord = await db
+				.delete(collaborators)
+				.where(and(eq(collaborators.institutional_email, email), eq(collaborators.application_id, application_id)))
+				.returning();
 
 			if (!deletedRecord[0]) {
-				throw new Error(`Error deleting collaborator with ${id}, no record deleted`);
+				throw new Error(
+					`Error deleting collaborator with ${email} in application ${application_id}, no record deleted`,
+				);
 			}
 
 			return success(deletedRecord);
 		} catch (error) {
-			const message = `Error deleting collaborator with id: ${id}`;
+			const message = `Error deleting collaborator with ${email} in application ${application_id}, no record deleted`;
 
 			logger.error(message, error);
 

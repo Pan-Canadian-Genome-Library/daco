@@ -187,7 +187,7 @@ collaboratorsRouter.get(
  * Delete Collaborator
  */
 collaboratorsRouter.delete(
-	'/:applicationId/:collaboratorId',
+	'/:applicationId/:collaboratorEmail',
 	authMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsDeleteParamsSchema,
@@ -200,10 +200,12 @@ collaboratorsRouter.delete(
 			>,
 		) => {
 			try {
-				const collaboratorId = Number(request.params.collaboratorId);
+				const collaboratorEmail = request.params.collaboratorEmail;
 
-				if (!isPositiveInteger(collaboratorId)) {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Collaborator ID is not a valid number.' });
+				if (!collaboratorEmail) {
+					response
+						.status(400)
+						.json({ error: 'INVALID_REQUEST', message: 'Collaborator Email must be included in delete request.' });
 					return;
 				}
 
@@ -244,7 +246,7 @@ collaboratorsRouter.delete(
 
 				const result = await deleteCollaborator({
 					application_id: applicationId,
-					id: collaboratorId,
+					collaborator_email: collaboratorEmail,
 				});
 
 				if (result.success) {

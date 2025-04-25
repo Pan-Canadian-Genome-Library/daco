@@ -23,7 +23,7 @@ import { fetch } from '@/global/FetchClient';
 
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorUpdateRecord, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
+import { type CollaboratorDTO, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 
 const useEditCollaborator = () => {
 	const { t: translate } = useTranslation();
@@ -34,7 +34,7 @@ const useEditCollaborator = () => {
 		Error,
 		{
 			applicationId: number | string;
-			collaboratorUpdates: CollaboratorUpdateRecord;
+			collaboratorUpdates: CollaboratorDTO;
 		}
 	>({
 		mutationFn: async ({ applicationId, collaboratorUpdates }) => {
@@ -83,7 +83,7 @@ const useEditCollaborator = () => {
 			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
 				return prev.map((value) => {
 					// Replace cached value with response object
-					if (value.id === data[0]?.id) {
+					if (value.collaboratorInstitutionalEmail === data[0]?.collaboratorInstitutionalEmail) {
 						return data[0];
 					}
 					return value;

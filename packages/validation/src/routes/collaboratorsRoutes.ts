@@ -59,6 +59,6 @@ export const collaboratorsListParamsSchema = z
 export const collaboratorsDeleteParamsSchema = z
 	.object({
 		applicationId: z.coerce.number().int().gt(0),
-		collaboratorId: z.coerce.number().int().gt(0),
+		collaboratorEmail: z.string().nonempty().email(),
 	})
 	.required();
