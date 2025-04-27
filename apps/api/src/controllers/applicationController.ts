@@ -253,6 +253,7 @@ export const dacRejectApplication = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
 
 		if (!result.success) {
 			return result;
@@ -270,6 +271,22 @@ export const dacRejectApplication = async ({
 
 		const update = { state: appStateManager.state, updated_at: new Date() };
 		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+		}
+
+		const { applicant_institutional_email, applicant_first_name } = resultContents.data.contents;
+
+		await emailService.sendEmailReject({
+			id: application.id,
+			to: applicant_institutional_email,
+			name: applicant_first_name || 'N/A',
+			comment: 'Invalid application contents was provided', // TODO: there doesn't seem to be any reject comment available, add functionality when implemented
+		});
 
 		return updatedResult;
 	} catch (error) {
