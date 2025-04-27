@@ -505,14 +505,19 @@ export const submitApplication = async ({
 			return result;
 		}
 
-		const { applicant_first_name, institutional_rep_first_name, institutional_rep_email } =
-			resultContents.data.contents;
+		const {
+			applicant_first_name,
+			institutional_rep_first_name,
+			institutional_rep_email,
+			applicant_institutional_email,
+		} = resultContents.data.contents;
+
+		if (!institutional_rep_email || !applicant_institutional_email) {
+			const message = 'Error retrieving address to send email to';
+			return failure('SYSTEM_ERROR', message);
+		}
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
-			if (!institutional_rep_email) {
-				const message = 'Error retrieving address to send email to';
-				return failure('SYSTEM_ERROR', message);
-			}
 			// Send email to institutional rep for review
 			await emailService.sendEmailInstitutionalRepForReview({
 				id: application.id,
@@ -528,6 +533,13 @@ export const submitApplication = async ({
 				to: institutional_rep_email || 'DAC@email.com', // TODO: make this DAC email
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: submissionResult.data.created_at,
+			});
+
+			//  send email to applicant that application is submitted to DAC
+			await emailService.sendEmailApplicantApplicationSubmitted({
+				id: application.id,
+				to: applicant_institutional_email,
+				name: applicant_first_name || 'N/A',
 			});
 		}
 
