@@ -373,11 +373,6 @@ export const requestApplicationRevisionsByDac = async ({
 
 		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
 
-		if (!institutional_rep_email) {
-			const message = 'Error retrieving address to send email to';
-			return failure('SYSTEM_ERROR', message);
-		}
-
 		await emailService.sendEmailApplicantDacRevisions({
 			id: application.id,
 			to: institutional_rep_email,
@@ -440,17 +435,13 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
 			resultContents.data.contents;
 
-		if (!institutional_rep_email) {
-			const message = 'Error retrieving address to send email to';
-			return failure('SYSTEM_ERROR', message);
-		}
 		await emailService.sendEmailApplicantRepRevisions({
 			id: application.id,
+			to: institutional_rep_email,
 			applicantName: applicant_first_name || 'N/A',
 			institutionalRepFirstName: institutional_rep_first_name || 'N/A',
 			institutionalRepLastName: institutional_rep_last_name || 'N/A',
 			comments: revisionRequestResult.data,
-			to: institutional_rep_email,
 		});
 
 		return service.getApplicationWithContents({ id: applicationId });
@@ -511,11 +502,6 @@ export const submitApplication = async ({
 			institutional_rep_email,
 			applicant_institutional_email,
 		} = resultContents.data.contents;
-
-		if (!institutional_rep_email || !applicant_institutional_email) {
-			const message = 'Error retrieving address to send email to';
-			return failure('SYSTEM_ERROR', message);
-		}
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
 			// Send email to institutional rep for review

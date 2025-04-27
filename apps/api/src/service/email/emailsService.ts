@@ -72,6 +72,10 @@ const emailSvc = () => ({
 				email: { fromAddress },
 			} = getEmailConfig();
 
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
+
 			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
@@ -113,6 +117,10 @@ const emailSvc = () => ({
 				email: { fromAddress },
 			} = getEmailConfig();
 
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
+
 			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
@@ -153,6 +161,10 @@ const emailSvc = () => ({
 				email: { fromAddress },
 			} = getEmailConfig();
 
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
+
 			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
@@ -181,6 +193,10 @@ const emailSvc = () => ({
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
 
 			const response = await emailClient.sendMail({
 				from: fromAddress,
@@ -211,6 +227,10 @@ const emailSvc = () => ({
 				email: { fromAddress },
 			} = getEmailConfig();
 
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
+
 			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
@@ -239,6 +259,10 @@ const emailSvc = () => ({
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
 
 			const response = await emailClient.sendMail({
 				from: fromAddress,
@@ -269,6 +293,10 @@ const emailSvc = () => ({
 				email: { fromAddress },
 			} = getEmailConfig();
 
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
+
 			const response = await emailClient.sendMail({
 				from: fromAddress,
 				to,
@@ -297,6 +325,10 @@ const emailSvc = () => ({
 			const {
 				email: { fromAddress },
 			} = getEmailConfig();
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
 
 			const response = await emailClient.sendMail({
 				from: fromAddress,

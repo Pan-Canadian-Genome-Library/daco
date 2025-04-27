@@ -32,7 +32,7 @@ export const EmailSubjects = {
 export type EmailSubjectsType = (typeof EmailSubjects)[keyof typeof EmailSubjects];
 
 export type BaseEmailType = {
-	to: string;
+	to?: string | null;
 	lang?: string;
 };
 
@@ -62,19 +62,6 @@ export type GenerateDacRevisionType = {
 	applicantName: string;
 	submittedDate: Date | string;
 } & BaseEmailType;
-
-type RevisionsType = {
-	applicantNotes?: string;
-	institutionalNotes?: string;
-	collaboratorNotes?: string;
-	projectNotes?: string;
-	requestedStudiesNotes?: string;
-	ethicsNotes?: string;
-	dataAccessAgreementNotes?: string;
-	appendicesNotes?: string;
-	signNotes?: string;
-	generalComments?: string;
-};
 
 export type GenerateApplicantRevisionType = {
 	id: string | number;
