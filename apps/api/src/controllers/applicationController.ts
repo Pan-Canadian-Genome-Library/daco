@@ -338,7 +338,7 @@ export const requestApplicationRevisionsByDac = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
-
+		const emailService = await emailSvc();
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -363,6 +363,27 @@ export const requestApplicationRevisionsByDac = async ({
 		if (!revisionRequestResult.success) {
 			return revisionRequestResult;
 		}
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			return resultContents;
+		}
+
+		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
+
+		if (!institutional_rep_email) {
+			const message = 'Error retrieving address to send email to';
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		await emailService.sendEmailApplicantDacRevisions({
+			id: application.id,
+			to: institutional_rep_email,
+			applicantName: applicant_first_name || 'N/A',
+			comments: revisionRequestResult.data,
+		});
 
 		return service.getApplicationWithContents({ id: applicationId });
 	} catch (error) {
