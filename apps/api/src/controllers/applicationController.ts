@@ -21,6 +21,7 @@ import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
+import { emailSvc } from '@/service/email/emailsService.ts';
 import {
 	type ApplicationRecord,
 	type ApplicationService,
@@ -381,6 +382,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
+		const emailService = await emailSvc();
 
 		const result = await service.getApplicationById({ id: applicationId });
 
@@ -407,6 +409,29 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return revisionRequestResult;
 		}
 
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			return resultContents;
+		}
+
+		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
+			resultContents.data.contents;
+
+		if (!institutional_rep_email) {
+			const message = 'Error retrieving address to send email to';
+			return failure('SYSTEM_ERROR', message);
+		}
+		await emailService.sendEmailApplicantRepRevisions({
+			id: application.id,
+			applicantName: applicant_first_name || 'N/A',
+			institutionalRepFirstName: institutional_rep_first_name || 'N/A',
+			institutionalRepLastName: institutional_rep_last_name || 'N/A',
+			comments: revisionRequestResult.data,
+			to: institutional_rep_email,
+		});
+
 		return service.getApplicationWithContents({ id: applicationId });
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
@@ -423,6 +448,7 @@ export const submitApplication = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
+		const emailService = await emailSvc();
 
 		// Fetch the application
 		const result = await service.getApplicationById({ id: applicationId });
@@ -446,6 +472,32 @@ export const submitApplication = async ({
 		} else {
 			submissionResult = await appStateManager.submitRepRevision();
 		}
+
+		if (!submissionResult.success) {
+			return submissionResult;
+		}
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			return result;
+		}
+
+		const { applicant_first_name, institutional_rep_first_name, institutional_rep_email } =
+			resultContents.data.contents;
+
+		if (!institutional_rep_email) {
+			const message = 'Error retrieving address to send email to';
+			return failure('SYSTEM_ERROR', message);
+		}
+		await emailService.sendEmailInstitutionalRepReviewRequest({
+			id: application.id,
+			to: institutional_rep_email,
+			applicantName: applicant_first_name || 'N/A',
+			repName: institutional_rep_first_name || 'N/A',
+			submittedDate: submissionResult.data.created_at,
+		});
 
 		return submissionResult;
 	} catch (error) {
