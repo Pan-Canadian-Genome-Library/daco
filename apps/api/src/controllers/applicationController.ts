@@ -21,6 +21,7 @@ import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
+import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import {
 	type ApplicationRecord,
@@ -182,6 +183,8 @@ export const approveApplication = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
+		const collaboratorsService = await collaboratorsSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -203,6 +206,35 @@ export const approveApplication = async ({
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
 		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+		}
+
+		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
+
+		await emailService.sendEmailApproval({
+			id: application.id,
+			to: applicant_institutional_email,
+			name: applicant_first_name || 'N/A',
+		});
+
+		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
+
+		if (!collaboratorResponse.success) {
+			return failure('SYSTEM_ERROR', 'Error retrieving collaborators to send emails to');
+		}
+
+		collaboratorResponse.data.forEach(async (collab) => {
+			await emailService.sendEmailApproval({
+				id: application.id,
+				to: collab.institutional_email,
+				name: collab.first_name || 'N/A',
+			});
+		});
 
 		return updatedResult;
 	} catch (error) {
