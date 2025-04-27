@@ -258,6 +258,7 @@ export const submitRevision = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
 
 		if (!result.success) {
 			return result;
@@ -283,6 +284,34 @@ export const submitRevision = async ({
 
 		if (!submittedRevision.success) {
 			return failure('INVALID_STATE_TRANSITION', submittedRevision.message || 'Failed to submit application revision.');
+		}
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+		}
+
+		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
+			resultContents.data.contents;
+
+		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+			await emailService.sendEmailDacForSubmittedRevisions({
+				id: application.id,
+				to: institutional_rep_email, // TODO: Change to DAC email
+				applicantName: applicant_first_name || 'N/A',
+				submittedDate: submittedRevision.data.created_at,
+			});
+		} else {
+			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
+			await emailService.sendEmailInstitutionalRepForReview({
+				id: application.id,
+				to: institutional_rep_email,
+				repName: institutional_rep_first_name || 'N/A',
+				applicantName: applicant_first_name || 'N/A',
+				submittedDate: submittedRevision.data.created_at,
+			});
 		}
 
 		return submittedRevision;
@@ -493,7 +522,7 @@ export const submitApplication = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			return result;
+			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
 		}
 
 		const {
