@@ -508,17 +508,28 @@ export const submitApplication = async ({
 		const { applicant_first_name, institutional_rep_first_name, institutional_rep_email } =
 			resultContents.data.contents;
 
-		if (!institutional_rep_email) {
-			const message = 'Error retrieving address to send email to';
-			return failure('SYSTEM_ERROR', message);
+		if (appStateManager.state === ApplicationStates.DRAFT) {
+			if (!institutional_rep_email) {
+				const message = 'Error retrieving address to send email to';
+				return failure('SYSTEM_ERROR', message);
+			}
+			// Send email to institutional rep for review
+			await emailService.sendEmailInstitutionalRepForReview({
+				id: application.id,
+				to: institutional_rep_email,
+				applicantName: applicant_first_name || 'N/A',
+				repName: institutional_rep_first_name || 'N/A',
+				submittedDate: submissionResult.data.created_at,
+			});
+		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+			// Send email to DAC for review
+			await emailService.sendEmailDacForReview({
+				id: application.id,
+				to: institutional_rep_email || 'DAC@email.com', // TODO: make this DAC email
+				applicantName: applicant_first_name || 'N/A',
+				submittedDate: submissionResult.data.created_at,
+			});
 		}
-		await emailService.sendEmailInstitutionalRepReviewRequest({
-			id: application.id,
-			to: institutional_rep_email,
-			applicantName: applicant_first_name || 'N/A',
-			repName: institutional_rep_first_name || 'N/A',
-			submittedDate: submissionResult.data.created_at,
-		});
 
 		return submissionResult;
 	} catch (error) {

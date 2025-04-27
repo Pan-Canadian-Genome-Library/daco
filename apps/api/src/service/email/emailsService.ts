@@ -60,7 +60,7 @@ const logger = BaseLogger.forModule('emailService');
 
 const emailSvc = () => ({
 	// Email to the Institutional Rep to Review Application
-	sendEmailInstitutionalRepReviewRequest: async ({
+	sendEmailInstitutionalRepForReview: async ({
 		id,
 		applicantName,
 		repName,
