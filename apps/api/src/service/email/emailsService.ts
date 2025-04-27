@@ -96,7 +96,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
@@ -143,7 +143,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
@@ -175,7 +175,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
@@ -208,7 +208,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
@@ -241,7 +241,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
@@ -274,7 +274,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
@@ -307,7 +307,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
@@ -340,7 +340,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `Error sending email to recipient: ${to}`;
+			const message = `An error has occurred sending the email`;
 
 			logger.error(message, error);
 
