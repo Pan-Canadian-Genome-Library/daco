@@ -17,39 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import i18n from '@/i18n/translations';
+import { useQuery } from '@tanstack/react-query';
 
-export const withErrorResponseHandler = (response: Response) => {
-	if (response.ok) {
-		return response;
-	} else {
-		const error = {
-			message: i18n.t('errors.generic.title'),
-			errors: i18n.t('errors.generic.message'),
-		};
+import { withErrorResponseHandler } from '@/api/apiUtils';
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { type SignatureDTO } from '@pcgl-daco/data-model';
 
-		switch (response.status) {
-			case 400:
-				error.message = i18n.t('errors.http.400.title');
-				error.errors = i18n.t('errors.http.400.message');
-				break;
-			case 403:
-				error.message = i18n.t('errors.http.403.title');
-				error.errors = i18n.t('errors.http.403.message');
-				break;
-			case 404:
-				error.message = i18n.t('errors.http.404.title');
-				error.errors = i18n.t('errors.http.404.message');
-				break;
-			case 500:
-				error.message = i18n.t('errors.http.500.title');
-				error.errors = i18n.t('errors.http.500.message');
-				break;
-			default:
-				error.message = i18n.t('errors.fetchError.title');
-				error.errors = i18n.t('errors.fetchError.message');
-		}
+const useGetSignatures = ({ applicationId }: { applicationId: number | string }) => {
+	return useQuery<SignatureDTO, ServerError>({
+		queryKey: [`signature-${applicationId}`],
+		queryFn: async () => {
+			const response = await fetch(`/signature/${applicationId}`).then(withErrorResponseHandler);
 
-		throw error;
-	}
+			return await response.json();
+		},
+	});
 };
+
+export default useGetSignatures;

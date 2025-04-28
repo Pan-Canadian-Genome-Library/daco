@@ -529,9 +529,6 @@ paths:
                 applicationId:
                   type: number
                   description: ID of the related Application record that new Collaborators are associated with
-                userId:
-                  type: string
-                  description: Temporary, Applicant's User Id, required for authorization
                 collaborators:
                   $ref: '#/components/requests/CreateCollaborators'
       responses:
@@ -604,9 +601,6 @@ paths:
                 applicationId:
                   type: number
                   description: ID of the related Application record that Collaborator records are associated with
-                userId:
-                  type: string
-                  description: Temporary, Applicant's User Id, required for authorization
                 collaboratorUpdates:
                   $ref: '#/components/requests/UpdatedCollaborators'
       responses:
@@ -887,6 +881,56 @@ paths:
                 $ref: '#/components/responses/ClientErrors'
         '500':
           description: Server error - unable to process closure request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
+  /applications/{applicationId}/withdraw:
+    post:
+      tags:
+        - Applications
+      summary: Withdraws an application if in REP_REVIEW or DAC_REVIEW, placing it back to DRAFT mode.
+      description: |
+        Allows an Applicant to withdraw an application. This is only available if the Application is in `REP_REVIEW`` or `DAC_REVIEW`. 
+        If withdrawn in these states the application will be moved back to `DRAFT`. All other states however, the application cannot be
+        "withdrawn", and so this endpoint will return an error.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application you'd like to withdraw.
+      responses:
+        '200':
+          description: Application has been successfully withdrawn.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applications'
+        '400':
+          description: Invalid request - Missing or invalid Application ID, or the Application is in an inappropriate state and cannot be withdrawn.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Unauthorized - You do not own, or have the correct permissions to modify the application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Not Found - Application cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server Error - unable to process withdraw request.
           content:
             application/json:
               schema:
@@ -1335,25 +1379,34 @@ components:
         id:
           type: number
           description: The unique ID of the collaborator in the database.
-        application_id:
+        applicationId:
           type: number
           description: The Application ID associated with the Collaborator.
-        first_name:
+        collaboratorFirstName:
           type: string
           description: The collaborator's first name
-        middle_name:
+        collaboratorMiddleName:
           type: string
           description: The collaborator's middle name
-        last_name:
+        collaboratorLastName:
           type: string
           description: The collaborator's last name
-        suffix:
+        collaboratorSuffix:
           type: string
           description: The collaborator's additional name suffix
-        position_title:
+        collaboratorType:
+          type: string
+          description: The type of collaborator. This field is not used.
+        collaboratorResearcherProfileURL:
+          type: string
+          description: The URL containing the researcher's profile.
+        collaboratorPrimaryAffiliation:
+          type: string
+          description: The primary research institution that a researcher is affiliated with.
+        collaboratorPositionTitle:
           type: string
           description: The collaborator's job title
-        institutional_email:
+        collaboratorInstitutionalEmail:
           type: string
           description: The collaborator's contact email
 
@@ -1602,15 +1655,11 @@ components:
       type: object
       required:
         - applicationId
-        - userId
         - collaboratorId
       properties:
         applicationId:
           type: number
           description: The id of the relevant Application record
-        userId:
-          type: string
-          description: The user ID belonging to the currently signed in user.
         collaboratorId:
           type: number
           description: The ID of the Collaborator to delete.
