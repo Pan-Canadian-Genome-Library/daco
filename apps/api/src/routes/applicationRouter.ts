@@ -32,6 +32,7 @@ import {
 	revokeApplication,
 	submitApplication,
 	submitRevision,
+	withdrawApplication,
 } from '@/controllers/applicationController.js';
 import {
 	RevisionRequestModel,
@@ -40,8 +41,8 @@ import {
 	type JoinedApplicationRecord,
 } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import type { ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
-import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import type { ApplicationDTO, ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
+import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
 	collaboratorsListParamsSchema,
@@ -656,6 +657,93 @@ applicationRouter.post(
 			response.status(500).json({
 				error: 'SYSTEM_ERROR',
 				message: 'Unexpected error.',
+			});
+		}
+	},
+);
+
+applicationRouter.post(
+	'/:applicationId/withdraw',
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
+	async (
+		request: Request,
+		response: ResponseWithData<
+			ApplicationDTO,
+			['INVALID_REQUEST', 'FORBIDDEN', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']
+		>,
+	) => {
+		const applicationId = Number(request.params.applicationId);
+
+		const { user } = request.session;
+		const { userId } = user || {};
+
+		if (!userId) {
+			response.status(401).json({ error: ErrorType.UNAUTHORIZED, message: 'User is not authenticated.' });
+			return;
+		}
+
+		if (!isPositiveInteger(applicationId)) {
+			response
+				.status(400)
+				.json({ error: ErrorType.INVALID_REQUEST, message: 'Application ID parameter is not a valid number.' });
+			return;
+		}
+
+		try {
+			const application = await getApplicationById({ applicationId });
+
+			if (!application.success) {
+				switch (application.error) {
+					case 'NOT_FOUND':
+						response.status(404);
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500);
+						break;
+					default:
+						response.status(500);
+				}
+
+				response.send({
+					error: application.error,
+					message: application.message,
+				});
+				return;
+			}
+
+			if (application.data.userId !== userId) {
+				response.status(403).send({
+					error: ErrorType.FORBIDDEN,
+					message: 'You do not own, or have the rights to modify this application.',
+				});
+			}
+
+			const result = await withdrawApplication({ applicationId });
+
+			if (result.success) {
+				response.status(200).json(result.data);
+				return;
+			}
+
+			switch (result.error) {
+				case 'INVALID_STATE_TRANSITION':
+					response.status(400);
+					break;
+				case 'NOT_FOUND':
+					response.status(404);
+					break;
+				default:
+					response.status(500);
+			}
+
+			response.send({
+				error: result.error === 'INVALID_STATE_TRANSITION' ? 'INVALID_REQUEST' : result.error,
+				message: result.message,
+			});
+		} catch (error) {
+			response.status(500).json({
+				error: 'SYSTEM_ERROR',
+				message: 'Something went wrong, please try again later.',
 			});
 		}
 	},
