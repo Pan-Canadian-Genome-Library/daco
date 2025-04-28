@@ -9,6 +9,12 @@
 			"description": "Your application {{id}} has already been submitted for review. If you choose to edit it, the application will be moved back to Draft status, requiring you to resubmit it for review. Please note that this will extend the processing time. We recommend making changes only when absolutely necessary.",
 			"buttons": {
 				"edit": "Edit Application"
+			},
+			"notifications": {
+				"successTitle": "Application Successfully Withdrawn from Review",
+				"successMessage": "Application PCGL-{{id}} has been withdrawn from review and is now available to edit.",
+				"failureTitle": "Failed to Withdraw Application from Review",
+				"failureMessage": "Something went wrong. Application could not be be withdrawn from review and is not available to edit. Please try again later."
 			}
 		},
 		"closeApplication": {
