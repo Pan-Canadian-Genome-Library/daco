@@ -65,7 +65,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 				.catch(() => {
 					notification.openNotification({
 						type: 'error',
-						message: 'Submission Failed',
+						message: translate('submissionFailed'),
 						description: translate('modals.applications.global.failure.text'),
 					});
 				});
@@ -78,14 +78,13 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 				.catch(() => {
 					notification.openNotification({
 						type: 'error',
-						message: 'Submission Failed',
+						message: translate('submissionFailed'),
 						description: translate('modals.applications.global.failure.text'),
 					});
 				});
 		}
 	};
 
-	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleCloseApplicationRequest = () => {
 		setShowCloseApplicationModal(false);
 	};
