@@ -30,11 +30,26 @@ const NewApplicationCard = () => {
 
 	const { mutate: createNewApplication } = useCreateApplication();
 
+	const handleCreateNewApplication = () => {
+		createNewApplication();
+	};
+
 	return (
-		<Card style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200 }} hoverable>
-			<Flex justify="center" align="center" vertical gap="middle">
+		<Card
+			style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200, cursor: 'pointer' }}
+			hoverable
+			onClick={handleCreateNewApplication}
+		>
+			<Flex justify="center" align="center" vertical gap="middle" style={{ height: '100%' }}>
 				<Title level={3}>{translate('dashboard.startNewApp')}</Title>
-				<Button color="default" variant="outlined" onClick={() => createNewApplication()}>
+				<Button
+					color="default"
+					variant="outlined"
+					onClick={(e) => {
+						e.stopPropagation();
+						handleCreateNewApplication();
+					}}
+				>
 					{translate('button.getStarted')}
 				</Button>
 			</Flex>
