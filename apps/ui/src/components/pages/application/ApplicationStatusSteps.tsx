@@ -92,7 +92,13 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 				<Flex
 					flex={1}
 					key={item.step}
-					style={{ textWrap: 'nowrap', minWidth: '100px', padding: token.paddingSM, backgroundColor: color }}
+					style={{
+						textWrap: 'nowrap',
+						minWidth: '100px',
+						padding: token.paddingXS,
+						paddingInline: '40px',
+						backgroundColor: color,
+					}}
 					justify="center"
 					align="center"
 				>
