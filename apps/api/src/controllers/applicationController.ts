@@ -30,10 +30,11 @@ import {
 import {
 	convertToApplicationContentsRecord,
 	convertToApplicationRecord,
+	convertToBasicApplicationRecord,
 	convertToRevisionsRecord,
 } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
-import type { ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
+import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
@@ -511,6 +512,50 @@ export const closeApplication = async ({
 		return closeResult;
 	} catch (error) {
 		const message = `Unable to close application with id: ${applicationId}`;
+		logger.error(message, error);
+
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+export const withdrawApplication = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+		const result = await service.getApplicationById({ id: applicationId });
+
+		if (!result.success) {
+			return result;
+		}
+
+		const application = result.data;
+		const appStateManager = new ApplicationStateManager(application);
+
+		let withdrawalRequest;
+		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+			withdrawalRequest = await appStateManager.withdrawDacReview();
+		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+			withdrawalRequest = await appStateManager.withdrawRepReview();
+		} else {
+			return failure(
+				'INVALID_STATE_TRANSITION',
+				"The application cannot be withdrawn because it's in an inappropriate state. Only applications in DAC_REVIEW or INSTITUTIONAL_REP_REVIEW may be withdrawn.",
+			);
+		}
+
+		if (!withdrawalRequest.success) {
+			return withdrawalRequest;
+		}
+
+		const dtoFriendlyData = convertToBasicApplicationRecord(withdrawalRequest.data);
+
+		return dtoFriendlyData;
+	} catch (error) {
+		const message = `Unable to withdraw application with id: ${applicationId}`;
 		logger.error(message, error);
 
 		return failure('SYSTEM_ERROR', message);
