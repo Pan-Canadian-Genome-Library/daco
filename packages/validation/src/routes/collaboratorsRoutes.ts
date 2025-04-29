@@ -47,7 +47,7 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 });
 
 export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
-	institutionalEmail: z.string().nonempty().email(),
+	collaboratorEmail: z.string().nonempty().email(),
 	collaboratorUpdates: collaboratorsSchema,
 });
 

@@ -601,6 +601,10 @@ paths:
                 applicationId:
                   type: number
                   description: ID of the related Application record that Collaborator records are associated with
+                collaboratorEmail:
+                  type: string
+                  format: email
+                  description: Email address associated to the collaborator in the Application.
                 collaboratorUpdates:
                   $ref: '#/components/requests/UpdatedCollaborators'
       responses:

@@ -290,7 +290,7 @@ collaboratorsRouter.post(
 			>,
 		) => {
 			try {
-				const { applicationId: application_id, institutionalEmail, collaboratorUpdates } = request.body;
+				const { applicationId: application_id, collaboratorEmail, collaboratorUpdates } = request.body;
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
@@ -300,7 +300,7 @@ collaboratorsRouter.post(
 
 				const result = await updateCollaborator({
 					application_id,
-					institutional_email: institutionalEmail,
+					institutional_email: collaboratorEmail,
 					user_id: userId,
 					collaboratorUpdates,
 				});
