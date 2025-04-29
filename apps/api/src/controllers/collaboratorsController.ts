@@ -177,16 +177,19 @@ export const listCollaborators = async ({
 /**
  * Update a selected collaborator by ID
  * @param application_id - ID of related application record to associate with Collaborators
+ * @param institutional_email - The institutional email of the collaborator you want to update
  * @param user_id - ID of Applicant updating the application
  * @param collaborators - Collaborator record with updated properties
  * @returns Success with Collaborator data record / Failure with Error.
  */
 export const updateCollaborator = async ({
 	application_id,
+	institutional_email,
 	user_id,
 	collaboratorUpdates,
 }: {
 	application_id: number;
+	institutional_email: string;
 	user_id: string;
 	collaboratorUpdates: CollaboratorDTO;
 }): AsyncResult<
@@ -223,8 +226,6 @@ export const updateCollaborator = async ({
 		return collaboratorsListResult;
 	}
 
-	const { collaboratorInstitutionalEmail } = collaboratorUpdates;
-
 	const collaborator: Partial<CollaboratorModel> = {
 		first_name: collaboratorUpdates.collaboratorFirstName,
 		middle_name: collaboratorUpdates.collaboratorMiddleName,
@@ -238,7 +239,7 @@ export const updateCollaborator = async ({
 	};
 
 	const updateResult = await collaboratorsRepo.updateCollaborator({
-		institutional_email: collaboratorInstitutionalEmail,
+		institutional_email: institutional_email,
 		application_id: application_id,
 		collaborator,
 	});

@@ -102,7 +102,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		}
 	},
 	updateCollaborator: async ({
-		institutional_email,
+		institutional_email: original_identifying_email,
 		application_id,
 		collaborator,
 	}: {
@@ -125,18 +125,22 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 				 * Related but not exactly our issue:
 				 * @see https://github.com/drizzle-team/drizzle-orm/issues/2472
 				 */
-				const existingRecordsCheck = await transaction
-					.select({
-						application_id: collaborators.application_id,
-						institutional_email: collaborators.institutional_email,
-					})
-					.from(collaborators)
-					.where(
-						and(
-							eq(collaborators.application_id, application_id),
-							eq(collaborators.institutional_email, institutional_email),
-						),
-					);
+
+				let existingRecordsCheck: CollaboratorRecord[] = [];
+				if (
+					collaborator.institutional_email !== undefined &&
+					collaborator.institutional_email !== original_identifying_email
+				) {
+					existingRecordsCheck = await transaction
+						.select()
+						.from(collaborators)
+						.where(
+							and(
+								eq(collaborators.application_id, application_id),
+								eq(collaborators.institutional_email, collaborator.institutional_email),
+							),
+						);
+				}
 
 				if (existingRecordsCheck.length) {
 					/**
@@ -151,21 +155,23 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 						table: 'collaborators',
 					});
 				}
-				return transaction
+
+				return await transaction
 					.update(collaborators)
 					.set(collaborator)
 					.where(
 						and(
-							eq(collaborators.institutional_email, institutional_email),
+							eq(collaborators.institutional_email, original_identifying_email),
 							eq(collaborators.application_id, application_id),
 						),
 					)
 					.returning();
 			});
 
+			console.log(updatedRecord, 'here');
 			if (!updatedRecord[0]) {
 				throw new Error(
-					`Error updating collaborator with ${institutional_email} in application ID ${application_id}, no record updated`,
+					`Error updating collaborator with ${original_identifying_email} in application ID ${application_id}, no record updated`,
 				);
 			}
 
@@ -177,7 +183,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 				return failure('DUPLICATE_RECORD', `Cannot update record to be duplicate collaborator records.`);
 			}
 
-			const message = `Error updating collaborator with ${institutional_email} in application ID ${application_id}.`;
+			const message = `Error updating collaborator with ${original_identifying_email} in application ID ${application_id}.`;
 
 			logger.error(message, error);
 

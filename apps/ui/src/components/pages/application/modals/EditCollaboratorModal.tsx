@@ -70,7 +70,8 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 		if (rowData?.collaboratorInstitutionalEmail) {
 			editCollaborator({
 				applicationId: appId,
-				collaboratorUpdates: { ...data, collaboratorInstitutionalEmail: rowData?.collaboratorInstitutionalEmail },
+				institutionalEmail: rowData.collaboratorInstitutionalEmail,
+				collaboratorUpdates: { ...data },
 			});
 			setIsOpen({ isOpen: false });
 		}
