@@ -30,10 +30,18 @@ type PostgresErrors = (typeof PostgresErrors)[keyof typeof PostgresErrors];
 
 interface DACOPostgresErrorObject {
 	/**
+	 * @description The severity of the error encountered by Postgres, see below for definitions of what constitutes which type of error.
 	 * @see https://www.postgresql.org/docs/current/runtime-config-logging.html
 	 */
 	severity: 'INFO' | 'NOTICE' | 'WARNING' | 'ERROR' | 'LOG' | 'FATAL' | 'PANIC';
+	/**
+	 * @description The Postgres error code.
+	 * @type PostgresErrors
+	 */
 	code: PostgresErrors;
+	/**
+	 * @description The table in-which the error occurred.
+	 */
 	table: string;
 }
 
@@ -66,8 +74,10 @@ export const isPostgresError = (
 };
 
 /**
- * Temporary class used to "fake" a postgres error because currently Drizzle eats postgres
+ * @description Temporary class used to "fake" a postgres error because currently Drizzle eats postgres
  * errors in some cases (key violation during update for example).
+ *
+ * ** Please deprecate or avoid the use of this once Drizzle has more robust error handling **
  */
 export class DACOPostgresError extends Error {
 	severity;
