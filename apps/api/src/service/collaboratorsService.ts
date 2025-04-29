@@ -19,7 +19,7 @@
 
 import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
-import { DACOPostgresError, isPostgresError, PostgresErrors } from '@/db/utils.ts';
+import { isPostgresError, PostgresErrors } from '@/db/utils.ts';
 import BaseLogger from '@/logger.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { and, eq } from 'drizzle-orm';
@@ -111,64 +111,17 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		collaborator: Partial<CollaboratorModel>;
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
-			const updatedRecord = await db.transaction(async (transaction) => {
-				/**
-				 * Normally we do not have to do this, given that there's a unique key constraint on both
-				 * the email and the application ID for this table, the DB should automatically handle checking
-				 * for a key violation and throwing an error, HOWEVER, it seems like drizzle just eats the error
-				 * and doesn't throw it to the the caller, despite obeying the constraint and now updating the record.
-				 *
-				 * This is a huge issue given that the `insert` DOES throw the error, and we check for it in our hacky
-				 * way. Until this is fixed, we're going to have to use a transaction and check before attempting an update
-				 * if there's a record.
-				 *
-				 * Related but not exactly our issue:
-				 * @see https://github.com/drizzle-team/drizzle-orm/issues/2472
-				 */
+			const updatedRecord = await db
+				.update(collaborators)
+				.set(collaborator)
+				.where(
+					and(
+						eq(collaborators.institutional_email, original_identifying_email),
+						eq(collaborators.application_id, application_id),
+					),
+				)
+				.returning();
 
-				let existingRecordsCheck: CollaboratorRecord[] = [];
-				if (
-					collaborator.institutional_email !== undefined &&
-					collaborator.institutional_email !== original_identifying_email
-				) {
-					existingRecordsCheck = await transaction
-						.select()
-						.from(collaborators)
-						.where(
-							and(
-								eq(collaborators.application_id, application_id),
-								eq(collaborators.institutional_email, collaborator.institutional_email),
-							),
-						);
-				}
-
-				if (existingRecordsCheck.length) {
-					/**
-					 * Given that Drizzle eats the error (as mentioned above), we'll fake it by creating our own
-					 * postgres-like error which we expect from Drizzle so we can keep the logic of the update and insert functions consistent.
-					 *
-					 * Hopefully Drizzle will figure this out in the future. If they do, we should refactor and remove these.
-					 */
-					throw new DACOPostgresError('Attempting to violate constraint, duplicate record detected.', {
-						severity: 'ERROR',
-						code: PostgresErrors.UNIQUE_KEY_VIOLATION,
-						table: 'collaborators',
-					});
-				}
-
-				return await transaction
-					.update(collaborators)
-					.set(collaborator)
-					.where(
-						and(
-							eq(collaborators.institutional_email, original_identifying_email),
-							eq(collaborators.application_id, application_id),
-						),
-					)
-					.returning();
-			});
-
-			console.log(updatedRecord, 'here');
 			if (!updatedRecord[0]) {
 				throw new Error(
 					`Error updating collaborator with ${original_identifying_email} in application ID ${application_id}, no record updated`,
