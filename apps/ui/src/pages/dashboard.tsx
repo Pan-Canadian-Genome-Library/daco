@@ -52,8 +52,8 @@ const DashboardPage = () => {
 				direction: 'desc',
 			},
 			{
-				column: 'updated_at',
-				direction: 'desc',
+				column: 'created_at',
+				direction: 'asc',
 			},
 		],
 		pageSize: 100,
