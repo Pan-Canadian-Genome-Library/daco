@@ -18,7 +18,7 @@
  */
 
 import useCreateApplication from '@/api/mutations/useCreateApplication';
-import { Button, Card, Flex, theme, Typography } from 'antd';
+import { Card, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
@@ -30,28 +30,23 @@ const NewApplicationCard = () => {
 
 	const { mutate: createNewApplication } = useCreateApplication();
 
-	const handleCreateNewApplication = () => {
-		createNewApplication();
+	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+		if (('key' in event && (event.key === 'Enter' || event.key === ' ')) || event.type === 'click') {
+			event.stopPropagation();
+			createNewApplication();
+		}
 	};
 
 	return (
 		<Card
 			style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200, cursor: 'pointer' }}
 			hoverable
-			onClick={handleCreateNewApplication}
+			tabIndex={0}
+			onClick={handleCardClick}
+			onKeyDown={handleCardClick}
 		>
 			<Flex justify="center" align="center" vertical gap="middle" style={{ height: '100%' }}>
 				<Title level={3}>{translate('dashboard.startNewApp')}</Title>
-				<Button
-					color="default"
-					variant="outlined"
-					onClick={(e) => {
-						e.stopPropagation();
-						handleCreateNewApplication();
-					}}
-				>
-					{translate('button.getStarted')}
-				</Button>
 			</Flex>
 		</Card>
 	);
