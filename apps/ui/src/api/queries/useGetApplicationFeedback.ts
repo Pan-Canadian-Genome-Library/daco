@@ -71,7 +71,7 @@ const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStat
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					ethics: {
-						isApproved: revisionDependant ? data[0]?.requestedStudiesApproved : undefined,
+						isApproved: revisionDependant ? data[0]?.ethicsApproved : undefined,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					agreement: {

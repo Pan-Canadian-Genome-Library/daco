@@ -91,7 +91,8 @@ export const editApplication = async ({
 	 * behaviour for any applications within the REP_REV or DAC_REV states.
 	 */
 	const shouldKeepState =
-		application.state === 'INSTITUTIONAL_REP_REVISION_REQUESTED' || application.state === 'DAC_REVISIONS_REQUESTED';
+		application.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
+		application.state === ApplicationStates.DAC_REVISIONS_REQUESTED;
 
 	if (!canEditResult.success) {
 		const message = `Cannot update application with state ${application.state}`;
@@ -103,7 +104,7 @@ export const editApplication = async ({
 
 	if (!formattedResult.success) return formattedResult;
 
-	return await applicationRepo.editApplication({ id, update: formattedResult.data, shouldKeepState: shouldKeepState });
+	return await applicationRepo.editApplication({ id, update: formattedResult.data, shouldKeepState });
 };
 
 /**
