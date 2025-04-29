@@ -18,34 +18,6 @@
  */
 
 /**
- * More errors for this can be added in the future,
- * however currently we only really care about unique key violations.
- *
- * @see https://www.postgresql.org/docs/current/errcodes-appendix.html
- */
-export const PostgresErrors = {
-	UNIQUE_KEY_VIOLATION: '23505',
-} as const;
-type PostgresErrors = (typeof PostgresErrors)[keyof typeof PostgresErrors];
-
-interface DACOPostgresErrorObject {
-	/**
-	 * @description The severity of the error encountered by Postgres, see below for definitions of what constitutes which type of error.
-	 * @see https://www.postgresql.org/docs/current/runtime-config-logging.html
-	 */
-	severity: 'INFO' | 'NOTICE' | 'WARNING' | 'ERROR' | 'LOG' | 'FATAL' | 'PANIC';
-	/**
-	 * @description The Postgres error code.
-	 * @type PostgresErrors
-	 */
-	code: PostgresErrors;
-	/**
-	 * @description The table in-which the error occurred.
-	 */
-	table: string;
-}
-
-/**
  * Currently Drizzle does not type errors which means it makes it harder for us to check for what error
  * we've encountered after one has been thrown. This is planned to be added in the future in Drizzle, and
  * when it is, use of this check should be updated and use of this function should be deprecated.
@@ -74,6 +46,17 @@ export const isPostgresError = (
 };
 
 /**
+ * More errors for this can be added in the future,
+ * however currently we only really care about unique key violations.
+ *
+ * @see https://www.postgresql.org/docs/current/errcodes-appendix.html
+ */
+export const PostgresErrors = {
+	UNIQUE_KEY_VIOLATION: '23505',
+} as const;
+type PostgresErrors = (typeof PostgresErrors)[keyof typeof PostgresErrors];
+
+/**
  * @description Temporary class used to "fake" a postgres error because currently Drizzle eats postgres
  * errors in some cases (key violation during update for example).
  *
@@ -83,7 +66,29 @@ export class DACOPostgresError extends Error {
 	severity;
 	code;
 	table;
-	constructor(message: string, { severity, code, table }: DACOPostgresErrorObject) {
+	constructor(
+		message: string,
+		{
+			severity,
+			code,
+			table,
+		}: {
+			/**
+			 * @description The severity of the error encountered by Postgres, see below for definitions of what constitutes which type of error.
+			 * @see https://www.postgresql.org/docs/current/runtime-config-logging.html
+			 */
+			severity: 'INFO' | 'NOTICE' | 'WARNING' | 'ERROR' | 'LOG' | 'FATAL' | 'PANIC';
+			/**
+			 * @description The Postgres error code.
+			 * @type PostgresErrors
+			 */
+			code: PostgresErrors;
+			/**
+			 * @description The table in-which the error occurred.
+			 */
+			table: string;
+		},
+	) {
 		super(`${message}`);
 		this.name = 'DACOPostgresError';
 		this.severity = severity;
