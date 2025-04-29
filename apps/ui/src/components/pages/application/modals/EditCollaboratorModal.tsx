@@ -38,9 +38,9 @@ const rule = createSchemaFieldRule(collaboratorsSchema);
 const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
-	const { mutate: editCollaborator } = useEditCollaborator();
+	const { mutateAsync: editCollaborator } = useEditCollaborator();
 
-	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
+	const { handleSubmit, control, reset, setFocus } = useForm<CollaboratorsSchemaType>({
 		defaultValues: {
 			collaboratorFirstName: rowData?.collaboratorFirstName || undefined,
 			collaboratorMiddleName: rowData?.collaboratorMiddleName || undefined,
@@ -67,13 +67,20 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 	}, [rowData, reset]);
 
 	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
+		console.log(rowData);
 		if (rowData?.collaboratorInstitutionalEmail) {
 			editCollaborator({
 				applicationId: appId,
 				institutionalEmail: rowData.collaboratorInstitutionalEmail,
 				collaboratorUpdates: { ...data },
-			});
-			setIsOpen({ isOpen: false });
+			})
+				.then(() => {
+					reset(); // Clear form after submit
+					setIsOpen({ isOpen: false });
+				})
+				.catch(() => {
+					setFocus('collaboratorInstitutionalEmail');
+				});
 		}
 	};
 
