@@ -47,7 +47,7 @@
 			},
 			"duplicate": {
 				"duplicateTitle": "Duplicate Collaborator",
-				"duplicateMessage": "This collaborator already exists within this application and cannot be added again. Please edit or delete their entry."
+				"duplicateMessage": "A collaborator associated with this email address already exists within this application and cannot be added again."
 			},
 			"deleted": {
 				"successTitle": "Collaborator Removed",

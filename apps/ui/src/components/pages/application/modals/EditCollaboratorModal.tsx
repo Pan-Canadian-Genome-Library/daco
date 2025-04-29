@@ -98,7 +98,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('collab-section.editModalDescription')}</Text>
-				<Form layout="vertical" clearOnDestroy>
+				<Form layout="vertical" clearOnDestroy onFinish={handleSubmit(onSubmit)}>
 					<Flex vertical>
 						<Row gutter={26}>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -170,7 +170,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 						<Button htmlType="button" onClick={(prev) => setIsOpen({ ...prev, isOpen: false })}>
 							{translate('button.cancel')}
 						</Button>
-						<Button type="primary" onClick={handleSubmit(onSubmit)}>
+						<Button type="primary" htmlType="submit">
 							{translate('button.save')}
 						</Button>
 					</Flex>
