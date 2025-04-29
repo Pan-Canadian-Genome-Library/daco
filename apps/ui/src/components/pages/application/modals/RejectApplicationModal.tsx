@@ -17,39 +17,46 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { withErrorResponseHandler } from '@/api/apiUtils';
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
-import { useMutation } from '@tanstack/react-query';
+import useRejectApplication from '@/api/mutations/useRejectApplication';
+import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
-type RejectApplicationPayload = {
-	applicationId: number;
+const { Text } = Typography;
+
+type RejectApplicationModalProps = {
+	id: number;
+	isOpen: boolean;
+	setIsOpen: (isOpen: boolean) => void;
 };
 
-const useRejectApplication = (id?: string | number) => {
-	const notification = useNotificationContext();
+const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModalProps) => {
 	const { t: translate } = useTranslation();
-	queryKey: [id];
-	return useMutation<ApplicationResponseData, ServerError, RejectApplicationPayload>({
-		mutationFn: async ({ applicationId }) => {
-			const response = await fetch(`/applications/${id}/reject`, {
-				method: 'POST',
-				body: JSON.stringify({ applicationId }),
-			}).then(withErrorResponseHandler);
+	const navigate = useNavigate();
+	const { mutateAsync: rejectApplication } = useRejectApplication();
 
-			return await response.json();
-		},
-		onSuccess: () => {},
-		onError: () => {
-			notification.openNotification({
-				type: 'error',
-				message: translate('modals.rejectApplication.notifications.rejectApplicationFailed'),
-			});
-		},
-	});
+	const handleRejectApplicationRequest = async () => {
+		await rejectApplication({ applicationId: id });
+		setIsOpen(false);
+		navigate('/dashboard');
+	};
+
+	return (
+		<Modal
+			title={translate('modals.rejectApplication.title', { id })}
+			okText={translate('button.closeApp')}
+			cancelText={translate('modals.buttons.cancel')}
+			width="100%"
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			open={isOpen}
+			onOk={handleRejectApplicationRequest}
+			onCancel={() => setIsOpen(false)}
+		>
+			<Flex style={{ height: '100%', marginTop: 20 }}>
+				<Text>{translate('modals.rejectApplication.description')}</Text>
+			</Flex>
+		</Modal>
+	);
 };
 
-export default useRejectApplication;
+export default RejectApplicationModal;

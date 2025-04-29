@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import useCloseApplication from '@/api/mutations/useCloseApplication';
 import useRejectApplication from '@/api/mutations/useRejectApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
+import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
 import PageHeader from '@/components/pages/global/PageHeader';
@@ -77,6 +78,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const handleRejectApplicationRequest = () => {
 		rejectApplication({ applicationId: id }).then(() => {
 			setOpenRevisionsModal(false);
+			setShowSuccessModal(true);
 			navigate('/dashboard');
 		});
 	};
@@ -157,20 +159,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 						<Text>{translate('modals.closeApplication.description')}</Text>
 					</Flex>
 				</Modal>
-				<Modal
-					title={translate('modals.rejectApplication.title', { id })}
-					okText={translate('button.closeApp')}
-					cancelText={translate('modals.buttons.cancel')}
-					width={'100%'}
-					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-					open={showRejectModal}
-					onOk={handleRejectApplicationRequest}
-					onCancel={() => setShowRejectModal(false)}
-				>
-					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modals.rejectApplication.description')}</Text>
-					</Flex>
-				</Modal>
+				<RejectApplicationModal id={id} isOpen={showRejectModal} setIsOpen={setShowRejectModal} />
 				<RequestRevisionsModal
 					onSubmit={onRevisionsSubmit}
 					isOpen={openRevisionsModal}

@@ -23,8 +23,8 @@
 			"title": "Are you sure you want to reject Application: PCGL-{{id}}",
 			"description": "Rejected applications cannot be reopened.",
 			"notifications": {
-				"closeApplicationSuccess": "Your application, PCGL-{{id}}, has been rejected.",
-				"closeApplicationFailed": "Sorry, there was an unexpected error while rejecting your application. Please try again later."
+				"rejectApplicationSuccess": "Your application, PCGL-{{id}}, has been rejected.",
+				"rejectApplicationFailed": "Sorry, there was an unexpected error while rejecting your application. Please try again later."
 			}
 		},
 		"authorization": {

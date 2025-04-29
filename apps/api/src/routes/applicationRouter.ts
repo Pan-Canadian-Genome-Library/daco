@@ -399,7 +399,7 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/reject',
+	'/:applicationId/reject',
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
 		request,
@@ -408,7 +408,7 @@ applicationRouter.post(
 			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
 		>,
 	) => {
-		const { applicationId }: { applicationId: unknown } = request.body;
+		const applicationId = Number(request.params.applicationId);
 
 		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
 			response.status(400).json({
