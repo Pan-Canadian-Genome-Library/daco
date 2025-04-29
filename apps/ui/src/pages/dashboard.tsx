@@ -30,7 +30,7 @@ import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard'
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { Application } from '@/global/types';
+import { ApplicationDTO } from '@pcgl-daco/data-model';
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -53,7 +53,7 @@ const DashboardPage = () => {
 			},
 			{
 				column: 'updated_at',
-				direction: 'asc',
+				direction: 'desc',
 			},
 		],
 		pageSize: 100,
@@ -76,8 +76,8 @@ const DashboardPage = () => {
 			{error ? (
 				// TODO: Temporary, until we get guidance on how to display error states.
 				<Alert
-					message={error.errors ? error.message : 'An Error Occurred.'}
-					description={error.errors ?? error.message}
+					message={error.error ? error.message : 'An Error Occurred.'}
+					description={error.error ?? error.message}
 					showIcon
 					type="error"
 				/>
@@ -131,7 +131,7 @@ const DashboardPage = () => {
 										<Col xs={24} md={24} lg={12}>
 											<NewApplicationCard />
 										</Col>
-										{applicationData.applications.map((applicationItem: Application) => {
+										{applicationData.map((applicationItem: ApplicationDTO) => {
 											return (
 												<Col key={applicationItem.id} xs={24} md={24} lg={12}>
 													<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />
