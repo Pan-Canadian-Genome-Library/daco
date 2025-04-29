@@ -112,6 +112,19 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
 			const updatedRecord = await db.transaction(async (transaction) => {
+				/**
+				 * Normally we do not have to do this, given that there's a unique key constraint on both
+				 * the email and the application ID for this table, the DB should automatically handle checking
+				 * for a key violation and throwing an error, HOWEVER, it seems like drizzle just eats the error
+				 * and doesn't throw it to the the caller, despite obeying the constraint and now updating the record.
+				 *
+				 * This is a huge issue given that the `insert` DOES throw the error, and we check for it in our hacky
+				 * way. Until this is fixed, we're going to have to use a transaction and check before attempting an update
+				 * if there's a record.
+				 *
+				 * Related but not exactly our issue:
+				 * @see https://github.com/drizzle-team/drizzle-orm/issues/2472
+				 */
 				const existingRecordsCheck = await transaction
 					.select({
 						application_id: collaborators.application_id,
@@ -126,7 +139,13 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 					);
 
 				if (existingRecordsCheck.length) {
-					throw new DACOPostgresError('Attempting to violate constraint, duplicate record detected', {
+					/**
+					 * Given that Drizzle eats the error (as mentioned above), we'll fake it by creating our own
+					 * postgres-like error which we expect from Drizzle so we can keep the logic of the update and insert functions consistent.
+					 *
+					 * Hopefully Drizzle will figure this out in the future. If they do, we should refactor and remove these.
+					 */
+					throw new DACOPostgresError('Attempting to violate constraint, duplicate record detected.', {
 						severity: 'ERROR',
 						code: PostgresErrors.UNIQUE_KEY_VIOLATION,
 						table: 'collaborators',
@@ -155,7 +174,7 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			const postgresError = isPostgresError(error);
 
 			if (postgresError && postgresError.code === PostgresErrors.UNIQUE_KEY_VIOLATION) {
-				return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
+				return failure('DUPLICATE_RECORD', `Cannot update record to be duplicate collaborator records.`);
 			}
 
 			const message = `Error updating collaborator with ${institutional_email} in application ID ${application_id}.`;
