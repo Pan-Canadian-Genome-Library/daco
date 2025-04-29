@@ -19,7 +19,7 @@
 
 import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
-import { isPostgresError, PostgresErrors } from '@/db/utils.ts';
+import { DACOPostgresError, isPostgresError, PostgresErrors } from '@/db/utils.ts';
 import BaseLogger from '@/logger.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { and, eq } from 'drizzle-orm';
@@ -111,16 +111,38 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		collaborator: Partial<CollaboratorModel>;
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
-			const updatedRecord = await db
-				.update(collaborators)
-				.set(collaborator)
-				.where(
-					and(
-						eq(collaborators.institutional_email, institutional_email),
-						eq(collaborators.application_id, application_id),
-					),
-				)
-				.returning();
+			const updatedRecord = await db.transaction(async (transaction) => {
+				const existingRecordsCheck = await transaction
+					.select({
+						application_id: collaborators.application_id,
+						institutional_email: collaborators.institutional_email,
+					})
+					.from(collaborators)
+					.where(
+						and(
+							eq(collaborators.application_id, application_id),
+							eq(collaborators.institutional_email, institutional_email),
+						),
+					);
+
+				if (existingRecordsCheck.length) {
+					throw new DACOPostgresError('Attempting to violate constraint, duplicate record detected', {
+						severity: 'ERROR',
+						code: PostgresErrors.UNIQUE_KEY_VIOLATION,
+						table: 'collaborators',
+					});
+				}
+				return transaction
+					.update(collaborators)
+					.set(collaborator)
+					.where(
+						and(
+							eq(collaborators.institutional_email, institutional_email),
+							eq(collaborators.application_id, application_id),
+						),
+					)
+					.returning();
+			});
 
 			if (!updatedRecord[0]) {
 				throw new Error(

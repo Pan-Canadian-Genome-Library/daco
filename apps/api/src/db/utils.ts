@@ -18,6 +18,26 @@
  */
 
 /**
+ * More errors for this can be added in the future,
+ * however currently we only really care about unique key violations.
+ *
+ * @see https://www.postgresql.org/docs/current/errcodes-appendix.html
+ */
+export const PostgresErrors = {
+	UNIQUE_KEY_VIOLATION: '23505',
+} as const;
+type PostgresErrors = (typeof PostgresErrors)[keyof typeof PostgresErrors];
+
+interface DACOPostgresErrorObject {
+	/**
+	 * @see https://www.postgresql.org/docs/current/runtime-config-logging.html
+	 */
+	severity: 'INFO' | 'NOTICE' | 'WARNING' | 'ERROR' | 'LOG' | 'FATAL' | 'PANIC';
+	code: PostgresErrors;
+	table: string;
+}
+
+/**
  * Currently Drizzle does not type errors which means it makes it harder for us to check for what error
  * we've encountered after one has been thrown. This is planned to be added in the future in Drizzle, and
  * when it is, use of this check should be updated and use of this function should be deprecated.
@@ -32,12 +52,13 @@ export const isPostgresError = (
 	error: unknown,
 ): (Error & { code: string | unknown; severity: string | unknown }) | undefined => {
 	if (
-		error &&
-		typeof error === 'object' &&
-		error instanceof Error &&
-		'severity' in error &&
-		'code' in error &&
-		'table' in error
+		(error &&
+			typeof error === 'object' &&
+			error instanceof Error &&
+			'severity' in error &&
+			'code' in error &&
+			'table' in error) ||
+		(error && error instanceof DACOPostgresError)
 	) {
 		return error;
 	}
@@ -45,11 +66,18 @@ export const isPostgresError = (
 };
 
 /**
- * More errors for this can be added in the future,
- * however currently we only really care about unique key violations.
- *
- * @see https://www.postgresql.org/docs/current/errcodes-appendix.html
+ * Temporary class used to "fake" a postgres error because currently Drizzle eats postgres
+ * errors in some cases (key violation during update for example).
  */
-export const PostgresErrors = {
-	UNIQUE_KEY_VIOLATION: '23505',
-} as const;
+export class DACOPostgresError extends Error {
+	severity;
+	code;
+	table;
+	constructor(message: string, { severity, code, table }: DACOPostgresErrorObject) {
+		super(`${message}`);
+		this.name = 'DACOPostgresError';
+		this.severity = severity;
+		this.code = code;
+		this.table = table;
+	}
+}
