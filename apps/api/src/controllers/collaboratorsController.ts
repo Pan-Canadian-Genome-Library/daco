@@ -80,7 +80,7 @@ export const createCollaborators = async ({
 		last_name: data.collaboratorLastName,
 		suffix: data.collaboratorSuffix,
 		position_title: data.collaboratorPositionTitle,
-		institutional_email: data.collaboratorInstitutionalEmail,
+		institutional_email: data.collaboratorInstitutionalEmail.toLowerCase(),
 		application_id,
 	}));
 
@@ -231,7 +231,7 @@ export const updateCollaborator = async ({
 		last_name: collaboratorUpdates.collaboratorLastName,
 		suffix: collaboratorUpdates.collaboratorSuffix,
 		position_title: collaboratorUpdates.collaboratorPositionTitle,
-		institutional_email: collaboratorUpdates.collaboratorInstitutionalEmail,
+		institutional_email: collaboratorUpdates.collaboratorInstitutionalEmail.toLowerCase(),
 		profile_url: collaboratorUpdates.collaboratorResearcherProfileURL,
 		collaborator_type: collaboratorUpdates.collaboratorType,
 		application_id,
