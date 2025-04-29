@@ -22,7 +22,7 @@ import { useQuery } from '@tanstack/react-query';
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { ApplicationListResponse } from '@pcgl-daco/data-model';
+import { type ApplicationListResponse } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 export interface ApplicationListSortingOptions {

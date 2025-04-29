@@ -30,7 +30,7 @@ import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard'
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { ApplicationDTO } from '@pcgl-daco/data-model';
+import { type ApplicationDTO } from '@pcgl-daco/data-model';
 
 const { Content } = Layout;
 const { Text } = Typography;
