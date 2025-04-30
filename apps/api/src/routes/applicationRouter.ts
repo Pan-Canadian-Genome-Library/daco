@@ -615,7 +615,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
