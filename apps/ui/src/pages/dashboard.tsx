@@ -17,10 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Alert, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
-import { useState } from 'react';
+import { Alert, Col, Flex, Layout, Row, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 import useGetApplicationList from '@/api/queries/useGetApplicationList';
 
@@ -33,18 +31,14 @@ import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { type ApplicationDTO } from '@pcgl-daco/data-model';
 
 const { Content } = Layout;
-const { Text } = Typography;
 
 const DashboardPage = () => {
 	const { useToken } = theme;
 	const { t: translate } = useTranslation();
-	const [openModal, setOpenModal] = useState(false);
-	const [modalAppId, setModalAppId] = useState('');
 
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
-	const navigate = useNavigate();
 	const { data: applicationData, error } = useGetApplicationList({
 		sort: [
 			{
@@ -53,23 +47,11 @@ const DashboardPage = () => {
 			},
 			{
 				column: 'created_at',
-				direction: 'asc',
+				direction: 'desc',
 			},
 		],
 		pageSize: 100,
 	});
-
-	const showEditApplicationModal = (id: string) => {
-		setModalAppId(id);
-		setOpenModal(true);
-	};
-
-	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
-	const handleOk = () => {
-		setOpenModal(false);
-		//TODO: No endpoint exists to move this to draft mode in the API just yet, this needs to be done otherwise we redirect to view mode automatically.
-		navigate(`/application/${modalAppId}/intro/edit`);
-	};
 
 	return (
 		<>
@@ -131,10 +113,10 @@ const DashboardPage = () => {
 										<Col xs={24} md={24} lg={12}>
 											<NewApplicationCard />
 										</Col>
-										{applicationData.applications.map((applicationItem: ApplicationDTO) => {
+										{applicationData?.applications.map((applicationItem: ApplicationDTO) => {
 											return (
 												<Col key={applicationItem.id} xs={24} md={24} lg={12}>
-													<ApplicationCard application={applicationItem} openEdit={showEditApplicationModal} />
+													<ApplicationCard application={applicationItem} />
 												</Col>
 											);
 										})}
@@ -144,20 +126,6 @@ const DashboardPage = () => {
 						</div>
 					</ContentWrapper>
 				</Flex>
-				<Modal
-					title={translate('modals.editApplication.title', { id: modalAppId })}
-					okText={translate('modals.editApplication.buttons.edit')}
-					cancelText={translate('modals.buttons.cancel')}
-					width={'100%'}
-					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-					open={openModal}
-					onOk={handleOk}
-					onCancel={() => setOpenModal(false)}
-				>
-					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modals.editApplication.description')}</Text>
-					</Flex>
-				</Modal>
 			</Content>
 		</>
 	);

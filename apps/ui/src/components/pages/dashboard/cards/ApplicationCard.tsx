@@ -31,7 +31,6 @@ const { Title, Text } = Typography;
 const { useToken } = theme;
 
 type ApplicationCardProps = {
-	openEdit: (id: string) => void;
 	application: ApplicationDTO;
 };
 
