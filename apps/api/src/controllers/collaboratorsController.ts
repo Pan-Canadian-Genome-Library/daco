@@ -148,8 +148,7 @@ export const deleteCollaborator = async ({
 
 /*
  * Lists all Collaborators for a given application
- * @param application_id - ID of related application record to associate with Collaborators
- * @param collaborators - Array of new Collaborators to create
+ * @param applicationId - ID of related application record to associate with Collaborators
  * @returns Success with Collaborator data array / Failure with Error.
  */
 export const listCollaborators = async ({
@@ -179,7 +178,7 @@ export const listCollaborators = async ({
  * @param application_id - ID of related application record to associate with Collaborators
  * @param institutional_email - The institutional email of the collaborator you want to update
  * @param user_id - ID of Applicant updating the application
- * @param collaborators - Collaborator record with updated properties
+ * @param collaboratorUpdates - Collaborator record with updated properties
  * @returns Success with Collaborator data record / Failure with Error.
  */
 export const updateCollaborator = async ({
