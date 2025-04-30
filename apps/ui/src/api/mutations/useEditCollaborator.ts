@@ -34,16 +34,16 @@ const useEditCollaborator = () => {
 		Error,
 		{
 			applicationId: number | string;
-			institutionalEmail: string;
+			collaboratorEmail: string;
 			collaboratorUpdates: CollaboratorDTO;
 		}
 	>({
-		mutationFn: async ({ applicationId, institutionalEmail, collaboratorUpdates }) => {
+		mutationFn: async ({ applicationId, collaboratorEmail, collaboratorUpdates }) => {
 			const response = await fetch('/collaborators/update', {
 				method: 'POST',
 				body: JSON.stringify({
 					applicationId,
-					institutionalEmail,
+					collaboratorEmail,
 					collaboratorUpdates,
 				}),
 			});

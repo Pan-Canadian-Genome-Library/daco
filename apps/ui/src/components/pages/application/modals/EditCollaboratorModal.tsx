@@ -71,7 +71,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 		if (rowData?.collaboratorInstitutionalEmail) {
 			editCollaborator({
 				applicationId: appId,
-				institutionalEmail: rowData.collaboratorInstitutionalEmail,
+				collaboratorEmail: rowData.collaboratorInstitutionalEmail,
 				collaboratorUpdates: { ...data },
 			})
 				.then(() => {
