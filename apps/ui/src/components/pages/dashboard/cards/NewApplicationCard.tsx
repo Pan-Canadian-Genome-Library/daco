@@ -39,6 +39,11 @@ const NewApplicationCard = () => {
 
 	return (
 		<Card
+		  styles={{
+				body: {
+					height: '100%',
+				},
+			}}
 			style={{ backgroundColor: token.colorWhite, minHeight: 200, height: 200, cursor: 'pointer' }}
 			hoverable
 			tabIndex={0}
