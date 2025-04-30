@@ -17,69 +17,69 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pcglColors } from '@/providers/ThemeProvider';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 type ApplicationCardProps = {
 	showEdit: boolean;
 	showActionRequired: boolean;
-	color: string;
+	colour: string;
 };
 
 export const getApplicationStateProperties = (applicationState: ApplicationStateValues): ApplicationCardProps => {
 	let showEdit = false;
 	let showActionRequired = false;
-	let color = pcglColors.white;
+	let colour = pcglColours.white;
 
 	switch (applicationState) {
 		case ApplicationStates.DRAFT:
 			showEdit = true;
-			color = pcglColors.warningPrimary;
+			colour = pcglColours.warningPrimary;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
 			showEdit = true;
-			color = pcglColors.warningPrimary;
+			colour = pcglColours.warningPrimary;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.DAC_REVIEW:
 			showEdit = true;
-			color = pcglColors.warningPrimary;
+			colour = pcglColours.warningPrimary;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
 			showEdit = true;
-			color = pcglColors.warningPrimary;
+			colour = pcglColours.warningPrimary;
 			showActionRequired = true;
 			break;
 		case ApplicationStates.DAC_REVISIONS_REQUESTED:
 			showEdit = true;
-			color = pcglColors.warningPrimary;
+			colour = pcglColours.warningPrimary;
 			showActionRequired = true;
 			break;
 		case ApplicationStates.REJECTED:
 			showEdit = false;
-			color = pcglColors.errorSecondary;
+			colour = pcglColours.errorSecondary;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.REVOKED:
 			showEdit = false;
-			color = pcglColors.errorSecondary;
+			colour = pcglColours.errorSecondary;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.APPROVED:
 			showEdit = false;
-			color = pcglColors.successSecondary;
+			colour = pcglColours.successSecondary;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.CLOSED:
 			showEdit = false;
-			color = pcglColors.grey;
+			colour = pcglColours.grey;
 			showActionRequired = false;
 			break;
 		default:
 			break;
 	}
 
-	return { showEdit, showActionRequired, color };
+	return { showEdit, showActionRequired, colour };
 };
