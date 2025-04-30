@@ -554,6 +554,10 @@ describe('Application API', () => {
 			await testApplicationRepo.createRevisionRequest({
 				applicationId,
 				revisionData: {
+					agreements_approved: false,
+					appendices_approved: false,
+					ethics_approved: false,
+					sign_and_submit_approved: true,
 					application_id: applicationId,
 					comments: 'Initial revision',
 					applicant_approved: false,

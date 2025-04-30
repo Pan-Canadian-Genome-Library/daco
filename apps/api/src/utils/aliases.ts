@@ -142,7 +142,6 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
 
 	data.forEach((value) => {
 		formattedUpdate.push({
-			id: value.id,
 			applicationId: value.application_id,
 			collaboratorFirstName: value.first_name,
 			collaboratorMiddleName: value.middle_name,
