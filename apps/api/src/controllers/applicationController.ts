@@ -333,7 +333,7 @@ export const requestApplicationRevisionsByDac = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -363,7 +363,19 @@ export const requestApplicationRevisionsByDac = async ({
 			return revisionRequestResult;
 		}
 
-		return service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+
+		if (!aliasResult.success) {
+			return aliasResult;
+		}
+
+		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
 
@@ -377,7 +389,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -407,7 +419,19 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return revisionRequestResult;
 		}
 
-		return service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+
+		if (!aliasResult.success) {
+			return aliasResult;
+		}
+
+		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
 
