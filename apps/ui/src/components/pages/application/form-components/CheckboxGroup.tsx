@@ -22,7 +22,7 @@ import { ReactNode } from 'react';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
-import { pcglColors } from '@/providers/ThemeProvider';
+import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Item } = Form;
 const { useToken } = theme;
@@ -69,7 +69,7 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 									<Checkbox
 										value={checkbox.value}
 										disabled={props.disabled}
-										style={{ width: '100%', backgroundColor: pcglColors.greyLight, padding: token.padding }}
+										style={{ width: '100%', backgroundColor: pcglColours.greyLight, padding: token.padding }}
 									>
 										{checkbox.label}
 									</Checkbox>

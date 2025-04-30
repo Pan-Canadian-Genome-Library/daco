@@ -18,7 +18,7 @@
  */
 
 import { SectionRoutes } from '@/pages/AppRouter';
-import { pcglColors } from '@/providers/ThemeProvider';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -76,13 +76,15 @@ const SectionMenuItem = ({
 		return;
 	};
 
+	const iconColour = isEditMode ? pcglColours.primary : 'inherit';
+
 	return (
 		<Flex style={{ width: '100%' }} justify="space-between">
 			<Text style={{ color: 'inherit' }} ellipsis>
 				{translate(`menu.${label}`)}
 			</Text>
 
-			<Flex style={{ color: !isEditMode ? 'inherit' : pcglColors.primary }}>{renderIcon()}</Flex>
+			<Flex style={{ color: iconColour }}>{renderIcon()}</Flex>
 		</Flex>
 	);
 };
