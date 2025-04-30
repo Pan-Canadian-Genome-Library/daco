@@ -39,7 +39,7 @@ const NewApplicationCard = () => {
 
 	return (
 		<Card
-		  styles={{
+			styles={{
 				body: {
 					height: '100%',
 				},
@@ -51,7 +51,9 @@ const NewApplicationCard = () => {
 			onKeyDown={handleCardClick}
 		>
 			<Flex justify="center" align="center" vertical gap="middle" style={{ height: '100%' }}>
-				<Title style={{ margin: 0 }} level={3}>{translate('dashboard.startNewApp')}</Title>
+				<Title style={{ margin: 0 }} level={3}>
+					{translate('dashboard.startNewApp')}
+				</Title>
 			</Flex>
 		</Card>
 	);
