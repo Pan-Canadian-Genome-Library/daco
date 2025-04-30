@@ -18,9 +18,15 @@
  */
 
 import useRejectApplication from '@/api/mutations/useRejectApplication';
-import { Flex, Modal, Typography } from 'antd';
+import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { RejectionSchemaType, rejectionSchema } from '@pcgl-daco/validation';
+import { Flex, Form, Modal, Typography } from 'antd';
+import { createSchemaFieldRule } from 'antd-zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+const rule = createSchemaFieldRule(rejectionSchema);
 
 const { Text } = Typography;
 
@@ -35,25 +41,46 @@ const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModa
 	const navigate = useNavigate();
 	const { mutateAsync: rejectApplication } = useRejectApplication();
 
-	const handleRejectApplicationRequest = async () => {
-		await rejectApplication({ applicationId: id });
+	const { handleSubmit, control, reset, formState } = useForm<RejectionSchemaType>({
+		defaultValues: { rejectionReason: '' },
+		resolver: zodResolver(rejectionSchema),
+	});
+
+	const handleRejectApplicationRequest: SubmitHandler<RejectionSchemaType> = async (data) => {
+		await rejectApplication({ applicationId: data.id, rejectionReason: data.rejectionReason });
 		setIsOpen(false);
+		reset();
 		navigate('/dashboard');
 	};
 
 	return (
 		<Modal
 			title={translate('modals.rejectApplication.title', { id })}
-			okText={translate('button.closeApp')}
+			okText={translate('button.rejectApp')}
 			cancelText={translate('modals.buttons.cancel')}
 			width="100%"
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 			open={isOpen}
-			onOk={handleRejectApplicationRequest}
-			onCancel={() => setIsOpen(false)}
+			onOk={handleSubmit(handleRejectApplicationRequest)}
+			onCancel={() => {
+				setIsOpen(false);
+				reset();
+			}}
+			okButtonProps={{ disabled: !formState.isDirty }}
 		>
-			<Flex style={{ height: '100%', marginTop: 20 }}>
+			<Flex vertical gap="middle" style={{ marginTop: 20 }}>
 				<Text>{translate('modals.rejectApplication.description')}</Text>
+				<Form layout="vertical">
+					<TextAreaBox
+						name="rejectionReason"
+						label={translate('modals.rejectApplication.rejectionReasonLabel')}
+						control={control}
+						showCount
+						rows={4}
+						maxWordCount={300}
+						rule={rule}
+					/>
+				</Form>
 			</Flex>
 		</Modal>
 	);

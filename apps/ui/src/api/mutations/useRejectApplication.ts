@@ -27,15 +27,16 @@ import { useTranslation } from 'react-i18next';
 
 type RejectApplicationPayload = {
 	applicationId: number;
+	rejectionReason: string;
 };
 
-const useRejectApplication = (id?: string | number) => {
+const useRejectApplication = (applicationId?: string | number) => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	queryKey: [id];
+	queryKey: [applicationId];
 	return useMutation<ApplicationResponseData, ServerError, RejectApplicationPayload>({
 		mutationFn: async ({ applicationId }) => {
-			const response = await fetch(`/applications/${id}/reject`, {
+			const response = await fetch(`/applications/${applicationId}/reject`, {
 				method: 'POST',
 				body: JSON.stringify({ applicationId }),
 			}).then(withErrorResponseHandler);
