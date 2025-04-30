@@ -46,7 +46,7 @@ const NewApplicationCard = () => {
 			onKeyDown={handleCardClick}
 		>
 			<Flex justify="center" align="center" vertical gap="middle" style={{ height: '100%' }}>
-				<Title level={3}>{translate('dashboard.startNewApp')}</Title>
+				<Title style={{ margin: 0 }} level={3}>{translate('dashboard.startNewApp')}</Title>
 			</Flex>
 		</Card>
 	);
