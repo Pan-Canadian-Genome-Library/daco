@@ -60,7 +60,10 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			const postgresError = isPostgresError(error);
 
 			if (postgresError && postgresError.code === PostgresErrors.UNIQUE_KEY_VIOLATION) {
-				return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
+				return failure(
+					'DUPLICATE_RECORD',
+					`Unable to create new collaborator. Email address provided is already being used by another collaborator record in the same application.`,
+				);
 			}
 
 			const message = `Error creating new collaborator records.`;
@@ -133,7 +136,10 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 			const postgresError = isPostgresError(error);
 
 			if (postgresError && postgresError.code === PostgresErrors.UNIQUE_KEY_VIOLATION) {
-				return failure('DUPLICATE_RECORD', `Cannot update record to be duplicate collaborator records.`);
+				return failure(
+					'DUPLICATE_RECORD',
+					`Unable to update record. Email address provided is already being used by another collaborator record in this application.`,
+				);
 			}
 
 			const message = `Error updating collaborator with ${original_identifying_email} in application ID ${application_id}.`;

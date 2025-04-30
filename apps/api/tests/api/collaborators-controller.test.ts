@@ -191,6 +191,7 @@ describe('Collaborators Controller', () => {
 
 			const collaboratorResult = await updateCollaborator({
 				application_id,
+				institutional_email: institutional_email,
 				user_id,
 				collaboratorUpdates,
 			});

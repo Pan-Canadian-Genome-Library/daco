@@ -208,7 +208,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				.from(collaborators)
 				.where(eq(collaborators.institutional_email, collaboratorEmail));
 			if (applicationIds.length === 0) {
-				return failure('NOT_FOUND', 'Could not find an collaborator for the provided collaboratorId');
+				return failure('NOT_FOUND', 'Could not find an collaborator for the provided collaborator email.');
 			}
 
 			// Fetch the applciation by ID
