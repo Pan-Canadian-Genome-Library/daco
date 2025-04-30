@@ -74,13 +74,15 @@ const SectionMenuItem = ({
 		return;
 	};
 
+	const iconColour = isEditMode ? pcglColours.primary : 'inherit';
+
 	return (
 		<Flex style={{ width: '100%' }} justify="space-between">
 			<Text style={{ color: 'inherit' }} ellipsis>
 				{translate(`menu.${label}`)}
 			</Text>
 
-			<Flex style={{ color: !isEditMode ? 'inherit' : pcglColours.primary }}>{renderIcon()}</Flex>
+			<Flex style={{ color: iconColour }}>{renderIcon()}</Flex>
 		</Flex>
 	);
 };
