@@ -23,7 +23,7 @@ import { fetch } from '@/global/FetchClient';
 
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorUpdateRecord, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
+import { type CollaboratorDTO, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 
 const useEditCollaborator = () => {
 	const { t: translate } = useTranslation();
@@ -34,14 +34,16 @@ const useEditCollaborator = () => {
 		Error,
 		{
 			applicationId: number | string;
-			collaboratorUpdates: CollaboratorUpdateRecord;
+			collaboratorEmail: string;
+			collaboratorUpdates: CollaboratorDTO;
 		}
 	>({
-		mutationFn: async ({ applicationId, collaboratorUpdates }) => {
+		mutationFn: async ({ applicationId, collaboratorEmail, collaboratorUpdates }) => {
 			const response = await fetch('/collaborators/update', {
 				method: 'POST',
 				body: JSON.stringify({
 					applicationId,
+					collaboratorEmail,
 					collaboratorUpdates,
 				}),
 			});
@@ -80,15 +82,7 @@ const useEditCollaborator = () => {
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the edit collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
-				return prev.map((value) => {
-					// Replace cached value with response object
-					if (value.id === data[0]?.id) {
-						return data[0];
-					}
-					return value;
-				});
-			});
+			await queryClient.invalidateQueries({ queryKey: [`collaborators-${data[0]?.applicationId}`] });
 			notification.openNotification({
 				type: 'success',
 				message: translate('collab-section.notifications.edit.successTitle'),
