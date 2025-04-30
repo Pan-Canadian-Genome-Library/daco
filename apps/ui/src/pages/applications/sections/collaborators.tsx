@@ -122,7 +122,12 @@ const Collaborators = () => {
 					showDivider={false}
 				/>
 				<SectionContent showDivider={false}>
-					<Table rowKey={(record) => `PCGL-${record.id}`} columns={columns} dataSource={data} pagination={false} />
+					<Table
+						rowKey={(record) => `PCGL-${record.collaboratorInstitutionalEmail}`}
+						columns={columns}
+						dataSource={data}
+						pagination={false}
+					/>
 					<Row justify={'end'}>
 						<Col style={{ paddingTop: token.paddingLG }}>
 							<Button
