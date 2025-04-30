@@ -64,7 +64,8 @@
 		"addCollab": "Add Collaborator",
 		"upload": "Upload",
 		"save": "Save Changes",
-		"rejectApp": "Reject Application"
+		"rejectApp": "Reject Application",
+		"rejectApplication": "Reject"
 	},
 	"label": {
 		"created": "Created",

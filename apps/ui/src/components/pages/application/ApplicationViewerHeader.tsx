@@ -22,7 +22,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
-import useRejectApplication from '@/api/mutations/useRejectApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
@@ -61,7 +60,6 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
-	const { mutateAsync: rejectApplication } = useRejectApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
@@ -153,6 +151,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					{canShowEdit ? <Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button> : null}
 					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
+					<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
 				</Flex>
 				<WithdrawModal
 					applicationId={id}
