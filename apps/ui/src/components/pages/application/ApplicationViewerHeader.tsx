@@ -31,6 +31,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useNavigate } from 'react-router';
+import ApproveApplicationModal from './modals/ApproveApplicationModal';
 import WithdrawModal from './modals/WithdrawModal';
 
 const { Text } = Typography;
@@ -59,6 +60,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
+	const [showApproveModal, setShowApproveModal] = useState(false);
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
@@ -149,6 +151,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					{canShowEdit ? <Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button> : null}
 					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
+					<Button onClick={() => setShowApproveModal(true)}>{translate('button.approveApplication')}</Button>
 				</Flex>
 				<WithdrawModal
 					applicationId={id}
@@ -171,6 +174,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 						<Text>{translate('modals.closeApplication.description')}</Text>
 					</Flex>
 				</Modal>
+				<ApproveApplicationModal id={id} isOpen={showApproveModal} setIsOpen={setShowApproveModal} />
 				<RequestRevisionsModal
 					onSubmit={onRevisionsSubmit}
 					isOpen={openRevisionsModal}

@@ -63,7 +63,8 @@
 		"submitApplication": "Submit Application",
 		"addCollab": "Add Collaborator",
 		"upload": "Upload",
-		"save": "Save Changes"
+		"save": "Save Changes",
+		"approveApplication": "Approve"
 	},
 	"label": {
 		"created": "Created",
