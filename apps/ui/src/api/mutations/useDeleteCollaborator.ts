@@ -34,10 +34,10 @@ const useDeleteCollaborator = () => {
 	return useMutation<
 		ListCollaboratorResponse,
 		ServerError,
-		{ applicationId: number | string; collaboratorId: number | string }
+		{ applicationId: number | string; collaboratorEmail: string }
 	>({
-		mutationFn: async ({ applicationId, collaboratorId }) => {
-			const response = await fetch(`/collaborators/${applicationId}/${collaboratorId}`, {
+		mutationFn: async ({ applicationId, collaboratorEmail }) => {
+			const response = await fetch(`/collaborators/${applicationId}/${collaboratorEmail}`, {
 				method: 'DELETE',
 			}).then(withErrorResponseHandler);
 
@@ -53,7 +53,7 @@ const useDeleteCollaborator = () => {
 		onSuccess: async (data) => {
 			//  Update the cache if the delete collaborator request is successful to prevent refetching data
 			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
-				return prev.filter((value) => value.id !== data[0]?.id);
+				return prev.filter((value) => value.collaboratorInstitutionalEmail !== data[0]?.collaboratorInstitutionalEmail);
 			});
 			notification.openNotification({
 				type: 'success',
