@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { CollaboratorDTO } from '@pcgl-daco/data-model';
+import { type CollaboratorDTO } from '@pcgl-daco/data-model';
 import { Link, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
