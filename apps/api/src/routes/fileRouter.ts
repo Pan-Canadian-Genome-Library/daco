@@ -27,7 +27,7 @@ import { ErrorType, fileUploadValidation, withParamsSchemaValidation } from '@pc
 import { deleteFileByIdSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
 import formidable from 'formidable';
-import { ResponseWithData } from './types.ts';
+import type { ResponseWithData } from './types.ts';
 
 const fileRouter = express.Router();
 

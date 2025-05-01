@@ -208,15 +208,11 @@ export const createApplicationPDF = async ({
 
 	const ethicsLetterID = applicationContents.data.contents?.ethics_letter;
 
-	const filename = `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`;
-
-	let fileContents = undefined;
-
-	if (ethicsLetterID) {
-		fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
-	} else {
+	if (!ethicsLetterID) {
 		return failure('SYSTEM_ERROR', 'No ethics approval or exemption file was found, unable to generate PDF.');
 	}
+
+	const fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
 
 	if (!fileContents.success) {
 		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
@@ -244,7 +240,7 @@ export const createApplicationPDF = async ({
 		signatureContents: aliasedSignatureContents.data,
 		collaboratorsContents: aliasedCollaboratorsContents,
 		fileContents: aliasedFileContents.data,
-		filename,
+		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
 	});
 
 	if (!renderedPDF.success) {
@@ -253,8 +249,8 @@ export const createApplicationPDF = async ({
 
 	const createFileRecord = await fileService.createFile({
 		file: {
-			originalFilename: `${filename}.pdf`,
-			filepath: '/', //This doesn't matter as it's not used in the createFile method, however it required by the Formidable.File Type
+			originalFilename: `${`PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`}.pdf`,
+			filepath: '#', //This doesn't matter as it's not used in the createFile method, however it required by the Formidable.File Type
 		},
 		application: applicationContents.data,
 		readFrom: 'buffer',

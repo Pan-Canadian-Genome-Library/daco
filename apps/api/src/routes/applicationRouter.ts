@@ -308,8 +308,8 @@ applicationRouter.get(
 		if (result.success) {
 			const { data } = result;
 
-			// Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER
-			if (data.userId !== userId && getUserRole(request.session) !== userRoleSchema.Values.DAC_MEMBER) {
+			// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
+			if (data.userId !== userId || getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER) {
 				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 				return;
 			}
@@ -355,9 +355,9 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/approve',
-	authMiddleware({ requiredRoles: ['APPLICANT'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
-		request,
+		request: Request,
 		response: ResponseWithData<
 			{ message: string; data: ApplicationRecord },
 			['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']
@@ -430,7 +430,7 @@ applicationRouter.post(
 	'/reject',
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
-		request,
+		request: Request,
 		response: ResponseWithData<
 			{ message: string; data: ApplicationRecord },
 			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
