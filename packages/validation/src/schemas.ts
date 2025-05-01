@@ -51,20 +51,6 @@ export const applicantInformationSchema = z.object({
 });
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 
-export const collaboratorsSchema = z.object({
-	collaboratorFirstName: NonEmptyString,
-	collaboratorMiddleName: EmptyOrOptionalString,
-	collaboratorLastName: NonEmptyString,
-	collaboratorSuffix: EmptyOrOptionalString,
-	collaboratorInstitutionalEmail: NonEmptyString.email(),
-	collaboratorPositionTitle: NonEmptyString,
-	collaboratorPrimaryAffiliation: EmptyOrOptionalString,
-	collaboratorResearcherProfileURL: EmptyOrOptionalString,
-	collaboratorType: EmptyOrOptionalString,
-});
-
-export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
-
 export const institutionalRepSchema = z.object({
 	institutionalTitle: OptionalString,
 	institutionalFirstName: NonEmptyString,
@@ -100,17 +86,25 @@ export type ProjectInformationSchemaType = z.infer<typeof projectInformationSche
 
 export const ethicsSchema = z.object({
 	ethicsReviewRequired: z.boolean(),
+	ethicsLetter: z.number().nonnegative(),
 });
 
 export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
-export const requestedStudySchema = z.object({
-	requestedStudy: z.number().nonnegative(),
+export const requestedStudiesSchema = z.object({
+	requestedStudies: z.array(z.string()).superRefine((study, context) => {
+		if (study.length !== 1) {
+			context.addIssue({
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'requiredField' },
+			});
+		}
+	}),
 });
-export type RequestedStudySchemaType = z.infer<typeof requestedStudySchema>;
+export type RequestedStudiesSchemaType = z.infer<typeof requestedStudiesSchema>;
 
 export const agreementsSchema = z.object({
-	agreements: z.array(z.string()).superRefine((allAgreements, context) => {
+	acceptedAgreements: z.array(z.string()).superRefine((allAgreements, context) => {
 		if (allAgreements.length > 9) {
 			context.addIssue({
 				code: z.ZodIssueCode.too_big,
@@ -122,10 +116,8 @@ export const agreementsSchema = z.object({
 
 		if (allAgreements.length < 9) {
 			context.addIssue({
-				code: z.ZodIssueCode.too_small,
-				minimum: 9,
-				type: 'array',
-				inclusive: true,
+				code: z.ZodIssueCode.custom,
+				params: { violation: 'checkboxesNotFilledOut' },
 			});
 		}
 
@@ -147,7 +139,7 @@ export const agreementsSchema = z.object({
 export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
 
 export const appendicesSchema = z.object({
-	appendices: z.array(z.string()).superRefine((policies, context) => {
+	acceptedAppendices: z.array(z.string()).superRefine((policies, context) => {
 		if (policies.length !== 3) {
 			context.addIssue({
 				code: z.ZodIssueCode.custom,

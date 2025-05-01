@@ -160,6 +160,14 @@ export type ProjectDTO = {
 	projectPublicationUrls?: string[] | null;
 };
 
+export type AgreementDTO = {
+	acceptedAgreements?: string[] | null;
+};
+
+export type AppendicesDTO = {
+	acceptedAppendices?: string[] | null;
+};
+
 export type EthicsLetterDTO = {
 	ethicsLetter?: number | null;
 	ethicsReviewRequired?: boolean | null;
@@ -217,6 +225,8 @@ export type ApplicationContentsResponse = {
 	InstitutionalRepDTO &
 	ProjectDTO &
 	RequestedStudiesDTO &
+	AgreementDTO &
+	AppendicesDTO &
 	EthicsLetterDTO;
 
 export interface ApplicationResponseData extends ApplicationDTO {
@@ -256,7 +266,7 @@ export interface CollaboratorDTO {
 	collaboratorInstitutionalEmail: string;
 	collaboratorLastName: string;
 	collaboratorMiddleName?: string | null;
-	collaboratorPositionTitle: string;
+	collaboratorPositionTitle?: string | null;
 	collaboratorPrimaryAffiliation?: string | null;
 	collaboratorResearcherProfileURL?: string | null;
 	collaboratorSuffix?: string | null;
@@ -264,7 +274,6 @@ export interface CollaboratorDTO {
 }
 
 export interface CollaboratorsResponseDTO extends CollaboratorDTO {
-	id: number;
 	applicationId: number;
 }
 export type ListCollaboratorResponse = CollaboratorsResponseDTO[];
@@ -278,12 +287,8 @@ export interface ListCollaboratorRequest extends BaseCollaboratorRequest {
 	collaborators: CollaboratorDTO[];
 }
 
-export type CollaboratorUpdateRecord = Partial<CollaboratorDTO> & {
-	id: number;
-};
-
 export interface UpdateCollaboratorRequest extends BaseCollaboratorRequest {
-	collaborators: CollaboratorUpdateRecord;
+	collaborators: CollaboratorDTO;
 }
 
 export interface DeleteCollaboratorRequest {
@@ -356,3 +361,17 @@ export interface SignatureDTO {
 	institutionalRepSignature?: string | null;
 	institutionalRepSignedAt?: Date | null;
 }
+
+export const agreementEnum = [
+	'dac_agreement_software_updates',
+	'dac_agreement_non_disclosure',
+	'dac_agreement_monitor_individual_access',
+	'dac_agreement_destroy_data',
+	'dac_agreement_familiarize_restrictions',
+	'dac_agreement_provide_it_policy',
+	'dac_agreement_notify_unauthorized_access',
+	'dac_agreement_certify_application',
+	'dac_agreement_read_and_agreed',
+] as const;
+
+export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as const;

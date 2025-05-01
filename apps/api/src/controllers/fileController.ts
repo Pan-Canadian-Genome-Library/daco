@@ -108,10 +108,6 @@ export const uploadEthicsFile = async ({
 
 		const fileRecord = convertToFileRecord(txResult.data);
 
-		if (!fileRecord.success) {
-			return fileRecord;
-		}
-
 		return fileRecord;
 	} catch (error) {
 		const message = `Unable to upload file to application with id: ${applicationId}`;

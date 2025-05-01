@@ -17,8 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema, projectInformationSchema } from '@pcgl-daco/validation';
+import { type ApplicationContentsResponse } from '@pcgl-daco/data-model';
+import {
+	agreementsSchema,
+	appendicesSchema,
+	applicantInformationSchema,
+	ethicsSchema,
+	institutionalRepSchema,
+	projectInformationSchema,
+	requestedStudiesSchema,
+} from '@pcgl-daco/validation';
 
 export const ValidatorApplicant = (fields: ApplicationContentsResponse): boolean => {
 	return applicantInformationSchema.safeParse({
@@ -73,4 +81,41 @@ export const ValidatorProject = (fields: ApplicationContentsResponse): boolean =
 		relevantPublicationURL2: fields.projectPublicationUrls ? fields.projectPublicationUrls[1] : null,
 		relevantPublicationURL3: fields.projectPublicationUrls ? fields.projectPublicationUrls[2] : null,
 	}).success;
+};
+
+export const ValidatorEthics = (fields: ApplicationContentsResponse): boolean => {
+	return ethicsSchema.safeParse({
+		ethicsReviewRequired: fields.ethicsReviewRequired,
+		ethicsLetter: fields.ethicsLetter,
+	}).success;
+};
+
+export const ValidatorAgreements = (fields: ApplicationContentsResponse): boolean => {
+	return agreementsSchema.safeParse({
+		acceptedAgreements: fields.acceptedAgreements,
+	}).success;
+};
+
+export const ValidatorAppendices = (fields: ApplicationContentsResponse): boolean => {
+	return appendicesSchema.safeParse({
+		acceptedAppendices: fields.acceptedAppendices,
+	}).success;
+};
+
+export const ValidatorStudy = (fields: ApplicationContentsResponse): boolean => {
+	return requestedStudiesSchema.safeParse({
+		requestedStudies: fields.requestedStudies,
+	}).success;
+};
+
+export const ValidateAllSections = (fields: ApplicationContentsResponse): boolean => {
+	return (
+		ValidatorAppendices(fields) &&
+		ValidatorAgreements(fields) &&
+		ValidatorEthics(fields) &&
+		ValidatorStudy(fields) &&
+		ValidatorProject(fields) &&
+		ValidatorInstitution(fields) &&
+		ValidatorApplicant(fields)
+	);
 };

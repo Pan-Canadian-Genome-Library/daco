@@ -62,7 +62,10 @@ export const updateApplicationSignature = async ({
 	applicationId,
 	signature,
 	signee,
-}: EditSignatureRequest): AsyncResult<ApplicationSignatureDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}: EditSignatureRequest & { signee: SignatureType }): AsyncResult<
+	ApplicationSignatureDTO,
+	'NOT_FOUND' | 'SYSTEM_ERROR'
+> => {
 	const database = getDbInstance();
 	const signatureRepo: SignatureService = signatureService(database);
 

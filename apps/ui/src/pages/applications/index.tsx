@@ -27,7 +27,7 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/queries/useGetApplication';
 import ErrorPage from '@/components/pages/ErrorPage';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const { Content } = Layout;
 
@@ -39,49 +39,57 @@ const ApplicationViewer = () => {
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
-
-	const { data, isError, error, isLoading } = useGetApplication(params.id);
+	const {
+		data: applicationData,
+		isError: applicationIsErrored,
+		error: applicationError,
+		isLoading: applicationIsLoading,
+	} = useGetApplication(params.id);
 
 	useEffect(() => {
-		if (data && !('isError' in data)) {
-			/**
-			 * This likely means that the user directly linked the edit page somehow
-			 * when the application was no longer in DRAFT mode. We redirect back to
-			 * the view mode as protection.
-			 *
-			 * In the future, this should also check user ability (can they edit?)
-			 */
-			if (data.state !== ApplicationStates.DRAFT && isEditMode) {
-				navigation(`/application/${data.id}/`, { replace: true });
+		if (applicationData && !applicationError) {
+			const isNotInEditLifecycle =
+				applicationData.state !== ApplicationStates.DRAFT &&
+				applicationData.state !== ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED &&
+				applicationData.state !== ApplicationStates.DAC_REVISIONS_REQUESTED;
+
+			if (isNotInEditLifecycle && isEditMode) {
+				navigation(`/application/${applicationData.id}/`, { replace: true });
 			}
 		}
-	}, [data, isEditMode, navigation]);
+	}, [applicationData, applicationError, isEditMode, navigation]);
 
 	// scroll to top on page change
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, [match]);
 
-	if (!data || isError || isLoading) return <ErrorPage loading={isLoading} error={error} />;
+	if (!applicationData || applicationIsErrored || applicationIsLoading)
+		return <ErrorPage loading={applicationIsLoading} error={applicationError} />;
 
 	return (
 		<Content>
 			<Flex style={{ height: '100%' }} vertical>
-				<ApplicationViewerHeader id={data.id} state={data.state} />
+				<ApplicationViewerHeader
+					isEditMode={isEditMode}
+					currentSection={currentSection}
+					id={applicationData.id}
+					state={applicationData.state}
+				/>
 				{/* Multipart form Viewer */}
 				<Flex style={{ width: '100%', paddingInline: '52px' }}>
 					<ContentWrapper style={{ minHeight: '70vh', padding: '2em 0', gap: '3rem' }}>
 						<>
 							<Row style={{ width: '25%' }}>
 								<Col style={{ width: '100%' }}>
-									<SectionMenu appId={data.id} currentSection={currentSection} isEditMode={isEditMode} />
+									<SectionMenu appId={applicationData.id} currentSection={currentSection} isEditMode={isEditMode} />
 								</Col>
 							</Row>
 							<Row style={{ width: '75%' }}>
 								<Col style={{ background: 'white', width: '100%' }}>
 									<Outlet
 										context={{
-											appId: data.id,
+											appId: applicationData.id,
 											isEditMode,
 										}}
 									/>

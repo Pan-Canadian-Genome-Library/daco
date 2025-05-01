@@ -22,7 +22,7 @@ import { FormItemLayout } from 'antd/es/form/Form';
 import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
-import { pcglColors } from '@/providers/ThemeProvider';
+import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Item } = Form;
 const { useToken } = theme;
@@ -62,7 +62,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 							<Flex
 								key={item.key}
 								style={{
-									backgroundColor: pcglColors.greyLight,
+									backgroundColor: pcglColours.greyLight,
 									width: '100%',
 									padding: token.padding,
 								}}

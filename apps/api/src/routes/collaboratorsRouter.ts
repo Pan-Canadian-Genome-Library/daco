@@ -151,7 +151,8 @@ collaboratorsRouter.get(
 
 			const isApplicationUser = applicationResult.data.userId === userId;
 			// TODO: Identify if the user role is institutional rep and is the rep for this application
-			const isApplicationInstitutionalRep = await isAssociatedRep({ session: request.session, applicationId });
+			const isApplicationInstitutionalRep = await isAssociatedRep(request.session, applicationId);
+
 			const isDacMember = userRole === 'DAC_MEMBER';
 
 			if (!(isApplicationUser || isApplicationInstitutionalRep || isDacMember)) {
@@ -186,7 +187,7 @@ collaboratorsRouter.get(
  * Delete Collaborator
  */
 collaboratorsRouter.delete(
-	'/:applicationId/:collaboratorId',
+	'/:applicationId/:collaboratorEmail',
 	authMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsDeleteParamsSchema,
@@ -199,10 +200,12 @@ collaboratorsRouter.delete(
 			>,
 		) => {
 			try {
-				const collaboratorId = Number(request.params.collaboratorId);
+				const collaboratorEmail = request.params.collaboratorEmail;
 
-				if (!isPositiveInteger(collaboratorId)) {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Collaborator ID is not a valid number.' });
+				if (!collaboratorEmail) {
+					response
+						.status(400)
+						.json({ error: 'INVALID_REQUEST', message: 'Collaborator Email must be included in delete request.' });
 					return;
 				}
 
@@ -243,7 +246,7 @@ collaboratorsRouter.delete(
 
 				const result = await deleteCollaborator({
 					application_id: applicationId,
-					id: collaboratorId,
+					collaborator_email: collaboratorEmail,
 				});
 
 				if (result.success) {
@@ -287,7 +290,7 @@ collaboratorsRouter.post(
 			>,
 		) => {
 			try {
-				const { applicationId: application_id, collaboratorUpdates } = request.body;
+				const { applicationId: application_id, collaboratorEmail, collaboratorUpdates } = request.body;
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
@@ -297,6 +300,7 @@ collaboratorsRouter.post(
 
 				const result = await updateCollaborator({
 					application_id,
+					institutional_email: collaboratorEmail,
 					user_id: userId,
 					collaboratorUpdates,
 				});

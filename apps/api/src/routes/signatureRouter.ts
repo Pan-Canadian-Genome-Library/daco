@@ -28,6 +28,7 @@ import {
 	editSignatureRequestSchema,
 	getSignatureParamsSchema,
 	isPositiveInteger,
+	userRoleSchema,
 	type EditSignatureResponse,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
@@ -131,7 +132,7 @@ signatureRouter.get(
  *
  * The body of the request will indicate if the signature is from the applicant or the institutional representative.
  *
- * To sign an applciation, the user must be the author of the application, or be the institional rep assinged to the application.
+ * To sign an application, the user must be the author of the application, or be the institutional rep assigned to the application.
  */
 signatureRouter.post(
 	'/sign',
@@ -148,7 +149,16 @@ signatureRouter.post(
 		) => {
 			try {
 				const data = request.body;
-				const { applicationId, signature, signee } = data;
+				const { applicationId, signature } = data;
+				const role = getUserRole(request.session);
+
+				if (role !== userRoleSchema.Values.APPLICANT && role !== userRoleSchema.Values.INSTITUTIONAL_REP) {
+					response.status(403).json({
+						error: 'FORBIDDEN',
+						message: 'User role is not allowed to create a signature for this application',
+					});
+					return;
+				}
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
@@ -170,10 +180,10 @@ signatureRouter.post(
 					}
 				}
 
-				const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
-				// TODO: Identify if the user role is institutional rep and is the rep for this application
+				const isApplicationUser = role === userRoleSchema.Values.APPLICANT && applicationResult.data.userId === userId;
+
 				const isApplicationInstitutionalRep =
-					signee === 'INSTITUTIONAL_REP' && isAssociatedRep({ session: request.session, applicationId });
+					role === userRoleSchema.Values.INSTITUTIONAL_REP && (await isAssociatedRep(request.session, applicationId));
 
 				if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 					response
@@ -185,7 +195,7 @@ signatureRouter.post(
 				const result = await updateApplicationSignature({
 					applicationId,
 					signature,
-					signee,
+					signee: role,
 				});
 
 				if (result.success) {
@@ -211,10 +221,6 @@ signatureRouter.post(
 	),
 );
 
-/**
- * TODO:
- * 	- Currently no validation is done to ensure that the current logged in user can create a application. This should be done and refactored.
- */
 signatureRouter.delete(
 	'/:applicationId',
 	authMiddleware(),
@@ -242,7 +248,7 @@ signatureRouter.delete(
 					if (!queryValidationResult.success) {
 						response.status(400).json({
 							error: 'INVALID_REQUEST',
-							message: `5Signee parameter must be either 'APPLICANT' or 'INSTITUTIONAL_REP'.`,
+							message: `Signee parameter must be either 'APPLICANT' or 'INSTITUTIONAL_REP'.`,
 						});
 						return;
 					}
@@ -270,9 +276,9 @@ signatureRouter.delete(
 					}
 
 					const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
-					// TODO: Identify if the user role is institutional rep and is the rep for this application
+
 					const isApplicationInstitutionalRep =
-						signee === 'INSTITUTIONAL_REP' && isAssociatedRep({ session: request.session, applicationId });
+						signee === 'INSTITUTIONAL_REP' && (await isAssociatedRep(request.session, applicationId));
 
 					if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 						response

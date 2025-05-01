@@ -17,16 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ErrorName, ErrorResponse } from '../error/ErrorResponse.js';
+import { useQuery } from '@tanstack/react-query';
 
-const { SERVER_ERROR } = ErrorName;
+import { withErrorResponseHandler } from '@/api/apiUtils';
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { type SignatureDTO } from '@pcgl-daco/data-model';
 
-/**
- * Creates a ServerError Response containing a message detailing the problem.
- * @param customMessage
- * @returns
- */
-export const ServerErrorResponse = (customMessage?: string): ErrorResponse => ({
-	error: SERVER_ERROR,
-	message: customMessage ?? "Sorry, something went wrong. We're unable to process your request, please try again later.",
-});
+const useGetSignatures = ({ applicationId }: { applicationId: number | string }) => {
+	return useQuery<SignatureDTO, ServerError>({
+		queryKey: [`signature-${applicationId}`],
+		queryFn: async () => {
+			const response = await fetch(`/signature/${applicationId}`).then(withErrorResponseHandler);
+
+			return await response.json();
+		},
+	});
+};
+
+export default useGetSignatures;

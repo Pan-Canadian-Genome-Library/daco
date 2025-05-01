@@ -17,22 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export enum ErrorName {
-	BAD_REQUEST_ERROR = 'BadRequestError',
-	CONFLICT_ERROR = 'ConflictError',
-	NOT_FOUND_ERROR = 'NotFoundError',
-	RECAPTCHA_ERROR = 'RecaptchaError',
-	REQUEST_VALIDATION_ERROR = 'RequestValidationError',
-	SERVER_ERROR = 'ServerError',
-	UNAUTHORIZED = 'Unauthorized',
-}
+import { useMutation } from '@tanstack/react-query';
 
-export type ErrorResponse = {
-	error: ErrorName | 'NOT_IMPLEMENTED'; // TODO: remove once all routes are implemented
-	message: string;
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+
+import { queryClient } from '@/providers/Providers';
+import { withErrorResponseHandler } from '../apiUtils';
+
+const useDeleteEthicsFile = () => {
+	return useMutation<{ fileId: number | string }, ServerError, { fileId: number | string }>({
+		mutationFn: async ({ fileId }) => {
+			await fetch(`/file/${fileId}`, {
+				method: 'DELETE',
+			}).then(withErrorResponseHandler);
+
+			return { fileId: fileId };
+		},
+		onSuccess: async (data) => {
+			//  Update the cache to empty if the delete was successful
+			await queryClient.setQueryData([`file-${data.fileId}`], () => {
+				return [];
+			});
+		},
+	});
 };
 
-export const ErrorResponse = (error: ErrorName | 'NOT_IMPLEMENTED', message: string) => ({
-	error,
-	message,
-});
+export default useDeleteEthicsFile;

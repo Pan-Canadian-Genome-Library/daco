@@ -18,13 +18,26 @@
  */
 
 import {
+	type AgreementDTO,
+	type AppendicesDTO,
 	type ApplicantDTO,
 	type ApplicationContentsResponse,
+	type EthicsLetterDTO,
 	type InstitutionalRepDTO,
 	type InstitutionDTO,
 	type ProjectDTO,
+	type RequestedStudiesDTO,
 } from '@pcgl-daco/data-model';
-import { applicantInformationSchema, institutionalRepSchema, projectInformationSchema } from '@pcgl-daco/validation';
+
+import {
+	agreementsSchema,
+	appendicesSchema,
+	applicantInformationSchema,
+	ethicsSchema,
+	institutionalRepSchema,
+	projectInformationSchema,
+	requestedStudiesSchema,
+} from '@pcgl-daco/validation';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
 export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
@@ -39,6 +52,22 @@ export function isApplicantKey(value: string): value is keyof ApplicantDTO {
 interface InstitutionalKey extends InstitutionalRepDTO, InstitutionDTO {}
 export function isInstitutionalKey(value: string): value is keyof InstitutionalKey {
 	return value in institutionalRepSchema.keyof().Values;
+}
+
+export function isAgreementKey(value: string): value is keyof AgreementDTO {
+	return value in agreementsSchema.keyof().Values;
+}
+
+export function isAppendicesKey(value: string): value is keyof AppendicesDTO {
+	return value in appendicesSchema.keyof().Values;
+}
+// EthicsKey
+export function isEthicsKey(value: string): value is keyof EthicsLetterDTO {
+	return value in ethicsSchema.keyof().Values;
+}
+// RequestedStudyKey
+export function isRequestedStudies(value: string): value is keyof RequestedStudiesDTO {
+	return value in requestedStudiesSchema.keyof().Values;
 }
 
 // ProjectKey

@@ -40,15 +40,19 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const { mutateAsync: addCollaborator } = useAddCollaborator();
 
-	const { handleSubmit, control, reset } = useForm<CollaboratorsSchemaType>({
+	const { handleSubmit, control, reset, setFocus } = useForm<CollaboratorsSchemaType>({
 		resolver: zodResolver(collaboratorsSchema),
 	});
 
 	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = async (data) => {
-		addCollaborator({ applicationId: appId, collaborators: [data] }).then(() => {
-			reset(); // Clear form after submit
-			setIsOpen({ isOpen: false });
-		});
+		addCollaborator({ applicationId: appId, collaborators: [data] })
+			.then(() => {
+				reset(); // Clear form after submit
+				setIsOpen({ isOpen: false });
+			})
+			.catch(() => {
+				setFocus('collaboratorInstitutionalEmail');
+			});
 	};
 
 	useEffect(() => {
@@ -134,7 +138,6 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									control={control}
 									rule={rule}
-									required
 									disabled={!isEditMode}
 								/>
 							</Col>

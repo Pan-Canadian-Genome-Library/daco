@@ -24,7 +24,7 @@ import { getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { apiZodErrorMapping } from '@/utils/validation.ts';
 import { FilesDTO } from '@pcgl-daco/data-model';
 import { ErrorType, fileUploadValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { fileDeleteParamsSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
+import { deleteFileByIdSchema, getFileByIdParamsSchema, isPositiveInteger } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
 import formidable from 'formidable';
 import { ResponseWithData } from './types.ts';
@@ -75,23 +75,17 @@ async function retrieveFile(
 		return;
 	}
 
-	const isApplicationInstitutionalRep = await isAssociatedRep({
-		session: req.session,
-		applicationId: result.data.applicationId,
-	});
+	const isApplicationInstitutionalRep = await isAssociatedRep(req.session, result.data.applicationId);
 
-	if (
-		!isApplicationInstitutionalRep ||
-		(userRole === 'APPLICANT' && userInfo?.userId !== result.data.submitterUserId)
-	) {
-		res.status(403).json({
-			error: ErrorType.FORBIDDEN,
-			message: 'Looks like you do not own, or have the rights to access to this file.',
-		});
+	if (isApplicationInstitutionalRep || userRole === 'DAC_MEMBER' || userInfo?.userId === result.data.submitterUserId) {
+		res.status(200).send(result.data);
 		return;
 	}
 
-	res.status(200).send(result.data);
+	res.status(403).json({
+		error: ErrorType.FORBIDDEN,
+		message: 'Looks like you do not own, or have the rights to retrieve this file.',
+	});
 	return;
 }
 
@@ -118,7 +112,7 @@ fileRouter.get(
 		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
 	}),
 	withParamsSchemaValidation(
-		fileDeleteParamsSchema,
+		getFileByIdParamsSchema,
 		apiZodErrorMapping,
 		async (
 			req: Request,
@@ -132,7 +126,7 @@ fileRouter.get(
 fileRouter.post(
 	'/ethics/:applicationId',
 	authMiddleware({
-		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
+		requiredRoles: ['APPLICANT'],
 	}),
 	fileUploadValidation(
 		async (
@@ -209,10 +203,10 @@ fileRouter.post(
 fileRouter.delete(
 	'/:fileId',
 	authMiddleware({
-		requiredRoles: ['APPLICANT', 'DAC_MEMBER'],
+		requiredRoles: ['APPLICANT'],
 	}),
 	withParamsSchemaValidation(
-		fileDeleteParamsSchema,
+		deleteFileByIdSchema,
 		apiZodErrorMapping,
 		async (req: Request, res: ResponseWithData<void, ['FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']>) => {
 			const { fileId } = req.params;
@@ -234,7 +228,7 @@ fileRouter.delete(
 				return;
 			}
 
-			if (getUserRole(userSession) !== 'DAC_MEMBER' && file.data.submitterUserId !== userSession.user?.userId) {
+			if (file.data.submitterUserId !== userSession.user?.userId) {
 				res.status(403).send({
 					error: ErrorType.FORBIDDEN,
 					message: 'Looks like you do not own, or have the rights to modify this file.',

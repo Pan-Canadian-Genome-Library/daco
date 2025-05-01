@@ -17,12 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { UploadOutlined } from '@ant-design/icons';
+import { CloseOutlined, UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Form, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -32,9 +32,11 @@ import useGetDownload from '@/api/queries/useGetDownload';
 import useGetFile from '@/api/queries/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
+import DeleteEthicsFileModal from '@/components/pages/application/modals/DeleteEthicsFileModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
@@ -50,14 +52,19 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 
+	const form = useSectionForm({
+		section: 'ethics',
+		sectionVisited: state.formState.sectionsVisited.ethics,
+	});
+
 	const { refetch: getDownload } = useGetDownload({ fileId: state.fields.ethicsLetter });
 	const { data, isLoading } = useGetFile({ fileId: state.fields.ethicsLetter });
 
-	const [fileList, setFileList] = useState<UploadFile[]>([]);
 	const { token } = useToken();
 
 	const { control, watch, getValues } = useForm<Nullable<EthicsSchemaType>>({
@@ -97,7 +104,8 @@ const Ethics = () => {
 
 		const { data: responseData } = response;
 
-		if (!responseData) {
+		// If there is not response date OR the file name does not exist, fail the download procedure
+		if (!responseData || responseData.filename === null) {
 			return;
 		}
 
@@ -120,19 +128,7 @@ const Ethics = () => {
 	};
 
 	const handleChange = (info: UploadChangeParam<UploadFile<FilesDTO>>) => {
-		// Handle upload progress
-		if (info.file.status === 'uploading') {
-			setFileList(() => [
-				{
-					uid: `${info.file.uid}`,
-					name: `${info.file.name}`,
-					status: 'done',
-					url: '/',
-				},
-			]);
-			return;
-		}
-
+		// Update store once file is uploaded
 		if (info.file.status === 'done' && info.file.response?.id) {
 			dispatch({
 				type: 'UPDATE_APPLICATION',
@@ -151,13 +147,6 @@ const Ethics = () => {
 		}
 	};
 
-	useEffect(() => {
-		// Transform and update fileList when data arrives
-		if (!isLoading && data) {
-			setFileList(data);
-		}
-	}, [data, fileList.length, isLoading]);
-
 	return (
 		<SectionWrapper>
 			<>
@@ -168,6 +157,7 @@ const Ethics = () => {
 				/>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>
 					<Form
+						form={form}
 						layout="vertical"
 						onChange={() => {
 							const ethicsReviewReq = getValues('ethicsReviewRequired');
@@ -183,11 +173,11 @@ const Ethics = () => {
 									type: 'UPDATE_APPLICATION',
 									payload: {
 										fields: {
-											...state?.fields,
+											...state.fields,
 											ethicsReviewRequired: ethicsReviewReq,
 										},
 										formState: {
-											...state?.formState,
+											...state.formState,
 										},
 									},
 								});
@@ -231,18 +221,28 @@ const Ethics = () => {
 										{!isLoading ? (
 											<Upload
 												action={`${__API_PROXY_PATH__}/file/ethics/${appId}`}
+												multiple={false}
 												maxCount={1}
 												beforeUpload={beforeUpload}
-												fileList={fileList}
+												fileList={data}
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
 												disabled={!isEditMode}
 												onChange={handleChange}
+												onRemove={() => {
+													setIsDeleteModalOpen(true);
+													return false;
+												}}
+												itemRender={(element) => {
+													// Make sure the file element doesn't expand entire width
+													return <Flex>{element}</Flex>;
+												}}
 												showUploadList={{
 													showDownloadIcon: false,
-													showRemoveIcon: false,
+													showRemoveIcon: true,
+													removeIcon: <CloseOutlined />,
 												}}
 											>
-												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode}>
+												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode || !!data?.length}>
 													{translate('button.upload')}
 												</Button>
 											</Upload>
@@ -254,6 +254,11 @@ const Ethics = () => {
 					</Form>
 				</SectionContent>
 				<SectionFooter currentRoute="ethics" isEditMode={isEditMode} />
+				<DeleteEthicsFileModal
+					filename={data && data[0] ? data[0].name : ''}
+					setIsOpen={setIsDeleteModalOpen}
+					isOpen={isDeleteModalOpen}
+				/>
 			</>
 		</SectionWrapper>
 	);

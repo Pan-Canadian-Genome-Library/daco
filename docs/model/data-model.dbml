@@ -172,6 +172,14 @@ Table revision_requests {
   project_notes text
   requested_studies_approved boolean [not null]
   requested_studies_notes text
+  ethics_approved boolean [not null]
+  ethics_notes text
+  agreements_approved boolean [not null]
+  agreements_notes text
+  appendices_approved boolean [not null]
+  appendices_notes text
+  sign_and_submit_approved boolean [not null]
+  sign_and_submit_notes text
 }
 
 table collaborators {
@@ -182,7 +190,7 @@ table collaborators {
 	last_name varchar(255) [not null]
 	title varchar(255)
 	suffix varchar(255)
-	position_title varchar(255) [not null]
+	position_title varchar(255)
 	institutional_email varchar(320) [not null]
 	profile_url text
 	collaborator_type text

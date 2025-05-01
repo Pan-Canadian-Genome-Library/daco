@@ -18,22 +18,25 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, pgTable, text, varchar } from 'drizzle-orm/pg-core';
+import { bigint, pgTable, primaryKey, text, varchar } from 'drizzle-orm/pg-core';
 import { applicationContents } from './applicationContents.ts';
 
-export const collaborators = pgTable('collaborators', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	first_name: varchar({ length: 255 }).notNull(),
-	middle_name: varchar({ length: 255 }),
-	last_name: varchar({ length: 255 }).notNull(),
-	title: varchar({ length: 255 }),
-	suffix: varchar({ length: 255 }),
-	position_title: varchar({ length: 255 }).notNull(),
-	institutional_email: varchar({ length: 320 }).notNull(),
-	profile_url: text(),
-	collaborator_type: text(),
-});
+export const collaborators = pgTable(
+	'collaborators',
+	{
+		application_id: bigint({ mode: 'number' }).notNull(),
+		first_name: varchar({ length: 255 }).notNull(),
+		middle_name: varchar({ length: 255 }),
+		last_name: varchar({ length: 255 }).notNull(),
+		title: varchar({ length: 255 }),
+		suffix: varchar({ length: 255 }),
+		position_title: varchar({ length: 255 }),
+		institutional_email: varchar({ length: 320 }).notNull(),
+		profile_url: text(),
+		collaborator_type: text(),
+	},
+	(table) => [primaryKey({ columns: [table.application_id, table.institutional_email] })],
+);
 
 export const collaboratorsRelations = relations(collaborators, ({ one }) => ({
 	application_id: one(applicationContents, {
