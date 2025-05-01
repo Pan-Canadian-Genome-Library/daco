@@ -70,7 +70,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);
@@ -115,7 +115,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);
@@ -159,7 +159,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);
@@ -192,7 +192,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);
@@ -225,7 +225,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);
@@ -258,7 +258,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);
@@ -291,7 +291,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);
@@ -324,7 +324,7 @@ const emailSvc = () => ({
 		try {
 			const {
 				email: { fromAddress },
-			} = getEmailConfig();
+			} = getEmailConfig;
 
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to: ${to}`);

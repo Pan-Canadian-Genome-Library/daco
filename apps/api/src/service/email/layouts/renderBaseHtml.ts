@@ -46,7 +46,7 @@ export const basicLayout = ({ body }: { body?: string; lang?: string }) => {
 const HeaderRender = () => {
 	const {
 		email: { imageBaseUrl },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	return `
 		<mj-wrapper mj-class="header-background">

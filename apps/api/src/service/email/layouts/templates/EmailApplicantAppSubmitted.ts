@@ -25,7 +25,7 @@ import { basicLayout } from '../renderBaseHtml.ts';
 export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateApproveType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	const template = `  
             <mj-column css-class="section-wrapper">

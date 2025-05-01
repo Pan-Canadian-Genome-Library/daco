@@ -25,7 +25,7 @@ import { basicLayout } from '../renderBaseHtml.ts';
 export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	const template = `  
             <mj-column css-class="section-wrapper">

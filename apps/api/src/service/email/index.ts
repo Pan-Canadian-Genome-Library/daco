@@ -20,7 +20,7 @@
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import { createTransport } from 'nodemailer';
 
-const config = getEmailConfig();
+const config = getEmailConfig;
 
 const emailClient = createTransport({
 	host: config.email.host,

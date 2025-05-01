@@ -33,7 +33,7 @@ export const GenerateEmailApplicantRepRevision = ({
 }: Omit<GenerateApplicantRepRevisionType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	const template = `  
             <mj-column css-class="section-wrapper">
@@ -91,7 +91,7 @@ export const GenerateEmailApplicantRepRevisionPlain = ({
 }: Omit<GenerateApplicantRepRevisionType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	return ` Dear ${applicantName},
     \n We hope you are doing well. 

@@ -29,7 +29,7 @@ export const GenerateEmailDacForReview = ({
 }: Omit<GenerateDacRevisionType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	const template = `  
             <mj-column css-class="section-wrapper">
@@ -72,7 +72,7 @@ export const GenerateEmailDacForReviewPlain = ({
 }: Omit<GenerateDacRevisionType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	return ` Dear DAC Members,
     \n We are writing to inform you that a PCGL DACO application is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience.

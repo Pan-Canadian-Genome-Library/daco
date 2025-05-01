@@ -17,32 +17,45 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Synchronous function to retrieve static config values from process.env
- * Intended for use in non-async functions that require config values (i.e. logger.ts)
- * @returns emailConfig
- */
-export const getEmailConfig = () => {
-	return {
-		isProduction: (process.env.NODE_ENV || 'production') === 'production',
-		express: {
-			port: process.env.PORT || '8087',
-			ui: process.env.UI_HOST || 'http://localhost:5173',
-		},
-		email: {
-			host: process.env.EMAIL_HOST || 'localhost',
-			port: process.env.EMAIL_PORT || 1025,
-			fromAddress: process.env.EMAIL_FROM_ADDRESS || 'noreply@opcgl.ca',
-			fromName: process.env.EMAIL_FROM_NAME || 'PCGL Registry',
-			contactAddress: process.env.EMAIL_CONTACT_ADDRESS || 'info@pcgl.ca',
-			auth: {
-				user: process.env.EMAIL_USER,
-				password: process.env.EMAIL_PASSWORD,
-			},
-			imageBaseUrl: process.env.IMAGE_BASE_URL || '',
-			frenchEnabled: (process.env.FRENCH_EMAILS_ENABLED || 'false') === 'true',
-		},
-	};
-};
+import { z } from 'zod';
+import EnvironmentConfigError from './EnvironmentConfigError.ts';
 
-export type emailConfig = ReturnType<typeof getEmailConfig>;
+export const emailConfigSchema = z.object({
+	IS_PROD: z.string().optional().default('false'),
+	PORT: z.coerce.number().optional().default(3000),
+	UI_HOST: z.string().url().optional().default('http://localhost:5173'),
+	EMAIL_HOST: z.string().default('localhost'),
+	EMAIL_PORT: z.coerce.number().optional().default(1025),
+	EMAIL_FROM_ADDRESS: z.string().email().optional().default('noreply@pcgl.ca'),
+	EMAIL_FROM_NAME: z.string(),
+	EMAIL_CONTACT_ADDRESS: z.string(),
+	IMAGE_BASE_URL: z.string(),
+	EMAIL_USER: z.string().optional(),
+	EMAIL_PASSWORD: z.string().optional(),
+});
+
+const parseResult = emailConfigSchema.safeParse(process.env);
+
+if (!parseResult.success) {
+	throw new EnvironmentConfigError(`email`, parseResult.error);
+}
+
+export const getEmailConfig = {
+	isProduction: parseResult.data.IS_PROD.toLocaleLowerCase() === 'true',
+	express: {
+		port: parseResult.data.PORT,
+		ui: parseResult.data.UI_HOST,
+	},
+	email: {
+		host: parseResult.data.EMAIL_HOST,
+		port: parseResult.data.EMAIL_PORT,
+		fromAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
+		fromName: parseResult.data.EMAIL_FROM_NAME,
+		contactAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
+		auth: {
+			user: parseResult.data.EMAIL_USER,
+			password: parseResult.data.EMAIL_PASSWORD,
+		},
+		imageBaseUrl: parseResult.data.IMAGE_BASE_URL,
+	},
+};

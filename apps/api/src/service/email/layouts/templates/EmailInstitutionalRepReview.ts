@@ -30,7 +30,7 @@ export const GenerateEmailInstitutionalRepReview = ({
 }: Omit<GenerateInstitutionalRepType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	const template = `  
             <mj-column css-class="section-wrapper">
@@ -92,7 +92,7 @@ export const GenerateEmailInstitutionalRepReviewPlain = ({
 }: Omit<GenerateInstitutionalRepType, 'to'>) => {
 	const {
 		express: { ui },
-	} = getEmailConfig();
+	} = getEmailConfig;
 
 	return ` Dear ${repName},
     \n We hope this message finds you well.
