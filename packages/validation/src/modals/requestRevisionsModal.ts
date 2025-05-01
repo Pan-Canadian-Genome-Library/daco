@@ -29,5 +29,11 @@ export const revisionsModalSchema = z.object({
 	ethics: Maximum300WordsString.optional(),
 	signature: Maximum300WordsString.optional(),
 	general: Maximum300WordsString.optional(),
+	agreementsApproved: z.boolean().optional(),
+	agreementsNotes: Maximum300WordsString.optional(),
+	appendicesApproved: z.boolean().optional(),
+	appendicesNotes: Maximum300WordsString.optional(),
+	signAndSubmitApproved: z.boolean().optional(),
+	signAndSubmitNotes: Maximum300WordsString.optional(),
 });
 export type RevisionsModalSchemaType = z.infer<typeof revisionsModalSchema>;
