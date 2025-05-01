@@ -22,8 +22,9 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import List from '@/service/pdf/components/List.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
+import { ApplicationAgreements, type AgreementDTO } from '@pcgl-daco/data-model';
 
-const TermsAndConditions = () => {
+const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<FormDisplay title="Terms and Conditions">
@@ -61,35 +62,83 @@ const TermsAndConditions = () => {
 				<Paragraph>
 					You MUST agree to the following procedures in order to have access to the PCGL Controlled Data:
 				</Paragraph>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_software_updates)
+					}
+				>
 					Yes, You will keep all computer systems on which PCGL Controlled Data reside, or which provide access to such
 					data, up-to-date with respect to software patches and antivirus file definitions (if applicable).
 				</Checkbox>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_non_disclosure)
+					}
+				>
 					Yes, You will protect PCGL Controlled Data against disclosure to and use by unauthorized individuals.
 				</Checkbox>
-				<Checkbox>Yes, You will monitor and control which individuals have access to PCGL controlled Data.</Checkbox>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find(
+							(agreement) => agreement === ApplicationAgreements.dac_agreement_monitor_individual_access,
+						)
+					}
+				>
+					Yes, You will monitor and control which individuals have access to PCGL controlled Data.
+				</Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_destroy_data)
+					}
+				>
 					Yes, You will securely destroy all copies of PCGL Controlled Data in accordance with the terms and conditions
 					of the Data Access Agreement.
 				</Checkbox>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find(
+							(agreement) => agreement === ApplicationAgreements.dac_agreement_familiarize_restrictions,
+						)
+					}
+				>
 					Yes, You will familiarize all individuals who have access to PCGL Controlled Data with the restrictions on its
 					use.
 				</Checkbox>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find(
+							(agreement) => agreement === ApplicationAgreements.dac_agreement_provide_it_policy,
+						)
+					}
+				>
 					Yes, You agree to swiftly provide a copy of both your institutional and Research Project related IT policy
 					documents upon request from a DACO representative.
 				</Checkbox>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find(
+							(agreement) => agreement === ApplicationAgreements.dac_agreement_notify_unauthorized_access,
+						)
+					}
+				>
 					Yes, You will notify the DACO immediately if you become aware or suspect that someone has gained unauthorized
 					access to the PCGL Controlled Data.
 				</Checkbox>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find(
+							(agreement) => agreement === ApplicationAgreements.dac_agreement_certify_application,
+						)
+					}
+				>
 					Yes, You certify that the contents in the application are true and correct to the best of your knowledge and
 					belief.
 				</Checkbox>
-				<Checkbox>
+				<Checkbox
+					unchecked={
+						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_read_and_agreed)
+					}
+				>
 					Yes, You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement.
 				</Checkbox>
 			</FormDisplay>

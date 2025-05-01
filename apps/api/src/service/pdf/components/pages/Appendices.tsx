@@ -25,6 +25,7 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
+import { type AppendicesDTO, appendicesEnum } from '@pcgl-daco/data-model';
 
 const styles = StyleSheet.create({
 	link: {
@@ -35,13 +36,13 @@ const styles = StyleSheet.create({
 	},
 });
 
-const Appendices = () => {
+const Appendices = ({ acceptedAppendices }: AppendicesDTO) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
 			<Title>Appendices</Title>
 			<Paragraph>Please review and agree to the following Appendices.</Paragraph>
 			<FormDisplay title="PCGL Policies">
-				<Checkbox>
+				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[0])}>
 					<Text style={styles.text}>
 						You have read APPENDIX I &mdash;{' '}
 						<Link src="#" style={styles.link}>
@@ -49,7 +50,7 @@ const Appendices = () => {
 						</Link>
 					</Text>
 				</Checkbox>
-				<Checkbox>
+				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[1])}>
 					<Text style={styles.text}>
 						You have read APPENDIX II &mdash;{' '}
 						<Link src="#" style={styles.link}>
@@ -57,7 +58,7 @@ const Appendices = () => {
 						</Link>
 					</Text>
 				</Checkbox>
-				<Checkbox>
+				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[2])}>
 					<Text style={styles.text}>
 						You have read APPENDIX III &mdash;{' '}
 						<Link src="#" style={styles.link}>

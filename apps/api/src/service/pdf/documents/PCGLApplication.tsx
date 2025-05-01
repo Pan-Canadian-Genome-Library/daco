@@ -139,8 +139,8 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 			<RequestedStudy requestedStudies={contents?.requestedStudies} />
 			<Ethics ethicsReviewRequired={contents?.ethicsReviewRequired} />
 			<DataAccessAgreement />
-			<TermsAndConditions />
-			<Appendices />
+			<TermsAndConditions acceptedAgreements={contents?.acceptedAgreements} />
+			<Appendices acceptedAppendices={contents?.acceptedAppendices} />
 			<SignSubmit
 				applicantFirstName={contents?.applicantFirstName}
 				applicantMiddleName={contents?.applicantMiddleName}
