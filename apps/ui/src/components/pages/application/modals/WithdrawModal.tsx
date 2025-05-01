@@ -19,51 +19,53 @@
 
 import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
-import useDeleteCollaborator from '@/api/mutations/useDeleteCollaborator';
-import { ModalStateProps } from '@/pages/applications/sections/collaborators';
+import useWithdrawApplication from '@/api/mutations/useWithdrawApplication';
 
-const { Text } = Typography;
-
-interface DeleteCollaboratorModalProps extends ModalStateProps {
-	appId: string | number;
+interface WithdrawModalProps {
+	currentSection: string;
+	applicationId: number | string;
+	showEditModal: boolean;
+	setShowEditModal: (show: boolean) => void;
 }
+const WithdrawModal = ({ currentSection, applicationId, showEditModal, setShowEditModal }: WithdrawModalProps) => {
+	const { Text } = Typography;
 
-const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCollaboratorModalProps) => {
 	const { t: translate } = useTranslation();
-	const { mutate: deleteCollaborator } = useDeleteCollaborator();
+	const navigate = useNavigate();
+	const { mutateAsync: withdrawApplication, isPending: isWithdrawing } = useWithdrawApplication();
 
-	const onSubmit = () => {
-		if (rowData?.collaboratorInstitutionalEmail) {
-			deleteCollaborator({ applicationId: appId, collaboratorEmail: rowData.collaboratorInstitutionalEmail });
-			setIsOpen({ isOpen: false });
-		}
+	const handleWithdrawApplication = () => {
+		withdrawApplication({ applicationId: applicationId }).then(() => {
+			setShowEditModal(false);
+			navigate(`${currentSection}/edit`, { replace: true });
+		});
 	};
 
 	return (
 		<Modal
-			title={translate('collab-section.deleteModalTitle')}
-			okText={translate('button.delete')}
-			okButtonProps={{ color: 'danger', variant: 'solid' }}
-			cancelText={translate('button.cancel')}
+			title={translate('modals.editApplication.title', { id: applicationId })}
+			okText={translate('modals.editApplication.buttons.edit')}
+			cancelText={translate('modals.buttons.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-			open={isOpen}
-			onOk={onSubmit}
-			onCancel={() => setIsOpen({ isOpen: false })}
-			destroyOnClose
+			open={showEditModal}
+			onOk={handleWithdrawApplication}
+			okType="default"
+			okButtonProps={{
+				disabled: isWithdrawing,
+			}}
+			cancelButtonProps={{
+				type: 'primary',
+			}}
+			onCancel={() => setShowEditModal(false)}
 		>
-			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
-				<Text>
-					{translate('collab-section.deleteModalDescription', {
-						firstName: rowData?.collaboratorFirstName,
-						lastName: rowData?.collaboratorLastName,
-						appId,
-					})}
-				</Text>
+			<Flex style={{ height: '100%', marginTop: 20 }}>
+				<Text>{translate('modals.editApplication.description', { id: applicationId })}</Text>
 			</Flex>
 		</Modal>
 	);
 };
 
-export default DeleteCollaboratorModal;
+export default WithdrawModal;

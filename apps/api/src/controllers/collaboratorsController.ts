@@ -26,13 +26,11 @@ import { failure, success, type AsyncResult } from '@/utils/results.js';
 import {
 	type CollaboratorDTO,
 	type CollaboratorsResponseDTO,
-	type CollaboratorUpdateRecord,
 	type ListCollaboratorResponse,
 } from '@pcgl-daco/data-model';
-import { getApplicationById } from './applicationController.ts';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
 
-const logger = BaseLogger.forModule('coillaboratorsController');
+const logger = BaseLogger.forModule('collaboratorsController');
 
 /**
  * Creates a new collaborator and returns the created data.
@@ -67,7 +65,6 @@ export const createCollaborators = async ({
 	const { edit } = ApplicationStateEvents;
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
-	// TODO: Add Real Auth
 	// Validate User is Applicant
 	if (!(user_id === application.user_id)) {
 		return failure('UNAUTHORIZED', 'Unauthorized, cannot create Collaborators');
@@ -77,32 +74,13 @@ export const createCollaborators = async ({
 		return canEditResult;
 	}
 
-	const hasDuplicateRecords = collaborators.some((collaborator, index) => {
-		// TODO: duplicate for collaborators should be by application + email
-		const matchingRecord = collaborators.find(
-			(record, searchIndex) =>
-				searchIndex !== index &&
-				record.collaboratorFirstName === collaborator.collaboratorFirstName &&
-				record.collaboratorLastName === collaborator.collaboratorLastName &&
-				record.collaboratorInstitutionalEmail === collaborator.collaboratorInstitutionalEmail &&
-				record.collaboratorPositionTitle === collaborator.collaboratorPositionTitle,
-		);
-
-		return matchingRecord;
-	});
-
-	if (hasDuplicateRecords) {
-		// TODO: List the duplicate records.
-		return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-	}
-
 	const newCollaborators: CollaboratorModel[] = collaborators.map((data) => ({
 		first_name: data.collaboratorFirstName,
 		middle_name: data.collaboratorMiddleName,
 		last_name: data.collaboratorLastName,
 		suffix: data.collaboratorSuffix,
 		position_title: data.collaboratorPositionTitle,
-		institutional_email: data.collaboratorInstitutionalEmail,
+		institutional_email: data.collaboratorInstitutionalEmail.toLowerCase(),
 		application_id,
 	}));
 
@@ -122,16 +100,15 @@ export const createCollaborators = async ({
 /**
  * Delete a selected collaborator by ID
  * @param application_id - ID of related application record to associate with Collaborators
- * @param user_id - ID of Applicant updating the application
- * @param collaborator_id - ID of Collaborator to delete
+ * @param collaborator_email - Institutional Email of Collaborator to delete
  * @returns Success with Collaborator data record / Failure with Error.
  */
 export const deleteCollaborator = async ({
 	application_id,
-	id,
+	collaborator_email,
 }: {
 	application_id: number;
-	id: number;
+	collaborator_email: string;
 }): AsyncResult<CollaboratorsResponseDTO[], 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -146,13 +123,16 @@ export const deleteCollaborator = async ({
 
 		const application = applicationResult.data;
 
-		// TODO: Valid states for actions should be handled through the appStateManager
-		if (!(application.state === 'DRAFT')) {
-			return failure('INVALID_STATE_TRANSITION', `Can only add Collaborators when Application is in state DRAFT`);
+		const appStateManager = new ApplicationStateManager(application);
+		const canEdit = appStateManager._canPerformAction(ApplicationStateEvents.edit);
+
+		if (!canEdit.success) {
+			return failure('INVALID_STATE_TRANSITION', 'Cannot edit application in its current state');
 		}
 
 		const deleteResult = await collaboratorsRepo.deleteCollaborator({
-			id,
+			application_id,
+			institutional_email: collaborator_email,
 		});
 
 		if (!deleteResult.success) {
@@ -168,8 +148,7 @@ export const deleteCollaborator = async ({
 
 /*
  * Lists all Collaborators for a given application
- * @param application_id - ID of related application record to associate with Collaborators
- * @param collaborators - Array of new Collaborators to create
+ * @param applicationId - ID of related application record to associate with Collaborators
  * @returns Success with Collaborator data array / Failure with Error.
  */
 export const listCollaborators = async ({
@@ -197,26 +176,30 @@ export const listCollaborators = async ({
 /**
  * Update a selected collaborator by ID
  * @param application_id - ID of related application record to associate with Collaborators
+ * @param institutional_email - The institutional email of the collaborator you want to update
  * @param user_id - ID of Applicant updating the application
- * @param collaborators - Collaborator record with updated properties
+ * @param collaboratorUpdates - Collaborator record with updated properties
  * @returns Success with Collaborator data record / Failure with Error.
  */
 export const updateCollaborator = async ({
 	application_id,
+	institutional_email,
 	user_id,
 	collaboratorUpdates,
 }: {
 	application_id: number;
+	institutional_email: string;
 	user_id: string;
-	collaboratorUpdates: CollaboratorUpdateRecord;
+	collaboratorUpdates: CollaboratorDTO;
 }): AsyncResult<
 	CollaboratorsResponseDTO[],
 	'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_STATE_TRANSITION' | 'FORBIDDEN' | 'DUPLICATE_RECORD'
 > => {
 	const database = getDbInstance();
 	const collaboratorsRepo: CollaboratorsService = collaboratorsSvc(database);
+	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const applicationResult = await getApplicationById({ applicationId: application_id });
+	const applicationResult = await applicationRepo.getApplicationById({ id: application_id });
 
 	if (!applicationResult.success) {
 		return applicationResult;
@@ -225,13 +208,15 @@ export const updateCollaborator = async ({
 	const application = applicationResult.data;
 
 	// Validate User is Applicant
-	if (!(user_id === application.userId)) {
+	if (!(user_id === application.user_id)) {
 		return failure('FORBIDDEN', 'User is not authorized to modify collaborators for this application.');
 	}
 
-	// TODO: should use application state manager
-	if (!(application.state === 'DRAFT')) {
-		return failure('INVALID_STATE_TRANSITION', `Can only edit collaborators when application is in state DRAFT`);
+	const appStateManager = new ApplicationStateManager(application);
+	const canEdit = appStateManager._canPerformAction(ApplicationStateEvents.edit);
+
+	if (!canEdit.success) {
+		return failure('INVALID_STATE_TRANSITION', 'Cannot edit application in its current state');
 	}
 
 	const collaboratorsListResult = await collaboratorsRepo.listCollaborators(application.id);
@@ -240,36 +225,21 @@ export const updateCollaborator = async ({
 		return collaboratorsListResult;
 	}
 
-	const hasDuplicateRecords = collaboratorsListResult.data.some((collaborator) => {
-		return (
-			collaboratorUpdates.collaboratorFirstName === collaborator.first_name &&
-			collaboratorUpdates.collaboratorLastName === collaborator.last_name &&
-			collaboratorUpdates.collaboratorInstitutionalEmail === collaborator.institutional_email &&
-			collaboratorUpdates.collaboratorPositionTitle === collaborator.position_title
-		);
-	});
-
-	if (hasDuplicateRecords) {
-		// TODO: List the duplicate records.
-		return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-	}
-
-	const { id } = collaboratorUpdates;
-
 	const collaborator: Partial<CollaboratorModel> = {
 		first_name: collaboratorUpdates.collaboratorFirstName,
 		middle_name: collaboratorUpdates.collaboratorMiddleName,
 		last_name: collaboratorUpdates.collaboratorLastName,
 		suffix: collaboratorUpdates.collaboratorSuffix,
 		position_title: collaboratorUpdates.collaboratorPositionTitle,
-		institutional_email: collaboratorUpdates.collaboratorInstitutionalEmail,
+		institutional_email: collaboratorUpdates.collaboratorInstitutionalEmail.toLowerCase(),
 		profile_url: collaboratorUpdates.collaboratorResearcherProfileURL,
 		collaborator_type: collaboratorUpdates.collaboratorType,
 		application_id,
 	};
 
 	const updateResult = await collaboratorsRepo.updateCollaborator({
-		id,
+		institutional_email: institutional_email,
+		application_id: application_id,
 		collaborator,
 	});
 

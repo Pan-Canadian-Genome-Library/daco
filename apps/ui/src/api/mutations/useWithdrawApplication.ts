@@ -16,54 +16,51 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { withErrorResponseHandler } from '@/api/apiUtils';
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
+import { queryClient } from '@/providers/Providers';
+import { type ApplicationDTO } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-
-import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
-import { queryClient } from '@/providers/Providers';
-import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from '../apiUtils';
-
-const useDeleteCollaborator = () => {
-	const { t: translate } = useTranslation();
+const useWithdrawApplication = () => {
 	const notification = useNotificationContext();
+	const { t: translate } = useTranslation();
 
-	return useMutation<
-		ListCollaboratorResponse,
-		ServerError,
-		{ applicationId: number | string; collaboratorEmail: string }
-	>({
-		mutationFn: async ({ applicationId, collaboratorEmail }) => {
-			const response = await fetch(`/collaborators/${applicationId}/${collaboratorEmail}`, {
-				method: 'DELETE',
+	return useMutation<ApplicationDTO, ServerError, { applicationId?: string | number }>({
+		mutationFn: async ({ applicationId }) => {
+			const response = await fetch(`/applications/${applicationId}/withdraw`, {
+				method: 'POST',
+				body: JSON.stringify({
+					applicationId: applicationId,
+				}),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
-		onError: (error) => {
-			notification.openNotification({
-				type: 'error',
-				message: translate('errors.generic.title'),
-				description: error.message,
+		onSuccess: async (data) => {
+			/**
+			 * Used to invalidate our current application data to pull it fresh from the server,
+			 * we need to do this to have react rerender things in edit mode correctly.
+			 */
+			await queryClient.invalidateQueries({ queryKey: [`application-${data.id}`] }).then(() => {
+				notification.openNotification({
+					type: 'success',
+					message: translate('modals.editApplication.notifications.successTitle'),
+					description: translate('modals.editApplication.notifications.successMessage', { id: data.id }),
+				});
 			});
 		},
-		onSuccess: async (data) => {
-			//  Update the cache if the delete collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
-				return prev.filter((value) => value.collaboratorInstitutionalEmail !== data[0]?.collaboratorInstitutionalEmail);
-			});
+		onError: () => {
 			notification.openNotification({
-				type: 'success',
-				message: translate('collab-section.notifications.deleted.successTitle'),
-				description: translate('collab-section.notifications.deleted.successMessage', {
-					firstName: data[0]?.collaboratorFirstName,
-				}),
+				type: 'error',
+				message: translate('modals.editApplication.notifications.failureTitle'),
+				description: translate('modals.editApplication.notifications.failureMessage'),
 			});
 		},
 	});
 };
 
-export default useDeleteCollaborator;
+export default useWithdrawApplication;

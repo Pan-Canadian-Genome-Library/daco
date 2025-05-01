@@ -17,28 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { useMutation } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
-import { type ListCollaboratorResponse } from '@pcgl-daco/data-model';
+import { EditSignatureResponse } from '@pcgl-daco/validation';
 import { withErrorResponseHandler } from '../apiUtils';
 
-const useDeleteCollaborator = () => {
-	const { t: translate } = useTranslation();
+const useCreateSignature = () => {
 	const notification = useNotificationContext();
 
-	return useMutation<
-		ListCollaboratorResponse,
-		ServerError,
-		{ applicationId: number | string; collaboratorEmail: string }
-	>({
-		mutationFn: async ({ applicationId, collaboratorEmail }) => {
-			const response = await fetch(`/collaborators/${applicationId}/${collaboratorEmail}`, {
-				method: 'DELETE',
+	return useMutation<EditSignatureResponse, ServerError, { applicationId: number | string; signature: string }>({
+		mutationFn: async ({ applicationId, signature }) => {
+			const response = await fetch('/signature/sign', {
+				method: 'POST',
+				body: JSON.stringify({
+					applicationId,
+					signature,
+				}),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();
@@ -46,24 +43,15 @@ const useDeleteCollaborator = () => {
 		onError: (error) => {
 			notification.openNotification({
 				type: 'error',
-				message: translate('errors.generic.title'),
-				description: error.message,
+				message: error.message,
+				description: error.errors,
 			});
 		},
 		onSuccess: async (data) => {
-			//  Update the cache if the delete collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
-				return prev.filter((value) => value.collaboratorInstitutionalEmail !== data[0]?.collaboratorInstitutionalEmail);
-			});
-			notification.openNotification({
-				type: 'success',
-				message: translate('collab-section.notifications.deleted.successTitle'),
-				description: translate('collab-section.notifications.deleted.successMessage', {
-					firstName: data[0]?.collaboratorFirstName,
-				}),
-			});
+			// Invalidate previous signature get request
+			await queryClient.invalidateQueries({ queryKey: [`signature-${data.id}`] });
 		},
 	});
 };
 
-export default useDeleteCollaborator;
+export default useCreateSignature;

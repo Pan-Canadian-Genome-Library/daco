@@ -20,7 +20,7 @@
 
 import { ConfigProvider, notification, ThemeConfig } from 'antd';
 
-export const pcglColors = {
+export const pcglColours = {
 	// Main Colors
 	primary: '#C41D7F',
 	secondary: '#520339',
@@ -49,45 +49,45 @@ const pcglTheme: ThemeConfig = {
 		fontFamily:
 			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 
-		colorPrimary: pcglColors.primary,
-		colorFillAlter: pcglColors.white,
-		colorFillSecondary: pcglColors.white,
-		colorBgContainer: pcglColors.tertiary,
+		colorPrimary: pcglColours.primary,
+		colorFillAlter: pcglColours.white,
+		colorFillSecondary: pcglColours.white,
+		colorBgContainer: pcglColours.tertiary,
 
 		// States
-		colorSuccess: pcglColors.successPrimary,
-		colorWarning: pcglColors.warningPrimary,
-		colorError: pcglColors.errorPrimary,
+		colorSuccess: pcglColours.successPrimary,
+		colorWarning: pcglColours.warningPrimary,
+		colorError: pcglColours.errorPrimary,
 
 		// Link styles
-		colorLink: pcglColors.primary,
+		colorLink: pcglColours.primary,
 
 		// Text Styles
-		colorTextSecondary: pcglColors.white,
+		colorTextSecondary: pcglColours.white,
 
-		colorIcon: pcglColors.primary,
+		colorIcon: pcglColours.primary,
 	},
 	components: {
 		Checkbox: {
 			colorBgContainer: '#fff',
 		},
 		Table: {
-			colorBgContainer: pcglColors.white,
-			headerBg: pcglColors.greyLight,
-			headerSortActiveBg: pcglColors.offWhite,
-			headerSortHoverBg: pcglColors.offWhite,
+			colorBgContainer: pcglColours.white,
+			headerBg: pcglColours.greyLight,
+			headerSortActiveBg: pcglColours.offWhite,
+			headerSortHoverBg: pcglColours.offWhite,
 			rowHoverBg: 'rgba(0, 0, 0, 0.02)',
 		},
 		Button: {
 			fontWeight: 700,
-			defaultColor: pcglColors.black,
-			defaultBg: pcglColors.white,
+			defaultColor: pcglColours.black,
+			defaultBg: pcglColours.white,
 		},
 		Typography: {
 			fontSize: 16,
 		},
 		Tag: {
-			colorFillSecondary: pcglColors.white,
+			colorFillSecondary: pcglColours.white,
 		},
 		Modal: {
 			titleFontSize: 24,
@@ -97,27 +97,27 @@ const pcglTheme: ThemeConfig = {
 			// increase icon color animation change to match text color change
 			motionDurationSlow: '0.1s',
 
-			itemHoverBg: pcglColors.tertiary,
-			itemHoverColor: pcglColors.primary,
-			itemSelectedBg: pcglColors.primary,
-			itemSelectedColor: pcglColors.white,
-			colorBgTextHover: pcglColors.white,
+			itemHoverBg: pcglColours.tertiary,
+			itemHoverColor: pcglColours.primary,
+			itemSelectedBg: pcglColours.primary,
+			itemSelectedColor: pcglColours.white,
+			colorBgTextHover: pcglColours.white,
 		},
 		Progress: {
-			remainingColor: pcglColors.primary,
+			remainingColor: pcglColours.primary,
 		},
 		Divider: {
-			colorSplit: pcglColors.grey,
+			colorSplit: pcglColours.grey,
 			verticalMarginInline: 20,
 		},
 		Select: {
-			colorBgContainer: pcglColors.white,
+			colorBgContainer: pcglColours.white,
 		},
 		Input: {
-			colorBgContainer: pcglColors.white,
+			colorBgContainer: pcglColours.white,
 		},
 		Radio: {
-			colorBgContainer: pcglColors.white,
+			colorBgContainer: pcglColours.white,
 		},
 	},
 };
@@ -125,13 +125,13 @@ const pcglTheme: ThemeConfig = {
 // Header Theme Configurations
 export const pcglHeaderTheme: ThemeConfig = {
 	token: {
-		colorLink: pcglColors.black,
+		colorLink: pcglColours.black,
 		colorLinkHover: 'rgba(0,0,0,0.5)',
-		colorBgContainer: pcglColors.white,
+		colorBgContainer: pcglColours.white,
 	},
 	components: {
 		Layout: {
-			headerBg: pcglColors.white,
+			headerBg: pcglColours.white,
 		},
 	},
 };
@@ -140,12 +140,12 @@ export const pcglHeaderTheme: ThemeConfig = {
 export const pcglFooterTheme: ThemeConfig = {
 	components: {
 		Layout: {
-			footerBg: pcglColors.secondary,
+			footerBg: pcglColours.secondary,
 		},
 		Typography: {
 			fontSize: 12,
-			colorText: pcglColors.white,
-			colorLink: pcglColors.quaternary,
+			colorText: pcglColours.white,
+			colorLink: pcglColours.quaternary,
 			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
 		},
 	},
@@ -171,7 +171,7 @@ export const pcglSkeletonTheme: ThemeConfig = {
 		fontFamily:
 			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 
-		colorPrimary: pcglColors.tertiary,
+		colorPrimary: pcglColours.tertiary,
 		colorFillSecondary: '#f5f5f5',
 	},
 };

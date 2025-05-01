@@ -19,8 +19,10 @@
 
 import { Flex, theme } from 'antd';
 
-import { pcglColors } from '@/providers/ThemeProvider';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { ValidateAllSections } from './utils/validatorFunctions';
 
 const { useToken } = theme;
 
@@ -55,17 +57,19 @@ const appStatusItems: AppStatusType[] = [
 	},
 ];
 
-// Temporary logic
-const isFilled = true;
-
 const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValues }) => {
 	const { token } = useToken();
+	const { state } = useApplicationContext();
+	const isSectionsFilled = ValidateAllSections(state.fields);
 
 	const renderAppStatusItems = (): JSX.Element[] => {
 		const stepIndex = appStatusItems.findIndex((step) => {
 			if (step.state === ApplicationStates.DRAFT && currentStatus === ApplicationStates.DRAFT) {
 				// Check if the step is DRAFT and not filled or SIGNED and filled
-				if ((step.step === StepOptions.DRAFT && !isFilled) || (step.step === StepOptions.SIGNED && isFilled)) {
+				if (
+					(step.step === StepOptions.DRAFT && !isSectionsFilled) ||
+					(step.step === StepOptions.SIGNED && isSectionsFilled)
+				) {
 					return true;
 				}
 				return false;
@@ -76,12 +80,12 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 
 		// Until step is found, render green components but once it is found, set current step to yellow and remainder grey
 		return appStatusItems.map((item, index) => {
-			let color = pcglColors.grey;
+			let color = pcglColours.grey;
 
 			if (index < stepIndex) {
 				color = token.colorSuccess;
 			} else if (index === stepIndex) {
-				color = pcglColors.warningPrimary;
+				color = pcglColours.warningPrimary;
 			}
 
 			return (

@@ -18,7 +18,21 @@
  */
 
 import { z } from 'zod';
-import { collaboratorsSchema } from '../schemas.js';
+import { EmptyOrOptionalString, NonEmptyString } from '../common/strings.js';
+
+export const collaboratorsSchema = z.object({
+	collaboratorFirstName: NonEmptyString,
+	collaboratorMiddleName: EmptyOrOptionalString,
+	collaboratorLastName: NonEmptyString,
+	collaboratorSuffix: EmptyOrOptionalString,
+	collaboratorInstitutionalEmail: NonEmptyString.email(),
+	collaboratorPositionTitle: EmptyOrOptionalString,
+	collaboratorPrimaryAffiliation: EmptyOrOptionalString,
+	collaboratorResearcherProfileURL: EmptyOrOptionalString,
+	collaboratorType: EmptyOrOptionalString,
+});
+
+export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
 
 export const baseCollaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
@@ -33,7 +47,8 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 });
 
 export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaboratorUpdates: collaboratorsSchema.partial().extend({ id: z.number() }),
+	collaboratorEmail: z.string().nonempty().email(),
+	collaboratorUpdates: collaboratorsSchema,
 });
 
 export const collaboratorsListParamsSchema = z
@@ -45,6 +60,6 @@ export const collaboratorsListParamsSchema = z
 export const collaboratorsDeleteParamsSchema = z
 	.object({
 		applicationId: z.coerce.number().int().gt(0),
-		collaboratorId: z.coerce.number().int().gt(0),
+		collaboratorEmail: z.string().nonempty().email(),
 	})
 	.required();

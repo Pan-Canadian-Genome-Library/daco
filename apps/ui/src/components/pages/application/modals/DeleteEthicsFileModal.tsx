@@ -17,32 +17,46 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Modal, Typography } from 'antd';
+import useDeleteEthicsFile from '@/api/mutations/useDeleteEthicsFile';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { Modal } from 'antd';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import useDeleteCollaborator from '@/api/mutations/useDeleteCollaborator';
-import { ModalStateProps } from '@/pages/applications/sections/collaborators';
-
-const { Text } = Typography;
-
-interface DeleteCollaboratorModalProps extends ModalStateProps {
-	appId: string | number;
+interface DeleteEthicsFileModalProps {
+	setIsOpen: Dispatch<SetStateAction<boolean>>;
+	isOpen: boolean;
+	filename: string;
 }
 
-const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCollaboratorModalProps) => {
+const DeleteEthicsFileModal = ({ filename, isOpen, setIsOpen }: DeleteEthicsFileModalProps) => {
 	const { t: translate } = useTranslation();
-	const { mutate: deleteCollaborator } = useDeleteCollaborator();
+	const { mutateAsync: deleteFile } = useDeleteEthicsFile();
+	const { state, dispatch } = useApplicationContext();
 
 	const onSubmit = () => {
-		if (rowData?.collaboratorInstitutionalEmail) {
-			deleteCollaborator({ applicationId: appId, collaboratorEmail: rowData.collaboratorInstitutionalEmail });
-			setIsOpen({ isOpen: false });
+		if (state.fields.ethicsLetter) {
+			deleteFile({ fileId: state.fields.ethicsLetter }).then(() => {
+				dispatch({
+					type: 'UPDATE_APPLICATION',
+					payload: {
+						fields: {
+							...state.fields,
+							ethicsLetter: null,
+						},
+						formState: {
+							...state.formState,
+						},
+					},
+				});
+			});
+			setIsOpen(false);
 		}
 	};
 
 	return (
 		<Modal
-			title={translate('collab-section.deleteModalTitle')}
+			title={translate('ethics-section.deleteModalTitle', { filename })}
 			okText={translate('button.delete')}
 			okButtonProps={{ color: 'danger', variant: 'solid' }}
 			cancelText={translate('button.cancel')}
@@ -50,20 +64,10 @@ const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCo
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 			open={isOpen}
 			onOk={onSubmit}
-			onCancel={() => setIsOpen({ isOpen: false })}
+			onCancel={() => setIsOpen(false)}
 			destroyOnClose
-		>
-			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
-				<Text>
-					{translate('collab-section.deleteModalDescription', {
-						firstName: rowData?.collaboratorFirstName,
-						lastName: rowData?.collaboratorLastName,
-						appId,
-					})}
-				</Text>
-			</Flex>
-		</Modal>
+		></Modal>
 	);
 };
 
-export default DeleteCollaboratorModal;
+export default DeleteEthicsFileModal;

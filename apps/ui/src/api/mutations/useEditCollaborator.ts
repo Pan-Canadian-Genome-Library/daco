@@ -17,57 +17,78 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
 
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
-import { type CollaboratorUpdateRecord, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from '../apiUtils';
+import { type CollaboratorDTO, type ListCollaboratorResponse } from '@pcgl-daco/data-model';
 
 const useEditCollaborator = () => {
+	const { t: translate } = useTranslation();
+	const notification = useNotificationContext();
+
 	return useMutation<
 		ListCollaboratorResponse,
-		ServerError,
+		Error,
 		{
 			applicationId: number | string;
-			collaboratorUpdates: CollaboratorUpdateRecord;
-			userId?: number | string;
+			collaboratorEmail: string;
+			collaboratorUpdates: CollaboratorDTO;
 		}
 	>({
-		mutationFn: async ({ applicationId, collaboratorUpdates }) => {
+		mutationFn: async ({ applicationId, collaboratorEmail, collaboratorUpdates }) => {
 			const response = await fetch('/collaborators/update', {
 				method: 'POST',
 				body: JSON.stringify({
-					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
 					applicationId,
+					collaboratorEmail,
 					collaboratorUpdates,
 				}),
-			}).then(withErrorResponseHandler);
+			});
 
+			/**
+			 * OnError only triggers when an error is rethrown, this is not ideal,
+			 * but it's one way we can make do with how useMutation works for our
+			 * setup.
+			 */
+			if (!response.ok) {
+				switch (response.status) {
+					case 400:
+						throw new Error('INVALID_REQUEST');
+					case 409:
+						throw new Error('DUPLICATE');
+					default:
+						throw new Error('SYSTEM_ERROR');
+				}
+			}
 			return await response.json();
 		},
 		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
+			if (error.message === 'DUPLICATE') {
+				notification.openNotification({
+					type: 'error',
+					message: translate('collab-section.notifications.duplicate.duplicateTitle'),
+					description: translate('collab-section.notifications.duplicate.duplicateMessage'),
+				});
+			} else {
+				notification.openNotification({
+					type: 'error',
+					message: translate('errors.generic.title'),
+					description: translate('errors.generic.message'),
+				});
+			}
 		},
 		onSuccess: async (data) => {
 			//  Update the cache if the edit collaborator request is successful to prevent refetching data
-			await queryClient.setQueryData([`collaborators-${data[0]?.applicationId}`], (prev: ListCollaboratorResponse) => {
-				return prev.map((value) => {
-					// Replace cached value with response object
-					if (value.id === data[0]?.id) {
-						return data[0];
-					}
-					return value;
-				});
-			});
-			notification.success({
-				message: 'Update collaborator was successful',
+			await queryClient.invalidateQueries({ queryKey: [`collaborators-${data[0]?.applicationId}`] });
+			notification.openNotification({
+				type: 'success',
+				message: translate('collab-section.notifications.edit.successTitle'),
+				description: translate('collab-section.notifications.edit.successMessage', {
+					firstName: data[0]?.collaboratorFirstName,
+				}),
 			});
 		},
 	});

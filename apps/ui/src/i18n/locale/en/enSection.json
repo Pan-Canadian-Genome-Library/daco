@@ -34,12 +34,30 @@
 		"optional": "Collaborators are not required for your applications to be approved.",
 		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data.",
 		"deleteModalTitle": "Are you sure you want to delete collaborator?",
-		"deleteModalDescription": "You are about to delete collaborator, {{name}} from application PCGL-{{appId}}",
+		"deleteModalDescription": "You are about to delete collaborator, {{firstName}} {{lastName}} from Application: PCGL-{{appId}}",
 		"addModalTitle": "Add A Collaborator",
 		"addModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL. This email will also be associated with their access to PCGL Controlled Data.",
 		"editModalTitle": "Edit Collaborator",
 		"editModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL. This email will also be associated with their access to PCGL Controlled Data.",
-		"primaryEmailLabel": "The collaborator must be affiliated with the same institution as the Principal Investigator."
+		"primaryEmailLabel": "The collaborator must be affiliated with the same institution as the Principal Investigator.",
+		"notifications": {
+			"added": {
+				"successTitle": "New Collaborator Added",
+				"successMessage": "{{firstName}} has been added as a collaborator to this Application."
+			},
+			"duplicate": {
+				"duplicateTitle": "Duplicate Collaborator",
+				"duplicateMessage": "A collaborator associated with this email address already exists within this application and cannot be added again."
+			},
+			"deleted": {
+				"successTitle": "Collaborator Removed",
+				"successMessage": "{{firstName}} was removed as a collaborator for this Application."
+			},
+			"edit": {
+				"successTitle": "Collaborator Updated",
+				"successMessage": "{{firstName}}'s information was successfully updated."
+			}
+		}
 	},
 	"form": {
 		"firstName": "First Name:",
@@ -132,7 +150,8 @@
 		"ethicsLetterDescription": "Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.",
 		"exemptionDescription": "You represent and warrant that your country/region does not require your research project to undergo ethics review.",
 		"attach": "Please attach a PDF version of the ethics {{letter}} letter to this application:",
-		"allowedFileTypes": "Allowed file types: pdf, | Max file size: 5MB"
+		"allowedFileTypes": "Allowed file types: pdf, | Max file size: 5MB",
+		"deleteModalTitle": "Are you sure you want to delete {{filename}} ? "
 	},
 	"requested-study": {
 		"title": "Requested Study",

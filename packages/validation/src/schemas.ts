@@ -51,20 +51,6 @@ export const applicantInformationSchema = z.object({
 });
 export type ApplicantInformationSchemaType = z.infer<typeof applicantInformationSchema>;
 
-export const collaboratorsSchema = z.object({
-	collaboratorFirstName: NonEmptyString,
-	collaboratorMiddleName: EmptyOrOptionalString,
-	collaboratorLastName: NonEmptyString,
-	collaboratorSuffix: EmptyOrOptionalString,
-	collaboratorInstitutionalEmail: NonEmptyString.email(),
-	collaboratorPositionTitle: NonEmptyString,
-	collaboratorPrimaryAffiliation: EmptyOrOptionalString,
-	collaboratorResearcherProfileURL: EmptyOrOptionalString,
-	collaboratorType: EmptyOrOptionalString,
-});
-
-export type CollaboratorsSchemaType = z.infer<typeof collaboratorsSchema>;
-
 export const institutionalRepSchema = z.object({
 	institutionalTitle: OptionalString,
 	institutionalFirstName: NonEmptyString,

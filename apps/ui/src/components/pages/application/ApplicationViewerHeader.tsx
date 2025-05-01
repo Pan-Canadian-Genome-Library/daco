@@ -21,13 +21,17 @@ import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useCloseApplication from '@/api/mutations/useCloseApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
+import { useNavigate } from 'react-router';
+import WithdrawModal from './modals/WithdrawModal';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -35,6 +39,8 @@ const { useToken } = theme;
 type AppHeaderProps = {
 	id: number;
 	state: ApplicationStateValues;
+	currentSection: string;
+	isEditMode: boolean;
 };
 
 export interface RevisionModalStateProps {
@@ -43,7 +49,7 @@ export interface RevisionModalStateProps {
 	onSubmit: (data: RevisionsModalSchemaType) => void;
 }
 
-const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
+const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -54,6 +60,13 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	const { mutateAsync: repRevision } = useRepRevisions();
 	const { mutateAsync: dacRevision } = useDacRevisions();
 	const notification = useNotificationContext();
+	const [showEditModal, setShowEditModal] = useState(false);
+	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
+
+	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
+	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
+
+	const navigate = useNavigate();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
 		if (state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') {
@@ -86,7 +99,18 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 	};
 
 	const handleCloseApplicationRequest = () => {
-		setShowCloseApplicationModal(false);
+		closeApplication({ applicationId: id }).then(() => {
+			setOpenRevisionsModal(false);
+			navigate('/dashboard');
+		});
+	};
+
+	const onEditButtonClick = () => {
+		if (isWithdrawable) {
+			setShowEditModal(true);
+		} else if (state === 'DRAFT') {
+			navigate(`${currentSection}/edit`, { replace: true });
+		}
 	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
@@ -147,9 +171,16 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 				>
 					{/* TODO: Disable for MVP */}
 					{/* <Button>{translate('button.history')}</Button> */}
+					{canShowEdit ? <Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button> : null}
 					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				</Flex>
+				<WithdrawModal
+					applicationId={id}
+					currentSection={currentSection}
+					showEditModal={showEditModal}
+					setShowEditModal={setShowEditModal}
+				/>
 				<Modal
 					title={translate('modals.closeApplication.title', { id })}
 					okText={translate('button.closeApp')}
@@ -158,6 +189,7 @@ const ApplicationViewerHeader = ({ id, state }: AppHeaderProps) => {
 					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 					open={showCloseApplicationModal}
 					onOk={handleCloseApplicationRequest}
+					okButtonProps={{ disabled: isClosing }}
 					onCancel={() => setShowCloseApplicationModal(false)}
 				>
 					<Flex style={{ height: '100%', marginTop: 20 }}>

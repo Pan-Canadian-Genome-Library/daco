@@ -28,6 +28,7 @@ import {
 	editSignatureRequestSchema,
 	getSignatureParamsSchema,
 	isPositiveInteger,
+	userRoleSchema,
 	type EditSignatureResponse,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
@@ -148,7 +149,16 @@ signatureRouter.post(
 		) => {
 			try {
 				const data = request.body;
-				const { applicationId, signature, signee } = data;
+				const { applicationId, signature } = data;
+				const role = getUserRole(request.session);
+
+				if (role !== userRoleSchema.Values.APPLICANT && role !== userRoleSchema.Values.INSTITUTIONAL_REP) {
+					response.status(403).json({
+						error: 'FORBIDDEN',
+						message: 'User role is not allowed to create a signature for this application',
+					});
+					return;
+				}
 
 				const { userId } = request.session.user || {};
 				if (!userId) {
@@ -170,10 +180,10 @@ signatureRouter.post(
 					}
 				}
 
-				const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
+				const isApplicationUser = role === userRoleSchema.Values.APPLICANT && applicationResult.data.userId === userId;
 
 				const isApplicationInstitutionalRep =
-					signee === 'INSTITUTIONAL_REP' && (await isAssociatedRep(request.session, applicationId));
+					role === userRoleSchema.Values.INSTITUTIONAL_REP && (await isAssociatedRep(request.session, applicationId));
 
 				if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 					response
@@ -185,7 +195,7 @@ signatureRouter.post(
 				const result = await updateApplicationSignature({
 					applicationId,
 					signature,
-					signee,
+					signee: role,
 				});
 
 				if (result.success) {
