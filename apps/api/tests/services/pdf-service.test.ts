@@ -99,7 +99,7 @@ describe('File Service', () => {
 
 			const applicationRecords = applicationRecordsResult.data;
 
-			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(Array.isArray(applicationRecords.applications));
 			assert.ok(applicationRecords.applications[0]);
 
 			const test_app = applicationRecords.applications[0];
@@ -150,7 +150,7 @@ describe('File Service', () => {
 
 			assert.ok(pdfCreation.success);
 			assert.ok(pdfCreation.data);
-			assert.ok(Buffer.isBuffer(pdfCreation.data));
+			assert.ok(pdfCreation.data instanceof Uint8Array);
 		});
 	});
 
