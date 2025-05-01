@@ -216,7 +216,7 @@ export const approveApplication = async ({
 
 		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
 
-		await emailService.sendEmailApproval({
+		emailService.sendEmailApproval({
 			id: application.id,
 			to: applicant_institutional_email,
 			name: applicant_first_name || 'N/A',
@@ -228,8 +228,8 @@ export const approveApplication = async ({
 			return failure('SYSTEM_ERROR', 'Error retrieving collaborators to send emails to');
 		}
 
-		collaboratorResponse.data.forEach(async (collab) => {
-			await emailService.sendEmailApproval({
+		collaboratorResponse.data.forEach((collab) => {
+			emailService.sendEmailApproval({
 				id: application.id,
 				to: collab.institutional_email,
 				name: collab.first_name || 'N/A',
@@ -281,7 +281,7 @@ export const dacRejectApplication = async ({
 
 		const { applicant_institutional_email, applicant_first_name } = resultContents.data.contents;
 
-		await emailService.sendEmailReject({
+		emailService.sendEmailReject({
 			id: application.id,
 			to: applicant_institutional_email,
 			name: applicant_first_name || 'N/A',
@@ -346,7 +346,7 @@ export const submitRevision = async ({
 			resultContents.data.contents;
 
 		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
-			await emailService.sendEmailDacForSubmittedRevisions({
+			emailService.sendEmailDacForSubmittedRevisions({
 				id: application.id,
 				to: institutional_rep_email, // TODO: Change to DAC email
 				applicantName: applicant_first_name || 'N/A',
@@ -354,7 +354,7 @@ export const submitRevision = async ({
 			});
 		} else {
 			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
-			await emailService.sendEmailInstitutionalRepForReview({
+			emailService.sendEmailInstitutionalRepForReview({
 				id: application.id,
 				to: institutional_rep_email,
 				repName: institutional_rep_first_name || 'N/A',
@@ -451,7 +451,7 @@ export const requestApplicationRevisionsByDac = async ({
 
 		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
 
-		await emailService.sendEmailApplicantDacRevisions({
+		emailService.sendEmailApplicantDacRevisions({
 			id: application.id,
 			to: institutional_rep_email,
 			applicantName: applicant_first_name || 'N/A',
@@ -513,7 +513,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
 			resultContents.data.contents;
 
-		await emailService.sendEmailApplicantRepRevisions({
+		emailService.sendEmailApplicantRepRevisions({
 			id: application.id,
 			to: institutional_rep_email,
 			applicantName: applicant_first_name || 'N/A',
@@ -582,8 +582,8 @@ export const submitApplication = async ({
 		} = resultContents.data.contents;
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
-			// Send email to institutional rep for review
-			await emailService.sendEmailInstitutionalRepForReview({
+			//  email to institutional rep for review
+			emailService.sendEmailInstitutionalRepForReview({
 				id: application.id,
 				to: institutional_rep_email,
 				applicantName: applicant_first_name || 'N/A',
@@ -592,7 +592,7 @@ export const submitApplication = async ({
 			});
 		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
 			// Send email to DAC for review
-			await emailService.sendEmailDacForReview({
+			emailService.sendEmailDacForReview({
 				id: application.id,
 				to: institutional_rep_email || 'DAC@email.com', // TODO: make this DAC email
 				applicantName: applicant_first_name || 'N/A',
@@ -600,7 +600,7 @@ export const submitApplication = async ({
 			});
 
 			//  send email to applicant that application is submitted to DAC
-			await emailService.sendEmailApplicantApplicationSubmitted({
+			emailService.sendEmailApplicantApplicationSubmitted({
 				id: application.id,
 				to: applicant_institutional_email,
 				name: applicant_first_name || 'N/A',

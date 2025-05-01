@@ -62,7 +62,7 @@ There are many ways of creating html code with mjml.
 For PCGL, the current solution is option 3 of creating mjml syntax directly into the string. The reason for this is that point 1 and 2 has some downsides to consider for the future development:
 
 For point 1, generating templates locally will create more files, so if we had 9 mjml templates, we'd have to generate 9 html files and then read those files into our nodemailer.
-For point 2, it is a more cleaner and reduces files, but has a issue with inserting dynamic variables into the mjml template, which does have a solution to that, but with a caveat which leads into the next point.
+For point 2, it is a more cleaner solution and reduces files, but has a issue with inserting dynamic variables into the mjml template, which does have a solution to that, but with a caveat which leads into the next point.
 
 Translations is a consideration when picking which method of converting mjml code into html. For points 1 and 2, the text would be hardcoded into the actual mjml file vs just a string with point 3. It would be
 added complexity to switch text from french to english, on top of dynamically adding variables to each of the templates. Since we do not have a translation solution pre-mvp for the backend service, point 3 will provide a 
@@ -70,7 +70,7 @@ generic enough solution that will work for our needs and simple enough to handle
 
 ### Creating a Template
 
-If you want to preview a new template, my recommendation for now is to create a mjml file and import it into the `source.mjml` like the following:
+If you want to preview a new template, my recommendation for now is to create a mjml file and import it into the `source.mjml` or directly write mjml code directly into `source.mjml` like the following:
 
 ```html
     ...
