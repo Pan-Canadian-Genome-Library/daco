@@ -30,15 +30,17 @@ type RejectApplicationPayload = {
 	rejectionReason: string;
 };
 
-const useRejectApplication = (applicationId?: string | number) => {
+const useRejectApplication = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	queryKey: [applicationId];
 	return useMutation<ApplicationResponseData, ServerError, RejectApplicationPayload>({
-		mutationFn: async ({ applicationId }) => {
+		mutationFn: async ({ applicationId, rejectionReason }) => {
 			const response = await fetch(`/applications/${applicationId}/reject`, {
 				method: 'POST',
-				body: JSON.stringify({ applicationId }),
+				body: JSON.stringify({
+					applicationId: applicationId,
+					rejectionReason: rejectionReason,
+				}),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();

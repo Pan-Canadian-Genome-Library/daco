@@ -47,7 +47,7 @@ const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModa
 	});
 
 	const handleRejectApplicationRequest: SubmitHandler<RejectionSchemaType> = async (data) => {
-		await rejectApplication({ applicationId: data.id, rejectionReason: data.rejectionReason });
+		await rejectApplication({ applicationId: id, rejectionReason: data.rejectionReason });
 		setIsOpen(false);
 		reset();
 		navigate('/dashboard');
