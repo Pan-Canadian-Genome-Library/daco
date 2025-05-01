@@ -23,10 +23,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { RejectionSchemaType, rejectionSchema } from '@pcgl-daco/validation';
 import { Flex, Form, Modal, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+import SuccessModal from './SuccessModal';
 const rule = createSchemaFieldRule(rejectionSchema);
+const [showSuccessModal, setShowSuccessModal] = useState(false);
 
 const { Text } = Typography;
 
@@ -50,6 +53,7 @@ const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModa
 		await rejectApplication({ applicationId: id, rejectionReason: data.rejectionReason });
 		setIsOpen(false);
 		reset();
+		setShowSuccessModal(true);
 		navigate('/dashboard');
 	};
 
@@ -82,6 +86,12 @@ const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModa
 					/>
 				</Form>
 			</Flex>
+			<SuccessModal
+				successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showSuccessModal}
+				onOk={() => setShowSuccessModal(false)}
+			/>
 		</Modal>
 	);
 };
