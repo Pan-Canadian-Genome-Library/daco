@@ -21,9 +21,8 @@ import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-
-import useRepRevisions from '@/api/mutations/useRepRevisions';
 import useCloseApplication from '@/api/mutations/useCloseApplication';
+import useRepRevisions from '@/api/mutations/useRepRevisions';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
@@ -70,9 +69,9 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 
 	const navigate = useNavigate();
 
-
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
-		repRevision(data)
+		const payload = { ...data, applicationId: id };
+		repRevision(payload)
 			.then(() => {
 				setOpenRevisionsModal(false);
 				setShowSuccessModal(true);
