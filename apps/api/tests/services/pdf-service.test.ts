@@ -22,18 +22,55 @@ import { after, before, describe, it } from 'node:test';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.ts';
+import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfSvc } from '@/service/pdf/pdfService.ts';
-import { ApplicationService, FilesService, PDFService } from '@/service/types.ts';
-import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
+import { signatureService } from '@/service/signatureService.ts';
+import {
+	ApplicationService,
+	CollaboratorsService,
+	FilesService,
+	PDFService,
+	SignatureService,
+} from '@/service/types.ts';
+import {
+	convertToApplicationRecord,
+	convertToCollaboratorRecords,
+	convertToFileRecord,
+	convertToSignatureRecord,
+} from '@/utils/aliases.ts';
+import formidable from 'formidable';
+import assert from 'node:assert';
+import path from 'node:path';
+import {
+	addInitialApplications,
+	initTestMigration,
+	PG_DATABASE,
+	PG_PASSWORD,
+	PG_USER,
+	testUserId,
+} from '../utils/testUtils.ts';
 
 describe('File Service', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
 	let testApplicationRepo: ApplicationService;
 	let testFileService: FilesService;
+	let testSignatureService: SignatureService;
+	let testCollaboratorService: CollaboratorsService;
 	let testPDFService: PDFService;
 
+	const mockFile: formidable.File = {
+		filepath: path.join(process.cwd(), 'tests/utils/test-daco-pdf.pdf'),
+		hashAlgorithm: 'sha256',
+		mimetype: '	application/pdf',
+		newFilename: 'ethics_pdf-test',
+		originalFilename: 'test-daco-pdf.pdf',
+		size: 20000,
+		toJSON: function (): formidable.FileJSON {
+			throw new Error('Function not implemented.');
+		},
+	};
 	before(async () => {
 		container = await new PostgreSqlContainer()
 			.withUsername(PG_USER)
@@ -49,11 +86,72 @@ describe('File Service', () => {
 
 		testFileService = filesSvc(db);
 		testPDFService = pdfSvc();
+		testSignatureService = signatureService(db);
 		testApplicationRepo = applicationSvc(db);
+		testCollaboratorService = collaboratorsSvc(db);
 	});
 
 	describe('Create a PDF File', () => {
-		it('should successfully create a PDF file based off an application record.', {});
+		it('should successfully create a PDF file based off an application record.', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id: testUserId });
+
+			assert.ok(applicationRecordsResult.success);
+
+			const applicationRecords = applicationRecordsResult.data;
+
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords.applications[0]);
+
+			const test_app = applicationRecords.applications[0];
+
+			const applicationContents = await testApplicationRepo.getApplicationWithContents({ id: test_app.id });
+
+			assert.ok(applicationContents.success);
+			assert.ok(applicationContents.data);
+
+			const signatureContents = await testSignatureService.getApplicationSignature({ application_id: test_app.id });
+			assert.ok(signatureContents.success);
+			assert.ok(signatureContents.data);
+
+			const collabContents = await testCollaboratorService.listCollaborators(test_app.id);
+			assert.ok(collabContents.success);
+			assert.ok(collabContents.data);
+
+			const fileResponse = await testFileService.createFile({
+				application: applicationContents.data,
+				type: 'ETHICS_LETTER',
+				file: mockFile,
+			});
+
+			assert.ok(fileResponse.success);
+
+			const fileData = await testFileService.getFileById({ fileId: fileResponse.data.id });
+			assert.ok(fileData.success);
+
+			const aliasedAppData = convertToApplicationRecord(applicationContents.data);
+			assert.ok(aliasedAppData.success);
+
+			const aliasedSignatureData = convertToSignatureRecord(signatureContents.data);
+			assert.ok(aliasedSignatureData.success);
+
+			const aliasedCollabData = convertToCollaboratorRecords(collabContents.data);
+			assert.ok(Array.isArray(aliasedCollabData));
+
+			const aliasedFileData = convertToFileRecord(fileData.data);
+			assert.ok(aliasedFileData.success);
+
+			const pdfCreation = await testPDFService.renderPCGLApplicationPDF({
+				filename: 'test.pdf',
+				applicationContents: aliasedAppData.data,
+				signatureContents: aliasedSignatureData.data,
+				fileContents: aliasedFileData.data,
+				collaboratorsContents: aliasedCollabData,
+			});
+
+			assert.ok(pdfCreation.success);
+			assert.ok(pdfCreation.data);
+			assert.ok(Buffer.isBuffer(pdfCreation.data));
+		});
 	});
 
 	after(async () => {

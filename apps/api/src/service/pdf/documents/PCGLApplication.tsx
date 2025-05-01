@@ -147,15 +147,15 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				applicantLastName={contents?.applicantLastName}
 				applicantPositionTitle={contents?.applicantPositionTitle}
 				applicantPrimaryAffiliation={contents?.applicantPrimaryAffiliation}
-				applicantSignature={signature.applicantSignature}
-				applicantSignedAt={signature.applicantSignedAt}
+				applicantSignature={signature?.applicantSignature}
+				applicantSignedAt={signature?.applicantSignedAt}
 				institutionalRepFirstName={contents?.institutionalRepFirstName}
 				institutionalRepMiddleName={contents?.institutionalRepMiddleName}
 				institutionalRepLastName={contents?.institutionalRepLastName}
 				institutionalRepPositionTitle={contents?.institutionalRepPositionTitle}
 				institutionalRepPrimaryAffiliation={contents?.institutionalRepPrimaryAffiliation}
-				institutionalRepSignature={signature.institutionalRepSignature}
-				institutionalRepSignedAt={signature.institutionalRepSignedAt}
+				institutionalRepSignature={signature?.institutionalRepSignature}
+				institutionalRepSignedAt={signature?.institutionalRepSignedAt}
 			/>
 		</Document>
 	);
