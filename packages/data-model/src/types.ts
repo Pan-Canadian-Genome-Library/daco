@@ -273,7 +273,6 @@ export interface CollaboratorDTO {
 }
 
 export interface CollaboratorsResponseDTO extends CollaboratorDTO {
-	id: number;
 	applicationId: number;
 }
 export type ListCollaboratorResponse = CollaboratorsResponseDTO[];
@@ -287,12 +286,8 @@ export interface ListCollaboratorRequest extends BaseCollaboratorRequest {
 	collaborators: CollaboratorDTO[];
 }
 
-export type CollaboratorUpdateRecord = Partial<CollaboratorDTO> & {
-	id: number;
-};
-
 export interface UpdateCollaboratorRequest extends BaseCollaboratorRequest {
-	collaborators: CollaboratorUpdateRecord;
+	collaborators: CollaboratorDTO;
 }
 
 export interface DeleteCollaboratorRequest {
