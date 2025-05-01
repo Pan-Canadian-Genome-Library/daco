@@ -32,17 +32,17 @@ const useGetFile = ({ fileId }: { fileId?: number | null }) => {
 			const response = await fetch(`/file/${fileId}`).then(withErrorResponseHandler);
 			const result = await response.json();
 
-			const formatedFile: UploadFile[] = [
+			const formattedFile: UploadFile[] = [
 				{
 					uid: `${result?.id}`,
 					name: `${result?.filename}`,
 					status: 'done',
-					url: '/', // to show red color link after retrieving file
+					url: '#', // Shows our primary link colour when retrieving the file.
 					response: result,
 				},
 			];
 
-			return formatedFile;
+			return formattedFile;
 		},
 	});
 };

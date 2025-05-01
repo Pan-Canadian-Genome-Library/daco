@@ -33,9 +33,9 @@ const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCo
 	const { t: translate } = useTranslation();
 	const { mutate: deleteCollaborator } = useDeleteCollaborator();
 
-	const onSumbit = () => {
-		if (rowData?.id) {
-			deleteCollaborator({ applicationId: appId, collaboratorId: rowData.id });
+	const onSubmit = () => {
+		if (rowData?.collaboratorInstitutionalEmail) {
+			deleteCollaborator({ applicationId: appId, collaboratorEmail: rowData.collaboratorInstitutionalEmail });
 			setIsOpen({ isOpen: false });
 		}
 	};
@@ -49,13 +49,17 @@ const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCo
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 			open={isOpen}
-			onOk={onSumbit}
+			onOk={onSubmit}
 			onCancel={() => setIsOpen({ isOpen: false })}
 			destroyOnClose
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>
-					{translate('collab-section.deleteModalDescription', { name: rowData?.collaboratorFirstName, appId })}
+					{translate('collab-section.deleteModalDescription', {
+						firstName: rowData?.collaboratorFirstName,
+						lastName: rowData?.collaboratorLastName,
+						appId,
+					})}
 				</Text>
 			</Flex>
 		</Modal>
