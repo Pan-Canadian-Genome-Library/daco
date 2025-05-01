@@ -19,6 +19,7 @@
 
 import { type PostgresDb } from '@/db/index.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
+import { isPostgresError, PostgresErrors } from '@/db/utils.ts';
 import BaseLogger from '@/logger.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import { and, eq } from 'drizzle-orm';
@@ -33,34 +34,6 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		newCollaborators: CollaboratorModel[];
 	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
-			// Check for Duplicates
-			let hasDuplicateCollaborators = false;
-
-			// TODO: Duplicate check needs to be on institutional_email + application_id as the primary identifier, not the entire record.
-			//       This may be enforceable from the DB (composite PK).
-			for await (const collaborator of newCollaborators) {
-				const countExistingCollaborator = await db.$count(
-					collaborators,
-					and(
-						eq(collaborators.first_name, collaborator.first_name),
-						eq(collaborators.last_name, collaborator.last_name),
-						eq(collaborators.institutional_email, collaborator.institutional_email),
-						collaborator.position_title ? eq(collaborators.position_title, collaborator.position_title) : undefined,
-						eq(collaborators.application_id, collaborator.application_id),
-					),
-				);
-
-				if (countExistingCollaborator > 0) {
-					hasDuplicateCollaborators = true;
-				}
-			}
-
-			if (hasDuplicateCollaborators) {
-				// TODO: Duplicate record error message should inform which donors are duplicate.
-				return failure('DUPLICATE_RECORD', `Cannot create duplicate collaborator records.`);
-			}
-
-			// Create Collaborators
 			const collaboratorRecords = await db.transaction(async (transaction) => {
 				const newRecords: CollaboratorRecord[] = [];
 
@@ -84,24 +57,47 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 
 			return success(collaboratorRecords);
 		} catch (error) {
+			const postgresError = isPostgresError(error);
+
+			if (postgresError && postgresError.code === PostgresErrors.UNIQUE_KEY_VIOLATION) {
+				return failure(
+					'DUPLICATE_RECORD',
+					`Unable to create new collaborator. Email address provided is already being used by another collaborator record in the same application.`,
+				);
+			}
+
 			const message = `Error creating new collaborator records.`;
-
 			logger.error(message, error);
-
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	deleteCollaborator: async ({ id }: { id: number }): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
+	deleteCollaborator: async ({
+		institutional_email,
+		application_id,
+	}: {
+		institutional_email: string;
+		application_id: number;
+	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
 		try {
-			const deletedRecord = await db.delete(collaborators).where(eq(collaborators.id, id)).returning();
+			const deletedRecord = await db
+				.delete(collaborators)
+				.where(
+					and(
+						eq(collaborators.institutional_email, institutional_email),
+						eq(collaborators.application_id, application_id),
+					),
+				)
+				.returning();
 
 			if (!deletedRecord[0]) {
-				throw new Error(`Error deleting collaborator with ${id}, no record deleted`);
+				throw new Error(
+					`Error deleting collaborator with ${institutional_email} in application ${application_id}, no record deleted`,
+				);
 			}
 
 			return success(deletedRecord);
 		} catch (error) {
-			const message = `Error deleting collaborator with id: ${id}`;
+			const message = `Error deleting collaborator with ${institutional_email} in application ${application_id}, no record deleted`;
 
 			logger.error(message, error);
 
@@ -109,26 +105,44 @@ const collaboratorsSvc = (db: PostgresDb) => ({
 		}
 	},
 	updateCollaborator: async ({
-		id,
+		institutional_email: original_identifying_email,
+		application_id,
 		collaborator,
 	}: {
-		id: number;
+		institutional_email: string;
+		application_id: number;
 		collaborator: Partial<CollaboratorModel>;
-	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR'> => {
+	}): AsyncResult<CollaboratorRecord[], 'SYSTEM_ERROR' | 'DUPLICATE_RECORD'> => {
 		try {
 			const updatedRecord = await db
 				.update(collaborators)
 				.set(collaborator)
-				.where(eq(collaborators.id, id))
+				.where(
+					and(
+						eq(collaborators.institutional_email, original_identifying_email),
+						eq(collaborators.application_id, application_id),
+					),
+				)
 				.returning();
 
 			if (!updatedRecord[0]) {
-				throw new Error(`Error updating collaborator with ${id}, no record updated`);
+				throw new Error(
+					`Error updating collaborator with ${original_identifying_email} in application ID ${application_id}, no record updated`,
+				);
 			}
 
 			return success(updatedRecord);
 		} catch (error) {
-			const message = `Error updating collaborator with id: ${id}`;
+			const postgresError = isPostgresError(error);
+
+			if (postgresError && postgresError.code === PostgresErrors.UNIQUE_KEY_VIOLATION) {
+				return failure(
+					'DUPLICATE_RECORD',
+					`Unable to update record. Email address provided is already being used by another collaborator record in this application.`,
+				);
+			}
+
+			const message = `Error updating collaborator with ${original_identifying_email} in application ID ${application_id}.`;
 
 			logger.error(message, error);
 

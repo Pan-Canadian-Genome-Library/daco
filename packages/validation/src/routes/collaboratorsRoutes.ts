@@ -47,7 +47,8 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 });
 
 export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
-	collaboratorUpdates: collaboratorsSchema.partial().extend({ id: z.number() }),
+	collaboratorEmail: z.string().nonempty().email(),
+	collaboratorUpdates: collaboratorsSchema,
 });
 
 export const collaboratorsListParamsSchema = z
@@ -59,6 +60,6 @@ export const collaboratorsListParamsSchema = z
 export const collaboratorsDeleteParamsSchema = z
 	.object({
 		applicationId: z.coerce.number().int().gt(0),
-		collaboratorId: z.coerce.number().int().gt(0),
+		collaboratorEmail: z.string().nonempty().email(),
 	})
 	.required();

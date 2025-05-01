@@ -34,7 +34,7 @@
 		"optional": "Collaborators are not required for your applications to be approved.",
 		"note": "* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data.",
 		"deleteModalTitle": "Are you sure you want to delete collaborator?",
-		"deleteModalDescription": "You are about to delete collaborator, {{name}} from application PCGL-{{appId}}",
+		"deleteModalDescription": "You are about to delete collaborator, {{firstName}} {{lastName}} from Application: PCGL-{{appId}}",
 		"addModalTitle": "Add A Collaborator",
 		"addModalDescription": "Please fill out the following information for the collaborator, including a valid institutional email address that they will use to log in to PCGL. This email will also be associated with their access to PCGL Controlled Data.",
 		"editModalTitle": "Edit Collaborator",
@@ -47,7 +47,7 @@
 			},
 			"duplicate": {
 				"duplicateTitle": "Duplicate Collaborator",
-				"duplicateMessage": "This collaborator already exists within this application and cannot be added again. Please edit or delete their entry."
+				"duplicateMessage": "A collaborator associated with this email address already exists within this application and cannot be added again."
 			},
 			"deleted": {
 				"successTitle": "Collaborator Removed",

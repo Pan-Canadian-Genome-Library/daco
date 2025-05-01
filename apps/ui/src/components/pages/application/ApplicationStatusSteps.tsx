@@ -20,7 +20,7 @@
 import { Flex, theme } from 'antd';
 
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { pcglColors } from '@/providers/ThemeProvider';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { ValidateAllSections } from './utils/validatorFunctions';
 
@@ -80,12 +80,12 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 
 		// Until step is found, render green components but once it is found, set current step to yellow and remainder grey
 		return appStatusItems.map((item, index) => {
-			let color = pcglColors.grey;
+			let color = pcglColours.grey;
 
 			if (index < stepIndex) {
 				color = token.colorSuccess;
 			} else if (index === stepIndex) {
-				color = pcglColors.warningPrimary;
+				color = pcglColours.warningPrimary;
 			}
 
 			return (
