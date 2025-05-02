@@ -44,7 +44,7 @@ const useCloseApplication = () => {
 				}),
 			});
 		},
-		onError: (applicationId) => {
+		onError: () => {
 			notification.openNotification({
 				type: 'error',
 				message: translate('modals.closeApplication.notifications.closeApplicationFailed'),
