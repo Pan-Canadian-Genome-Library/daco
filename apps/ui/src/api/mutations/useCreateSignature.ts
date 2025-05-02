@@ -44,7 +44,7 @@ const useCreateSignature = () => {
 			notification.openNotification({
 				type: 'error',
 				message: error.message,
-				description: error.errors,
+				description: error.error,
 			});
 		},
 		onSuccess: async (data) => {
