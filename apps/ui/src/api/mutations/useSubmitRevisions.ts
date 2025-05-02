@@ -20,6 +20,7 @@ import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
+import { queryClient } from '@/providers/Providers';
 import { type ApplicationResponseData } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -34,18 +35,17 @@ const useSubmitRevisions = () => {
 		mutationFn: async ({ applicationId }) => {
 			const response = await fetch(`/applications/${applicationId}/submit-revisions`, {
 				method: 'POST',
-				body: JSON.stringify({
-					applicationId: applicationId,
-				}),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
-		onSuccess: () => {
+		onSuccess: async (data) => {
 			notification.openNotification({
 				type: 'success',
 				message: translate('sign-and-submit-section.notifications.submitApplicationWithRevisionsSuccess'),
 			});
+			// Invalidate previous application data
+			await queryClient.invalidateQueries({ queryKey: [`application-${data.id}`] });
 			navigation(`/dashboard`);
 		},
 		onError: () => {
