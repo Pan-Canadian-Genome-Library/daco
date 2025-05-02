@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { Application } from '@/global/types';
+import { ApplicationDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 import { useNavigate } from 'react-router';
 
@@ -31,7 +31,7 @@ const { Title, Text } = Typography;
 const { useToken } = theme;
 
 type ApplicationCardProps = {
-	application: Application;
+	application: ApplicationDTO;
 };
 
 const ApplicationCard = (props: ApplicationCardProps) => {
@@ -45,9 +45,9 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
-	const formatDate = (createdAt: string, expiresAt: string) => {
+	const formatDate = (createdAt: string | Date, expiresAt?: string | Date | null) => {
 		const createdDate = translate('date.intlDateTime', {
-			val: new Date(createdAt),
+			val: createdAt instanceof Date ? createdAt : new Date(createdAt),
 			formatParams: {
 				val: { year: 'numeric', month: 'long', day: 'numeric' },
 			},
@@ -55,7 +55,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 
 		const expiresDate = expiresAt
 			? translate('date.intlDateTime', {
-					val: new Date(expiresAt),
+					val: expiresAt instanceof Date ? expiresAt : new Date(expiresAt),
 					formatParams: {
 						val: { year: 'numeric', month: 'long', day: 'numeric' },
 					},
