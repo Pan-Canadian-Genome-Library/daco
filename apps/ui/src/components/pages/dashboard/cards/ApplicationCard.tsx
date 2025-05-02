@@ -18,39 +18,36 @@
  */
 
 import { ExclamationCircleFilled } from '@ant-design/icons';
-import { Button, Card, Flex, theme, Typography } from 'antd';
+import { Card, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { Application } from '@/global/types';
+import { ApplicationDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
-import { useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 const { Title, Text } = Typography;
 const { useToken } = theme;
 
 type ApplicationCardProps = {
-	openEdit: (id: string) => void;
-	application: Application;
+	application: ApplicationDTO;
 };
 
 const ApplicationCard = (props: ApplicationCardProps) => {
 	const { t: translate } = useTranslation();
 	const { id, state, createdAt, expiresAt } = props.application;
-	const { showEdit, color, showActionRequired } = getApplicationStateProperties(state);
+	const { colour, showActionRequired } = getApplicationStateProperties(state);
 
 	const navigate = useNavigate();
 	const minWidth = useMinWidth();
-	const editButtonRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
 	const { token } = useToken();
 
 	const isLowResDevice = minWidth <= token.screenLGMax;
 
-	const formatDate = (createdAt: string, expiresAt: string) => {
+	const formatDate = (createdAt: string | Date, expiresAt?: string | Date | null) => {
 		const createdDate = translate('date.intlDateTime', {
-			val: new Date(createdAt),
+			val: createdAt instanceof Date ? createdAt : new Date(createdAt),
 			formatParams: {
 				val: { year: 'numeric', month: 'long', day: 'numeric' },
 			},
@@ -58,7 +55,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 
 		const expiresDate = expiresAt
 			? translate('date.intlDateTime', {
-					val: new Date(expiresAt),
+					val: expiresAt instanceof Date ? expiresAt : new Date(expiresAt),
 					formatParams: {
 						val: { year: 'numeric', month: 'long', day: 'numeric' },
 					},
@@ -66,14 +63,6 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 			: translate('generic.notApplicable');
 
 		return `${translate('label.created')}: ${createdDate} | ${translate('label.expires')}: ${expiresDate}`;
-	};
-
-	const handleEditClick = (id: string, state: string, openEdit: (id: string) => void) => {
-		if (state === ApplicationStates.DRAFT) {
-			navigate(`/application/${id}/intro/edit`);
-		} else {
-			openEdit(id);
-		}
 	};
 
 	const handleCardClick = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
@@ -85,13 +74,10 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 		 */
 		if (('key' in event && (event.key === 'Enter' || event.key === ' ')) || event.type === 'click') {
 			event.stopPropagation();
-			const editButtonReference = editButtonRef?.current;
-			/**
-			 * Using a ref, we need to check the user isn't trying to click the edit button. If they are
-			 * we already have logic to handle that in `handleEditClick`.
-			 */
-			if (!(event.target === editButtonReference?.children[0] || event.target === editButtonReference)) {
-				navigate(`/application/${id}/`);
+			if (state === ApplicationStates.DRAFT) {
+				navigate(`/application/${id}/intro/edit`);
+			} else {
+				navigate(`/application/${id}/intro/`);
 			}
 		}
 	};
@@ -109,7 +95,7 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 					<Flex align={isLowResDevice ? 'start' : 'center'} vertical={isLowResDevice} gap="middle">
 						<Flex
 							style={{
-								backgroundColor: color,
+								backgroundColor: colour,
 								padding: 10,
 								minWidth: minWidth <= token.screenLG ? 100 : 200,
 								borderRadius: token.borderRadius,
@@ -124,13 +110,6 @@ const ApplicationCard = (props: ApplicationCardProps) => {
 								<ExclamationCircleFilled style={{ color: token.colorPrimary, fontSize: 20 }} />
 								<Text strong>{translate('alert.actionRequired')}</Text>
 							</Flex>
-						) : null}
-					</Flex>
-					<Flex flex={1} justify="flex-end" align="center">
-						{showEdit ? (
-							<Button ref={editButtonRef} onClick={() => handleEditClick(id, state, props.openEdit)}>
-								{translate('button.edit')}
-							</Button>
 						) : null}
 					</Flex>
 				</Flex>
