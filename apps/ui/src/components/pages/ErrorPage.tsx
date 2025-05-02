@@ -44,7 +44,7 @@ const ErrorPage = ({ error, loading }: ErrorProps) => {
 				) : (
 					<Col>
 						<h1>{error?.message}</h1>
-						<h2>{error?.errors}</h2>
+						<h2>{error?.error}</h2>
 					</Col>
 				)}
 			</Row>
