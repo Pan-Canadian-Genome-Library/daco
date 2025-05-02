@@ -32,7 +32,7 @@ const useSubmitRevisions = () => {
 
 	return useMutation<ApplicationResponseData, ServerError, { applicationId?: string | number }>({
 		mutationFn: async ({ applicationId }) => {
-			const response = await fetch(`/applications/${applicationId}/revisions/submit`, {
+			const response = await fetch(`/applications/${applicationId}/submit-revisions`, {
 				method: 'POST',
 				body: JSON.stringify({
 					applicationId: applicationId,
