@@ -36,6 +36,7 @@ import {
 	withdrawApplication,
 } from '@/controllers/applicationController.js';
 
+import BaseLogger from '@/logger.js';
 import {
 	RevisionRequestModel,
 	type ApplicationRecord,
@@ -59,7 +60,7 @@ import { failure, success, type AsyncResult } from '../utils/results.ts';
 import type { ResponseWithData } from './types.ts';
 
 const applicationRouter = express.Router();
-
+const logger = BaseLogger.forModule('applicationRouter');
 /**
  * Ensure that the application requested is owned/created by the user making the request.
  * This will fetch the application from the database and check that the stored application's
@@ -68,8 +69,8 @@ const applicationRouter = express.Router();
  *
  * This function returns several error cases in order to handle cases where:
  * - NOT_FOUND: the application id was not found in the database
- * - SYSTEM_ERROR: somethign unexpected happened fetching the application
- * - FORBIDEN: the application does not belong to this user
+ * - SYSTEM_ERROR: something unexpected happened fetching the application
+ * - FORBIDDEN: the application does not belong to this user
  * @param param0
  * @returns
  */
@@ -390,19 +391,29 @@ applicationRouter.post(
 				}
 
 				switch (pdfGenerate.error) {
-					case 'NOT_FOUND':
+					case 'NOT_FOUND': {
+						logger.error(
+							`Application ${approvalResult.data.id} was approved, however, PDF was unable to be generated because required data was not found.`,
+						);
+
 						response.status(404).json({
 							error: 'NOT_FOUND',
 							message:
 								'Application was approved, but PDF was unable to be generated because required data was not found.',
 						});
 						return;
-					case 'SYSTEM_ERROR':
+					}
+					case 'SYSTEM_ERROR': {
+						logger.error(
+							`Application ${approvalResult.data.id} was approved, however, PDF was unable to be generated. ${pdfGenerate.message}`,
+						);
+
 						response.status(500).json({
 							error: 'SYSTEM_ERROR',
 							message: `Application was successfully approved, however, a PDF generation error occurred. ${pdfGenerate.message}`,
 						});
 						return;
+					}
 				}
 			}
 
@@ -421,7 +432,7 @@ applicationRouter.post(
 				}
 			}
 		} catch (error) {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later..` });
 		}
 	},
 );

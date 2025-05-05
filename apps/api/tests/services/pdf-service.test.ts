@@ -152,6 +152,67 @@ describe('File Service', () => {
 			assert.ok(pdfCreation.data);
 			assert.ok(pdfCreation.data instanceof Uint8Array);
 		});
+		it('should fail to create a PDF file if no ethics exemption or approval letter exists.', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id: testUserId });
+
+			assert.ok(applicationRecordsResult.success);
+
+			const applicationRecords = applicationRecordsResult.data;
+
+			assert.ok(Array.isArray(applicationRecords.applications));
+			assert.ok(applicationRecords.applications[0]);
+
+			const test_app = applicationRecords.applications[0];
+
+			const applicationContents = await testApplicationRepo.getApplicationWithContents({ id: test_app.id });
+
+			assert.ok(applicationContents.success);
+			assert.ok(applicationContents.data);
+
+			const signatureContents = await testSignatureService.getApplicationSignature({ application_id: test_app.id });
+			assert.ok(signatureContents.success);
+			assert.ok(signatureContents.data);
+
+			const collabContents = await testCollaboratorService.listCollaborators(test_app.id);
+			assert.ok(collabContents.success);
+			assert.ok(collabContents.data);
+
+			const fileResponse = await testFileService.createFile({
+				application: applicationContents.data,
+				type: 'ETHICS_LETTER',
+				file: mockFile,
+			});
+
+			assert.ok(fileResponse.success);
+
+			const fileData = await testFileService.getFileById({ fileId: fileResponse.data.id });
+			assert.ok(fileData.success);
+
+			const aliasedAppData = convertToApplicationRecord(applicationContents.data);
+			assert.ok(aliasedAppData.success);
+
+			const aliasedSignatureData = convertToSignatureRecord(signatureContents.data);
+			assert.ok(aliasedSignatureData.success);
+
+			const aliasedCollabData = convertToCollaboratorRecords(collabContents.data);
+			assert.ok(Array.isArray(aliasedCollabData));
+
+			const aliasedFileData = convertToFileRecord(fileData.data);
+			assert.ok(aliasedFileData.success);
+
+			aliasedFileData.data.id = 10;
+			aliasedFileData.data.content = null;
+
+			const pdfCreation = await testPDFService.renderPCGLApplicationPDF({
+				filename: 'test.pdf',
+				applicationContents: aliasedAppData.data,
+				signatureContents: aliasedSignatureData.data,
+				fileContents: aliasedFileData.data,
+				collaboratorsContents: aliasedCollabData,
+			});
+
+			assert.ok(!pdfCreation.success);
+		});
 	});
 
 	after(async () => {
