@@ -249,7 +249,7 @@ export const createApplicationPDF = async ({
 
 	const createFileRecord = await fileService.createFile({
 		file: {
-			originalFilename: `${`PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`}.pdf`,
+			originalFilename: `${`PCGL_DACO_Application-${applicationContents.data.id}_${Date.now().toString()}`}.pdf`,
 			filepath: '#', //This doesn't matter as it's not used in the createFile method, however it required by the Formidable.File Type
 		},
 		application: applicationContents.data,

@@ -110,7 +110,7 @@ const pdfService = () => ({
 
 			return success(await finalApplication.save());
 		} catch (err) {
-			const message = `Error Rendering Application to PDF file.`;
+			const message = `Error Rendering Application to PDF file for Application ${applicationContents.id}.`;
 
 			logger.error(message);
 			logger.error(err);
