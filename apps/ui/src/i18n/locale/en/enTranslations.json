@@ -50,7 +50,8 @@
 		"contact": "Contact Us",
 		"pcglWebsite": "PCGL Website",
 		"dataPlatform": "Data Platform",
-		"applications": "My Applications"
+		"myApplications": "My Applications",
+		"manageApplications": "Manage Applications"
 	},
 	"button": {
 		"logout": "Logout",

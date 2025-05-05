@@ -58,8 +58,7 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-
-	const { isLoggedIn } = useUserContext();
+	const { isLoggedIn, role } = useUserContext();
 
 	const isResponsiveMode = minWidth <= token.screenXL;
 
@@ -78,6 +77,39 @@ const HeaderComponent = () => {
 			setResponsiveMenuOpen(false);
 		}
 		buttonAction();
+	};
+
+	/**
+	 * Determines how the Applications Button is rendered (if at all), depending on the logged in
+	 * state, and the user's role.
+	 *
+	 * @returns `MenuLink` | `undefined` - returns `undefined` if the user is a Institutional Rep
+	 */
+	const determineIfApplicationsShown = (): MenuLink | undefined => {
+		if (!isLoggedIn) {
+			return {
+				name: translate('links.apply'),
+				href: `#`,
+				position: 'right',
+				target: '_self',
+			};
+		} else if (isLoggedIn && role === 'DAC_MEMBER') {
+			return {
+				name: translate('links.manageApplications'),
+				href: '/manage/applications',
+				position: 'right',
+				target: '_self',
+			};
+		} else if (isLoggedIn && role === 'APPLICANT') {
+			return {
+				name: translate('links.myApplications'),
+				href: '/dashboard',
+				position: 'right',
+				target: '_self',
+			};
+		} else {
+			return undefined;
+		}
 	};
 
 	const location = useLocation();
@@ -107,7 +139,7 @@ const HeaderComponent = () => {
 		position: 'right',
 	};
 
-	const menuItems: (MenuLink | MenuButton)[] = [
+	const defaultMenuItems: (MenuLink | MenuButton)[] = [
 		{
 			name: translate('links.policies'),
 			href: '#',
@@ -123,34 +155,27 @@ const HeaderComponent = () => {
 			href: '#',
 			position: 'left',
 		},
-		isLoggedIn
-			? {
-					name: translate('links.applications'),
-					href: '/dashboard',
-					position: 'right',
-					target: '_self',
-				}
-			: {
-					name: translate('links.apply'),
-					href: `#`,
-					position: 'right',
-				},
-		isLoggedIn ? logoutButton : loginButton,
 	];
+
+	const menuItems = [...defaultMenuItems, determineIfApplicationsShown(), isLoggedIn ? logoutButton : loginButton];
 
 	/**
 	 * Generates the links to display in the mobile and desktop menus.
 	 * @param menuItems An array containing the list of links for the menu
 	 * @param position The 'side' of links you want in the menu, left (next to the logo) or right (away from the logo on the other side of the screen)
-	 * @returns JSX Element array containing the link elements.
+	 * @returns JSX Element array containing the link elements or `null` if the link is not shown.
 	 */
 	const displayMenuItems = (
-		menuItems: (MenuLink | MenuButton)[],
+		menuItems: (MenuLink | MenuButton | undefined)[],
 		position: 'left' | 'right' | 'both',
-	): JSX.Element[] => {
+	): (JSX.Element | null)[] => {
 		return menuItems
-			.filter((menuItem) => (position !== 'both' ? menuItem.position === position : menuItem.position))
+			.filter((menuItem) => (position !== 'both' ? menuItem?.position === position : menuItem?.position))
 			.map((menuItem, key) => {
+				if (!menuItem) {
+					return null;
+				}
+
 				if ('buttonProps' in menuItem) {
 					const clickAction = menuItem.onClickAction;
 					return (
