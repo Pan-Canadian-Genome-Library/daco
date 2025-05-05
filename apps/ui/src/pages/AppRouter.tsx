@@ -35,8 +35,8 @@ import SignAndSubmit from '@/pages/applications/sections/sign';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
+import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
-import InstitutionalRepLogin from './review';
 
 export const SectionRoutes = {
 	INTRO: 'intro',
@@ -149,7 +149,16 @@ function AppRouter() {
 						</ProtectedRoute>
 					}
 				/>
-				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
+
+				<Route
+					path="review/:applicationId"
+					element={
+						// TODO: This is broken, speak with Jon to figure this out.
+						// <ProtectedRoute requiredRoles={['ANONYMOUS', 'INSTITUTIONAL_REP']}>
+						<InstitutionalRepLogin />
+						// </ProtectedRoute>
+					}
+				/>
 			</Route>
 		</Routes>
 	);
