@@ -33,6 +33,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';
+import { pdfService } from './pdf/pdfService.ts';
 import { signatureService } from './signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
@@ -60,6 +61,8 @@ export type ApplicationSignatureUpdate = Pick<
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
+
+export type PDFService = ReturnType<typeof pdfService>;
 
 export type FilesModel = typeof files.$inferInsert;
 export type FilesRecord = typeof files.$inferSelect;
