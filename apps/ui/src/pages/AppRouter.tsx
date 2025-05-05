@@ -36,6 +36,7 @@ import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
 import ManageApplicationsPage from '@/pages/manage/applications';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
+import InstitutionalRepLogin from './review';
 
 export const SectionRoutes = {
 	INTRO: 'intro',
@@ -148,6 +149,7 @@ function AppRouter() {
 						</ProtectedRoute>
 					}
 				/>
+				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
 			</Route>
 		</Routes>
 	);

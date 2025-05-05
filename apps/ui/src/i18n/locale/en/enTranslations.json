@@ -17,6 +17,11 @@
 		"noAccess": "You do not have access to PCGL Controlled Data",
 		"startNewApp": "Start A New Application"
 	},
+	"repView": {
+		"title": "Welcome",
+		"description": "You are about to be redirected to a login page. Please login using your institutional email and begin the review.",
+		"login": "Login to Review"
+	},
 	"applicationViewer": {
 		"title": "My Application: PCGL-{{id}}"
 	},
