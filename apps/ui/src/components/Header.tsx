@@ -68,6 +68,11 @@ const HeaderComponent = () => {
 		width: isResponsiveMode ? '100%' : 'auto',
 	};
 
+	const buttonLinkStyle: React.CSSProperties = {
+		fontWeight: 'normal',
+		fontSize: token.fontSizeLG,
+	};
+
 	/**
 	 * Default action when a button in the menu is clicked, used particularly for the mobile menu which should close after click.
 	 * @param buttonAction The function for the action needed to be performed.
@@ -85,11 +90,16 @@ const HeaderComponent = () => {
 	 *
 	 * @returns `MenuLink` | `undefined` - returns `undefined` if the user is a Institutional Rep
 	 */
-	const determineIfApplicationsShown = (): MenuLink | undefined => {
+	const determineIfApplicationsShown = (): MenuLink | MenuButton | undefined => {
 		if (!isLoggedIn) {
 			return {
 				name: translate('links.apply'),
-				href: `#`,
+				buttonProps: {
+					style: { ...buttonLinkStyle },
+					variant: 'text',
+					type: 'text',
+				},
+				onClickAction: () => console.log('clicked'),
 				position: 'right',
 				target: '_self',
 			};
