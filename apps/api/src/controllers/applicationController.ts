@@ -21,17 +21,28 @@ import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
+import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
+import { filesSvc } from '@/service/fileService.ts';
+import { pdfService } from '@/service/pdf/pdfService.ts';
+import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
 	type ApplicationService,
+	type CollaboratorsService,
+	type FilesService,
 	type JoinedApplicationRecord,
+	type PDFService,
 	type RevisionRequestModel,
+	type SignatureService,
 } from '@/service/types.js';
 import {
 	convertToApplicationContentsRecord,
 	convertToApplicationRecord,
 	convertToBasicApplicationRecord,
+	convertToCollaboratorRecords,
+	convertToFileRecord,
 	convertToRevisionsRecord,
+	convertToSignatureRecord,
 } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
 import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
@@ -172,6 +183,111 @@ export const getApplicationStateTotals = async () => {
 
 	return await service.applicationStateTotals();
 };
+
+/**
+ * Generates a PDF with the application data provided in the various application tables.
+ * @param applicationId - The ID of the application within the database.
+ * @returns Success with a Buffer containing the PDF / Failure with Error.
+ */
+export const createApplicationPDF = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<Uint8Array<ArrayBufferLike>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	const database = getDbInstance();
+	const applicationService: ApplicationService = applicationSvc(database);
+	const signatureService: SignatureService = signatureSvc(database);
+	const collaboratorsService: CollaboratorsService = collaboratorsSvc(database);
+	const fileService: FilesService = filesSvc(database);
+
+	const pdfRepo: PDFService = pdfService();
+
+	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
+
+	if (!applicationContents.success) {
+		return applicationContents;
+	}
+
+	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
+	if (!signatureContents.success) {
+		return signatureContents;
+	}
+
+	const collaboratorsContents = await collaboratorsService.listCollaborators(applicationId);
+	if (!collaboratorsContents.success) {
+		return collaboratorsContents;
+	}
+
+	const ethicsLetterID = applicationContents.data.contents?.ethics_letter;
+
+	if (!ethicsLetterID) {
+		return failure('SYSTEM_ERROR', 'No ethics approval or exemption file was found, unable to generate PDF.');
+	}
+
+	const fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
+
+	if (!fileContents.success) {
+		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
+	}
+
+	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
+	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
+	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
+	const aliasedFileContents = convertToFileRecord(fileContents.data);
+
+	if (
+		!aliasedApplicationContents.success ||
+		!aliasedSignatureContents.success ||
+		!aliasedFileContents.success ||
+		!aliasedFileContents.success
+	) {
+		return failure('SYSTEM_ERROR', 'Error aliasing data records. Unknown keys.');
+	}
+	/**
+	 * This is a bit odd because we're using the DTO aliases while passing back to the service (usually its the opposite),
+	 * however, given this service is essentially running a React render, we need to.
+	 */
+	const renderedPDF = await pdfRepo.renderPCGLApplicationPDF({
+		applicationContents: aliasedApplicationContents.data,
+		signatureContents: aliasedSignatureContents.data,
+		collaboratorsContents: aliasedCollaboratorsContents,
+		fileContents: aliasedFileContents.data,
+		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
+	});
+
+	if (!renderedPDF.success) {
+		return renderedPDF;
+	}
+
+	const createFileRecord = await fileService.createFile({
+		file: {
+			originalFilename: `${`PCGL_DACO_Application-${applicationContents.data.id}_${Date.now().toString()}`}.pdf`,
+			filepath: '#', //This doesn't matter as it's not used in the createFile method, however it required by the Formidable.File Type
+		},
+		application: applicationContents.data,
+		readFrom: 'buffer',
+		contentsBuffer: Buffer.from(renderedPDF.data),
+		type: 'SIGNED_APPLICATION',
+	});
+
+	if (!createFileRecord.success) {
+		return createFileRecord;
+	}
+
+	const updatedApplicationRecord = await applicationService.editApplication({
+		id: applicationId,
+		update: {
+			signed_pdf: createFileRecord.data.id,
+		},
+	});
+
+	if (!updatedApplicationRecord.success) {
+		return updatedApplicationRecord;
+	}
+
+	return renderedPDF;
+};
+
 /**
  * Approves the application by providing the applicationId
  *
