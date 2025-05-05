@@ -171,6 +171,7 @@ export type AppendicesDTO = {
 export type EthicsLetterDTO = {
 	ethicsLetter?: number | null;
 	ethicsReviewRequired?: boolean | null;
+	signedPdf?: number | null;
 };
 
 export interface RequestedStudiesDTO {
