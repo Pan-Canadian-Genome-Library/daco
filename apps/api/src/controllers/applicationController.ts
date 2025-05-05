@@ -345,7 +345,7 @@ export const submitRevision = async ({
 		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
 			resultContents.data.contents;
 
-		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+		if (result.data.state === ApplicationStates.DAC_REVIEW) {
 			emailService.sendEmailDacForSubmittedRevisions({
 				id: application.id,
 				to: institutional_rep_email, // TODO: Change to DAC email
@@ -581,7 +581,7 @@ export const submitApplication = async ({
 			applicant_institutional_email,
 		} = resultContents.data.contents;
 
-		if (appStateManager.state === ApplicationStates.DRAFT) {
+		if (result.data.state === ApplicationStates.DRAFT) {
 			//  email to institutional rep for review
 			emailService.sendEmailInstitutionalRepForReview({
 				id: application.id,
@@ -590,7 +590,7 @@ export const submitApplication = async ({
 				repName: institutional_rep_first_name || 'N/A',
 				submittedDate: submissionResult.data.created_at,
 			});
-		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
 			// Send email to DAC for review
 			emailService.sendEmailDacForReview({
 				id: application.id,
