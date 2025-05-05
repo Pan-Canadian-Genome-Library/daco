@@ -23,7 +23,7 @@ import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { pdfSvc } from '@/service/pdf/pdfService.ts';
+import { pdfService } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -188,7 +188,7 @@ export const createApplicationPDF = async ({
 	const collaboratorsService: CollaboratorsService = collaboratorsSvc(database);
 	const fileService: FilesService = filesSvc(database);
 
-	const pdfService: PDFService = pdfSvc();
+	const pdfRepo: PDFService = pdfService();
 
 	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
@@ -235,7 +235,7 @@ export const createApplicationPDF = async ({
 	 * This is a bit odd because we're using the DTO aliases while passing back to the service (usually its the opposite),
 	 * however, given this service is essentially running a React render, we need to.
 	 */
-	const renderedPDF = await pdfService.renderPCGLApplicationPDF({
+	const renderedPDF = await pdfRepo.renderPCGLApplicationPDF({
 		applicationContents: aliasedApplicationContents.data,
 		signatureContents: aliasedSignatureContents.data,
 		collaboratorsContents: aliasedCollaboratorsContents,

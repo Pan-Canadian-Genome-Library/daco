@@ -24,7 +24,7 @@ import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { pdfSvc } from '@/service/pdf/pdfService.ts';
+import { pdfService } from '@/service/pdf/pdfService.ts';
 import { signatureService } from '@/service/signatureService.ts';
 import {
 	ApplicationService,
@@ -85,7 +85,7 @@ describe('File Service', () => {
 		await addInitialApplications(db);
 
 		testFileService = filesSvc(db);
-		testPDFService = pdfSvc();
+		testPDFService = pdfService();
 		testSignatureService = signatureService(db);
 		testApplicationRepo = applicationSvc(db);
 		testCollaboratorService = collaboratorsSvc(db);

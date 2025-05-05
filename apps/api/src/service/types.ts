@@ -32,7 +32,7 @@ import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { filesSvc } from './fileService.js';
-import { pdfSvc } from './pdf/pdfService.ts';
+import { pdfService } from './pdf/pdfService.ts';
 import { signatureService } from './signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
@@ -61,7 +61,7 @@ export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'conten
 	contents: ApplicationContentUpdates | null;
 }
 
-export type PDFService = ReturnType<typeof pdfSvc>;
+export type PDFService = ReturnType<typeof pdfService>;
 
 export type FilesModel = typeof files.$inferInsert;
 export type FilesRecord = typeof files.$inferSelect;

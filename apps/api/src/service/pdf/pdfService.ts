@@ -26,10 +26,37 @@ import logger from '@/logger.ts';
 import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
 import { failure, success } from '@/utils/results.ts';
 
+/**
+ * These constants appear in the PDF metadata, either in Finder / Windows Explorer file metadata, or within
+ * "document properties" in most PDF readers.
+ *
+ * PDF Creator - This is the "app" used to create the PDF, in our case it's the DACO backend, so putting the app ve
+ * makes sense.
+ *
+ * PDF Author - This is the author of the PDF. In our case it's the Data Compliance Office at PCGL. This may however,
+ * benefit from i18n when we add French post MVP.
+ *
+ * See below for all properties of a PDF doc:
+ * @see https://pdf-lib.js.org/docs/api/classes/pdfdocument#setauthor
+ */
 const PDF_CREATOR_PRODUCER = `Pan-Canadian Genome Library DACO (ver. ${serverConfig.npm_package_version})`;
 const PDF_AUTHOR = `Data Access Compliance Office, Pan-Canadian Genome Library`;
 
-const pdfSvc = () => ({
+/**
+ * Sets the PDF language in the metadata, EN-CA - English Canada
+ *
+ * This metadata feature can be useful for a11y reasons:
+ * @see https://www.w3.org/TR/WCAG20-TECHS/PDF16.html
+ *
+ * TODO: -
+ * 	When we eventually do translation we should make this a toggle to set this to
+ * 	FR-CA - French Canada. However, if we make the PDF have both languages
+ * 	(English followed by French for example), we should set this based on the pages
+ * 	instead of the entire document.
+ */
+const PDF_LANGUAGE = `en-ca`;
+
+const pdfService = () => ({
 	renderPCGLApplicationPDF: async ({
 		applicationContents,
 		signatureContents,
@@ -43,6 +70,12 @@ const pdfSvc = () => ({
 		fileContents: FilesDTO;
 		filename: string;
 	}) => {
+		/**
+		 * This acts as a title for the PDF, displayed at the top. Along with being displayed as
+		 * metadata. See comments and links above.
+		 */
+		const PDF_SUBJECT = `Application for Access to PCGL Controlled Data`;
+
 		try {
 			const pdfCreationDate = new Date();
 
@@ -55,11 +88,11 @@ const pdfSvc = () => ({
 
 			const finalApplication = await PDFDocument.create();
 
-			finalApplication.setLanguage('en-ca');
+			finalApplication.setLanguage(PDF_LANGUAGE);
 			finalApplication.setTitle(filename, {
 				showInWindowTitleBar: true,
 			});
-			finalApplication.setSubject('Application for Access to PCGL Controlled Data');
+			finalApplication.setSubject(PDF_SUBJECT);
 			finalApplication.setAuthor(PDF_AUTHOR);
 			finalApplication.setCreator(PDF_CREATOR_PRODUCER);
 			finalApplication.setProducer(PDF_CREATOR_PRODUCER);
@@ -77,7 +110,7 @@ const pdfSvc = () => ({
 
 			return success(await finalApplication.save());
 		} catch (err) {
-			const message = `Error Rendering Application to PDF file`;
+			const message = `Error Rendering Application to PDF file.`;
 
 			logger.error(message);
 			logger.error(err);
@@ -87,4 +120,4 @@ const pdfSvc = () => ({
 	},
 });
 
-export { pdfSvc };
+export { pdfService };
