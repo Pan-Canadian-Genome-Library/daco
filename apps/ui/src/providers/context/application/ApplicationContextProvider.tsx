@@ -27,6 +27,7 @@ const initialState: ApplicationFormState = {
 	formState: {
 		isFormCompleted: false,
 		isDirty: false,
+		isLocked: false,
 		sectionsVisited: {
 			institutional: false,
 			intro: false,

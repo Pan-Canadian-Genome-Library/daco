@@ -34,13 +34,15 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 
@@ -107,13 +109,14 @@ const Applicant = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					title={translate('applicant-section.title')}
+					showLockIcon={!canEdit}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
 				<SectionContent title={translate('applicant-section.section1')}>
@@ -129,7 +132,7 @@ const Applicant = () => {
 									return { value: titles.en, label: titles.en };
 								})}
 								initialValue={getValues('applicantTitle')}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -141,7 +144,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -150,7 +153,7 @@ const Applicant = () => {
 								name="applicantMiddleName"
 								control={control}
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -162,7 +165,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -171,7 +174,7 @@ const Applicant = () => {
 								name="applicantSuffix"
 								control={control}
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -184,7 +187,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -197,7 +200,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -211,7 +214,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -223,7 +226,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -241,7 +244,7 @@ const Applicant = () => {
 								initialValue={'CAN'}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -253,7 +256,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -262,7 +265,7 @@ const Applicant = () => {
 								name="applicantInstitutionBuilding"
 								control={control}
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -274,7 +277,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -284,7 +287,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -296,12 +299,12 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="applicant" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="applicant" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);
