@@ -43,6 +43,7 @@ import {
 	type ApplicationStateTotals,
 	type JoinedApplicationRecord,
 } from '@/service/types.ts';
+import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
 	ApplicationDTO,
@@ -501,7 +502,7 @@ applicationRouter.post(
 		async (
 			request: Request,
 			response: ResponseWithData<
-				{ message: string; data: ApplicationRecord },
+				ApplicationDTO,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
@@ -544,31 +545,36 @@ applicationRouter.post(
 
 				const result = await submitRevision({ applicationId });
 
-				if (result.success) {
-					response.status(200).json({
-						message: 'Application review submitted successfully.',
-						data: result.data,
-					});
+				if (!result.success) {
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+							return;
+						}
+					}
+				}
+
+				const aliasedResponse = convertToBasicApplicationRecord(result.data);
+
+				if (!aliasedResponse.success) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: aliasedResponse.message });
 					return;
 				}
-				switch (result.error) {
-					case 'INVALID_STATE_TRANSITION': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-						return;
-					}
-				}
+
+				response.status(200).json(aliasedResponse.data);
+				return;
 			} catch (error) {
 				response.status(500).json({
 					error: 'SYSTEM_ERROR',
-					message: 'Unexpected error.',
+					message: 'Sorry something went wrong, please try again later.',
 				});
 			}
 		},
