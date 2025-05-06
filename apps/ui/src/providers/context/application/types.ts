@@ -24,6 +24,7 @@ import { Dispatch } from 'react';
 export interface FormState {
 	isFormCompleted?: boolean;
 	isDirty: boolean;
+	isLocked: boolean;
 	sectionsVisited: SectionsVisited<SectionRoutesValues>;
 }
 export type SectionsVisited<T extends string> = {
