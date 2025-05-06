@@ -29,6 +29,7 @@ import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
+import ApplyForAccessModal from './modals/ApplyForAccessModal';
 
 const { Link } = Typography;
 const { Header } = Layout;
@@ -63,6 +64,7 @@ const HeaderComponent = () => {
 	const isResponsiveMode = minWidth <= token.screenXL;
 
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
+	const [applyForAccessOpen, setApplyForAccessOpen] = useState(false);
 
 	const menuButtonStyle: React.CSSProperties = {
 		width: isResponsiveMode ? '100%' : 'auto',
@@ -99,7 +101,7 @@ const HeaderComponent = () => {
 					variant: 'text',
 					type: 'text',
 				},
-				onClickAction: () => console.log('clicked'),
+				onClickAction: () => setApplyForAccessOpen(true),
 				position: 'right',
 				target: '_self',
 			};
@@ -272,6 +274,7 @@ const HeaderComponent = () => {
 					</Drawer>
 				) : null}
 			</Header>
+			<ApplyForAccessModal openModal={applyForAccessOpen} setOpenModal={setApplyForAccessOpen} />
 		</ConfigProvider>
 	);
 };
