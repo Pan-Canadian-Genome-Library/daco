@@ -41,10 +41,11 @@ import {
 	convertToBasicApplicationRecord,
 	convertToCollaboratorRecords,
 	convertToFileRecord,
+	convertToRevisionsRecord,
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
-import type { ApplicationDTO, ApplicationResponseData, ApproveApplication } from '@pcgl-daco/data-model';
+import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
@@ -89,8 +90,11 @@ export const editApplication = async ({
 	}
 
 	const application = result.data;
-
 	const { edit } = ApplicationStateEvents;
+
+	/**
+	 * FIXME: This does not prevent editing of fields that have already been approved. This needs to be added.
+	 */
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
 	if (!canEditResult.success) {
@@ -383,14 +387,14 @@ export const submitRevision = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (
-			appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED ||
-			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
+			appStateManager.state === ApplicationStates.DAC_REVIEW ||
+			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW
 		) {
-			return failure('INVALID_STATE_TRANSITION', 'Application revision is already submitted.');
+			return failure('INVALID_STATE_TRANSITION', 'Application is already submitted for revisions.');
 		}
 
 		let submittedRevision;
-		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+		if (appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
 			submittedRevision = await appStateManager.submitDacRevision();
 		} else {
 			submittedRevision = await appStateManager.submitRepRevision();
@@ -671,7 +675,7 @@ export const getRevisions = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
+}): AsyncResult<RevisionsDTO[], 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -682,7 +686,16 @@ export const getRevisions = async ({
 			return revisionsResult;
 		}
 
-		return success(revisionsResult.data);
+		const aliasedRevs = revisionsResult.data.map((rev) => convertToRevisionsRecord(rev));
+
+		const filteredFailures = aliasedRevs.filter((results) => !results.success);
+		const filteredSuccesses = aliasedRevs.filter((results) => results.success).map((results) => results.data);
+
+		if (filteredFailures.length) {
+			throw new Error('Failed to alias Revisions Record');
+		} else {
+			return success(filteredSuccesses);
+		}
 	} catch (error) {
 		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
 		logger.error(message, error);

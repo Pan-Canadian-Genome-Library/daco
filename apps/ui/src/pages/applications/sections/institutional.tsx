@@ -34,13 +34,15 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'institutional', isEditMode });
 	const {
 		state: { fields, formState },
 		dispatch,
@@ -106,13 +108,14 @@ const Institutional = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					title={translate('institutional-section.title')}
+					showLockIcon={!canEdit}
 					text={[translate('institutional-section.description1')]}
 				/>
 				<SectionContent title={translate('institutional-section.section1')}>
@@ -128,7 +131,7 @@ const Institutional = () => {
 									return { value: titles.en, label: titles.en };
 								})}
 								initialValue={getValues('institutionalTitle')}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -141,7 +144,7 @@ const Institutional = () => {
 								autoComplete="given-name"
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -151,7 +154,7 @@ const Institutional = () => {
 								autoComplete="additional-name"
 								control={control}
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -164,7 +167,7 @@ const Institutional = () => {
 								autoComplete="family-name"
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -174,7 +177,7 @@ const Institutional = () => {
 								control={control}
 								autoComplete="honorific-suffix"
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -187,7 +190,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -200,7 +203,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -215,7 +218,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -227,7 +230,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -245,7 +248,7 @@ const Institutional = () => {
 								})}
 								initialValue={'CAN'}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -257,7 +260,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -266,7 +269,7 @@ const Institutional = () => {
 								name="institutionBuilding"
 								control={control}
 								rule={rule}
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -278,7 +281,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -288,7 +291,7 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -300,12 +303,12 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="institutional" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="institutional" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

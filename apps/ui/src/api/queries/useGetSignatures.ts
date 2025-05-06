@@ -29,7 +29,6 @@ const useGetSignatures = ({ applicationId }: { applicationId: number | string })
 		queryKey: [`signature-${applicationId}`],
 		queryFn: async () => {
 			const response = await fetch(`/signature/${applicationId}`).then(withErrorResponseHandler);
-
 			return await response.json();
 		},
 	});
