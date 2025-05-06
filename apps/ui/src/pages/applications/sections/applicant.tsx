@@ -34,6 +34,7 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
@@ -41,7 +42,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = (revisions.applicant?.isApproved !== undefined && !revisions.applicant?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 

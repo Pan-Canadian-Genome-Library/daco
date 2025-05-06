@@ -38,6 +38,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
@@ -53,7 +54,7 @@ const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = (revisions.ethics?.isApproved !== undefined && !revisions.ethics?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'ethics', isEditMode });
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();

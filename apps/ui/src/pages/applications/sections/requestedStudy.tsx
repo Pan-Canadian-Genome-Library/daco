@@ -32,6 +32,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import Link from 'antd/es/typography/Link';
 
@@ -58,7 +59,7 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = (revisions.study?.isApproved !== undefined && !revisions.study?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'study', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 

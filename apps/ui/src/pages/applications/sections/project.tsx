@@ -34,6 +34,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(projectInformationSchema);
@@ -41,7 +42,7 @@ const rule = createSchemaFieldRule(projectInformationSchema);
 const Project = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = (revisions.project?.isApproved !== undefined && !revisions.project?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'project', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 

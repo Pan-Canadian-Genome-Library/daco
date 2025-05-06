@@ -34,6 +34,7 @@ import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(institutionalRepSchema);
@@ -41,8 +42,7 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit =
-		(revisions.institutional?.isApproved !== undefined && !revisions.institutional?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'institutional', isEditMode });
 	const {
 		state: { fields, formState },
 		dispatch,

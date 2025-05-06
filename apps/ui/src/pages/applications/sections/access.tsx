@@ -32,6 +32,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { Nullable, type ApplicationOutletContext } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
 
@@ -41,7 +42,7 @@ const rule = createSchemaFieldRule(agreementsSchema);
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = (revisions.agreement?.isApproved !== undefined && !revisions.agreement?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'agreement', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {

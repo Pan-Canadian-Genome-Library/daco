@@ -32,6 +32,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { appendicesEnum } from '@pcgl-daco/data-model';
 import { appendicesSchema, type AppendicesSchemaType } from '@pcgl-daco/validation';
@@ -41,7 +42,7 @@ const rule = createSchemaFieldRule(appendicesSchema);
 const Appendices = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = (revisions.appendices?.isApproved !== undefined && !revisions.appendices?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const {
 		control,

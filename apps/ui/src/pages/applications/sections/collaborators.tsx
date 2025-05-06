@@ -33,6 +33,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationOutletContext } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { type CollaboratorsResponseDTO } from '@pcgl-daco/data-model';
 
 const { useToken } = theme;
@@ -49,8 +50,7 @@ export interface ModalStateProps extends ModalState {
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit =
-		(revisions.collaborators?.isApproved !== undefined && !revisions.collaborators?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'collaborators', isEditMode });
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);
 

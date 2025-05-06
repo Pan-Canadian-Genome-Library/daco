@@ -37,6 +37,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { type ApplicationOutletContext } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useUserContext } from '@/providers/UserProvider';
 
@@ -45,7 +46,7 @@ const { Text } = Typography;
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = (revisions.sign?.isApproved !== undefined && !revisions.sign?.isApproved) || isEditMode;
+	const canEdit = canEditSection({ revisions, section: 'sign', isEditMode });
 	const [openModal, setOpenModal] = useState(false);
 	const {
 		state: { fields },
