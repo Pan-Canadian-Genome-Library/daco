@@ -18,7 +18,8 @@ The repository is organized with the following directory structure:
 └── packages/
     ├── data-model
     ├── logger
-    └── validation
+    ├── validation
+    └── request-utils
 ```
 
 
