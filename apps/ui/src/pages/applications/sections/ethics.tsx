@@ -105,7 +105,7 @@ const Ethics = () => {
 
 		const { data: responseData } = response;
 
-		// If there is not response date OR the file name does not exist, fail the download procedure
+		// If there is no response data OR the file name does not exist, fail the download procedure
 		if (!responseData || responseData.filename === null) {
 			return;
 		}
