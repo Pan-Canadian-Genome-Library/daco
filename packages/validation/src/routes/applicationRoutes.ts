@@ -103,25 +103,25 @@ export const basicApplicationResponseSchema = applicationResponseSchema.omit({ c
 
 export const revisionDataSchema = z
 	.object({
-		comments: z.string().optional().nullish(),
-		applicantNotes: z.string().optional().nullish(),
+		comments: z.string().nullish(),
+		applicantNotes: z.string().nullish(),
 		applicantApproved: z.boolean(),
 		institutionRepApproved: z.boolean(),
-		institutionRepNotes: z.string().optional().nullish(),
+		institutionRepNotes: z.string().nullish(),
 		collaboratorsApproved: z.boolean(),
-		collaboratorsNotes: z.string().optional().nullish(),
+		collaboratorsNotes: z.string().nullish(),
 		projectApproved: z.boolean(),
-		projectNotes: z.string().optional().nullish(),
+		projectNotes: z.string().nullish(),
 		requestedStudiesApproved: z.boolean(),
-		requestedStudiesNotes: z.string().optional().nullish(),
+		requestedStudiesNotes: z.string().nullish(),
 		ethicsApproved: z.boolean(),
-		ethicsNotes: z.string().optional().nullish(),
+		ethicsNotes: z.string().nullish(),
 		agreementsApproved: z.boolean(),
-		agreementsNotes: z.string().optional().nullish(),
+		agreementsNotes: z.string().nullish(),
 		appendicesApproved: z.boolean(),
-		appendicesNotes: z.string().optional().nullish(),
+		appendicesNotes: z.string().nullish(),
 		signAndSubmitApproved: z.boolean(),
-		signAndSubmitNotes: z.string().optional().nullish(),
+		signAndSubmitNotes: z.string().nullish(),
 	})
 	.strict();
 
