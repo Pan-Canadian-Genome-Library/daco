@@ -97,14 +97,6 @@ export const editApplication = async ({
 	 */
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
-	/**
-	 * By default the application service will reset an applications state to DRAFT when edited. We need to avoid this
-	 * behaviour for any applications within the REP_REV or DAC_REV states.
-	 */
-	const shouldKeepState =
-		application.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
-		application.state === ApplicationStates.DAC_REVISIONS_REQUESTED;
-
 	if (!canEditResult.success) {
 		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
@@ -115,7 +107,7 @@ export const editApplication = async ({
 
 	if (!formattedResult.success) return formattedResult;
 
-	return await applicationRepo.editApplication({ id, update: formattedResult.data, shouldKeepState });
+	return await applicationRepo.editApplication({ id, update: formattedResult.data });
 };
 
 /**
