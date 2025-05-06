@@ -26,7 +26,6 @@ import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
-import { API_PATH_LOGIN } from '../api/paths';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -46,12 +45,6 @@ const HomePage = () => {
 	const [openModal, setOpenModal] = useState(false);
 
 	const isResponsiveMode = minWidth <= token.screenLG;
-
-	// TODO: Handle the transition over to the the login page
-	const handleLoginButton = () => {
-		setOpenModal(false);
-		window.location.href = API_PATH_LOGIN;
-	};
 
 	return (
 		<Content>

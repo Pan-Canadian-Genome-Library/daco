@@ -34,6 +34,7 @@ import RequestedStudy from '@/pages/applications/sections/requestedStudy';
 import SignAndSubmit from '@/pages/applications/sections/sign';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
+import LoginRedirect from '@/pages/login/redirect';
 import ManageApplicationsPage from '@/pages/manage/applications';
 import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
@@ -116,6 +117,7 @@ function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<PageLayout />}>
+				<Route path="login/redirect" element={<LoginRedirect />} />
 				<Route index element={<HomePage />} />
 				<Route
 					path="dashboard"

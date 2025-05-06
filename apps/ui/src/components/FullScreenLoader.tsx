@@ -17,40 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import EnvironmentConfigError from './EnvironmentConfigError.js';
-import { serverConfig } from './serverConfig.js';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Layout, Spin, Typography } from 'antd';
 
-function getAuthConfig() {
-	const enabled = process.env.DISABLE_AUTH !== 'true';
+const { Content } = Layout;
+const { Text } = Typography;
 
-	// Enforce enabling auth when running in production
-	if (serverConfig.isProduction && !enabled) {
-		throw new EnvironmentConfigError(
-			`The application "NODE_ENV" is set to "production" while "ENABLE_AUTH" is not "true". Auth must be enabled to run in production.`,
+interface FullscreenLoaderProps {
+	trueFullscreen?: boolean;
+	loadingText?: string;
+}
+
+const FullscreenLoader = ({ trueFullscreen = false, loadingText }: FullscreenLoaderProps) => {
+	if (trueFullscreen && loadingText) {
+		console.error(
+			'Error: FullscreenLoader - Using trueFullscreen with loadingText provided will result in text appearing behind the loader. ',
 		);
 	}
 
-	if (!enabled) {
-		// Running with auth disabled may be useful for developers.
-		return { enabled };
-	}
+	return (
+		<Content style={{ display: 'flex' }}>
+			<Flex align="center" justify="center" vertical gap={'2rem'} flex={1}>
+				<Spin fullscreen={trueFullscreen} indicator={<LoadingOutlined style={{ fontSize: 56 }} spin />} />
+				{loadingText ? <Text>{loadingText}</Text> : null}
+			</Flex>
+		</Content>
+	);
+};
 
-	const authConfigSchema = z.object({
-		AUTH_PROVIDER_HOST: z.string().url(),
-		AUTH_CLIENT_ID: z.string(),
-		AUTH_CLIENT_SECRET: z.string(),
-	});
-
-	const parseResult = authConfigSchema.safeParse(process.env);
-
-	if (!parseResult.success) {
-		// Only require auth config if auth is enabled
-		throw new EnvironmentConfigError(`db`, parseResult.error);
-	}
-
-	return { ...parseResult.data, enabled, loginRedirectPath: '/login/redirect', logoutRedirectPath: '/' };
-}
-
-export const authConfig = getAuthConfig();
-export type AuthConfig = typeof authConfig & { enabled: true };
+export default FullscreenLoader;

@@ -23,6 +23,7 @@ import { UserRole } from '@pcgl-daco/validation';
 
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
+import FullscreenLoader from './FullScreenLoader';
 
 type ProtectedRouteProps = PropsWithChildren<{
 	requiredRoles?: [UserRole, ...UserRole[]];
@@ -61,7 +62,7 @@ const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteP
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 
 	if (isLoading) {
-		return <span>Loading user info...</span>;
+		return <FullscreenLoader />;
 	}
 	if (!isLoggedIn) {
 		return <Redirect />;

@@ -1,4 +1,9 @@
 {
+	"global": {
+		"login": {
+			"loggingIn": "Logging you in..."
+		}
+	},
 	"homepage": {
 		"title": "Apply for Access to Controlled Data",
 		"introduction": "The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers and commercial teams for access to PCGL Controlled Data.",
