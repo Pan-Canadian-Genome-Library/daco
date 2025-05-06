@@ -117,12 +117,12 @@ describe('File API', () => {
 			it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
 				await testApplicationRepo.findOneAndUpdate({
 					id: testApplicationId,
-					update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
+					update: { state: ApplicationStates.DAC_REVIEW },
 				});
 				const result = await submitRevision({ applicationId: testApplicationId });
 
 				assert.ok(!result.success);
-				assert.strictEqual(result.message, 'Application revision is already submitted.');
+				assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 			});
 
 			it('should fail to submit a revision for a non-existent application', async () => {

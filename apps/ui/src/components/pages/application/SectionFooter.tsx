@@ -42,7 +42,8 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 	const { id } = useParams();
 	const { mutate: editApplication } = useEditApplication();
 	const { state } = useApplicationContext();
-	const { appId } = useOutletContext<ApplicationOutletContext>();
+	const { appId, state: appLifecycleStep } = useOutletContext<ApplicationOutletContext>();
+	const shouldNavigateToEditMode = appLifecycleStep === 'DRAFT' && isEditMode;
 
 	// Determine the next and previous route
 	const { previousRoute, nextRoute } = useMemo(() => {
@@ -61,23 +62,21 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 		if (state?.formState?.isDirty) {
 			editApplication({ id: appId });
 		}
-		navigate(`/application/${id}/${previousRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
+		navigate(`/application/${id}/${previousRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const nextSection = () => {
 		if (state?.formState?.isDirty) {
 			editApplication({ id: appId });
 		}
-		navigate(`/application/${id}/${nextRoute}/${isEditMode ? 'edit' : ''}`, { replace: true });
+		navigate(`/application/${id}/${nextRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const submitApplication = () => {
-		if (!!signSubmitHandler && isEditMode) {
+		if (signSubmitHandler !== undefined && isEditMode) {
 			signSubmitHandler();
 			return;
 		}
-
-		console.log('Submit application');
 	};
 
 	return (
@@ -93,7 +92,9 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 				</Button>
 			) : (
 				<Button onClick={submitApplication} disabled={submitDisabled} type="primary">
-					{translate('button.submitApplication')}
+					{appLifecycleStep === 'INSTITUTIONAL_REP_REVISION_REQUESTED' || appLifecycleStep === 'DAC_REVISIONS_REQUESTED'
+						? translate('button.submitRevisions')
+						: translate('button.submitApplication')}
 				</Button>
 			)}
 		</Flex>

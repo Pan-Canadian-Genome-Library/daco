@@ -43,8 +43,14 @@ import {
 	type ApplicationStateTotals,
 	type JoinedApplicationRecord,
 } from '@/service/types.ts';
+import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import type { ApplicationDTO, ApplicationListResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
+import type {
+	ApplicationDTO,
+	ApplicationListResponse,
+	ApplicationResponseData,
+	RevisionsDTO,
+} from '@pcgl-daco/data-model';
 import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
@@ -90,7 +96,7 @@ async function validateUserPermissionForApplication({
 
 		// ensure application has this user's ID
 		if (applicationResult.data.userId !== userId) {
-			return failure('FORBIDDEN', 'User is not the creater of this application.');
+			return failure('FORBIDDEN', 'User is not the creator of this application.');
 		}
 
 		return success(undefined);
@@ -285,7 +291,7 @@ applicationRouter.get(
 		request: Request,
 		response: ResponseWithData<
 			ApplicationResponseData,
-			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR']
+			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
 		>,
 	) => {
 		const { user } = request.session;
@@ -324,7 +330,7 @@ applicationRouter.get(
 				return;
 			}
 			case 'NOT_FOUND': {
-				response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
+				response.status(404).json({ error: 'NOT_FOUND', message: 'Application not found.' });
 				return;
 			}
 		}
@@ -488,7 +494,7 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/:applicationId/submit-revision',
+	'/:applicationId/submit-revisions',
 	authMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
@@ -496,7 +502,7 @@ applicationRouter.post(
 		async (
 			request: Request,
 			response: ResponseWithData<
-				{ message: string; data: ApplicationRecord },
+				ApplicationDTO,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
@@ -539,31 +545,36 @@ applicationRouter.post(
 
 				const result = await submitRevision({ applicationId });
 
-				if (result.success) {
-					response.status(200).json({
-						message: 'Application review submitted successfully.',
-						data: result.data,
-					});
+				if (!result.success) {
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+							return;
+						}
+					}
+				}
+
+				const aliasedResponse = convertToBasicApplicationRecord(result.data);
+
+				if (!aliasedResponse.success) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: aliasedResponse.message });
 					return;
 				}
-				switch (result.error) {
-					case 'INVALID_STATE_TRANSITION': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-						return;
-					}
-				}
+
+				response.status(200).json(aliasedResponse.data);
+				return;
 			} catch (error) {
 				response.status(500).json({
 					error: 'SYSTEM_ERROR',
-					message: 'Unexpected error.',
+					message: 'Sorry something went wrong, please try again later.',
 				});
 			}
 		},
@@ -1028,17 +1039,16 @@ applicationRouter.post(
 
 applicationRouter.get(
 	'/:applicationId/revisions',
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
 		async (
 			request,
-			response: ResponseWithData<
-				{ message: string; data: RevisionRequestModel[] },
-				['UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']
-			>,
+			response: ResponseWithData<RevisionsDTO[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const { applicationId } = request.params;
+			const userSession = request.session;
 
 			if (!applicationId || isNaN(Number(applicationId))) {
 				response.status(400).json({
@@ -1049,21 +1059,49 @@ applicationRouter.get(
 			}
 
 			try {
-				// Fetch all revisions for the application
-				const result = await getRevisions({ applicationId: Number(applicationId) });
+				const applicationInfo = await getApplicationById({ applicationId: Number(applicationId) });
 
-				if (result.success) {
-					response.status(200).json({
-						message: 'Revisions fetched successfully.',
-						data: result.data,
+				if (!applicationInfo.success) {
+					switch (applicationInfo.error) {
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						case 'SYSTEM_ERROR':
+						default:
+							response.status(500);
+							break;
+					}
+					response.send({
+						error: applicationInfo.error,
+						message: applicationInfo.message,
+					});
+
+					return;
+				}
+
+				if (getUserRole(userSession) === 'APPLICANT' && applicationInfo.data.userId !== userSession.user?.userId) {
+					response.status(403).send({
+						error: 'FORBIDDEN',
+						message: 'You do not own, or have the rights to access this application.',
 					});
 					return;
 				}
 
-				response.status(500).json({ error: result.error, message: result.message });
+				const result = await getRevisions({ applicationId: Number(applicationId) });
+
+				//Service only returns this if a SYSTEM_ERROR occurs, set to HTTP code 500 and bail if this is the case.
+				if (!result.success) {
+					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+
+				response.status(200).json(result.data);
 				return;
 			} catch (error) {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: "We're sorry, an unexpected error occurred. Please try again later.",
+				});
 				return;
 			}
 		},
