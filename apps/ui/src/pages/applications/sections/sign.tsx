@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { esignatureSchema, type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { type SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router';
 import SignatureCanvas from 'react-signature-canvas';
@@ -55,18 +55,16 @@ const SignAndSubmit = () => {
 	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
 	const { mutateAsync: submitRevisions, isPending: isSubmittingRevs } = useSubmitRevisions();
-
-	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset, getValues } =
-		useForm<eSignatureSchemaType>({
-			resolver: zodResolver(esignatureSchema),
-		});
-	const { mutateAsync: createSignature } = useCreateSignature();
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
 	const { role } = useUserContext();
+	const { mutateAsync: createSignature } = useCreateSignature();
 
-	const onSubmit: SubmitHandler<eSignatureSchemaType> = () => {
-		setOpenModal(true);
-	};
+	const { control, setValue, formState, watch, clearErrors, reset, getValues } = useForm<eSignatureSchemaType>({
+		resolver: zodResolver(esignatureSchema),
+	});
+
+	const watchSignature = watch('signature');
+	const eSignDisabled = (role === 'APPLICANT' && canEdit) || role === 'INSTITUTIONAL_REP';
 
 	const onSaveClicked = async () => {
 		const signature = getValues('signature');
@@ -95,6 +93,7 @@ const SignAndSubmit = () => {
 		}
 	};
 
+	// Load the proper signature based off type of user
 	useEffect(() => {
 		if (data && data.applicantSignature && signatureRef.current && role === 'APPLICANT') {
 			signatureRef.current.fromDataURL(data.applicantSignature);
@@ -112,28 +111,20 @@ const SignAndSubmit = () => {
 		}
 	}, [appId, fields, isEditMode, navigation, state]);
 
-	const watchSignature = watch('signature');
-
 	// - differentiate between which signature we are validating against as we have two different types of signatures
 	// - ensure the local signature is synced with saved api signature
 	const determineCanSubmit = () => {
-		const hasRevisions =
-			(Object.values(revisions).find((rev) => rev.isApproved === false) &&
-				state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') ||
-			state === 'DAC_REVISIONS_REQUESTED';
-
-		if (hasRevisions || canEdit) {
-			return true;
-		} else if (role === 'APPLICANT') {
+		if (role === 'APPLICANT') {
 			return data?.applicantSignature !== getValues('signature');
 		} else {
 			return data?.institutionalRepSignature !== getValues('signature');
 		}
 	};
+
 	return (
 		<>
 			<SectionWrapper>
-				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+				<Form layout="vertical" onFinish={() => setOpenModal(true)}>
 					<SectionTitle
 						title={translate('sign-and-submit-section.title')}
 						showLockIcon={!canEdit}
@@ -150,7 +141,7 @@ const SignAndSubmit = () => {
 								<input disabled type="hidden" name="createdAt" />
 								{!isLoading ? (
 									<ESignature
-										disabled={role === 'DAC_MEMBER'}
+										disabled={!eSignDisabled}
 										signatureRef={signatureRef}
 										name="signature"
 										control={control}
@@ -159,7 +150,7 @@ const SignAndSubmit = () => {
 										setValue={setValue}
 										reset={reset}
 										clearErrors={clearErrors}
-										disableSaveButton={!watchSignature || role === 'DAC_MEMBER'}
+										disableSaveButton={!watchSignature || !eSignDisabled}
 										onSaveClicked={onSaveClicked}
 										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
@@ -172,9 +163,11 @@ const SignAndSubmit = () => {
 					</SectionContent>
 					<SectionFooter
 						currentRoute="sign"
-						isEditMode={determineCanSubmit()}
-						signSubmitHandler={handleSubmit(onSubmit)}
-						submitDisabled={determineSignatureDisabled() || role === 'DAC_MEMBER'}
+						isEditMode={eSignDisabled}
+						signSubmitHandler={() => {
+							setOpenModal(true);
+						}}
+						submitDisabled={determineCanSubmit()}
 					/>
 				</Form>
 			</SectionWrapper>
