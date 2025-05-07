@@ -89,7 +89,7 @@ const ApplicationViewer = () => {
 					isEditMode={isEditMode}
 					currentSection={currentSection}
 					id={applicationData.id}
-					state={applicationData.state}
+					appState={applicationData.state}
 				/>
 				{/* Multipart form Viewer */}
 				<Flex style={{ width: '100%', paddingInline: '52px' }}>
@@ -102,6 +102,7 @@ const ApplicationViewer = () => {
 										currentSection={currentSection}
 										isEditMode={isEditMode}
 										revisions={revisionsData}
+										appState={applicationData.state}
 									/>
 								</Col>
 							</Row>
