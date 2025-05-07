@@ -18,9 +18,11 @@
  */
 
 import { Button, Flex, Layout, theme, Typography } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { API_PATH_LOGIN } from '@/api/paths';
+import { clearExtraSessionInformation, setExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { useMatch, useNavigate } from 'react-router';
 
@@ -50,17 +52,22 @@ const InstitutionalRepLogin = () => {
 		maxWidth: '35rem',
 	};
 
-	const onLoginClick = () => {
-		/**
-		 * TODO: This should go to the Login Provider.
-		 * Instead of directly to the application.
-		 */
+	useEffect(() => {
 		if (match?.params.applicationId) {
-			const redirectTo = `/application/${match.params.applicationId}/`;
-			navigation(redirectTo);
-		} else {
-			navigation('/');
+			const saveSessionInfo = setExtraSessionInformation({
+				role: 'INSTITUTIONAL_REP',
+				applicationId: Number(match.params.applicationId),
+			});
+
+			if (saveSessionInfo === false) {
+				clearExtraSessionInformation();
+				navigation('/', { replace: true });
+			}
 		}
+	}, [match?.params.applicationId, navigation]);
+
+	const onLoginClick = () => {
+		window.location.href = API_PATH_LOGIN;
 	};
 
 	return (

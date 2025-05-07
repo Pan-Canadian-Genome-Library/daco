@@ -73,6 +73,8 @@ const HeaderComponent = () => {
 	const buttonLinkStyle: React.CSSProperties = {
 		fontWeight: 'normal',
 		fontSize: token.fontSizeLG,
+		justifyContent: isResponsiveMode ? 'start' : 'center',
+		padding: isResponsiveMode ? '0 0' : '1rem',
 	};
 
 	/**

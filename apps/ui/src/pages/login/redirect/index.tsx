@@ -17,7 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import FullscreenLoader from '@/components/FullScreenLoader';
+import FullscreenLoader from '@/components/FullscreenLoader';
+import { getExtraSessionInformation } from '@/global/localStorage';
 import { useUserContext } from '@/providers/UserProvider';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +29,18 @@ const LoginRedirect = () => {
 	const { role } = useUserContext();
 	const navigate = useNavigate();
 
+	const redirectRep = () => {
+		const sessionInfo = getExtraSessionInformation();
+
+		if (!sessionInfo) {
+			return '/';
+		}
+
+		if (sessionInfo.role === 'INSTITUTIONAL_REP') {
+			return `/application/${sessionInfo.applicationId}/`;
+		}
+	};
+
 	useEffect(() => {
 		switch (role) {
 			case 'APPLICANT':
@@ -36,9 +49,11 @@ const LoginRedirect = () => {
 			case 'DAC_MEMBER':
 				navigate('/manage/applications', { replace: true });
 				break;
-			case 'INSTITUTIONAL_REP': {
-				navigate('/rep/', { replace: true });
-			}
+			case 'INSTITUTIONAL_REP':
+				navigate(redirectRep() ?? '/', { replace: true });
+				break;
+			default:
+				navigate('/', { replace: true });
 		}
 	}, [navigate, role]);
 

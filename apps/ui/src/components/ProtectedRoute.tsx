@@ -23,7 +23,7 @@ import { UserRole } from '@pcgl-daco/validation';
 
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
-import FullscreenLoader from './FullScreenLoader';
+import FullscreenLoader from './FullscreenLoader';
 
 type ProtectedRouteProps = PropsWithChildren<{
 	requiredRoles?: [UserRole, ...UserRole[]];

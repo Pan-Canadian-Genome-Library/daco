@@ -17,12 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './localStorage/sessionExtras.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { z } from 'zod';
+import { userRoleSchema } from '../user.js';
+
+export const ExtraSessionInformationSchema = z.discriminatedUnion('role', [
+	z.object({
+		role: z.literal(userRoleSchema.Values.INSTITUTIONAL_REP),
+		applicationId: z.number().int().nonnegative(),
+	}),
+	z.object({
+		role: z.literal(userRoleSchema.Values.APPLICANT),
+	}),
+	z.object({
+		role: z.literal(userRoleSchema.Values.DAC_MEMBER),
+	}),
+	z.object({
+		role: z.literal(userRoleSchema.Values.ANONYMOUS),
+	}),
+]);
+export type ExtraSessionInformation = z.infer<typeof ExtraSessionInformationSchema>;
