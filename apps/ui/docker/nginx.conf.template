@@ -3,6 +3,7 @@ server {
  root   /usr/share/nginx/html;
  index  index.html;
  etag   on;
+ client_max_body_size 6M;
 
  location /api/ {
    rewrite /api/(.*) /$1  break;
@@ -13,10 +14,12 @@ server {
    # Proxy information for backend
    proxy_set_header X-Real-IP $remote_addr;
    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
  }
 
  location / {
   try_files $uri $uri/ /index.html;
+  
  }
 
  error_page   500 502 503 504  /50x.html;
