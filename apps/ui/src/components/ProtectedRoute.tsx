@@ -21,9 +21,9 @@ import { Navigate, type To } from 'react-router';
 
 import { UserRole } from '@pcgl-daco/validation';
 
+import FullscreenLoader from '@/components/FullscreenLoader';
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
-import FullscreenLoader from './FullscreenLoader';
 
 type ProtectedRouteProps = PropsWithChildren<{
 	requiredRoles?: [UserRole, ...UserRole[]];
