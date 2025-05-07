@@ -31,6 +31,7 @@ type SectionMenuItemProps = {
 	isSectionValid?: boolean;
 	label: string;
 	isEditMode?: boolean;
+	isLocked?: boolean;
 	hasCollaborators?: boolean;
 };
 
@@ -39,6 +40,7 @@ const SectionMenuItem = ({
 	isSectionTouched,
 	isSectionValid,
 	label,
+	isLocked,
 	isEditMode,
 	hasCollaborators,
 }: SectionMenuItemProps) => {
@@ -48,7 +50,7 @@ const SectionMenuItem = ({
 	 * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
 	 */
 	const renderIcon = () => {
-		if (!isEditMode) {
+		if (isLocked ?? !isEditMode) {
 			// display lock on edit mode
 			return <LockOutlined />;
 		} else if (label === SectionRoutes.INTRO) {
