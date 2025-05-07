@@ -62,10 +62,10 @@ const SignAndSubmit = () => {
 	const watchSignature = watch('signature');
 	const disableBasedofRole = (role === 'APPLICANT' && canEdit) || role === 'INSTITUTIONAL_REP';
 	const disableBasedofState =
-		state !== 'DRAFT' &&
-		state !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' &&
-		state !== 'DAC_REVISIONS_REQUESTED' &&
-		state !== 'INSTITUTIONAL_REP_REVIEW';
+		state !== 'DRAFT' && // Applicant should be able to submit first draft to rep
+		state !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' && // Applicant should be able to submit application after revisions
+		state !== 'DAC_REVISIONS_REQUESTED' && // Applicant should be able to submit application after revisions
+		state !== 'INSTITUTIONAL_REP_REVIEW'; // Rep should be able to approve the application
 
 	// Load the proper signature based off type of user
 	useEffect(() => {

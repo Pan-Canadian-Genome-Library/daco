@@ -19,20 +19,38 @@
 
 import { SectionRoutes } from '@/pages/AppRouter';
 import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 import { SectionMenuItemProps } from '../SectionMenuItem';
 
 /**
  * TODO: once we are in the DAC/REP revision state in the application, add a renderIcon condition
  */
-export const RenderIcon = ({
-	isLocked,
-	isEditMode,
+export const RenderIcon = (props: SectionMenuItemProps) => {
+	const { appState } = props;
+
+	switch (appState) {
+		case ApplicationStates.DRAFT:
+			return DraftLogic(props);
+		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+			return InstitutionalRepReviewLogic(props);
+		case ApplicationStates.DAC_REVIEW:
+			return DACReviewLogic();
+		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
+			return InstitutionalRepReviewRequestedLogic(props);
+		default:
+			return DraftLogic(props);
+	}
+};
+
+const DraftLogic = ({
+	isCurrentSection,
 	label,
 	hasCollaborators,
-	isCurrentSection,
-	isSectionValid,
+	isEditMode,
+	isLocked,
 	isSectionTouched,
-}: SectionMenuItemProps) => {
+	isSectionValid,
+}: Omit<SectionMenuItemProps, 'appState'>) => {
 	if (isLocked ?? !isEditMode) {
 		// display lock on edit mode
 		return <LockOutlined />;
@@ -55,6 +73,30 @@ export const RenderIcon = ({
 		// display exlamation if section is invalid and needs revisions
 		return <ExclamationCircleFilled />;
 	}
+};
 
-	return;
+const InstitutionalRepReviewRequestedLogic = ({ label, isLocked }: Omit<SectionMenuItemProps, 'appState'>) => {
+	if (label === SectionRoutes.INTRO) {
+		// do not display intro icon
+		return <LockOutlined />;
+	} else if (!isLocked) {
+		// Do not display icon on sections with revisions, should also ignore editMode
+		return;
+	} else if (label === SectionRoutes.SIGN) {
+		return;
+	}
+	return <LockOutlined />;
+};
+
+const InstitutionalRepReviewLogic = ({ label }: Omit<SectionMenuItemProps, 'appState'>) => {
+	if (label === SectionRoutes.SIGN) {
+		// Only sign and submit section should display no icon
+		return;
+	}
+
+	return <LockOutlined />;
+};
+
+const DACReviewLogic = () => {
+	return <LockOutlined />;
 };
