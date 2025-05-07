@@ -34,13 +34,15 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'project', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 
@@ -101,12 +103,16 @@ const Project = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
-				<SectionTitle title={translate('project-section.title')} text={[translate('project-section.description')]} />
+				<SectionTitle
+					title={translate('project-section.title')}
+					text={[translate('project-section.description')]}
+					showLockIcon={!canEdit}
+				/>
 				<Row gutter={26}>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<InputBox
@@ -115,7 +121,7 @@ const Project = () => {
 							control={control}
 							rule={rule}
 							required
-							disabled={!isEditMode}
+							disabled={!canEdit}
 						/>
 					</Col>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -126,7 +132,7 @@ const Project = () => {
 							placeHolder="https://"
 							control={control}
 							rule={rule}
-							disabled={!isEditMode}
+							disabled={!canEdit}
 						/>
 					</Col>
 				</Row>
@@ -153,7 +159,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -177,7 +183,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -192,7 +198,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -219,7 +225,7 @@ const Project = () => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>
@@ -241,7 +247,7 @@ const Project = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
@@ -257,7 +263,7 @@ const Project = () => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Col>
@@ -274,13 +280,13 @@ const Project = () => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="project" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="project" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

@@ -38,6 +38,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
@@ -52,8 +53,9 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
+	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'ethics', isEditMode });
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { mutateAsync: editApplication } = useEditApplication();
 
@@ -104,7 +106,7 @@ const Ethics = () => {
 
 		const { data: responseData } = response;
 
-		// If there is not response date OR the file name does not exist, fail the download procedure
+		// If there is no response data OR the file name does not exist, fail the download procedure
 		if (!responseData || responseData.filename === null) {
 			return;
 		}
@@ -151,6 +153,7 @@ const Ethics = () => {
 		<SectionWrapper>
 			<>
 				<SectionTitle
+					showLockIcon={!canEdit}
 					title={translate('ethics-section.title')}
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}
@@ -190,7 +193,7 @@ const Ethics = () => {
 							control={control}
 							rule={rule}
 							required
-							disabled={!isEditMode}
+							disabled={!canEdit}
 							options={[
 								{
 									key: 'exemption',
@@ -226,7 +229,7 @@ const Ethics = () => {
 												beforeUpload={beforeUpload}
 												fileList={data}
 												onPreview={onDownload} // since we have to generate a url on the frontend, need to use on preview onclick to download the file
-												disabled={!isEditMode}
+												disabled={!canEdit}
 												onChange={handleChange}
 												onRemove={() => {
 													setIsDeleteModalOpen(true);
@@ -242,7 +245,7 @@ const Ethics = () => {
 													removeIcon: <CloseOutlined />,
 												}}
 											>
-												<Button type="primary" icon={<UploadOutlined />} disabled={!isEditMode || !!data?.length}>
+												<Button type="primary" icon={<UploadOutlined />} disabled={!canEdit || !!data?.length}>
 													{translate('button.upload')}
 												</Button>
 											</Upload>
@@ -253,7 +256,7 @@ const Ethics = () => {
 						) : null}
 					</Form>
 				</SectionContent>
-				<SectionFooter currentRoute="ethics" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="ethics" isEditMode={canEdit} />
 				<DeleteEthicsFileModal
 					filename={data && data[0] ? data[0].name : ''}
 					setIsOpen={setIsDeleteModalOpen}
