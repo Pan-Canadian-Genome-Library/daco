@@ -47,7 +47,7 @@ const useRejectApplication = () => {
 			return await response.json();
 		},
 		onSuccess: async (data) => {
-			await queryClient.invalidateQueries({ queryKey: [`application-$`] });
+			await queryClient.invalidateQueries({ queryKey: [`application-${data.id}`] });
 		},
 		onError: () => {
 			notification.openNotification({
