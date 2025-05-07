@@ -54,31 +54,18 @@ const SignAndSubmit = () => {
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
 	const { role } = useUserContext();
 	const { mutateAsync: createSignature } = useCreateSignature();
-
 	const { control, setValue, formState, watch, clearErrors, reset, getValues } = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),
 	});
 
 	// Logic
 	const watchSignature = watch('signature');
-	const eSignDisabled = (role === 'APPLICANT' && canEdit) || role === 'INSTITUTIONAL_REP';
+	const disableBasedofRole = (role === 'APPLICANT' && canEdit) || role === 'INSTITUTIONAL_REP';
 	const disableBasedofState =
 		state !== 'DRAFT' &&
 		state !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' &&
 		state !== 'DAC_REVISIONS_REQUESTED' &&
 		state !== 'INSTITUTIONAL_REP_REVIEW';
-
-	const onSaveClicked = async () => {
-		const signature = getValues('signature');
-
-		if (signature) {
-			await createSignature({ applicationId: appId, signature }).then(() => {
-				if (signatureRef.current) {
-					signatureRef.current.clear();
-				}
-			});
-		}
-	};
 
 	// Load the proper signature based off type of user
 	useEffect(() => {
@@ -98,16 +85,16 @@ const SignAndSubmit = () => {
 		}
 	}, [appId, fields, isEditMode, navigation, state]);
 
-	// - differentiate between which signature we are validating against as we have two different types of signatures
-	// - ensure the local signature is synced with saved api signature
-	const determineCanSubmit = () => {
-		if (role === 'APPLICANT') {
-			return data?.applicantSignature !== getValues('signature');
-		} else if (role === 'INSTITUTIONAL_REP') {
-			return data?.institutionalRepSignature !== getValues('signature');
-		}
+	const onSaveClicked = async () => {
+		const signature = getValues('signature');
 
-		return false;
+		if (signature) {
+			await createSignature({ applicationId: appId, signature }).then(() => {
+				if (signatureRef.current) {
+					signatureRef.current.clear();
+				}
+			});
+		}
 	};
 
 	return (
@@ -130,7 +117,7 @@ const SignAndSubmit = () => {
 								<input disabled type="hidden" name="createdAt" />
 								{!isLoading ? (
 									<ESignature
-										disabled={!eSignDisabled || disableBasedofState}
+										disabled={disableBasedofState || !disableBasedofRole}
 										signatureRef={signatureRef}
 										name="signature"
 										control={control}
@@ -139,7 +126,7 @@ const SignAndSubmit = () => {
 										setValue={setValue}
 										reset={reset}
 										clearErrors={clearErrors}
-										disableSaveButton={!watchSignature || !eSignDisabled || disableBasedofState}
+										disableSaveButton={!watchSignature || disableBasedofState || !disableBasedofRole}
 										onSaveClicked={onSaveClicked}
 										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
@@ -152,11 +139,11 @@ const SignAndSubmit = () => {
 					</SectionContent>
 					<SectionFooter
 						currentRoute="sign"
-						isEditMode={eSignDisabled}
+						isEditMode={disableBasedofRole}
 						signSubmitHandler={() => {
 							setOpenModal(true);
 						}}
-						submitDisabled={determineCanSubmit()}
+						submitDisabled={disableBasedofState || !disableBasedofRole}
 					/>
 				</Form>
 			</SectionWrapper>
