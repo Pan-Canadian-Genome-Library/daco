@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback';
+import { SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RuleRender } from 'antd/es/form';
 import { ReactNode } from 'react';
@@ -57,6 +59,8 @@ export interface FetchError extends ServerError {
 export interface ApplicationOutletContext {
 	appId: string | number;
 	isEditMode: boolean;
+	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
+	state: ApplicationStateValues;
 }
 
 export interface BasicFormFieldProps {
