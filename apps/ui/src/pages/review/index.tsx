@@ -95,7 +95,7 @@ const InstitutionalRepLogin = () => {
 				navigation('/', { replace: true });
 			}
 		}
-	}, [isLoggedIn, match?.params.applicationId, navigation]);
+	}, [isLoggedIn, loggedInRole, match?.params.applicationId, navigation]);
 
 	const onLoginClick = () => {
 		window.location.href = API_PATH_LOGIN;
