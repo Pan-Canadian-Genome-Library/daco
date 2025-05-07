@@ -22,8 +22,13 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { API_PATH_LOGIN } from '@/api/paths';
-import { clearExtraSessionInformation, setExtraSessionInformation } from '@/global/localStorage';
+import {
+	clearExtraSessionInformation,
+	getExtraSessionInformation,
+	setExtraSessionInformation,
+} from '@/global/localStorage';
 import { pcglColours } from '@/providers/ThemeProvider';
+import { useUserContext } from '@/providers/UserProvider';
 import { useMatch, useNavigate } from 'react-router';
 
 const { useToken } = theme;
@@ -34,7 +39,7 @@ const InstitutionalRepLogin = () => {
 	const { token } = useToken();
 	const { t: translate } = useTranslation();
 	const navigation = useNavigate();
-
+	const { isLoggedIn } = useUserContext();
 	const match = useMatch('review/:applicationId');
 
 	const landingPageOuter: React.CSSProperties = {
@@ -54,17 +59,39 @@ const InstitutionalRepLogin = () => {
 
 	useEffect(() => {
 		if (match?.params.applicationId) {
+			const appId = Number(match.params.applicationId);
+			const existingSessionInfo = getExtraSessionInformation();
+
+			if (
+				isLoggedIn &&
+				existingSessionInfo &&
+				existingSessionInfo.role === 'INSTITUTIONAL_REP' &&
+				existingSessionInfo.applicationId === appId
+			) {
+				/**
+				 * In this case, they're just visiting the link again, so we'll
+				 * redirect them right away instead of the user clicking "Login to Review"
+				 * again.
+				 **/
+				navigation('/login/redirect', { replace: true });
+			} else {
+				clearExtraSessionInformation();
+			}
+
 			const saveSessionInfo = setExtraSessionInformation({
 				role: 'INSTITUTIONAL_REP',
-				applicationId: Number(match.params.applicationId),
+				applicationId: appId,
 			});
 
+			/**
+			 * This means that the applicationId or role were invalid
+			 * and failed our Zod validation. In this case we wanna redirect
+			 */
 			if (saveSessionInfo === false) {
-				clearExtraSessionInformation();
 				navigation('/', { replace: true });
 			}
 		}
-	}, [match?.params.applicationId, navigation]);
+	}, [isLoggedIn, match?.params.applicationId, navigation]);
 
 	const onLoginClick = () => {
 		window.location.href = API_PATH_LOGIN;
