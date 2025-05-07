@@ -131,8 +131,16 @@ describe('Application API', () => {
 			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
 			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
+			/**
+			 * Applications must be withdrawn before they can be edited.
+			 */
+			const withdrawResult = await withdrawApplication({ applicationId: id });
+
+			assert.ok(withdrawResult.success);
+
 			const contentUpdate = { applicantLastName: 'User' };
 			const result = await editApplication({ id, update: contentUpdate });
+
 			assert.ok(result.success);
 
 			const editedApplication = result.data;
@@ -259,12 +267,12 @@ describe('Application API', () => {
 		it('should fail to submit a revision for an already revised application (DAC_REVISIONS_REQUESTED)', async () => {
 			await testApplicationRepo.findOneAndUpdate({
 				id: testApplicationId,
-				update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
+				update: { state: ApplicationStates.DAC_REVIEW },
 			});
 			const result = await submitRevision({ applicationId: testApplicationId });
 
 			assert.ok(!result.success);
-			assert.strictEqual(result.message, 'Application revision is already submitted.');
+			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 		});
 
 		it('should fail to submit a revision for a non-existent application', async () => {

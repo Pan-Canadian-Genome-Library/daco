@@ -28,6 +28,7 @@ import SignatureCanvas from 'react-signature-canvas';
 
 import useCreateSignature from '@/api/mutations/useCreateSignature';
 import useSubmitApplication from '@/api/mutations/useSubmitApplication';
+import useSubmitRevisions from '@/api/mutations/useSubmitRevisions';
 import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
@@ -36,6 +37,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { type ApplicationOutletContext } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useUserContext } from '@/providers/UserProvider';
 
@@ -43,7 +45,8 @@ const { Text } = Typography;
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'sign', isEditMode });
 	const [openModal, setOpenModal] = useState(false);
 	const {
 		state: { fields },
@@ -51,6 +54,8 @@ const SignAndSubmit = () => {
 	const navigation = useNavigate();
 	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
+	const { mutateAsync: submitRevisions, isPending: isSubmittingRevs } = useSubmitRevisions();
+
 	const { handleSubmit, control, setValue, formState, watch, clearErrors, reset, getValues } =
 		useForm<eSignatureSchemaType>({
 			resolver: zodResolver(esignatureSchema),
@@ -76,9 +81,18 @@ const SignAndSubmit = () => {
 	};
 
 	const modalSubmission = () => {
-		submitApplication({ applicationId: appId }).then(() => {
-			setOpenModal(false);
-		});
+		switch (state) {
+			case 'INSTITUTIONAL_REP_REVISION_REQUESTED':
+			case 'DAC_REVISIONS_REQUESTED':
+				submitRevisions({ applicationId: appId }).then(() => {
+					setOpenModal(false);
+				});
+				break;
+			default:
+				submitApplication({ applicationId: appId }).then(() => {
+					setOpenModal(false);
+				});
+		}
 	};
 
 	useEffect(() => {
@@ -93,28 +107,36 @@ const SignAndSubmit = () => {
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
-		if (!ValidateAllSections(fields)) {
+		if (!ValidateAllSections(fields) && state === 'DRAFT') {
 			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
 		}
-	}, [appId, fields, isEditMode, navigation]);
+	}, [appId, fields, isEditMode, navigation, state]);
 
 	const watchSignature = watch('signature');
 
 	// - differentiate between which signature we are validating against as we have two different types of signatures
 	// - ensure the local signature is synced with saved api signature
-	const determineSignatureDisabled = () => {
-		if (role === 'APPLICANT') {
-			return data?.applicantSignature !== getValues('signature');
-		}
-		return data?.institutionalRepSignature !== getValues('signature');
-	};
+	const determineCanSubmit = () => {
+		const hasRevisions =
+			(Object.values(revisions).find((rev) => rev.isApproved === false) &&
+				state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') ||
+			state === 'DAC_REVISIONS_REQUESTED';
 
+		if (hasRevisions || canEdit) {
+			return true;
+		} else if (role === 'APPLICANT') {
+			return data?.applicantSignature !== getValues('signature');
+		} else {
+			return data?.institutionalRepSignature !== getValues('signature');
+		}
+	};
 	return (
 		<>
 			<SectionWrapper>
 				<Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
 					<SectionTitle
 						title={translate('sign-and-submit-section.title')}
+						showLockIcon={!canEdit}
 						text={translate('sign-and-submit-section.description')}
 						showDivider={false}
 					/>
@@ -150,7 +172,7 @@ const SignAndSubmit = () => {
 					</SectionContent>
 					<SectionFooter
 						currentRoute="sign"
-						isEditMode={isEditMode}
+						isEditMode={determineCanSubmit()}
 						signSubmitHandler={handleSubmit(onSubmit)}
 						submitDisabled={determineSignatureDisabled() || role === 'DAC_MEMBER'}
 					/>
@@ -164,7 +186,7 @@ const SignAndSubmit = () => {
 				style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 				open={openModal}
 				onOk={modalSubmission}
-				okButtonProps={{ disabled: isSubmitting }}
+				okButtonProps={{ disabled: isSubmitting || isSubmittingRevs }}
 				onCancel={() => setOpenModal(false)}
 			>
 				<Flex style={{ height: '100%', marginTop: 20 }}>
