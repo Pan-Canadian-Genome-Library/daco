@@ -19,7 +19,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { esignatureSchema, type eSignatureSchemaType } from '@pcgl-daco/validation';
-import { Col, Flex, Form, Modal, Row, Typography } from 'antd';
+import { Col, Form, Row } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -27,11 +27,10 @@ import { useNavigate, useOutletContext } from 'react-router';
 import SignatureCanvas from 'react-signature-canvas';
 
 import useCreateSignature from '@/api/mutations/useCreateSignature';
-import useSubmitApplication from '@/api/mutations/useSubmitApplication';
-import useSubmitRevisions from '@/api/mutations/useSubmitRevisions';
 import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
+import SubmitApplicationModal from '@/components/pages/application/modals/SubmitApplicationModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -40,8 +39,6 @@ import { type ApplicationOutletContext } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useUserContext } from '@/providers/UserProvider';
-
-const { Text } = Typography;
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
@@ -53,8 +50,7 @@ const SignAndSubmit = () => {
 	} = useApplicationContext();
 	const navigation = useNavigate();
 	const signatureRef = useRef<SignatureCanvas>(null);
-	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
-	const { mutateAsync: submitRevisions, isPending: isSubmittingRevs } = useSubmitRevisions();
+
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
 	const { role } = useUserContext();
 	const { mutateAsync: createSignature } = useCreateSignature();
@@ -63,8 +59,14 @@ const SignAndSubmit = () => {
 		resolver: zodResolver(esignatureSchema),
 	});
 
+	// Logic
 	const watchSignature = watch('signature');
 	const eSignDisabled = (role === 'APPLICANT' && canEdit) || role === 'INSTITUTIONAL_REP';
+	const disableBasedofState =
+		state !== 'DRAFT' &&
+		state !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' &&
+		state !== 'DAC_REVISIONS_REQUESTED' &&
+		state !== 'INSTITUTIONAL_REP_REVIEW';
 
 	const onSaveClicked = async () => {
 		const signature = getValues('signature');
@@ -75,21 +77,6 @@ const SignAndSubmit = () => {
 					signatureRef.current.clear();
 				}
 			});
-		}
-	};
-
-	const modalSubmission = () => {
-		switch (state) {
-			case 'INSTITUTIONAL_REP_REVISION_REQUESTED':
-			case 'DAC_REVISIONS_REQUESTED':
-				submitRevisions({ applicationId: appId }).then(() => {
-					setOpenModal(false);
-				});
-				break;
-			default:
-				submitApplication({ applicationId: appId }).then(() => {
-					setOpenModal(false);
-				});
 		}
 	};
 
@@ -116,9 +103,11 @@ const SignAndSubmit = () => {
 	const determineCanSubmit = () => {
 		if (role === 'APPLICANT') {
 			return data?.applicantSignature !== getValues('signature');
-		} else {
+		} else if (role === 'INSTITUTIONAL_REP') {
 			return data?.institutionalRepSignature !== getValues('signature');
 		}
+
+		return false;
 	};
 
 	return (
@@ -141,7 +130,7 @@ const SignAndSubmit = () => {
 								<input disabled type="hidden" name="createdAt" />
 								{!isLoading ? (
 									<ESignature
-										disabled={!eSignDisabled}
+										disabled={!eSignDisabled || disableBasedofState}
 										signatureRef={signatureRef}
 										name="signature"
 										control={control}
@@ -150,7 +139,7 @@ const SignAndSubmit = () => {
 										setValue={setValue}
 										reset={reset}
 										clearErrors={clearErrors}
-										disableSaveButton={!watchSignature || !eSignDisabled}
+										disableSaveButton={!watchSignature || !eSignDisabled || disableBasedofState}
 										onSaveClicked={onSaveClicked}
 										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
@@ -171,21 +160,7 @@ const SignAndSubmit = () => {
 					/>
 				</Form>
 			</SectionWrapper>
-			<Modal
-				title={translate('sign-and-submit-section.modal.title')}
-				okText={translate('sign-and-submit-section.modal.submit')}
-				cancelText={translate('sign-and-submit-section.modal.cancel')}
-				width={'100%'}
-				style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-				open={openModal}
-				onOk={modalSubmission}
-				okButtonProps={{ disabled: isSubmitting || isSubmittingRevs }}
-				onCancel={() => setOpenModal(false)}
-			>
-				<Flex style={{ height: '100%', marginTop: 20 }}>
-					<Text>{translate('sign-and-submit-section.modal.description', { id: appId })}</Text>
-				</Flex>
-			</Modal>
+			<SubmitApplicationModal isOpen={openModal} setIsOpen={setOpenModal} />
 		</>
 	);
 };
