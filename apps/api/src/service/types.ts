@@ -31,6 +31,7 @@ import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';
 import { pdfService } from './pdf/pdfService.ts';
 import { signatureService } from './signatureService.ts';
@@ -114,3 +115,5 @@ export type PostgresTransaction = PgTransaction<
 
 export type RevisionRequestModel = typeof revisionRequests.$inferInsert;
 export type RevisionRequestRecord = typeof revisionRequests.$inferSelect;
+
+export type EmailService = ReturnType<typeof emailSvc>;
