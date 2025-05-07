@@ -61,6 +61,7 @@
 		"requestRevisions": "Request Revisions",
 		"back": "Back",
 		"submitApplication": "Submit Application",
+		"submitRevisions": "Submit Revisions",
 		"addCollab": "Add Collaborator",
 		"upload": "Upload",
 		"save": "Save Changes",
@@ -105,7 +106,7 @@
 		"http": {
 			"403": {
 				"title": "Unauthorized.",
-				"message": "Sorry, looks you're not not authorized to access this resource."
+				"message": "Sorry, looks like you're not authorized to access this resource."
 			},
 			"404": {
 				"title": "The requested resource could not be found.",
