@@ -152,15 +152,7 @@ function AppRouter() {
 					}
 				/>
 
-				<Route
-					path="review/:applicationId"
-					element={
-						// TODO: This is broken, speak with Jon to figure this out.
-						// <ProtectedRoute requiredRoles={['ANONYMOUS', 'INSTITUTIONAL_REP']}>
-						<InstitutionalRepLogin />
-						// </ProtectedRoute>
-					}
-				/>
+				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
 			</Route>
 		</Routes>
 	);
