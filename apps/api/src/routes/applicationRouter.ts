@@ -449,7 +449,7 @@ applicationRouter.post(
 	async (
 		request: Request,
 		response: ResponseWithData<
-			{ message: string; data: ApplicationResponseData },
+			ResponseWithData<ApplicationResponseData>,
 			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
 		>,
 	) => {
@@ -467,10 +467,7 @@ applicationRouter.post(
 			const result = await dacRejectApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).json({
-					message: 'Application rejected successfully.',
-					data: result.data,
-				});
+				response.status(200).json(result.data);
 				return;
 			}
 			switch (result.error) {
