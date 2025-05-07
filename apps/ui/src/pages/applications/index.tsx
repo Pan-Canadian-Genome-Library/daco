@@ -56,10 +56,7 @@ const ApplicationViewer = () => {
 
 	useEffect(() => {
 		if (applicationData && !applicationError) {
-			const isNotInEditLifecycle =
-				applicationData.state !== ApplicationStates.DRAFT &&
-				applicationData.state !== ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED &&
-				applicationData.state !== ApplicationStates.DAC_REVISIONS_REQUESTED;
+			const isNotInEditLifecycle = applicationData.state !== ApplicationStates.DRAFT;
 
 			if (isNotInEditLifecycle && isEditMode) {
 				navigation(`/application/${applicationData.id}/`, { replace: true });
