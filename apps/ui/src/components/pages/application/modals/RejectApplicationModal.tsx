@@ -23,13 +23,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { RejectionSchemaType, rejectionSchema } from '@pcgl-daco/validation';
 import { Flex, Form, Modal, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import SuccessModal from './SuccessModal';
+
 const rule = createSchemaFieldRule(rejectionSchema);
-const [showSuccessModal, setShowSuccessModal] = useState(false);
 
 const { Text } = Typography;
 
@@ -37,11 +34,11 @@ type RejectApplicationModalProps = {
 	id: number;
 	isOpen: boolean;
 	setIsOpen: (isOpen: boolean) => void;
+	setShowSuccessRejectsModal: (isOpen: boolean) => void;
 };
 
-const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModalProps) => {
+const RejectApplicationModal = ({ id, isOpen, setIsOpen, setShowSuccessRejectsModal }: RejectApplicationModalProps) => {
 	const { t: translate } = useTranslation();
-	const navigate = useNavigate();
 	const { mutateAsync: rejectApplication } = useRejectApplication();
 
 	const { handleSubmit, control, reset, formState } = useForm<RejectionSchemaType>({
@@ -50,11 +47,11 @@ const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModa
 	});
 
 	const handleRejectApplicationRequest: SubmitHandler<RejectionSchemaType> = async (data) => {
-		await rejectApplication({ applicationId: id, rejectionReason: data.rejectionReason });
-		setIsOpen(false);
-		reset();
-		setShowSuccessModal(true);
-		navigate('/dashboard');
+		await rejectApplication({ applicationId: id, rejectionReason: data.rejectionReason }).then(() => {
+			setIsOpen(false);
+			reset();
+			setShowSuccessRejectsModal(true);
+		});
 	};
 
 	return (
@@ -86,12 +83,6 @@ const RejectApplicationModal = ({ id, isOpen, setIsOpen }: RejectApplicationModa
 					/>
 				</Form>
 			</Flex>
-			<SuccessModal
-				successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
-				okText={translate('modals.buttons.ok')}
-				isOpen={showSuccessModal}
-				onOk={() => setShowSuccessModal(false)}
-			/>
 		</Modal>
 	);
 };

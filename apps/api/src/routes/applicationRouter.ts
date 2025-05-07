@@ -404,7 +404,7 @@ applicationRouter.post(
 	async (
 		request,
 		response: ResponseWithData<
-			{ message: string; data: ApplicationRecord },
+			{ message: string; data: ApplicationResponseData },
 			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
 		>,
 	) => {

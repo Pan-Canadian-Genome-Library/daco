@@ -20,6 +20,7 @@
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { queryClient } from '@/providers/Providers';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { ApplicationResponseData } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
@@ -45,7 +46,9 @@ const useRejectApplication = () => {
 
 			return await response.json();
 		},
-		onSuccess: () => {},
+		onSuccess: async (data) => {
+			await queryClient.invalidateQueries({ queryKey: [`application-$`] });
+		},
 		onError: () => {
 			notification.openNotification({
 				type: 'error',
