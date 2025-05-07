@@ -449,7 +449,7 @@ applicationRouter.post(
 	async (
 		request: Request,
 		response: ResponseWithData<
-			ResponseWithData<ApplicationResponseData>,
+		ApplicationResponseData,
 			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
 		>,
 	) => {
