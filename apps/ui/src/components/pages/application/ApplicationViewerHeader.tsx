@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
+import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
 import PageHeader from '@/components/pages/global/PageHeader';
@@ -59,6 +60,8 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
+	const [showRejectModal, setShowRejectModal] = useState(false);
+	const [showSuccessRejectsModal, setShowSuccessRejectsModal] = useState(false);
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
@@ -149,6 +152,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					{canShowEdit ? <Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button> : null}
 					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
+					<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
 				</Flex>
 				<WithdrawModal
 					applicationId={id}
@@ -171,18 +175,30 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 						<Text>{translate('modals.closeApplication.description')}</Text>
 					</Flex>
 				</Modal>
+				<RejectApplicationModal
+					id={id}
+					isOpen={showRejectModal}
+					setIsOpen={setShowRejectModal}
+					setShowSuccessRejectsModal={setShowSuccessRejectsModal}
+				/>
 				<RequestRevisionsModal
 					onSubmit={onRevisionsSubmit}
 					isOpen={openRevisionsModal}
 					setIsOpen={setOpenRevisionsModal}
 				/>
+				<SuccessModal
+					successText={translate('modals.applications.global.success.text', { id })}
+					okText={translate('modals.buttons.ok')}
+					isOpen={showSuccessModal}
+					onOk={() => setShowSuccessModal(false)}
+				/>
+				<SuccessModal
+					successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
+					okText={translate('modals.buttons.ok')}
+					isOpen={showSuccessRejectsModal}
+					onOk={() => setShowSuccessRejectsModal(false)}
+				/>
 			</Flex>
-			<SuccessModal
-				successText={translate('modals.applications.global.success.text', { id })}
-				okText={translate('modals.buttons.ok')}
-				isOpen={showSuccessModal}
-				onOk={() => setShowSuccessModal(false)}
-			/>
 		</PageHeader>
 	);
 };
