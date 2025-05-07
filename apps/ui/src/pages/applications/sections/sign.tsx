@@ -81,13 +81,15 @@ const SignAndSubmit = () => {
 		});
 	};
 
-	// TODO: we have institutional rep signatures to be implemented. Currently only allows APPLICANT roles
 	useEffect(() => {
-		if (data && data.applicantSignature && signatureRef.current) {
+		if (data && data.applicantSignature && signatureRef.current && role === 'APPLICANT') {
 			signatureRef.current.fromDataURL(data.applicantSignature);
 			setValue('signature', data.applicantSignature);
+		} else if (data && data.institutionalRepSignature && signatureRef.current && role === 'INSTITUTIONAL_REP') {
+			signatureRef.current.fromDataURL(data.institutionalRepSignature);
+			setValue('signature', data.institutionalRepSignature);
 		}
-	}, [data, setValue]);
+	}, [data, role, setValue]);
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
@@ -126,7 +128,7 @@ const SignAndSubmit = () => {
 								<input disabled type="hidden" name="createdAt" />
 								{!isLoading ? (
 									<ESignature
-										disabled={!isEditMode}
+										disabled={role === 'DAC_MEMBER'}
 										signatureRef={signatureRef}
 										name="signature"
 										control={control}
@@ -135,7 +137,7 @@ const SignAndSubmit = () => {
 										setValue={setValue}
 										reset={reset}
 										clearErrors={clearErrors}
-										disableSaveButton={!watchSignature || !isEditMode}
+										disableSaveButton={!watchSignature || role === 'DAC_MEMBER'}
 										onSaveClicked={onSaveClicked}
 										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
@@ -150,7 +152,7 @@ const SignAndSubmit = () => {
 						currentRoute="sign"
 						isEditMode={isEditMode}
 						signSubmitHandler={handleSubmit(onSubmit)}
-						submitDisabled={determineSignatureDisabled() || !isEditMode}
+						submitDisabled={determineSignatureDisabled() || role === 'DAC_MEMBER'}
 					/>
 				</Form>
 			</SectionWrapper>
