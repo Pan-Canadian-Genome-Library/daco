@@ -75,7 +75,9 @@
 		"submitRevisions": "Submit Revisions",
 		"addCollab": "Add Collaborator",
 		"upload": "Upload",
-		"save": "Save Changes"
+		"save": "Save Changes",
+		"rejectApp": "Reject Application",
+		"rejectApplication": "Reject"
 	},
 	"label": {
 		"created": "Created",
