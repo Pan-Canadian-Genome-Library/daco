@@ -27,6 +27,7 @@ import { useNavigate, useOutletContext } from 'react-router';
 import SignatureCanvas from 'react-signature-canvas';
 
 import useCreateSignature from '@/api/mutations/useCreateSignature';
+import useGetDownload from '@/api/queries/useGetDownload';
 import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
@@ -50,9 +51,11 @@ const SignAndSubmit = () => {
 	const navigation = useNavigate();
 	const signatureRef = useRef<SignatureCanvas>(null);
 
+	const { refetch: getDownload } = useGetDownload({ fileId: fields.signedPdf });
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
-	const { role } = useUserContext();
 	const { mutateAsync: createSignature } = useCreateSignature();
+
+	const { role } = useUserContext();
 	const { control, setValue, formState, watch, clearErrors, reset, getValues } = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),
 	});
@@ -97,6 +100,35 @@ const SignAndSubmit = () => {
 		}
 	};
 
+	// Generate download url and then remove the link after downloading
+	const onPDFDownload = async () => {
+		const response = await getDownload();
+
+		const { data: responseData } = response;
+
+		// If there is no response data OR the file name does not exist, fail the download procedure
+		if (!responseData || responseData.filename === null) {
+			return;
+		}
+
+		const bufferArray = new Uint8Array(responseData.content.data).buffer;
+
+		const blob = new Blob([bufferArray], {
+			type: 'pdf',
+		});
+
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+
+		a.download = responseData.filename;
+		document.body.appendChild(a);
+		a.click();
+
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	};
+
 	return (
 		<>
 			<SectionWrapper>
@@ -128,6 +160,8 @@ const SignAndSubmit = () => {
 										clearErrors={clearErrors}
 										disableSaveButton={!watchSignature || disableSignature}
 										onSaveClicked={onSaveClicked}
+										onDownloadClicked={onPDFDownload}
+										disableDownloadPDF={fields.signedPdf === undefined}
 										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
 										clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
