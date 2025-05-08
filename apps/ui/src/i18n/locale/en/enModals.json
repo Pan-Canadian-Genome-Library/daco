@@ -5,8 +5,8 @@
 			"ok": "OK"
 		},
 		"editApplication": {
-			"title": "Are you sure you want to edit Application: PCGL-{{id}}",
-			"description": "If so, the application will move back into Draft status and you will need to resubmit the application for review.",
+			"title": "Are you sure you want to edit application PCGL-{{id}}",
+			"description": "Your application PCGL-{{id}} has already been submitted for review. If you choose to edit it, the application will be moved back to Draft status, requiring you to resubmit it for review. Please note that this will extend the processing time. We recommend making changes only when absolutely necessary.",
 			"buttons": {
 				"edit": "Edit Application"
 			},
