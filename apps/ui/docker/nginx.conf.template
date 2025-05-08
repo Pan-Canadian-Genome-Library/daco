@@ -3,6 +3,7 @@ server {
  root   /usr/share/nginx/html;
  index  index.html;
  etag   on;
+ client_max_body_size 6M;
 
  location /api/ {
    rewrite /api/(.*) /$1  break;
@@ -19,8 +20,6 @@ server {
  location / {
   try_files $uri $uri/ /index.html;
   
-  # File
-  client_max_body_size 5.2M;
  }
 
  error_page   500 502 503 504  /50x.html;
