@@ -22,12 +22,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
+import useRepRevisions from '@/api/mutations/useRepRevisions';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
@@ -59,6 +61,8 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
+	const { mutateAsync: repRevision } = useRepRevisions();
+	const notification = useNotificationContext();
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showSuccessRejectsModal, setShowSuccessRejectsModal] = useState(false);
@@ -70,10 +74,19 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const navigate = useNavigate();
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
-		//TODO: Add logic to this to actually submit the revisions.
-		console.log('Submission Handled', data);
-		setOpenRevisionsModal(false);
-		setShowSuccessModal(true);
+		const payload = { ...data, applicationId: id };
+		repRevision(payload)
+			.then(() => {
+				setOpenRevisionsModal(false);
+				setShowSuccessModal(true);
+			})
+			.catch(() => {
+				notification.openNotification({
+					type: 'error',
+					message: translate('errors.generic.title'),
+					description: translate('modals.applications.global.failure.text'),
+				});
+			});
 	};
 
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
