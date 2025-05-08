@@ -66,7 +66,9 @@
 		"upload": "Upload",
 		"save": "Save Changes",
 		"rejectApp": "Reject Application",
-		"rejectApplication": "Reject"
+		"rejectApplication": "Reject",
+		"save": "Save Changes",
+		"approveApplication": "Approve"
 	},
 	"label": {
 		"created": "Created",
