@@ -112,13 +112,6 @@ describe('State Machine', () => {
 			assert.ok(applicationResult.data.state === 'INSTITUTIONAL_REP_REVIEW');
 		});
 
-		it('should allow edit on INSTITUTIONAL_REP_REVIEW', async () => {
-			const editResult = await testStateManager.editRepReview();
-			stateValue = testStateManager.getState();
-			assert.ok(editResult.success);
-			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
-		});
-
 		it('should change from INSTITUTIONAL_REP_REVIEW to INSTITUTIONAL_REP_REVISION_REQUESTED on revision_request', async () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
@@ -138,6 +131,13 @@ describe('State Machine', () => {
 						record.state_after === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
 				),
 			);
+		});
+
+		it('should allow edit on INSTITUTIONAL_REP_REVISION_REQUESTED', async () => {
+			const editResult = await testStateManager.editRepReview();
+			stateValue = testStateManager.getState();
+			assert.ok(editResult.success);
+			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
 		});
 
 		it('should change from INSTITUTIONAL_REP_REVISION_REQUESTED to INSTITUTIONAL_REP_REVIEW on submit', async () => {
@@ -184,19 +184,6 @@ describe('State Machine', () => {
 			assert.ok(applicationResult.data.state === ApplicationStates.DAC_REVIEW);
 		});
 
-		it('should allow edit on DAC_REVIEW', async () => {
-			stateValue = testStateManager.getState();
-			assert.strictEqual(stateValue, DAC_REVIEW);
-
-			await testStateManager.submitDraft();
-			await testStateManager.approveRepReview();
-			const editResult = await testStateManager.editDacReview();
-
-			stateValue = testStateManager.getState();
-			assert.ok(editResult.success);
-			assert.strictEqual(stateValue, DAC_REVIEW);
-		});
-
 		it('should change from DAC_REVIEW to DAC_REVISIONS_REQUESTED on revision_request', async () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
@@ -221,6 +208,19 @@ describe('State Machine', () => {
 						record.state_after === ApplicationStates.DAC_REVISIONS_REQUESTED,
 				),
 			);
+		});
+
+		it('should allow edit on DAC_REVISIONS_REQUESTED', async () => {
+			stateValue = testStateManager.getState();
+			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
+
+			await testStateManager.submitDraft();
+			await testStateManager.approveRepReview();
+			const editResult = await testStateManager.editDacReview();
+
+			stateValue = testStateManager.getState();
+			assert.ok(editResult.success);
+			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
 		});
 
 		it('should change from DAC_REVISIONS_REQUESTED to DAC_REVIEW on submit', async () => {

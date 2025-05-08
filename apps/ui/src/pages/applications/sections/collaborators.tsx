@@ -33,6 +33,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import ErrorPage from '@/components/pages/ErrorPage';
 import { ApplicationOutletContext } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { type CollaboratorsResponseDTO } from '@pcgl-daco/data-model';
 
 const { useToken } = theme;
@@ -48,7 +49,8 @@ export interface ModalStateProps extends ModalState {
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'collaborators', isEditMode });
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);
 
@@ -114,6 +116,7 @@ const Collaborators = () => {
 			<>
 				<SectionTitle
 					title={translate('collab-section.title')}
+					showLockIcon={!canEdit}
 					text={[
 						translate('collab-section.description1'),
 						translate('collab-section.optional'),
@@ -134,7 +137,7 @@ const Collaborators = () => {
 								onClick={() => setAddModalState({ isOpen: true })}
 								style={{ borderRadius: 100 }}
 								type="primary"
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							>
 								<Flex align="center" justify="center" gap={'small'}>
 									<PlusCircleOutlined />
@@ -156,7 +159,7 @@ const Collaborators = () => {
 					setIsOpen={setEditModalState}
 					isOpen={editModalState.isOpen}
 				/>
-				<SectionFooter currentRoute="collaborators" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="collaborators" isEditMode={canEdit} />
 			</>
 		</SectionWrapper>
 	);

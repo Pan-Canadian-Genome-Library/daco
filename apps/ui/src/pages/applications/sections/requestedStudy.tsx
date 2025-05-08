@@ -32,6 +32,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import Link from 'antd/es/typography/Link';
 
@@ -57,7 +58,8 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'study', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
@@ -96,13 +98,14 @@ const RequestedStudy = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					title={translate('requested-study.title')}
+					showLockIcon={!canEdit}
 					text={
 						<Col>
 							<Text>{translate('requested-study.description1') + ' '}</Text>
@@ -123,12 +126,12 @@ const RequestedStudy = () => {
 									return { value: study.studyName, label: study.studyName };
 								})}
 								required
-								disabled={!isEditMode}
+								disabled={!canEdit}
 							/>
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="study" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="study" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

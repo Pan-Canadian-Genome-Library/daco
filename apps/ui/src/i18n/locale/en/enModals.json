@@ -25,6 +25,15 @@
 				"closeApplicationFailed": "Sorry, there was an unexpected error while closing your application. Please try again later."
 			}
 		},
+		"rejectApplication": {
+			"title": "Are you sure you want to reject Application: PCGL-{{id}}",
+			"description": "If so, the applicant will be notified and will be unable to reopen this application.",
+			"rejectionReasonLabel": "Details from the PCGL DACO Team::",
+			"notifications": {
+				"rejectApplicationSuccess": "Your application, PCGL-{{id}}, has been rejected.",
+				"rejectApplicationFailed": "Sorry, there was an unexpected error while rejecting your application. Please try again later."
+			}
+		},
 		"approveApplication": {
 			"title": "Are you sure you want to approve Application: PCGL-{{id}}",
 			"description": "If so, the applicant and collaborators will be notified and will receive access to PCGL Controlled Data.",

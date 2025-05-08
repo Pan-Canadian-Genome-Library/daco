@@ -32,6 +32,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { appendicesEnum } from '@pcgl-daco/data-model';
 import { appendicesSchema, type AppendicesSchemaType } from '@pcgl-daco/validation';
@@ -40,7 +41,8 @@ const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const {
 		control,
@@ -82,13 +84,14 @@ const Appendices = () => {
 				<SectionTitle
 					title={translate('appendices.title')}
 					showDivider={true}
+					showLockIcon={!canEdit}
 					text={[translate('appendices.description')]}
 				/>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>
 					<Form
 						form={form}
 						onBlur={() => {
-							if (isEditMode) {
+							if (canEdit) {
 								onSubmit();
 							}
 						}}
@@ -97,7 +100,7 @@ const Appendices = () => {
 							control={control}
 							rule={rule}
 							name="acceptedAppendices"
-							disabled={!isEditMode}
+							disabled={!canEdit}
 							gap={50}
 							options={[
 								{
@@ -135,7 +138,7 @@ const Appendices = () => {
 					</Form>
 				</SectionContent>
 
-				<SectionFooter currentRoute="appendices" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="appendices" isEditMode={canEdit} />
 			</>
 		</SectionWrapper>
 	);
