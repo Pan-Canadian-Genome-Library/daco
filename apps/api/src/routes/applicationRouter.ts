@@ -448,10 +448,7 @@ applicationRouter.post(
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
 		request: Request,
-		response: ResponseWithData<
-		ApplicationResponseData,
-			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
-		>,
+		response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 	) => {
 		const applicationId = Number(request.params.applicationId);
 

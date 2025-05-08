@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback';
+import { SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationStates, ApplicationStateValues, SignatureDTO } from '@pcgl-daco/data-model';
 
 export const canSignSection = ({
@@ -24,11 +26,12 @@ export const canSignSection = ({
 	state,
 	isEditMode,
 	signatures,
+	revisions,
 }: {
 	signatures?: SignatureDTO;
 	role: 'DAC_MEMBER' | 'INSTITUTIONAL_REP' | 'APPLICANT' | 'ANONYMOUS' | undefined;
 	state: ApplicationStateValues;
-	// revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
+	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
 	isEditMode: boolean;
 }) => {
 	// If signatures are still loading, then disable signature functionality
@@ -40,7 +43,27 @@ export const canSignSection = ({
 		case ApplicationStates.DRAFT:
 			return {
 				disableSignature: !(role === 'APPLICANT' && isEditMode),
-				disableSubmit: role !== 'APPLICANT' || !signatures.applicantSignature,
+				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature && isEditMode),
+			};
+		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+			return {
+				disableSignature: !(role === 'INSTITUTIONAL_REP'),
+				disableSubmit: !(role === 'INSTITUTIONAL_REP' && signatures.institutionalRepSignature),
+			};
+		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
+			return {
+				disableSignature: !(role === 'APPLICANT' && !revisions['sign']?.isApproved),
+				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature),
+			};
+		case ApplicationStates.DAC_REVIEW:
+			return {
+				disableSignature: true,
+				disableSubmit: true,
+			};
+		case ApplicationStates.DAC_REVISIONS_REQUESTED:
+			return {
+				disableSignature: !(role === 'APPLICANT' && !revisions['sign']?.isApproved),
+				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature),
 			};
 		default:
 			return { disableSignature: true, disableSubmit: true };

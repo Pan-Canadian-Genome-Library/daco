@@ -78,7 +78,7 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 	};
 
 	const submitApplication = () => {
-		if (signSubmitHandler !== undefined && isEditMode) {
+		if (signSubmitHandler !== undefined) {
 			signSubmitHandler();
 			return;
 		}

@@ -36,7 +36,6 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { type ApplicationOutletContext } from '@/global/types';
-import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useUserContext } from '@/providers/UserProvider';
 import { canSignSection } from '../utils/canSignSection';
@@ -44,7 +43,6 @@ import { canSignSection } from '../utils/canSignSection';
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'sign', isEditMode: true });
 	const [openModal, setOpenModal] = useState(false);
 	const {
 		state: { fields },
@@ -60,7 +58,13 @@ const SignAndSubmit = () => {
 	});
 
 	// Logic
-	const { disableSignature, disableSubmit } = canSignSection({ isEditMode, role, state, signatures: data });
+	const { disableSignature, disableSubmit } = canSignSection({
+		revisions,
+		isEditMode,
+		role,
+		state,
+		signatures: data,
+	});
 	const watchSignature = watch('signature');
 
 	// Load the proper signature based off type of user
@@ -99,7 +103,7 @@ const SignAndSubmit = () => {
 				<Form layout="vertical" onFinish={() => setOpenModal(true)}>
 					<SectionTitle
 						title={translate('sign-and-submit-section.title')}
-						showLockIcon={!canEdit}
+						showLockIcon={disableSignature}
 						text={translate('sign-and-submit-section.description')}
 						showDivider={false}
 					/>
