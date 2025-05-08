@@ -37,10 +37,10 @@ const ApproveApplicationModal = ({
 	setShowSuccessApproveModal,
 }: ApproveApplicationModalProps) => {
 	const { t: translate } = useTranslation();
-	const { mutateAsync: approveApplication } = useApproveApplication();
+	const { mutateAsync: approveApplication, isPending: isApproving } = useApproveApplication();
 
 	const handleApprove = async () => {
-		await approveApplication({ applicationId: id }).then(() => {
+		approveApplication({ applicationId: id }).then(() => {
 			setIsOpen(false);
 			setShowSuccessApproveModal(true);
 		});
@@ -56,7 +56,7 @@ const ApproveApplicationModal = ({
 			onCancel={() => {
 				setIsOpen(false);
 			}}
-			okButtonProps={{ danger: false, type: 'primary' }}
+			okButtonProps={{ disabled: isApproving, type: 'primary' }}
 			width="100%"
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 		>

@@ -39,7 +39,10 @@
 			"description": "If so, the applicant and collaborators will be notified and will receive access to PCGL Controlled Data.",
 			"notifications": {
 				"applicationApproveSuccess": "Application, PCGL-{{id}}, has been approved.",
-				"applicationApproveFailed": "Application approval failed."
+				"applicationApproveFailed": "Sorry, there was an unexpected error while approving your application. Please try again later."
+			},
+			"buttons": {
+				"sendRequest": "Send Request"
 			}
 		},
 		"authorization": {

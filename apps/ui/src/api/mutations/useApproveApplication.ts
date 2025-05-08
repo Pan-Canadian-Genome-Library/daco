@@ -32,9 +32,8 @@ const useApproveApplication = () => {
 
 	return useMutation<ApplicationResponseData, ServerError, { applicationId: number }>({
 		mutationFn: async ({ applicationId }) => {
-			const response = await fetch(`/application/approve`, {
+			const response = await fetch(`/applications/${applicationId}/approve`, {
 				method: 'POST',
-				body: JSON.stringify({ applicationId }),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();
