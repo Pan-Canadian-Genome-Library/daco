@@ -877,7 +877,7 @@ applicationRouter.post(
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
-			async (request, response: ResponseWithData<JoinedApplicationRecord, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
+			async (request, response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 
@@ -959,7 +959,7 @@ applicationRouter.post(
 		async (
 			request,
 			response: ResponseWithData<
-				JoinedApplicationRecord,
+				ApplicationResponseData,
 				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
 			>,
 		) => {
