@@ -39,11 +39,12 @@ import { type ApplicationOutletContext } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useUserContext } from '@/providers/UserProvider';
+import { canSignSection } from '../utils/canSignSection';
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'sign', isEditMode });
+	const canEdit = canEditSection({ revisions, section: 'sign', isEditMode: true });
 	const [openModal, setOpenModal] = useState(false);
 	const {
 		state: { fields },
@@ -59,13 +60,8 @@ const SignAndSubmit = () => {
 	});
 
 	// Logic
+	const { disableSignature, disableSubmit } = canSignSection({ isEditMode, role, state, signatures: data });
 	const watchSignature = watch('signature');
-	const disableBasedofRole = (role === 'APPLICANT' && canEdit) || role === 'INSTITUTIONAL_REP';
-	const disableBasedofState =
-		state !== 'DRAFT' && // Applicant should be able to submit first draft to rep
-		state !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' && // Applicant should be able to submit application after revisions
-		state !== 'DAC_REVISIONS_REQUESTED' && // Applicant should be able to submit application after revisions
-		state !== 'INSTITUTIONAL_REP_REVIEW'; // Rep should be able to approve the application
 
 	// Load the proper signature based off type of user
 	useEffect(() => {
@@ -117,7 +113,7 @@ const SignAndSubmit = () => {
 								<input disabled type="hidden" name="createdAt" />
 								{!isLoading ? (
 									<ESignature
-										disabled={disableBasedofState || !disableBasedofRole}
+										disabled={disableSignature}
 										signatureRef={signatureRef}
 										name="signature"
 										control={control}
@@ -126,7 +122,7 @@ const SignAndSubmit = () => {
 										setValue={setValue}
 										reset={reset}
 										clearErrors={clearErrors}
-										disableSaveButton={!watchSignature || disableBasedofState || !disableBasedofRole}
+										disableSaveButton={!watchSignature || disableSignature}
 										onSaveClicked={onSaveClicked}
 										downloadButtonText={translate('sign-and-submit-section.section.buttons.download')}
 										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
@@ -139,11 +135,11 @@ const SignAndSubmit = () => {
 					</SectionContent>
 					<SectionFooter
 						currentRoute="sign"
-						isEditMode={disableBasedofRole}
+						isEditMode={disableSubmit}
 						signSubmitHandler={() => {
 							setOpenModal(true);
 						}}
-						submitDisabled={disableBasedofState || !disableBasedofRole}
+						submitDisabled={disableSubmit}
 					/>
 				</Form>
 			</SectionWrapper>
