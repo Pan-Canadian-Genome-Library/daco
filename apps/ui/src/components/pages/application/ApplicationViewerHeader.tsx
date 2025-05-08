@@ -61,6 +61,9 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const { mutateAsync: repRevision } = useRepRevisions();
+	const { mutateAsync: dacRevision } = useDacRevisions();
+	const notification = useNotificationContext();
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: repRevision } = useRepRevisions();
 	const notification = useNotificationContext();
@@ -89,9 +92,35 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					description: translate('modals.applications.global.failure.text'),
 				});
 			});
+		if (state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') {
+			repRevision(data)
+				.then(() => {
+					setOpenRevisionsModal(false);
+					setShowSuccessModal(true);
+				})
+				.catch(() => {
+					notification.openNotification({
+						type: 'error',
+						message: translate('submissionFailed'),
+						description: translate('modals.applications.global.failure.text'),
+					});
+				});
+		} else {
+			dacRevision(data)
+				.then(() => {
+					setOpenRevisionsModal(false);
+					setShowSuccessModal(true);
+				})
+				.catch(() => {
+					notification.openNotification({
+						type: 'error',
+						message: translate('submissionFailed'),
+						description: translate('modals.applications.global.failure.text'),
+					});
+				});
+		}
 	};
 
-	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleCloseApplicationRequest = () => {
 		closeApplication({ applicationId: id }).then(() => {
 			setOpenRevisionsModal(false);
