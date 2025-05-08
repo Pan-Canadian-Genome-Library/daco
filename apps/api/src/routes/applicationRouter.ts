@@ -444,16 +444,16 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/reject',
+	'/:applicationId/reject',
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<
-			{ message: string; data: ApplicationRecord },
+		ApplicationResponseData,
 			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
 		>,
 	) => {
-		const { applicationId }: { applicationId: unknown } = request.body;
+		const applicationId = Number(request.params.applicationId);
 
 		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
 			response.status(400).json({
@@ -467,10 +467,7 @@ applicationRouter.post(
 			const result = await dacRejectApplication({ applicationId });
 
 			if (result.success) {
-				response.status(200).json({
-					message: 'Application rejected successfully.',
-					data: result.data,
-				});
+				response.status(200).json(result.data);
 				return;
 			}
 			switch (result.error) {
@@ -880,7 +877,7 @@ applicationRouter.post(
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
-			async (request, response: ResponseWithData<JoinedApplicationRecord, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
+			async (request, response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 
@@ -962,7 +959,7 @@ applicationRouter.post(
 		async (
 			request,
 			response: ResponseWithData<
-				JoinedApplicationRecord,
+				ApplicationResponseData,
 				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
 			>,
 		) => {
