@@ -362,11 +362,11 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/approve',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<
-			{ message: string; data: ApplicationRecord },
+			{ message: string; data: ApplicationResponseData },
 			['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']
 		>,
 	) => {
@@ -448,10 +448,7 @@ applicationRouter.post(
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
 		request: Request,
-		response: ResponseWithData<
-		ApplicationResponseData,
-			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
-		>,
+		response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 	) => {
 		const applicationId = Number(request.params.applicationId);
 
@@ -662,7 +659,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,

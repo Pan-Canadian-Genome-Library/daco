@@ -20,7 +20,6 @@
 import useApproveApplication from '@/api/mutations/useApproveApplication';
 import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 const { Text } = Typography;
 
@@ -28,17 +27,23 @@ type ApproveApplicationModalProps = {
 	id: number;
 	isOpen: boolean;
 	setIsOpen: (isOpen: boolean) => void;
+	setShowSuccessApproveModal: (isOpen: boolean) => void;
 };
 
-const ApproveApplicationModal = ({ id, isOpen, setIsOpen }: ApproveApplicationModalProps) => {
+const ApproveApplicationModal = ({
+	id,
+	isOpen,
+	setIsOpen,
+	setShowSuccessApproveModal,
+}: ApproveApplicationModalProps) => {
 	const { t: translate } = useTranslation();
-	const navigate = useNavigate();
 	const { mutateAsync: approveApplication } = useApproveApplication();
 
 	const handleApprove = async () => {
-		await approveApplication({ applicationId: id });
-		setIsOpen(false);
-		navigate('/dashboard');
+		await approveApplication({ applicationId: id }).then(() => {
+			setIsOpen(false);
+			setShowSuccessApproveModal(true);
+		});
 	};
 
 	return (
@@ -48,9 +53,12 @@ const ApproveApplicationModal = ({ id, isOpen, setIsOpen }: ApproveApplicationMo
 			cancelText={translate('modals.buttons.cancel')}
 			open={isOpen}
 			onOk={handleApprove}
-			onCancel={() => setIsOpen(false)}
+			onCancel={() => {
+				setIsOpen(false);
+			}}
 			okButtonProps={{ danger: false, type: 'primary' }}
-			style={{ top: '20%', maxWidth: '600px' }}
+			width="100%"
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 		>
 			<Flex vertical gap="middle" style={{ marginTop: 20 }}>
 				<Text>{translate('modals.approveApplication.description')}</Text>

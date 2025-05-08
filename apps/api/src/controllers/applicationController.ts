@@ -295,7 +295,10 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
-}: ApproveApplication): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}: ApproveApplication): AsyncResult<
+	ApplicationResponseData,
+	'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'
+> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -321,9 +324,21 @@ export const approveApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		await service.findOneAndUpdate({ id: applicationId, update });
 
-		return updatedResult;
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const dtoFriendlyData = convertToApplicationRecord(updatedApplication.data);
+
+		if (!dtoFriendlyData.success) {
+			return dtoFriendlyData;
+		}
+
+		return dtoFriendlyData;
 	} catch (error) {
 		logger.error(`Unable to approve application with id: ${applicationId}`, error);
 		return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to approve application.');

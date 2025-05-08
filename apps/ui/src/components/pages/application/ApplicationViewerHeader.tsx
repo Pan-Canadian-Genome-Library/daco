@@ -64,6 +64,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showSuccessRejectsModal, setShowSuccessRejectsModal] = useState(false);
 	const [showApproveModal, setShowApproveModal] = useState(false);
+	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
@@ -184,7 +185,12 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					setIsOpen={setShowRejectModal}
 					setShowSuccessRejectsModal={setShowSuccessRejectsModal}
 				/>
-				<ApproveApplicationModal id={id} isOpen={showApproveModal} setIsOpen={setShowApproveModal} />
+				<ApproveApplicationModal
+					id={id}
+					isOpen={showApproveModal}
+					setIsOpen={setShowApproveModal}
+					setShowSuccessApproveModal={setShowSuccessApproveModal}
+				/>
 				<RequestRevisionsModal
 					onSubmit={onRevisionsSubmit}
 					isOpen={openRevisionsModal}
@@ -201,6 +207,12 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					okText={translate('modals.buttons.ok')}
 					isOpen={showSuccessRejectsModal}
 					onOk={() => setShowSuccessRejectsModal(false)}
+				/>
+				<SuccessModal
+					successText={translate('modals.approveApplication.notifications.applicationApproveSuccess', { id })}
+					okText={translate('modals.buttons.ok')}
+					isOpen={showSuccessApproveModal}
+					onOk={() => setShowSuccessApproveModal(false)}
 				/>
 			</Flex>
 		</PageHeader>
