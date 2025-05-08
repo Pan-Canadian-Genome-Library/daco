@@ -363,13 +363,13 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/:applicationId/approve',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	withParamsSchemaValidation(
 		approveApplicationRequestSchema,
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<ApplicationResponseData, ['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
 

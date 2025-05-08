@@ -49,7 +49,7 @@ const ApproveApplicationModal = ({
 	return (
 		<Modal
 			title={translate('modals.approveApplication.title', { id })}
-			okText={translate('Send Request')}
+			okText={translate('modals.approveApplication.buttons.sendRequest')}
 			cancelText={translate('modals.buttons.cancel')}
 			open={isOpen}
 			onOk={handleApprove}

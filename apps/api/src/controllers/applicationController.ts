@@ -295,10 +295,7 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
-}: ApproveApplication): AsyncResult<
-	ApplicationResponseData,
-	'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'
-> => {
+}: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -326,13 +323,13 @@ export const approveApplication = async ({
 		const update = { state: appStateManager.state, approved_at: new Date() };
 		await service.findOneAndUpdate({ id: applicationId, update });
 
-		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
 		}
 
-		const dtoFriendlyData = convertToApplicationRecord(updatedApplication.data);
+		const dtoFriendlyData = convertToBasicApplicationRecord(updatedApplication.data);
 
 		if (!dtoFriendlyData.success) {
 			return dtoFriendlyData;
