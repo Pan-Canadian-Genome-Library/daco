@@ -18,7 +18,14 @@
 		"startNewApp": "Start A New Application"
 	},
 	"applicationViewer": {
-		"title": "My Application: PCGL-{{id}}"
+		"title": "My Application: PCGL-{{id}}",
+		"steps": {
+			"DRAFT": "Draft",
+			"SIGN_SUBMIT": "Sign & Submit",
+			"REP_REVIEW": "Rep Review",
+			"DAC_REVIEW": "DAC Review",
+			"APPROVED": "Application Approved: Read Only"
+		}
 	},
 	"manage": {
 		"applications": {
@@ -66,7 +73,8 @@
 		"upload": "Upload",
 		"save": "Save Changes",
 		"rejectApp": "Reject Application",
-		"rejectApplication": "Reject"
+		"rejectApplication": "Reject",
+		"revoke": "Revoke Application"
 	},
 	"label": {
 		"created": "Created",
