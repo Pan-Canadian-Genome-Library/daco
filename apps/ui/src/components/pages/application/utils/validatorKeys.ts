@@ -76,7 +76,7 @@ export function isProjectKey(value: string): value is keyof ProjectDTO {
 	return value in projectInformationSchema.keyof().Values;
 }
 
-// Grab fields that are
+// Grab fields that have revision requests
 export function parseRevisedFields(fields: ApplicationContentsResponse, revisedFields: Partial<SectionRevision>) {
 	const result = Object.entries(fields).reduce((acc, item) => {
 		const [key, value] = item;

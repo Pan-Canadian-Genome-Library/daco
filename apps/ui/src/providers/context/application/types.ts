@@ -32,7 +32,7 @@ export type SectionsVisited<T extends string> = {
 };
 
 export interface ApplicationFormState {
-	applicationState: ApplicationStateValues;
+	applicationState?: ApplicationStateValues;
 	fields: Partial<ApplicationContentsResponse>;
 	formState: FormState;
 }
