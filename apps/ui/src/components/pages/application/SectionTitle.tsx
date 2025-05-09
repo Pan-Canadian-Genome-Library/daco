@@ -54,15 +54,17 @@ const SectionTitle = ({
 				) : null}
 			</Flex>
 			<Flex vertical gap={'middle'}>
-				{text && Array.isArray(text)
-					? text.map((text) => {
-							return (
-								<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined} key={text}>
-									{text}
-								</Text>
-							);
-						})
-					: text}
+				{text && Array.isArray(text) ? (
+					text.map((text) => {
+						return (
+							<Text style={textAbidesNewLines ? { whiteSpace: 'pre-line' } : undefined} key={text}>
+								{text}
+							</Text>
+						);
+					})
+				) : (
+					<Text>{text}</Text>
+				)}
 			</Flex>
 			{children}
 			{showDivider && <Divider />}

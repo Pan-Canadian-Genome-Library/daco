@@ -317,7 +317,6 @@ describe('Application Service', () => {
 			assert.ok(result.success);
 
 			const editedApplication = result.data;
-			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
 
 			assert.ok(editedApplication.contents);
 			assert.strictEqual(editedApplication.contents.applicant_first_name, update.applicant_first_name);

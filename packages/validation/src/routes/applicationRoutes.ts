@@ -68,6 +68,7 @@ export const applicationContentsSchema = z
 		acceptedAgreements: z.array(z.enum(agreementEnum)).nullable(),
 		acceptedAppendices: z.array(z.enum(appendicesEnum)).nullable(),
 		requestedStudies: z.array(z.string()).nullable(),
+		signedPdf: z.number().nullable(),
 	})
 	.partial();
 

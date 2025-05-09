@@ -95,7 +95,6 @@ const signatureService = (db: PostgresDb) => ({
 				// Update Related Application
 				const applicationUpdates = {
 					updated_at: sql`NOW()`,
-					state: ApplicationStates.DRAFT,
 				};
 
 				const editedApplication = await transaction

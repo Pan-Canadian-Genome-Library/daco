@@ -72,7 +72,13 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 				) {
 					return true;
 				}
+
 				return false;
+			} else if (
+				step.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW &&
+				currentStatus === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
+			) {
+				return true;
 			}
 
 			return step.state === currentStatus;

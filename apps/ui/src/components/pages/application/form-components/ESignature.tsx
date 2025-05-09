@@ -49,6 +49,8 @@ interface ESignatureProps {
 	saveButtonText: string;
 	disableSaveButton?: boolean;
 	onSaveClicked: () => void;
+	onDownloadClicked: () => void;
+	disableDownloadPDF: boolean;
 }
 
 const SignatureFieldCover = ({ style }: { style: React.CSSProperties }) => {
@@ -145,7 +147,13 @@ const ESignature = <T extends FieldValues>(
 						/>
 						<Flex justify="space-between" style={{ width: '100%', margin: '1rem 0 0 0' }}>
 							<Flex gap={token.margin}>
-								<Button icon={<DownloadOutlined />}>{downloadButtonText}</Button>
+								<Button
+									disabled={props.disableDownloadPDF}
+									onClick={props.onDownloadClicked}
+									icon={<DownloadOutlined />}
+								>
+									{downloadButtonText}
+								</Button>
 							</Flex>
 							<Flex gap={token.margin}>
 								<Button onClick={clearSignature} disabled={disabled}>
