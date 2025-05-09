@@ -33,6 +33,7 @@ const StepOptions = {
 	REP_REVIEW: 'REP_REVIEW',
 	DAC_REVIEW: 'DAC_REVIEW',
 	APPROVED: 'APPROVED',
+	REVOKED: 'REVOKED',
 } as const;
 type StepOptions = (typeof StepOptions)[keyof typeof StepOptions];
 
@@ -128,17 +129,31 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 		});
 	};
 
-	return (
-		<Flex flex={1} style={{ width: '100%' }} gap={2} justify="center" align="center">
-			{currentStatus !== ApplicationStates.APPROVED ? (
-				renderAppStatusItems()
-			) : (
+	const renderStatus = () => {
+		if (currentStatus !== ApplicationStates.APPROVED && currentStatus !== ApplicationStates.REVOKED) {
+			return renderAppStatusItems();
+		} else if (currentStatus === ApplicationStates.APPROVED) {
+			return (
 				<ApplicationStep
 					colour={pcglColours.successPrimary}
 					item={{ state: ApplicationStates.APPROVED, step: StepOptions.APPROVED }}
 					token={token}
 				/>
-			)}
+			);
+		} else {
+			return (
+				<ApplicationStep
+					colour={pcglColours.grey}
+					item={{ state: ApplicationStates.REVOKED, step: StepOptions.REVOKED }}
+					token={token}
+				/>
+			);
+		}
+	};
+
+	return (
+		<Flex flex={1} style={{ width: '100%' }} gap={2} justify="center" align="center">
+			{renderStatus()}
 		</Flex>
 	);
 };

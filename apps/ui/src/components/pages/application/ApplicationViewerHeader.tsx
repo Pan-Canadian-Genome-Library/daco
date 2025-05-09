@@ -32,6 +32,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useNavigate } from 'react-router';
+import RevokeApplicationModal from './modals/RevokeApplicationModal';
 import WithdrawModal from './modals/WithdrawModal';
 
 const { Text } = Typography;
@@ -61,7 +62,8 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
-	const [showSuccessRejectsModal, setShowSuccessRejectsModal] = useState(false);
+	const [showRevokeModal, setShowRevokeModal] = useState(false);
+	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
@@ -116,7 +118,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 		>
 			<Flex style={{ width: '100%' }} justify="center" align="end" vertical>
 				<Row style={{ width: '100%' }} justify={'end'} wrap>
-					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }}>
+					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }} flex={1}>
 						<Flex
 							style={{ height: '100%', width: '100%' }}
 							justify={isLowResDevice ? 'center' : 'end'}
@@ -150,9 +152,15 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					{/* TODO: Disable for MVP */}
 					{/* <Button>{translate('button.history')}</Button> */}
 					{canShowEdit ? <Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button> : null}
-					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
-					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
-					<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
+					{state === ApplicationStates.APPROVED ? (
+						<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
+					) : (
+						<>
+							<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
+							<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
+							<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
+						</>
+					)}
 				</Flex>
 				<WithdrawModal
 					applicationId={id}
@@ -175,12 +183,23 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 						<Text>{translate('modals.closeApplication.description')}</Text>
 					</Flex>
 				</Modal>
+
+				{/* Revoke Modal */}
 				<RejectApplicationModal
 					id={id}
 					isOpen={showRejectModal}
 					setIsOpen={setShowRejectModal}
-					setShowSuccessRejectsModal={setShowSuccessRejectsModal}
+					setShowSuccessRejectsModal={setShowRejectSuccessModal}
 				/>
+				<SuccessModal
+					successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
+					okText={translate('modals.buttons.ok')}
+					isOpen={showRejectSuccessModal}
+					onOk={() => setShowRejectSuccessModal(false)}
+				/>
+				{/* Revoke Modal */}
+
+				{/* Revisions Modal */}
 				<RequestRevisionsModal
 					onSubmit={onRevisionsSubmit}
 					isOpen={openRevisionsModal}
@@ -192,11 +211,12 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					isOpen={showSuccessModal}
 					onOk={() => setShowSuccessModal(false)}
 				/>
-				<SuccessModal
-					successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
-					okText={translate('modals.buttons.ok')}
-					isOpen={showSuccessRejectsModal}
-					onOk={() => setShowSuccessRejectsModal(false)}
+				{/* Revisions Modal */}
+
+				<RevokeApplicationModal
+					applicationId={id}
+					showRevokeModal={showRevokeModal}
+					setShowRevokeModal={setShowRevokeModal}
 				/>
 			</Flex>
 		</PageHeader>

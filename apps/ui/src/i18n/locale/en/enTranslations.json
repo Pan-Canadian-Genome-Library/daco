@@ -24,7 +24,8 @@
 			"SIGN_SUBMIT": "Sign & Submit",
 			"REP_REVIEW": "Rep Review",
 			"DAC_REVIEW": "DAC Review",
-			"APPROVED": "Application Approved: Read Only"
+			"APPROVED": "Application Approved: Read Only",
+			"REVOKED": "Application Revoked: Read Only"
 		}
 	},
 	"manage": {
