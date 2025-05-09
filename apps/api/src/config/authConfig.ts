@@ -49,7 +49,7 @@ function getAuthConfig() {
 		throw new EnvironmentConfigError(`db`, parseResult.error);
 	}
 
-	return { ...parseResult.data, enabled, loginRedirectPath: '/dashboard', logoutRedirectPath: '/' };
+	return { ...parseResult.data, enabled, loginRedirectPath: '/login/redirect', logoutRedirectPath: '/' };
 }
 
 export const authConfig = getAuthConfig();

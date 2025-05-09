@@ -17,13 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './localStorage/sessionExtras.js';
-export * from './modals/rejectApplicationModal.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Layout, Spin, Typography } from 'antd';
+
+const { Content } = Layout;
+const { Text } = Typography;
+
+interface FullscreenLoaderProps {
+	trueFullscreen?: boolean;
+	loadingText?: string;
+}
+
+const FullscreenLoader = ({ trueFullscreen = false, loadingText }: FullscreenLoaderProps) => {
+	if (trueFullscreen && loadingText) {
+		console.error(
+			'Error: FullscreenLoader - Using trueFullscreen with loadingText provided will result in text appearing behind the loader. ',
+		);
+	}
+
+	return (
+		<Content style={{ display: 'flex' }}>
+			<Flex align="center" justify="center" vertical gap={'2rem'} flex={1}>
+				<Spin fullscreen={trueFullscreen} indicator={<LoadingOutlined style={{ fontSize: 56 }} spin />} />
+				{loadingText ? <Text>{loadingText}</Text> : null}
+			</Flex>
+		</Content>
+	);
+};
+
+export default FullscreenLoader;

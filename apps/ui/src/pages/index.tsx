@@ -18,14 +18,14 @@
  */
 
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col, Flex, Layout, Modal, Row, Typography, theme } from 'antd';
+import { Avatar, Button, Col, Flex, Layout, Row, Typography, theme } from 'antd';
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
-import { API_PATH_LOGIN } from '../api/paths';
+import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -45,12 +45,6 @@ const HomePage = () => {
 	const [openModal, setOpenModal] = useState(false);
 
 	const isResponsiveMode = minWidth <= token.screenLG;
-
-	// TODO: Handle the transition over to the the login page
-	const handleLoginButton = () => {
-		setOpenModal(false);
-		window.location.href = API_PATH_LOGIN;
-	};
 
 	return (
 		<Content>
@@ -120,23 +114,7 @@ const HomePage = () => {
 					</Flex>
 				</Col>
 			</Row>
-			<Modal
-				title={translate('links.apply')}
-				okText={translate('button.login')}
-				width={'100%'}
-				style={{
-					top: '20%',
-					maxWidth: '800px',
-					paddingInline: minWidth <= token.screenSM || minWidth >= token.screenXL ? token.padding : token.paddingXL,
-				}}
-				open={openModal}
-				onOk={handleLoginButton}
-				onCancel={() => setOpenModal(false)}
-			>
-				<Flex>
-					<Text>{translate('modals.authorization.description')}</Text>
-				</Flex>
-			</Modal>
+			<ApplyForAccessModal openModal={openModal} setOpenModal={setOpenModal} />
 		</Content>
 	);
 };
