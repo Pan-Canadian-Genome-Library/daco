@@ -34,6 +34,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useNavigate } from 'react-router';
+import ApproveApplicationModal from './modals/ApproveApplicationModal';
 import WithdrawModal from './modals/WithdrawModal';
 
 const { Text } = Typography;
@@ -66,6 +67,8 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showSuccessRejectsModal, setShowSuccessRejectsModal] = useState(false);
+	const [showApproveModal, setShowApproveModal] = useState(false);
+	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
 
 	const isWithdrawable =
 		appState === ApplicationStates.INSTITUTIONAL_REP_REVIEW || appState === ApplicationStates.DAC_REVIEW;
@@ -167,6 +170,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 					<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 					<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 					<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
+					<Button onClick={() => setShowApproveModal(true)}>{translate('button.approveApplication')}</Button>
 				</Flex>
 				<WithdrawModal
 					applicationId={id}
@@ -195,6 +199,12 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 					setIsOpen={setShowRejectModal}
 					setShowSuccessRejectsModal={setShowSuccessRejectsModal}
 				/>
+				<ApproveApplicationModal
+					id={id}
+					isOpen={showApproveModal}
+					setIsOpen={setShowApproveModal}
+					setShowSuccessApproveModal={setShowSuccessApproveModal}
+				/>
 				<RequestRevisionsModal
 					onSubmit={onRevisionsSubmit}
 					isOpen={openRevisionsModal}
@@ -211,6 +221,12 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 					okText={translate('modals.buttons.ok')}
 					isOpen={showSuccessRejectsModal}
 					onOk={() => setShowSuccessRejectsModal(false)}
+				/>
+				<SuccessModal
+					successText={translate('modals.approveApplication.notifications.applicationApproveSuccess', { id })}
+					okText={translate('modals.buttons.ok')}
+					isOpen={showSuccessApproveModal}
+					onOk={() => setShowSuccessApproveModal(false)}
 				/>
 			</Flex>
 		</PageHeader>

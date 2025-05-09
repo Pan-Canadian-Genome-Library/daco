@@ -101,6 +101,11 @@ export const applicationResponseSchema = z.object({
 });
 
 export const basicApplicationResponseSchema = applicationResponseSchema.omit({ contents: true });
+export const approveApplicationRequestSchema = z
+	.object({
+		applicationId: z.coerce.number().nonnegative().min(1).int(),
+	})
+	.strict();
 
 export const revisionDataSchema = z
 	.object({
