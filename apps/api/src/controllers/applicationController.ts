@@ -45,6 +45,7 @@ import {
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
+import { validateRevisedFields } from '@/utils/validation.ts';
 import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -102,6 +103,13 @@ export const editApplication = async ({
 		logger.error(message);
 		return failure('INVALID_STATE_TRANSITION', message);
 	}
+
+	/**
+	 * By default the application service will reset an applications state to DRAFT when edited. We need to avoid this
+	 * behaviour for any applications within the REP_REV or DAC_REV states.
+	 */
+	const shouldKeepState =
+		application.state === 'INSTITUTIONAL_REP_REVISION_REQUESTED' || application.state === 'DAC_REVISIONS_REQUESTED';
 
 	// If the application state is in revision, then we need to verify that only fields that require revision has been sent to the backend
 	if (shouldKeepState) {

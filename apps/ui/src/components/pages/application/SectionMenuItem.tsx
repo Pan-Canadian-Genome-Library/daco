@@ -16,10 +16,9 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { SectionRoutes } from '@/pages/AppRouter';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
+import { SectionRoutes } from '@pcgl-daco/validation';
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
