@@ -75,7 +75,8 @@
 		"save": "Save Changes",
 		"rejectApp": "Reject Application",
 		"rejectApplication": "Reject",
-		"revoke": "Revoke Application"
+		"revoke": "Revoke Application",
+		"approveApplication": "Approve"
 	},
 	"label": {
 		"created": "Created",

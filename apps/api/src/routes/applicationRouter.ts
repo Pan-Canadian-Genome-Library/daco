@@ -54,6 +54,7 @@ import type {
 import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
+	approveApplicationRequestSchema,
 	collaboratorsListParamsSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
@@ -347,7 +348,7 @@ applicationRouter.get(
 applicationRouter.get(
 	'/metadata/counts',
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
-	async (request, response: ResponseWithData<ApplicationStateTotals, ['SYSTEM_ERROR']>) => {
+	async (request: Request, response: ResponseWithData<ApplicationStateTotals, ['SYSTEM_ERROR']>) => {
 		const result = await getApplicationStateTotals();
 
 		if (result.success) {
@@ -361,86 +362,76 @@ applicationRouter.get(
 );
 
 applicationRouter.post(
-	'/approve',
+	'/:applicationId/approve',
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
-	async (
-		request: Request,
-		response: ResponseWithData<
-			{ message: string; data: ApplicationRecord },
-			['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']
-		>,
-	) => {
-		const { applicationId }: { applicationId: unknown } = request.body;
+	withParamsSchemaValidation(
+		approveApplicationRequestSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+		) => {
+			const applicationId = Number(request.params.applicationId);
 
-		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
-			response.status(400).json({
-				error: 'INVALID_REQUEST',
-				message: 'ApplicationId must be a valid number and is required.',
-			});
-			return;
-		}
+			try {
+				const approvalResult = await approveApplication({ applicationId });
 
-		try {
-			const approvalResult = await approveApplication({ applicationId });
+				if (approvalResult.success) {
+					/**
+					 * We want to auto generate a PDF on successful approval, as such call the local createApplicationPDF function.
+					 */
+					const pdfGenerate = await createApplicationPDF({ applicationId });
+					if (pdfGenerate.success) {
+						response.status(200).json(approvalResult.data);
+						return;
+					}
 
-			if (approvalResult.success) {
-				/**
-				 * We want to auto generate a PDF on successful approval, as such call the local createApplicationPDF function.
-				 */
-				const pdfGenerate = await createApplicationPDF({ applicationId });
-				if (pdfGenerate.success) {
-					response.status(200).json({
-						message: 'Application was successfully approved and its corresponding PDF was successfully generated.',
-						data: approvalResult.data,
-					});
-					return;
+					switch (pdfGenerate.error) {
+						case 'NOT_FOUND': {
+							logger.error(
+								`Application ${approvalResult.data.id} was approved, however, PDF was unable to be generated because required data was not found.`,
+							);
+
+							response.status(404).json({
+								error: 'NOT_FOUND',
+								message:
+									'Application was approved, but PDF was unable to be generated because required data was not found.',
+							});
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							logger.error(
+								`Application ${approvalResult.data.id} was approved, however, PDF was unable to be generated. ${pdfGenerate.message}`,
+							);
+
+							response.status(500).json({
+								error: 'SYSTEM_ERROR',
+								message: `Application was successfully approved, however, a PDF generation error occurred. ${pdfGenerate.message}`,
+							});
+							return;
+						}
+					}
 				}
 
-				switch (pdfGenerate.error) {
-					case 'NOT_FOUND': {
-						logger.error(
-							`Application ${approvalResult.data.id} was approved, however, PDF was unable to be generated because required data was not found.`,
-						);
-
-						response.status(404).json({
-							error: 'NOT_FOUND',
-							message:
-								'Application was approved, but PDF was unable to be generated because required data was not found.',
-						});
+				switch (approvalResult.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: approvalResult.message });
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						logger.error(
-							`Application ${approvalResult.data.id} was approved, however, PDF was unable to be generated. ${pdfGenerate.message}`,
-						);
-
-						response.status(500).json({
-							error: 'SYSTEM_ERROR',
-							message: `Application was successfully approved, however, a PDF generation error occurred. ${pdfGenerate.message}`,
-						});
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: approvalResult.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
 						return;
 					}
 				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later.` });
 			}
-
-			switch (approvalResult.error) {
-				case 'INVALID_STATE_TRANSITION': {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: approvalResult.message });
-					return;
-				}
-				case 'SYSTEM_ERROR': {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: approvalResult.message });
-					return;
-				}
-				case 'NOT_FOUND': {
-					response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
-					return;
-				}
-			}
-		} catch (error) {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later..` });
-		}
-	},
+		},
+	),
 );
 
 applicationRouter.post(
@@ -448,10 +439,7 @@ applicationRouter.post(
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
 		request: Request,
-		response: ResponseWithData<
-		ApplicationResponseData,
-			['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']
-		>,
+		response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 	) => {
 		const applicationId = Number(request.params.applicationId);
 
@@ -662,7 +650,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
@@ -877,7 +865,7 @@ applicationRouter.post(
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
-			async (request, response: ResponseWithData<JoinedApplicationRecord, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
+			async (request, response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 
@@ -959,7 +947,7 @@ applicationRouter.post(
 		async (
 			request,
 			response: ResponseWithData<
-				JoinedApplicationRecord,
+				ApplicationResponseData,
 				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
 			>,
 		) => {
