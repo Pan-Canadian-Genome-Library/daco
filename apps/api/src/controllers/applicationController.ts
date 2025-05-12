@@ -347,7 +347,7 @@ export const approveApplication = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			logger.error(`Unable to retrieve information to send approval email: ${applicationId}`, resultContents);
 			return dtoFriendlyData;
 		}
 
@@ -363,7 +363,7 @@ export const approveApplication = async ({
 
 		if (!collaboratorResponse.success) {
 			logger.error(
-				`Unable to retrieve information to send email to collaborators: ${applicationId}`,
+				`Unable to retrieve information to send approval email to collaborators: ${applicationId}`,
 				collaboratorResponse,
 			);
 			return dtoFriendlyData;
@@ -433,7 +433,7 @@ export const dacRejectApplication = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			logger.error(`Unable to retrieve information to send reject email: ${applicationId}`, resultContents);
 			return dtoFriendlyData;
 		}
 
@@ -497,7 +497,10 @@ export const submitRevision = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			logger.error(
+				`Unable to retrieve information to send submitted revisions email: ${applicationId}`,
+				resultContents,
+			);
 			return submittedRevision;
 		}
 
@@ -617,7 +620,10 @@ export const requestApplicationRevisionsByDac = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			logger.error(
+				`Unable to retrieve information to send dac revisions requested email: ${applicationId}`,
+				resultContents,
+			);
 			return aliasResult;
 		}
 
@@ -694,7 +700,10 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 		}
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			logger.error(
+				`Unable to retrieve information to send institutional rep revisions request email: ${applicationId}`,
+				resultContents,
+			);
 			return aliasResult;
 		}
 
@@ -759,7 +768,7 @@ export const submitApplication = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			logger.error(`Unable to retrieve information to send submission email: ${applicationId}`, resultContents);
 			return submissionResult;
 		}
 

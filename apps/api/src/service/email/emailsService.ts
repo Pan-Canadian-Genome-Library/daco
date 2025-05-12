@@ -96,7 +96,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
+			const message = `Error sending email - sendEmailInstitutionalRepForReview`;
 
 			logger.error(message, error);
 
@@ -143,7 +143,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
+			const message = `Error sending email - sendEmailApplicantRepRevisions`;
 
 			logger.error(message, error);
 
@@ -175,7 +175,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
+			const message = `Error sending email - sendEmailApplicantApplicationSubmitted`;
 
 			logger.error(message, error);
 
@@ -208,7 +208,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
+			const message = `Error sending email - sendEmailDacForReview`;
 
 			logger.error(message, error);
 
@@ -241,7 +241,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
+			const message = `Error sending email - sendEmailApplicantDacRevisions`;
 
 			logger.error(message, error);
 
@@ -274,8 +274,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
-
+			const message = `Error sending email - sendEmailDacForSubmittedRevisions`;
 			logger.error(message, error);
 
 			return failure('SYSTEM_ERROR', message);
@@ -307,8 +306,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
-
+			const message = `Error sending email - sendEmailApproval`;
 			logger.error(message, error);
 
 			return failure('SYSTEM_ERROR', message);
@@ -340,7 +338,7 @@ const emailSvc = () => ({
 
 			return success(response);
 		} catch (error) {
-			const message = `An error has occurred sending the email`;
+			const message = `Error sending email - sendEmailReject`;
 
 			logger.error(message, error);
 
