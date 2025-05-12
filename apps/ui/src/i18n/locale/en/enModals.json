@@ -5,8 +5,8 @@
 			"ok": "OK"
 		},
 		"editApplication": {
-			"title": "Are you sure you want to edit Application: PCGL-{{id}}",
-			"description": "If so, the application will move back into Draft status and you will need to resubmit the application for review.",
+			"title": "Are you sure you want to edit application PCGL-{{id}}",
+			"description": "Your application PCGL-{{id}} has already been submitted for review. If you choose to edit it, the application will be moved back to Draft status, requiring you to resubmit it for review. Please note that this will extend the processing time. We recommend making changes only when absolutely necessary.",
 			"buttons": {
 				"edit": "Edit Application"
 			},
@@ -23,6 +23,26 @@
 			"notifications": {
 				"closeApplicationSuccess": "Your application, PCGL-{{id}}, has been closed.",
 				"closeApplicationFailed": "Sorry, there was an unexpected error while closing your application. Please try again later."
+			}
+		},
+		"rejectApplication": {
+			"title": "Are you sure you want to reject Application: PCGL-{{id}}",
+			"description": "If so, the applicant will be notified and will be unable to reopen this application.",
+			"rejectionReasonLabel": "Details from the PCGL DACO Team::",
+			"notifications": {
+				"rejectApplicationSuccess": "Your application, PCGL-{{id}}, has been rejected.",
+				"rejectApplicationFailed": "Sorry, there was an unexpected error while rejecting your application. Please try again later."
+			}
+		},
+		"approveApplication": {
+			"title": "Are you sure you want to approve Application: PCGL-{{id}}",
+			"description": "If so, the applicant and collaborators will be notified and will receive access to PCGL Controlled Data.",
+			"notifications": {
+				"applicationApproveSuccess": "Application, PCGL-{{id}}, has been approved.",
+				"applicationApproveFailed": "Sorry, there was an unexpected error while approving your application. Please try again later."
+			},
+			"buttons": {
+				"sendRequest": "Send Request"
 			}
 		},
 		"authorization": {
@@ -46,6 +66,9 @@
 				},
 				"success": {
 					"text": "Request for revisions has been sent to Application PCGL-{{id}}"
+				},
+				"failure": {
+					"text": "Request for revisions has failed"
 				}
 			}
 		}

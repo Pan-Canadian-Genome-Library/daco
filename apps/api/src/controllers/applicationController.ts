@@ -295,7 +295,7 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
-}: ApproveApplication): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -321,9 +321,21 @@ export const approveApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		await service.findOneAndUpdate({ id: applicationId, update });
 
-		return updatedResult;
+		const updatedApplication = await service.getApplicationById({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const dtoFriendlyData = convertToBasicApplicationRecord(updatedApplication.data);
+
+		if (!dtoFriendlyData.success) {
+			return dtoFriendlyData;
+		}
+
+		return dtoFriendlyData;
 	} catch (error) {
 		logger.error(`Unable to approve application with id: ${applicationId}`, error);
 		return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to approve application.');
@@ -334,7 +346,7 @@ export const dacRejectApplication = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -356,9 +368,20 @@ export const dacRejectApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, updated_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		await service.findOneAndUpdate({ id: applicationId, update });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
 
-		return updatedResult;
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const dtoFriendlyData = convertToApplicationRecord(updatedApplication.data);
+
+		if (!dtoFriendlyData.success) {
+			return dtoFriendlyData;
+		}
+
+		return dtoFriendlyData;
 	} catch (error) {
 		const message = `Unable to reject application with id: ${applicationId}`;
 		logger.error(message);
@@ -453,7 +476,7 @@ export const requestApplicationRevisionsByDac = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -483,7 +506,19 @@ export const requestApplicationRevisionsByDac = async ({
 			return revisionRequestResult;
 		}
 
-		return service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+
+		if (!aliasResult.success) {
+			return aliasResult;
+		}
+
+		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
 
@@ -497,7 +532,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -527,7 +562,19 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return revisionRequestResult;
 		}
 
-		return service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+
+		if (!aliasResult.success) {
+			return aliasResult;
+		}
+
+		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
 
