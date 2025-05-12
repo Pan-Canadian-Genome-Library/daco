@@ -17,13 +17,38 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './localStorage/sessionExtras.js';
-export * from './modals/rejectApplicationModal.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { ExtraSessionInformation, ExtraSessionInformationSchema } from '@pcgl-daco/validation';
+
+const SESSION_INFO_KEY = 'pcgl-daco-session';
+
+function clearExtraSessionInformation() {
+	localStorage.removeItem(SESSION_INFO_KEY);
+}
+
+function getExtraSessionInformation() {
+	const extraSessionInfo = localStorage.getItem(SESSION_INFO_KEY);
+
+	if (extraSessionInfo) {
+		const parsedSession = JSON.parse(extraSessionInfo);
+		const parsedSessionInfo = ExtraSessionInformationSchema.safeParse(parsedSession);
+
+		if (parsedSessionInfo.success) {
+			return parsedSessionInfo.data;
+		}
+		clearExtraSessionInformation();
+
+		return null;
+	}
+}
+
+function setExtraSessionInformation(sessionInfo: ExtraSessionInformation) {
+	const validSessionInfo = ExtraSessionInformationSchema.safeParse(sessionInfo);
+
+	if (validSessionInfo.success) {
+		localStorage.setItem(SESSION_INFO_KEY, JSON.stringify(sessionInfo));
+	}
+
+	return validSessionInfo.success;
+}
+
+export { clearExtraSessionInformation, getExtraSessionInformation, setExtraSessionInformation };
