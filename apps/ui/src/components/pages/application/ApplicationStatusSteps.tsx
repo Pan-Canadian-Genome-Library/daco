@@ -34,6 +34,8 @@ const StepOptions = {
 	DAC_REVIEW: 'DAC_REVIEW',
 	APPROVED: 'APPROVED',
 	REVOKED: 'REVOKED',
+	REJECTED: 'REJECTED',
+	CLOSED: 'CLOSED',
 } as const;
 type StepOptions = (typeof StepOptions)[keyof typeof StepOptions];
 
@@ -130,7 +132,12 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 	};
 
 	const renderStatus = () => {
-		if (currentStatus !== ApplicationStates.APPROVED && currentStatus !== ApplicationStates.REVOKED) {
+		if (
+			currentStatus !== ApplicationStates.APPROVED &&
+			currentStatus !== ApplicationStates.REVOKED &&
+			currentStatus !== ApplicationStates.REJECTED &&
+			currentStatus !== ApplicationStates.CLOSED
+		) {
 			return renderAppStatusItems();
 		} else if (currentStatus === ApplicationStates.APPROVED) {
 			return (
@@ -140,11 +147,27 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 					token={token}
 				/>
 			);
-		} else {
+		} else if (currentStatus === ApplicationStates.REVOKED) {
 			return (
 				<ApplicationStep
 					colour={pcglColours.grey}
 					item={{ state: ApplicationStates.REVOKED, step: StepOptions.REVOKED }}
+					token={token}
+				/>
+			);
+		} else if (currentStatus === ApplicationStates.REJECTED) {
+			return (
+				<ApplicationStep
+					colour={pcglColours.grey}
+					item={{ state: ApplicationStates.REJECTED, step: StepOptions.REJECTED }}
+					token={token}
+				/>
+			);
+		} else {
+			return (
+				<ApplicationStep
+					colour={pcglColours.grey}
+					item={{ state: ApplicationStates.CLOSED, step: StepOptions.CLOSED }}
 					token={token}
 				/>
 			);

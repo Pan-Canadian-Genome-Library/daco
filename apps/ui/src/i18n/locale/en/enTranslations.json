@@ -25,7 +25,9 @@
 			"REP_REVIEW": "Rep Review",
 			"DAC_REVIEW": "DAC Review",
 			"APPROVED": "Application Approved: Read Only",
-			"REVOKED": "Application Revoked: Read Only"
+			"REVOKED": "Application Revoked: Read Only",
+			"REJECTED": "Application Rejected: Read Only",
+			"CLOSED": "Application Closed: Read Only"
 		}
 	},
 	"manage": {
