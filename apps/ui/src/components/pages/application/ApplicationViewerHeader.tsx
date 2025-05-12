@@ -23,17 +23,19 @@ import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
+import ApproveApplicationModal from '@/components/pages/application/modals/ApproveApplicationModal';
 import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
+import RevokeApplicationModal from '@/components/pages/application/modals/RevokeApplicationModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
+import WithdrawModal from '@/components/pages/application/modals/WithdrawModal';
 import PageHeader from '@/components/pages/global/PageHeader';
+import ProtectedComponent from '@/components/ProtectedComponent';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useNavigate } from 'react-router';
-import RevokeApplicationModal from './modals/RevokeApplicationModal';
-import WithdrawModal from './modals/WithdrawModal';
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -63,10 +65,11 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showRevokeModal, setShowRevokeModal] = useState(false);
+	const [showApprovalModal, setShowApprovalModal] = useState(false);
 	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
+	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
 
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
-	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
 
 	const navigate = useNavigate();
 
@@ -91,6 +94,46 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 		} else if (state === 'DRAFT') {
 			navigate(`${currentSection}/edit`, { replace: true });
 		}
+	};
+
+	const renderHeaderButtons = () => {
+		const buttons = [];
+
+		if ((state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode) {
+			console.log('here?');
+			buttons.push(
+				<ProtectedComponent requiredRoles={['APPLICANT']}>
+					<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>
+				</ProtectedComponent>,
+			);
+		}
+
+		buttons.push(
+			<ProtectedComponent requiredRoles={['DAC_MEMBER', 'APPLICANT']} requiredStates={['APPROVED']}>
+				<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
+			</ProtectedComponent>,
+			<ProtectedComponent requiredRoles={['INSTITUTIONAL_REP']} requiredStates={['INSTITUTIONAL_REP_REVIEW']}>
+				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
+			</ProtectedComponent>,
+			<ProtectedComponent requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
+				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
+			</ProtectedComponent>,
+			<ProtectedComponent
+				requiredRoles={['APPLICANT']}
+				requiredStates={['DRAFT', 'INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW']}
+			>
+				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
+			</ProtectedComponent>,
+			<ProtectedComponent requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
+				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
+			</ProtectedComponent>,
+			<ProtectedComponent requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
+				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
+				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
+			</ProtectedComponent>,
+		);
+
+		return buttons;
 	};
 
 	const formatDate = (createdAt: Date, updatedAt: Date) => {
@@ -149,18 +192,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 						marginInline: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
 					}}
 				>
-					{/* TODO: Disable for MVP */}
-					{/* <Button>{translate('button.history')}</Button> */}
-					{canShowEdit ? <Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button> : null}
-					{state === ApplicationStates.APPROVED ? (
-						<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
-					) : (
-						<>
-							<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
-							<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
-							<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
-						</>
-					)}
+					{renderHeaderButtons()}
 				</Flex>
 				<WithdrawModal
 					applicationId={id}
@@ -213,11 +245,28 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 				/>
 				{/* Revisions Modal */}
 
+				{/* Revoke Modal */}
 				<RevokeApplicationModal
 					applicationId={id}
 					showRevokeModal={showRevokeModal}
 					setShowRevokeModal={setShowRevokeModal}
 				/>
+				{/* Revoke Modal */}
+
+				{/* Approval Modal */}
+				<ApproveApplicationModal
+					id={id}
+					isOpen={showApprovalModal}
+					setIsOpen={setShowApprovalModal}
+					setShowSuccessApproveModal={setShowSuccessApproveModal}
+				/>
+				<SuccessModal
+					successText={translate('modals.approveApplication.notifications.applicationApproveSuccess', { id })}
+					okText={translate('modals.buttons.ok')}
+					isOpen={showSuccessApproveModal}
+					onOk={() => setShowSuccessApproveModal(false)}
+				/>
+				{/* Approval Modal */}
 			</Flex>
 		</PageHeader>
 	);

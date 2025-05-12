@@ -1024,7 +1024,7 @@ applicationRouter.post(
 
 applicationRouter.get(
 	'/:applicationId/revisions',
-	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'] }),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
