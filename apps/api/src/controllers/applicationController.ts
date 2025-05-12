@@ -329,11 +329,25 @@ export const approveApplication = async ({
 		if (!updatedResult.success) {
 			return updatedResult;
 		}
+
+		const updatedApplication = await service.getApplicationById({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const dtoFriendlyData = convertToBasicApplicationRecord(updatedApplication.data);
+
+		if (!dtoFriendlyData.success) {
+			return dtoFriendlyData;
+		}
+
 		// Fetch the application with contents to send the email
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			return dtoFriendlyData;
 		}
 
 		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
@@ -347,7 +361,11 @@ export const approveApplication = async ({
 		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
 
 		if (!collaboratorResponse.success) {
-			return failure('SYSTEM_ERROR', 'Error retrieving collaborators to send emails to');
+			logger.error(
+				`Unable to retrieve information to send email to collaborators: ${applicationId}`,
+				collaboratorResponse,
+			);
+			return dtoFriendlyData;
 		}
 
 		collaboratorResponse.data.forEach((collab) => {
@@ -357,18 +375,6 @@ export const approveApplication = async ({
 				name: collab.first_name || 'N/A',
 			});
 		});
-
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
-
-		if (!updatedApplication.success) {
-			return updatedApplication;
-		}
-
-		const dtoFriendlyData = convertToBasicApplicationRecord(updatedApplication.data);
-
-		if (!dtoFriendlyData.success) {
-			return dtoFriendlyData;
-		}
 
 		return dtoFriendlyData;
 	} catch (error) {
@@ -426,7 +432,8 @@ export const dacRejectApplication = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			return dtoFriendlyData;
 		}
 
 		const { applicant_institutional_email, applicant_first_name } = resultContents.data.contents;
@@ -489,7 +496,8 @@ export const submitRevision = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			return submittedRevision;
 		}
 
 		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
@@ -592,22 +600,6 @@ export const requestApplicationRevisionsByDac = async ({
 			return revisionRequestResult;
 		}
 
-		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
-
-		if (!resultContents.success || !resultContents.data.contents) {
-			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
-		}
-
-		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
-
-		emailService.sendEmailApplicantDacRevisions({
-			id: application.id,
-			to: institutional_rep_email,
-			applicantName: applicant_first_name || 'N/A',
-			comments: revisionRequestResult.data,
-		});
-
 		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!updatedApplication.success) {
@@ -620,10 +612,26 @@ export const requestApplicationRevisionsByDac = async ({
 			return aliasResult;
 		}
 
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			return aliasResult;
+		}
+
+		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
+
+		emailService.sendEmailApplicantDacRevisions({
+			id: application.id,
+			to: institutional_rep_email,
+			applicantName: applicant_first_name || 'N/A',
+			comments: revisionRequestResult.data,
+		});
+
 		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
-
 		return failure('SYSTEM_ERROR', 'An error occurred while processing the request.');
 	}
 };
@@ -672,8 +680,21 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return resultContents;
 		}
 
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+
+		if (!aliasResult.success) {
+			return aliasResult;
+		}
+
 		if (!resultContents.success || !resultContents.data.contents) {
-			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			return aliasResult;
 		}
 
 		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
@@ -687,18 +708,6 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			institutionalRepLastName: institutional_rep_last_name || 'N/A',
 			comments: revisionRequestResult.data,
 		});
-
-		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
-
-		if (!updatedApplication.success) {
-			return updatedApplication;
-		}
-
-		const aliasResult = convertToApplicationRecord(updatedApplication.data);
-
-		if (!aliasResult.success) {
-			return aliasResult;
-		}
 
 		return aliasResult;
 	} catch (error) {
@@ -749,7 +758,8 @@ export const submitApplication = async ({
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
-			return failure('SYSTEM_ERROR', 'Error retrieving application contents');
+			logger.error(`Unable to retrieve information to send email: ${applicationId}`, resultContents);
+			return submissionResult;
 		}
 
 		const {
