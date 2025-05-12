@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getEmailConfig } from '@/config/emailConfig.ts';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
@@ -779,10 +780,14 @@ export const submitApplication = async ({
 				submittedDate: submissionResult.data.created_at,
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+			const {
+				email: { dacAddress },
+			} = getEmailConfig;
+
 			// Send email to DAC for review
 			emailService.sendEmailDacForReview({
 				id: application.id,
-				to: institutional_rep_email || 'DAC@email.com', // TODO: make this DAC email
+				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: submissionResult.data.created_at,
 			});

@@ -29,6 +29,7 @@ export const emailConfigSchema = z.object({
 	EMAIL_FROM_ADDRESS: z.string().email(),
 	EMAIL_FROM_NAME: z.string(),
 	EMAIL_CONTACT_ADDRESS: z.string().email(),
+	EMAIL_DACO_ADDRESS: z.string().email(),
 	IMAGE_BASE_URL: z.string(),
 	EMAIL_USER: z.string(),
 	EMAIL_PASSWORD: z.string(),
@@ -52,6 +53,7 @@ export const getEmailConfig = {
 		fromAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
 		fromName: parseResult.data.EMAIL_FROM_NAME,
 		contactAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
+		dacAddress: parseResult.data.EMAIL_DACO_ADDRESS,
 		auth: {
 			user: parseResult.data.EMAIL_USER,
 			password: parseResult.data.EMAIL_PASSWORD,
