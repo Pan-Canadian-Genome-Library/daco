@@ -28,7 +28,7 @@ export const emailConfigSchema = z.object({
 	EMAIL_PORT: z.coerce.number().default(1025),
 	EMAIL_FROM_ADDRESS: z.string().email(),
 	EMAIL_FROM_NAME: z.string(),
-	EMAIL_CONTACT_ADDRESS: z.string(),
+	EMAIL_CONTACT_ADDRESS: z.string().email(),
 	IMAGE_BASE_URL: z.string(),
 	EMAIL_USER: z.string(),
 	EMAIL_PASSWORD: z.string(),
