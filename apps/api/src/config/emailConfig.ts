@@ -23,15 +23,15 @@ import EnvironmentConfigError from './EnvironmentConfigError.ts';
 export const emailConfigSchema = z.object({
 	IS_PROD: z.string().optional().default('false'),
 	PORT: z.coerce.number().optional().default(3000),
-	UI_HOST: z.string().url().optional().default('http://localhost:5173'),
-	EMAIL_HOST: z.string().default('localhost'),
-	EMAIL_PORT: z.coerce.number().optional().default(1025),
-	EMAIL_FROM_ADDRESS: z.string().email().optional().default('noreply@pcgl.ca'),
+	UI_HOST: z.string().url(),
+	EMAIL_HOST: z.string(),
+	EMAIL_PORT: z.coerce.number().default(1025),
+	EMAIL_FROM_ADDRESS: z.string().email(),
 	EMAIL_FROM_NAME: z.string(),
 	EMAIL_CONTACT_ADDRESS: z.string(),
 	IMAGE_BASE_URL: z.string(),
-	EMAIL_USER: z.string().optional(),
-	EMAIL_PASSWORD: z.string().optional(),
+	EMAIL_USER: z.string(),
+	EMAIL_PASSWORD: z.string(),
 });
 
 const parseResult = emailConfigSchema.safeParse(process.env);
