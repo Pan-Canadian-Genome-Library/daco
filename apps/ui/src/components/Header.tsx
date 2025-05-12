@@ -107,14 +107,14 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
-		} else if (isLoggedIn && role === 'DAC_MEMBER') {
+		} else if (role === 'DAC_MEMBER') {
 			return {
 				name: translate('links.manageApplications'),
 				href: '/manage/applications',
 				position: 'right',
 				target: '_self',
 			};
-		} else if (isLoggedIn && role === 'APPLICANT') {
+		} else if (role === 'APPLICANT') {
 			return {
 				name: translate('links.myApplications'),
 				href: '/dashboard',

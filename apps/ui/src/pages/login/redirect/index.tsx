@@ -31,14 +31,10 @@ const LoginRedirect = () => {
 
 	const redirectRep = () => {
 		const sessionInfo = getExtraSessionInformation();
-
-		if (!sessionInfo) {
-			return '/';
-		}
-
-		if (sessionInfo.role === 'INSTITUTIONAL_REP') {
+		if (sessionInfo && sessionInfo.role === 'INSTITUTIONAL_REP') {
 			return `/application/${sessionInfo.applicationId}/`;
 		}
+		return '/';
 	};
 
 	useEffect(() => {
@@ -50,7 +46,7 @@ const LoginRedirect = () => {
 				navigate('/manage/applications', { replace: true });
 				break;
 			case 'INSTITUTIONAL_REP':
-				navigate(redirectRep() ?? '/', { replace: true });
+				navigate(redirectRep(), { replace: true });
 				break;
 			default:
 				navigate('/', { replace: true });
