@@ -32,6 +32,7 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
 import { Nullable, type ApplicationOutletContext } from '@/global/types';
+import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationAgreements } from '@pcgl-daco/data-model';
 
@@ -40,7 +41,8 @@ const rule = createSchemaFieldRule(agreementsSchema);
 
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const canEdit = canEditSection({ revisions, section: 'agreement', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {
@@ -89,13 +91,14 @@ const AccessAgreement = () => {
 				form={form}
 				layout="vertical"
 				onBlur={() => {
-					if (isEditMode) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					textAbidesNewLines={true}
+					showLockIcon={!canEdit}
 					title={translate('data-access-section.title')}
 					text={[translate('data-access-section.description1')]}
 				/>
@@ -120,7 +123,7 @@ const AccessAgreement = () => {
 								control={control}
 								rule={rule}
 								name="acceptedAgreements"
-								disabled={!isEditMode}
+								disabled={!canEdit}
 								label={translate('data-access-section.section3.description')}
 								options={agreementOptions}
 							/>
@@ -130,7 +133,7 @@ const AccessAgreement = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}></Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="agreement" isEditMode={isEditMode} />
+				<SectionFooter currentRoute="agreement" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

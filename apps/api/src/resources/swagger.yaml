@@ -281,18 +281,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApplicationRecord'
 
-  /applications/approve:
+  /applications/{applicationId}/approve:
     post:
       tags:
         - Applications
       summary: Approve an application.
-      requestBody:
-        description: Request body containing approval details.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requests/ApproveApplication'
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to approve.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
       responses:
         '200':
           description: Application successfully approved.
@@ -319,11 +320,19 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
 
-  /applications/reject:
+  /applications/{applicationId}/reject:
     post:
       tags:
         - Applications
       summary: Reject an application
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to retrieve the signature from.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
       description: Allows DAC to reject an application. Rejected applications cannot be reopened or changed.
       requestBody:
         description: Request body containing rejection details.
@@ -347,44 +356,6 @@ paths:
                 $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'Application successfully rejected'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ApplicationResponse'
-
-  /applications/{applicationId}/submit-revision:
-    post:
-      tags:
-        - Applications
-      summary: Submit revisions for an application
-      description: Allows applicants to submit requested revisions for DAC or Rep review.
-      parameters:
-        - name: applicationId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '500':
-          description: 'Cannot reject application by ID'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-        '400':
-          description: 'Error submitting revision. Request validation failed.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/RequestValidationError'
-        '404':
-          description: 'Invalid request or submit revision not allowed'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
-        '200':
-          description: 'Application successfully submitted for revision'
           content:
             application/json:
               schema:
@@ -960,15 +931,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Revisions fetched successfully.'
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/RevisionDetails'
+                type: array
+                items:
+                  $ref: '#/components/schemas/RevisionDetails'
         '400':
           description: Invalid request - applicationId is missing or invalid.
           content:
@@ -987,6 +952,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
+  /applications/{applicationId}/submit-revisions:
+    post:
+      tags:
+        - Revisions
+      summary: Submit revisions for an application
+      description: Allows applicants to submit requested revisions for DAC or Rep review.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '500':
+          description: 'Cannot reject application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error submitting revision. Request validation failed.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: 'Invalid request or submit revision not allowed'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application successfully submitted for revision'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/BasicApplicationResponse'
 
   /file/{fileId}/download:
     get:
@@ -1722,6 +1725,50 @@ components:
           description: 'Additional comments'
 
   responses:
+    BasicApplicationResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        userId:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              DAC_REVISIONS_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
+          description: The current state that the application is in.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the application was created
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+
     ApplicationResponse:
       type: object
       properties:

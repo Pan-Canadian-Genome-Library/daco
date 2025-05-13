@@ -100,28 +100,41 @@ export const applicationResponseSchema = z.object({
 });
 
 export const basicApplicationResponseSchema = applicationResponseSchema.omit({ contents: true });
+export const approveApplicationRequestSchema = z
+	.object({
+		applicationId: z.coerce.number().nonnegative().min(1).int(),
+	})
+	.strict();
 
 export const revisionDataSchema = z
 	.object({
-		comments: z.string().optional(),
-		applicantNotes: z.string().optional(),
+		comments: z.string().nullish(),
+		applicantNotes: z.string().nullish(),
 		applicantApproved: z.boolean(),
 		institutionRepApproved: z.boolean(),
-		institutionRepNotes: z.string().optional(),
+		institutionRepNotes: z.string().nullish(),
 		collaboratorsApproved: z.boolean(),
-		collaboratorsNotes: z.string().optional(),
+		collaboratorsNotes: z.string().nullish(),
 		projectApproved: z.boolean(),
-		projectNotes: z.string().optional(),
+		projectNotes: z.string().nullish(),
 		requestedStudiesApproved: z.boolean(),
-		requestedStudiesNotes: z.string().optional(),
+		requestedStudiesNotes: z.string().nullish(),
 		ethicsApproved: z.boolean(),
-		ethicsNotes: z.string().optional(),
+		ethicsNotes: z.string().nullish(),
 		agreementsApproved: z.boolean(),
-		agreementsNotes: z.string().optional(),
+		agreementsNotes: z.string().nullish(),
 		appendicesApproved: z.boolean(),
-		appendicesNotes: z.string().optional(),
+		appendicesNotes: z.string().nullish(),
 		signAndSubmitApproved: z.boolean(),
-		signAndSubmitNotes: z.string().optional(),
+		signAndSubmitNotes: z.string().nullish(),
+	})
+	.strict();
+
+export const revisionDataResponseSchema = revisionDataSchema
+	.extend({
+		id: z.number().nonnegative(),
+		applicationId: z.number().nonnegative(),
+		createdAt: z.date(),
 	})
 	.strict();
 

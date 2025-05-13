@@ -21,19 +21,31 @@ import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
+import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
+import { filesSvc } from '@/service/fileService.ts';
+import { pdfService } from '@/service/pdf/pdfService.ts';
+import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
 	type ApplicationService,
+	type CollaboratorsService,
+	type FilesService,
 	type JoinedApplicationRecord,
+	type PDFService,
 	type RevisionRequestModel,
+	type SignatureService,
 } from '@/service/types.js';
 import {
 	convertToApplicationContentsRecord,
 	convertToApplicationRecord,
 	convertToBasicApplicationRecord,
+	convertToCollaboratorRecords,
+	convertToFileRecord,
+	convertToRevisionsRecord,
+	convertToSignatureRecord,
 } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
-import type { ApplicationDTO, ApplicationResponseData, ApproveApplication } from '@pcgl-daco/data-model';
+import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
@@ -78,8 +90,11 @@ export const editApplication = async ({
 	}
 
 	const application = result.data;
-
 	const { edit } = ApplicationStateEvents;
+
+	/**
+	 * FIXME: This does not prevent editing of fields that have already been approved. This needs to be added.
+	 */
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
 	if (!canEditResult.success) {
@@ -160,6 +175,111 @@ export const getApplicationStateTotals = async () => {
 
 	return await service.applicationStateTotals();
 };
+
+/**
+ * Generates a PDF with the application data provided in the various application tables.
+ * @param applicationId - The ID of the application within the database.
+ * @returns Success with a Buffer containing the PDF / Failure with Error.
+ */
+export const createApplicationPDF = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<Uint8Array<ArrayBufferLike>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	const database = getDbInstance();
+	const applicationService: ApplicationService = applicationSvc(database);
+	const signatureService: SignatureService = signatureSvc(database);
+	const collaboratorsService: CollaboratorsService = collaboratorsSvc(database);
+	const fileService: FilesService = filesSvc(database);
+
+	const pdfRepo: PDFService = pdfService();
+
+	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
+
+	if (!applicationContents.success) {
+		return applicationContents;
+	}
+
+	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
+	if (!signatureContents.success) {
+		return signatureContents;
+	}
+
+	const collaboratorsContents = await collaboratorsService.listCollaborators(applicationId);
+	if (!collaboratorsContents.success) {
+		return collaboratorsContents;
+	}
+
+	const ethicsLetterID = applicationContents.data.contents?.ethics_letter;
+
+	if (!ethicsLetterID) {
+		return failure('SYSTEM_ERROR', 'No ethics approval or exemption file was found, unable to generate PDF.');
+	}
+
+	const fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
+
+	if (!fileContents.success) {
+		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
+	}
+
+	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
+	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
+	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
+	const aliasedFileContents = convertToFileRecord(fileContents.data);
+
+	if (
+		!aliasedApplicationContents.success ||
+		!aliasedSignatureContents.success ||
+		!aliasedFileContents.success ||
+		!aliasedFileContents.success
+	) {
+		return failure('SYSTEM_ERROR', 'Error aliasing data records. Unknown keys.');
+	}
+	/**
+	 * This is a bit odd because we're using the DTO aliases while passing back to the service (usually its the opposite),
+	 * however, given this service is essentially running a React render, we need to.
+	 */
+	const renderedPDF = await pdfRepo.renderPCGLApplicationPDF({
+		applicationContents: aliasedApplicationContents.data,
+		signatureContents: aliasedSignatureContents.data,
+		collaboratorsContents: aliasedCollaboratorsContents,
+		fileContents: aliasedFileContents.data,
+		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
+	});
+
+	if (!renderedPDF.success) {
+		return renderedPDF;
+	}
+
+	const createFileRecord = await fileService.createFile({
+		file: {
+			originalFilename: `${`PCGL_DACO_Application-${applicationContents.data.id}_${Date.now().toString()}`}.pdf`,
+			filepath: '#', //This doesn't matter as it's not used in the createFile method, however it required by the Formidable.File Type
+		},
+		application: applicationContents.data,
+		readFrom: 'buffer',
+		contentsBuffer: Buffer.from(renderedPDF.data),
+		type: 'SIGNED_APPLICATION',
+	});
+
+	if (!createFileRecord.success) {
+		return createFileRecord;
+	}
+
+	const updatedApplicationRecord = await applicationService.editApplication({
+		id: applicationId,
+		update: {
+			signed_pdf: createFileRecord.data.id,
+		},
+	});
+
+	if (!updatedApplicationRecord.success) {
+		return updatedApplicationRecord;
+	}
+
+	return renderedPDF;
+};
+
 /**
  * Approves the application by providing the applicationId
  *
@@ -175,7 +295,7 @@ export const getApplicationStateTotals = async () => {
  */
 export const approveApplication = async ({
 	applicationId,
-}: ApproveApplication): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -201,9 +321,21 @@ export const approveApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		await service.findOneAndUpdate({ id: applicationId, update });
 
-		return updatedResult;
+		const updatedApplication = await service.getApplicationById({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const dtoFriendlyData = convertToBasicApplicationRecord(updatedApplication.data);
+
+		if (!dtoFriendlyData.success) {
+			return dtoFriendlyData;
+		}
+
+		return dtoFriendlyData;
 	} catch (error) {
 		logger.error(`Unable to approve application with id: ${applicationId}`, error);
 		return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to approve application.');
@@ -214,7 +346,7 @@ export const dacRejectApplication = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -236,9 +368,20 @@ export const dacRejectApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, updated_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		await service.findOneAndUpdate({ id: applicationId, update });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
 
-		return updatedResult;
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const dtoFriendlyData = convertToApplicationRecord(updatedApplication.data);
+
+		if (!dtoFriendlyData.success) {
+			return dtoFriendlyData;
+		}
+
+		return dtoFriendlyData;
 	} catch (error) {
 		const message = `Unable to reject application with id: ${applicationId}`;
 		logger.error(message);
@@ -267,14 +410,14 @@ export const submitRevision = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (
-			appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED ||
-			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
+			appStateManager.state === ApplicationStates.DAC_REVIEW ||
+			appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW
 		) {
-			return failure('INVALID_STATE_TRANSITION', 'Application revision is already submitted.');
+			return failure('INVALID_STATE_TRANSITION', 'Application is already submitted for revisions.');
 		}
 
 		let submittedRevision;
-		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
+		if (appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
 			submittedRevision = await appStateManager.submitDacRevision();
 		} else {
 			submittedRevision = await appStateManager.submitRepRevision();
@@ -333,7 +476,7 @@ export const requestApplicationRevisionsByDac = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -363,7 +506,19 @@ export const requestApplicationRevisionsByDac = async ({
 			return revisionRequestResult;
 		}
 
-		return service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+
+		if (!aliasResult.success) {
+			return aliasResult;
+		}
+
+		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
 
@@ -377,7 +532,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -407,7 +562,19 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return revisionRequestResult;
 		}
 
-		return service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!updatedApplication.success) {
+			return updatedApplication;
+		}
+
+		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+
+		if (!aliasResult.success) {
+			return aliasResult;
+		}
+
+		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
 
@@ -555,7 +722,7 @@ export const getRevisions = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
+}): AsyncResult<RevisionsDTO[], 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -566,7 +733,16 @@ export const getRevisions = async ({
 			return revisionsResult;
 		}
 
-		return success(revisionsResult.data);
+		const aliasedRevs = revisionsResult.data.map((rev) => convertToRevisionsRecord(rev));
+
+		const filteredFailures = aliasedRevs.filter((results) => !results.success);
+		const filteredSuccesses = aliasedRevs.filter((results) => results.success).map((results) => results.data);
+
+		if (filteredFailures.length) {
+			throw new Error('Failed to alias Revisions Record');
+		} else {
+			return success(filteredSuccesses);
+		}
 	} catch (error) {
 		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
 		logger.error(message, error);
