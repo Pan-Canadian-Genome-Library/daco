@@ -89,7 +89,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 				.catch(() => {
 					notification.openNotification({
 						type: 'error',
-						message: translate('errors.generic.title'),
+						message: translate('revisionRequestFailed'),
 						description: translate('modals.applications.global.failure.text'),
 					});
 				});
@@ -102,7 +102,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 				.catch(() => {
 					notification.openNotification({
 						type: 'error',
-						message: translate('errors.generic.title'),
+						message: translate('revisionRequestFailed'),
 						description: translate('modals.applications.global.failure.text'),
 					});
 				});
