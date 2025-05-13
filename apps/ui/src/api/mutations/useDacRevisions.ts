@@ -19,34 +19,39 @@
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type JoinedApplicationRecord, type RevisionRequestModel } from '@/service/types.js';
+import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useMutation } from '@tanstack/react-query';
 
 const useDacRevisions = () => {
-	return useMutation<JoinedApplicationRecord, ServerError, RevisionRequestModel>({
+	return useMutation<
+		ApplicationResponseData,
+		ServerError,
+		RevisionsModalSchemaType & { applicationId: string | number }
+	>({
 		mutationFn: async (payload) => {
 			const response = await fetch(`/applications/dac/${payload.applicationId}/request-revisions`, {
 				method: 'POST',
 				body: JSON.stringify({
-					comments: payload.comments,
-					applicantApproved: payload.applicantApproved,
-					applicantNotes: payload.applicantNotes,
-					institutionRepApproved: payload.institutionRepApproved,
-					institutionRepNotes: payload.institutionRepNotes,
-					collaboratorsApproved: payload.collaboratorsApproved,
-					collaboratorsNotes: payload.collaboratorsNotes,
-					projectApproved: payload.projectApproved,
-					projectNotes: payload.projectNotes,
-					requestedStudiesApproved: payload.requestedStudiesApproved,
-					requestedStudiesNotes: payload.requestedStudiesNotes,
-					ethicsApproved: payload.ethicsApproved,
-					ethicsNotes: payload.ethicsNotes,
-					agreementsApproved: payload.agreementsApproved,
-					agreementsNotes: payload.agreementsNotes,
-					appendicesApproved: payload.appendicesApproved,
-					appendicesNotes: payload.appendicesNotes,
-					signAndSubmitApproved: payload.signAndSubmitApproved,
-					signAndSubmitNotes: payload.signAndSubmitNotes,
+					applicantApproved: !payload.applicantInformation,
+					applicantNotes: payload.applicantInformation,
+					institutionRepApproved: !payload.institutionalRep,
+					institutionRepNotes: payload.institutionalRep,
+					collaboratorsApproved: !payload.collaborators,
+					collaboratorsNotes: payload.collaborators,
+					projectApproved: !payload.projectInformation,
+					projectNotes: payload.projectInformation,
+					requestedStudiesApproved: !payload.requestedStudy,
+					requestedStudiesNotes: payload.requestedStudy,
+					ethicsApproved: !payload.ethics,
+					ethicsNotes: payload.ethics,
+					agreementsApproved: !payload.agreements,
+					agreementsNotes: payload.agreements,
+					appendicesApproved: !payload.appendices,
+					appendicesNotes: payload.appendices,
+					signAndSubmitApproved: !payload.signature,
+					signAndSubmitNotes: payload.signature,
+					comments: payload.general,
 				}),
 			}).then(withErrorResponseHandler);
 
