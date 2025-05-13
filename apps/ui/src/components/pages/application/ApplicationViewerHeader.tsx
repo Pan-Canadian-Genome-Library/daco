@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useCloseApplication from '@/api/mutations/useCloseApplication';
+import useDacRevisions from '@/api/mutations/useDacRevisions';
 import useRepRevisions from '@/api/mutations/useRepRevisions';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
@@ -63,9 +64,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showSuccessModal, setShowSuccessModal] = useState(false);
 	const { mutateAsync: repRevision } = useRepRevisions();
 	const { mutateAsync: dacRevision } = useDacRevisions();
-	const notification = useNotificationContext();
 	const [showEditModal, setShowEditModal] = useState(false);
-	const { mutateAsync: repRevision } = useRepRevisions();
 	const notification = useNotificationContext();
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
