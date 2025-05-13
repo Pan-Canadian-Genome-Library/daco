@@ -17,13 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Col, Flex, Modal, Row, theme, Typography } from 'antd';
+import { Button, Col, Flex, Row, theme } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import useCloseApplication from '@/api/mutations/useCloseApplication';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import ApproveApplicationModal from '@/components/pages/application/modals/ApproveApplicationModal';
+import CloseApplicationModal from '@/components/pages/application/modals/CloseApplicationModal';
 import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import RevokeApplicationModal from '@/components/pages/application/modals/RevokeApplicationModal';
@@ -36,7 +36,6 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { useNavigate } from 'react-router';
 
-const { Text } = Typography;
 const { useToken } = theme;
 
 type AppHeaderProps = {
@@ -55,7 +54,6 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showReqRevisionsSuccessModal, setShowReqRevisionsSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
-	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showRevokeModal, setShowRevokeModal] = useState(false);
 	const [showApprovalModal, setShowApprovalModal] = useState(false);
@@ -65,13 +63,6 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
 
 	const navigate = useNavigate();
-
-	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
-	const handleCloseApplicationRequest = () => {
-		closeApplication({ applicationId: id }).then(() => {
-			navigate('/dashboard');
-		});
-	};
 
 	const onEditButtonClick = () => {
 		if (isWithdrawable) {
@@ -85,7 +76,6 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 		const buttons = [];
 
 		if ((state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode) {
-			console.log('here?');
 			buttons.push(
 				<ProtectedComponent requiredRoles={['APPLICANT']}>
 					<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>
@@ -185,21 +175,14 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					showEditModal={showEditModal}
 					setShowEditModal={setShowEditModal}
 				/>
-				<Modal
-					title={translate('modals.closeApplication.title', { id })}
-					okText={translate('button.closeApp')}
-					cancelText={translate('modals.buttons.cancel')}
-					width={'100%'}
-					style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-					open={showCloseApplicationModal}
-					onOk={handleCloseApplicationRequest}
-					okButtonProps={{ disabled: isClosing }}
-					onCancel={() => setShowCloseApplicationModal(false)}
-				>
-					<Flex style={{ height: '100%', marginTop: 20 }}>
-						<Text>{translate('modals.closeApplication.description')}</Text>
-					</Flex>
-				</Modal>
+
+				{/* Close Modal */}
+				<CloseApplicationModal
+					id={id}
+					setShowCloseApplicationModal={setShowCloseApplicationModal}
+					showCloseApplicationModal={showCloseApplicationModal}
+				/>
+				{/* Close Modal */}
 
 				{/* Revoke Modal */}
 				<RejectApplicationModal
