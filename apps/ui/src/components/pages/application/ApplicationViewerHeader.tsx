@@ -79,20 +79,9 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 
 	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
 		const payload = { ...data, applicationId: id };
-		repRevision(payload)
-			.then(() => {
-				setOpenRevisionsModal(false);
-				setShowSuccessModal(true);
-			})
-			.catch(() => {
-				notification.openNotification({
-					type: 'error',
-					message: translate('errors.generic.title'),
-					description: translate('modals.applications.global.failure.text'),
-				});
-			});
-		if (state === 'INSTITUTIONAL_REP_REVISION_REQUESTED') {
-			repRevision(data)
+
+		if (state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+			repRevision(payload)
 				.then(() => {
 					setOpenRevisionsModal(false);
 					setShowSuccessModal(true);
@@ -100,12 +89,12 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 				.catch(() => {
 					notification.openNotification({
 						type: 'error',
-						message: translate('submissionFailed'),
+						message: translate('errors.generic.title'),
 						description: translate('modals.applications.global.failure.text'),
 					});
 				});
-		} else {
-			dacRevision(data)
+		} else if (state === ApplicationStates.DAC_REVIEW) {
+			dacRevision(payload)
 				.then(() => {
 					setOpenRevisionsModal(false);
 					setShowSuccessModal(true);
@@ -113,7 +102,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 				.catch(() => {
 					notification.openNotification({
 						type: 'error',
-						message: translate('submissionFailed'),
+						message: translate('errors.generic.title'),
 						description: translate('modals.applications.global.failure.text'),
 					});
 				});
