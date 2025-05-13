@@ -34,7 +34,6 @@ import ProtectedComponent from '@/components/ProtectedComponent';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useNavigate } from 'react-router';
 
 const { Text } = Typography;
@@ -47,12 +46,6 @@ type AppHeaderProps = {
 	isEditMode: boolean;
 };
 
-export interface RevisionModalStateProps {
-	isOpen: boolean;
-	setIsOpen: (isOpen: boolean) => void;
-	onSubmit: (data: RevisionsModalSchemaType) => void;
-}
-
 const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
@@ -60,7 +53,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const isLowResDevice = minWidth <= token.screenLG;
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
-	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const [showReqRevisionsSuccessModal, setShowReqRevisionsSuccessModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const [showRejectModal, setShowRejectModal] = useState(false);
@@ -73,17 +66,9 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 
 	const navigate = useNavigate();
 
-	const onRevisionsSubmit = (data: RevisionsModalSchemaType) => {
-		//TODO: Add logic to this to actually submit the revisions.
-		console.log('Submission Handled', data);
-		setOpenRevisionsModal(false);
-		setShowSuccessModal(true);
-	};
-
 	// TODO: logic to change ApplicationState from current to draft then redirect user to the relevant Application Form page
 	const handleCloseApplicationRequest = () => {
 		closeApplication({ applicationId: id }).then(() => {
-			setOpenRevisionsModal(false);
 			navigate('/dashboard');
 		});
 	};
@@ -233,15 +218,16 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 
 				{/* Revisions Modal */}
 				<RequestRevisionsModal
-					onSubmit={onRevisionsSubmit}
+					id={id}
+					setSuccessModalOpen={setShowReqRevisionsSuccessModal}
 					isOpen={openRevisionsModal}
 					setIsOpen={setOpenRevisionsModal}
 				/>
 				<SuccessModal
 					successText={translate('modals.applications.global.success.text', { id })}
 					okText={translate('modals.buttons.ok')}
-					isOpen={showSuccessModal}
-					onOk={() => setShowSuccessModal(false)}
+					isOpen={showReqRevisionsSuccessModal}
+					onOk={() => setShowReqRevisionsSuccessModal(false)}
 				/>
 				{/* Revisions Modal */}
 
