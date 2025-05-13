@@ -1,4 +1,9 @@
 {
+	"global": {
+		"login": {
+			"loggingIn": "Logging you in..."
+		}
+	},
 	"homepage": {
 		"title": "Apply for Access to Controlled Data",
 		"introduction": "The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers and commercial teams for access to PCGL Controlled Data.",
@@ -16,6 +21,11 @@
 		"hasAccess": "You have access to PCGL Controlled Data",
 		"noAccess": "You do not have access to PCGL Controlled Data",
 		"startNewApp": "Start A New Application"
+	},
+	"repView": {
+		"title": "Welcome",
+		"description": "You are about to be redirected to a login page. Please login using your institutional email and begin the review.",
+		"login": "Login to Review"
 	},
 	"applicationViewer": {
 		"title": "My Application: PCGL-{{id}}"
@@ -45,7 +55,8 @@
 		"contact": "Contact Us",
 		"pcglWebsite": "PCGL Website",
 		"dataPlatform": "Data Platform",
-		"applications": "My Applications"
+		"myApplications": "My Applications",
+		"manageApplications": "Manage Applications"
 	},
 	"button": {
 		"logout": "Logout",
@@ -66,7 +77,9 @@
 		"upload": "Upload",
 		"save": "Save Changes",
 		"rejectApp": "Reject Application",
-		"rejectApplication": "Reject"
+		"rejectApplication": "Reject",
+		"save": "Save Changes",
+		"approveApplication": "Approve"
 	},
 	"label": {
 		"created": "Created",
