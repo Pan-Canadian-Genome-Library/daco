@@ -105,14 +105,13 @@ export const editApplication = async ({
 	}
 
 	/**
-	 * By default the application service will reset an applications state to DRAFT when edited. We need to avoid this
-	 * behaviour for any applications within the REP_REV or DAC_REV states.
+	 * If the state is INSTITUTIONAL_REP_REVISION_REQUESTED or DAC_REVISIONS_REQUESTED, that means the fields sent
+	 * must be belong to the relevant sections that the Rep or DAC has requested revisions for.
 	 */
-	const shouldKeepState =
-		application.state === 'INSTITUTIONAL_REP_REVISION_REQUESTED' || application.state === 'DAC_REVISIONS_REQUESTED';
-
-	// If the application state is in revision, then we need to verify that only fields that require revision has been sent to the backend
-	if (shouldKeepState) {
+	if (
+		application.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
+		application.state === ApplicationStates.DAC_REVISIONS_REQUESTED
+	) {
 		const revisionsResult = await getRevisions({ applicationId: id });
 		if (!revisionsResult.success) {
 			return revisionsResult;
@@ -124,6 +123,7 @@ export const editApplication = async ({
 			return failure('SYSTEM_ERROR', message);
 		}
 
+		// If the application state is in revision, then we need to verify that only fields that require revision has been sent to the backend
 		if (!validateRevisedFields(update, revisionsResult.data[0])) {
 			const message = `Upload data contains illegal fields`;
 
