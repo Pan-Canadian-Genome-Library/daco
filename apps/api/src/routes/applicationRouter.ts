@@ -113,7 +113,7 @@ async function validateUserPermissionForApplication({
 applicationRouter.post(
 	'/create',
 	authMiddleware(),
-	async (request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>, next) => {
+	async (request: Request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>, next) => {
 		const { user } = request.session;
 		const { userId } = user || {};
 
@@ -139,7 +139,7 @@ applicationRouter.post(
 		editApplicationRequestSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<
 				JoinedApplicationRecord,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
@@ -573,7 +573,7 @@ applicationRouter.post(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<
 				{ message: string; data: ApplicationRecord },
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
@@ -865,7 +865,10 @@ applicationRouter.post(
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
-			async (request, response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
+			async (
+				request: Request,
+				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 
@@ -945,7 +948,7 @@ applicationRouter.post(
 		applicationRevisionRequestSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<
 				ApplicationResponseData,
 				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
@@ -1024,12 +1027,12 @@ applicationRouter.post(
 
 applicationRouter.get(
 	'/:applicationId/revisions',
-	authMiddleware({ requiredRoles: ['APPLICANT', 'INSTITUTIONAL_REP', 'DAC_MEMBER'] }),
+	authMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<RevisionsDTO[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const { applicationId } = request.params;
