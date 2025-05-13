@@ -28,7 +28,7 @@ import RejectApplicationModal from '@/components/pages/application/modals/Reject
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import RevokeApplicationModal from '@/components/pages/application/modals/RevokeApplicationModal';
 import SuccessModal from '@/components/pages/application/modals/SuccessModal';
-import WithdrawModal from '@/components/pages/application/modals/WithdrawModal';
+import WithdrawApplicationModal from '@/components/pages/application/modals/WithdrawApplicationModal';
 import PageHeader from '@/components/pages/global/PageHeader';
 import ProtectedComponent from '@/components/ProtectedComponent';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
@@ -169,7 +169,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 				>
 					{renderHeaderButtons()}
 				</Flex>
-				<WithdrawModal
+				<WithdrawApplicationModal
 					applicationId={id}
 					currentSection={currentSection}
 					showEditModal={showEditModal}

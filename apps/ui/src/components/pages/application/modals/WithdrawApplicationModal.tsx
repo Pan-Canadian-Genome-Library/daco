@@ -23,13 +23,18 @@ import { useNavigate } from 'react-router';
 
 import useWithdrawApplication from '@/api/mutations/useWithdrawApplication';
 
-interface WithdrawModalProps {
+interface WithdrawApplicationModalProps {
 	currentSection: string;
 	applicationId: number | string;
 	showEditModal: boolean;
 	setShowEditModal: (show: boolean) => void;
 }
-const WithdrawModal = ({ currentSection, applicationId, showEditModal, setShowEditModal }: WithdrawModalProps) => {
+const WithdrawApplicationModal = ({
+	currentSection,
+	applicationId,
+	showEditModal,
+	setShowEditModal,
+}: WithdrawApplicationModalProps) => {
 	const { Text } = Typography;
 
 	const { t: translate } = useTranslation();
@@ -68,4 +73,4 @@ const WithdrawModal = ({ currentSection, applicationId, showEditModal, setShowEd
 	);
 };
 
-export default WithdrawModal;
+export default WithdrawApplicationModal;
