@@ -21,6 +21,7 @@ import { Navigate, type To } from 'react-router';
 
 import { UserRole } from '@pcgl-daco/validation';
 
+import FullscreenLoader from '@/components/FullscreenLoader';
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
 
@@ -61,7 +62,7 @@ const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteP
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 
 	if (isLoading) {
-		return <span>Loading user info...</span>;
+		return <FullscreenLoader />;
 	}
 	if (!isLoggedIn) {
 		return <Redirect />;

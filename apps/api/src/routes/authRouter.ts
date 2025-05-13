@@ -25,6 +25,7 @@ import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import BaseLogger from '@/logger.js';
+import { getUserRole } from '@/service/authService.ts';
 import { serverConfig } from '../config/serverConfig.js';
 import * as oidcAuthClient from '../external/oidcAuthClient.ts';
 import { resetSession } from '../session/index.js';
@@ -211,7 +212,7 @@ authRouter.get('/user', async (request, response: ResponseWithData<UserResponse,
 	const { user } = request.session;
 
 	const output: UserResponse = {
-		role: user ? 'APPLICANT' : 'ANONYMOUS',
+		role: getUserRole(request.session),
 		user,
 	};
 

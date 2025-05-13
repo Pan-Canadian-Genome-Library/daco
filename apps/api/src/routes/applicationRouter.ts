@@ -206,9 +206,9 @@ applicationRouter.post(
 // TODO: validate queryParam options using zod
 applicationRouter.get(
 	'/',
-	authMiddleware(),
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
 	async (
-		request,
+		request: Request,
 		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
 	) => {
 		const { userId } = request.session.user || {};
