@@ -78,8 +78,8 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 			.catch(() => {
 				notification.openNotification({
 					type: 'error',
-					message: translate('errors.generic.title'),
-					description: translate('modals.applications.global.failure.text'),
+					message: translate('modals.requestRevisions.notifications.failure.title'),
+					description: translate('modals.requestRevisions.notifications.failure.text'),
 				});
 			});
 		reset();
@@ -87,7 +87,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 
 	return (
 		<Modal
-			title={translate('modals.applications.global.revisions.title')}
+			title={translate('modals.requestRevisions.title')}
 			width={'100%'}
 			centered={true}
 			style={{
@@ -128,7 +128,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 			destroyOnClose
 		>
 			<Flex style={{ height: '10%', marginTop: 20 }} vertical gap={'middle'}>
-				<Text>{translate('modals.applications.global.revisions.description')}</Text>
+				<Text>{translate('modals.requestRevisions.description')}</Text>
 				<Form layout="vertical" clearOnDestroy validateTrigger={['onChange']} disabled={isRequestingRevisions}>
 					<Flex vertical>
 						<Row>
@@ -137,7 +137,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.applicantInformation')}
+									label={translate('modals.requestRevisions.applicantInformation')}
 									name="applicantInformation"
 									control={control}
 									rule={rule}
@@ -150,7 +150,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.institutionalRepresentative')}
+									label={translate('modals.requestRevisions.institutionalRepresentative')}
 									name="institutionalRep"
 									control={control}
 									rule={rule}
@@ -163,7 +163,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.collaborators')}
+									label={translate('modals.requestRevisions.collaborators')}
 									name="collaborators"
 									control={control}
 									rule={rule}
@@ -176,7 +176,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.projectInformation')}
+									label={translate('modals.requestRevisions.projectInformation')}
 									name="projectInformation"
 									control={control}
 									rule={rule}
@@ -189,7 +189,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.requestedStudy')}
+									label={translate('modals.requestRevisions.requestedStudy')}
 									name="requestedStudy"
 									control={control}
 									rule={rule}
@@ -202,7 +202,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.ethics')}
+									label={translate('modals.requestRevisions.ethics')}
 									name="ethics"
 									control={control}
 									rule={rule}
@@ -215,7 +215,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.signSubmit')}
+									label={translate('modals.requestRevisions.signSubmit')}
 									name="signature"
 									control={control}
 									rule={rule}
@@ -228,7 +228,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.general')}
+									label={translate('modals.requestRevisions.general')}
 									name="general"
 									control={control}
 									rule={rule}
@@ -254,14 +254,14 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 								reset();
 							}}
 						>
-							{translate('modals.applications.global.revisions.cancel')}
+							{translate('modals.buttons.cancel')}
 						</Button>
 						<Button
 							type="primary"
 							onClick={handleSubmit(onSubmit)}
 							disabled={!formState.isDirty || isRequestingRevisions}
 						>
-							{translate('modals.applications.global.revisions.sendRequest')}
+							{translate('modals.requestRevisions.buttons.sendRequest')}
 						</Button>
 					</Flex>
 				</Form>

@@ -4,6 +4,27 @@
 			"cancel": "Cancel",
 			"ok": "OK"
 		},
+		"requestRevisions": {
+			"title": "Request Revisions",
+			"description": "Please provide the revisions details for the sections that have issues. These details will be emailed to the applicant.",
+			"applicantInformation": "A. Applicant Information",
+			"institutionalRepresentative": "B. Institutional Representative",
+			"collaborators": "C. Collaborators",
+			"projectInformation": "D. Project Information",
+			"requestedStudy": "E. Requested Study",
+			"ethics": "F. Ethics",
+			"signSubmit": "Sign & Submit",
+			"general": "General Comments",
+			"buttons": {
+				"sendRequest": "Send Request"
+			},
+			"notifications": {
+				"failure": {
+					"title": "Failed to Request Revisions",
+					"text": "Sorry, something went wrong while requesting revisions for this application. Please try again later."
+				}
+			}
+		},
 		"revokeApplication": {
 			"title": "Are you sure you want to revoke application PCGL-{{id}}?",
 			"description": "If so, the applicant and all collaborators will lose data access.",
@@ -60,30 +81,6 @@
 		},
 		"authorization": {
 			"description": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access."
-		},
-		"applications": {
-			"global": {
-				"revisions": {
-					"title": "Request Revisions",
-					"description": "Please provide the revisions details for the sections that have issues. These details will be emailed to the applicant.",
-					"applicantInformation": "A. Applicant Information",
-					"institutionalRepresentative": "B. Institutional Representative",
-					"collaborators": "C. Collaborators",
-					"projectInformation": "D. Project Information",
-					"requestedStudy": "E. Requested Study",
-					"ethics": "F. Ethics",
-					"signSubmit": "Sign & Submit",
-					"general": "General Comments",
-					"cancel": "Cancel",
-					"sendRequest": "Send Request"
-				},
-				"success": {
-					"text": "Request for revisions has been sent to Application PCGL-{{id}}"
-				},
-				"failure": {
-					"text": "Request for revisions has failed"
-				}
-			}
 		}
 	}
 }
