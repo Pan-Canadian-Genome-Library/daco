@@ -17,40 +17,38 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import EnvironmentConfigError from './EnvironmentConfigError.js';
-import { serverConfig } from './serverConfig.js';
+import { ExtraSessionInformation, ExtraSessionInformationSchema } from '@pcgl-daco/validation';
 
-function getAuthConfig() {
-	const enabled = process.env.DISABLE_AUTH !== 'true';
+const SESSION_INFO_KEY = 'pcgl-daco-session';
 
-	// Enforce enabling auth when running in production
-	if (serverConfig.isProduction && !enabled) {
-		throw new EnvironmentConfigError(
-			`The application "NODE_ENV" is set to "production" while "ENABLE_AUTH" is not "true". Auth must be enabled to run in production.`,
-		);
-	}
-
-	if (!enabled) {
-		// Running with auth disabled may be useful for developers.
-		return { enabled };
-	}
-
-	const authConfigSchema = z.object({
-		AUTH_PROVIDER_HOST: z.string().url(),
-		AUTH_CLIENT_ID: z.string(),
-		AUTH_CLIENT_SECRET: z.string(),
-	});
-
-	const parseResult = authConfigSchema.safeParse(process.env);
-
-	if (!parseResult.success) {
-		// Only require auth config if auth is enabled
-		throw new EnvironmentConfigError(`db`, parseResult.error);
-	}
-
-	return { ...parseResult.data, enabled, loginRedirectPath: '/login/redirect', logoutRedirectPath: '/' };
+function clearExtraSessionInformation() {
+	localStorage.removeItem(SESSION_INFO_KEY);
 }
 
-export const authConfig = getAuthConfig();
-export type AuthConfig = typeof authConfig & { enabled: true };
+function getExtraSessionInformation() {
+	const extraSessionInfo = localStorage.getItem(SESSION_INFO_KEY);
+
+	if (extraSessionInfo) {
+		const parsedSession = JSON.parse(extraSessionInfo);
+		const parsedSessionInfo = ExtraSessionInformationSchema.safeParse(parsedSession);
+
+		if (parsedSessionInfo.success) {
+			return parsedSessionInfo.data;
+		}
+		clearExtraSessionInformation();
+
+		return null;
+	}
+}
+
+function setExtraSessionInformation(sessionInfo: ExtraSessionInformation) {
+	const validSessionInfo = ExtraSessionInformationSchema.safeParse(sessionInfo);
+
+	if (validSessionInfo.success) {
+		localStorage.setItem(SESSION_INFO_KEY, JSON.stringify(sessionInfo));
+	}
+
+	return validSessionInfo.success;
+}
+
+export { clearExtraSessionInformation, getExtraSessionInformation, setExtraSessionInformation };

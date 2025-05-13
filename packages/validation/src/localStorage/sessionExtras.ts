@@ -18,39 +18,21 @@
  */
 
 import { z } from 'zod';
-import EnvironmentConfigError from './EnvironmentConfigError.js';
-import { serverConfig } from './serverConfig.js';
+import { userRoleSchema } from '../user.js';
 
-function getAuthConfig() {
-	const enabled = process.env.DISABLE_AUTH !== 'true';
-
-	// Enforce enabling auth when running in production
-	if (serverConfig.isProduction && !enabled) {
-		throw new EnvironmentConfigError(
-			`The application "NODE_ENV" is set to "production" while "ENABLE_AUTH" is not "true". Auth must be enabled to run in production.`,
-		);
-	}
-
-	if (!enabled) {
-		// Running with auth disabled may be useful for developers.
-		return { enabled };
-	}
-
-	const authConfigSchema = z.object({
-		AUTH_PROVIDER_HOST: z.string().url(),
-		AUTH_CLIENT_ID: z.string(),
-		AUTH_CLIENT_SECRET: z.string(),
-	});
-
-	const parseResult = authConfigSchema.safeParse(process.env);
-
-	if (!parseResult.success) {
-		// Only require auth config if auth is enabled
-		throw new EnvironmentConfigError(`db`, parseResult.error);
-	}
-
-	return { ...parseResult.data, enabled, loginRedirectPath: '/login/redirect', logoutRedirectPath: '/' };
-}
-
-export const authConfig = getAuthConfig();
-export type AuthConfig = typeof authConfig & { enabled: true };
+export const ExtraSessionInformationSchema = z.discriminatedUnion('role', [
+	z.object({
+		role: z.literal(userRoleSchema.Values.INSTITUTIONAL_REP),
+		applicationId: z.number().int().nonnegative(),
+	}),
+	z.object({
+		role: z.literal(userRoleSchema.Values.APPLICANT),
+	}),
+	z.object({
+		role: z.literal(userRoleSchema.Values.DAC_MEMBER),
+	}),
+	z.object({
+		role: z.literal(userRoleSchema.Values.ANONYMOUS),
+	}),
+]);
+export type ExtraSessionInformation = z.infer<typeof ExtraSessionInformationSchema>;
