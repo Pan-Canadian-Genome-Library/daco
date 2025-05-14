@@ -62,7 +62,7 @@ import {
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
-import { getUserRole } from '../service/authService.ts';
+import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import { failure, success, type AsyncResult } from '../utils/results.ts';
 import type { ResponseWithData } from './types.ts';
 
@@ -316,8 +316,12 @@ applicationRouter.get(
 		if (result.success) {
 			const { data } = result;
 
+			const hasSpecialAccess =
+				getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
+				isAssociatedRep(request.session, applicationId);
+
 			// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
-			if (data.userId !== userId || getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER) {
+			if (data.userId !== userId && !hasSpecialAccess) {
 				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 				return;
 			}
