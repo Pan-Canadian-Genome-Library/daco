@@ -22,7 +22,8 @@
 				"failure": {
 					"title": "Failed to Request Revisions",
 					"text": "Sorry, something went wrong while requesting revisions for this application. Please try again later."
-				}
+				},
+				"revisionsRequested": "Request for revisions has been sent to Application PCGL-{{id}}"
 			}
 		},
 		"revokeApplication": {

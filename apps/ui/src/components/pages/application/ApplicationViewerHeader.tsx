@@ -203,10 +203,13 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 					setIsOpen={setOpenRevisionsModal}
 				/>
 				<SuccessModal
-					successText={translate('modals.applications.global.success.text', { id })}
+					successText={translate('modals.requestRevisions.notifications.revisionsRequested', { id })}
 					okText={translate('modals.buttons.ok')}
 					isOpen={showReqRevisionsSuccessModal}
-					onOk={() => setShowReqRevisionsSuccessModal(false)}
+					onOk={() => {
+						setShowReqRevisionsSuccessModal(false);
+						navigate('/dashboard');
+					}}
 				/>
 				{/* Revisions Modal */}
 
