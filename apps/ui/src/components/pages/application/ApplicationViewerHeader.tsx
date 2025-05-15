@@ -34,18 +34,25 @@ import ProtectedComponent from '@/components/ProtectedComponent';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useNavigate } from 'react-router';
 
 const { useToken } = theme;
 
 type AppHeaderProps = {
 	id: number;
-	state: ApplicationStateValues;
+	appState: ApplicationStateValues;
 	currentSection: string;
 	isEditMode: boolean;
 };
 
-const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppHeaderProps) => {
+export interface RevisionModalStateProps {
+	isOpen: boolean;
+	setIsOpen: (isOpen: boolean) => void;
+	onSubmit: (data: RevisionsModalSchemaType) => void;
+}
+
+const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -60,22 +67,24 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
 	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
 
-	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
+	const isWithdrawable =
+		appState === ApplicationStates.INSTITUTIONAL_REP_REVIEW || appState === ApplicationStates.DAC_REVIEW;
 
 	const navigate = useNavigate();
 
 	const onEditButtonClick = () => {
 		if (isWithdrawable) {
 			setShowEditModal(true);
-		} else if (state === 'DRAFT') {
+		} else if (appState === 'DRAFT') {
 			navigate(`${currentSection}/edit`, { replace: true });
 		}
 	};
 
 	const renderHeaderButtons = () => {
 		const buttons = [];
+		const canShowEdit = (appState === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
 
-		if ((state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode) {
+		if (canShowEdit) {
 			buttons.push(
 				<ProtectedComponent requiredRoles={['APPLICANT']}>
 					<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>
@@ -150,7 +159,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 								vertical
 								gap={'middle'}
 							>
-								<ApplicationStatusSteps currentStatus={state} />
+								<ApplicationStatusSteps currentStatus={appState} />
 							</Flex>
 						</Flex>
 					</Col>
