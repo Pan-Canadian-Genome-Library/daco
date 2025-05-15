@@ -795,7 +795,7 @@ export const submitApplication = async ({
 				repName: institutional_rep_first_name || 'N/A',
 				submittedDate: submissionResult.data.created_at,
 			});
-		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
 			const {
 				email: { dacAddress },
 			} = getEmailConfig;
