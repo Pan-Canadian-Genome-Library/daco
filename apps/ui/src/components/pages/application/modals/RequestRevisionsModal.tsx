@@ -26,17 +26,29 @@ import { memo } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { RevisionModalStateProps } from '@/components/pages/application/ApplicationViewerHeader';
 import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+
+import useRepRevisions from '@/api/mutations/useRepRevisions';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 
 const { Text } = Typography;
 const { useToken } = theme;
 
 const rule = createSchemaFieldRule(revisionsModalSchema);
 
-const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallback }: RevisionModalStateProps) => {
+export interface RevisionModalStateProps {
+	isOpen: boolean;
+	id: number;
+	setIsOpen: (isOpen: boolean) => void;
+	setSuccessModalOpen: (isOpen: boolean) => void;
+}
+
+const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen }: RevisionModalStateProps) => {
+	const { mutateAsync: requestRevisions, isPending: isRequestingRevisions } = useRepRevisions();
 	const { t: translate } = useTranslation();
+	const notification = useNotificationContext();
+
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 
@@ -57,13 +69,25 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 	});
 
 	const onSubmit: SubmitHandler<RevisionsModalSchemaType> = (data) => {
-		onSubmitCallback(data);
+		const payload = { ...data, applicationId: id };
+		requestRevisions(payload)
+			.then(() => {
+				setIsOpen(false);
+				setSuccessModalOpen(true);
+			})
+			.catch(() => {
+				notification.openNotification({
+					type: 'error',
+					message: translate('modals.requestRevisions.notifications.failure.title'),
+					description: translate('modals.requestRevisions.notifications.failure.text'),
+				});
+			});
 		reset();
 	};
 
 	return (
 		<Modal
-			title={translate('modals.applications.global.revisions.title')}
+			title={translate('modals.requestRevisions.title')}
 			width={'100%'}
 			centered={true}
 			style={{
@@ -104,8 +128,8 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 			destroyOnClose
 		>
 			<Flex style={{ height: '10%', marginTop: 20 }} vertical gap={'middle'}>
-				<Text>{translate('modals.applications.global.revisions.description')}</Text>
-				<Form layout="vertical" clearOnDestroy validateTrigger={['onChange']}>
+				<Text>{translate('modals.requestRevisions.description')}</Text>
+				<Form layout="vertical" clearOnDestroy validateTrigger={['onChange']} disabled={isRequestingRevisions}>
 					<Flex vertical>
 						<Row>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
@@ -113,7 +137,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.applicantInformation')}
+									label={translate('modals.requestRevisions.applicantInformation')}
 									name="applicantInformation"
 									control={control}
 									rule={rule}
@@ -126,7 +150,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.institutionalRepresentative')}
+									label={translate('modals.requestRevisions.institutionalRepresentative')}
 									name="institutionalRep"
 									control={control}
 									rule={rule}
@@ -139,7 +163,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.collaborators')}
+									label={translate('modals.requestRevisions.collaborators')}
 									name="collaborators"
 									control={control}
 									rule={rule}
@@ -152,7 +176,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.projectInformation')}
+									label={translate('modals.requestRevisions.projectInformation')}
 									name="projectInformation"
 									control={control}
 									rule={rule}
@@ -165,7 +189,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.requestedStudy')}
+									label={translate('modals.requestRevisions.requestedStudy')}
 									name="requestedStudy"
 									control={control}
 									rule={rule}
@@ -178,7 +202,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.ethics')}
+									label={translate('modals.requestRevisions.ethics')}
 									name="ethics"
 									control={control}
 									rule={rule}
@@ -191,7 +215,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.signSubmit')}
+									label={translate('modals.requestRevisions.signSubmit')}
 									name="signature"
 									control={control}
 									rule={rule}
@@ -204,7 +228,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.applications.global.revisions.general')}
+									label={translate('modals.requestRevisions.general')}
 									name="general"
 									control={control}
 									rule={rule}
@@ -230,10 +254,14 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, onSubmit: onSubmitCallb
 								reset();
 							}}
 						>
-							{translate('modals.applications.global.revisions.cancel')}
+							{translate('modals.buttons.cancel')}
 						</Button>
-						<Button type="primary" onClick={handleSubmit(onSubmit)} disabled={!formState.isDirty}>
-							{translate('modals.applications.global.revisions.sendRequest')}
+						<Button
+							type="primary"
+							onClick={handleSubmit(onSubmit)}
+							disabled={!formState.isDirty || isRequestingRevisions}
+						>
+							{translate('modals.requestRevisions.buttons.sendRequest')}
 						</Button>
 					</Flex>
 				</Form>

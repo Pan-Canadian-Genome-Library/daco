@@ -21,11 +21,11 @@ import { ExtraSessionInformation, ExtraSessionInformationSchema } from '@pcgl-da
 
 const SESSION_INFO_KEY = 'pcgl-daco-session';
 
-function clearExtraSessionInformation() {
+export function clearExtraSessionInformation() {
 	localStorage.removeItem(SESSION_INFO_KEY);
 }
 
-function getExtraSessionInformation() {
+export function getExtraSessionInformation(): ExtraSessionInformation | undefined {
 	const extraSessionInfo = localStorage.getItem(SESSION_INFO_KEY);
 
 	if (extraSessionInfo) {
@@ -36,12 +36,10 @@ function getExtraSessionInformation() {
 			return parsedSessionInfo.data;
 		}
 		clearExtraSessionInformation();
-
-		return null;
 	}
 }
 
-function setExtraSessionInformation(sessionInfo: ExtraSessionInformation) {
+export function setExtraSessionInformation(sessionInfo: ExtraSessionInformation): boolean {
 	const validSessionInfo = ExtraSessionInformationSchema.safeParse(sessionInfo);
 
 	if (validSessionInfo.success) {
@@ -50,5 +48,3 @@ function setExtraSessionInformation(sessionInfo: ExtraSessionInformation) {
 
 	return validSessionInfo.success;
 }
-
-export { clearExtraSessionInformation, getExtraSessionInformation, setExtraSessionInformation };

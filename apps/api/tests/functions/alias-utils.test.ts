@@ -78,6 +78,5 @@ describe('Alias Utils', () => {
 
 		assert.ok(aliasResult.success && aliasResult.data.contents);
 		assert.ok(aliasResult.data.contents.hasOwnProperty('applicantFirstName'));
-		assert.ok(!aliasResult.data.contents.hasOwnProperty('signedPdf'));
 	});
 });

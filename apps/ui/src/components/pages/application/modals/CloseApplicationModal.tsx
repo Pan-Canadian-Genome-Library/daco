@@ -17,47 +17,52 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import FullscreenLoader from '@/components/FullscreenLoader';
-import { getExtraSessionInformation } from '@/global/localStorage';
-import { useUserContext } from '@/providers/UserProvider';
-import { useEffect } from 'react';
+import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-const LoginRedirect = () => {
+import useCloseApplication from '@/api/mutations/useCloseApplication';
+
+const { Text } = Typography;
+
+interface CloseApplicationModalProps {
+	id: number;
+	showCloseApplicationModal: boolean;
+	setShowCloseApplicationModal: (isOpen: boolean) => void;
+}
+
+const CloseApplicationModal = ({
+	setShowCloseApplicationModal,
+	showCloseApplicationModal,
+	id,
+}: CloseApplicationModalProps) => {
 	const { t: translate } = useTranslation();
-	const { role, isLoading } = useUserContext();
+	const { mutateAsync: closeApplication, isPending: isClosing } = useCloseApplication();
 	const navigate = useNavigate();
 
-	const redirectRep = () => {
-		const sessionInfo = getExtraSessionInformation();
-		if (sessionInfo && sessionInfo.role === 'INSTITUTIONAL_REP') {
-			return `/application/${sessionInfo.applicationId}/`;
-		}
-		return '/';
+	const handleCloseApplicationRequest = () => {
+		closeApplication({ applicationId: id }).then(() => {
+			navigate('/dashboard');
+		});
 	};
 
-	useEffect(() => {
-		if (isLoading) {
-			return;
-		}
-
-		switch (role) {
-			case 'APPLICANT':
-				navigate('/dashboard', { replace: true });
-				break;
-			case 'DAC_MEMBER':
-				navigate('/manage/applications', { replace: true });
-				break;
-			case 'INSTITUTIONAL_REP':
-				navigate(redirectRep(), { replace: true });
-				break;
-			default:
-				navigate('/', { replace: true });
-		}
-	}, [isLoading, navigate, role]);
-
-	return <FullscreenLoader loadingText={translate('global.login.loggingIn')} />;
+	return (
+		<Modal
+			title={translate('modals.closeApplication.title', { id })}
+			okText={translate('button.closeApp')}
+			cancelText={translate('modals.buttons.cancel')}
+			width={'100%'}
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			open={showCloseApplicationModal}
+			onOk={handleCloseApplicationRequest}
+			okButtonProps={{ disabled: isClosing }}
+			onCancel={() => setShowCloseApplicationModal(false)}
+		>
+			<Flex style={{ height: '100%', marginTop: 20 }}>
+				<Text>{translate('modals.closeApplication.description')}</Text>
+			</Flex>
+		</Modal>
+	);
 };
 
-export default LoginRedirect;
+export default CloseApplicationModal;

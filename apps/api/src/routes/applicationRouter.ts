@@ -62,7 +62,7 @@ import {
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
-import { getUserRole } from '../service/authService.ts';
+import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import { failure, success, type AsyncResult } from '../utils/results.ts';
 import type { ResponseWithData } from './types.ts';
 
@@ -113,7 +113,7 @@ async function validateUserPermissionForApplication({
 applicationRouter.post(
 	'/create',
 	authMiddleware(),
-	async (request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>, next) => {
+	async (request: Request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>, next) => {
 		const { user } = request.session;
 		const { userId } = user || {};
 
@@ -139,7 +139,7 @@ applicationRouter.post(
 		editApplicationRequestSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<
 				JoinedApplicationRecord,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
@@ -316,8 +316,12 @@ applicationRouter.get(
 		if (result.success) {
 			const { data } = result;
 
+			const hasSpecialAccess =
+				getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
+				isAssociatedRep(request.session, applicationId);
+
 			// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
-			if (data.userId !== userId || getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER) {
+			if (data.userId !== userId && !hasSpecialAccess) {
 				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 				return;
 			}
@@ -573,7 +577,7 @@ applicationRouter.post(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<
 				{ message: string; data: ApplicationRecord },
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
@@ -650,7 +654,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
@@ -865,7 +869,10 @@ applicationRouter.post(
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
-			async (request, response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>) => {
+			async (
+				request: Request,
+				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 
@@ -945,7 +952,7 @@ applicationRouter.post(
 		applicationRevisionRequestSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<
 				ApplicationResponseData,
 				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
@@ -1024,12 +1031,12 @@ applicationRouter.post(
 
 applicationRouter.get(
 	'/:applicationId/revisions',
-	authMiddleware({ requiredRoles: ['APPLICANT', 'INSTITUTIONAL_REP', 'DAC_MEMBER'] }),
+	authMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsListParamsSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<RevisionsDTO[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const { applicationId } = request.params;

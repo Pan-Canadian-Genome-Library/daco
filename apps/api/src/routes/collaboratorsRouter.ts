@@ -54,7 +54,7 @@ collaboratorsRouter.post(
 			request,
 			response: ResponseWithData<
 				ListCollaboratorResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
 			>,
 		) => {
 			try {
@@ -78,7 +78,7 @@ collaboratorsRouter.post(
 				}
 				switch (result.error) {
 					case 'DUPLICATE_RECORD': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						response.status(409).json({ error: 'CONFLICT', message: result.message });
 						return;
 					}
 					case 'INVALID_STATE_TRANSITION': {
@@ -286,7 +286,7 @@ collaboratorsRouter.post(
 			request,
 			response: ResponseWithData<
 				ListCollaboratorResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'DUPLICATE_RECORD']
+				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
 			>,
 		) => {
 			try {
@@ -327,7 +327,7 @@ collaboratorsRouter.post(
 						return;
 					}
 					case 'DUPLICATE_RECORD': {
-						response.status(409).json({ error: result.error, message: result.message });
+						response.status(409).json({ error: 'CONFLICT', message: result.message });
 						return;
 					}
 				}
