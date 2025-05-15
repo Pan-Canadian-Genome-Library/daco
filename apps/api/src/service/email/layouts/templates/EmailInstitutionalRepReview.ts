@@ -72,7 +72,7 @@ export const GenerateEmailInstitutionalRepReview = ({
                     If you are not satisfied with the application and would like to request revisions, click the 'Request Revisions' button. A window will open where you can enter requests. When you are done, click the 'Send Request' button to complete the review. Please do not submit the application if you requested revisions. The applicant will receive an email notification about your requests and comments, and they will update the application based on your feedback. DACO will notify you when the application is re-submitted for your review. 
                 </mj-text>
                 <mj-text>
-                    Please access the application through <a href="${ui}" target="_blank" rel="nofollow">DACO portal </a> at your earliest convenience. If you encounter any issues or have questions, feel free to reach out, and we would be happy to assist.
+                    Please access the application through <a href="${ui}" target="_blank" rel="nofollow">DACO Portal</a> at your earliest convenience. If you encounter any issues or have questions, feel free to reach out, and we would be happy to assist.
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
