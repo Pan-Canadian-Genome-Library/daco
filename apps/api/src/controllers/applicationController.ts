@@ -47,6 +47,7 @@ import {
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
 import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
+import { validateRevisedFields } from '@/utils/validation.ts';
 import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
 import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
@@ -103,6 +104,33 @@ export const editApplication = async ({
 		const message = `Cannot update application with state ${application.state}`;
 		logger.error(message);
 		return failure('INVALID_STATE_TRANSITION', message);
+	}
+
+	/**
+	 * If the state is INSTITUTIONAL_REP_REVISION_REQUESTED or DAC_REVISIONS_REQUESTED, that means the fields sent
+	 * must be belong to the relevant sections that the Rep or DAC has requested revisions for.
+	 */
+	if (
+		application.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
+		application.state === ApplicationStates.DAC_REVISIONS_REQUESTED
+	) {
+		const revisionsResult = await getRevisions({ applicationId: id });
+		if (!revisionsResult.success) {
+			return revisionsResult;
+		}
+
+		if (!revisionsResult.data[0]) {
+			const message = `Cannot verify most recent application revision data`;
+
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		// If the application state is in revision, then we need to verify that only fields that require revision has been sent to the backend
+		if (!validateRevisedFields(update, revisionsResult.data[0])) {
+			const message = `Upload data contains illegal fields`;
+
+			return failure('SYSTEM_ERROR', message);
+		}
 	}
 
 	const formattedResult = convertToApplicationContentsRecord(update);
