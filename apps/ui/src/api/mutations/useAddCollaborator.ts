@@ -20,7 +20,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
 
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
@@ -53,11 +52,10 @@ const useAddCollaborator = () => {
 			if (!response.ok) {
 				switch (response.status) {
 					case 400: {
-						const error: ServerError = await response.json();
-						if (error.message.includes('duplicate')) {
-							throw new Error('DUPLICATE');
-						}
 						throw new Error('INVALID_REQUEST');
+					}
+					case 409: {
+						throw new Error('CONFLICT');
 					}
 					default:
 						throw new Error('OTHER');
@@ -80,7 +78,7 @@ const useAddCollaborator = () => {
 			});
 		},
 		onError: (error) => {
-			if (error.message === 'DUPLICATE') {
+			if (error.message === 'CONFLICT') {
 				notification.openNotification({
 					type: 'error',
 					message: translate('collab-section.notifications.duplicate.duplicateTitle'),
