@@ -127,7 +127,7 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 				colour = pcglColours.warningPrimary;
 			}
 
-			return <ApplicationStep colour={colour} item={item} token={token} />;
+			return <ApplicationStep key={`header-status-${item.step}`} colour={colour} item={item} token={token} />;
 		});
 	};
 

@@ -86,26 +86,35 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 
 		if (canShowEdit) {
 			buttons.push(
-				<ProtectedComponent requiredRoles={['APPLICANT']}>
+				<ProtectedComponent key={'header-edit'} requiredRoles={['APPLICANT']}>
 					<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>
 				</ProtectedComponent>,
 			);
 		}
 
 		buttons.push(
-			<ProtectedComponent requiredRoles={['DAC_MEMBER', 'APPLICANT']} requiredStates={['APPROVED']}>
+			<ProtectedComponent
+				key={'header-revoke'}
+				requiredRoles={['DAC_MEMBER', 'APPLICANT']}
+				requiredStates={['APPROVED']}
+			>
 				<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
 			</ProtectedComponent>,
-			<ProtectedComponent requiredRoles={['INSTITUTIONAL_REP']} requiredStates={['INSTITUTIONAL_REP_REVIEW']}>
+			<ProtectedComponent
+				key={'header-rep-controls'}
+				requiredRoles={['INSTITUTIONAL_REP']}
+				requiredStates={['INSTITUTIONAL_REP_REVIEW']}
+			>
 				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 			</ProtectedComponent>,
 			<ProtectedComponent
+				key={'header-close'}
 				requiredRoles={['APPLICANT']}
 				requiredStates={['DRAFT', 'INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW']}
 			>
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 			</ProtectedComponent>,
-			<ProtectedComponent requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
+			<ProtectedComponent key={'header-dac-controls'} requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
 				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
