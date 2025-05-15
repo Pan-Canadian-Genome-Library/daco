@@ -508,9 +508,13 @@ export const submitRevision = async ({
 			resultContents.data.contents;
 
 		if (result.data.state === ApplicationStates.DAC_REVIEW) {
+			const {
+				email: { dacAddress },
+			} = getEmailConfig;
+
 			emailService.sendEmailDacForSubmittedRevisions({
 				id: application.id,
-				to: institutional_rep_email, // TODO: Change to DAC email
+				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: submittedRevision.data.created_at,
 			});
@@ -627,11 +631,14 @@ export const requestApplicationRevisionsByDac = async ({
 			return aliasResult;
 		}
 
-		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
+		const { applicant_first_name } = resultContents.data.contents;
+		const {
+			email: { dacAddress },
+		} = getEmailConfig;
 
 		emailService.sendEmailApplicantDacRevisions({
 			id: application.id,
-			to: institutional_rep_email,
+			to: dacAddress,
 			applicantName: applicant_first_name || 'N/A',
 			comments: revisionRequestResult.data,
 		});
