@@ -151,7 +151,7 @@ function AppRouter() {
 						</ProtectedRoute>
 					}
 				/>
-				<Route path="review/:applicationId/" element={<InstitutionalRepLogin />} />
+				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
 			</Route>
 		</Routes>
 	);
