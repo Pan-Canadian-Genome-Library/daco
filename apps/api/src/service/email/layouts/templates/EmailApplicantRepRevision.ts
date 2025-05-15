@@ -35,6 +35,19 @@ export const GenerateEmailApplicantRepRevision = ({
 		express: { ui },
 	} = getEmailConfig;
 
+	const {
+		applicant_notes,
+		institution_rep_notes,
+		collaborators_notes,
+		project_notes,
+		requested_studies_notes,
+		ethics_notes,
+		agreements_notes,
+		appendices_notes,
+		sign_and_submit_notes,
+		comments: generalComments,
+	} = comments;
+
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
@@ -51,16 +64,16 @@ export const GenerateEmailApplicantRepRevision = ({
                 </mj-text>
                 <mj-text>
                     <ol type="A">
-                        <li> Applicant Information: ${comments.agreements_notes ?? defaultRevisionText} </li>
-                        <li> Institutional Representative: ${comments.institution_rep_notes ?? defaultRevisionText} <br /> </li>
-                        <li> Collaborator: ${comments.collaborators_notes ?? defaultRevisionText} </li>
-                        <li> Project Information: ${comments.project_notes ?? defaultRevisionText} </li>
-                        <li> Requested Study: ${comments.requested_studies_notes ?? defaultRevisionText} </li> 
-                        <li> Ethics: ${comments.ethics_notes ?? defaultRevisionText} </li>
-                        <li> Data Access Agreement: ${comments.agreements_notes ?? defaultRevisionText} </li> 
-                        <li> Appendices: ${comments.appendices_notes ?? defaultRevisionText} </li>
-                        <li> Sign & Submit: ${comments.sign_and_submit_notes ?? defaultRevisionText} </li> 
-                        <li> General Comments: ${comments.comments ?? defaultRevisionText} </li>  
+                        <li> Applicant Information: ${applicant_notes ? applicant_notes : defaultRevisionText} </li>
+                        <li> Institutional Representative: ${institution_rep_notes ? institution_rep_notes : defaultRevisionText} <br /> </li>
+                        <li> Collaborator: ${collaborators_notes ? collaborators_notes : defaultRevisionText} </li>
+                        <li> Project Information: ${project_notes ? project_notes : defaultRevisionText} </li>
+                        <li> Requested Study: ${requested_studies_notes ? requested_studies_notes : defaultRevisionText} </li> 
+                        <li> Ethics: ${ethics_notes ? ethics_notes : defaultRevisionText} </li>
+                        <li> Data Access Agreement: ${agreements_notes ? agreements_notes : defaultRevisionText} </li> 
+                        <li> Appendices: ${appendices_notes ? appendices_notes : defaultRevisionText} </li>
+                        <li> Sign & Submit: ${comments.sign_and_submit_notes ? sign_and_submit_notes : defaultRevisionText} </li> 
+                        <li> General Comments: ${generalComments ? generalComments : defaultRevisionText} </li>  
                     </ol>
                 </mj-text>
                 <mj-text>
@@ -93,21 +106,34 @@ export const GenerateEmailApplicantRepRevisionPlain = ({
 		express: { ui },
 	} = getEmailConfig;
 
+	const {
+		applicant_notes,
+		institution_rep_notes,
+		collaborators_notes,
+		project_notes,
+		requested_studies_notes,
+		ethics_notes,
+		agreements_notes,
+		appendices_notes,
+		sign_and_submit_notes,
+		comments: generalComments,
+	} = comments;
+
 	return ` Dear ${applicantName},
     \n We hope you are doing well. 
     \n\n We want to inform you that the institutional representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.  
     \n\n The following revisions have been requested:
     \n
-    \n A. Applicant Information: ${comments.applicant_notes ?? defaultRevisionText} 
-    \n B. Institutional Representative: ${comments.institution_rep_notes ?? defaultRevisionText} 
-    \n C. Collaborator: ${comments.collaborators_notes ?? defaultRevisionText} 
-    \n D. Project Information: ${comments.project_notes ?? defaultRevisionText} 
-    \n E. Requested Study: ${comments.requested_studies_notes ?? defaultRevisionText}
-    \n F. Ethics: ${comments.ethics_notes ?? defaultRevisionText} 
-    \n G. Data Access Agreement: ${comments.agreements_notes ?? defaultRevisionText}
-    \n H. Appendices: ${comments.appendices_notes ?? defaultRevisionText}
-    \n I. Sign & Submit: ${comments.sign_and_submit_notes ?? defaultRevisionText}
-    \n J. General Comments: ${comments.comments ?? defaultRevisionText}
+    \n A. Applicant Information: ${applicant_notes ? applicant_notes : defaultRevisionText} 
+    \n B. Institutional Representative: ${institution_rep_notes ? institution_rep_notes : defaultRevisionText} 
+    \n C. Collaborator: ${collaborators_notes ? collaborators_notes : defaultRevisionText} 
+    \n D. Project Information: ${project_notes ? project_notes : defaultRevisionText} 
+    \n E. Requested Study: ${requested_studies_notes ? requested_studies_notes : defaultRevisionText}
+    \n F. Ethics: ${ethics_notes ? ethics_notes : defaultRevisionText} 
+    \n G. Data Access Agreement: ${agreements_notes ? agreements_notes : defaultRevisionText}
+    \n H. Appendices: ${appendices_notes ? appendices_notes : defaultRevisionText}
+    \n I. Sign & Submit: ${comments.sign_and_submit_notes ? sign_and_submit_notes : defaultRevisionText}
+    \n J. General Comments: ${generalComments ? generalComments : defaultRevisionText}
     \n\n
     \n Please go to ${ui}/application/${id} to review the revisions.
     \n 
