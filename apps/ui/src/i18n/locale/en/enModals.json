@@ -59,6 +59,8 @@
 					"projectInformation": "D. Project Information",
 					"requestedStudy": "E. Requested Study",
 					"ethics": "F. Ethics",
+					"agreement": "G. Data Access Agreement",
+					"appendices": "H. Appendices",
 					"signSubmit": "Sign & Submit",
 					"general": "General Comments",
 					"cancel": "Cancel",
