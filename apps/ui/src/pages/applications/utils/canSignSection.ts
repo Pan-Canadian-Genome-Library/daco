@@ -20,6 +20,7 @@
 import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback';
 import { SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationStates, ApplicationStateValues, SignatureDTO } from '@pcgl-daco/data-model';
+import { UserRole } from '@pcgl-daco/validation';
 
 export const canSignSection = ({
 	role,
@@ -29,7 +30,7 @@ export const canSignSection = ({
 	revisions,
 }: {
 	signatures?: SignatureDTO;
-	role: 'DAC_MEMBER' | 'INSTITUTIONAL_REP' | 'APPLICANT' | 'ANONYMOUS' | undefined;
+	role?: UserRole;
 	state: ApplicationStateValues;
 	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
 	isEditMode: boolean;
