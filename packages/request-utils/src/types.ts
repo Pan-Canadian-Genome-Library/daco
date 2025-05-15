@@ -27,6 +27,7 @@ export const ErrorType = {
 	UNAUTHORIZED: 'UNAUTHORIZED',
 	FORBIDDEN: 'FORBIDDEN',
 	NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
+	CONFLICT: 'CONFLICT',
 } as const;
 
 export type ErrorTypes = (typeof ErrorType)[keyof typeof ErrorType];

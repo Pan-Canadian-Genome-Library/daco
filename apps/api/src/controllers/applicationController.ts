@@ -761,7 +761,7 @@ export const submitApplication = async ({
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
 			submissionResult = await appStateManager.submitDraft();
-		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
 			submissionResult = await appStateManager.approveRepReview();
 		} else {
 			submissionResult = await appStateManager.submitRepRevision();
