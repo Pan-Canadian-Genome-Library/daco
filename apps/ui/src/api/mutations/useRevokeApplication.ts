@@ -25,13 +25,13 @@ import { type ApplicationDTO } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-const useWithdrawApplication = () => {
+const useRevokeApplication = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 
 	return useMutation<ApplicationDTO, ServerError, { applicationId?: string | number }>({
 		mutationFn: async ({ applicationId }) => {
-			const response = await fetch(`/applications/${applicationId}/withdraw`, {
+			const response = await fetch(`/applications/${applicationId}/revoke`, {
 				method: 'POST',
 			}).then(withErrorResponseHandler);
 
@@ -42,22 +42,22 @@ const useWithdrawApplication = () => {
 			 * Used to invalidate our current application data to pull it fresh from the server,
 			 * we need to do this to have react rerender things in edit mode correctly.
 			 */
-			await queryClient.invalidateQueries({ queryKey: [`application-${data.id}`] }).then(() => {
+			await queryClient.refetchQueries({ queryKey: [`application-${data.id}`] }).then(() => {
 				notification.openNotification({
 					type: 'success',
-					message: translate('modals.editApplication.notifications.successTitle'),
-					description: translate('modals.editApplication.notifications.successMessage', { id: data.id }),
+					message: translate('modals.revokeApplication.notifications.successTitle'),
+					description: translate('modals.revokeApplication.notifications.successMessage', { id: data.id }),
 				});
 			});
 		},
 		onError: () => {
 			notification.openNotification({
 				type: 'error',
-				message: translate('modals.editApplication.notifications.failureTitle'),
-				description: translate('modals.editApplication.notifications.failureMessage'),
+				message: translate('modals.revokeApplication.notifications.failureTitle'),
+				description: translate('modals.revokeApplication.notifications.failureMessage'),
 			});
 		},
 	});
 };
 
-export default useWithdrawApplication;
+export default useRevokeApplication;

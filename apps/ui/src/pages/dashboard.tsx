@@ -28,10 +28,7 @@ import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard'
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { useUserContext } from '@/providers/UserProvider';
 import { type ApplicationDTO } from '@pcgl-daco/data-model';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
 
 const { Content } = Layout;
 
@@ -42,8 +39,6 @@ const DashboardPage = () => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const showDeviceRestriction = minWidth <= 1024;
-	const userInfo = useUserContext();
-	const navigate = useNavigate();
 
 	const { data: applicationData, error } = useGetApplicationList({
 		sort: [
@@ -58,16 +53,6 @@ const DashboardPage = () => {
 		],
 		pageSize: 100,
 	});
-
-	/**
-	 * Will auto redirect DAC Members and Institutional Reps to
-	 * their correct routes on component mount.
-	 */
-	useEffect(() => {
-		if (userInfo.isLoggedIn && userInfo.role !== 'APPLICANT') {
-			navigate('/login/redirect', { replace: true });
-		}
-	}, [navigate, userInfo.isLoggedIn, userInfo.role]);
 
 	return (
 		<>

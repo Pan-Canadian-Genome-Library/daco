@@ -19,53 +19,53 @@
 
 import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
-import useWithdrawApplication from '@/api/mutations/useWithdrawApplication';
+import useRevokeApplication from '@/api/mutations/useRevokeApplication';
 
-interface WithdrawModalProps {
-	currentSection: string;
+interface RevokeApplicationModalProps {
 	applicationId: number | string;
-	showEditModal: boolean;
-	setShowEditModal: (show: boolean) => void;
+	showRevokeModal: boolean;
+	setShowRevokeModal: (show: boolean) => void;
 }
-const WithdrawModal = ({ currentSection, applicationId, showEditModal, setShowEditModal }: WithdrawModalProps) => {
+const RevokeApplicationModal = ({
+	applicationId,
+	showRevokeModal,
+	setShowRevokeModal,
+}: RevokeApplicationModalProps) => {
 	const { Text } = Typography;
 
 	const { t: translate } = useTranslation();
-	const navigate = useNavigate();
-	const { mutateAsync: withdrawApplication, isPending: isWithdrawing } = useWithdrawApplication();
+	const { mutateAsync: revokeApplication, isPending: isRevoking } = useRevokeApplication();
 
 	const handleWithdrawApplication = () => {
-		withdrawApplication({ applicationId: applicationId }).then(() => {
-			setShowEditModal(false);
-			navigate(`${currentSection}/edit`, { replace: true });
+		revokeApplication({ applicationId: applicationId }).then(() => {
+			setShowRevokeModal(false);
 		});
 	};
 
 	return (
 		<Modal
-			title={translate('modals.editApplication.title', { id: applicationId })}
-			okText={translate('modals.editApplication.buttons.edit')}
+			title={translate('modals.revokeApplication.title', { id: applicationId })}
+			okText={translate('modals.revokeApplication.buttons.revoke')}
 			cancelText={translate('modals.buttons.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-			open={showEditModal}
+			open={showRevokeModal}
 			onOk={handleWithdrawApplication}
-			okType="default"
+			okType="danger"
 			okButtonProps={{
-				disabled: isWithdrawing,
+				disabled: isRevoking,
 			}}
 			cancelButtonProps={{
-				type: 'primary',
+				type: 'default',
 			}}
-			onCancel={() => setShowEditModal(false)}
+			onCancel={() => setShowRevokeModal(false)}
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }}>
-				<Text>{translate('modals.editApplication.description', { id: applicationId })}</Text>
+				<Text>{translate('modals.revokeApplication.description', { id: applicationId })}</Text>
 			</Flex>
 		</Modal>
 	);
 };
 
-export default WithdrawModal;
+export default RevokeApplicationModal;

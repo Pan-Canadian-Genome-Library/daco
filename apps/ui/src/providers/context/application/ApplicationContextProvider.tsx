@@ -21,8 +21,10 @@ import { createContext, useReducer } from 'react';
 
 import ApplicationReducer from '@/providers/context/application/ApplicationReducer';
 import { type ApplicationContextType, type ApplicationFormState } from '@/providers/context/application/types';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const initialState: ApplicationFormState = {
+	applicationState: ApplicationStates.DRAFT,
 	fields: {},
 	formState: {
 		isFormCompleted: false,

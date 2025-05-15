@@ -46,7 +46,7 @@ const useGetApplication = (id?: string | number) => {
 						return acc;
 					}, {} as Partial<ApplicationContentsResponse>);
 
-					dispatch({ type: 'UPDATE_APPLICATION', payload: { ...state, fields } });
+					dispatch({ type: 'UPDATE_APPLICATION', payload: { ...state, applicationState: data.state, fields } });
 				}
 				return data;
 			});
