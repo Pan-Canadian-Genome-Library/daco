@@ -50,7 +50,7 @@ export const getEmailConfig = {
 	email: {
 		host: parseResult.data.EMAIL_HOST,
 		port: parseResult.data.EMAIL_PORT,
-		fromAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
+		fromAddress: parseResult.data.EMAIL_FROM_ADDRESS,
 		fromName: parseResult.data.EMAIL_FROM_NAME,
 		contactAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
 		dacAddress: parseResult.data.EMAIL_DACO_ADDRESS,
