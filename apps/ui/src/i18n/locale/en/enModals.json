@@ -82,6 +82,32 @@
 		},
 		"authorization": {
 			"description": "For authorization, we require a valid institutional email address. This will be the email address you will use to log in to PCGL DACO and will be the email address associated with PCGL Controlled Data Access."
+		},
+		"applications": {
+			"global": {
+				"revisions": {
+					"title": "Request Revisions",
+					"description": "Please provide the revisions details for the sections that have issues. These details will be emailed to the applicant.",
+					"applicantInformation": "A. Applicant Information",
+					"institutionalRepresentative": "B. Institutional Representative",
+					"collaborators": "C. Collaborators",
+					"projectInformation": "D. Project Information",
+					"requestedStudy": "E. Requested Study",
+					"ethics": "F. Ethics",
+					"agreement": "G. Data Access Agreement",
+					"appendices": "H. Appendices",
+					"signSubmit": "Sign & Submit",
+					"general": "General Comments",
+					"cancel": "Cancel",
+					"sendRequest": "Send Request"
+				},
+				"success": {
+					"text": "Request for revisions has been sent to Application PCGL-{{id}}"
+				},
+				"failure": {
+					"text": "Request for revisions has failed"
+				}
+			}
 		}
 	}
 }

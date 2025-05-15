@@ -66,6 +66,8 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 			projectInformation: '',
 			requestedStudy: '',
 			ethics: '',
+			agreements: '',
+			appendices: '',
 			signature: '',
 			general: '',
 		},
@@ -219,7 +221,33 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									showCount
 									maxWordCount={300}
 									rows={2}
-									label={translate('modals.requestRevisions.signSubmit')}
+									label={translate('modals.applications.global.revisions.agreement')}
+									name="agreements"
+									control={control}
+									rule={rule}
+								/>
+							</Col>
+						</Row>
+						<Row>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
+								<TextAreaBox
+									showCount
+									maxWordCount={300}
+									rows={2}
+									label={translate('modals.applications.global.revisions.appendices')}
+									name="appendices"
+									control={control}
+									rule={rule}
+								/>
+							</Col>
+						</Row>
+						<Row>
+							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
+								<TextAreaBox
+									showCount
+									maxWordCount={300}
+									rows={2}
+									label={translate('modals.applications.global.revisions.signSubmit')}
 									name="signature"
 									control={control}
 									rule={rule}

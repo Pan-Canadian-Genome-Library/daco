@@ -1,0 +1,22 @@
+<mjml>
+  <mj-head>
+    <!-- HEAD (meta-data) -->
+    <mj-include path="./head.mjml" />
+    <!-- CSS -->
+    <mj-include path="./styles.mjml" />
+  </mj-head>
+
+  <mj-body background-color="#F0F0F0">
+    <!-- Header -->
+    <mj-include path="./components/header.mjml" />
+    <!-- Content -->
+    <mj-wrapper mj-class="section-background">
+      <mj-section css-class="main-content">
+        <!-- TEST TEMPLATE HERE -->
+      </mj-section>
+    </mj-wrapper>
+    <!-- Footer -->
+    <mj-include path="./components/footer.mjml" />
+
+  </mj-body>
+</mjml>

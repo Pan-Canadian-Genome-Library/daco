@@ -17,11 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getEmailConfig } from '@/config/emailConfig.ts';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
+import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
@@ -329,6 +331,8 @@ export const approveApplication = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
+		const collaboratorsService = await collaboratorsSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -349,7 +353,11 @@ export const approveApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
-		await service.findOneAndUpdate({ id: applicationId, update });
+		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		if (!updatedResult.success) {
+			return updatedResult;
+		}
 
 		const updatedApplication = await service.getApplicationById({ id: applicationId });
 
@@ -362,6 +370,40 @@ export const approveApplication = async ({
 		if (!dtoFriendlyData.success) {
 			return dtoFriendlyData;
 		}
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(`Unable to retrieve information to send approval email: ${applicationId}`, resultContents);
+			return dtoFriendlyData;
+		}
+
+		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
+
+		emailService.sendEmailApproval({
+			id: application.id,
+			to: applicant_institutional_email,
+			name: applicant_first_name || 'N/A',
+		});
+
+		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
+
+		if (!collaboratorResponse.success) {
+			logger.error(
+				`Unable to retrieve information to send approval email to collaborators: ${applicationId}`,
+				collaboratorResponse,
+			);
+			return dtoFriendlyData;
+		}
+
+		collaboratorResponse.data.forEach((collab) => {
+			emailService.sendEmailApproval({
+				id: application.id,
+				to: collab.institutional_email,
+				name: collab.first_name || 'N/A',
+			});
+		});
 
 		return dtoFriendlyData;
 	} catch (error) {
@@ -380,6 +422,7 @@ export const dacRejectApplication = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
 
 		if (!result.success) {
 			return result;
@@ -396,7 +439,12 @@ export const dacRejectApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, updated_at: new Date() };
-		await service.findOneAndUpdate({ id: applicationId, update });
+		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+
+		if (!updatedResult.success) {
+			return updatedResult;
+		}
+
 		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!updatedApplication.success) {
@@ -408,6 +456,23 @@ export const dacRejectApplication = async ({
 		if (!dtoFriendlyData.success) {
 			return dtoFriendlyData;
 		}
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(`Unable to retrieve information to send reject email: ${applicationId}`, resultContents);
+			return dtoFriendlyData;
+		}
+
+		const { applicant_institutional_email, applicant_first_name } = resultContents.data.contents;
+
+		emailService.sendEmailReject({
+			id: application.id,
+			to: applicant_institutional_email,
+			name: applicant_first_name || 'N/A',
+			comment: 'Invalid application contents was provided', // TODO: there doesn't seem to be any reject comment available, add functionality when implemented
+		});
 
 		return dtoFriendlyData;
 	} catch (error) {
@@ -428,6 +493,7 @@ export const submitRevision = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
 
 		if (!result.success) {
 			return result;
@@ -453,6 +519,42 @@ export const submitRevision = async ({
 
 		if (!submittedRevision.success) {
 			return failure('INVALID_STATE_TRANSITION', submittedRevision.message || 'Failed to submit application revision.');
+		}
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(
+				`Unable to retrieve information to send submitted revisions email: ${applicationId}`,
+				resultContents,
+			);
+			return submittedRevision;
+		}
+
+		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
+			resultContents.data.contents;
+
+		if (result.data.state === ApplicationStates.DAC_REVIEW) {
+			const {
+				email: { dacAddress },
+			} = getEmailConfig;
+
+			emailService.sendEmailDacForSubmittedRevisions({
+				id: application.id,
+				to: dacAddress,
+				applicantName: applicant_first_name || 'N/A',
+				submittedDate: submittedRevision.data.created_at,
+			});
+		} else {
+			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
+			emailService.sendEmailInstitutionalRepForReview({
+				id: application.id,
+				to: institutional_rep_email,
+				repName: institutional_rep_first_name || 'N/A',
+				applicantName: applicant_first_name || 'N/A',
+				submittedDate: submittedRevision.data.created_at,
+			});
 		}
 
 		return submittedRevision;
@@ -508,7 +610,7 @@ export const requestApplicationRevisionsByDac = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
-
+		const emailService = await emailSvc();
 		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -546,10 +648,32 @@ export const requestApplicationRevisionsByDac = async ({
 			return aliasResult;
 		}
 
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(
+				`Unable to retrieve information to send dac revisions requested email: ${applicationId}`,
+				resultContents,
+			);
+			return aliasResult;
+		}
+
+		const { applicant_first_name } = resultContents.data.contents;
+		const {
+			email: { dacAddress },
+		} = getEmailConfig;
+
+		emailService.sendEmailApplicantDacRevisions({
+			id: application.id,
+			to: dacAddress,
+			applicantName: applicant_first_name || 'N/A',
+			comments: revisionRequestResult.data,
+		});
+
 		return aliasResult;
 	} catch (error) {
 		logger.error(`Failed to request revisions for applicationId: ${applicationId}`, error);
-
 		return failure('SYSTEM_ERROR', 'An error occurred while processing the request.');
 	}
 };
@@ -564,6 +688,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
+		const emailService = await emailSvc();
 
 		const result = await service.getApplicationById({ id: applicationId });
 
@@ -590,6 +715,13 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return revisionRequestResult;
 		}
 
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success) {
+			return resultContents;
+		}
+
 		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!updatedApplication.success) {
@@ -601,6 +733,26 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 		if (!aliasResult.success) {
 			return aliasResult;
 		}
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(
+				`Unable to retrieve information to send institutional rep revisions request email: ${applicationId}`,
+				resultContents,
+			);
+			return aliasResult;
+		}
+
+		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
+			resultContents.data.contents;
+
+		emailService.sendEmailApplicantRepRevisions({
+			id: application.id,
+			to: institutional_rep_email,
+			applicantName: applicant_first_name || 'N/A',
+			institutionalRepFirstName: institutional_rep_first_name || 'N/A',
+			institutionalRepLastName: institutional_rep_last_name || 'N/A',
+			comments: revisionRequestResult.data,
+		});
 
 		return aliasResult;
 	} catch (error) {
@@ -618,6 +770,7 @@ export const submitApplication = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
+		const emailService = await emailSvc();
 
 		// Fetch the application
 		const result = await service.getApplicationById({ id: applicationId });
@@ -640,6 +793,55 @@ export const submitApplication = async ({
 			submissionResult = await appStateManager.approveRepReview();
 		} else {
 			submissionResult = await appStateManager.submitRepRevision();
+		}
+
+		if (!submissionResult.success) {
+			return submissionResult;
+		}
+
+		// Fetch the application with contents to send the email
+		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(`Unable to retrieve information to send submission email: ${applicationId}`, resultContents);
+			return submissionResult;
+		}
+
+		const {
+			applicant_first_name,
+			institutional_rep_first_name,
+			institutional_rep_email,
+			applicant_institutional_email,
+		} = resultContents.data.contents;
+
+		if (result.data.state === ApplicationStates.DRAFT) {
+			//  email to institutional rep for review
+			emailService.sendEmailInstitutionalRepForReview({
+				id: application.id,
+				to: institutional_rep_email,
+				applicantName: applicant_first_name || 'N/A',
+				repName: institutional_rep_first_name || 'N/A',
+				submittedDate: submissionResult.data.created_at,
+			});
+		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+			const {
+				email: { dacAddress },
+			} = getEmailConfig;
+
+			// Send email to DAC for review
+			emailService.sendEmailDacForReview({
+				id: application.id,
+				to: dacAddress,
+				applicantName: applicant_first_name || 'N/A',
+				submittedDate: submissionResult.data.created_at,
+			});
+
+			//  send email to applicant that application is submitted to DAC
+			emailService.sendEmailApplicantApplicationSubmitted({
+				id: application.id,
+				to: applicant_institutional_email,
+				name: applicant_first_name || 'N/A',
+			});
 		}
 
 		return submissionResult;
