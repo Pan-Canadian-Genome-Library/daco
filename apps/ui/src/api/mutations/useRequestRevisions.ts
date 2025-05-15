@@ -19,45 +19,48 @@
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { ApplicationResponseData, ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useMutation } from '@tanstack/react-query';
 
-const useRepRevisions = () => {
+const useRequestRevisions = (currentState: ApplicationStateValues) => {
 	return useMutation<
 		ApplicationResponseData,
 		ServerError,
 		RevisionsModalSchemaType & { applicationId: string | number }
 	>({
 		mutationFn: async (payload) => {
-			const response = await fetch(`/applications/rep/${payload.applicationId}/request-revisions`, {
-				method: 'POST',
-				body: JSON.stringify({
-					applicantApproved: !payload.applicantInformation,
-					applicantNotes: payload.applicantInformation,
-					institutionRepApproved: !payload.institutionalRep,
-					institutionRepNotes: payload.institutionalRep,
-					collaboratorsApproved: !payload.collaborators,
-					collaboratorsNotes: payload.collaborators,
-					projectApproved: !payload.projectInformation,
-					projectNotes: payload.projectInformation,
-					requestedStudiesApproved: !payload.requestedStudy,
-					requestedStudiesNotes: payload.requestedStudy,
-					ethicsApproved: !payload.ethics,
-					ethicsNotes: payload.ethics,
-					agreementsApproved: !payload.agreements,
-					agreementsNotes: payload.agreements,
-					appendicesApproved: !payload.appendices,
-					appendicesNotes: payload.appendices,
-					signAndSubmitApproved: !payload.signature,
-					signAndSubmitNotes: payload.signature,
-					comments: payload.general,
-				}),
-			}).then(withErrorResponseHandler);
+			const response = await fetch(
+				`/applications/${currentState === ApplicationStates.DAC_REVIEW ? 'dac' : 'rep'}/${payload.applicationId}/request-revisions`,
+				{
+					method: 'POST',
+					body: JSON.stringify({
+						applicantApproved: !payload.applicantInformation,
+						applicantNotes: payload.applicantInformation,
+						institutionRepApproved: !payload.institutionalRep,
+						institutionRepNotes: payload.institutionalRep,
+						collaboratorsApproved: !payload.collaborators,
+						collaboratorsNotes: payload.collaborators,
+						projectApproved: !payload.projectInformation,
+						projectNotes: payload.projectInformation,
+						requestedStudiesApproved: !payload.requestedStudy,
+						requestedStudiesNotes: payload.requestedStudy,
+						ethicsApproved: !payload.ethics,
+						ethicsNotes: payload.ethics,
+						agreementsApproved: !payload.agreements,
+						agreementsNotes: payload.agreements,
+						appendicesApproved: !payload.appendices,
+						appendicesNotes: payload.appendices,
+						signAndSubmitApproved: !payload.signature,
+						signAndSubmitNotes: payload.signature,
+						comments: payload.general,
+					}),
+				},
+			).then(withErrorResponseHandler);
 
 			return await response.json();
 		},
 	});
 };
 
-export default useRepRevisions;
+export default useRequestRevisions;
