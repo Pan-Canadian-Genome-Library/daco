@@ -63,10 +63,10 @@ export const GenerateEmailInstitutionalRepReview = ({
                     Action Required
                 </mj-text>
                 <mj-text>
-                    Please carefully review the application. There are two ways to do so, you can review using the <a href="${ui}" target="_blank" rel="nofollow">DACO portal </a>, or download the application PDF from the 'Sign & Submit' page. 
+                    Please carefully review the application. There are two ways to do so, you can review using the <a href="${ui}" target="_blank" rel="nofollow">DACO Portal</a>, or download the application PDF from the 'Sign & Submit' page. 
                 </mj-text>
                 <mj-text>
-                    If you are satisfied with the details, proceed to the 'ign & Submit' page' provide your e-signature, and click on the 'Submit Application' button to complete the review. The application will be forwarded to the Data Access Committee for further review. The applicant will receive an email notification regarding your submission.
+                    If you are satisfied with the details, proceed to the 'Sign & Submit' page' provide your e-signature, and click on the 'Submit Application' button to complete the review. The application will be forwarded to the Data Access Committee for further review. The applicant will receive an email notification regarding your submission.
                 </mj-text>
                 <mj-text>
                     If you are not satisfied with the application and would like to request revisions, click the 'Request Revisions' button. A window will open where you can enter requests. When you are done, click the 'Send Request' button to complete the review. Please do not submit the application if you requested revisions. The applicant will receive an email notification about your requests and comments, and they will update the application based on your feedback. DACO will notify you when the application is re-submitted for your review. 
