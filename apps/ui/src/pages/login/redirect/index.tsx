@@ -26,7 +26,7 @@ import { useNavigate } from 'react-router';
 
 const LoginRedirect = () => {
 	const { t: translate } = useTranslation();
-	const { role } = useUserContext();
+	const { role, isLoading } = useUserContext();
 	const navigate = useNavigate();
 
 	const redirectRep = () => {
@@ -38,6 +38,10 @@ const LoginRedirect = () => {
 	};
 
 	useEffect(() => {
+		if (isLoading) {
+			return;
+		}
+
 		switch (role) {
 			case 'APPLICANT':
 				navigate('/dashboard', { replace: true });
@@ -51,7 +55,7 @@ const LoginRedirect = () => {
 			default:
 				navigate('/', { replace: true });
 		}
-	}, [navigate, role]);
+	}, [isLoading, navigate, role]);
 
 	return <FullscreenLoader loadingText={translate('global.login.loggingIn')} />;
 };
