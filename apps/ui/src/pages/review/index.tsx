@@ -58,10 +58,6 @@ const InstitutionalRepLogin = () => {
 	};
 
 	useEffect(() => {
-		if (isLoggedIn && loggedInRole !== 'INSTITUTIONAL_REP') {
-			navigation('/login/redirect', { replace: true });
-		}
-
 		if (match?.params.applicationId) {
 			const appId = Number(match.params.applicationId);
 			const existingSessionInfo = getExtraSessionInformation();
