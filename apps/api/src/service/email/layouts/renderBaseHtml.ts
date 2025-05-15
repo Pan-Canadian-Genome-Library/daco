@@ -65,8 +65,7 @@ const FooterRender = () => {
 		<mj-wrapper mj-class="footer-background">
 			<mj-section>
 				<mj-column css-class="footer-wrapper">
-				<mj-text css-class="footer-text">© ${currentDate.getFullYear()} PCGL DACO. All rights reserved. |<a href="" target="_blank"> Privacy Policy </a>
-					| <a href="" target="_blank">Terms and Conditions </a>
+				<mj-text css-class="footer-text">&copy; ${currentDate.getFullYear()} PCGL DACO. All rights reserved. &nbsp; | &nbsp;<a href="" target="_blank">Privacy Policy</a> &nbsp; | &nbsp; <a href="" target="_blank">Terms and Conditions</a>
 				</mj-text>
 				</mj-column>
 			</mj-section>
