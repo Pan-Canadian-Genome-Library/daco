@@ -29,7 +29,8 @@ import { useTranslation } from 'react-i18next';
 import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
-import useRepRevisions from '@/api/mutations/useRepRevisions';
+import useRequestRevisions from '@/api/mutations/useRequestRevisions';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 
 const { Text } = Typography;
@@ -45,7 +46,10 @@ export interface RevisionModalStateProps {
 }
 
 const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen }: RevisionModalStateProps) => {
-	const { mutateAsync: requestRevisions, isPending: isRequestingRevisions } = useRepRevisions();
+	const { state: application } = useApplicationContext();
+	const { mutateAsync: requestRevisions, isPending: isRequestingRevisions } = useRequestRevisions(
+		application.applicationState,
+	);
 	const { t: translate } = useTranslation();
 	const notification = useNotificationContext();
 
