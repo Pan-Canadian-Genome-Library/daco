@@ -28,10 +28,16 @@ interface FullscreenLoaderProps {
 	loadingText?: string;
 }
 
+/**
+ * A component which displays a full page loading spinner, with optional text below it.
+ * @param trueFullscreen - This when set to true will utilize the antd `<Spin>`'s fullscreen prop. This prop, when enabled will display the loader overtop of all other UI elements, displaying overtop all chrome with a black overlay.
+ * @param loadingText - When provided will show text below the loading spinner indicating what function is being processed. NOTE: This cannot be used with `trueFullscreen` enabled. This will result in a console warning being thrown.
+ * @returns JSX.Component -  A JSX Component with the full page spinner.
+ */
 const FullscreenLoader = ({ trueFullscreen = false, loadingText }: FullscreenLoaderProps) => {
 	if (trueFullscreen && loadingText) {
 		console.error(
-			'Error: FullscreenLoader - Using trueFullscreen with loadingText provided will result in text appearing behind the loader. ',
+			'FullscreenLoader - Using trueFullscreen with loadingText provided will result in text appearing behind the loader. ',
 		);
 	}
 

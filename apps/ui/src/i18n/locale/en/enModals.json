@@ -4,6 +4,41 @@
 			"cancel": "Cancel",
 			"ok": "OK"
 		},
+		"requestRevisions": {
+			"title": "Request Revisions",
+			"description": "Please provide the revisions details for the sections that have issues. These details will be emailed to the applicant.",
+			"applicantInformation": "A. Applicant Information",
+			"institutionalRepresentative": "B. Institutional Representative",
+			"collaborators": "C. Collaborators",
+			"projectInformation": "D. Project Information",
+			"requestedStudy": "E. Requested Study",
+			"ethics": "F. Ethics",
+			"signSubmit": "Sign & Submit",
+			"general": "General Comments",
+			"buttons": {
+				"sendRequest": "Send Request"
+			},
+			"notifications": {
+				"failure": {
+					"title": "Failed to Request Revisions",
+					"text": "Sorry, something went wrong while requesting revisions for this application. Please try again later."
+				},
+				"revisionsRequested": "Request for revisions has been sent to Application PCGL-{{id}}"
+			}
+		},
+		"revokeApplication": {
+			"title": "Are you sure you want to revoke application PCGL-{{id}}?",
+			"description": "If so, the applicant and all collaborators will lose data access.",
+			"buttons": {
+				"revoke": "Revoke"
+			},
+			"notifications": {
+				"successTitle": "Application Successfully Revoked.",
+				"successMessage": "Application PCGL-{{id}} has been revoked. The applicant and all collaborators no longer have data access.",
+				"failureTitle": "Failed to Revoke Application",
+				"failureMessage": "Something went wrong. Application could not be be revoked. Please try again later."
+			}
+		},
 		"editApplication": {
 			"title": "Are you sure you want to edit application PCGL-{{id}}",
 			"description": "Your application PCGL-{{id}} has already been submitted for review. If you choose to edit it, the application will be moved back to Draft status, requiring you to resubmit it for review. Please note that this will extend the processing time. We recommend making changes only when absolutely necessary.",
