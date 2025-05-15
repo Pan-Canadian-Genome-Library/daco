@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SectionRoutes } from '@/pages/AppRouter';
 import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
 import { ApplicationStates } from '@pcgl-daco/data-model';
+import { SectionRoutes } from '@pcgl-daco/validation';
 import { SectionMenuItemProps } from '../SectionMenuItem';
 
 /**
