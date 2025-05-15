@@ -37,7 +37,7 @@ export const GenerateEmailDacForSubmittedRevision = ({
                     Dear DAC Members,
                 </mj-text>
                 <mj-text>                    
-                    We are writing to inform you that the  <a href="" target="_blank" rel="nofollow">PCGL DACO application </a> that you requested revisions on is now ready for your review. The applicant has re-submitted the application based on your feedback, and we kindly request that you review the application at your earliest convenience. <br /> <br />
+                    We are writing to inform you that the  <a href="" target="_blank" rel="nofollow">PCGL DACO application</a> that you requested revisions on is now ready for your review. The applicant has re-submitted the application based on your feedback, and we kindly request that you review the application at your earliest convenience. <br /> <br />
                 <mj-text>
                     Here are the application details: <br /> <br />
                 </mj-text>

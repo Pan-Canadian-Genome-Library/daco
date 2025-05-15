@@ -33,7 +33,7 @@ export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateAp
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application </a> has been successfully submitted for DAC review by the institutional representative. The review process is now underway, and you will be notified once any updates or decisions are made.<br /> <br />
+                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully submitted for DAC review by the institutional representative. The review process is now underway, and you will be notified once any updates or decisions are made.<br /> <br />
                 <mj-text>
                     If you have any questions or need further information during this time, please do not hesitate to contact us. <br /> <br />
                 </mj-text>
