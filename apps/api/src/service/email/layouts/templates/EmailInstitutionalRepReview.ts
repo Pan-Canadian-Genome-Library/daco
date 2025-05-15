@@ -41,7 +41,7 @@ export const GenerateEmailInstitutionalRepReview = ({
                     We hope this message finds you well.
                 </mj-text>
                 <mj-text>
-                    A new PCGL <a href="" target="_blank" rel="nofollow">DACO application</a> has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
+                    A new PCGL <a href="${ui}/review/${id}/" target="_blank" rel="nofollow">DACO application</a> has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
                 </mj-text>
                 <mj-text>
                     Here are the details of the application:
