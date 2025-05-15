@@ -43,7 +43,7 @@ const { useToken } = theme;
 
 type AppHeaderProps = {
 	id: number;
-	state: ApplicationStateValues;
+	appState: ApplicationStateValues;
 	currentSection: string;
 	isEditMode: boolean;
 };
@@ -54,7 +54,7 @@ export interface RevisionModalStateProps {
 	onSubmit: (data: RevisionsModalSchemaType) => void;
 }
 
-const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppHeaderProps) => {
+const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: AppHeaderProps) => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
@@ -72,8 +72,9 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const [showApproveModal, setShowApproveModal] = useState(false);
 	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
 
-	const isWithdrawable = state === ApplicationStates.INSTITUTIONAL_REP_REVIEW || state === ApplicationStates.DAC_REVIEW;
-	const canShowEdit = (state === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
+	const isWithdrawable =
+		appState === ApplicationStates.INSTITUTIONAL_REP_REVIEW || appState === ApplicationStates.DAC_REVIEW;
+	const canShowEdit = (appState === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
 
 	const navigate = useNavigate();
 
@@ -119,7 +120,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 	const onEditButtonClick = () => {
 		if (isWithdrawable) {
 			setShowEditModal(true);
-		} else if (state === 'DRAFT') {
+		} else if (appState === 'DRAFT') {
 			navigate(`${currentSection}/edit`, { replace: true });
 		}
 	};
@@ -167,7 +168,7 @@ const ApplicationViewerHeader = ({ id, state, currentSection, isEditMode }: AppH
 								vertical
 								gap={'middle'}
 							>
-								<ApplicationStatusSteps currentStatus={state} />
+								<ApplicationStatusSteps currentStatus={appState} />
 							</Flex>
 						</Flex>
 					</Col>
