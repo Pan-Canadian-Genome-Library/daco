@@ -148,7 +148,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			title={translate('applicationViewer.title', { id: id })}
 			description={`${formatDate(new Date(), new Date())}`}
 		>
-			<Flex style={{ width: '100%' }} justify="center" align="end" vertical>
+			<Flex style={{ width: '100%' }} justify="center" align="end" vertical gap={'middle'}>
 				<Row style={{ width: '100%' }} justify={'end'} wrap>
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }} flex={1}>
 						<Flex
@@ -159,7 +159,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 							<Flex
 								flex={1}
 								style={{
-									padding: token.paddingLG,
+									padding: `${token.paddingLG} 0`,
 									borderRadius: token.borderRadius,
 									margin: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
 								}}
@@ -173,87 +173,89 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 						</Flex>
 					</Col>
 				</Row>
-				<Flex
-					gap={'middle'}
-					style={{
-						paddingInline: token.paddingLG,
-						borderRadius: token.borderRadius,
-						marginInline: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
-					}}
-				>
-					{renderHeaderButtons()}
-				</Flex>
-				<WithdrawApplicationModal
-					applicationId={id}
-					currentSection={currentSection}
-					showEditModal={showEditModal}
-					setShowEditModal={setShowEditModal}
-				/>
-
-				{/* Close Modal */}
-				<CloseApplicationModal
-					id={id}
-					setShowCloseApplicationModal={setShowCloseApplicationModal}
-					showCloseApplicationModal={showCloseApplicationModal}
-				/>
-				{/* Close Modal */}
-
-				{/* Revoke Modal */}
-				<RejectApplicationModal
-					id={id}
-					isOpen={showRejectModal}
-					setIsOpen={setShowRejectModal}
-					setShowSuccessRejectsModal={setShowRejectSuccessModal}
-				/>
-				<SuccessModal
-					successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
-					okText={translate('modals.buttons.ok')}
-					isOpen={showRejectSuccessModal}
-					onOk={() => setShowRejectSuccessModal(false)}
-				/>
-				{/* Revoke Modal */}
-
-				{/* Revisions Modal */}
-				<RequestRevisionsModal
-					id={id}
-					setSuccessModalOpen={setShowReqRevisionsSuccessModal}
-					isOpen={openRevisionsModal}
-					setIsOpen={setOpenRevisionsModal}
-				/>
-				<SuccessModal
-					successText={translate('modals.requestRevisions.notifications.revisionsRequested', { id })}
-					okText={translate('modals.buttons.ok')}
-					isOpen={showReqRevisionsSuccessModal}
-					onOk={() => {
-						setShowReqRevisionsSuccessModal(false);
-						navigate('/dashboard');
-					}}
-				/>
-				{/* Revisions Modal */}
-
-				{/* Revoke Modal */}
-				<RevokeApplicationModal
-					applicationId={id}
-					showRevokeModal={showRevokeModal}
-					setShowRevokeModal={setShowRevokeModal}
-				/>
-				{/* Revoke Modal */}
-
-				{/* Approval Modal */}
-				<ApproveApplicationModal
-					id={id}
-					isOpen={showApprovalModal}
-					setIsOpen={setShowApprovalModal}
-					setShowSuccessApproveModal={setShowSuccessApproveModal}
-				/>
-				<SuccessModal
-					successText={translate('modals.approveApplication.notifications.applicationApproveSuccess', { id })}
-					okText={translate('modals.buttons.ok')}
-					isOpen={showSuccessApproveModal}
-					onOk={() => setShowSuccessApproveModal(false)}
-				/>
-				{/* Approval Modal */}
+				<Row style={{ width: '100%' }} justify={'end'} wrap>
+					<Flex
+						gap={'middle'}
+						style={{
+							borderRadius: token.borderRadius,
+							marginRight: isLowResDevice ? 'auto' : `${token.paddingSM}px 0`,
+							marginLeft: isLowResDevice ? 'none' : `${token.paddingSM}px 0`,
+						}}
+					>
+						{renderHeaderButtons()}
+					</Flex>
+				</Row>
 			</Flex>
+			<WithdrawApplicationModal
+				applicationId={id}
+				currentSection={currentSection}
+				showEditModal={showEditModal}
+				setShowEditModal={setShowEditModal}
+			/>
+
+			{/* Close Modal */}
+			<CloseApplicationModal
+				id={id}
+				setShowCloseApplicationModal={setShowCloseApplicationModal}
+				showCloseApplicationModal={showCloseApplicationModal}
+			/>
+			{/* Close Modal */}
+
+			{/* Revoke Modal */}
+			<RejectApplicationModal
+				id={id}
+				isOpen={showRejectModal}
+				setIsOpen={setShowRejectModal}
+				setShowSuccessRejectsModal={setShowRejectSuccessModal}
+			/>
+			<SuccessModal
+				successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showRejectSuccessModal}
+				onOk={() => setShowRejectSuccessModal(false)}
+			/>
+			{/* Revoke Modal */}
+
+			{/* Revisions Modal */}
+			<RequestRevisionsModal
+				id={id}
+				setSuccessModalOpen={setShowReqRevisionsSuccessModal}
+				isOpen={openRevisionsModal}
+				setIsOpen={setOpenRevisionsModal}
+			/>
+			<SuccessModal
+				successText={translate('modals.requestRevisions.notifications.revisionsRequested', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showReqRevisionsSuccessModal}
+				onOk={() => {
+					setShowReqRevisionsSuccessModal(false);
+					navigate('/dashboard');
+				}}
+			/>
+			{/* Revisions Modal */}
+
+			{/* Revoke Modal */}
+			<RevokeApplicationModal
+				applicationId={id}
+				showRevokeModal={showRevokeModal}
+				setShowRevokeModal={setShowRevokeModal}
+			/>
+			{/* Revoke Modal */}
+
+			{/* Approval Modal */}
+			<ApproveApplicationModal
+				id={id}
+				isOpen={showApprovalModal}
+				setIsOpen={setShowApprovalModal}
+				setShowSuccessApproveModal={setShowSuccessApproveModal}
+			/>
+			<SuccessModal
+				successText={translate('modals.approveApplication.notifications.applicationApproveSuccess', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showSuccessApproveModal}
+				onOk={() => setShowSuccessApproveModal(false)}
+			/>
+			{/* Approval Modal */}
 		</PageHeader>
 	);
 };
