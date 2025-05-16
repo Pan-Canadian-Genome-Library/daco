@@ -15,6 +15,13 @@
 		"description2": "When completed, obtain the required signatures and submit the signed application for review.",
 		"description3": "The PCGL DACO will review the application and approved project teams will be granted access to PCGL Controlled Data."
 	},
+	"notFound": {
+		"title": "404 Page Not Found",
+		"description": "Sorry, that page doesn’t exist.",
+		"buttons": {
+			"home": "Go to Homepage"
+		}
+	},
 	"dashboard": {
 		"title": "My Applications",
 		"description": "This is where you can manage your Applications for Access to PCGL Controlled Data. Access will be granted starting from the date of approval by the PCGL DACO.",
