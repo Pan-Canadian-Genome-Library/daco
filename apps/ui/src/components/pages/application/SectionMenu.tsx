@@ -22,30 +22,32 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/mutations/useEditApplication';
-import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback';
 import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
-import { ApplicationSectionRoutes, SectionRoutes, SectionRoutesValues } from '@/pages/AppRouter';
+import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { ApplicationStateValues } from '@pcgl-daco/data-model';
+import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 import { ValidateAllSections } from './utils/validatorFunctions';
 
 type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
 	appId: string | number;
-	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
+	revisions: Partial<SectionRevision>;
+	appState: ApplicationStateValues;
 };
 
-const SectionMenu = ({ currentSection, isEditMode, appId, revisions }: SectionMenuProps) => {
+const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetCollaborators(appId);
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
-		if (state?.formState?.isDirty) {
-			editApplication({ id: appId });
+		if (state?.formState.isDirty) {
+			editApplication({ id: appId, revisions });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};
@@ -104,6 +106,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions }: SectionMe
 										isEditMode={isEditMode}
 										isLocked={determineIfLocked(route)}
 										hasCollaborators={data && data.length > 0}
+										appState={appState}
 									/>
 								),
 								disabled: route === SectionRoutes.SIGN && !ValidateAllSections(state.fields),

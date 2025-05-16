@@ -40,10 +40,15 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 	const { t: translate } = useTranslation();
 	const navigate = useNavigate();
 	const { id } = useParams();
-	const { mutate: editApplication } = useEditApplication();
 	const { state } = useApplicationContext();
-	const { appId, state: appLifecycleStep } = useOutletContext<ApplicationOutletContext>();
+	const { appId, state: appLifecycleStep, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { mutate: editApplication } = useEditApplication();
 	const shouldNavigateToEditMode = appLifecycleStep === 'DRAFT' && isEditMode;
+	const showSignAndSubmit =
+		appLifecycleStep !== 'DRAFT' &&
+		appLifecycleStep !== 'INSTITUTIONAL_REP_REVISION_REQUESTED' &&
+		appLifecycleStep !== 'DAC_REVISIONS_REQUESTED' &&
+		appLifecycleStep !== 'INSTITUTIONAL_REP_REVIEW';
 
 	// Determine the next and previous route
 	const { previousRoute, nextRoute } = useMemo(() => {
@@ -60,20 +65,20 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 
 	const goBack = () => {
 		if (state?.formState?.isDirty) {
-			editApplication({ id: appId });
+			editApplication({ id: appId, revisions });
 		}
 		navigate(`/application/${id}/${previousRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const nextSection = () => {
 		if (state?.formState?.isDirty) {
-			editApplication({ id: appId });
+			editApplication({ id: appId, revisions });
 		}
 		navigate(`/application/${id}/${nextRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const submitApplication = () => {
-		if (signSubmitHandler !== undefined && isEditMode) {
+		if (signSubmitHandler !== undefined) {
 			signSubmitHandler();
 			return;
 		}
@@ -91,11 +96,14 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 					{translate('button.next')}
 				</Button>
 			) : (
-				<Button onClick={submitApplication} disabled={submitDisabled} type="primary">
-					{appLifecycleStep === 'INSTITUTIONAL_REP_REVISION_REQUESTED' || appLifecycleStep === 'DAC_REVISIONS_REQUESTED'
-						? translate('button.submitRevisions')
-						: translate('button.submitApplication')}
-				</Button>
+				!showSignAndSubmit && (
+					<Button onClick={submitApplication} disabled={submitDisabled} type="primary">
+						{appLifecycleStep === 'INSTITUTIONAL_REP_REVISION_REQUESTED' ||
+						appLifecycleStep === 'DAC_REVISIONS_REQUESTED'
+							? translate('button.submitRevisions')
+							: translate('button.submitApplication')}
+					</Button>
+				)
 			)}
 		</Flex>
 	);

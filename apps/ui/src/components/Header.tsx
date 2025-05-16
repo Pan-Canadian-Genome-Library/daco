@@ -26,6 +26,7 @@ import { useLocation } from 'react-router';
 
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { clearExtraSessionInformation } from '@/global/localStorage';
 import { pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
@@ -142,6 +143,7 @@ const HeaderComponent = () => {
 	};
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
+		onClickAction: () => clearExtraSessionInformation(),
 		buttonProps: {
 			type: `${isHome ? 'default' : 'text'}`,
 			color: `${isHome ? 'primary' : 'default'}`,

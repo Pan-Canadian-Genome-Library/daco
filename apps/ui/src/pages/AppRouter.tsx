@@ -38,21 +38,7 @@ import LoginRedirect from '@/pages/login/redirect';
 import ManageApplicationsPage from '@/pages/manage/applications';
 import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
-
-export const SectionRoutes = {
-	INTRO: 'intro',
-	APPLICANT: 'applicant',
-	INSTITUTIONAL: 'institutional',
-	COLLABORATORS: 'collaborators',
-	PROJECT: 'project',
-	STUDY: 'study',
-	ETHICS: 'ethics',
-	AGREEMENT: 'agreement',
-	APPENDICES: 'appendices',
-	SIGN: 'sign',
-} as const;
-
-export type SectionRoutesValues = (typeof SectionRoutes)[keyof typeof SectionRoutes];
+import { SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 
 export interface ApplicationSectionRouteTypes {
 	route: SectionRoutesValues;
@@ -122,7 +108,7 @@ function AppRouter() {
 				<Route
 					path="dashboard"
 					element={
-						<ProtectedRoute>
+						<ProtectedRoute requiredRoles={['APPLICANT']} redirectTo={'/login/redirect/'}>
 							<DashboardPage />
 						</ProtectedRoute>
 					}
@@ -146,12 +132,11 @@ function AppRouter() {
 				<Route
 					path="manage/applications"
 					element={
-						<ProtectedRoute requiredRoles={['DAC_MEMBER']}>
+						<ProtectedRoute requiredRoles={['DAC_MEMBER']} redirectTo={'/login/redirect/'}>
 							<ManageApplicationsPage />
 						</ProtectedRoute>
 					}
 				/>
-
 				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
 			</Route>
 		</Routes>

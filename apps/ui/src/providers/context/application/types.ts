@@ -17,8 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SectionRoutesValues } from '@/pages/AppRouter';
-import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
+import { ApplicationContentsResponse, ApplicationStateValues } from '@pcgl-daco/data-model';
+import { SectionRoutesValues } from '@pcgl-daco/validation';
 import { Dispatch } from 'react';
 
 export interface FormState {
@@ -32,6 +32,7 @@ export type SectionsVisited<T extends string> = {
 };
 
 export interface ApplicationFormState {
+	applicationState: ApplicationStateValues;
 	fields: Partial<ApplicationContentsResponse>;
 	formState: FormState;
 }

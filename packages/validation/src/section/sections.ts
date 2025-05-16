@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,39 +17,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pcglColours } from '@/providers/ThemeProvider';
-import { ApplicationStateValues } from '@pcgl-daco/data-model';
-import { Flex, Typography } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { RenderIcon } from './utils/IconSelector';
+export const SectionRoutes = {
+	INTRO: 'intro',
+	APPLICANT: 'applicant',
+	INSTITUTIONAL: 'institutional',
+	COLLABORATORS: 'collaborators',
+	PROJECT: 'project',
+	STUDY: 'study',
+	ETHICS: 'ethics',
+	AGREEMENT: 'agreement',
+	APPENDICES: 'appendices',
+	SIGN: 'sign',
+} as const;
 
-const { Text } = Typography;
+export type SectionRoutesValues = (typeof SectionRoutes)[keyof typeof SectionRoutes];
 
-export type SectionMenuItemProps = {
-	isCurrentSection: boolean;
-	isSectionTouched?: boolean;
-	isSectionValid?: boolean;
-	label: string;
-	isEditMode?: boolean;
-	isLocked?: boolean;
-	hasCollaborators?: boolean;
-	appState: ApplicationStateValues;
+export type RevisionType = {
+	isApproved: boolean | undefined;
+	comment: string | null;
 };
 
-const SectionMenuItem = (props: SectionMenuItemProps) => {
-	const { t: translate } = useTranslation();
-
-	const iconColour = props.isEditMode ? pcglColours.primary : 'inherit';
-
-	return (
-		<Flex style={{ width: '100%' }} justify="space-between">
-			<Text style={{ color: 'inherit' }} ellipsis>
-				{translate(`menu.${props.label}`)}
-			</Text>
-
-			<Flex style={{ color: iconColour }}>{RenderIcon(props)}</Flex>
-		</Flex>
-	);
+export type VerifySectionRevisionType<T extends string> = {
+	[section in T]: RevisionType;
 };
 
-export default SectionMenuItem;
+export type SectionRevision = VerifySectionRevisionType<SectionRoutesValues>;

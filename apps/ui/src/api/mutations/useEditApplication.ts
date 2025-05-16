@@ -19,10 +19,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
 
+import { parseRevisedFields } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationContentsResponse, ApplicationResponseData } from '@pcgl-daco/data-model';
+import { SectionRevision } from '@pcgl-daco/validation';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useEditApplication = () => {
@@ -31,15 +33,26 @@ const useEditApplication = () => {
 	return useMutation<
 		ApplicationResponseData,
 		ServerError,
-		{ id: number | string; update?: Partial<ApplicationContentsResponse> }
+		{ id: number | string; update?: Partial<ApplicationContentsResponse>; revisions?: Partial<SectionRevision> }
 	>({
-		mutationFn: async ({ id, update }) => {
+		mutationFn: async ({ id, update, revisions }) => {
+			let fields = state.fields;
+
+			// If applications state is in revisions, then send only relevant fields in each sections
+			if (
+				(state.applicationState === 'DAC_REVISIONS_REQUESTED' ||
+					state.applicationState === 'INSTITUTIONAL_REP_REVISION_REQUESTED') &&
+				revisions
+			) {
+				fields = parseRevisedFields(state.fields, revisions);
+			}
+
 			const response = await fetch('/applications/edit', {
 				method: 'POST',
 				body: JSON.stringify({
 					id,
 					update: {
-						...state.fields,
+						...fields,
 						...update,
 					},
 				}),

@@ -17,38 +17,5 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createContext, useReducer } from 'react';
-
-import ApplicationReducer from '@/providers/context/application/ApplicationReducer';
-import { type ApplicationContextType, type ApplicationFormState } from '@/providers/context/application/types';
-import { ApplicationStates } from '@pcgl-daco/data-model';
-
-const initialState: ApplicationFormState = {
-	applicationState: ApplicationStates.DRAFT,
-	fields: {},
-	formState: {
-		isFormCompleted: false,
-		isDirty: false,
-		isLocked: false,
-		sectionsVisited: {
-			institutional: false,
-			intro: false,
-			applicant: false,
-			collaborators: false,
-			project: false,
-			study: false,
-			ethics: false,
-			agreement: false,
-			appendices: false,
-			sign: false,
-		},
-	},
-};
-
-export const ApplicationContext = createContext<ApplicationContextType | undefined>(undefined);
-
-export const ApplicationContextProvider = ({ children }: { children: React.ReactNode }) => {
-	const [state, dispatch] = useReducer(ApplicationReducer, initialState);
-
-	return <ApplicationContext.Provider value={{ state, dispatch }}>{children}</ApplicationContext.Provider>;
-};
+export * from './sectionKeys.js';
+export * from './sections.js';

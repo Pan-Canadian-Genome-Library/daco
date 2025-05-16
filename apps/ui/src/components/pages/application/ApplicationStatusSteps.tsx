@@ -17,26 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, theme } from 'antd';
+import { Flex, GlobalToken, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
+import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { ValidateAllSections } from './utils/validatorFunctions';
 
 const { useToken } = theme;
+
+const StepOptions = {
+	DRAFT: 'DRAFT',
+	SIGNED: 'SIGN_SUBMIT',
+	REP_REVIEW: 'REP_REVIEW',
+	DAC_REVIEW: 'DAC_REVIEW',
+	APPROVED: 'APPROVED',
+	REVOKED: 'REVOKED',
+	REJECTED: 'REJECTED',
+	CLOSED: 'CLOSED',
+} as const;
+type StepOptions = (typeof StepOptions)[keyof typeof StepOptions];
 
 type AppStatusType = {
 	step: StepOptions;
 	state: ApplicationStateValues;
 };
-
-enum StepOptions {
-	DRAFT = 'Draft',
-	SIGNED = 'Sign & Submit',
-	REP_REVIEW = 'Rep Review',
-	DAC_REVIEW = 'DAC Review',
-}
 
 const appStatusItems: AppStatusType[] = [
 	{
@@ -57,6 +63,28 @@ const appStatusItems: AppStatusType[] = [
 	},
 ];
 
+const ApplicationStep = ({ item, colour, token }: { item: AppStatusType; colour: string; token: GlobalToken }) => {
+	const { t: translate } = useTranslation();
+	return (
+		<Flex
+			flex={1}
+			key={item.step}
+			style={{
+				width: '100%',
+				textWrap: 'nowrap',
+				minWidth: '100px',
+				padding: token.paddingXS,
+				paddingInline: '40px',
+				backgroundColor: colour,
+			}}
+			justify="center"
+			align="center"
+		>
+			{translate(`applicationViewer.steps.${item.step}`)}
+		</Flex>
+	);
+};
+
 const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationStateValues }) => {
 	const { token } = useToken();
 	const { state } = useApplicationContext();
@@ -71,8 +99,19 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 					(step.step === StepOptions.SIGNED && isSectionsFilled)
 				) {
 					return true;
+				} else {
+					return false;
 				}
-				return false;
+			} else if (
+				step.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW &&
+				currentStatus === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED
+			) {
+				return true;
+			} else if (
+				step.state === ApplicationStates.DAC_REVIEW &&
+				currentStatus === ApplicationStates.DAC_REVISIONS_REQUESTED
+			) {
+				return true;
 			}
 
 			return step.state === currentStatus;
@@ -80,37 +119,64 @@ const ApplicationStatusSteps = ({ currentStatus }: { currentStatus: ApplicationS
 
 		// Until step is found, render green components but once it is found, set current step to yellow and remainder grey
 		return appStatusItems.map((item, index) => {
-			let color = pcglColours.grey;
+			let colour = pcglColours.grey;
 
 			if (index < stepIndex) {
-				color = token.colorSuccess;
+				colour = pcglColours.successPrimary;
 			} else if (index === stepIndex) {
-				color = pcglColours.warningPrimary;
+				colour = pcglColours.warningPrimary;
 			}
 
-			return (
-				<Flex
-					flex={1}
-					key={item.step}
-					style={{
-						textWrap: 'nowrap',
-						minWidth: '100px',
-						padding: token.paddingXS,
-						paddingInline: '40px',
-						backgroundColor: color,
-					}}
-					justify="center"
-					align="center"
-				>
-					{item.step}
-				</Flex>
-			);
+			return <ApplicationStep key={`header-status-${item.step}`} colour={colour} item={item} token={token} />;
 		});
 	};
 
+	const renderStatus = () => {
+		if (
+			currentStatus !== ApplicationStates.APPROVED &&
+			currentStatus !== ApplicationStates.REVOKED &&
+			currentStatus !== ApplicationStates.REJECTED &&
+			currentStatus !== ApplicationStates.CLOSED
+		) {
+			return renderAppStatusItems();
+		} else if (currentStatus === ApplicationStates.APPROVED) {
+			return (
+				<ApplicationStep
+					colour={pcglColours.successPrimary}
+					item={{ state: ApplicationStates.APPROVED, step: StepOptions.APPROVED }}
+					token={token}
+				/>
+			);
+		} else if (currentStatus === ApplicationStates.REVOKED) {
+			return (
+				<ApplicationStep
+					colour={pcglColours.grey}
+					item={{ state: ApplicationStates.REVOKED, step: StepOptions.REVOKED }}
+					token={token}
+				/>
+			);
+		} else if (currentStatus === ApplicationStates.REJECTED) {
+			return (
+				<ApplicationStep
+					colour={pcglColours.grey}
+					item={{ state: ApplicationStates.REJECTED, step: StepOptions.REJECTED }}
+					token={token}
+				/>
+			);
+		} else {
+			return (
+				<ApplicationStep
+					colour={pcglColours.grey}
+					item={{ state: ApplicationStates.CLOSED, step: StepOptions.CLOSED }}
+					token={token}
+				/>
+			);
+		}
+	};
+
 	return (
-		<Flex flex={1} style={{ width: '100%' }} gap={'small'} justify="center" align="center">
-			{renderAppStatusItems()}
+		<Flex flex={1} style={{ width: '100%' }} gap={2} justify="center" align="center">
+			{renderStatus()}
 		</Flex>
 	);
 };

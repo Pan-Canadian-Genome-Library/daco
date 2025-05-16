@@ -17,18 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {
-	type AgreementDTO,
-	type AppendicesDTO,
-	type ApplicantDTO,
-	type ApplicationContentsResponse,
-	type EthicsLetterDTO,
-	type InstitutionalRepDTO,
-	type InstitutionDTO,
-	type ProjectDTO,
-	type RequestedStudiesDTO,
+import type {
+	AgreementDTO,
+	AppendicesDTO,
+	ApplicantDTO,
+	ApplicationContentsResponse,
+	EthicsLetterDTO,
+	InstitutionalRepDTO,
+	InstitutionDTO,
+	ProjectDTO,
+	RequestedStudiesDTO,
 } from '@pcgl-daco/data-model';
-
 import {
 	agreementsSchema,
 	appendicesSchema,
@@ -37,8 +36,7 @@ import {
 	institutionalRepSchema,
 	projectInformationSchema,
 	requestedStudiesSchema,
-	SectionRevision,
-} from '@pcgl-daco/validation';
+} from '../schemas.js';
 
 // Determines of value is a key of one of the metadata passed in ApplicationContentsResponse
 export function isRestrictedApplicationContentsKey(value: string): value is keyof ApplicationContentsResponse {
@@ -49,23 +47,28 @@ export function isRestrictedApplicationContentsKey(value: string): value is keyo
 export function isApplicantKey(value: string): value is keyof ApplicantDTO {
 	return value in applicantInformationSchema.keyof().Values;
 }
+
 // InstitutionalKey
 interface InstitutionalKey extends InstitutionalRepDTO, InstitutionDTO {}
 export function isInstitutionalKey(value: string): value is keyof InstitutionalKey {
 	return value in institutionalRepSchema.keyof().Values;
 }
 
+// AgreementKeys
 export function isAgreementKey(value: string): value is keyof AgreementDTO {
 	return value in agreementsSchema.keyof().Values;
 }
 
+// AppendicesKeys
 export function isAppendicesKey(value: string): value is keyof AppendicesDTO {
 	return value in appendicesSchema.keyof().Values;
 }
+
 // EthicsKey
 export function isEthicsKey(value: string): value is keyof EthicsLetterDTO {
 	return value in ethicsSchema.keyof().Values;
 }
+
 // RequestedStudyKey
 export function isRequestedStudies(value: string): value is keyof RequestedStudiesDTO {
 	return value in requestedStudiesSchema.keyof().Values;
@@ -74,31 +77,4 @@ export function isRequestedStudies(value: string): value is keyof RequestedStudi
 // ProjectKey
 export function isProjectKey(value: string): value is keyof ProjectDTO {
 	return value in projectInformationSchema.keyof().Values;
-}
-
-// Grab fields that have revision requests
-export function parseRevisedFields(fields: ApplicationContentsResponse, revisedFields: Partial<SectionRevision>) {
-	const result = Object.entries(fields).reduce((acc, item) => {
-		const [key, value] = item;
-
-		if (!revisedFields.applicant?.isApproved && isApplicantKey(key)) {
-			acc[key] = value;
-		} else if (!revisedFields.institutional?.isApproved && isInstitutionalKey(key)) {
-			acc[key] = value;
-		} else if (!revisedFields.project?.isApproved && isProjectKey(key)) {
-			acc[key] = value;
-		} else if (!revisedFields.agreement?.isApproved && isAgreementKey(key)) {
-			acc[key] = value;
-		} else if (!revisedFields.appendices?.isApproved && isAppendicesKey(key)) {
-			acc[key] = value;
-		} else if (!revisedFields.ethics?.isApproved && isEthicsKey(key)) {
-			acc[key] = value;
-		} else if (!revisedFields.study?.isApproved && isRequestedStudies(key)) {
-			acc[key] = value;
-		}
-
-		return acc;
-	}, {} as Partial<ApplicationContentsResponse>);
-
-	return result;
 }

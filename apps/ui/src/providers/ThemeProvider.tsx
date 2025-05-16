@@ -30,10 +30,10 @@ export const pcglColours = {
 	errorPrimary: '#FF4D4F',
 	errorSecondary: '#FFCCC7',
 
-	warningPrimary: '#FADB14',
+	warningPrimary: '#F5DC4D',
 	warningSecondary: '#FFFFB8',
 
-	successPrimary: '#52C41A',
+	successPrimary: '#73D13D',
 	successSecondary: '#D9F7BE',
 
 	white: '#FFFFFF',
