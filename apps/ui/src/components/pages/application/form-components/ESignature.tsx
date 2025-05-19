@@ -77,9 +77,9 @@ const ESignature = <T extends FieldValues>(
 
 	const [signatureSaved, setSignatureSaved] = useState(false);
 	const SignatureFieldStyle: React.CSSProperties = {
-		height: '10rem',
+		height: '160px',
 		width: '100%',
-		maxWidth: '900px',
+		maxWidth: '916px',
 		border: 'solid 2px',
 		borderColor: token.colorBorder,
 		borderRadius: token.borderRadius,
@@ -130,7 +130,7 @@ const ESignature = <T extends FieldValues>(
 	const { signature: signatureError } = props.formState.errors;
 
 	return (
-		<div>
+		<>
 			<Controller
 				control={control}
 				name={name}
@@ -169,7 +169,7 @@ const ESignature = <T extends FieldValues>(
 			/>
 
 			{signatureError && <ErrorLabel text={signatureError ? signatureError.message : undefined} />}
-		</div>
+		</>
 	);
 };
 
