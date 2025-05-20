@@ -20,6 +20,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 
 import PageLayout from '@/components/layouts/PageLayout';
+import NotFound from '@/components/pages/NotFound';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ApplicationViewer from '@/pages/applications';
 import AccessAgreement from '@/pages/applications/sections/access';
@@ -103,6 +104,7 @@ function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<PageLayout />}>
+				<Route path="*" element={<NotFound />} />
 				<Route path="login/redirect" element={<LoginRedirect />} />
 				<Route index element={<HomePage />} />
 				<Route
