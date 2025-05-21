@@ -1,0 +1,7 @@
+<mj-attributes>
+  <mj-all font-family="Open Sans, sans-serif" padding="0" align="center" />
+  <mj-class name="header-background" background-color="#9e1068" />
+  <mj-class name="footer-background" background-color="#520339" />
+  <mj-class name="section-background" background-color="#ffffff" />
+  <mj-text color="#231F20" align="left" css-class="main-content-text" />
+</mj-attributes>

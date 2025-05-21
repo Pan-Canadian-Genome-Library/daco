@@ -1,0 +1,7 @@
+<mj-wrapper mj-class="header-background">
+  <mj-section>
+    <mj-column css-class="logo-wrapper">
+      <mj-image css-class="logo" src="../../assets/pcgl_daco_logo_white.png" alt="PCGL-LOGO" />
+    </mj-column>
+  </mj-section>
+</mj-wrapper>
