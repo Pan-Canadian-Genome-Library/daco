@@ -73,10 +73,18 @@ const SignAndSubmit = () => {
 	// Load the proper signature based off type of user
 	useEffect(() => {
 		if (data && data.applicantSignature && signatureRef.current && role === 'APPLICANT') {
-			signatureRef.current.fromDataURL(data.applicantSignature, { ratio: 1 });
+			signatureRef.current.fromDataURL(data.applicantSignature, {
+				ratio: 1,
+				width: signatureRef.current?.getCanvas().offsetWidth,
+				height: signatureRef.current?.getCanvas().offsetHeight,
+			});
 			setValue('signature', data.applicantSignature);
 		} else if (data && data.institutionalRepSignature && signatureRef.current && role === 'INSTITUTIONAL_REP') {
-			signatureRef.current.fromDataURL(data.institutionalRepSignature, { ratio: 1 });
+			signatureRef.current.fromDataURL(data.institutionalRepSignature, {
+				ratio: 1,
+				width: signatureRef.current?.getCanvas().offsetWidth,
+				height: signatureRef.current?.getCanvas().offsetHeight,
+			});
 			setValue('signature', data.institutionalRepSignature);
 		}
 	}, [data, role, setValue]);

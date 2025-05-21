@@ -17,10 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { VerifyPageRevisionType } from '@/api/queries/useGetApplicationFeedback';
-import { SectionRoutesValues } from '@/pages/AppRouter';
 import { ApplicationStates, ApplicationStateValues, SignatureDTO } from '@pcgl-daco/data-model';
-import { UserRole } from '@pcgl-daco/validation';
+import { SectionRevision, UserRole } from '@pcgl-daco/validation';
 
 export const canSignSection = ({
 	role,
@@ -32,7 +30,7 @@ export const canSignSection = ({
 	signatures?: SignatureDTO;
 	role?: UserRole;
 	state: ApplicationStateValues;
-	revisions: Partial<VerifyPageRevisionType<SectionRoutesValues>>;
+	revisions: Partial<SectionRevision>;
 	isEditMode: boolean;
 }) => {
 	// If signatures are still loading, then disable signature functionality
