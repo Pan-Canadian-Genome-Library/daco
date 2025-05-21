@@ -31,7 +31,7 @@ import type { ApplicationService } from './types.ts';
  * This is temporarily returning only `APPLICANT` or `ANONYMOUS`
  */
 export function getUserRole(session: Partial<SessionData>): UserRole {
-	return session.user ? userRoleSchema.Values.APPLICANT : userRoleSchema.Values.ANONYMOUS;
+	return session.user ? userRoleSchema.Values.INSTITUTIONAL_REP : userRoleSchema.Values.ANONYMOUS;
 }
 
 /**
