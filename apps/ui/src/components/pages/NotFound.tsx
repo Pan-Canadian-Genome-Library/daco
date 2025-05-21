@@ -14,53 +14,43 @@
  * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH D
  */
-import { Col, Layout, Row, Typography, theme } from 'antd';
-import React from 'react';
+import { Button, Flex, Layout, Typography, theme } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { errorStyles, errorStylesCondensed } from '@/components/pages/ErrorPage';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { ServerError } from '@/global/types';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { useToken } = theme;
 
-type ErrorProps = {
-	loading: boolean;
-	error: ServerError | null;
-};
-
-export const errorStyles: React.CSSProperties = {
-	marginLeft: '18.25rem',
-	paddingRight: '5%',
-	paddingTop: '1.75rem',
-};
-export const errorStylesCondensed: React.CSSProperties = {
-	paddingTop: '1rem',
-};
-
-const ErrorPage = ({ error, loading }: ErrorProps) => {
+const NotFound = () => {
 	const minWidth = useMinWidth();
+	const { t: translate } = useTranslation();
 	const { token } = useToken();
-	const isLowResDevice = minWidth <= token.screenXL;
+
+	const isLowResDevice = minWidth <= token.screenLGMin;
+
+	const buttonContainerStyles: React.CSSProperties = {
+		margin: isLowResDevice ? '2rem 0' : '2.5rem 0',
+	};
 
 	return (
-		<Content>
-			<Row style={{ ...contentWrapperStyles, ...(isLowResDevice ? errorStylesCondensed : errorStyles) }}>
-				{loading ? (
-					<SkeletonLoader />
-				) : (
-					<Col>
-						<Title level={1}>{error?.message}</Title>
-						<Text>{error?.error}</Text>
-					</Col>
-				)}
-			</Row>
+		<Content style={{ ...contentWrapperStyles, ...(isLowResDevice ? errorStylesCondensed : errorStyles) }}>
+			<Flex vertical>
+				<Title>{translate('notFound.title')}</Title>
+				<Text>{translate('notFound.description')}</Text>
+				<div style={{ ...buttonContainerStyles }}>
+					<Button href="/" type="primary">
+						{translate('notFound.buttons.home')}
+					</Button>
+				</div>
+			</Flex>
 		</Content>
 	);
 };
 
-export default ErrorPage;
+export default NotFound;
