@@ -22,11 +22,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { API_PATH_LOGIN } from '@/api/paths';
-import {
-	clearExtraSessionInformation,
-	getExtraSessionInformation,
-	setExtraSessionInformation,
-} from '@/global/localStorage';
+import { getExtraSessionInformation, setExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
 import { useMatch, useNavigate } from 'react-router';
@@ -64,8 +60,7 @@ const InstitutionalRepLogin = () => {
 
 			if (
 				isLoggedIn &&
-				existingSessionInfo &&
-				existingSessionInfo.role === 'INSTITUTIONAL_REP' &&
+				existingSessionInfo?.role === 'INSTITUTIONAL_REP' &&
 				existingSessionInfo.applicationId === appId
 			) {
 				/**
@@ -74,9 +69,13 @@ const InstitutionalRepLogin = () => {
 				 * again.
 				 **/
 				navigation('/login/redirect', { replace: true });
-			} else {
-				clearExtraSessionInformation();
 			}
+		}
+	}, [isLoggedIn, loggedInRole, match?.params.applicationId, navigation]);
+
+	const onLoginClick = () => {
+		if (match?.params.applicationId) {
+			const appId = Number(match.params.applicationId);
 
 			const saveSessionInfo = setExtraSessionInformation({
 				role: 'INSTITUTIONAL_REP',
@@ -90,11 +89,9 @@ const InstitutionalRepLogin = () => {
 			if (saveSessionInfo === false) {
 				navigation('/', { replace: true });
 			}
-		}
-	}, [isLoggedIn, loggedInRole, match?.params.applicationId, navigation]);
 
-	const onLoginClick = () => {
-		window.location.href = API_PATH_LOGIN;
+			window.location.href = API_PATH_LOGIN;
+		}
 	};
 
 	return (
