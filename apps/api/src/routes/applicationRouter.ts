@@ -55,6 +55,7 @@ import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from 
 import {
 	applicationRevisionRequestSchema,
 	approveApplicationRequestSchema,
+	basicApplicationParamSchema,
 	collaboratorsListParamsSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
@@ -280,66 +281,59 @@ applicationRouter.get(
 	},
 );
 
-/**
- * TODO:
- * 	- Validate request params using Zod.
- * 	- Ideally we should also standardize errors eventually, so that we're not comparing strings.
- */
 applicationRouter.get(
 	'/:applicationId',
 	authMiddleware(),
-	async (
-		request: Request,
-		response: ResponseWithData<
-			ApplicationResponseData,
-			['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
-		>,
-	) => {
-		const { user } = request.session;
-		const { userId } = user || {};
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<
+				ApplicationResponseData,
+				['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
+			>,
+		) => {
+			const { user } = request.session;
+			const { userId } = user || {};
 
-		if (!userId) {
-			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-			return;
-		}
-
-		const applicationId = Number(request.params.applicationId);
-		if (!isPositiveInteger(applicationId)) {
-			response
-				.status(400)
-				.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
-			return;
-		}
-
-		const result = await getApplicationById({ applicationId });
-
-		if (result.success) {
-			const { data } = result;
-
-			const hasSpecialAccess =
-				getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
-				isAssociatedRep(request.session, applicationId);
-
-			// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
-			if (data.userId !== userId && !hasSpecialAccess) {
-				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+			if (!userId) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
 			}
 
-			response.status(200).json(data);
-			return;
-		}
-		switch (result.error) {
-			case 'SYSTEM_ERROR': {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+			const applicationId = Number(request.params.applicationId);
+
+			const result = await getApplicationById({ applicationId });
+
+			if (result.success) {
+				const { data } = result;
+
+				const hasSpecialAccess =
+					getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
+					isAssociatedRep(request.session, applicationId);
+
+				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
+				if (data.userId !== userId && !hasSpecialAccess) {
+					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+					return;
+				}
+
+				response.status(200).json(data);
 				return;
 			}
-			case 'NOT_FOUND': {
-				response.status(404).json({ error: 'NOT_FOUND', message: 'Application not found.' });
-				return;
+			switch (result.error) {
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
+				case 'NOT_FOUND': {
+					response.status(404).json({ error: 'NOT_FOUND', message: 'Application not found.' });
+					return;
+				}
 			}
-		}
-	},
+		},
+	),
 );
 
 /**
@@ -410,7 +404,7 @@ applicationRouter.post(
 
 							response.status(500).json({
 								error: 'SYSTEM_ERROR',
-								message: `Application was successfully approved, however, a PDF generation error occurred. ${pdfGenerate.message}`,
+								message: `Application was successfully approved, however, a PDF generation error occurred.`,
 							});
 							return;
 						}
