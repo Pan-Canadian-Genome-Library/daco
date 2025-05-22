@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { serverConfig } from '@/config/serverConfig.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
 import { userRoleSchema, type UserRole } from '@pcgl-daco/validation';
@@ -31,7 +32,8 @@ import type { ApplicationService } from './types.ts';
  * This is temporarily returning only `APPLICANT` or `ANONYMOUS`
  */
 export function getUserRole(session: Partial<SessionData>): UserRole {
-	return session.user ? userRoleSchema.Values.INSTITUTIONAL_REP : userRoleSchema.Values.ANONYMOUS;
+	// return session.user ? userRoleSchema.Values.INSTITUTIONAL_REP : userRoleSchema.Values.ANONYMOUS;
+	return session.user ? serverConfig.USER_ROLE : userRoleSchema.Values.ANONYMOUS;
 }
 
 /**
