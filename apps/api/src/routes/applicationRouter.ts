@@ -58,6 +58,7 @@ import {
 	collaboratorsListParamsSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
+	rejectApplicationRequestSchema,
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
@@ -441,45 +442,49 @@ applicationRouter.post(
 applicationRouter.post(
 	'/:applicationId/reject',
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
-	async (
-		request: Request,
-		response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
-	) => {
-		const applicationId = Number(request.params.applicationId);
+	withBodySchemaValidation(
+		rejectApplicationRequestSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
+		) => {
+			const { applicationId, rejectionReason } = request.body;
 
-		if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
-			response.status(400).json({
-				error: 'INVALID_REQUEST',
-				message: 'Invalid request. ApplicationId is required and must be a valid number.',
-			});
-			return;
-		}
-
-		try {
-			const result = await dacRejectApplication({ applicationId });
-
-			if (result.success) {
-				response.status(200).json(result.data);
+			if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
+				response.status(400).json({
+					error: 'INVALID_REQUEST',
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+				});
 				return;
 			}
-			switch (result.error) {
-				case 'INVALID_STATE_TRANSITION': {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+
+			try {
+				const result = await dacRejectApplication({ applicationId, rejectionReason });
+
+				if (result.success) {
+					response.status(200).json(result.data);
 					return;
 				}
-				case 'SYSTEM_ERROR': {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-					return;
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
 				}
-				case 'NOT_FOUND': {
-					response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
-					return;
-				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
 			}
-		} catch (error) {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
-		}
-	},
+		},
+	),
 );
 
 applicationRouter.post(

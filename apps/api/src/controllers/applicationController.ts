@@ -414,8 +414,10 @@ export const approveApplication = async ({
 
 export const dacRejectApplication = async ({
 	applicationId,
+	rejectionReason,
 }: {
 	applicationId: number;
+	rejectionReason: string;
 }): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -471,7 +473,7 @@ export const dacRejectApplication = async ({
 			id: application.id,
 			to: applicant_institutional_email,
 			name: applicant_first_name || 'N/A',
-			comment: 'Invalid application contents was provided', // TODO: there doesn't seem to be any reject comment available, add functionality when implemented
+			comment: rejectionReason,
 		});
 
 		return dtoFriendlyData;
