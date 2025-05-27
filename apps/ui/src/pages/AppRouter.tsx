@@ -104,8 +104,8 @@ function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<PageLayout />}>
-				<Route path="*" element={<NotFound />} />
 				<Route path="login/redirect" element={<LoginRedirect />} />
+
 				<Route index element={<HomePage />} />
 				<Route
 					path="dashboard"
@@ -140,6 +140,8 @@ function AppRouter() {
 					}
 				/>
 				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
+
+				<Route path="*" element={<NotFound />} />
 			</Route>
 		</Routes>
 	);
