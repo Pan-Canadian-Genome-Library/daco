@@ -44,7 +44,12 @@ const NotFound = () => {
 				<Title>{translate('notFound.title')}</Title>
 				<Text>{translate('notFound.description')}</Text>
 				<div style={{ ...buttonContainerStyles }}>
-					<Button href="/" type="primary">
+					{/*
+					 * This will redirect the appropriate "homepage" for the user
+					 * since protected routes redirect to /login/redirect on role match failure
+					 *  which determines the correct routing action for the user type.
+					 */}
+					<Button href="/dashboard" type="primary">
 						{translate('notFound.buttons.home')}
 					</Button>
 				</div>
