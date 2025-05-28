@@ -66,6 +66,10 @@ const revisionRequestData: RevisionRequestModel = {
 	project_notes: 'Not sufficient justification',
 	requested_studies_approved: false,
 	requested_studies_notes: 'Unclear scope',
+	ethics_approved: false,
+	agreements_approved: false,
+	appendices_approved: false,
+	sign_and_submit_approved: false,
 };
 
 describe('Application API', () => {
@@ -246,6 +250,8 @@ describe('Application API', () => {
 	describe('Reject Application', () => {
 		it('should successfully reject an application in DAC_REVIEW state', async () => {
 			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			const rejectionReason = 'Reject';
+
 			assert.ok(applicationRecordsResult.success);
 			assert.ok(
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
@@ -254,7 +260,7 @@ describe('Application API', () => {
 			const { id } = applicationRecordsResult.data.applications[0];
 			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
 
-			const result = await dacRejectApplication({ applicationId: id });
+			const result = await dacRejectApplication({ applicationId: id, rejectionReason });
 			assert.ok(result.success);
 
 			const rejectedApplication = await getApplicationById({ applicationId: id });
@@ -566,10 +572,6 @@ describe('Application API', () => {
 					project_approved: false,
 					requested_studies_approved: false,
 					created_at: new Date(),
-					ethics_approved: false,
-					agreements_approved: false,
-					appendices_approved: false,
-					sign_and_submit_approved: false,
 				},
 			});
 
