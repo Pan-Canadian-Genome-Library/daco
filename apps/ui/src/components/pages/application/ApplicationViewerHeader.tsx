@@ -56,7 +56,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
-	const isLowResDevice = minWidth <= token.screenLG;
+	const isLowResDevice = minWidth <= token.screenLGMax;
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showReqRevisionsSuccessModal, setShowReqRevisionsSuccessModal] = useState(false);
@@ -148,8 +148,8 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			title={translate('applicationViewer.title', { id: id })}
 			description={`${formatDate(new Date(), new Date())}`}
 		>
-			<Flex style={{ position: 'relative', width: '100%' }} justify="center" align="end" vertical>
-				<Row style={{ width: '100%' }} justify={'end'} wrap>
+			<Flex style={{ position: 'relative', width: '100%' }} justify="center" align="end" vertical gap={'middle'}>
+				<Row style={{ width: '100%', flexWrap: isLowResDevice ? 'wrap' : 'nowrap' }} justify={'end'}>
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }} flex={1}>
 						<Flex
 							style={{ height: '100%', width: '100%' }}
@@ -161,7 +161,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 								style={{
 									padding: `${token.paddingLG} 0`,
 									borderRadius: token.borderRadius,
-									margin: isLowResDevice ? `${token.paddingSM}px 0` : 'none',
+									margin: isLowResDevice ? `1.5rem 0` : 'none',
 								}}
 								justify="center"
 								align="flex-end"
@@ -173,16 +173,22 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 						</Flex>
 					</Col>
 				</Row>
-				<Row style={{ position: 'relative', width: '100%', top: 40 }} justify={'end'} wrap>
-					<Flex
-						gap={'middle'}
-						style={{
-							borderRadius: token.borderRadius,
-							marginRight: isLowResDevice ? 'auto' : `${token.paddingSM}px 0`,
-							marginLeft: isLowResDevice ? 'none' : `${token.paddingSM}px 0`,
-						}}
-					>
-						{renderHeaderButtons()}
+				<Row
+					style={{ width: '100%', flexWrap: isLowResDevice ? 'wrap' : 'nowrap' }}
+					justify={isLowResDevice ? 'start' : 'end'}
+				>
+					<Flex>
+						<Flex
+							gap={'middle'}
+							style={{
+								transform: isLowResDevice ? '' : 'translate(0rem, 1.75rem)',
+								borderRadius: token.borderRadius,
+								marginRight: isLowResDevice ? 'auto' : `${token.paddingSM}px 0`,
+								marginLeft: isLowResDevice ? 'none' : `${token.paddingSM}px 0`,
+							}}
+						>
+							{renderHeaderButtons()}
+						</Flex>
 					</Flex>
 				</Row>
 			</Flex>
