@@ -186,6 +186,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 					</Flex>
 				</Row>
 			</Flex>
+			{/* Withdraw model */}
 			<WithdrawApplicationModal
 				applicationId={id}
 				currentSection={currentSection}
@@ -199,9 +200,8 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				setShowCloseApplicationModal={setShowCloseApplicationModal}
 				showCloseApplicationModal={showCloseApplicationModal}
 			/>
-			{/* Close Modal */}
 
-			{/* Revoke Modal */}
+			{/* Reject Modal */}
 			<RejectApplicationModal
 				id={id}
 				isOpen={showRejectModal}
@@ -214,7 +214,6 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				isOpen={showRejectSuccessModal}
 				onOk={() => setShowRejectSuccessModal(false)}
 			/>
-			{/* Revoke Modal */}
 
 			{/* Revisions Modal */}
 			<RequestRevisionsModal
@@ -232,7 +231,6 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 					navigate('/dashboard');
 				}}
 			/>
-			{/* Revisions Modal */}
 
 			{/* Revoke Modal */}
 			<RevokeApplicationModal
@@ -240,8 +238,6 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				showRevokeModal={showRevokeModal}
 				setShowRevokeModal={setShowRevokeModal}
 			/>
-			{/* Revoke Modal */}
-
 			{/* Approval Modal */}
 			<ApproveApplicationModal
 				id={id}
@@ -255,7 +251,6 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				isOpen={showSuccessApproveModal}
 				onOk={() => setShowSuccessApproveModal(false)}
 			/>
-			{/* Approval Modal */}
 		</PageHeader>
 	);
 };
