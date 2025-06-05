@@ -148,7 +148,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			title={translate('applicationViewer.title', { id: id })}
 			description={`${formatDate(new Date(), new Date())}`}
 		>
-			<Flex style={{ width: '100%' }} justify="center" align="end" vertical gap={'middle'}>
+			<Flex style={{ position: 'relative', width: '100%' }} justify="center" align="end" vertical>
 				<Row style={{ width: '100%' }} justify={'end'} wrap>
 					<Col xs={{ flex: '100%' }} lg={{ flex: '50%' }} flex={1}>
 						<Flex
@@ -173,7 +173,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 						</Flex>
 					</Col>
 				</Row>
-				<Row style={{ width: '100%' }} justify={'end'} wrap>
+				<Row style={{ position: 'relative', width: '100%', top: 40 }} justify={'end'} wrap>
 					<Flex
 						gap={'middle'}
 						style={{
