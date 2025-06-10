@@ -19,7 +19,7 @@
 
 import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
 import { ApplicationStates } from '@pcgl-daco/data-model';
-import { SectionRoutes } from '@pcgl-daco/validation';
+import { SectionRoutes, userRoleSchema } from '@pcgl-daco/validation';
 import { SectionMenuItemProps } from '../SectionMenuItem';
 
 /**
@@ -36,7 +36,9 @@ export const RenderIcon = (props: SectionMenuItemProps) => {
 		case ApplicationStates.DAC_REVIEW:
 			return DACReviewLogic();
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
-			return InstitutionalRepReviewRequestedLogic(props);
+			return RevisionsRequested(props);
+		case ApplicationStates.DAC_REVISIONS_REQUESTED:
+			return RevisionsRequested(props);
 		default:
 			return DraftLogic(props);
 	}
@@ -61,7 +63,7 @@ const DraftLogic = ({
 		// If has collaborators, show checkmark otherwise return null
 		return hasCollaborators ? <CheckCircleOutlined /> : null;
 	} else if (isCurrentSection && isEditMode && !isSectionValid) {
-		// do not display icon if on currentpage
+		// do not display icon if on current page
 		return;
 	} else if (!isSectionTouched) {
 		// do not display icon if the section has not been worked on
@@ -70,17 +72,18 @@ const DraftLogic = ({
 		// display checkmark is section is valid
 		return <CheckCircleOutlined />;
 	} else if (!isSectionValid) {
-		// display exlamation if section is invalid and needs revisions
+		// display exclamation if section is invalid and needs revisions
 		return <ExclamationCircleFilled />;
 	}
 };
 
-const InstitutionalRepReviewRequestedLogic = ({ label, isLocked }: Omit<SectionMenuItemProps, 'appState'>) => {
+// This is the logic for the application state when revisions are requested for both INSTITUTIONAL REP and DAC MEMBERS
+const RevisionsRequested = ({ label, isLocked, role }: Omit<SectionMenuItemProps, 'appState'>) => {
 	if (label === SectionRoutes.INTRO) {
 		// do not display intro icon
 		return <LockOutlined />;
-	} else if (!isLocked) {
-		// Do not display icon on sections with revisions, should also ignore editMode
+	} else if (!isLocked && role === userRoleSchema.Values.APPLICANT) {
+		// Do not display icon on sections with revisions AND if the user is APPLICANT.
 		return;
 	} else if (label === SectionRoutes.SIGN) {
 		return;

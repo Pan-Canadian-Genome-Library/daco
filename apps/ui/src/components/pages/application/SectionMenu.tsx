@@ -27,6 +27,7 @@ import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useUserContext } from '@/providers/UserProvider';
 import { ApplicationStateValues } from '@pcgl-daco/data-model';
 import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 import { ValidateAllSections } from './utils/validatorFunctions';
@@ -44,6 +45,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 	const { state } = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetCollaborators(appId);
+	const { role } = useUserContext();
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		if (state?.formState.isDirty) {
@@ -91,7 +93,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 			selectedKeys={[currentSection]}
 			mode="inline"
 			items={
-				!isLoading
+				!isLoading && role
 					? ApplicationSectionRoutes.map((item) => {
 							const route = item.route;
 
@@ -107,6 +109,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 										isLocked={determineIfLocked(route)}
 										hasCollaborators={data && data.length > 0}
 										appState={appState}
+										role={role}
 									/>
 								),
 								disabled: route === SectionRoutes.SIGN && !ValidateAllSections(state.fields),

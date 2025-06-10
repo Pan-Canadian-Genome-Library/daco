@@ -19,6 +19,7 @@
 
 import { pcglColours } from '@/providers/ThemeProvider';
 import { ApplicationStateValues } from '@pcgl-daco/data-model';
+import { UserRole } from '@pcgl-daco/validation';
 import { Flex, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { RenderIcon } from './utils/IconSelector';
@@ -34,6 +35,7 @@ export type SectionMenuItemProps = {
 	isLocked?: boolean;
 	hasCollaborators?: boolean;
 	appState: ApplicationStateValues;
+	role: UserRole;
 };
 
 const SectionMenuItem = (props: SectionMenuItemProps) => {
