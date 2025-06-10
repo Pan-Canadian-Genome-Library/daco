@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { userRoleSchema } from '@pcgl-daco/validation';
 import { Col, Flex, Layout, Row } from 'antd';
 import { useEffect } from 'react';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
@@ -28,6 +29,7 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 import useGetApplication from '@/api/queries/useGetApplication';
 import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
 import ErrorPage from '@/components/pages/ErrorPage';
+import { useUserContext } from '@/providers/UserProvider';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const { Content } = Layout;
@@ -35,11 +37,12 @@ const { Content } = Layout;
 const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
-
+	const { role } = useUserContext();
 	// grab current route and its relevant information
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
 	const currentSection = match?.params.section ?? `intro${isEditMode ? '/edit' : ''}`;
+
 	const {
 		data: applicationData,
 		isError: applicationIsErrored,
@@ -56,13 +59,16 @@ const ApplicationViewer = () => {
 
 	useEffect(() => {
 		if (applicationData && !applicationError) {
-			const isNotInEditLifecycle = applicationData.state !== ApplicationStates.DRAFT;
+			// Application can only be in edit if the application-state is in DRAFT and if the user is an APPLICANT
+			// TODO: possibly need to change depending on the auth rework with authz
+			const forceToViewMode =
+				applicationData.state !== ApplicationStates.DRAFT || role !== userRoleSchema.Values.APPLICANT;
 
-			if (isNotInEditLifecycle && isEditMode) {
+			if (forceToViewMode && isEditMode) {
 				navigation(`/application/${applicationData.id}/`, { replace: true });
 			}
 		}
-	}, [applicationData, applicationError, isEditMode, navigation]);
+	}, [applicationData, applicationError, isEditMode, navigation, role]);
 
 	// scroll to top on page change
 	useEffect(() => {
