@@ -57,6 +57,7 @@ import {
 	basicApplicationParamSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
+	rejectApplicationRequestSchema,
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
@@ -433,17 +434,25 @@ applicationRouter.post(
 applicationRouter.post(
 	'/:applicationId/reject',
 	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
-	withParamsSchemaValidation(
-		basicApplicationParamSchema,
+	withBodySchemaValidation(
+		rejectApplicationRequestSchema,
 		apiZodErrorMapping,
 		async (
 			request: Request,
 			response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 		) => {
-			const applicationId = Number(request.params.applicationId);
+			const { applicationId, rejectionReason } = request.body;
+
+			if (!(typeof applicationId === 'number' && isPositiveInteger(applicationId))) {
+				response.status(400).json({
+					error: 'INVALID_REQUEST',
+					message: 'Invalid request. ApplicationId is required and must be a valid number.',
+				});
+				return;
+			}
 
 			try {
-				const result = await dacRejectApplication({ applicationId });
+				const result = await dacRejectApplication({ applicationId, rejectionReason });
 
 				if (result.success) {
 					response.status(200).json(result.data);
@@ -464,7 +473,7 @@ applicationRouter.post(
 					}
 				}
 			} catch (error) {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later.` });
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
 			}
 		},
 	),

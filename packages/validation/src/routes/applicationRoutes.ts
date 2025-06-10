@@ -154,3 +154,8 @@ export const submitApplicationRequestSchema = z
 		signature: z.string().regex(BASE64_IMAGE),
 	})
 	.strict();
+
+export const rejectApplicationRequestSchema = z.object({
+	applicationId: z.number().nonnegative(),
+	rejectionReason: z.string().nullable(),
+});
