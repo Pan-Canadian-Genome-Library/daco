@@ -36,7 +36,9 @@ export const RenderIcon = (props: SectionMenuItemProps) => {
 		case ApplicationStates.DAC_REVIEW:
 			return DACReviewLogic();
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
-			return InstitutionalRepReviewRequestedLogic(props);
+			return RevisionsRequested(props);
+		case ApplicationStates.DAC_REVISIONS_REQUESTED:
+			return RevisionsRequested(props);
 		default:
 			return DraftLogic(props);
 	}
@@ -75,7 +77,8 @@ const DraftLogic = ({
 	}
 };
 
-const InstitutionalRepReviewRequestedLogic = ({ label, isLocked }: Omit<SectionMenuItemProps, 'appState'>) => {
+// This is the logic for the application state when revisions are requested for both INSTITUTIONAL REP and DAC MEMBERS
+const RevisionsRequested = ({ label, isLocked }: Omit<SectionMenuItemProps, 'appState'>) => {
 	if (label === SectionRoutes.INTRO) {
 		// do not display intro icon
 		return <LockOutlined />;
