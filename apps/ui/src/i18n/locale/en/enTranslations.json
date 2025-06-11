@@ -50,7 +50,8 @@
 	"manage": {
 		"applications": {
 			"title": "Manage Applications",
-			"listTitle": "Dashboard"
+			"show": "Show",
+			"rows": "rows"
 		}
 	},
 	"status": {
