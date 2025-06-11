@@ -21,6 +21,7 @@ import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import RowCount from '@/components/pages/manage/RowCount';
+import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@/global/constants';
 import { pcglTableTheme } from '@/providers/ThemeProvider';
 import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
@@ -82,7 +83,10 @@ const tableColumnConfiguration = [
 		dataIndex: ['applicant', 'country'],
 		key: 'country',
 		render: (value: string, record: ApplicationListSummary) =>
-			record.applicant?.country ? record.applicant.country : '-',
+			//FIXME: i18n: When french support is added, we need to make this toggle dynamic somehow
+			record.applicant?.country
+				? (GC_STANDARD_GEOGRAPHIC_AREAS.find((country) => country.iso === record.applicant?.country)?.en ?? '-')
+				: '-',
 	},
 	{
 		title: 'Applicant',
