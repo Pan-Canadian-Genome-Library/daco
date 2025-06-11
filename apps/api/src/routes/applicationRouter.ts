@@ -114,7 +114,7 @@ async function validateUserPermissionForApplication({
 applicationRouter.post(
 	'/create',
 	authMiddleware(),
-	async (request: Request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>, next) => {
+	async (request: Request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
 		const { userId } = user || {};
 
