@@ -43,7 +43,7 @@ export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 		resolver: zodResolver(esignatureSchema),
 	});
 
-	// Logic
+	// Disable logic
 	const { disableSignature, disableSubmit } = canSignSection({
 		revisions,
 		isEditMode,
@@ -76,6 +76,7 @@ export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 		}
 	}, [signatureData, role, form.setValue, form]);
 
+	// Save signature
 	const onSaveClicked = async () => {
 		const signature = form.getValues('signature');
 
