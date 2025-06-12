@@ -18,12 +18,14 @@
  */
 
 import TextList from '@/components/TextList';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Flex, Typography } from 'antd';
 import { Trans, useTranslation } from 'react-i18next';
 import SectionContent from '../SectionContent';
 import SectionFooter from '../SectionFooter';
 import SectionTitle from '../SectionTitle';
+import SignatureViewer from '../SignatureViewer';
 
 const { Text } = Typography;
 
@@ -35,12 +37,17 @@ type Props = {
 
 const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Props) => {
 	const { t: translate } = useTranslation();
+	const {
+		state: { fields },
+	} = useApplicationContext();
+
+	const { applicantFirstName, applicantLastName, institutionalRepFirstName, institutionalRepLastName } = fields;
 
 	const PointArray = [
 		<Trans i18nKey={'sign-and-submit-section.dac-section.point1'} components={{ bold: <strong /> }} />,
 		<Trans i18nKey={'sign-and-submit-section.dac-section.point2'} components={{ bold: <strong /> }} />,
-		<Trans i18nKey={'sign-and-submit-section.dac-section.point2'} components={{ bold: <strong /> }} />,
-		<Trans i18nKey={'sign-and-submit-section.dac-section.point2'} components={{ bold: <strong /> }} />,
+		<Trans i18nKey={'sign-and-submit-section.dac-section.point3'} components={{ bold: <strong /> }} />,
+		<Trans i18nKey={'sign-and-submit-section.dac-section.point4'} components={{ bold: <strong /> }} />,
 	];
 
 	return (
@@ -51,7 +58,24 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 					<TextList data={PointArray} />
 				</Flex>
 			</SectionTitle>
-			<SectionContent showDivider={false}></SectionContent>
+			<SectionContent showDivider={false}>
+				{!signatureLoading ? (
+					<SignatureViewer
+						title="Applicant"
+						name={`${applicantFirstName} ${applicantLastName}`}
+						signature={signatureData?.applicantSignature}
+						date={signatureData?.applicantSignedAt}
+					/>
+				) : null}
+				{!signatureLoading ? (
+					<SignatureViewer
+						title="Institutional Rep"
+						name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
+						signature={signatureData?.institutionalRepSignature}
+						date={signatureData?.institutionalRepSignedAt}
+					/>
+				) : null}
+			</SectionContent>
 			<SectionFooter
 				currentRoute="sign"
 				isEditMode={false}

@@ -18,6 +18,7 @@
  */
 
 import TextList from '@/components/TextList';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Col, Flex, Row, Typography } from 'antd';
 import { Trans, useTranslation } from 'react-i18next';
@@ -25,6 +26,7 @@ import ESignature from '../form-components/ESignature';
 import SectionContent from '../SectionContent';
 import SectionFooter from '../SectionFooter';
 import SectionTitle from '../SectionTitle';
+import SignatureViewer from '../SignatureViewer';
 import { useSignatureForm } from '../utils/useSignatureForm';
 
 const { Text } = Typography;
@@ -37,6 +39,11 @@ type Props = {
 
 const RepSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Props) => {
 	const { t: translate } = useTranslation();
+	const {
+		state: { fields },
+	} = useApplicationContext();
+
+	const { applicantFirstName, applicantLastName } = fields;
 
 	const { form, disableSignature, disableSubmit, signatureRef, onSaveClicked } = useSignatureForm({
 		signatureData: signatureData,
@@ -62,8 +69,17 @@ const RepSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 					<TextList data={PointArray} />
 				</Flex>
 			</SectionTitle>
+			<SectionContent showDivider={true}>
+				{!signatureLoading ? (
+					<SignatureViewer
+						title="Applicant"
+						name={`${applicantFirstName} ${applicantLastName}`}
+						signature={signatureData?.applicantSignature}
+						date={signatureData?.applicantSignedAt}
+					/>
+				) : null}
+			</SectionContent>
 			<SectionContent
-				showDivider={false}
 				title={translate('sign-and-submit-section.section.title')}
 				text={translate('sign-and-submit-section.section.description')}
 			>
