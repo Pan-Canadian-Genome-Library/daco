@@ -17,16 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { esignatureSchema, type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
-import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router';
-import SignatureCanvas from 'react-signature-canvas';
 
-import useCreateSignature from '@/api/mutations/useCreateSignature';
 import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import ESignature from '@/components/pages/application/form-components/ESignature';
@@ -34,58 +29,27 @@ import SubmitApplicationModal from '@/components/pages/application/modals/Submit
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSignatureForm } from '@/components/pages/application/utils/useSignatureForm';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
-import { type ApplicationOutletContext } from '@/global/types';
+import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { useUserContext } from '@/providers/UserProvider';
-import { canSignSection } from '../utils/canSignSection';
 
 const SignAndSubmit = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
 	const [openModal, setOpenModal] = useState(false);
 	const {
 		state: { fields },
 	} = useApplicationContext();
+	const { isEditMode, appId, state } = useOutletContext<ApplicationOutletContext>();
 	const navigation = useNavigate();
-	const signatureRef = useRef<SignatureCanvas>(null);
-
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
-	const { mutateAsync: createSignature } = useCreateSignature();
 
-	const { role } = useUserContext();
-	const { control, setValue, formState, watch, clearErrors, reset, getValues } = useForm<eSignatureSchemaType>({
-		resolver: zodResolver(esignatureSchema),
+	const { form, disableSignature, disableSubmit, signatureRef, onSaveClicked } = useSignatureForm({
+		signatureData: data,
 	});
+	const { control, setValue, formState, watch, clearErrors, reset } = form;
 
-	// Logic
-	const { disableSignature, disableSubmit } = canSignSection({
-		revisions,
-		isEditMode,
-		role,
-		state,
-		signatures: data,
-	});
 	const watchSignature = watch('signature');
-
-	// Load the proper signature based off type of user
-	useEffect(() => {
-		if (data && data.applicantSignature && signatureRef.current && role === 'APPLICANT') {
-			signatureRef.current.fromDataURL(data.applicantSignature, {
-				ratio: 1,
-				width: signatureRef.current?.getCanvas().offsetWidth,
-				height: signatureRef.current?.getCanvas().offsetHeight,
-			});
-			setValue('signature', data.applicantSignature);
-		} else if (data && data.institutionalRepSignature && signatureRef.current && role === 'INSTITUTIONAL_REP') {
-			signatureRef.current.fromDataURL(data.institutionalRepSignature, {
-				ratio: 1,
-				width: signatureRef.current?.getCanvas().offsetWidth,
-				height: signatureRef.current?.getCanvas().offsetHeight,
-			});
-			setValue('signature', data.institutionalRepSignature);
-		}
-	}, [data, role, setValue]);
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
@@ -93,18 +57,6 @@ const SignAndSubmit = () => {
 			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
 		}
 	}, [appId, fields, isEditMode, navigation, state]);
-
-	const onSaveClicked = async () => {
-		const signature = getValues('signature');
-
-		if (signature) {
-			await createSignature({ applicationId: appId, signature }).then(() => {
-				if (signatureRef.current) {
-					signatureRef.current.clear();
-				}
-			});
-		}
-	};
 
 	return (
 		<>
