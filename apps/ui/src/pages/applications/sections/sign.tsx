@@ -25,6 +25,7 @@ import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import SubmitApplicationModal from '@/components/pages/application/modals/SubmitApplicationModal';
 import ApplicantSignatureView from '@/components/pages/application/signature-views/ApplicantSignatureView';
+import DacSignatureView from '@/components/pages/application/signature-views/DacSignatureView';
 import RepSignatureView from '@/components/pages/application/signature-views/RepSignatureView';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import ProtectedComponent from '@/components/ProtectedComponent';
@@ -56,6 +57,9 @@ const SignAndSubmit = () => {
 					</ProtectedComponent>
 					<ProtectedComponent requiredRoles={['INSTITUTIONAL_REP']}>
 						<RepSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
+					</ProtectedComponent>
+					<ProtectedComponent requiredRoles={['DAC_MEMBER']}>
+						<DacSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
 					</ProtectedComponent>
 				</Form>
 			</SectionWrapper>
