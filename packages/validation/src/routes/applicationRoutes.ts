@@ -25,7 +25,7 @@ export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema
 export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
 
 export const basicApplicationParamSchema = z.object({
-	applicationId: z.coerce.number().int().nonnegative(),
+	applicationId: z.coerce.number().int().nonnegative().min(1),
 });
 
 export const applicationContentsSchema = z
@@ -155,7 +155,6 @@ export const submitApplicationRequestSchema = z
 	})
 	.strict();
 
-export const rejectApplicationRequestSchema = z.object({
-	applicationId: z.number().nonnegative(),
+export const rejectApplicationRequestSchema = basicApplicationParamSchema.extend({
 	rejectionReason: z.string().nullable(),
 });
