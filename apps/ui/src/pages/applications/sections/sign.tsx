@@ -17,25 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Col, Form, Row } from 'antd';
+import { Form } from 'antd';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useOutletContext } from 'react-router';
 
 import useGetSignatures from '@/api/queries/useGetSignatures';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
-import ESignature from '@/components/pages/application/form-components/ESignature';
 import SubmitApplicationModal from '@/components/pages/application/modals/SubmitApplicationModal';
-import SectionContent from '@/components/pages/application/SectionContent';
-import SectionFooter from '@/components/pages/application/SectionFooter';
-import SectionTitle from '@/components/pages/application/SectionTitle';
-import { useSignatureForm } from '@/components/pages/application/utils/useSignatureForm';
+import ApplicantSignatureView from '@/components/pages/application/signature-views/ApplicantSignatureView';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 
 const SignAndSubmit = () => {
-	const { t: translate } = useTranslation();
 	const [openModal, setOpenModal] = useState(false);
 	const {
 		state: { fields },
@@ -43,13 +37,6 @@ const SignAndSubmit = () => {
 	const { isEditMode, appId, state } = useOutletContext<ApplicationOutletContext>();
 	const navigation = useNavigate();
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
-
-	const { form, disableSignature, disableSubmit, signatureRef, onSaveClicked } = useSignatureForm({
-		signatureData: data,
-	});
-	const { control, setValue, formState, watch, clearErrors, reset } = form;
-
-	const watchSignature = watch('signature');
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
@@ -62,49 +49,7 @@ const SignAndSubmit = () => {
 		<>
 			<SectionWrapper>
 				<Form layout="vertical" onFinish={() => setOpenModal(true)}>
-					<SectionTitle
-						title={translate('sign-and-submit-section.title')}
-						showLockIcon={disableSignature}
-						text={translate('sign-and-submit-section.description')}
-						showDivider={false}
-					/>
-					<SectionContent
-						showDivider={false}
-						title={translate('sign-and-submit-section.section.title')}
-						text={translate('sign-and-submit-section.section.description')}
-					>
-						<Row>
-							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
-								<input disabled type="hidden" name="createdAt" />
-								{!isLoading ? (
-									<ESignature
-										disabled={disableSignature}
-										signatureRef={signatureRef}
-										name="signature"
-										control={control}
-										watch={watch}
-										formState={formState}
-										setValue={setValue}
-										reset={reset}
-										clearErrors={clearErrors}
-										disableSaveButton={!watchSignature || disableSignature}
-										onSaveClicked={onSaveClicked}
-										saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
-										clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
-									/>
-								) : null}
-							</Col>
-						</Row>
-						<Row style={{ minHeight: '40vh' }} />
-					</SectionContent>
-					<SectionFooter
-						currentRoute="sign"
-						isEditMode={disableSubmit}
-						signSubmitHandler={() => {
-							setOpenModal(true);
-						}}
-						submitDisabled={disableSubmit}
-					/>
+					<ApplicantSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
 				</Form>
 			</SectionWrapper>
 			<SubmitApplicationModal isOpen={openModal} setIsOpen={setOpenModal} />
