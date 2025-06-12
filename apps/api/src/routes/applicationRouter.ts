@@ -106,14 +106,10 @@ async function validateUserPermissionForApplication({
 	}
 }
 
-/**
- * TODO:
- * 	- Validate request params using Zod.
- */
 applicationRouter.post(
 	'/create',
-	authMiddleware(),
-	async (request: Request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>, next) => {
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
+	async (request: Request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
 		const { userId } = user || {};
 
