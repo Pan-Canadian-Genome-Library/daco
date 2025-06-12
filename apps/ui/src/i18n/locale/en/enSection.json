@@ -220,6 +220,11 @@
 			"submitApplicationSuccess": "Your application has been submitted for review.",
 			"submitApplicationWithRevisionsSuccess": "Your application revisions have been submitted for review.",
 			"submitApplicationFailed": "Sorry, there was an unexpected error while submitting your application for review. Please try again later."
+		},
+		"rep-section": {
+			"desc1": "As the final step, please review the applicant signature. Once you've completed the review, take one of the following actions:",
+			"point1": "<bold>Submit Application</bold>: If you are satisfied with the application, please provide your signature, as it is required for review by the PCGL Data Access Committee. Click the Submit Application to complete your review, we will notify the Data Access Committee that the application is ready for their review.",
+			"point2": "<bold>Request Revisions</bold>: If the application requires changes, click Request Revisions to send it back to the applicant for updates."
 		}
 	}
 }
