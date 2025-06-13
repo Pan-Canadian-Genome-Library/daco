@@ -21,6 +21,7 @@ import { Button, Col, Flex, Row, theme } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useGetDownload from '@/api/queries/useGetDownload';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import ApproveApplicationModal from '@/components/pages/application/modals/ApproveApplicationModal';
 import CloseApplicationModal from '@/components/pages/application/modals/CloseApplicationModal';
@@ -32,6 +33,7 @@ import WithdrawApplicationModal from '@/components/pages/application/modals/With
 import PageHeader from '@/components/pages/global/PageHeader';
 import ProtectedComponent from '@/components/ProtectedComponent';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
@@ -66,6 +68,10 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const [showApprovalModal, setShowApprovalModal] = useState(false);
 	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
 	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
+	const {
+		state: { fields },
+	} = useApplicationContext();
+	const { refetch: getDownload } = useGetDownload({ fileId: fields.signedPdf });
 
 	const isWithdrawable =
 		appState === ApplicationStates.INSTITUTIONAL_REP_REVIEW || appState === ApplicationStates.DAC_REVIEW;
@@ -78,6 +84,35 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 		} else if (appState === 'DRAFT') {
 			navigate(`${currentSection}/edit`, { replace: true });
 		}
+	};
+
+	// Generate download url and then remove the link after downloading
+	const onPDFDownload = async () => {
+		const response = await getDownload();
+
+		const { data: responseData } = response;
+
+		// If there is no response data OR the file name does not exist, fail the download procedure
+		if (!responseData || responseData.filename === null) {
+			return;
+		}
+
+		const bufferArray = new Uint8Array(responseData.content.data).buffer;
+
+		const blob = new Blob([bufferArray], {
+			type: 'pdf',
+		});
+
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+
+		a.download = responseData.filename;
+		document.body.appendChild(a);
+		a.click();
+
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
 	};
 
 	const renderHeaderButtons = () => {
@@ -119,6 +154,13 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
 				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
+			</ProtectedComponent>,
+			<ProtectedComponent
+				key={'header-close'}
+				requiredRoles={['DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP']}
+				requiredStates={['APPROVED']}
+			>
+				<Button onClick={() => onPDFDownload()}>{translate('sign-and-submit-section.section.buttons.download')}</Button>
 			</ProtectedComponent>,
 		);
 
