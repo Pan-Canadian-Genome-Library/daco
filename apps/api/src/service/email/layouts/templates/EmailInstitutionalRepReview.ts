@@ -41,7 +41,7 @@ export const GenerateEmailInstitutionalRepReview = ({
                     We hope this message finds you well.
                 </mj-text>
                 <mj-text>
-                    A new PCGL <a href="${ui}/review/${id}/" target="_blank" rel="nofollow">DACO application</a> has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
+                   <b>${applicantName} has identified you as the institutional representative of the PCGL DACO application. The application has been submitted and is now awaiting your review.</b> Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.         
                 </mj-text>
                 <mj-text>
                     Here are the details of the application:
@@ -96,7 +96,7 @@ export const GenerateEmailInstitutionalRepReviewPlain = ({
 
 	return ` Dear ${repName},
     \n We hope this message finds you well.
-    \n A new PCGL DACO application has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
+    \n ${applicantName} has identified you as the institutional representative of the PCGL DACO application. The application has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.         
     \n Here are the details of the application:
     \n Applicant Name: ${applicantName}
     \n Application ID: ${id}
