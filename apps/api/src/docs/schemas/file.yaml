@@ -16,6 +16,68 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 components:
+  schemas:
+    FileRecord:
+      type: object
+      description: Files related to a PCGL DACO Application.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        applicationId:
+          type: number
+          description: |
+            The associated application id.
+        submittedAt:
+          type: string
+          description: |
+            Date it was submitted at
+        submitterUserId:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          enum: ['ETHICS_LETTER', 'SIGNED_APPLICATION']
+          description: |
+            The type of the file
+
+    FileRecordWithContents:
+      type: object
+      description: File record related to a PCGL DACO Application with Contents.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        applicationId:
+          type: number
+          description: |
+            The associated application id.
+        content:
+          type: object
+          description: |
+            File in the form of a arraylike buffer.
+        submittedAt:
+          type: string
+          description: |
+            Date it was submitted at
+        submitterUserId:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          enum: ['ETHICS_LETTER', 'SIGNED_APPLICATION']
+          description: |
+            The type of the file:
   responses:
     uploadFileResponse:
       type: object
@@ -28,61 +90,3 @@ components:
           type: string
           description: |
             The name of the file.
-    fileDownloadResponse:
-      type: object
-      description: The contents of the upload file.
-      properties:
-        id:
-          type: number
-          description: The ID of the file.
-        filename:
-          type: string
-          description: |
-            The name of the file.
-        application_id:
-          type: number
-          description: |
-            The associated application id.
-        content:
-          type: object
-          description: |
-            File in the form of a arraylike buffer.
-        submitted_at:
-          type: string
-          description: |
-            Date it was submitted at
-        submitter_user_id:
-          type: string
-          description: |
-            User submitted data
-        type:
-          type: string
-          description: |
-            The type of the file
-    fileGetResponse:
-      type: object
-      description: The contents of the upload file.
-      properties:
-        id:
-          type: number
-          description: The ID of the file.
-        filename:
-          type: string
-          description: |
-            The name of the file.
-        application_id:
-          type: number
-          description: |
-            The associated application id.
-        submitted_at:
-          type: string
-          description: |
-            Date it was submitted at
-        submitter_user_id:
-          type: string
-          description: |
-            User submitted data
-        type:
-          type: string
-          description: |
-            The type of the file

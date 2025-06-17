@@ -20,7 +20,7 @@ paths:
     get:
       tags:
         - File
-      summary: Get file with buffer data
+      summary: Retrieve a uploaded file with buffer data by its ID.
       parameters:
         - in: path
           name: fileId
@@ -34,7 +34,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/fileDownloadResponse'
+                $ref: '#/components/schemas/FileRecordWithContents'
 
         '500':
           description: 'Error retrieving file in database'
@@ -55,7 +55,7 @@ paths:
     post:
       tags:
         - File
-      summary: Upload new file or replace old file
+      summary: Upload new file or replace old file.
       description: Numeric ID of the associated application upload
       parameters:
         - in: path
@@ -78,8 +78,8 @@ paths:
                   type: string
                   format: binary
       responses:
-        '200':
-          description: 'File uploaded'
+        '201':
+          description: 'File successfully uploaded.'
           content:
             application/json:
               schema:
@@ -103,7 +103,7 @@ paths:
     get:
       tags:
         - File
-      summary: Get uploaded file by its id
+      summary: Retrieve a uploaded file by its ID.
       parameters:
         - in: path
           name: fileId
@@ -113,11 +113,11 @@ paths:
           description: Numeric ID of the associated fileId upload
       responses:
         '200':
-          description: 'File deleted'
+          description: 'File successfully retrieved.'
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/fileGetResponse'
+                $ref: '#/components/schemas/FileRecord'
         '500':
           description: 'Error deleting file in database'
           content:
@@ -135,17 +135,17 @@ paths:
     delete:
       tags:
         - File
-      summary: Delete file by id
+      summary: Delete file by its ID.
       parameters:
         - in: path
           name: fileId
           schema:
             type: integer
           required: true
-          description: Numeric ID of the associated fileId upload
+          description: Numeric ID of the associated fileId upload.
       responses:
-        '200':
-          description: 'File deleted'
+        '204':
+          description: 'File deleted, no contents will be returned.'
         '400':
           description: 'Invalid fileId.'
           content:

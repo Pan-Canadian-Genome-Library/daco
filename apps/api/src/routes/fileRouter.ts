@@ -173,7 +173,7 @@ fileRouter.post(
 
 			const result = await uploadEthicsFile({ applicationId: id, file });
 			if (result.success) {
-				res.status(200).send({
+				res.status(201).send({
 					id: result.data.id,
 					filename: result.data.filename,
 				});
