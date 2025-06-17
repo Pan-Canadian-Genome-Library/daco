@@ -24,46 +24,13 @@ import { serverConfig } from '@/config/serverConfig.ts';
 
 const healthRouter = express.Router();
 
-/**
- * @openapi
- * /health:
- *  get:
- *    tags:
- *      - Health
- *    summary: Get status of app and various app components.
- *    responses:
- *      '500':
- *          description: 'App is not fully healthy'
- *          content:
- *            application/json:
- *              schema:
- *                $ref: '#/components/responses/RequestValidationError'
- *      '200':
- *          description: 'All components reporting healthy status'
- *          content:
- *              application/json:
- *                  schema:
- *                    type: object
- *                    properties:
- *                      version:
- *                        type: string
- *                      health:
- *                        type: object
- *                        additionalProperties:
- *                         type: object
- *                         properties:
- *                             status:
- *                                 type: string
- *                             statusText:
- *                                 type: string
- */
-healthRouter.get('/health', (_req: Request, res: Response) => {
+healthRouter.get('/', (_req: Request, res: Response) => {
 	const health = getHealth();
 	const resBody = {
 		version: serverConfig.npm_package_version,
 		health,
 	};
-	if (health.all.status != Status.OK) {
+	if (health.all.status !== Status.OK) {
 		res.status(500).json(resBody);
 		return;
 	}

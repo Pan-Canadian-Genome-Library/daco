@@ -17,93 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { serverConfig } from '@/config/serverConfig.ts';
 import express from 'express';
 import swaggerJSDoc, { SwaggerDefinition } from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
-
-/**
- * ************
- * Common re-usable components used for errors throughout the app:
- * ************
- *
- * @openapi
- * components:
- *  responses:
- *    ServerErrors:
- *      type: object
- *      required:
- *        - message
- *        - error
- *      properties:
- *        error:
- *          type: string
- *          description: Code to identify the cause of the error.
- *        message:
- *          type: string
- *          description: Short description of the error to provide some context for why the request failed.
- *
- *    ClientErrors:
- *      type: object
- *      required:
- *        - message
- *        - error
- *      properties:
- *        error:
- *          type: string
- *          description: Code to identify the cause of the error.
- *        message:
- *          type: string
- *          description: Short description of the error to provide some context for why the request failed.
- *
- *    RequestValidationError:
- *      type: object
- *      required:
- *        - message
- *        - error
- *        - details
- *      properties:
- *        error:
- *          type: string
- *          description: Code to identify the cause of the error.
- *        message:
- *          type: string
- *          description: Short description of the error to provide some context for why the request failed.
- *        details:
- *          type: array
- *          items:
- *            type: object
- *            properties:
- *              code:
- *                type: string
- *                description: The validation error type
- *              expected:
- *                type: string
- *                description: The expected property.
- *              received:
- *                type: string
- *                description: The property that was received in the request
- *              path:
- *                type: array
- *                items:
- *                  type: string
- *                  description: The path of the object where validation failed.
- *              message:
- *                type: string
- *                description: A plain text error message describing why the validation failed.
- *
- */
 
 const SWAGGER_OPTIONS: SwaggerDefinition = {
 	openapi: '3.0.0',
 	info: {
 		title: 'PCGL DACO API',
-		version: '1.0.0',
+		description:
+			'The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers, and commercial teams for access to PCGL Controlled Data.<br/><br/>Information related to PCGL and the DACO can be found at: [genomelibrary.ca](https://genomelibrary.ca/).',
+		version: serverConfig.npm_package_version,
 	},
 };
 
 const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.Options = {
 	swaggerDefinition: SWAGGER_OPTIONS,
-	apis: ['./src/routes/*.ts'],
+	apis: ['./src/docs/**/*.yaml'],
 };
 
 const swaggerRouter = express.Router();

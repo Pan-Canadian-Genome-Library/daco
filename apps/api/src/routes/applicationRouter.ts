@@ -198,8 +198,9 @@ applicationRouter.post(
 	),
 );
 
-// TODO: create a way for admin to fetch all applications, this is filtering by the requesting user's ID
-// TODO: validate queryParam options using zod
+/**
+ * TODO: validate queryParam options using zod
+ */
 applicationRouter.get(
 	'/',
 	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
