@@ -20,7 +20,8 @@ paths:
     get:
       tags:
         - Applications
-      summary: Get All Users Applications
+      summary: List all applications that belong to a user.
+      description: Lists all applications which belong to the logged in user.<br/><br/>*_Note:_* If the user is a <strong>DAC Member</strong>, this endpoint will return all applications in the system.
       parameters:
         - in: query
           name: state
@@ -123,11 +124,6 @@ paths:
       tags:
         - Applications
       summary: Gets the total number of applications in each state / status category.
-      parameters:
-        - in: query
-          name: userId
-          schema:
-            type: string
       responses:
         '500':
           description: 'Error getting the total number of applications in each state / status category'
@@ -146,38 +142,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  APPROVED:
-                    type: number
-                    nullable: false
-                  CLOSED:
-                    type: number
-                    nullable: false
-                  DAC_REVIEW:
-                    type: number
-                    nullable: false
-                  DAC_REVISIONS_REQUESTED:
-                    type: number
-                    nullable: false
-                  DRAFT:
-                    type: number
-                    nullable: false
-                  INSTITUTIONAL_REP_REVIEW:
-                    type: number
-                    nullable: false
-                  REJECTED:
-                    type: number
-                    nullable: false
-                  INSTITUTIONAL_REP_REVISION_REQUESTED:
-                    type: number
-                    nullable: false
-                  REVOKED:
-                    type: number
-                    nullable: false
-                  TOTAL:
-                    type: number
-                    nullable: false
+                $ref: '#/components/schemas/ApplicationsMetadata'
 
   /applications/create:
     post:
@@ -291,7 +256,7 @@ paths:
       parameters:
         - name: applicationId
           in: path
-          description: The ID of the application you wish to retrieve the signature from.
+          description: The ID of the application you wish to reject.
           required: true
           schema:
             type: integer
@@ -322,7 +287,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ApplicationResponse'
+                $ref: '#/components/schemas/Application'
 
   /applications/{applicationId}/submit:
     post:
