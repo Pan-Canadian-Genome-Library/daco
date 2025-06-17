@@ -39,7 +39,6 @@ const useRejectApplication = () => {
 			const response = await fetch(`/applications/${applicationId}/reject`, {
 				method: 'POST',
 				body: JSON.stringify({
-					applicationId: applicationId,
 					rejectionReason: rejectionReason,
 				}),
 			}).then(withErrorResponseHandler);

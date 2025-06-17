@@ -155,6 +155,6 @@ export const submitApplicationRequestSchema = z
 	})
 	.strict();
 
-export const rejectApplicationRequestSchema = basicApplicationParamSchema.extend({
+export const rejectApplicationRequestSchema = z.object({
 	rejectionReason: z.string().nullable(),
 });

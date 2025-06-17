@@ -22,18 +22,24 @@ import express from 'express';
 import swaggerJSDoc, { SwaggerDefinition } from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 
+const DESCRIPTION_EN =
+	'The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers, and commercial teams for access to PCGL Controlled Data.<br/><br/>Additional information related to PCGL and the DACO can be found at: [genomelibrary.ca](https://genomelibrary.ca/).';
+
+const DESCRIPTION_FR =
+	"<p>Le Bureau de conformité pour l’accès aux données de la BGP (BCAD de la BGP) traite les demandes d’accès aux données contrôlées de la BGP émanant de scientifiques, de chercheurs et chercheuses et d’équipes commerciales.<br/><br/>Des informations supplémentaires sur la BGP et le BCAD sont disponibles à l'adresse suivante: [genomelibrary.ca/fr](https://genomelibrary.ca/fr).</p>";
+
 const SWAGGER_OPTIONS: SwaggerDefinition = {
 	openapi: '3.0.0',
 	info: {
 		title: 'PCGL DACO API',
-		description:
-			'The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers, and commercial teams for access to PCGL Controlled Data.<br/><br/>Information related to PCGL and the DACO can be found at: [genomelibrary.ca](https://genomelibrary.ca/).',
+		description: `${DESCRIPTION_EN}<hr/>${DESCRIPTION_FR}`,
 		version: serverConfig.npm_package_version,
 	},
 };
 
 const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.Options = {
 	swaggerDefinition: SWAGGER_OPTIONS,
+	failOnErrors: true, //Like the previous YAML parser, this setting ensures the server fails on start up if any YAML if malformed.
 	apis: ['./src/docs/**/*.yaml'],
 };
 
