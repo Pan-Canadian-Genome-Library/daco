@@ -805,7 +805,9 @@ export const submitApplication = async ({
 
 		const {
 			applicant_first_name,
+			applicant_last_name,
 			institutional_rep_first_name,
+			institutional_rep_last_name,
 			institutional_rep_email,
 			applicant_institutional_email,
 		} = resultContents.data.contents;
@@ -815,8 +817,8 @@ export const submitApplication = async ({
 			emailService.sendEmailInstitutionalRepForReview({
 				id: application.id,
 				to: institutional_rep_email,
-				applicantName: applicant_first_name || 'N/A',
-				repName: institutional_rep_first_name || 'N/A',
+				applicantName: `${applicant_first_name} ${applicant_last_name}` || 'N/A',
+				repName: `${institutional_rep_first_name} ${institutional_rep_last_name}` || 'N/A',
 				submittedDate: submissionResult.data.created_at,
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
