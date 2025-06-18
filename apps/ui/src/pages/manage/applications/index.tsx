@@ -36,6 +36,16 @@ import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
 
+/**
+ * The default number of rows shown in the table, also known as PageSize
+ */
+const DEFAULT_NUMBER_OF_ROWS = 20;
+
+/**
+ * Default filter that's selected on page load, or when an unknown configuration is encountered.
+ */
+const DEFAULT_FILTER_STATE: FilterKeys = 'TOTAL';
+
 export interface TableProperties {
 	pagination: TablePaginationConfig;
 }
@@ -45,15 +55,15 @@ const ManageApplicationsPage = () => {
 
 	const appliedFilters = searchParams.get('filters');
 	const appliedPage = searchParams.get('page');
-	const appliedRows = searchParams.get('rows');
+	const appliedRows = Number(searchParams.get('rows'));
 
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
-	const [rowCount, setRowCount] = useState<number>(20);
+	const [rowCount, setRowCount] = useState<number>(DEFAULT_NUMBER_OF_ROWS);
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
 		pagination: {
 			current: 1,
-			pageSize: 20,
+			pageSize: DEFAULT_NUMBER_OF_ROWS,
 			total: 0,
 		},
 	});
@@ -69,7 +79,7 @@ const ManageApplicationsPage = () => {
 		sort: sorting ? sorting : undefined,
 		state: parseFilters(appliedFilters).filter((filter) => isApplicationStateValue(filter)),
 		page: parsePageNumber(tableParams.pagination?.current, true),
-		pageSize: parseRowNumber(appliedRows ?? '20'),
+		pageSize: parseRowNumber(appliedRows),
 	});
 
 	const { data: filterMetadata, error: filterMetaDataError, isLoading: areFiltersLoading } = useGetApplicationCounts();
@@ -133,7 +143,7 @@ const ManageApplicationsPage = () => {
 			setSorting(sortingOpt);
 		}
 
-		setRowCount(parseRowNumber(pagination.pageSize ?? 20));
+		setRowCount(parseRowNumber(pagination.pageSize ?? DEFAULT_NUMBER_OF_ROWS));
 
 		setSearchParams((prev) => {
 			prev.set('page', parsePageNumber(page, false).toString());
@@ -152,8 +162,7 @@ const ManageApplicationsPage = () => {
 			!appliedFilters ||
 			!appliedPage ||
 			!appliedRows ||
-			!isValidPageNumber(Number.parseInt(appliedPage)) ||
-			!isValidPageNumber(Number.parseInt(appliedRows)) ||
+			!isValidPageNumber(Number(appliedPage)) ||
 			!isValidRowNumber(appliedRows);
 
 		const unknownFilters = !isFilterKeySet(parseFilters(appliedFilters));
@@ -166,9 +175,9 @@ const ManageApplicationsPage = () => {
 		 * We should validate this first before continuing.
 		 */
 		if (missingOrInvalidPageState || unknownFilters) {
-			allUrlParams.set('filters', 'TOTAL');
+			allUrlParams.set('filters', DEFAULT_FILTER_STATE);
 			allUrlParams.set('page', '1');
-			allUrlParams.set('rows', '20');
+			allUrlParams.set('rows', DEFAULT_NUMBER_OF_ROWS.toString());
 			setSearchParams(allUrlParams);
 			return;
 		}
@@ -302,7 +311,7 @@ const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata): Filter
  */
 const parsePageNumber = (pageNumber?: number | string | null, forAPI?: boolean): number => {
 	if (pageNumber) {
-		const parsedPage = typeof pageNumber === 'string' ? parseInt(pageNumber) : pageNumber;
+		const parsedPage = typeof pageNumber === 'string' ? Number(pageNumber) : pageNumber;
 		if (isValidPageNumber(parsedPage)) {
 			return forAPI ? parsedPage - 1 : parsedPage;
 		}
@@ -346,7 +355,7 @@ const isFilterKeySet = (appliedFilters: string[]): appliedFilters is FilterKeys[
  * @returns `boolean` true if valid, false if not.
  */
 const isValidRowNumber = (appliedRowNumber: string | number) => {
-	const parsedRow = typeof appliedRowNumber === 'string' ? parseInt(appliedRowNumber) : appliedRowNumber;
+	const parsedRow = typeof appliedRowNumber === 'string' ? Number(appliedRowNumber) : appliedRowNumber;
 	if (isValidPageNumber(parsedRow) && (parsedRow === 20 || parsedRow === 50 || parsedRow === 100)) {
 		return true;
 	} else {
@@ -357,12 +366,12 @@ const isValidRowNumber = (appliedRowNumber: string | number) => {
 /**
  * Parses number for the number of rows requested. If it's valid, it re-returns that number as a `number`
  * otherwise, it returns the default of 20.
- * @param appliedRowNumber `string | number` - The current row number in the URL params
+ * @param appliedRowNumber `number` - The current row number in the URL params
  * @returns `number` - A parsed number representing the number of rows requested.
  */
-const parseRowNumber = (appliedRowNumber: string | number) => {
+const parseRowNumber = (appliedRowNumber: number) => {
 	if (isValidRowNumber(appliedRowNumber)) {
-		return typeof appliedRowNumber === 'string' ? Number(appliedRowNumber) : appliedRowNumber;
+		return appliedRowNumber;
 	}
-	return 20;
+	return DEFAULT_NUMBER_OF_ROWS;
 };
