@@ -70,7 +70,6 @@ paths:
             type: integer
           required: true
           description: The ID of the application to close.
-      operationId: 'requestRevisions'
       requestBody:
         description: Request body containing revision request details.
         required: true
@@ -111,7 +110,6 @@ paths:
             type: integer
           required: true
           description: The ID of the application to close.
-      operationId: 'requestRevisions'
       requestBody:
         description: Request body containing revision request details.
         required: true

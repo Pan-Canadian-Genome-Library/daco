@@ -67,11 +67,13 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
         '400':
-          description: 'Occurs when no User ID is provided, an error has occurred while processing JSON provided for the state/sort values, or page and/or page size are negative values.'
+          description: 'Occurs when an error has occurred while processing JSON provided for the state/sort values, or page and/or page size are negative values.'
           content:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
         '200':
           description: 'Applications retrieved'
           content:
@@ -100,6 +102,14 @@ paths:
           description: Retrieve a specific application with the specified application ID.
           required: true
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You do not own, or have the rights to access this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Cannot retrieve application by ID'
           content:
@@ -125,18 +135,20 @@ paths:
         - Applications
       summary: Gets the total number of applications in each state / status category.
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You are not a **DAC Member** and therefore cannot access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Error getting the total number of applications in each state / status category'
           content:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
-        '400':
-          description: 'Error the total number of applications in each state / status category - No User ID specified.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'The object containing the metadata information'
           content:
@@ -149,14 +161,15 @@ paths:
       tags:
         - Applications
       summary: Create a new application.
-      requestBody:
-        description: The body containing information about the requesting user.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requests/ApplicationCreation'
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You are not an **Applicant** and therefore cannot create a new application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Error creating application'
           content:
@@ -175,7 +188,7 @@ paths:
             application/json:
               schema:
                 type: object
-                $ref: '#/components/schemas/Applications'
+                $ref: '#/components/schemas/Application'
 
   /applications/edit:
     post:
@@ -190,6 +203,14 @@ paths:
             schema:
               $ref: '#/components/requests/ApplicationUpdates'
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Error editing application'
           content:
@@ -207,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationRecord'
+                $ref: '#/components/schemas/ApplicationContents'
 
   /applications/{applicationId}/approve:
     post:
@@ -223,6 +244,14 @@ paths:
             type: integer
             minimum: 1
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You are not a **DAC Member** or have sufficient rights to approve this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: Application successfully approved.
           content:
@@ -270,6 +299,14 @@ paths:
             schema:
               $ref: '#/components/requests/RejectApplication'
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You are not a **DAC Member** or have sufficient rights to reject this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Cannot reject application by ID'
           content:
@@ -303,6 +340,14 @@ paths:
           required: true
           description: Numeric ID of the associated application upload
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You do not own or have the rights to submit this Application to its next lifecycle step.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: Application submitted successfully
           content:
@@ -343,6 +388,14 @@ paths:
           required: true
           description: The ID of the application to revoke.
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+        '403':
+          description: Forbidden. You do not own or have the rights to revoke this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: Application successfully revoked.
           content:
@@ -393,6 +446,8 @@ paths:
           required: true
           description: The ID of the application to close.
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
         '200':
           description: Application successfully closed.
           content:
@@ -449,6 +504,8 @@ paths:
           required: true
           description: The ID of the application you'd like to withdraw.
       responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
         '200':
           description: Application has been successfully withdrawn.
           content:
