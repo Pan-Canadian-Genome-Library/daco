@@ -17,15 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import SectionContent from '@/components/pages/application/SectionContent';
+import SectionFooter from '@/components/pages/application/SectionFooter';
+import SectionTitle from '@/components/pages/application/SectionTitle';
+import SignatureViewer from '@/components/pages/application/SignatureViewer';
 import TextList from '@/components/TextList';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Flex, Typography } from 'antd';
 import { Trans, useTranslation } from 'react-i18next';
-import SectionContent from '../SectionContent';
-import SectionFooter from '../SectionFooter';
-import SectionTitle from '../SectionTitle';
-import SignatureViewer from '../SignatureViewer';
 
 const { Text } = Typography;
 

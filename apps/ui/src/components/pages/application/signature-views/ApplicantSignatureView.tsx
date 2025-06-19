@@ -17,14 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import ESignature from '@/components/pages/application/form-components/ESignature';
+import SectionContent from '@/components/pages/application/SectionContent';
+import SectionFooter from '@/components/pages/application/SectionFooter';
+import SectionTitle from '@/components/pages/application/SectionTitle';
+import { useSignatureForm } from '@/components/pages/application/utils/useSignatureForm';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Col, Row } from 'antd';
 import { useTranslation } from 'react-i18next';
-import ESignature from '../form-components/ESignature';
-import SectionContent from '../SectionContent';
-import SectionFooter from '../SectionFooter';
-import SectionTitle from '../SectionTitle';
-import { useSignatureForm } from '../utils/useSignatureForm';
 
 type Props = {
 	signatureData?: SignatureDTO;
