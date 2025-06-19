@@ -165,6 +165,8 @@
 		}
 	},
 	"generic": {
-		"notApplicable": "N/A"
+		"notApplicable": "N/A",
+		"applicant": "Applicant",
+		"rep": "Institutional Rep"
 	}
 }

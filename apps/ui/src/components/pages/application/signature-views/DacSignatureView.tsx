@@ -61,7 +61,7 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 			<SectionContent showDivider={false}>
 				{!signatureLoading ? (
 					<SignatureViewer
-						title="Applicant"
+						title={translate('generic.applicant')}
 						name={`${applicantFirstName} ${applicantLastName}`}
 						signature={signatureData?.applicantSignature}
 						date={signatureData?.applicantSignedAt}
@@ -69,7 +69,7 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 				) : null}
 				{!signatureLoading ? (
 					<SignatureViewer
-						title="Institutional Rep"
+						title={translate('generic.rep')}
 						name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
 						signature={signatureData?.institutionalRepSignature}
 						date={signatureData?.institutionalRepSignedAt}
