@@ -35,7 +35,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/SignatureRecord'
+                $ref: '#/components/schemas/SignatureRecord'
         '400':
           description: Will occur when not provided a valid `applicationId`, either a negative number, or not a number at all.
           content:
@@ -44,6 +44,18 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application and therefore cannot view its signatures.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:
@@ -86,6 +98,18 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application and therefore cannot delete its signatures.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:
@@ -125,6 +149,18 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application and therefore cannot add to its signatures.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '404':
           description: Application not found.
           content:

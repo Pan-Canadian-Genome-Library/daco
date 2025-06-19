@@ -39,7 +39,7 @@ const SWAGGER_OPTIONS: SwaggerDefinition = {
 
 const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.Options = {
 	swaggerDefinition: SWAGGER_OPTIONS,
-	failOnErrors: true, //Like the previous YAML parser, this setting ensures the server fails on start up if any YAML if malformed.
+	failOnErrors: true, //Like the previous YAML parser, this setting ensures the server fails on start up if any YAML is malformed.
 	apis: ['./src/docs/**/*.yaml'],
 };
 
