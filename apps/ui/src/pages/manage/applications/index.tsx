@@ -163,7 +163,7 @@ const ManageApplicationsPage = () => {
 			!appliedPage ||
 			!appliedRows ||
 			!isValidPageNumber(Number(appliedPage)) ||
-			!isValidRowNumber(appliedRows);
+			!isValidRowNumber(Number(appliedRows));
 
 		const unknownFilters = !isFilterKeySet(parseFilters(appliedFilters));
 
@@ -351,12 +351,14 @@ const isFilterKeySet = (appliedFilters: string[]): appliedFilters is FilterKeys[
 /**
  * Ensures that the row number in the URL params is valid (within the appropriate range, is a number, etc..),
  * and converts it if needed.
- * @param appliedRowNumber `string | number` - The row number from the URL parameter.
+ * @param appliedRowNumber `number` - The row number from the URL parameter pre-converted into an Int.
  * @returns `boolean` true if valid, false if not.
  */
-const isValidRowNumber = (appliedRowNumber: string | number) => {
-	const parsedRow = typeof appliedRowNumber === 'string' ? Number(appliedRowNumber) : appliedRowNumber;
-	if (isValidPageNumber(parsedRow) && (parsedRow === 20 || parsedRow === 50 || parsedRow === 100)) {
+const isValidRowNumber = (appliedRowNumber: number) => {
+	if (
+		isValidPageNumber(appliedRowNumber) &&
+		(appliedRowNumber === 20 || appliedRowNumber === 50 || appliedRowNumber === 100)
+	) {
 		return true;
 	} else {
 		return false;
