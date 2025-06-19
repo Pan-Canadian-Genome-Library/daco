@@ -138,104 +138,104 @@ components:
       type: object
       description: Complete Application details
       properties:
-        applicant_first_name:
+        applicantFirstName:
           type: string
           description: Applicant's first name
-        applicant_middle_name:
+        applicantMiddleName:
           type: string
           description: Applicant's middle name
-        applicant_last_name:
+        applicantLastName:
           type: string
           description: Applicant's last name
-        applicant_title:
+        applicantTitle:
           type: string
           description: Applicant's formal title
-        applicant_suffix:
+        applicantSuffix:
           type: string
           description: Applicant's formal suffix
-        applicant_position_title:
+        applicantPositionTitle:
           type: string
           description: Applicant's professional title
-        applicant_primary_affiliation:
+        applicantInstitution:
           type: string
           description: Applicant's institution
-        applicant_institutional_email:
+        applicantInstitutionalEmail:
           type: string
           description: Applicant's email
-        applicant_profile_url:
+        applicantProfileUrl:
           type: string
           description: Applicant's profile URL
         # Institutional Rep
-        institutional_rep_title:
+        institutionalRepTitle:
           type: string
           description: Institutional representative's professional title
-        institutional_rep_first_name:
+        institutionalRepFirstName:
           type: string
           description: Institutional representative's first name
-        institutional_rep_middle_name:
+        institutionalRepMiddleName:
           type: string
           description: Institutional representative's middle name
-        institutional_rep_last_name:
+        institutionalRepLastName:
           type: string
           description: Institutional representative's last name
-        institutional_rep_suffix:
+        institutionalRepSuffix:
           type: string
           description: Institutional representative's formal suffix
-        institutional_rep_primary_affiliation:
+        institutionalRepPrimaryAffiliation:
           type: string
           description: Institutional representative's affiliation
-        institutional_rep_email:
+        institutionalRepEmail:
           type: string
           description: Institutional representative's email
-        institutional_rep_profile_url:
+        institutionalRepProfileUrl:
           type: string
           description: Institutional representative's profile URL
-        institutional_rep_position_title:
+        institutionalRepPositionTitle:
           type: string
           description: Institutional representative's professional title
         # Institution
-        institution_country:
+        institutionCountry:
           type: string
           description: Address of Institution - Country
-        institution_state:
+        institutionState:
           type: string
           description: Address of Institution - State
-        institution_city:
+        institutionCity:
           type: string
           description: Address of Institution - City
-        institution_street_address:
+        institutionStreetAddress:
           type: string
           description: Address of Institution - street name and number
-        institution_postal_code:
+        institutionPostalCode:
           type: string
           description: Address of Institution - postal code
-        institution_building:
+        institutionBuilding:
           type: string
           description: Address of Institution - specific building name if required
         # Project
-        project_title:
+        projectTitle:
           type: string
           description: Name of project
-        project_website:
+        projectWebsite:
           type: string
           description: URL of project website
-        project_background:
+        projectBackground:
           type: string
           description: Brief description of project
-        project_methodology:
+        projectMethodology:
           type: string
           description: Description of scientific approach used in the project
-        project_aims:
+        projectAims:
           type: string
           description: Goals for the project
-        project_summary:
+        projectSummary:
           type: string
           description: In depth text summary of project
-        project_publication_urls:
+        projectPublicationUrls:
           type: array
           description: URLs of publications related to the project
         # Studies
-        requested_studies:
+        requestedStudies:
           type: array
           description: List of studies
 

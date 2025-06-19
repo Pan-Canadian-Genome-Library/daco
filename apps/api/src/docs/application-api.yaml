@@ -73,7 +73,11 @@ paths:
               schema:
                 $ref: '#/components/responses/ClientErrors'
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: 'Applications retrieved'
           content:
@@ -103,7 +107,11 @@ paths:
           required: true
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You do not own, or have the rights to access this application.
           content:
@@ -136,7 +144,11 @@ paths:
       summary: Gets the total number of applications in each state / status category.
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You are not a **DAC Member** and therefore cannot access this endpoint.
           content:
@@ -163,7 +175,11 @@ paths:
       summary: Create a new application.
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You are not an **Applicant** and therefore cannot create a new application.
           content:
@@ -204,7 +220,11 @@ paths:
               $ref: '#/components/requests/ApplicationUpdates'
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You do not own, or are not associated with this application.
           content:
@@ -245,7 +265,11 @@ paths:
             minimum: 1
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You are not a **DAC Member** or have sufficient rights to approve this application.
           content:
@@ -257,7 +281,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Applications'
+                $ref: '#/components/schemas/Application'
         '400':
           description: Invalid request - missing or invalid approval data.
           content:
@@ -300,7 +324,11 @@ paths:
               $ref: '#/components/requests/RejectApplication'
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You are not a **DAC Member** or have sufficient rights to reject this application.
           content:
@@ -341,7 +369,11 @@ paths:
           description: Numeric ID of the associated application upload
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You do not own or have the rights to submit this Application to its next lifecycle step.
           content:
@@ -389,7 +421,11 @@ paths:
           description: The ID of the application to revoke.
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '403':
           description: Forbidden. You do not own or have the rights to revoke this application.
           content:
@@ -401,7 +437,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Applications'
+                $ref: '#/components/schemas/Application'
         '400':
           description: |
             Invalid request - the application is not in the `APPROVED` state, or the application ID is invalid.
@@ -447,13 +483,17 @@ paths:
           description: The ID of the application to close.
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: Application successfully closed.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Applications'
+                $ref: '#/components/schemas/Application'
         '400':
           description: Invalid request - missing or invalid application ID, or the application is in an invalid state for closure.
           content:
@@ -463,7 +503,7 @@ paths:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
         '403':
-          description: Unauthorized - requester lacks permission to close the application in its current state.
+          description: Forbidden - requester lacks permission to close the application in its current state.
           content:
             application/json:
               schema:
@@ -505,13 +545,17 @@ paths:
           description: The ID of the application you'd like to withdraw.
       responses:
         '401':
-          description: Unauthorized. Will occur when the user is not logged in. No body will be returned.
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '200':
           description: Application has been successfully withdrawn.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Applications'
+                $ref: '#/components/schemas/Application'
         '400':
           description: Invalid request - Missing or invalid Application ID, or the Application is in an inappropriate state and cannot be withdrawn.
           content:
@@ -521,7 +565,7 @@ paths:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
         '403':
-          description: Unauthorized - You do not own, or have the correct permissions to modify the application.
+          description: Forbidden - You do not own, or have the correct permissions to modify the application.
           content:
             application/json:
               schema:
