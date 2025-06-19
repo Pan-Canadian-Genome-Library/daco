@@ -58,15 +58,16 @@ const ApplicationViewer = () => {
 	} = useGetApplicationFeedback(params.id, applicationData?.state);
 
 	useEffect(() => {
-		if (applicationData && !applicationError) {
-			// Application can only be in edit if the application-state is in DRAFT and if the user is an APPLICANT
-			// TODO: possibly need to change depending on the auth rework with authz
-			const forceToViewMode =
-				applicationData.state !== ApplicationStates.DRAFT || role !== userRoleSchema.Values.APPLICANT;
+		if (!applicationData || applicationError) {
+			return;
+		}
+		// Application can only be in edit if the application-state is in DRAFT and if the user is an APPLICANT
+		// TODO: possibly need to change depending on the auth rework with authz
+		const forceToViewMode =
+			(applicationData.state !== ApplicationStates.DRAFT || role !== userRoleSchema.Values.APPLICANT) && isEditMode;
 
-			if (forceToViewMode && isEditMode) {
-				navigation(`/application/${applicationData.id}/`, { replace: true });
-			}
+		if (forceToViewMode) {
+			navigation(`/application/${applicationData.id}/`, { replace: true });
 		}
 	}, [applicationData, applicationError, isEditMode, navigation, role]);
 
