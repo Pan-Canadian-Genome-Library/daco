@@ -310,8 +310,10 @@ applicationRouter.get(
 					isAssociatedRep(request.session, applicationId);
 
 				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
-				if (data.userId !== userId && !hasSpecialAccess) {
-					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+				if (data.userId !== userId || !hasSpecialAccess) {
+					response
+						.status(403)
+						.json({ error: 'FORBIDDEN', message: 'User does not have permission to access this application.' });
 					return;
 				}
 
@@ -439,7 +441,7 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
+				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
 				const { rejectionReason } = request.body;
 				const { applicationId } = request.params;
@@ -751,7 +753,7 @@ applicationRouter.post(
 				if (application.data.userId !== userId) {
 					response.status(403).send({
 						error: ErrorType.FORBIDDEN,
-						message: 'You do not own, or have the rights to modify this application.',
+						message: 'User does not have permission to access or modify this application.',
 					});
 				}
 
@@ -1077,7 +1079,7 @@ applicationRouter.get(
 				if (getUserRole(userSession) === 'APPLICANT' && applicationInfo.data.userId !== userSession.user?.userId) {
 					response.status(403).send({
 						error: 'FORBIDDEN',
-						message: 'You do not own, or have the rights to access this application.',
+						message: 'User does not have permission to access or modify this application.',
 					});
 					return;
 				}
