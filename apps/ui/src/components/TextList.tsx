@@ -21,7 +21,7 @@ import { List, theme } from 'antd';
 const { useToken } = theme;
 
 type TextProps = {
-	data: string[] | JSX.Element[];
+	data: (string | JSX.Element)[];
 	isNumbered?: boolean;
 };
 
