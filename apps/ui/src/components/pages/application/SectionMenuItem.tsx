@@ -35,7 +35,7 @@ export type SectionMenuItemProps = {
 	isLocked?: boolean;
 	hasCollaborators?: boolean;
 	appState: ApplicationStateValues;
-	role: UserRole;
+	role?: UserRole;
 };
 
 const SectionMenuItem = (props: SectionMenuItemProps) => {

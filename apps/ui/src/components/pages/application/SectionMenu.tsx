@@ -93,7 +93,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 			selectedKeys={[currentSection]}
 			mode="inline"
 			items={
-				!isLoading && role
+				!isLoading
 					? ApplicationSectionRoutes.map((item) => {
 							const route = item.route;
 
