@@ -220,6 +220,18 @@
 			"submitApplicationSuccess": "Your application has been submitted for review.",
 			"submitApplicationWithRevisionsSuccess": "Your application revisions have been submitted for review.",
 			"submitApplicationFailed": "Sorry, there was an unexpected error while submitting your application for review. Please try again later."
+		},
+		"rep-section": {
+			"desc1": "As the final step, please review the applicant signature. Once you've completed the review, take one of the following actions:",
+			"point1": "<bold>Submit Application</bold>: If you are satisfied with the application, please provide your signature, as it is required for review by the PCGL Data Access Committee. Click the Submit Application to complete your review, we will notify the Data Access Committee that the application is ready for their review.",
+			"point2": "<bold>Request Revisions</bold>: If the application requires changes, click Request Revisions to send it back to the applicant for updates."
+		},
+		"dac-section": {
+			"desc1": "Please review the signatures of both the applicant and the institutional representative to confirm authorization of the application. Once you've completed your review, take one of the following actions:",
+			"point1": "<bold>Approve</bold> - If the application is complete and accurate, click Approve to grant data access.",
+			"point2": "<bold>Request Revisions</bold> - If the application requires changes, click Request Revisions to send it back to the applicant for updates.",
+			"point3": "<bold>Reject</bold>  If you determine that data access should not be granted, click Reject to deny the application.",
+			"point4": "<bold>Close Application</bold> - If the application is no longer valid or relevant, click Close Application to remove it from consideration."
 		}
 	}
 }
