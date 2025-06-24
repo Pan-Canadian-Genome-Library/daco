@@ -44,7 +44,7 @@ export type VerifyPageSectionsType<T extends string> = {
 
 /**
  *
- * @param fields fields retrived from the store
+ * @param fields fields retrieved from the store
  * @returns VerifyPageSectionsType object sections determining if the section is touched
  *
  * This is needed for a users first time visit, there should not be an icon present if the user hasn't started any of the sections
@@ -116,10 +116,10 @@ export const VerifySectionsTouched = (fields?: ApplicationContentsResponse) => {
 
 /**
  *
- * @param fields fields retrived from the store
+ * @param fields fields retrieved from the store
  * @returns VerifyPageSectionsType object sections determining if the section is valid
  *
- *  Verify each section with zod if there are errors on their fields using
+ *  Verify each section with zod if there are any errors
  */
 export const VerifyFormSections = (
 	fields?: ApplicationContentsResponse,
