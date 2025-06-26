@@ -24,6 +24,10 @@ import { BASE64_IMAGE } from '../utils/regex.js';
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
 export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationRequestSchema>;
 
+export const basicApplicationParamSchema = z.object({
+	applicationId: z.coerce.number().int().nonnegative().min(1),
+});
+
 export const applicationContentsSchema = z
 	.object({
 		applicantFirstName: z.string().nullable(),
@@ -152,6 +156,5 @@ export const submitApplicationRequestSchema = z
 	.strict();
 
 export const rejectApplicationRequestSchema = z.object({
-	applicationId: z.number().nonnegative(),
 	rejectionReason: z.string().nullable(),
 });
