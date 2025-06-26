@@ -20,15 +20,15 @@
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/DashboardFilter';
+import RowCount from '@/components/pages/manage/RowCount';
+import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@/global/constants';
 import { pcglTableTheme } from '@/providers/ThemeProvider';
 import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 
 import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
 import { FilterValue, SorterResult } from 'antd/es/table/interface';
 
-import { useTranslation } from 'react-i18next';
-
-const { Text, Link } = Typography;
+const { Link } = Typography;
 const { useToken } = theme;
 
 export interface FilterState {
@@ -42,6 +42,7 @@ export interface TableParams {
 
 interface ManagementDashboardProps {
 	onFilterChange: (filtersEnabled: FilterKeys[]) => void;
+	onRowsChange: (pageCount: number) => void;
 	onTableChange: ({
 		pagination,
 		filters,
@@ -52,6 +53,7 @@ interface ManagementDashboardProps {
 		sorter: SorterResult<ApplicationListSummary>[] | SorterResult<ApplicationListSummary>;
 	}) => void;
 	filterCounts: FilterState[];
+	rowsCount: number | undefined;
 	filters: FilterKeys[];
 	data: ApplicationListSummary[];
 	loading: boolean;
@@ -81,7 +83,10 @@ const tableColumnConfiguration = [
 		dataIndex: ['applicant', 'country'],
 		key: 'country',
 		render: (value: string, record: ApplicationListSummary) =>
-			record.applicant?.country ? record.applicant.country : '-',
+			//FIXME: i18n: When french support is added, we need to make this toggle dynamic somehow
+			record.applicant?.country
+				? (GC_STANDARD_GEOGRAPHIC_AREAS.find((country) => country.iso === record.applicant?.country)?.en ?? '-')
+				: '-',
 	},
 	{
 		title: 'Applicant',
@@ -117,13 +122,14 @@ const tableColumnConfiguration = [
 const ManagementDashboard = ({
 	onFilterChange,
 	onTableChange,
+	onRowsChange,
+	rowsCount,
 	filterCounts,
 	filters,
 	pagination,
 	data,
 	loading,
 }: ManagementDashboardProps) => {
-	const { t: translate } = useTranslation();
 	const { token } = useToken();
 
 	return (
@@ -139,10 +145,7 @@ const ManagementDashboard = ({
 					availableStates={filterCounts}
 				/>
 			</Flex>
-			<Flex justify="left" align="center" style={{ width: '100%', margin: '0 0 .5rem .5rem' }}>
-				<Text>{translate('manage.applications.listTitle')}</Text>
-			</Flex>
-			<Flex style={{ width: '100%', height: '100%' }}>
+			<Flex style={{ width: '100%', height: '100%', margin: '.5rem 0' }} vertical>
 				<ConfigProvider theme={pcglTableTheme}>
 					<Table
 						rowKey={(record) => {
@@ -156,6 +159,11 @@ const ManagementDashboard = ({
 						style={{ width: '100%', height: '100%' }}
 					/>
 				</ConfigProvider>
+				<RowCount
+					rowCount={rowsCount}
+					onRowsChange={onRowsChange}
+					style={{ translate: '.75rem -2.5rem', display: data.length ? 'block' : 'none' }}
+				/>
 			</Flex>
 		</Flex>
 	);

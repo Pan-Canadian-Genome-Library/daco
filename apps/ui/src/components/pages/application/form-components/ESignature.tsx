@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { DownloadOutlined } from '@ant-design/icons';
 import { type eSignatureSchemaType } from '@pcgl-daco/validation';
 import { Button, Flex, Row, theme } from 'antd';
 import React, { useState, type RefObject } from 'react';
@@ -44,13 +43,10 @@ interface ESignatureFormProps<T extends FieldValues> {
 }
 interface ESignatureProps {
 	signatureRef: RefObject<SignatureCanvas>;
-	downloadButtonText: string;
 	clearButtonText: string;
 	saveButtonText: string;
 	disableSaveButton?: boolean;
 	onSaveClicked: () => void;
-	onDownloadClicked: () => void;
-	disableDownloadPDF: boolean;
 }
 
 const SignatureFieldCover = ({ style }: { style: React.CSSProperties }) => {
@@ -95,7 +91,6 @@ const ESignature = <T extends FieldValues>(
 		clearErrors,
 		disableSaveButton,
 		clearButtonText,
-		downloadButtonText,
 		saveButtonText,
 	} = props;
 
@@ -145,16 +140,7 @@ const ESignature = <T extends FieldValues>(
 								style: SignatureFieldStyle,
 							}}
 						/>
-						<Flex justify="space-between" style={{ width: '100%', margin: '1rem 0 0 0' }}>
-							<Flex gap={token.margin}>
-								<Button
-									disabled={props.disableDownloadPDF}
-									onClick={props.onDownloadClicked}
-									icon={<DownloadOutlined />}
-								>
-									{downloadButtonText}
-								</Button>
-							</Flex>
+						<Flex justify="flex-end" style={{ width: '100%', margin: '1rem 0 0 0' }}>
 							<Flex gap={token.margin}>
 								<Button onClick={clearSignature} disabled={disabled}>
 									{clearButtonText}

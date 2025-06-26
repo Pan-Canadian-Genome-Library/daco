@@ -36,6 +36,16 @@ import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
 
+/**
+ * The default number of rows shown in the table, also known as PageSize
+ */
+const DEFAULT_NUMBER_OF_ROWS = 20;
+
+/**
+ * Default filter that's selected on page load, or when an unknown configuration is encountered.
+ */
+const DEFAULT_FILTER_STATE: FilterKeys = 'TOTAL';
+
 export interface TableProperties {
 	pagination: TablePaginationConfig;
 }
@@ -45,13 +55,15 @@ const ManageApplicationsPage = () => {
 
 	const appliedFilters = searchParams.get('filters');
 	const appliedPage = searchParams.get('page');
+	const appliedRows = Number(searchParams.get('rows'));
 
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
+	const [rowCount, setRowCount] = useState<number>(DEFAULT_NUMBER_OF_ROWS);
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
 		pagination: {
 			current: 1,
-			pageSize: 20,
+			pageSize: DEFAULT_NUMBER_OF_ROWS,
 			total: 0,
 		},
 	});
@@ -67,6 +79,7 @@ const ManageApplicationsPage = () => {
 		sort: sorting ? sorting : undefined,
 		state: parseFilters(appliedFilters).filter((filter) => isApplicationStateValue(filter)),
 		page: parsePageNumber(tableParams.pagination?.current, true),
+		pageSize: parseRowNumber(appliedRows),
 	});
 
 	const { data: filterMetadata, error: filterMetaDataError, isLoading: areFiltersLoading } = useGetApplicationCounts();
@@ -84,6 +97,18 @@ const ManageApplicationsPage = () => {
 	};
 
 	/**
+	 * Gets called whenever the "show X rows" toggle is changed.
+	 * @param pageCount The currently selected count (20, 50, 100)
+	 */
+	const handleRowChange = (pageCount: number) => {
+		setSearchParams((prev) => {
+			prev.set('rows', String(pageCount));
+			return prev;
+		});
+		setRowCount(pageCount);
+	};
+
+	/**
 	 * Is called whenever the table has a change or update in its sorting, pagination or filtering.
 	 * @see @link https://ant.design/components/table#table-demo-ajax
 	 */
@@ -95,6 +120,7 @@ const ManageApplicationsPage = () => {
 		sorter: SorterResult<ApplicationListSummary>[] | SorterResult<ApplicationListSummary>;
 	}) => {
 		const page = pagination.current;
+		const pageSize = pagination.pageSize;
 		const sortingOpt: ApplicationListSortingOptions[] = [];
 
 		if (!Array.isArray(sorter)) {
@@ -116,8 +142,12 @@ const ManageApplicationsPage = () => {
 			}
 			setSorting(sortingOpt);
 		}
+
+		setRowCount(parseRowNumber(pagination.pageSize ?? DEFAULT_NUMBER_OF_ROWS));
+
 		setSearchParams((prev) => {
 			prev.set('page', parsePageNumber(page, false).toString());
+			prev.set('rows', parsePageNumber(pageSize, false).toString());
 			return prev;
 		});
 	};
@@ -129,7 +159,11 @@ const ManageApplicationsPage = () => {
 		const allUrlParams = new URLSearchParams();
 
 		const missingOrInvalidPageState =
-			!appliedFilters || !appliedPage || !isValidPageNumber(Number.parseInt(appliedPage));
+			!appliedFilters ||
+			!appliedPage ||
+			!appliedRows ||
+			!isValidPageNumber(Number(appliedPage)) ||
+			!isValidRowNumber(Number(appliedRows));
 
 		const unknownFilters = !isFilterKeySet(parseFilters(appliedFilters));
 
@@ -141,8 +175,9 @@ const ManageApplicationsPage = () => {
 		 * We should validate this first before continuing.
 		 */
 		if (missingOrInvalidPageState || unknownFilters) {
-			allUrlParams.set('filters', 'TOTAL');
+			allUrlParams.set('filters', DEFAULT_FILTER_STATE);
 			allUrlParams.set('page', '1');
+			allUrlParams.set('rows', DEFAULT_NUMBER_OF_ROWS.toString());
 			setSearchParams(allUrlParams);
 			return;
 		}
@@ -155,18 +190,19 @@ const ManageApplicationsPage = () => {
 				...prev,
 				pagination: {
 					...prev.pagination,
+					pageSize: parseRowNumber(appliedRows),
 					current: parsePageNumber(appliedPage, false),
 				},
 			};
 		});
-	}, [appliedFilters, appliedPage, setSearchParams]);
+	}, [appliedFilters, appliedPage, appliedRows, setSearchParams]);
 
 	/**
 	 * Whenever the table params change we want to ensure we fire off a network request.
 	 */
 	useEffect(() => {
 		tableDataRefetch();
-	}, [tableDataRefetch, tableParams, sorting]);
+	}, [tableDataRefetch, tableParams, sorting, rowCount]);
 
 	/**
 	 * Once we receive data from the server, reapply it to our table.
@@ -190,22 +226,24 @@ const ManageApplicationsPage = () => {
 
 	return (
 		<Content>
-			<Flex vertical>
-				<PageHeader title={translate('manage.applications.title')} />
-				{filterMetaDataError || areFiltersLoading ? (
-					<ErrorPage loading={areFiltersLoading} error={filterMetaDataError || tableError} />
-				) : (
+			{filterMetaDataError || areFiltersLoading ? (
+				<ErrorPage loading={areFiltersLoading} error={filterMetaDataError || tableError} />
+			) : (
+				<Flex vertical>
+					<PageHeader title={translate('manage.applications.title')} />
 					<ManagementDashboard
 						filterCounts={filterMetadata ? calculateFilterAmounts(filterMetadata) : []}
 						loading={isTableLoading}
+						rowsCount={tableParams.pagination.pageSize}
+						onRowsChange={handleRowChange}
 						data={tableData && tableData.applications ? tableData.applications : []}
 						filters={parseFilters(appliedFilters).filter((filter) => isFilterKey(filter))}
 						pagination={tableParams.pagination ? tableParams.pagination : {}}
 						onTableChange={handleTableChange}
 						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled)}
 					/>
-				)}
-			</Flex>
+				</Flex>
+			)}
 		</Content>
 	);
 };
@@ -273,7 +311,7 @@ const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata): Filter
  */
 const parsePageNumber = (pageNumber?: number | string | null, forAPI?: boolean): number => {
 	if (pageNumber) {
-		const parsedPage = typeof pageNumber === 'string' ? parseInt(pageNumber) : pageNumber;
+		const parsedPage = typeof pageNumber === 'string' ? Number(pageNumber) : pageNumber;
 		if (isValidPageNumber(parsedPage)) {
 			return forAPI ? parsedPage - 1 : parsedPage;
 		}
@@ -308,4 +346,34 @@ const isFilterKeySet = (appliedFilters: string[]): appliedFilters is FilterKeys[
 		}
 	}
 	return true;
+};
+
+/**
+ * Ensures that the row number in the URL params is valid (within the appropriate range, is a number, etc..),
+ * and converts it if needed.
+ * @param appliedRowNumber `number` - The row number from the URL parameter pre-converted into an Int.
+ * @returns `boolean` true if valid, false if not.
+ */
+const isValidRowNumber = (appliedRowNumber: number) => {
+	if (
+		isValidPageNumber(appliedRowNumber) &&
+		(appliedRowNumber === 20 || appliedRowNumber === 50 || appliedRowNumber === 100)
+	) {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+/**
+ * Parses number for the number of rows requested. If it's valid, it re-returns that number as a `number`
+ * otherwise, it returns the default of 20.
+ * @param appliedRowNumber `number` - The current row number in the URL params
+ * @returns `number` - A parsed number representing the number of rows requested.
+ */
+const parseRowNumber = (appliedRowNumber: number) => {
+	if (isValidRowNumber(appliedRowNumber)) {
+		return appliedRowNumber;
+	}
+	return DEFAULT_NUMBER_OF_ROWS;
 };

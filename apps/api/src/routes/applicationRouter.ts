@@ -130,7 +130,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/edit',
-	authMiddleware(),
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	withBodySchemaValidation(
 		editApplicationRequestSchema,
 		apiZodErrorMapping,
@@ -305,15 +305,15 @@ applicationRouter.get(
 			if (result.success) {
 				const { data } = result;
 
+				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
 				const hasSpecialAccess =
 					getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
 					isAssociatedRep(request.session, applicationId);
 
-				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
-				if (data.userId !== userId || !hasSpecialAccess) {
-					response
-						.status(403)
-						.json({ error: 'FORBIDDEN', message: 'User does not have permission to access this application.' });
+				const canAccess = data.userId === userId || hasSpecialAccess;
+
+				if (!canAccess) {
+					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 					return;
 				}
 
@@ -326,7 +326,7 @@ applicationRouter.get(
 					return;
 				}
 				case 'NOT_FOUND': {
-					response.status(404).json({ error: 'NOT_FOUND', message: 'Application not found.' });
+					response.status(404).json({ error: 'NOT_FOUND', message: result.message });
 					return;
 				}
 			}
@@ -415,11 +415,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: approvalResult.message });
+						response.status(500).json({ error: approvalResult.error, message: approvalResult.message });
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
+						response.status(404).json({ error: approvalResult.error, message: 'Application not found.' });
 						return;
 					}
 				}
@@ -441,7 +441,10 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
+				response: ResponseWithData<
+					ApplicationResponseData,
+					['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']
+				>,
 			) => {
 				const { rejectionReason } = request.body;
 				const { applicationId } = request.params;
@@ -463,7 +466,7 @@ applicationRouter.post(
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+							response.status(404).json({ error: 'NOT_FOUND', message: result.message });
 							return;
 						}
 					}
@@ -489,13 +492,6 @@ applicationRouter.post(
 			>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
-
-			if (!isPositiveInteger(applicationId)) {
-				response
-					.status(400)
-					.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
-				return;
-			}
 
 			// Need user ID to validate the user has access to this app.
 			const { user } = request.session;
@@ -534,11 +530,11 @@ applicationRouter.post(
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+							response.status(404).json({ error: result.error, message: result.message });
 							return;
 						}
 						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+							response.status(500).json({ error: result.error, message: result.message });
 							return;
 						}
 					}
@@ -577,13 +573,6 @@ applicationRouter.post(
 			>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
-
-			if (!isPositiveInteger(applicationId)) {
-				response
-					.status(400)
-					.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
-				return;
-			}
 
 			const { user } = request.session;
 			const { userId } = user || {};
@@ -627,11 +616,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						response.status(404).json({ error: result.error, message: result.message });
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						response.status(500).json({ error: result.error, message: result.message });
 						return;
 					}
 				}
@@ -653,16 +642,12 @@ applicationRouter.post(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<
+				{ message: string; data: ApplicationRecord },
+				['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']
+			>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
-
-			if (!isPositiveInteger(applicationId)) {
-				response
-					.status(400)
-					.json({ error: 'INVALID_REQUEST', message: 'Application ID parameter is not a valid number.' });
-				return;
-			}
 
 			try {
 				const result = await closeApplication({ applicationId });
@@ -680,11 +665,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						response.status(404).json({ error: result.error, message: result.message });
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						response.status(500).json({ error: result.error, message: result.message });
 						return;
 					}
 				}
@@ -718,13 +703,6 @@ applicationRouter.post(
 
 			if (!userId) {
 				response.status(401).json({ error: ErrorType.UNAUTHORIZED, message: 'User is not authenticated.' });
-				return;
-			}
-
-			if (!isPositiveInteger(applicationId)) {
-				response
-					.status(400)
-					.json({ error: ErrorType.INVALID_REQUEST, message: 'Application ID parameter is not a valid number.' });
 				return;
 			}
 
@@ -805,14 +783,6 @@ applicationRouter.post(
 			try {
 				const applicationId = Number(request.params.applicationId);
 
-				if (!isPositiveInteger(applicationId)) {
-					response.status(400).json({
-						error: 'INVALID_REQUEST',
-						message: 'ApplicationId is required and must be a valid number.',
-					});
-					return;
-				}
-
 				const { userId } = request.session.user || {};
 				if (!userId) {
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
@@ -850,11 +820,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						response.status(404).json({ error: result.error, message: result.message });
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						response.status(500).json({ error: result.error, message: result.message });
 						return;
 					}
 				}
@@ -876,7 +846,7 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
@@ -930,11 +900,11 @@ applicationRouter.post(
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+							response.status(404).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
 						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
+							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
 					}
@@ -953,84 +923,80 @@ applicationRouter.post(
 applicationRouter.post(
 	'/rep/:applicationId/request-revisions',
 	authMiddleware({ requiredRoles: ['INSTITUTIONAL_REP'] }),
-	withBodySchemaValidation(
-		applicationRevisionRequestSchema,
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
 		apiZodErrorMapping,
-		async (
-			request: Request,
-			response: ResponseWithData<
-				ApplicationResponseData,
-				['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
-			>,
-		) => {
-			try {
-				const applicationId = Number(request.params.applicationId);
+		withBodySchemaValidation(
+			applicationRevisionRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request: Request,
+				response: ResponseWithData<
+					ApplicationResponseData,
+					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
+				>,
+			) => {
+				try {
+					const applicationId = Number(request.params.applicationId);
 
-				if (!isPositiveInteger(applicationId)) {
-					response.status(400).json({
-						error: 'INVALID_REQUEST',
-						message: 'Invalid request. ApplicationId is required and must be a valid number.',
+					const revisionData = request.body;
+
+					const updatedRevisionData: RevisionRequestModel = {
+						application_id: applicationId,
+						comments: revisionData.comments,
+						applicant_approved: revisionData.applicantApproved,
+						applicant_notes: revisionData.applicantNotes,
+						institution_rep_approved: revisionData.institutionRepApproved,
+						institution_rep_notes: revisionData.institutionRepNotes,
+						collaborators_approved: revisionData.collaboratorsApproved,
+						collaborators_notes: revisionData.collaboratorsNotes,
+						project_approved: revisionData.projectApproved,
+						project_notes: revisionData.projectNotes,
+						requested_studies_approved: revisionData.requestedStudiesApproved,
+						requested_studies_notes: revisionData.requestedStudiesNotes,
+						ethics_approved: revisionData.ethicsApproved,
+						ethics_notes: revisionData.ethicsNotes,
+						agreements_approved: revisionData.agreementsApproved,
+						agreements_notes: revisionData.agreementsNotes,
+						appendices_approved: revisionData.appendicesApproved,
+						appendices_notes: revisionData.appendicesNotes,
+						sign_and_submit_approved: revisionData.signAndSubmitApproved,
+						sign_and_submit_notes: revisionData.signAndSubmitNotes,
+					};
+
+					// TODO: Check that the institutional rep is the correct rep for this application
+
+					// Call service method to handle request
+					const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
+						applicationId,
+						revisionData: updatedRevisionData,
 					});
-					return;
-				}
-
-				const revisionData = request.body;
-
-				const updatedRevisionData: RevisionRequestModel = {
-					application_id: applicationId,
-					comments: revisionData.comments,
-					applicant_approved: revisionData.applicantApproved,
-					applicant_notes: revisionData.applicantNotes,
-					institution_rep_approved: revisionData.institutionRepApproved,
-					institution_rep_notes: revisionData.institutionRepNotes,
-					collaborators_approved: revisionData.collaboratorsApproved,
-					collaborators_notes: revisionData.collaboratorsNotes,
-					project_approved: revisionData.projectApproved,
-					project_notes: revisionData.projectNotes,
-					requested_studies_approved: revisionData.requestedStudiesApproved,
-					requested_studies_notes: revisionData.requestedStudiesNotes,
-					ethics_approved: revisionData.ethicsApproved,
-					ethics_notes: revisionData.ethicsNotes,
-					agreements_approved: revisionData.agreementsApproved,
-					agreements_notes: revisionData.agreementsNotes,
-					appendices_approved: revisionData.appendicesApproved,
-					appendices_notes: revisionData.appendicesNotes,
-					sign_and_submit_approved: revisionData.signAndSubmitApproved,
-					sign_and_submit_notes: revisionData.signAndSubmitNotes,
-				};
-
-				// TODO: Check that the institutional rep is the correct rep for this application
-
-				// Call service method to handle request
-				const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
-					applicationId,
-					revisionData: updatedRevisionData,
-				});
-				if (updatedApplication.success) {
-					response.status(200).json(updatedApplication.data);
-					return;
-				}
-				switch (updatedApplication.error) {
-					case 'INVALID_STATE_TRANSITION': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+					if (updatedApplication.success) {
+						response.status(200).json(updatedApplication.data);
 						return;
 					}
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
-						return;
+					switch (updatedApplication.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: updatedApplication.error, message: updatedApplication.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
+							return;
+						}
 					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
-						return;
-					}
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: 'Unexpected error.',
+					});
 				}
-			} catch (error) {
-				response.status(500).json({
-					error: 'SYSTEM_ERROR',
-					message: 'Unexpected error.',
-				});
-			}
-		},
+			},
+		),
 	),
 );
 
@@ -1046,14 +1012,6 @@ applicationRouter.get(
 		) => {
 			const { applicationId } = request.params;
 			const userSession = request.session;
-
-			if (!applicationId || isNaN(Number(applicationId))) {
-				response.status(400).json({
-					error: 'INVALID_REQUEST',
-					message: 'ApplicationId is required and must be a valid number.',
-				});
-				return;
-			}
 
 			try {
 				const applicationInfo = await getApplicationById({ applicationId: Number(applicationId) });
