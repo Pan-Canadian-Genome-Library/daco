@@ -20,7 +20,7 @@ paths:
     get:
       tags:
         - Revisions
-      summary: Get all revisions for a specific application
+      summary: Get all revisions for a specific application.
       description: Fetches all revisions associated with a given application ID.
       parameters:
         - in: path
@@ -43,6 +43,18 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to access this application.
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/responses/ClientErrors'
         '404':
           description: No revisions found for the given applicationId.
@@ -61,8 +73,8 @@ paths:
     post:
       tags:
         - Revisions
-      summary: 'Request revisions for an application'
-      description: 'Allows a DAC to request revisions for an application, including approval status and comments on various sections.'
+      summary: 'Allows a DAC member to request revisions for an application.'
+      description: 'Allows a DAC Member to request revisions for an application, including approval status and comments on various sections.'
       parameters:
         - in: path
           name: applicationId
@@ -94,6 +106,22 @@ paths:
                       - $ref: '#/components/responses/ApplicationResponse'
         '400':
           description: 'Error in requesting revisions. Invalid input, missing required fields.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Error in requesting revisions'
 
@@ -101,8 +129,8 @@ paths:
     post:
       tags:
         - Revisions
-      summary: 'Request revisions for an application'
-      description: 'Allows a rep to request revisions for an application, including approval status and comments on various sections.'
+      summary: 'Allows an Institutional Representative to request revisions for an application.'
+      description: 'Allows an Institutional Representative to request revisions for an application, including approval status and comments on various sections.'
       parameters:
         - in: path
           name: applicationId
@@ -134,6 +162,22 @@ paths:
                       - $ref: '#/components/responses/ApplicationResponse'
         '400':
           description: 'Error in requesting revisions. Invalid input, missing required fields.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Error in requesting revisions'
 
@@ -141,8 +185,8 @@ paths:
     post:
       tags:
         - Revisions
-      summary: Submit revisions for an application
-      description: Allows applicants to submit requested revisions for DAC or Rep review.
+      summary: Submit revisions to an application.
+      description: Allows Applicants to submit revisions requested by DAC Members or Institutional Representatives in their respective review stages.
       parameters:
         - name: applicationId
           in: path
@@ -162,6 +206,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/RequestValidationError'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '404':
           description: 'Invalid request or submit revision not allowed'
           content:

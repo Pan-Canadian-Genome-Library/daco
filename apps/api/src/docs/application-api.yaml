@@ -210,7 +210,7 @@ paths:
     post:
       tags:
         - Applications
-      summary: Edit application details
+      summary: Edit the details of an application.
       requestBody:
         description: Changes made to an Application record
         required: true
@@ -305,7 +305,7 @@ paths:
     post:
       tags:
         - Applications
-      summary: Reject an application
+      summary: Reject an application.
       parameters:
         - name: applicationId
           in: path
@@ -356,7 +356,7 @@ paths:
 
   /applications/{applicationId}/submit:
     post:
-      summary: Submit an application
+      summary: Submit an application for review.
       description: Retrieves the application by ID, verifies the user and role, and submits it.
       tags:
         - Applications
@@ -409,7 +409,7 @@ paths:
     post:
       tags:
         - Applications
-      summary: Revoke an approved application
+      summary: Revoke an approved application.
       description: |
         Allows revoking an application that is in the `APPROVED` state. Once revoked, the application cannot be reopened or changed.
       parameters:
@@ -468,7 +468,7 @@ paths:
     post:
       tags:
         - Applications
-      summary: Close an application
+      summary: Close an application.
       description: |
         Allows an applicant or DAC member to close an application.
         - In `DRAFT` or `INSTITUTIONAL_REP_REVIEW` states, only the applicant can close.

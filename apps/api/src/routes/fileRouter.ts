@@ -84,7 +84,7 @@ async function retrieveFile(
 
 	res.status(403).json({
 		error: ErrorType.FORBIDDEN,
-		message: 'Looks like you do not own, or have the rights to retrieve this file.',
+		message: 'Looks like you do not own, or have permissions to retrieve this file.',
 	});
 	return;
 }
@@ -231,7 +231,7 @@ fileRouter.delete(
 			if (file.data.submitterUserId !== userSession.user?.userId) {
 				res.status(403).send({
 					error: ErrorType.FORBIDDEN,
-					message: 'Looks like you do not own, or have the rights to modify this file.',
+					message: 'Looks like you do not own, or have permissions to modify this file.',
 				});
 				return;
 			}

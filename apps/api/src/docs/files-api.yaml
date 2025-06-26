@@ -50,6 +50,18 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
 
   /file/ethics/{applicationId}:
     post:
@@ -98,6 +110,18 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
 
   /file/{fileId}:
     get:
@@ -132,6 +156,18 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
     delete:
       tags:
         - File
@@ -154,5 +190,17 @@ paths:
                 oneOf:
                   - $ref: '#/components/responses/RequestValidationError'
                   - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
         '500':
           description: 'Error deleting file in database'
