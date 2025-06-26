@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -18,40 +18,59 @@
  */
 
 import { pcglColours } from '@/providers/ThemeProvider';
-import { ApplicationStateValues } from '@pcgl-daco/data-model';
-import { UserRole } from '@pcgl-daco/validation';
-import { Flex, Typography } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { Dropdown, Typography, type MenuProps } from 'antd';
+import { type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RenderIcon } from './utils/IconSelector';
 
 const { Text } = Typography;
 
-export type SectionMenuItemProps = {
-	isCurrentSection: boolean;
-	isSectionTouched?: boolean;
-	isSectionValid?: boolean;
-	label: string;
-	isEditMode?: boolean;
-	isLocked?: boolean;
-	hasCollaborators?: boolean;
-	appState: ApplicationStateValues;
-	role?: UserRole;
-};
+interface RowCountProps {
+	style?: CSSProperties;
+	rowCount?: number;
+	onRowsChange: (rows: number) => void;
+}
 
-const SectionMenuItem = (props: SectionMenuItemProps) => {
+const RowCount = ({ style, rowCount, onRowsChange }: RowCountProps) => {
 	const { t: translate } = useTranslation();
 
-	const iconColour = props.isEditMode ? pcglColours.primary : 'inherit';
+	const items: MenuProps['items'] = [
+		{
+			label: '20',
+			key: 20,
+		},
+		{
+			label: '50',
+			key: 50,
+		},
+		{
+			label: '100',
+			key: 100,
+		},
+	];
+
+	const onItemSelect: MenuProps['onClick'] = ({ key }) => {
+		onRowsChange(Number(key));
+	};
 
 	return (
-		<Flex style={{ width: '100%' }} justify="space-between">
-			<Text style={{ color: 'inherit' }} ellipsis>
-				{translate(`menu.${props.label}`)}
-			</Text>
-
-			<Flex style={{ color: iconColour }}>{RenderIcon(props)}</Flex>
-		</Flex>
+		<Dropdown menu={{ items, onClick: onItemSelect }} trigger={['click']}>
+			<div style={{ ...style, maxWidth: '9rem' }}>
+				<Text>{translate('manage.applications.show')}&nbsp;</Text>
+				<Text
+					tabIndex={0}
+					onClick={(e) => e.preventDefault()}
+					style={{ color: pcglColours.primary, cursor: 'pointer' }}
+					role="button"
+				>
+					{rowCount}
+					&nbsp;
+					<DownOutlined />
+				</Text>
+				<Text>&nbsp;{translate('manage.applications.rows')}</Text>
+			</div>
+		</Dropdown>
 	);
 };
 
-export default SectionMenuItem;
+export default RowCount;

@@ -50,7 +50,8 @@
 	"manage": {
 		"applications": {
 			"title": "Manage Applications",
-			"listTitle": "Dashboard"
+			"show": "Show",
+			"rows": "rows"
 		}
 	},
 	"status": {
@@ -165,6 +166,8 @@
 		}
 	},
 	"generic": {
-		"notApplicable": "N/A"
+		"notApplicable": "N/A",
+		"applicant": "Applicant",
+		"rep": "Institutional Rep"
 	}
 }

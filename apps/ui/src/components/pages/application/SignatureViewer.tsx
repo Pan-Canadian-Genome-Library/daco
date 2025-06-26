@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -16,43 +16,38 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { List, theme } from 'antd';
 
-const { useToken } = theme;
+import { Flex, Image, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-type TextProps = {
-	data: (string | JSX.Element)[];
-	isNumbered?: boolean;
+const { Title, Text } = Typography;
+
+type SignatureViewerProps = {
+	title: string;
+	name: string;
+	signature?: string | null;
+	date?: Date | null;
 };
 
-/**
- *  @description Component to display a list of string data
- *  purpose: Antd has a List component but does not allow usage of standard css list-style like disc or numbers.
- */
-const TextList = ({ data, isNumbered = false }: TextProps) => {
-	const { token } = useToken();
+const SignatureViewer = ({ title, name, signature, date }: SignatureViewerProps) => {
+	const { t: translate } = useTranslation();
 
-	const listStyles: React.CSSProperties = {
-		margin: 0,
-		listStyleType: isNumbered ? 'number' : 'disc',
-	};
-	const listItemStyles: React.CSSProperties = {
-		fontSize: token.fontSizeLG,
-		margin: `${token.marginXS}px 0px`,
-		lineHeight: token.lineHeight,
-	};
+	const formattedSignedDate = translate('date.intlDateTime', {
+		val: new Date(date ?? ''),
+		formatParams: {
+			val: { year: 'numeric', month: 'long', day: 'numeric' },
+		},
+	});
 
-	return (
-		<ul style={listStyles}>
-			{data.map((item, index) => {
-				return (
-					<List.Item key={index} style={listItemStyles}>
-						{item}
-					</List.Item>
-				);
-			})}
-		</ul>
-	);
+	return signature ? (
+		<Flex vertical gap={'middle'}>
+			<Title style={{ margin: 0 }} level={4}>
+				{title}:
+			</Title>
+			<Image width={'75%'} src={signature} preview={false} draggable={false} />
+			<Text>{`${name} | ${formattedSignedDate}`}</Text>
+		</Flex>
+	) : null;
 };
 
-export default TextList;
+export default SignatureViewer;

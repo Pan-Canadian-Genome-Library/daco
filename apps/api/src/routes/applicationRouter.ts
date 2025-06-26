@@ -130,7 +130,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/edit',
-	authMiddleware(),
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	withBodySchemaValidation(
 		editApplicationRequestSchema,
 		apiZodErrorMapping,
