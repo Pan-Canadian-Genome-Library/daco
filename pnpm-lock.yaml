@@ -110,9 +110,6 @@ importers:
       url-join:
         specifier: ^5.0.0
         version: 5.0.0
-      yamljs:
-        specifier: ^0.3.0
-        version: 0.3.0
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -5158,10 +5155,6 @@ packages:
   yaml@2.7.1:
     resolution: {integrity: sha512-10ULxpnOCQXxJvBgxsn9ptjq6uviG/htZKk9veJGhlqn3w/DxQ631zFF+nlQXLwmImeS5amR2dl2U8sg6U9jsQ==}
     engines: {node: '>= 14'}
-    hasBin: true
-
-  yamljs@0.3.0:
-    resolution: {integrity: sha512-C/FsVVhht4iPQYXOInoxUM/1ELSf9EsgKH34FofQOp6hwCPrW4vG4w5++TED3xRUo8gD7l0P1J1dLlDYzODsTQ==}
     hasBin: true
 
   yargs-parser@21.1.1:
@@ -10550,11 +10543,6 @@ snapshots:
   yaml@2.0.0-1: {}
 
   yaml@2.7.1: {}
-
-  yamljs@0.3.0:
-    dependencies:
-      argparse: 1.0.10
-      glob: 7.2.3
 
   yargs-parser@21.1.1: {}
 
