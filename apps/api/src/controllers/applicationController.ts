@@ -418,7 +418,7 @@ export const dacRejectApplication = async ({
 }: {
 	applicationId: number;
 	rejectionReason: string;
-}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -447,13 +447,7 @@ export const dacRejectApplication = async ({
 			return updatedResult;
 		}
 
-		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
-
-		if (!updatedApplication.success) {
-			return updatedApplication;
-		}
-
-		const dtoFriendlyData = convertToApplicationRecord(updatedApplication.data);
+		const dtoFriendlyData = convertToBasicApplicationRecord(updatedResult.data);
 
 		if (!dtoFriendlyData.success) {
 			return dtoFriendlyData;

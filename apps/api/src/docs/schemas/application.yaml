@@ -1,0 +1,543 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+components:
+  schemas:
+    ApplicationWithApplicantInfo:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        user_id:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              DAC_REVISIONS_REQUESTED,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
+          description: The current state that the application is in.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the application was created
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+        contents:
+          type: object
+          description: Information about the applicant who applied in the application.
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: When the application contents record was created
+              nullable: false
+            firstName:
+              type: string
+              nullable: true
+              description: The first name of the applicant. Can be NULL.
+            lastName:
+              type: string
+              nullable: true
+              description: The last name of the applicant. Can be NULL.
+            email:
+              type: string
+              nullable: true
+              description: The email address of the applicant. Can be NULL.
+            country:
+              type: string
+              nullable: true
+              description: The country of the applicant's associated institution. Can be NULL.
+            institution:
+              type: string
+              nullable: true
+              description: The applicant's associated institution. Can be NULL.
+
+    Application:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        user_id:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              DAC_REVISIONS_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
+          description: The current state that the application is in.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the application was created
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+
+    ApplicationContents:
+      type: object
+      description: Complete Application details
+      properties:
+        applicantFirstName:
+          type: string
+          description: Applicant's first name
+        applicantMiddleName:
+          type: string
+          description: Applicant's middle name
+        applicantLastName:
+          type: string
+          description: Applicant's last name
+        applicantTitle:
+          type: string
+          description: Applicant's formal title
+        applicantSuffix:
+          type: string
+          description: Applicant's formal suffix
+        applicantPositionTitle:
+          type: string
+          description: Applicant's professional title
+        applicantInstitution:
+          type: string
+          description: Applicant's institution
+        applicantInstitutionalEmail:
+          type: string
+          description: Applicant's email
+        applicantProfileUrl:
+          type: string
+          description: Applicant's profile URL
+        # Institutional Rep
+        institutionalRepTitle:
+          type: string
+          description: Institutional representative's professional title
+        institutionalRepFirstName:
+          type: string
+          description: Institutional representative's first name
+        institutionalRepMiddleName:
+          type: string
+          description: Institutional representative's middle name
+        institutionalRepLastName:
+          type: string
+          description: Institutional representative's last name
+        institutionalRepSuffix:
+          type: string
+          description: Institutional representative's formal suffix
+        institutionalRepPrimaryAffiliation:
+          type: string
+          description: Institutional representative's affiliation
+        institutionalRepEmail:
+          type: string
+          description: Institutional representative's email
+        institutionalRepProfileUrl:
+          type: string
+          description: Institutional representative's profile URL
+        institutionalRepPositionTitle:
+          type: string
+          description: Institutional representative's professional title
+        # Institution
+        institutionCountry:
+          type: string
+          description: Address of Institution - Country
+        institutionState:
+          type: string
+          description: Address of Institution - State
+        institutionCity:
+          type: string
+          description: Address of Institution - City
+        institutionStreetAddress:
+          type: string
+          description: Address of Institution - street name and number
+        institutionPostalCode:
+          type: string
+          description: Address of Institution - postal code
+        institutionBuilding:
+          type: string
+          description: Address of Institution - specific building name if required
+        # Project
+        projectTitle:
+          type: string
+          description: Name of project
+        projectWebsite:
+          type: string
+          description: URL of project website
+        projectBackground:
+          type: string
+          description: Brief description of project
+        projectMethodology:
+          type: string
+          description: Description of scientific approach used in the project
+        projectAims:
+          type: string
+          description: Goals for the project
+        projectSummary:
+          type: string
+          description: In depth text summary of project
+        projectPublicationUrls:
+          type: array
+          description: URLs of publications related to the project
+        # Studies
+        requestedStudies:
+          type: array
+          description: List of studies
+
+    ApplicationRecord:
+      type: object
+      description: Merged Application & ApplicationContents record
+      $ref: '#/components/schemas/Application'
+      properties:
+        contents:
+          type: object
+          $ref: '#/components/schemas/ApplicationContents'
+
+    ApplicationsMetadata:
+      type: object
+      description: A object containing the metadata of the total number of applications within each category / status.
+      properties:
+        APPROVED:
+          type: number
+          nullable: false
+        CLOSED:
+          type: number
+          nullable: false
+        DAC_REVIEW:
+          type: number
+          nullable: false
+        DAC_REVISIONS_REQUESTED:
+          type: number
+          nullable: false
+        DRAFT:
+          type: number
+          nullable: false
+        INSTITUTIONAL_REP_REVIEW:
+          type: number
+          nullable: false
+        REJECTED:
+          type: number
+          nullable: false
+        INSTITUTIONAL_REP_REVISION_REQUESTED:
+          type: number
+          nullable: false
+        REVOKED:
+          type: number
+          nullable: false
+        TOTAL:
+          type: number
+          nullable: false
+
+  requests:
+    ApplicationCreation:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          description: The user ID belonging to the currently signed in user.
+
+    ApplicationUpdates:
+      type: object
+      required:
+        - id
+        - update
+      properties:
+        id:
+          type: number
+          description: The id of the Application
+        update:
+          description: Changes to make to the application
+          type: object
+          $ref: '#/components/responses/ApplicationContentsResponse'
+
+    ApproveApplication:
+      type: object
+      required:
+        - applicationId
+      properties:
+        applicationId:
+          description: The id of the Application
+          type: number
+
+    RejectApplication:
+      type: object
+      required:
+        - rejectionReason
+      properties:
+        rejectionReason:
+          description: The reason the DAC will reject this Application.
+          type: string
+          nullable: false
+
+    SubmitApplicationRequest:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          description: The id of the Application
+        role:
+          type: string
+          description: The role of the user submitting the application
+        signature:
+          type: string
+          format: base64
+          description: The digital signature of the user
+      required:
+        - userId
+        - role
+        - signature
+
+  responses:
+    BasicApplicationResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        userId:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              DAC_REVISIONS_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
+          description: The current state that the application is in.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the application was created
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+
+    ApplicationResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the application in the database.
+        userId:
+          type: string
+          description: The user ID associated with the application.
+        state:
+          type: string
+          enum:
+            [
+              DRAFT,
+              INSTITUTIONAL_REP_REVIEW,
+              DAC_REVIEW,
+              INSTITUTIONAL_REP_REVISION_REQUESTED,
+              DAC_REVISIONS_REQUESTED,
+              REJECTED,
+              APPROVED,
+              CLOSED,
+              REVOKED,
+            ]
+          description: The current state that the application is in.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the application was created
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was approved. Can be NULL.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application was updated. Can be NULL.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the application expires. Can be NULL.
+        content:
+          type: object
+          description: The Application Contents returned to the UI
+          $ref: '#/components/responses/ApplicationContentsResponse'
+
+    ApplicationContentsResponse:
+      type: object
+      description: Complete Application details
+      properties:
+        applicantFirstName:
+          type: string
+          description: Applicant's first name
+        applicantMiddleName:
+          type: string
+          description: Applicant's middle name
+        applicantLastName:
+          type: string
+          description: Applicant's last name
+        applicantTitle:
+          type: string
+          description: Applicant's formal title
+        applicantSuffix:
+          type: string
+          description: Applicant's formal suffix
+        applicantPositionTitle:
+          type: string
+          description: Applicant's professional title
+        applicantPrimaryAffiliation:
+          type: string
+          description: Applicant's institution
+        applicantInstitutionalEmail:
+          type: string
+          description: Applicant's email
+        applicantProfileUrl:
+          type: string
+          description: Applicant's profile URL
+        # Institutional Rep
+        institutionalRepTitle:
+          type: string
+          description: Institutional representative's professional title
+        institutionalRepFirstName:
+          type: string
+          description: Institutional representative's first name
+        institutionalRepMiddleName:
+          type: string
+          description: Institutional representative's middle name
+        institutionalRepLastName:
+          type: string
+          description: Institutional representative's last name
+        institutionalRepSuffix:
+          type: string
+          description: Institutional representative's formal suffix
+        institutionalRepPrimaryAffiliation:
+          type: string
+          description: Institutional representative's affiliation
+        institutionalRepEmail:
+          type: string
+          description: Institutional representative's email
+        institutionalRepProfileUrl:
+          type: string
+          description: Institutional representative's profile URL
+        institutionalRepPositionTitle:
+          type: string
+          description: Institutional representative's professional title
+        # Institution
+        institutionCountry:
+          type: string
+          description: Address of Institution - Country
+        institutionState:
+          type: string
+          description: Address of Institution - State
+        institutionCity:
+          type: string
+          description: Address of Institution - City
+        institutionStreetAddress:
+          type: string
+          description: Address of Institution - street name and number
+        institutionPostalCode:
+          type: string
+          description: Address of Institution - postal code
+        institutionBuilding:
+          type: string
+          description: Address of Institution - specific building name if required
+        # Project
+        projectTitle:
+          type: string
+          description: Name of project
+        projectWebsite:
+          type: string
+          description: URL of project website
+        projectBackground:
+          type: string
+          description: Brief description of project
+        projectMethodology:
+          type: string
+          description: Description of scientific approach used in the project
+        projectAims:
+          type: string
+          description: Goals for the project
+        projectSummary:
+          type: string
+          description: In depth text summary of project
+        projectPublicationUrls:
+          type: array
+          description: URLs of publications related to the project
+        # Studies
+        requestedStudies:
+          type: array
+          description: List of studies

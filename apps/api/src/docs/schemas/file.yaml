@@ -1,0 +1,92 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+components:
+  schemas:
+    FileRecord:
+      type: object
+      description: Files related to a PCGL DACO Application.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        applicationId:
+          type: number
+          description: |
+            The associated application id.
+        submittedAt:
+          type: string
+          description: |
+            Date it was submitted at
+        submitterUserId:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          enum: ['ETHICS_LETTER', 'SIGNED_APPLICATION']
+          description: |
+            The type of the file
+
+    FileRecordWithContents:
+      type: object
+      description: File record related to a PCGL DACO Application with Contents.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.
+        applicationId:
+          type: number
+          description: |
+            The associated application id.
+        content:
+          type: object
+          description: |
+            File in the form of a arraylike buffer.
+        submittedAt:
+          type: string
+          description: |
+            Date it was submitted at
+        submitterUserId:
+          type: string
+          description: |
+            User submitted data
+        type:
+          type: string
+          enum: ['ETHICS_LETTER', 'SIGNED_APPLICATION']
+          description: |
+            The type of the file:
+  responses:
+    uploadFileResponse:
+      type: object
+      description: The contents of the upload file.
+      properties:
+        id:
+          type: number
+          description: The ID of the file.
+        filename:
+          type: string
+          description: |
+            The name of the file.

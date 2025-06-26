@@ -1,0 +1,136 @@
+components:
+  schemas:
+    RevisionDetails:
+      type: object
+      description: Details of a specific revision request associated with an application.
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the revision request, generated automatically.
+          example: 1
+        applicationId:
+          type: integer
+          description: The ID of the application this revision request pertains to.
+          example: 12345
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the revision request was created, defaults to the current time.
+          example: '2025-03-20T10:00:00Z'
+        comments:
+          type: string
+          description: General comments related to the revision request.
+          nullable: true
+          example: 'Please review the updated ethics section.'
+        applicantNotes:
+          type: string
+          description: Notes specific to the applicant information section.
+          nullable: true
+          example: 'Applicant needs to clarify funding details.'
+        applicantApproved:
+          type: boolean
+          description: Indicates whether the applicant information section is approved.
+          example: true
+        institutionRepApproved:
+          type: boolean
+          description: Indicates whether the institutional representative section is approved.
+          example: false
+        institutionRepNotes:
+          type: string
+          description: Notes specific to the institutional representative section.
+          nullable: true
+          example: 'Missing signature from institutional rep.'
+        collaboratorsApproved:
+          type: boolean
+          description: Indicates whether the collaborators section is approved.
+          example: true
+        collaboratorsNotes:
+          type: string
+          description: Notes specific to the collaborators section.
+          nullable: true
+          example: 'All collaborator details verified.'
+        projectApproved:
+          type: boolean
+          description: Indicates whether the project information section is approved.
+          example: true
+        projectNotes:
+          type: string
+          description: Notes specific to the project information section.
+          nullable: true
+          example: 'Project methodology needs more detail.'
+        requestedStudiesApproved:
+          type: boolean
+          description: Indicates whether the requested studies section is approved.
+          example: true
+        requestedStudiesNotes:
+          type: string
+          description: Notes specific to the requested studies section.
+          nullable: true
+          example: 'Studies align with project goals.'
+      required:
+        - id
+        - applicationId
+        - createdAt
+        - applicantApproved
+        - institutionRepApproved
+        - collaboratorsApproved
+        - projectApproved
+        - requestedStudiesApproved
+
+  requests:
+    RequestRevisions:
+      type: object
+      required:
+        - revisionData
+      properties:
+        applicantApproved:
+          type: boolean
+          description: 'Approval status for the applicant information section.'
+          example: true
+        applicantNotes:
+          type: string
+          description: 'Notes related to the applicant information section.'
+          example: 'Applicant needs to update personal details.'
+        institutionRepApproved:
+          type: boolean
+          description: 'Approval status for the institutional representative section.'
+          example: false
+        institutionRepNotes:
+          type: string
+          description: 'Notes related to the institutional representative section.'
+          example: 'Institution rep has missing documents.'
+        collaboratorsApproved:
+          type: boolean
+          description: 'Approval status for the collaborators section.'
+          example: true
+        collaboratorsNotes:
+          type: string
+          description: 'Notes related to the collaborators section.'
+          example: 'All collaborators have provided necessary details.'
+        projectApproved:
+          type: boolean
+          description: 'Approval status for the project information section.'
+          example: true
+        projectNotes:
+          type: string
+          description: 'Notes related to the project information section.'
+          example: 'Project details are complete.'
+        requestedStudiesApproved:
+          type: boolean
+          description: 'Approval status for the requested study section.'
+          example: true
+        requestedStudiesNotes:
+          type: string
+          description: 'Notes related to the requested study section.'
+          example: 'Requested studies are well defined.'
+        ethicsApproved:
+          type: boolean
+          description: 'Approval status for the ethics section.'
+          example: true
+        ethicsNotes:
+          type: string
+          description: 'Notes related to the ethics section.'
+          example: 'Ethics review is pending.'
+        comments:
+          type: string
+          description: 'Additional comments'

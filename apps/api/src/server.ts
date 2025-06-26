@@ -20,11 +20,8 @@
 import { ExpressLogger } from '@pcgl-daco/logger';
 import express, { Request, Response } from 'express';
 import path, { dirname } from 'path';
-import * as swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from 'url';
-import yaml from 'yamljs';
 
-import { getHealth, Status } from '@/app-health.js';
 import applicationRouter from '@/routes/applicationRouter.js';
 import collaboratorsRouter from '@/routes/collaboratorsRouter.js';
 
@@ -34,7 +31,9 @@ import { serverConfig } from './config/serverConfig.js';
 import BaseLogger from './logger.js';
 import authRouter from './routes/authRouter.js';
 import fileRouter from './routes/fileRouter.ts';
+import healthRouter from './routes/healthRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
+import swaggerRouter from './routes/swaggerRouter.ts';
 import sessionMiddleware from './session/sessionMiddleware.js';
 
 const logger = BaseLogger.forModule('server');
@@ -52,6 +51,8 @@ const startServer = async () => {
 	app.use(express.json());
 	app.use(sessionMiddleware);
 
+	app.use('/health', healthRouter);
+
 	app.use('/collaborators', collaboratorsRouter);
 	app.use('/applications', applicationRouter);
 	app.use('/signature', signatureRouter);
@@ -59,30 +60,10 @@ const startServer = async () => {
 	app.use('/file', fileRouter);
 	app.use('/assets', express.static(path.join(__dirname, 'public')));
 
-	app.use(
-		`${API_PATH_DOCS}`,
-		swaggerUi.serve,
-		swaggerUi.setup(yaml.load(path.join(__dirname, './resources/swagger.yaml'))),
-	);
+	app.use(`${API_PATH_DOCS}`, swaggerRouter);
 
 	app.get('/', async (req: Request, res: Response) => {
 		res.send();
-	});
-
-	app.get('/health', (_req: Request, res: Response) => {
-		const health = getHealth();
-
-		const resBody = {
-			version: serverConfig.npm_package_version,
-			health,
-		};
-
-		if (health.all.status != Status.OK) {
-			res.status(500).json(resBody);
-			return;
-		}
-
-		res.status(200).json(resBody);
 	});
 
 	app.listen(serverConfig.PORT, () => {
