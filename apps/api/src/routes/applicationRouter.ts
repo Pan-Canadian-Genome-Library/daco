@@ -37,7 +37,7 @@ import {
 } from '@/controllers/applicationController.js';
 
 import BaseLogger from '@/logger.js';
-import { RevisionRequestModel, type ApplicationStateTotals, type JoinedApplicationRecord } from '@/service/types.ts';
+import { RevisionRequestModel, type ApplicationStateTotals } from '@/service/types.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
@@ -132,7 +132,7 @@ applicationRouter.post(
 		async (
 			request: Request,
 			response: ResponseWithData<
-				JoinedApplicationRecord,
+				ApplicationResponseData,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {

@@ -248,7 +248,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationContents'
+                $ref: '#/components/schemas/ApplicationRecord'
 
   /applications/{applicationId}/approve:
     post:

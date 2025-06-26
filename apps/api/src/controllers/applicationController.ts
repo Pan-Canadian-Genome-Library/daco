@@ -32,7 +32,6 @@ import {
 	type ApplicationService,
 	type CollaboratorsService,
 	type FilesService,
-	type JoinedApplicationRecord,
 	type PDFService,
 	type RevisionRequestModel,
 	type SignatureService,
@@ -88,7 +87,7 @@ export const editApplication = async ({
 }: {
 	id: number;
 	update: UpdateEditApplicationRequest;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -141,9 +140,19 @@ export const editApplication = async ({
 
 	const formattedResult = convertToApplicationContentsRecord(update);
 
-	if (!formattedResult.success) return formattedResult;
+	if (!formattedResult.success) {
+		return formattedResult;
+	}
 
-	return await applicationRepo.editApplication({ id, update: formattedResult.data });
+	const editResult = await applicationRepo.editApplication({ id, update: formattedResult.data });
+
+	if (!editResult.success) {
+		return editResult;
+	}
+
+	const joinedApplicationDTO = convertToApplicationRecord(editResult.data);
+
+	return joinedApplicationDTO;
 };
 
 /**
