@@ -822,7 +822,7 @@ applicationRouter.post(
 
 	// Endpoint for reps to request revisions
 	applicationRouter.post(
-		'/dac/:applicationId/request-revisions',
+		'/:applicationId/dac/request-revisions',
 		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
@@ -904,7 +904,7 @@ applicationRouter.post(
 
 // Endpoint for reps to request revisions
 applicationRouter.post(
-	'/rep/:applicationId/request-revisions',
+	'/:applicationId/rep/request-revisions',
 	authMiddleware({ requiredRoles: ['INSTITUTIONAL_REP'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
