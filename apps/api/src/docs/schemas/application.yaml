@@ -23,7 +23,7 @@ components:
         id:
           type: number
           description: The unique ID of the application in the database.
-        user_id:
+        userId:
           type: string
           description: The user ID associated with the application.
         state:
@@ -96,7 +96,7 @@ components:
         id:
           type: number
           description: The unique ID of the application in the database.
-        user_id:
+        userId:
           type: string
           description: The user ID associated with the application.
         state:
