@@ -20,23 +20,18 @@ import { useMutation } from '@tanstack/react-query';
 import { notification } from 'antd';
 import { useNavigate } from 'react-router';
 
-import { mockUserID } from '@/components/mock/applicationMockData';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { type ApplicationDTO } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useCreateApplication = () => {
 	const navigation = useNavigate();
 
-	return useMutation<ApplicationResponseData, ServerError>({
+	return useMutation<ApplicationDTO, ServerError>({
 		mutationFn: async () => {
 			const response = await fetch('/applications/create', {
 				method: 'POST',
-				body: JSON.stringify({
-					//TODO: Replace this with the globally authenticated user once authentication is implemented;
-					userId: mockUserID,
-				}),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();

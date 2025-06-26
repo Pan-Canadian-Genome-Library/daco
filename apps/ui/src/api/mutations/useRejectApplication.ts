@@ -22,7 +22,7 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { queryClient } from '@/providers/Providers';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
-import { ApplicationResponseData } from '@pcgl-daco/data-model';
+import { type ApplicationDTO } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -34,7 +34,7 @@ type RejectApplicationPayload = {
 const useRejectApplication = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	return useMutation<ApplicationResponseData, ServerError, RejectApplicationPayload>({
+	return useMutation<ApplicationDTO, ServerError, RejectApplicationPayload>({
 		mutationFn: async ({ applicationId, rejectionReason }) => {
 			const response = await fetch(`/applications/${applicationId}/reject`, {
 				method: 'POST',
