@@ -304,12 +304,14 @@ applicationRouter.get(
 			if (result.success) {
 				const { data } = result;
 
+				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
 				const hasSpecialAccess =
 					getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
 					isAssociatedRep(request.session, applicationId);
 
-				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
-				if (data.userId !== userId && !hasSpecialAccess) {
+				const canAccess = data.userId === userId || hasSpecialAccess;
+
+				if (!canAccess) {
 					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 					return;
 				}
@@ -323,7 +325,7 @@ applicationRouter.get(
 					return;
 				}
 				case 'NOT_FOUND': {
-					response.status(404).json({ error: 'NOT_FOUND', message: 'Application not found.' });
+					response.status(404).json({ error: 'NOT_FOUND', message: result.message });
 					return;
 				}
 			}
@@ -412,11 +414,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: approvalResult.message });
+						response.status(500).json({ error: approvalResult.error, message: approvalResult.message });
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: 'Application not found.' });
+						response.status(404).json({ error: approvalResult.error, message: 'Application not found.' });
 						return;
 					}
 				}
@@ -438,7 +440,10 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
+				response: ResponseWithData<
+					ApplicationResponseData,
+					['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']
+				>,
 			) => {
 				const { rejectionReason } = request.body;
 				const { applicationId } = request.params;
@@ -460,7 +465,7 @@ applicationRouter.post(
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+							response.status(404).json({ error: 'NOT_FOUND', message: result.message });
 							return;
 						}
 					}
@@ -524,11 +529,11 @@ applicationRouter.post(
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+							response.status(404).json({ error: result.error, message: result.message });
 							return;
 						}
 						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+							response.status(500).json({ error: result.error, message: result.message });
 							return;
 						}
 					}
@@ -610,11 +615,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						response.status(404).json({ error: result.error, message: result.message });
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						response.status(500).json({ error: result.error, message: result.message });
 						return;
 					}
 				}
@@ -636,7 +641,10 @@ applicationRouter.post(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<{ message: string; data: ApplicationRecord }, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<
+				{ message: string; data: ApplicationRecord },
+				['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']
+			>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
 
@@ -656,11 +664,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						response.status(404).json({ error: result.error, message: result.message });
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						response.status(500).json({ error: result.error, message: result.message });
 						return;
 					}
 				}
@@ -811,11 +819,11 @@ applicationRouter.post(
 						return;
 					}
 					case 'NOT_FOUND': {
-						response.status(404).json({ error: 'INVALID_REQUEST', message: result.message });
+						response.status(404).json({ error: result.error, message: result.message });
 						return;
 					}
 					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+						response.status(500).json({ error: result.error, message: result.message });
 						return;
 					}
 				}
@@ -837,7 +845,7 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR']>,
+				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
@@ -891,11 +899,11 @@ applicationRouter.post(
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+							response.status(404).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
 						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
+							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
 					}
@@ -972,11 +980,11 @@ applicationRouter.post(
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'INVALID_REQUEST', message: updatedApplication.message });
+							response.status(404).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
 						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
+							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
 					}
