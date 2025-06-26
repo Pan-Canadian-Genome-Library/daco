@@ -28,6 +28,10 @@ const DESCRIPTION_EN =
 const DESCRIPTION_FR =
 	"<p>Le Bureau de conformité pour l’accès aux données de la BGP (BCAD de la BGP) traite les demandes d’accès aux données contrôlées de la BGP émanant de scientifiques, de chercheurs et chercheuses et d’équipes commerciales.<br/><br/>Des informations supplémentaires sur la BGP et le BCAD sont disponibles à l'adresse suivante: [genomelibrary.ca/fr](https://genomelibrary.ca/fr).</p>";
 
+const SWAGGER_UI_EXPRESS_OPTIONS: swaggerUi.SwaggerUiOptions = {
+	customSiteTitle: 'PCGL DACO - Swagger UI',
+};
+
 const SWAGGER_OPTIONS: SwaggerDefinition = {
 	openapi: '3.0.0',
 	info: {
@@ -46,6 +50,6 @@ const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.Options = {
 const swaggerRouter = express.Router();
 
 swaggerRouter.use('/', swaggerUi.serve);
-swaggerRouter.get('/', swaggerUi.setup(swaggerJSDoc(SWAGGER_JS_DOC_OPTIONS)));
+swaggerRouter.get('/', swaggerUi.setup(swaggerJSDoc(SWAGGER_JS_DOC_OPTIONS), SWAGGER_UI_EXPRESS_OPTIONS));
 
 export default swaggerRouter;
