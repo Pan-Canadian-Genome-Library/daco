@@ -156,7 +156,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
 			</ProtectedComponent>,
 			<ProtectedComponent
-				key={'header-close'}
+				key={'header-download'}
 				requiredRoles={['DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP']}
 				requiredStates={['APPROVED']}
 			>

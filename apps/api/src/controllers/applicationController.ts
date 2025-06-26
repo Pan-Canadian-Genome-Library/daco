@@ -32,7 +32,6 @@ import {
 	type ApplicationService,
 	type CollaboratorsService,
 	type FilesService,
-	type JoinedApplicationRecord,
 	type PDFService,
 	type RevisionRequestModel,
 	type SignatureService,
@@ -60,13 +59,19 @@ const logger = BaseLogger.forModule('applicationController');
  * @param user_id - The ID of the user requesting the creation of the application.
  * @returns Success with Application data / Failure with Error.
  */
-export const createApplication = async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord> => {
+export const createApplication = async ({ user_id }: { user_id: string }): AsyncResult<ApplicationDTO> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
 	const result = await applicationRepo.createApplication({ user_id });
 
-	return result;
+	if (!result.success) {
+		return result;
+	}
+
+	const applicationDTO = convertToBasicApplicationRecord(result.data);
+
+	return applicationDTO;
 };
 
 /**
@@ -82,7 +87,7 @@ export const editApplication = async ({
 }: {
 	id: number;
 	update: UpdateEditApplicationRequest;
-}): AsyncResult<JoinedApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
@@ -135,9 +140,19 @@ export const editApplication = async ({
 
 	const formattedResult = convertToApplicationContentsRecord(update);
 
-	if (!formattedResult.success) return formattedResult;
+	if (!formattedResult.success) {
+		return formattedResult;
+	}
 
-	return await applicationRepo.editApplication({ id, update: formattedResult.data });
+	const editResult = await applicationRepo.editApplication({ id, update: formattedResult.data });
+
+	if (!editResult.success) {
+		return editResult;
+	}
+
+	const joinedApplicationDTO = convertToApplicationRecord(editResult.data);
+
+	return joinedApplicationDTO;
 };
 
 /**
@@ -418,7 +433,7 @@ export const dacRejectApplication = async ({
 }: {
 	applicationId: number;
 	rejectionReason: string;
-}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -447,13 +462,7 @@ export const dacRejectApplication = async ({
 			return updatedResult;
 		}
 
-		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
-
-		if (!updatedApplication.success) {
-			return updatedApplication;
-		}
-
-		const dtoFriendlyData = convertToApplicationRecord(updatedApplication.data);
+		const dtoFriendlyData = convertToBasicApplicationRecord(updatedResult.data);
 
 		if (!dtoFriendlyData.success) {
 			return dtoFriendlyData;
@@ -570,7 +579,7 @@ export const submitRevision = async ({
 
 export const revokeApplication = async (
 	applicationId: number,
-): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -594,7 +603,13 @@ export const revokeApplication = async (
 		const update = { state: appStateManager.state, approved_at: new Date() };
 		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
 
-		return updatedResult;
+		if (!updatedResult.success) {
+			return updatedResult;
+		}
+
+		const applicationDTO = convertToBasicApplicationRecord(updatedResult.data);
+
+		return applicationDTO;
 	} catch (error) {
 		const message = `Unable to revoke application with id: ${applicationId}`;
 		logger.error(message, error);
@@ -768,7 +783,7 @@ export const submitApplication = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -801,12 +816,14 @@ export const submitApplication = async ({
 			return submissionResult;
 		}
 
+		const applicationDTO = convertToBasicApplicationRecord(submissionResult.data);
+
 		// Fetch the application with contents to send the email
 		const resultContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
 			logger.error(`Unable to retrieve information to send submission email: ${applicationId}`, resultContents);
-			return submissionResult;
+			return applicationDTO;
 		}
 
 		const {
@@ -847,8 +864,7 @@ export const submitApplication = async ({
 				name: applicant_first_name || 'N/A',
 			});
 		}
-
-		return submissionResult;
+		return applicationDTO;
 	} catch (error) {
 		const message = `Unable to submit application with id: ${applicationId}`;
 		logger.error(message, error);
@@ -861,7 +877,7 @@ export const closeApplication = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -899,7 +915,9 @@ export const closeApplication = async ({
 			return closeResult;
 		}
 
-		return closeResult;
+		const applicationDTO = convertToBasicApplicationRecord(closeResult.data);
+
+		return applicationDTO;
 	} catch (error) {
 		const message = `Unable to close application with id: ${applicationId}`;
 		logger.error(message, error);

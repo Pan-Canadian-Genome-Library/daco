@@ -1,0 +1,104 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+components:
+  schemas:
+    PagingMetadata:
+      type: object
+      description: Information regarding what current page of results.
+      properties:
+        totalRecords:
+          type: number
+          description: The total number of records in the current result set.
+        page:
+          type: number
+          description: The current page of results, starts from 0. Default is 0.
+        pageSize:
+          type: number
+          description: The current page size. Default is 20.
+
+  responses:
+    ##############
+    # Occurs on a 400-series error.
+    ##############
+    ClientErrors:
+      type: object
+      required:
+        - message
+        - error
+      properties:
+        error:
+          type: string
+          description: Code to identify the cause of the error.
+        message:
+          type: string
+          description: Short description of the error to provide some context for why the request failed.
+
+    ##############
+    # Occurs on a 500-series error.
+    ##############
+    ServerErrors:
+      type: object
+      required:
+        - message
+        - error
+      properties:
+        error:
+          type: string
+          description: Code to identify the cause of the error.
+        message:
+          type: string
+          description: Short description of the error to provide some context for why the request failed.
+
+    ##############
+    # Can occur on a 400-series error. Appears when the Zod validation middleware detects a schema violation.
+    ##############
+    RequestValidationError:
+      type: object
+      required:
+        - message
+        - error
+        - details
+      properties:
+        error:
+          type: string
+          description: Code to identify the cause of the error.
+        message:
+          type: string
+          description: Short description of the error to provide some context for why the request failed.
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                description: The validation error type
+              expected:
+                type: string
+                description: The expected property.
+              received:
+                type: string
+                description: The property that was received in the request
+              path:
+                type: array
+                items:
+                  type: string
+                  description: The path of the object where validation failed.
+              message:
+                type: string
+                description: A plain text error message describing why the validation failed.

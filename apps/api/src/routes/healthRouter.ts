@@ -16,35 +16,25 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
-import { useNavigate } from 'react-router';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { type ApplicationDTO } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from '../apiUtils';
+import express, { type Request, type Response } from 'express';
 
-const useCreateApplication = () => {
-	const navigation = useNavigate();
+import { getHealth, Status } from '@/app-health.ts';
+import { serverConfig } from '@/config/serverConfig.ts';
 
-	return useMutation<ApplicationDTO, ServerError>({
-		mutationFn: async () => {
-			const response = await fetch('/applications/create', {
-				method: 'POST',
-			}).then(withErrorResponseHandler);
+const healthRouter = express.Router();
 
-			return await response.json();
-		},
-		onError: (error) => {
-			notification.error({
-				message: error.message,
-			});
-		},
-		onSuccess: (data) => {
-			navigation(`/application/${data.id}/intro/edit`);
-		},
-	});
-};
+healthRouter.get('/', (_req: Request, res: Response) => {
+	const health = getHealth();
+	const resBody = {
+		version: serverConfig.npm_package_version,
+		health,
+	};
+	if (health.all.status !== Status.OK) {
+		res.status(500).json(resBody);
+		return;
+	}
+	res.status(200).json(resBody);
+});
 
-export default useCreateApplication;
+export default healthRouter;

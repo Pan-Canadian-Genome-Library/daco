@@ -237,22 +237,7 @@ signatureRouter.delete(
 				try {
 					// Validate Parameter
 					const applicationId = Number(request.params.applicationId);
-
-					if (!isPositiveInteger(applicationId)) {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
-						return;
-					}
-
-					// Validate Query Params
-					const queryValidationResult = deleteSignatureQuerySchema.safeParse(request.query);
-					if (!queryValidationResult.success) {
-						response.status(400).json({
-							error: 'INVALID_REQUEST',
-							message: `Signee parameter must be either 'APPLICANT' or 'INSTITUTIONAL_REP'.`,
-						});
-						return;
-					}
-					const { signee } = queryValidationResult.data;
+					const { signee } = request.query;
 
 					// Get user from session and validate that they can act on this application
 					const { userId } = request.session.user || {};
@@ -283,7 +268,7 @@ signatureRouter.delete(
 					if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 						response
 							.status(403)
-							.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
+							.json({ error: 'FORBIDDEN', message: `User does not have permission to modify this signature.` });
 						return;
 					}
 

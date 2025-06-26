@@ -1,0 +1,131 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+components:
+  schemas:
+    Collaborators:
+      type: object
+      properties:
+        applicationId:
+          type: number
+          description: The Application ID associated with the Collaborator.
+        collaboratorFirstName:
+          type: string
+          description: The collaborator's first name
+        collaboratorMiddleName:
+          type: string
+          description: The collaborator's middle name
+        collaboratorLastName:
+          type: string
+          description: The collaborator's last name
+        collaboratorSuffix:
+          type: string
+          description: The collaborator's additional name suffix
+        collaboratorType:
+          type: string
+          description: The type of collaborator. This field is not used.
+        collaboratorResearcherProfileURL:
+          type: string
+          description: The URL containing the researcher's profile.
+        collaboratorPrimaryAffiliation:
+          type: string
+          description: The primary research institution that a researcher is affiliated with.
+        collaboratorPositionTitle:
+          type: string
+          description: The collaborator's job title
+        collaboratorInstitutionalEmail:
+          type: string
+          description: The collaborator's contact email
+
+  requests:
+    CreateCollaborators:
+      type: array
+      description: Array of new Collaborators to create
+      items:
+        $ref: '#/components/requests/NewCollaborator'
+
+    NewCollaborator:
+      type: object
+      required:
+        - collaboratorFirstName
+        - collaboratorLastName
+        - collaboratorPositionTitle
+        - collaboratorInstitutionalEmail
+      properties:
+        collaboratorFirstName:
+          type: string
+          description: The collaborator's first name
+        collaboratorMiddleName:
+          type: string
+          description: The collaborator's middle name
+        collaboratorLastName:
+          type: string
+          description: The collaborator's last name
+        collaboratorSuffix:
+          type: string
+          description: The collaborator's additional name suffix
+        collaboratorPositionTitle:
+          type: string
+          description: The collaborator's job title
+        collaboratorInstitutionalEmail:
+          type: string
+          description: The collaborator's contact email
+
+    UpdatedCollaborators:
+      type: object
+      required:
+        - collaboratorInstitutionalEmail
+      properties:
+        collaboratorFirstName:
+          type: string
+          description: The collaborator's first name
+        collaboratorMiddleName:
+          type: string
+          description: The collaborator's middle name
+        collaboratorLastName:
+          type: string
+          description: The collaborator's last name
+        collaboratorSuffix:
+          type: string
+          description: The collaborator's additional name suffix
+        collaboratorPositionTitle:
+          type: string
+          description: The collaborator's job title
+        collaboratorInstitutionalEmail:
+          type: string
+          description: The collaborator's contact email
+
+    DeleteCollaborators:
+      type: object
+      required:
+        - applicationId
+        - collaboratorEmail
+      properties:
+        applicationId:
+          type: number
+          description: The id of the relevant Application record
+        collaboratorEmail:
+          type: string
+          format: email
+          description: The email address of the Collaborator to delete.
+
+  responses:
+    CollaboratorsListResponse:
+      type: array
+      description: Array of Collaborator records
+      items:
+        $ref: '#/components/schemas/Collaborators'
