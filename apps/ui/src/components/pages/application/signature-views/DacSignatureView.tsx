@@ -59,22 +59,24 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 				</Flex>
 			</SectionTitle>
 			<SectionContent showDivider={false}>
-				{!signatureLoading ? (
-					<SignatureViewer
-						title={translate('generic.applicant')}
-						name={`${applicantFirstName} ${applicantLastName}`}
-						signature={signatureData?.applicantSignature}
-						date={signatureData?.applicantSignedAt}
-					/>
-				) : null}
-				{!signatureLoading ? (
-					<SignatureViewer
-						title={translate('generic.rep')}
-						name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
-						signature={signatureData?.institutionalRepSignature}
-						date={signatureData?.institutionalRepSignedAt}
-					/>
-				) : null}
+				<Flex vertical gap={'large'}>
+					{!signatureLoading ? (
+						<SignatureViewer
+							title={translate('generic.applicant')}
+							name={`${applicantFirstName} ${applicantLastName}`}
+							signature={signatureData?.applicantSignature}
+							date={signatureData?.applicantSignedAt}
+						/>
+					) : null}
+					{!signatureLoading ? (
+						<SignatureViewer
+							title={translate('generic.rep')}
+							name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
+							signature={signatureData?.institutionalRepSignature}
+							date={signatureData?.institutionalRepSignedAt}
+						/>
+					) : null}
+				</Flex>
 			</SectionContent>
 			<SectionFooter
 				currentRoute="sign"
