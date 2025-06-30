@@ -33,6 +33,7 @@ const SuccessModal = ({ isOpen, onOk, successText, okText }: SuccessModalProps) 
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 			open={isOpen}
+			closeIcon={false}
 			onOk={onOk}
 			footer={[]}
 			destroyOnClose
