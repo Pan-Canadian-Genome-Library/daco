@@ -42,7 +42,7 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, state } = useOutletContext<ApplicationOutletContext>();
 	const canEdit = canEditSection({ revisions, section: 'institutional', isEditMode });
 	const {
 		state: { fields, formState },
@@ -77,6 +77,7 @@ const Institutional = () => {
 		dispatch({
 			type: 'UPDATE_APPLICATION',
 			payload: {
+				applicationState: state,
 				fields: {
 					...fields,
 					institutionalRepFirstName: data.institutionalFirstName,

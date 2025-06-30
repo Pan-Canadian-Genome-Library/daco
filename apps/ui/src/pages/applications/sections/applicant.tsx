@@ -42,7 +42,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, state: applicationState } = useOutletContext<ApplicationOutletContext>();
 	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
@@ -78,6 +78,7 @@ const Applicant = () => {
 		dispatch({
 			type: 'UPDATE_APPLICATION',
 			payload: {
+				applicationState: applicationState,
 				fields: {
 					...state.fields,
 					applicantTitle: data.applicantTitle,
