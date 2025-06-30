@@ -32,6 +32,7 @@ import ApplicantInformation from '@/service/pdf/components/pages/ApplicantInform
 import Collaborators from '@/service/pdf/components/pages/Collaborators.tsx';
 import DataAccessAgreement from '@/service/pdf/components/pages/DataAccessAgreement/DataAccessAgreement.tsx';
 import TermsAndConditions from '@/service/pdf/components/pages/DataAccessAgreement/TermsAndConditions.tsx';
+import EndOfDocument from '@/service/pdf/components/pages/EndOfDocument.tsx';
 import Ethics from '@/service/pdf/components/pages/Ethics.tsx';
 import InstitutionalRepresentative from '@/service/pdf/components/pages/InstitutionalRepresentative.tsx';
 import IntroductionPage from '@/service/pdf/components/pages/IntroductionPage.tsx';
@@ -195,6 +196,7 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				institutionalRepSignature={signature?.institutionalRepSignature}
 				institutionalRepSignedAt={signature?.institutionalRepSignedAt}
 			/>
+			<EndOfDocument />
 		</Document>
 	);
 };
