@@ -17,7 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationResponseData, CollaboratorDTO, SignatureDTO } from '@pcgl-daco/data-model';
+import {
+	ApplicationResponseData,
+	CollaboratorDTO,
+	GC_STANDARD_GEOGRAPHIC_AREAS,
+	SignatureDTO,
+} from '@pcgl-daco/data-model';
 import { Document, Font, renderToBuffer, StyleSheet } from '@react-pdf/renderer';
 
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
@@ -34,6 +39,12 @@ import ProjectInformation from '@/service/pdf/components/pages/ProjectInformatio
 import RequestedStudy from '@/service/pdf/components/pages/RequestedStudy.tsx';
 import SignSubmit from '@/service/pdf/components/pages/SignSubmit.tsx';
 import TitlePage from '@/service/pdf/components/pages/TitlePage.tsx';
+
+/**
+ * FIXME: This should be dynamically set based on the language
+ * the PDF is being generated in.
+ */
+const PDF_LANGUAGE = 'en';
 
 interface PCGLApplicationProps {
 	applicationContents: ApplicationResponseData;
@@ -75,6 +86,27 @@ const styles = StyleSheet.create({
 	},
 });
 
+/**
+ * Translates a ISO3 country code into a country name.
+ * @param languageSetting `en | fr` - Sets the language the ISO3 country code should be decoded to.
+ * @param isoCode `string` - ISO3 country code
+ * @returns `string` - Either the country name in the requested format or, in-case the country code does not exist, the ISO3 code.
+ */
+const translateCountryCode = ({
+	languageSetting,
+	isoCode,
+}: {
+	languageSetting: 'en' | 'fr';
+	isoCode?: string | null;
+}) => {
+	const country = GC_STANDARD_GEOGRAPHIC_AREAS.find((gca) => gca.iso === isoCode);
+	if (country) {
+		return country[languageSetting];
+	} else {
+		return isoCode;
+	}
+};
+
 const PCGLApplication = ({ applicationContents, signature, collaborators, docCreatedAt }: PCGLApplicationProps) => {
 	const contents = applicationContents.contents;
 
@@ -102,7 +134,10 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				applicantInstitutionalEmail={contents?.applicantInstitutionalEmail}
 				applicantProfileUrl={contents?.applicantProfileUrl}
 				applicantPositionTitle={contents?.applicantPositionTitle}
-				applicantInstitutionCountry={contents?.applicantInstitutionCountry}
+				applicantInstitutionCountry={translateCountryCode({
+					isoCode: contents?.applicantInstitutionCountry,
+					languageSetting: PDF_LANGUAGE,
+				})}
 				applicantInstitutionState={contents?.applicantInstitutionState}
 				applicantInstitutionStreetAddress={contents?.applicantInstitutionStreetAddress}
 				applicantInstitutionBuilding={contents?.applicantInstitutionBuilding}
@@ -119,7 +154,10 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				institutionalRepEmail={contents?.institutionalRepEmail}
 				institutionalRepProfileUrl={contents?.institutionalRepProfileUrl}
 				institutionalRepPositionTitle={contents?.institutionalRepPositionTitle}
-				institutionCountry={contents?.institutionCountry}
+				institutionCountry={translateCountryCode({
+					isoCode: contents?.institutionCountry,
+					languageSetting: PDF_LANGUAGE,
+				})}
 				institutionState={contents?.institutionState}
 				institutionStreetAddress={contents?.institutionStreetAddress}
 				institutionBuilding={contents?.institutionBuilding}
