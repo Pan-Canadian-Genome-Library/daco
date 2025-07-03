@@ -67,6 +67,33 @@ components:
           description: Notes specific to the requested studies section.
           nullable: true
           example: 'Studies align with project goals.'
+        agreementsApproved:
+          type: boolean
+          description: Indicates whether the agreements section is approved.
+          example: true
+        agreementsNotes:
+          type: string
+          description: Notes specific to the agreements section.
+          nullable: true
+          example: 'Failed to agree to terms.'
+        appendicesApproved:
+          type: boolean
+          description: Indicates whether the appendices section is approved.
+          example: true
+        appendicesNotes:
+          type: string
+          description: Notes specific to the appendices section.
+          nullable: true
+          example: 'Failed to agree to appendix 1.'
+        signAndSubmitApproved:
+          type: boolean
+          description: Indicates whether the sign and submit section is approved.
+          example: true
+        signAndSubmitsNotes:
+          type: string
+          description: Notes specific to the sign and submit section.
+          nullable: true
+          example: 'Signature illegible.'
       required:
         - id
         - applicationId
@@ -75,6 +102,10 @@ components:
         - institutionRepApproved
         - collaboratorsApproved
         - projectApproved
+        - requestedStudiesApproved
+        - agreementsApproved
+        - appendicesApproved
+        - signAndSubmitApproved
         - requestedStudiesApproved
 
   requests:
