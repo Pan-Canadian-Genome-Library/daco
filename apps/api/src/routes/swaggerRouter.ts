@@ -39,6 +39,7 @@ const SWAGGER_OPTIONS: SwaggerDefinition = {
 		description: `${DESCRIPTION_EN}<hr/>${DESCRIPTION_FR}`,
 		version: serverConfig.npm_package_version,
 	},
+	servers: [{ url: '/' }, { url: '/api', description: 'PROXY - Prepend url with /api for UI proxy' }],
 };
 
 const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.Options = {
