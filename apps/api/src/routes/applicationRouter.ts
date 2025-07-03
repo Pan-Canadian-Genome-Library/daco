@@ -37,12 +37,7 @@ import {
 } from '@/controllers/applicationController.js';
 
 import BaseLogger from '@/logger.js';
-import {
-	RevisionRequestModel,
-	type ApplicationRecord,
-	type ApplicationStateTotals,
-	type JoinedApplicationRecord,
-} from '@/service/types.ts';
+import { RevisionRequestModel, type ApplicationStateTotals } from '@/service/types.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
@@ -109,7 +104,7 @@ async function validateUserPermissionForApplication({
 applicationRouter.post(
 	'/create',
 	authMiddleware({ requiredRoles: ['APPLICANT'] }),
-	async (request: Request, response: ResponseWithData<ApplicationRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
+	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
 		const { userId } = user || {};
 
@@ -137,7 +132,7 @@ applicationRouter.post(
 		async (
 			request: Request,
 			response: ResponseWithData<
-				JoinedApplicationRecord,
+				ApplicationResponseData,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
@@ -565,7 +560,7 @@ applicationRouter.post(
 		async (
 			request: Request,
 			response: ResponseWithData<
-				{ message: string; data: ApplicationRecord },
+				ApplicationDTO,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
@@ -601,10 +596,7 @@ applicationRouter.post(
 				const result = await revokeApplication(applicationId);
 
 				if (result.success) {
-					response.status(200).json({
-						message: 'Application revoked successfully.',
-						data: result.data,
-					});
+					response.status(200).json(result.data);
 					return;
 				}
 				switch (result.error) {
@@ -639,10 +631,7 @@ applicationRouter.post(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<
-				{ message: string; data: ApplicationRecord },
-				['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']
-			>,
+			response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
 
@@ -650,10 +639,7 @@ applicationRouter.post(
 				const result = await closeApplication({ applicationId });
 
 				if (result.success) {
-					response.status(200).json({
-						message: 'Application closed successfully.',
-						data: result.data,
-					});
+					response.status(200).json(result.data);
 					return;
 				}
 				switch (result.error) {
@@ -773,7 +759,7 @@ applicationRouter.post(
 		async (
 			request: Request,
 			response: ResponseWithData<
-				ApplicationRecord,
+				ApplicationDTO,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
@@ -836,14 +822,14 @@ applicationRouter.post(
 
 	// Endpoint for reps to request revisions
 	applicationRouter.post(
-		'/dac/:applicationId/request-revisions',
+		'/:applicationId/dac/request-revisions',
 		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
@@ -918,7 +904,7 @@ applicationRouter.post(
 
 // Endpoint for reps to request revisions
 applicationRouter.post(
-	'/rep/:applicationId/request-revisions',
+	'/:applicationId/rep/request-revisions',
 	authMiddleware({ requiredRoles: ['INSTITUTIONAL_REP'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
@@ -929,7 +915,7 @@ applicationRouter.post(
 			async (
 				request: Request,
 				response: ResponseWithData<
-					ApplicationResponseData,
+					ApplicationDTO,
 					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
 				>,
 			) => {

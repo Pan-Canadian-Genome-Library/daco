@@ -248,7 +248,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationContents'
+                $ref: '#/components/schemas/ApplicationRecord'
 
   /applications/{applicationId}/approve:
     post:
@@ -385,7 +385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ApplicationResponse'
+                $ref: '#/components/responses/BasicApplicationResponse'
         '400':
           description: Invalid request or application cannot be submitted
           content:

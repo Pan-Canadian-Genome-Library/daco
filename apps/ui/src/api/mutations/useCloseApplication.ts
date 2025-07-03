@@ -20,7 +20,7 @@ import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
-import { type ApplicationResponseData } from '@pcgl-daco/data-model';
+import { type ApplicationDTO } from '@pcgl-daco/data-model';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +28,7 @@ const useCloseApplication = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 
-	return useMutation<ApplicationResponseData, ServerError, { applicationId?: string | number }>({
+	return useMutation<ApplicationDTO, ServerError, { applicationId?: string | number }>({
 		mutationFn: async ({ applicationId }) => {
 			const response = await fetch(`/applications/${applicationId}/close`, {
 				method: 'POST',

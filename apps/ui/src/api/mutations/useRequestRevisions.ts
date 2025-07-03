@@ -19,19 +19,15 @@
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { ApplicationResponseData, ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model';
+import { type ApplicantDTO, ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model';
 import { RevisionsModalSchemaType } from '@pcgl-daco/validation';
 import { useMutation } from '@tanstack/react-query';
 
 const useRequestRevisions = (currentState: ApplicationStateValues) => {
-	return useMutation<
-		ApplicationResponseData,
-		ServerError,
-		RevisionsModalSchemaType & { applicationId: string | number }
-	>({
+	return useMutation<ApplicantDTO, ServerError, RevisionsModalSchemaType & { applicationId: string | number }>({
 		mutationFn: async (payload) => {
 			const response = await fetch(
-				`/applications/${currentState === ApplicationStates.DAC_REVIEW ? 'dac' : 'rep'}/${payload.applicationId}/request-revisions`,
+				`/applications/${payload.applicationId}/${currentState === ApplicationStates.DAC_REVIEW ? 'dac' : 'rep'}/request-revisions`,
 				{
 					method: 'POST',
 					body: JSON.stringify({
