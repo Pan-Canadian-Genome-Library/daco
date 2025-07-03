@@ -623,7 +623,7 @@ export const requestApplicationRevisionsByDac = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -638,7 +638,10 @@ export const requestApplicationRevisionsByDac = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (application.state !== ApplicationStates.DAC_REVIEW) {
-			return failure('INVALID_STATE_TRANSITION', 'Application is not in the correct status for revisions.');
+			return failure(
+				'INVALID_STATE_TRANSITION',
+				'Application is not in the correct status for revisions. Must be in DAC_REVIEW.',
+			);
 		}
 
 		const revisionResult = await appStateManager.reviseDacReview();
@@ -653,13 +656,13 @@ export const requestApplicationRevisionsByDac = async ({
 			return revisionRequestResult;
 		}
 
-		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
 		}
 
-		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+		const aliasResult = convertToBasicApplicationRecord(updatedApplication.data);
 
 		if (!aliasResult.success) {
 			return aliasResult;
@@ -701,7 +704,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
@@ -717,7 +720,10 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (application.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			return failure('INVALID_STATE_TRANSITION', 'Application is not in the correct status for revisions.');
+			return failure(
+				'INVALID_STATE_TRANSITION',
+				'Application is not in the correct status for revisions. Must be in INSTITUTIONAL_REP_REVIEW.',
+			);
 		}
 
 		const revisionResult = await appStateManager.reviseRepReview();
@@ -739,13 +745,13 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return resultContents;
 		}
 
-		const updatedApplication = await service.getApplicationWithContents({ id: applicationId });
+		const updatedApplication = await service.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
 		}
 
-		const aliasResult = convertToApplicationRecord(updatedApplication.data);
+		const aliasResult = convertToBasicApplicationRecord(updatedApplication.data);
 
 		if (!aliasResult.success) {
 			return aliasResult;

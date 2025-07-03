@@ -1,22 +1,8 @@
 components:
   schemas:
-    RevisionDetails:
+    ApplicationRevisions:
       type: object
-      description: Details of a specific revision request associated with an application.
       properties:
-        id:
-          type: integer
-          description: The unique identifier of the revision request, generated automatically.
-          example: 1
-        applicationId:
-          type: integer
-          description: The ID of the application this revision request pertains to.
-          example: 12345
-        createdAt:
-          type: string
-          format: date-time
-          description: The timestamp when the revision request was created, defaults to the current time.
-          example: '2025-03-20T10:00:00Z'
         comments:
           type: string
           description: General comments related to the revision request.
@@ -67,6 +53,15 @@ components:
           description: Notes specific to the requested studies section.
           nullable: true
           example: 'Studies align with project goals.'
+        ethicsApproved:
+          type: boolean
+          description: Indicates whether the ethics section is approved.
+          example: true
+        ethicsNotes:
+          type: string
+          description: Notes specific to the ethics section.
+          nullable: true
+          example: 'Failed to upload valid ethics file document.'
         agreementsApproved:
           type: boolean
           description: Indicates whether the agreements section is approved.
@@ -89,7 +84,7 @@ components:
           type: boolean
           description: Indicates whether the sign and submit section is approved.
           example: true
-        signAndSubmitsNotes:
+        signAndSubmitNotes:
           type: string
           description: Notes specific to the sign and submit section.
           nullable: true
@@ -103,65 +98,33 @@ components:
         - collaboratorsApproved
         - projectApproved
         - requestedStudiesApproved
+        - ethicsApproved
         - agreementsApproved
         - appendicesApproved
         - signAndSubmitApproved
-        - requestedStudiesApproved
 
   requests:
     RequestRevisions:
       type: object
-      required:
-        - revisionData
-      properties:
-        applicantApproved:
-          type: boolean
-          description: 'Approval status for the applicant information section.'
-          example: true
-        applicantNotes:
-          type: string
-          description: 'Notes related to the applicant information section.'
-          example: 'Applicant needs to update personal details.'
-        institutionRepApproved:
-          type: boolean
-          description: 'Approval status for the institutional representative section.'
-          example: false
-        institutionRepNotes:
-          type: string
-          description: 'Notes related to the institutional representative section.'
-          example: 'Institution rep has missing documents.'
-        collaboratorsApproved:
-          type: boolean
-          description: 'Approval status for the collaborators section.'
-          example: true
-        collaboratorsNotes:
-          type: string
-          description: 'Notes related to the collaborators section.'
-          example: 'All collaborators have provided necessary details.'
-        projectApproved:
-          type: boolean
-          description: 'Approval status for the project information section.'
-          example: true
-        projectNotes:
-          type: string
-          description: 'Notes related to the project information section.'
-          example: 'Project details are complete.'
-        requestedStudiesApproved:
-          type: boolean
-          description: 'Approval status for the requested study section.'
-          example: true
-        requestedStudiesNotes:
-          type: string
-          description: 'Notes related to the requested study section.'
-          example: 'Requested studies are well defined.'
-        ethicsApproved:
-          type: boolean
-          description: 'Approval status for the ethics section.'
-          example: true
-        ethicsNotes:
-          type: string
-          description: 'Notes related to the ethics section.'
-          example: 'Ethics review is pending.'
-        comments:
-          type: string
-          description: 'Additional comments'
+      $ref: '#/components/schemas/ApplicationRevisions'
+
+  responses:
+    RevisionDetails:
+      description: Details of a specific revision request associated with an application.
+      allOf:
+        - $ref: '#/components/schemas/ApplicationRevisions'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: The unique identifier of the revision request, generated automatically.
+              example: 1
+            applicationId:
+              type: integer
+              description: The ID of the application this revision request pertains to.
+              example: 12345
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp when the revision request was created, defaults to the current time.
+              example: '2025-03-20T10:00:00Z'

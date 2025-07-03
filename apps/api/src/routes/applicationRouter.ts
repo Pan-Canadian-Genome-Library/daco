@@ -829,7 +829,7 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationResponseData, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
@@ -915,7 +915,7 @@ applicationRouter.post(
 			async (
 				request: Request,
 				response: ResponseWithData<
-					ApplicationResponseData,
+					ApplicationDTO,
 					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
 				>,
 			) => {
