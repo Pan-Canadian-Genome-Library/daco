@@ -68,7 +68,7 @@ const startServer = async () => {
 		logger.info(`Server started - listening on port ${serverConfig.PORT}.`);
 		if (!serverConfig.isProduction) {
 			logger.info(
-				`\nRunning alongside the UI? API docs are available at: ${urlJoin([`${serverConfig.UI_HOST}/api`, API_PATH_DOCS, '#'])}\nRunning standalone? API docs are available at: ${urlJoin([`http://localhost:${serverConfig.PORT}`, API_PATH_DOCS])}`,
+				`-\n\nRunning alongside the UI? API docs are available at: ${urlJoin([`${serverConfig.UI_HOST}/api`, API_PATH_DOCS, '#'])}\nRunning standalone? API docs are available at: ${urlJoin([`http://localhost:${serverConfig.PORT}`, API_PATH_DOCS])}`,
 			);
 		}
 	});
