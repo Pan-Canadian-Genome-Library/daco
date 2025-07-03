@@ -17,38 +17,54 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type NodeProps, StyleSheet, Text } from '@react-pdf/renderer';
-import { ReactNode } from 'react';
+import { StyleSheet, View } from '@react-pdf/renderer';
 
+import Logo from '@/service/pdf/components/Logo/Logo.tsx';
+import Paragraph from '@/service/pdf/components/Paragraph.tsx';
+import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+import Title from '@/service/pdf/components/Title.tsx';
 
 const styles = StyleSheet.create({
-	paragraph: {
-		fontFamily: 'OpenSans',
-		fontWeight: 'normal',
-		lineHeight: '1rem',
+	link: {
+		color: standardStyles.colours.primary,
+	},
+	text: {
 		fontSize: standardStyles.textStyles.sizes.md,
 	},
+	logoImage: {
+		width: '50%',
+		margin: '0 0 0 0',
+	},
+	content: {
+		height: '100vh',
+		width: '100vw',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
 });
-const Paragraph = ({
-	children,
-	notice,
-	breakLine,
-	style,
-}: {
-	children: ReactNode;
-	notice?: boolean;
-	breakLine?: boolean;
-	style?: NodeProps['style'];
-}) => {
+
+const EndOfDocument = () => {
 	return (
-		<Text
-			break={breakLine}
-			style={{ ...styles.paragraph, color: notice ? standardStyles.colours.primary : '#000', ...style }}
-		>
-			{children}
-		</Text>
+		<StandardPage ignorePadding showAttribution alternatingAttribution showPageNumbers>
+			<View style={styles.content}>
+				<Logo colour={true} style={styles.logoImage} />
+				<Title style={{ paddingTop: '2.5cm' }} level="h2">
+					&mdash;&nbsp;END OF DOCUMENT&nbsp;&mdash;
+				</Title>
+				<Paragraph
+					style={{
+						fontWeight: 500,
+						paddingTop: '.75cm',
+					}}
+				>
+					Attached Ethics Letter and Appendices to follow.
+				</Paragraph>
+			</View>
+		</StandardPage>
 	);
 };
 
-export default Paragraph;
+export default EndOfDocument;

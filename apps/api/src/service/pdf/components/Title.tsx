@@ -17,12 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { StyleSheet, Text } from '@react-pdf/renderer';
+import { type NodeProps, StyleSheet, Text } from '@react-pdf/renderer';
 import { ReactNode } from 'react';
 
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 interface TitleProps {
 	level?: 'h1' | 'h2';
+	style?: NodeProps['style'];
 	breakLine?: boolean;
 	children: ReactNode;
 }
@@ -34,13 +35,14 @@ const styles = StyleSheet.create({
 	},
 });
 
-const Title = ({ level = 'h1', children, breakLine = false }: TitleProps) => {
+const Title = ({ level = 'h1', children, breakLine = false, style }: TitleProps) => {
 	return (
 		<Text
 			break={breakLine}
 			style={{
 				...styles.title,
 				fontSize: level === 'h1' ? standardStyles.textStyles.sizes.xl : standardStyles.textStyles.sizes.lg,
+				...style,
 			}}
 		>
 			{children}
