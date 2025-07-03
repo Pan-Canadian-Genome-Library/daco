@@ -19,7 +19,7 @@
 
 import { serverConfig } from '@/config/serverConfig.ts';
 import express from 'express';
-import swaggerJSDoc, { SwaggerDefinition } from 'swagger-jsdoc';
+import swaggerJSDoc, { OAS3Definition } from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 
 const DESCRIPTION_EN =
@@ -32,7 +32,7 @@ const SWAGGER_UI_EXPRESS_OPTIONS: swaggerUi.SwaggerUiOptions = {
 	customSiteTitle: 'PCGL DACO - Swagger UI',
 };
 
-const SWAGGER_OPTIONS: SwaggerDefinition = {
+const SWAGGER_OPTIONS: OAS3Definition = {
 	openapi: '3.0.0',
 	info: {
 		title: 'PCGL DACO API',
@@ -42,7 +42,7 @@ const SWAGGER_OPTIONS: SwaggerDefinition = {
 	servers: [{ url: '/' }, { url: '/api', description: 'PROXY - Prepend url with /api for UI proxy' }],
 };
 
-const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.Options = {
+const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.OAS3Options = {
 	swaggerDefinition: SWAGGER_OPTIONS,
 	failOnErrors: true, //Like the previous YAML parser, this setting ensures the server fails on start up if any YAML is malformed.
 	apis: ['./src/docs/**/*.yaml'],
