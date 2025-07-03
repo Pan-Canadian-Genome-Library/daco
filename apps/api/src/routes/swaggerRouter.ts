@@ -39,7 +39,7 @@ const SWAGGER_OPTIONS: OAS3Definition = {
 		description: `${DESCRIPTION_EN}<hr/>${DESCRIPTION_FR}`,
 		version: serverConfig.npm_package_version,
 	},
-	servers: [{ url: '/api', description: 'PROXY - requires cilogin/cookie for authentication' }, { url: '/' }],
+	servers: [{ url: '/api', description: 'UI Proxy - will use UI session cookie for authentication' }, { url: '/' }],
 };
 
 const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.OAS3Options = {
