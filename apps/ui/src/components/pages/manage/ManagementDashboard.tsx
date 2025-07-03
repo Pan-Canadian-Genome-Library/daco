@@ -16,17 +16,16 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@pcgl-daco/data-model';
+import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
+import { FilterValue, SorterResult } from 'antd/es/table/interface';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import RowCount from '@/components/pages/manage/RowCount';
-import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@/global/constants';
 import { pcglTableTheme } from '@/providers/ThemeProvider';
 import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-
-import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
-import { FilterValue, SorterResult } from 'antd/es/table/interface';
 
 const { Link } = Typography;
 const { useToken } = theme;

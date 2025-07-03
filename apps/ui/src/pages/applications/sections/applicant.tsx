@@ -18,6 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@pcgl-daco/data-model';
 import { applicantInformationSchema, type ApplicantInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
@@ -32,7 +33,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
-import { GC_STANDARD_GEOGRAPHIC_AREAS, PERSONAL_TITLES } from '@/global/constants';
+import { PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -41,7 +42,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, state: applicationState } = useOutletContext<ApplicationOutletContext>();
 	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
@@ -77,6 +78,7 @@ const Applicant = () => {
 		dispatch({
 			type: 'UPDATE_APPLICATION',
 			payload: {
+				applicationState: applicationState,
 				fields: {
 					...state.fields,
 					applicantTitle: data.applicantTitle,

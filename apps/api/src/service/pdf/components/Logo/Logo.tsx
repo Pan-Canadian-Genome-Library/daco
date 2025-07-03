@@ -19,8 +19,10 @@
 
 import { Image, NodeProps } from '@react-pdf/renderer';
 
-const Logo = ({ style }: Pick<NodeProps, 'style'>) => {
-	return <Image style={{ ...style }} src={'./src/service/pdf/components/Logo/pcgl-logo.png'} />;
+const Logo = ({ style, colour }: { colour?: boolean; style?: NodeProps['style'] }) => {
+	return (
+		<Image style={{ ...style }} src={`./src/service/pdf/components/Logo/pcgl-logo${colour ? '-colour' : ''}.png`} />
+	);
 };
 
 export default Logo;
