@@ -51,16 +51,14 @@ const startServer = async () => {
 	app.use(express.json());
 	app.use(sessionMiddleware);
 
-	app.use('/health', healthRouter);
-
-	app.use('/collaborators', collaboratorsRouter);
-	app.use('/applications', applicationRouter);
-	app.use('/signature', signatureRouter);
-	app.use('/auth', authRouter);
-	app.use('/file', fileRouter);
-	app.use('/assets', express.static(path.join(__dirname, 'public')));
-
 	app.use(`${API_PATH_DOCS}`, swaggerRouter);
+	app.use('/applications', applicationRouter);
+	app.use('/auth', authRouter);
+	app.use('/assets', express.static(path.join(__dirname, 'public')));
+	app.use('/collaborators', collaboratorsRouter);
+	app.use('/file', fileRouter);
+	app.use('/health', healthRouter);
+	app.use('/signature', signatureRouter);
 
 	app.get('/', async (req: Request, res: Response) => {
 		res.send();

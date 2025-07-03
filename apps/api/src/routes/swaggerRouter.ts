@@ -19,29 +19,30 @@
 
 import { serverConfig } from '@/config/serverConfig.ts';
 import express from 'express';
-import swaggerJSDoc, { SwaggerDefinition } from 'swagger-jsdoc';
+import swaggerJSDoc, { OAS3Definition } from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 
 const DESCRIPTION_EN =
 	'The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers, and commercial teams for access to PCGL Controlled Data.<br/><br/>Additional information related to PCGL and the DACO can be found at: [genomelibrary.ca](https://genomelibrary.ca/).';
 
 const DESCRIPTION_FR =
-	"<p>Le Bureau de conformité pour l’accès aux données de la BGP (BCAD de la BGP) traite les demandes d’accès aux données contrôlées de la BGP émanant de scientifiques, de chercheurs et chercheuses et d’équipes commerciales.<br/><br/>Des informations supplémentaires sur la BGP et le BCAD sont disponibles à l'adresse suivante: [genomelibrary.ca/fr](https://genomelibrary.ca/fr).</p>";
+	"<p>Le Bureau de conformité pour l'accès aux données de la BGP (BCAD de la BGP) traite les demandes d’accès aux données contrôlées de la BGP émanant de scientifiques, de chercheurs et chercheuses et d’équipes commerciales.<br/><br/>Des informations supplémentaires sur la BGP et le BCAD sont disponibles à l'adresse suivante: [genomelibrary.ca/fr](https://genomelibrary.ca/fr).</p>";
 
 const SWAGGER_UI_EXPRESS_OPTIONS: swaggerUi.SwaggerUiOptions = {
 	customSiteTitle: 'PCGL DACO - Swagger UI',
 };
 
-const SWAGGER_OPTIONS: SwaggerDefinition = {
+const SWAGGER_OPTIONS: OAS3Definition = {
 	openapi: '3.0.0',
 	info: {
 		title: 'PCGL DACO API',
 		description: `${DESCRIPTION_EN}<hr/>${DESCRIPTION_FR}`,
 		version: serverConfig.npm_package_version,
 	},
+	servers: [{ url: '/api', description: 'UI Proxy - will use UI session cookie for authentication' }, { url: '/' }],
 };
 
-const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.Options = {
+const SWAGGER_JS_DOC_OPTIONS: swaggerJSDoc.OAS3Options = {
 	swaggerDefinition: SWAGGER_OPTIONS,
 	failOnErrors: true, //Like the previous YAML parser, this setting ensures the server fails on start up if any YAML is malformed.
 	apis: ['./src/docs/**/*.yaml'],
