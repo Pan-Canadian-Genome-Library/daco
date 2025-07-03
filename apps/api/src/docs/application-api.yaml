@@ -1,0 +1,584 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+paths:
+  /applications:
+    get:
+      tags:
+        - Applications
+      summary: List all applications that belong to a user.
+      description: Lists all applications which belong to the logged in user.<br/><br/>*_Note:_* If the user is a <strong>DAC Member</strong>, this endpoint will return all applications in the system.
+      parameters:
+        - in: query
+          name: state
+          schema:
+            type: string
+          description: |
+            Retrieve specific application items in a certain State. This may be an array to get multiple application types. The states that may be requested, may be the following enum values: `["DRAFT", "INSTITUTIONAL_REP_REVIEW"," DAC_REVIEW", "DAC_REVISIONS_REQUESTED", "INSTITUTIONAL_REP_REVISION_REQUESTED", "REJECTED", "APPROVED", "CLOSED", "REVOKED"]`.
+            <br/>
+            <br/>
+            **For Example:** `["APPROVED", "REJECTED"]` to get both approved and rejected applications.
+            <br/>
+            <br/>
+            *Note:* These values *are* case sensitive.
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: |
+            Sort application items. Sorting application items takes in a JSON representation of an array and object combination.  This contains the column you'd like to sort by (id, user_id, state, created_at, approved_at, expires_at) and the direction (asc, desc).
+            <br/>
+            <br/>
+            **For Example:** `[{"direction":"desc","column":"id"}]`. 
+            <br/>
+            <br/>
+            *Note:* you may sort by multiple columns, just keep adding objects into the array.
+        - in: query
+          name: page
+          schema:
+            type: number
+            minimum: 0
+          description: Retrieve specific page of application items. All page counts start from zero (0) and must be a positive number. If none is provided, the default is 0.
+        - in: query
+          name: pageSize
+          schema:
+            type: number
+            minimum: 0
+          description: Max number of application items per page. Must be a positive number. If the property isn't provided, the default is 20.
+      responses:
+        '500':
+          description: 'Cannot return applications list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Occurs when an error has occurred while processing JSON provided for the state/sort values, or page and/or page size are negative values.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Applications retrieved'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApplicationWithApplicantInfo'
+                  pagingMetadata:
+                    type: object
+                    $ref: '#/components/schemas/PagingMetadata'
+
+  /applications/{applicationId}:
+    get:
+      tags:
+        - Applications
+      summary: Gets a application for a specified application ID.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: string
+          description: Retrieve a specific application with the specified application ID.
+          required: true
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have the rights to access this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Cannot retrieve application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '404':
+          description: 'Error retrieving application by ID - Application not found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application retrieved'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
+
+  /applications/metadata/counts:
+    get:
+      tags:
+        - Applications
+      summary: Gets the total number of applications in each state / status category.
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You are not a **DAC Member** and therefore cannot access this endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Error getting the total number of applications in each state / status category'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '200':
+          description: 'The object containing the metadata information'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationsMetadata'
+
+  /applications/create:
+    post:
+      tags:
+        - Applications
+      summary: Create a new application.
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You are not an **Applicant** and therefore cannot create a new application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Error creating application'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error creating application - No User ID specified.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '201':
+          description: 'Application created'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Application'
+
+  /applications/edit:
+    post:
+      tags:
+        - Applications
+      summary: Edit the details of an application.
+      requestBody:
+        description: Changes made to an Application record
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/ApplicationUpdates'
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Error editing application'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error editing application - Application not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationContents'
+
+  /applications/{applicationId}/approve:
+    post:
+      tags:
+        - Applications
+      summary: Approve an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to approve.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You are not a **DAC Member** or have sufficient rights to approve this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: Application successfully approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid request - missing or invalid approval data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server error - Unable to process approval.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
+  /applications/{applicationId}/reject:
+    post:
+      tags:
+        - Applications
+      summary: Reject an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to reject.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      description: Allows DAC to reject an application. Rejected applications cannot be reopened or changed.
+      requestBody:
+        description: Request body containing rejection details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/RejectApplication'
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You are not a **DAC Member** or have sufficient rights to reject this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Cannot reject application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '404':
+          description: 'Invalid request or rejection not allowed'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application successfully rejected'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+
+  /applications/{applicationId}/submit:
+    post:
+      summary: Submit an application for review.
+      description: Retrieves the application by ID, verifies the user and role, and submits it.
+      tags:
+        - Applications
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated application upload
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own or have the rights to submit this Application to its next lifecycle step.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: Application submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
+        '400':
+          description: Invalid request or application cannot be submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
+  /applications/{applicationId}/revoke:
+    post:
+      tags:
+        - Applications
+      summary: Revoke an approved application.
+      description: |
+        Allows revoking an application that is in the `APPROVED` state. Once revoked, the application cannot be reopened or changed.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application to revoke.
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own or have the rights to revoke this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: Application successfully revoked.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: |
+            Invalid request - the application is not in the `APPROVED` state, or the application ID is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/RequestValidationError'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '409':
+          description: Conflict - the application is already revoked or in an invalid state for revocation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server error - unable to process revocation request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
+  /applications/{applicationId}/close:
+    post:
+      tags:
+        - Applications
+      summary: Close an application.
+      description: |
+        Allows an applicant or DAC member to close an application.
+        - In `DRAFT` or `INSTITUTIONAL_REP_REVIEW` states, only the applicant can close.
+        - In `DAC_REVIEW` state, both the applicant and DAC members can close.
+        - Closed applications cannot be reopened.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application to close.
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: Application successfully closed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid request - missing or invalid application ID, or the application is in an invalid state for closure.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden - requester lacks permission to close the application in its current state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '409':
+          description: Conflict - application is already closed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server error - unable to process closure request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+
+  /applications/{applicationId}/withdraw:
+    post:
+      tags:
+        - Applications
+      summary: Withdraws an application if in REP_REVIEW or DAC_REVIEW, placing it back to DRAFT mode.
+      description: |
+        Allows an Applicant to withdraw an application. This is only available if the Application is in `REP_REVIEW`` or `DAC_REVIEW`. 
+        If withdrawn in these states the application will be moved back to `DRAFT`. All other states however, the application cannot be
+        "withdrawn", and so this endpoint will return an error.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the application you'd like to withdraw.
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: Application has been successfully withdrawn.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid request - Missing or invalid Application ID, or the Application is in an inappropriate state and cannot be withdrawn.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden - You do not own, or have the correct permissions to modify the application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Not Found - Application cannot be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Server Error - unable to process withdraw request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'

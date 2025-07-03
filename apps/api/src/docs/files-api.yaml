@@ -1,0 +1,206 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+paths:
+  /file/{fileId}/download:
+    get:
+      tags:
+        - File
+      summary: Retrieve a uploaded file with buffer data by its ID.
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File retrieved'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRecordWithContents'
+
+        '500':
+          description: 'Error retrieving file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+
+  /file/ethics/{applicationId}:
+    post:
+      tags:
+        - File
+      summary: Upload new file or replace old file.
+      description: Numeric ID of the associated application upload
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated application upload
+      consumes:
+        - multipart/form-data
+      requestBody:
+        description: |
+          Files must fit a certain set of properties to be accepted by our server. The file cannot be more than `5mb`, has to be of type `'pdf'` and only `one` file can be uploaded.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: 'File successfully uploaded.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/uploadFileResponse'
+        '500':
+          description: 'Error uploading file to database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Error uploading file. File must be less than 5mb and only 1 file can be uploaded.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+
+  /file/{fileId}:
+    get:
+      tags:
+        - File
+      summary: Retrieve a uploaded file by its ID.
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload
+      responses:
+        '200':
+          description: 'File successfully retrieved.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileRecord'
+        '500':
+          description: 'Error deleting file in database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+    delete:
+      tags:
+        - File
+      summary: Delete file by its ID.
+      parameters:
+        - in: path
+          name: fileId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the associated fileId upload.
+      responses:
+        '204':
+          description: 'File deleted, no contents will be returned.'
+        '400':
+          description: 'Invalid fileId.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have permissions to modify this file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Error deleting file in database'

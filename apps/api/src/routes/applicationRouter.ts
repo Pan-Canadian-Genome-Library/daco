@@ -198,8 +198,9 @@ applicationRouter.post(
 	),
 );
 
-// TODO: create a way for admin to fetch all applications, this is filtering by the requesting user's ID
-// TODO: validate queryParam options using zod
+/**
+ * TODO: validate queryParam options using zod
+ */
 applicationRouter.get(
 	'/',
 	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
@@ -440,10 +441,7 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<
-					ApplicationResponseData,
-					['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']
-				>,
+				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
 				const { rejectionReason } = request.body;
 				const { applicationId } = request.params;
@@ -730,7 +728,7 @@ applicationRouter.post(
 				if (application.data.userId !== userId) {
 					response.status(403).send({
 						error: ErrorType.FORBIDDEN,
-						message: 'You do not own, or have the rights to modify this application.',
+						message: 'User does not have permission to access or modify this application.',
 					});
 				}
 
@@ -1036,7 +1034,7 @@ applicationRouter.get(
 				if (getUserRole(userSession) === 'APPLICANT' && applicationInfo.data.userId !== userSession.user?.userId) {
 					response.status(403).send({
 						error: 'FORBIDDEN',
-						message: 'You do not own, or have the rights to access this application.',
+						message: 'User does not have permission to access or modify this application.',
 					});
 					return;
 				}

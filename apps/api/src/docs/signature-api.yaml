@@ -1,0 +1,175 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+paths:
+  /signature/{applicationId}:
+    get:
+      tags:
+        - Signature
+      summary: Get the signatures associated with an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to retrieve the signature from.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Successfully retrieved signature details from an application record. Note that these may be `null`, depending on if the application has been signed or not.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignatureRecord'
+        '400':
+          description: Will occur when not provided a valid `applicationId`, either a negative number, or not a number at all.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application and therefore cannot view its signatures.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+    delete:
+      tags:
+        - Signature
+      summary: Delete signatures associated with an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to retrieve the signature from.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: signee
+          schema:
+            type: string
+            enum: [INSTITUTIONAL_REP, APPLICANT]
+          description: Which signature to delete
+          required: true
+      responses:
+        '204':
+          description: Successfully deleted the signature requested. This will always result in a `No Content` response.
+        '400':
+          description: Will occur when not provided a valid `applicationId`, either a negative number, or not a number at all or invalid `signee`.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application and therefore cannot delete its signatures.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+  /signature/sign:
+    post:
+      tags:
+        - Signature
+      summary: Sign an application with a signature.
+      requestBody:
+        description: The ID of the application you wish to add the signature to, the signature (encoded in base64) and the time the signature took place.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/SignatureSign'
+      responses:
+        '200':
+          description: Application has been successfully signed. It will return the same data to you as what you sent in with a status `200 OK`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SignatureSigned'
+        '400':
+          description: Body parameters incorrect / validation failed. Likely due to missing params, or a non-base64 string.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/RequestValidationError'
+                  - $ref: '#/components/responses/ClientErrors'
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or are not associated with this application and therefore cannot add to its signatures.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: Application not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
