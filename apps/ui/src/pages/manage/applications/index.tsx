@@ -19,7 +19,7 @@
 
 import useGetApplicationCounts from '@/api/metadata/useGetApplicationCounts';
 import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/queries/useGetApplicationList';
-import ErrorPage from '@/components/pages/ErrorPage';
+import ErrorPage from '@/components/pages/global/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { isFilterKey, type FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import ManagementDashboard, { FilterState } from '@/components/pages/manage/ManagementDashboard';

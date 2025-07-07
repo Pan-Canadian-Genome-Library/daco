@@ -28,7 +28,7 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/queries/useGetApplication';
 import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
-import ErrorPage from '@/components/pages/ErrorPage';
+import ErrorPage from '@/components/pages/global/ErrorPage';
 import { useUserContext } from '@/providers/UserProvider';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
