@@ -37,6 +37,7 @@ function getAuthConfig() {
 	}
 
 	const authConfigSchema = z.object({
+		AUTHZ_ENDPOINT: z.string().url(),
 		AUTH_PROVIDER_HOST: z.string().url(),
 		AUTH_CLIENT_ID: z.string(),
 		AUTH_CLIENT_SECRET: z.string(),

@@ -17,15 +17,31 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './external/pcglAuthZ.js';
-export * from './localStorage/sessionExtras.js';
-export * from './modals/rejectApplicationModal.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './section/index.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { authConfig } from '@/config/authConfig.ts';
+import logger from '@/logger.ts';
+import { failure, success } from '@/utils/results.ts';
+import { authZUserInfo } from '@pcgl-daco/validation';
+import axios from 'axios';
+
+export const getUserInformation = async (accessToken: string) => {
+	if (!authConfig.enabled) {
+		return failure('AUTH_DISABLED', 'Authentication is disabled, authorization cannot continue.');
+	}
+
+	const request = await axios.get(`${authConfig.AUTHZ_ENDPOINT}/users/me`, {
+		headers: { Authorization: `Bearer ${accessToken}` },
+	});
+
+	if (request.status !== 200) {
+		return failure('BAD_TOKEN', 'Access token is invalid, expired?');
+	}
+
+	const validatedAuthZData = authZUserInfo.safeParse(request.data);
+
+	if (!validatedAuthZData.success) {
+		logger.error(`PCGL AuthZ service returned unexpected, or malformed data. ${validatedAuthZData.error}`);
+		return failure('SYSTEM_ERROR', 'Unable to retrieve user information from the PCGL AuthZ service.');
+	}
+
+	return success(validatedAuthZData.data);
+};

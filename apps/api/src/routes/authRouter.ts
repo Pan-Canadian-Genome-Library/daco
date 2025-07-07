@@ -24,12 +24,12 @@ import urlJoin from 'url-join';
 import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
+import { serverConfig } from '@/config/serverConfig.js';
+import * as oidcAuthClient from '@/external/oidcAuthNClient.ts';
 import BaseLogger from '@/logger.js';
+import { type ResponseWithData } from '@/routes/types.ts';
 import { getUserRole } from '@/service/authService.ts';
-import { serverConfig } from '../config/serverConfig.js';
-import * as oidcAuthClient from '../external/oidcAuthClient.ts';
-import { resetSession } from '../session/index.js';
-import { type ResponseWithData } from './types.js';
+import { resetSession } from '@/session/index.js';
 
 const logger = BaseLogger.forModule(`authRouter`);
 
