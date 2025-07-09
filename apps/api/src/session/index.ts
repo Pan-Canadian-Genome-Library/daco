@@ -17,22 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { SessionAccount, SessionUser } from '@/session/types.ts';
 import { type Request } from 'express';
 
 export { default as sessionMiddleware } from './sessionMiddleware.js';
-
-export type SessionUser = {
-	userId: string;
-	givenName?: string;
-	familyName?: string;
-};
-
-export type SessionAccount = {
-	idToken: string;
-	accessToken: string;
-	refreshToken: string;
-	refreshTokenIat: number;
-};
 
 declare module 'express-session' {
 	interface SessionData {

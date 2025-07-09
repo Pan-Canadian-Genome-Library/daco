@@ -25,11 +25,14 @@ import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import { serverConfig } from '@/config/serverConfig.js';
+import ExternalAuthError from '@/external/AuthenticationError.ts';
 import * as oidcAuthClient from '@/external/oidcAuthNClient.ts';
+import * as pcglAuthZClient from '@/external/pcglAuthZClient.ts';
 import BaseLogger from '@/logger.js';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { getUserRole } from '@/service/authService.ts';
 import { resetSession } from '@/session/index.js';
+import { convertToSessionAccount, convertToSessionUser } from '@/utils/aliases.ts';
 
 const logger = BaseLogger.forModule(`authRouter`);
 
@@ -162,34 +165,46 @@ authRouter.get('/token', async (request, response) => {
 			throw new Error(tokenResponse.message);
 		}
 
-		const userDataResponse = await oidcAuthClient.getUserInfo(authConfig, tokenResponse.data.access_token);
+		const pcglAuthzResponse = await pcglAuthZClient.getUserInformation(authConfig, tokenResponse.data.access_token);
 
-		if (!userDataResponse.success) {
-			throw new Error(userDataResponse.message);
+		if (!pcglAuthzResponse.success) {
+			throw new ExternalAuthError(pcglAuthzResponse.error, pcglAuthzResponse.message);
 		}
 
-		// Update session with all user information retrieved from OIDC Provider
-		// TODO: can replace this object definition with a `toCamelCase` function
-		request.session.account = {
-			accessToken: tokenResponse.data.access_token,
-			idToken: tokenResponse.data.id_token,
-			refreshToken: tokenResponse.data.refresh_token,
-			refreshTokenIat: tokenResponse.data.refresh_token_iat,
-		};
-		request.session.user = {
-			userId: userDataResponse.data.sub,
-			familyName: userDataResponse.data.family_name,
-			givenName: userDataResponse.data.given_name,
-		};
+		const oidcDataResponse = await oidcAuthClient.getUserInfo(authConfig, tokenResponse.data.access_token);
+		if (!oidcDataResponse.success) {
+			throw new ExternalAuthError(oidcDataResponse.error, oidcDataResponse.message);
+		}
+
+		const userAccountAliasing = convertToSessionAccount(tokenResponse.data);
+		if (!userAccountAliasing.success) {
+			throw new Error(userAccountAliasing.message);
+		}
+
+		const sessionUserAliasing = convertToSessionUser(oidcDataResponse.data, pcglAuthzResponse.data);
+		if (!sessionUserAliasing.success) {
+			throw new Error(sessionUserAliasing.message);
+		}
+
+		request.session.account = userAccountAliasing.data;
+		request.session.user = sessionUserAliasing.data;
+
 		request.session.save();
 	} catch (error) {
-		logger.error(`Error thrown retrieving tokens from OIDC Provider`, error);
+		logger.error(`Error thrown while going through authentication and authorization flow.`, error);
 
 		// TODO: Redirect failed /token request to an error page.
 		// There should be communication to the user that an error occurred during the
 		//  login process. An error page, or error code in query parameter that can
 		//  trigger an error message are possible solutions.
-		response.redirect(urlJoin(serverConfig.UI_HOST, '/'));
+		const redirectURL = urlJoin(serverConfig.UI_HOST, authConfig.loginErrorPath);
+		const errorCode = error instanceof ExternalAuthError ? error.code : 'UNKNOWN';
+
+		const errorParams = new URLSearchParams({
+			code: errorCode,
+		});
+
+		response.redirect(`${redirectURL}/?${errorParams.toString()}`);
 		return;
 	}
 

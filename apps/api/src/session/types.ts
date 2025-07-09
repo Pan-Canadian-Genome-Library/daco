@@ -17,14 +17,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './localStorage/sessionExtras.js';
-export * from './modals/rejectApplicationModal.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './section/index.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { authZUserInfo } from '@/external/types.ts';
+import { z } from 'zod';
+
+export const sessionUser = z.object({
+	userId: z.string(),
+	sub: z.string(),
+	givenName: z.string().optional(),
+	familyName: z.string().optional(),
+	...authZUserInfo.pick({ emails: true }).shape,
+	studyAuthorizations: z
+		.object({
+			teamMember: z.array(z.string()).optional(),
+			studyCurator: z.array(z.string()).optional(),
+			dacAuthorizations: z
+				.array(
+					z.object({
+						studyId: z.string(),
+						startDate: z.string(),
+						endDate: z.string(),
+					}),
+				)
+				.optional(),
+		})
+		.optional(),
+	...authZUserInfo.pick({ groups: true }).shape,
+});
+
+export type SessionUser = z.infer<typeof sessionUser>;
+
+export const sessionAccount = z.object({
+	idToken: z.string(),
+	accessToken: z.string(),
+	refreshToken: z.string(),
+	refreshTokenIat: z.number().int(),
+});
+export type SessionAccount = z.infer<typeof sessionAccount>;

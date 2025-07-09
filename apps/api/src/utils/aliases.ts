@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
@@ -26,6 +27,7 @@ import {
 	type JoinedApplicationRecord,
 	type RevisionRequestModel,
 } from '@/service/types.js';
+import { SessionAccount, sessionAccount, sessionUser, SessionUser } from '@/session/types.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationResponseData,
@@ -45,6 +47,47 @@ import {
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
 import { failure, Result, success } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
+
+export const convertToSessionAccount = (data: OIDCTokenResponse): Result<SessionAccount, 'SYSTEM_ERROR'> => {
+	const aliasedTokenResponse = objectToCamel(data);
+	const validationResult = sessionAccount.safeParse(aliasedTokenResponse);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToSessionAccount: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
+
+export const convertToSessionUser = (
+	oidcData: OIDCUserInfoResponse,
+	pcglData: PCGLAuthZUserInfoResponse,
+): Result<SessionUser, 'SYSTEM_ERROR'> => {
+	const aliasedOIDCResponse = objectToCamel(oidcData);
+
+	const aliasedPCGLResponse = objectToCamel(pcglData);
+
+	const finalizedUserObject: SessionUser = {
+		sub: aliasedOIDCResponse.sub,
+		familyName: aliasedOIDCResponse.familyName,
+		givenName: aliasedOIDCResponse.givenName,
+		userId: aliasedPCGLResponse.pcglId,
+		emails: aliasedPCGLResponse.emails,
+		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
+		groups: aliasedPCGLResponse.groups,
+	};
+
+	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
+
+	const result = userAccountValidation.success
+		? success(userAccountValidation.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToSessionUser: \n${userAccountValidation.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
 
 /** Converts database Application Record into camelCase response record
  * @param data Joined Application Record - Snake case database Application / ApplicationContents record

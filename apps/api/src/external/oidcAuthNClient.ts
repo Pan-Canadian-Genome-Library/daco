@@ -19,11 +19,16 @@
 
 import axios from 'axios';
 import urlJoin from 'url-join';
-import { z as zod } from 'zod';
 
 import { type AuthConfig } from '@/config/authConfig.js';
 import BaseLogger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
+import {
+	OIDCTokenResponse,
+	oidcTokenResponseSchema,
+	OIDCUserInfoResponse,
+	oidcUserInfoResponseSchema,
+} from './types.ts';
 
 const logger = BaseLogger.forModule('oidcAuthClient');
 
@@ -45,14 +50,6 @@ export const getOidcAuthorizeUrl = (authConfig: AuthConfig, onSuccessRedirectUrl
  * OIDC Authorization Flow Step 2
  * Exchange the authorization code for user tokens.
  */
-const oidcTokenResponseSchema = zod.object({
-	access_token: zod.string(),
-	refresh_token: zod.string(),
-	refresh_token_iat: zod.number(),
-	id_token: zod.string(),
-});
-export type OIDCTokenResponse = zod.infer<typeof oidcTokenResponseSchema>;
-
 export const exchangeCodeForTokens = async (
 	authConfig: AuthConfig,
 	{ code, redirectUrl }: { code: string; redirectUrl: string },
@@ -80,14 +77,6 @@ export const exchangeCodeForTokens = async (
 	}
 };
 
-const oidcUserInfoResponseSchema = zod.object({
-	sub: zod.string(),
-	given_name: zod.string().optional(),
-	family_name: zod.string().optional(),
-	email: zod.string().optional(),
-});
-export type OIDCUserInfoResponse = zod.infer<typeof oidcUserInfoResponseSchema>;
-
 export const getUserInfo = async (
 	authConfig: AuthConfig,
 	accessToken: string,
@@ -105,7 +94,7 @@ export const getUserInfo = async (
 	} catch (error) {
 		// This could be an error for invalid access token, but there is no different error handling
 		// we'll just log the result and return a system error
-		logger.error(`Unexpected error occured fetching OIDC User Info.`, error);
+		logger.error(`Unexpected error occurred fetching OIDC User Info.`, error);
 		return failure('SYSTEM_ERROR', 'Unable to retrieve user info from OIDC Provider.');
 	}
 };

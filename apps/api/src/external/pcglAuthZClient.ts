@@ -17,31 +17,66 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { authConfig } from '@/config/authConfig.ts';
+import axios, { isAxiosError, type AxiosRequestConfig } from 'axios';
+
+import { type AuthConfig } from '@/config/authConfig.ts';
+import { serverConfig } from '@/config/serverConfig.ts';
 import logger from '@/logger.ts';
-import { failure, success } from '@/utils/results.ts';
-import { authZUserInfo } from '@pcgl-daco/validation';
-import axios from 'axios';
+import { AsyncResult, failure, success } from '@/utils/results.ts';
+import { authZUserInfo, type PCGLAuthZUserInfoResponse } from './types.ts';
 
-export const getUserInformation = async (accessToken: string) => {
-	if (!authConfig.enabled) {
-		return failure('AUTH_DISABLED', 'Authentication is disabled, authorization cannot continue.');
+const authZClient = async ({
+	authConfig,
+	endpointURL,
+	accessToken,
+}: {
+	authConfig: AuthConfig;
+	endpointURL: string;
+	accessToken?: string;
+}) => {
+	const defaultHeaders: AxiosRequestConfig = {
+		headers: {
+			Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
+			'User-Agent': `PCGL DACO Service / ${serverConfig.npm_package_version}`,
+		},
+	};
+	return await axios.get(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, defaultHeaders);
+};
+
+export const getUserInformation = async (
+	authConfig: AuthConfig,
+	accessToken: string,
+): AsyncResult<PCGLAuthZUserInfoResponse, 'SYSTEM_ERROR' | 'FORBIDDEN' | 'NOT_FOUND'> => {
+	try {
+		const request = await authZClient({ authConfig, endpointURL: '/user/me', accessToken });
+		const validatedAuthZData = authZUserInfo.safeParse(request.data);
+
+		if (!validatedAuthZData.success) {
+			logger.error(`PCGL AuthZ service returned unexpected, or malformed data. ${validatedAuthZData.error}`);
+			return failure('SYSTEM_ERROR', 'Unable to retrieve user information from the PCGL AuthZ service.');
+		}
+
+		return success(validatedAuthZData.data);
+	} catch (error) {
+		if (!isAxiosError(error)) {
+			logger.error(`Unexpected error while getting user info from the AuthZ service.`, error);
+			return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
+		}
+
+		switch (error.status) {
+			case 401:
+			case 403:
+				return failure('FORBIDDEN', 'Access token is invalid, it may be expired.');
+			case 404:
+				return failure(
+					'NOT_FOUND',
+					'User does not exist within PCGL. They are not yet authorized to access the PCGL service.',
+				);
+			default:
+				logger.error(
+					`PCGL Authorization service returned an unexpected response.\n\t${error.response?.status} - ${error.response?.data}`,
+				);
+				return failure('SYSTEM_ERROR', 'Error contacting the PCGL Authorization Service.');
+		}
 	}
-
-	const request = await axios.get(`${authConfig.AUTHZ_ENDPOINT}/users/me`, {
-		headers: { Authorization: `Bearer ${accessToken}` },
-	});
-
-	if (request.status !== 200) {
-		return failure('BAD_TOKEN', 'Access token is invalid, expired?');
-	}
-
-	const validatedAuthZData = authZUserInfo.safeParse(request.data);
-
-	if (!validatedAuthZData.success) {
-		logger.error(`PCGL AuthZ service returned unexpected, or malformed data. ${validatedAuthZData.error}`);
-		return failure('SYSTEM_ERROR', 'Unable to retrieve user information from the PCGL AuthZ service.');
-	}
-
-	return success(validatedAuthZData.data);
 };
