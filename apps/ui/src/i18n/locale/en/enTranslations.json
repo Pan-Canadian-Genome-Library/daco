@@ -2,6 +2,26 @@
 	"global": {
 		"login": {
 			"loggingIn": "Logging you in..."
+		},
+		"loginError": {
+			"title": "Unable to Login.",
+			"descriptions": {
+				"NOT_FOUND": {
+					"subheading": "Account is not associated within the PCGL project.",
+					"description": "Looks like your account is currently not associated within the PCGL project and therefore cannot access the PCGL DACO Service. This may be due to the fact that you haven't completed the onboarding process for new accounts, or have logged in within an account not previously used. Please check and try again."
+				},
+				"SYSTEM_ERROR": {
+					"subheading": "Looks like we ran into a little hiccup while completing the login process.",
+					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
+				},
+				"FORBIDDEN": {
+					"subheading": "Looks like your browser used a stale session to attempt to login to the DCAO.",
+					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
+				}
+			},
+			"buttons": {
+				"home": "Go to Homepage"
+			}
 		}
 	},
 	"homepage": {

@@ -141,8 +141,10 @@ authRouter.get('/logout', async (request, response) => {
  *   - Institutional Rep: ?
  *   - DAC Member: /manage/applications
  *
- * If Authorization fails, the response should be a redirection to an error page. This
- * page does not currently exist so we instead redirect to the homepage.
+ * If Authentication or Authorization fails, we redirect to: /login/error with an
+ * errorCode associated from failure. This error code is then used to generate error
+ * messages on the frontend with clarification on why the auth process failed & what
+ * the user can do about it.
  */
 authRouter.get('/token', async (request, response) => {
 	if (!authConfig.enabled) {
@@ -161,12 +163,12 @@ authRouter.get('/token', async (request, response) => {
 			code,
 			redirectUrl: getOauthRedirectUri(serverConfig.UI_HOST),
 		});
+
 		if (!tokenResponse.success) {
-			throw new Error(tokenResponse.message);
+			throw new ExternalAuthError(tokenResponse.error, tokenResponse.message);
 		}
 
 		const pcglAuthzResponse = await pcglAuthZClient.getUserInformation(authConfig, tokenResponse.data.access_token);
-
 		if (!pcglAuthzResponse.success) {
 			throw new ExternalAuthError(pcglAuthzResponse.error, pcglAuthzResponse.message);
 		}
@@ -191,14 +193,10 @@ authRouter.get('/token', async (request, response) => {
 
 		request.session.save();
 	} catch (error) {
-		logger.error(`Error thrown while going through authentication and authorization flow.`, error);
+		logger.error(`Error thrown while going through authentication and authorization flow: `, error);
 
-		// TODO: Redirect failed /token request to an error page.
-		// There should be communication to the user that an error occurred during the
-		//  login process. An error page, or error code in query parameter that can
-		//  trigger an error message are possible solutions.
 		const redirectURL = urlJoin(serverConfig.UI_HOST, authConfig.loginErrorPath);
-		const errorCode = error instanceof ExternalAuthError ? error.code : 'UNKNOWN';
+		const errorCode = error instanceof ExternalAuthError ? error.code : 'SYSTEM_ERROR';
 
 		const errorParams = new URLSearchParams({
 			code: errorCode,
