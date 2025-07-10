@@ -19,6 +19,8 @@
 
 import { Navigate, Route, Routes } from 'react-router';
 
+import { SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
+
 import PageLayout from '@/components/layouts/PageLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ApplicationViewer from '@/pages/applications';
@@ -40,7 +42,6 @@ import ManageApplicationsPage from '@/pages/manage/applications';
 import NotFound from '@/pages/NotFound';
 import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
-import { SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 
 export interface ApplicationSectionRouteTypes {
 	route: SectionRoutesValues;
