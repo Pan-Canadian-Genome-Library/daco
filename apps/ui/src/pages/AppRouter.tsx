@@ -34,13 +34,13 @@ import RequestedStudy from '@/pages/applications/sections/requestedStudy';
 import SignAndSubmit from '@/pages/applications/sections/sign';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
+import LoginError from '@/pages/login/error';
 import LoginRedirect from '@/pages/login/redirect';
 import ManageApplicationsPage from '@/pages/manage/applications';
 import NotFound from '@/pages/NotFound';
 import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
 import { SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
-import LoginError from './login/error';
 
 export interface ApplicationSectionRouteTypes {
 	route: SectionRoutesValues;
