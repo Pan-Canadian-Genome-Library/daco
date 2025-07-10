@@ -36,26 +36,33 @@ export const oidcUserInfoResponseSchema = z.object({
 export type OIDCUserInfoResponse = z.infer<typeof oidcUserInfoResponseSchema>;
 
 export const authZUserInfo = z.object({
-	emails: z.array(
-		z.object({
-			address: z.string().email(),
-			type: z.literal('official').or(z.literal('delivery').or(z.literal('forwarding').or(z.literal('personal')))),
-		}),
-	),
-	pcgl_id: z.string(),
-	study_authorizations: z.object({
-		team_member: z.array(z.string()).optional(),
-		study_curator: z.array(z.string()).optional(),
-		dac_authorizations: z
-			.array(
-				z.object({
-					study_id: z.string(),
-					start_date: z.string(),
-					end_date: z.string(),
-				}),
-			)
-			.optional(),
+	userinfo: z.object({
+		emails: z.array(
+			z.object({
+				address: z.string().email(),
+				type: z
+					.literal('official')
+					.or(z.literal('delivery').or(z.literal('forwarding').or(z.literal('personal'))))
+					.optional(),
+			}),
+		),
+		pcgl_id: z.string(),
+		site_admin: z.boolean(),
+		site_curator: z.boolean(),
 	}),
+	study_authorizations: z.object({
+		editable_studies: z.array(z.string()).optional(),
+		readable_studies: z.array(z.string()).optional(),
+	}),
+	dac_authorizations: z.array(
+		z
+			.object({
+				study_id: z.string(),
+				start_date: z.string(),
+				end_date: z.string(),
+			})
+			.optional(),
+	),
 	groups: z
 		.array(
 			z.object({

@@ -25,25 +25,28 @@ export const sessionUser = z.object({
 	sub: z.string(),
 	givenName: z.string().optional(),
 	familyName: z.string().optional(),
-	...authZUserInfo.pick({ emails: true }).shape,
-	studyAuthorizations: z
-		.object({
-			teamMember: z.array(z.string()).optional(),
-			studyCurator: z.array(z.string()).optional(),
-			dacAuthorizations: z
-				.array(
-					z.object({
-						studyId: z.string(),
-						startDate: z.string(),
-						endDate: z.string(),
-					}),
-				)
-				.optional(),
-		})
-		.optional(),
-	...authZUserInfo.pick({ groups: true }).shape,
+	emails: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ emails: true }).shape.emails,
+	siteAdmin: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_admin: true }).shape.site_admin,
+	siteCurator: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_curator: true }).shape.site_curator,
+	studyAuthorizations: z.object({
+		editableStudies: authZUserInfo
+			.pick({ study_authorizations: true })
+			.shape.study_authorizations.pick({ editable_studies: true }).shape.editable_studies,
+		readableStudies: authZUserInfo
+			.pick({ study_authorizations: true })
+			.shape.study_authorizations.pick({ readable_studies: true }).shape.readable_studies,
+	}),
+	dacAuthorizations: z.array(
+		z
+			.object({
+				studyId: z.string(),
+				startDate: z.string(),
+				endDate: z.string(),
+			})
+			.optional(),
+	),
+	groups: authZUserInfo.pick({ groups: true }).shape.groups,
 });
-
 export type SessionUser = z.infer<typeof sessionUser>;
 
 export const sessionAccount = z.object({

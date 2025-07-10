@@ -70,11 +70,14 @@ export const convertToSessionUser = (
 
 	const finalizedUserObject: SessionUser = {
 		sub: aliasedOIDCResponse.sub,
-		familyName: aliasedOIDCResponse.familyName,
+		userId: aliasedPCGLResponse.userinfo.pcglId,
+		emails: aliasedPCGLResponse.userinfo.emails,
 		givenName: aliasedOIDCResponse.givenName,
-		userId: aliasedPCGLResponse.pcglId,
-		emails: aliasedPCGLResponse.emails,
+		familyName: aliasedOIDCResponse.familyName,
+		siteAdmin: aliasedPCGLResponse.userinfo.siteAdmin,
+		siteCurator: aliasedPCGLResponse.userinfo.siteCurator,
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
+		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedPCGLResponse.groups,
 	};
 
