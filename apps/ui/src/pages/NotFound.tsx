@@ -20,7 +20,7 @@ import { Button, Flex, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
-import { errorStyles, errorStylesCondensed } from '@/components/pages/ErrorPage';
+import { errorStyles, errorStylesCondensed } from '@/components/pages/global/ErrorPage';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Content } = Layout;

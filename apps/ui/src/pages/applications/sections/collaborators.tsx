@@ -31,7 +31,7 @@ import EditCollaboratorModal from '@/components/pages/application/modals/EditCol
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
-import ErrorPage from '@/components/pages/ErrorPage';
+import ErrorPage from '@/components/pages/global/ErrorPage';
 import { ApplicationOutletContext } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { type CollaboratorsResponseDTO } from '@pcgl-daco/data-model';

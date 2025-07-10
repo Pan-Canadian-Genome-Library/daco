@@ -24,12 +24,15 @@ import urlJoin from 'url-join';
 import { type UserResponse } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
+import { serverConfig } from '@/config/serverConfig.js';
+import ExternalAuthError from '@/external/AuthenticationError.ts';
+import * as oidcAuthClient from '@/external/oidcAuthNClient.ts';
+import * as pcglAuthZClient from '@/external/pcglAuthZClient.ts';
 import BaseLogger from '@/logger.js';
+import { type ResponseWithData } from '@/routes/types.ts';
 import { getUserRole } from '@/service/authService.ts';
-import { serverConfig } from '../config/serverConfig.js';
-import * as oidcAuthClient from '../external/oidcAuthClient.ts';
-import { resetSession } from '../session/index.js';
-import { type ResponseWithData } from './types.js';
+import { resetSession } from '@/session/index.js';
+import { convertToSessionAccount, convertToSessionUser } from '@/utils/aliases.ts';
 
 const logger = BaseLogger.forModule(`authRouter`);
 
@@ -138,8 +141,10 @@ authRouter.get('/logout', async (request, response) => {
  *   - Institutional Rep: ?
  *   - DAC Member: /manage/applications
  *
- * If Authorization fails, the response should be a redirection to an error page. This
- * page does not currently exist so we instead redirect to the homepage.
+ * If Authentication or Authorization fails, we redirect to: /login/error with an
+ * errorCode associated from failure. This error code is then used to generate error
+ * messages on the frontend with clarification on why the auth process failed & what
+ * the user can do about it.
  */
 authRouter.get('/token', async (request, response) => {
 	if (!authConfig.enabled) {
@@ -158,38 +163,46 @@ authRouter.get('/token', async (request, response) => {
 			code,
 			redirectUrl: getOauthRedirectUri(serverConfig.UI_HOST),
 		});
+
 		if (!tokenResponse.success) {
-			throw new Error(tokenResponse.message);
+			throw new ExternalAuthError(tokenResponse.error, tokenResponse.message);
 		}
 
-		const userDataResponse = await oidcAuthClient.getUserInfo(authConfig, tokenResponse.data.access_token);
-
-		if (!userDataResponse.success) {
-			throw new Error(userDataResponse.message);
+		const pcglAuthzResponse = await pcglAuthZClient.getUserInformation(authConfig, tokenResponse.data.access_token);
+		if (!pcglAuthzResponse.success) {
+			throw new ExternalAuthError(pcglAuthzResponse.error, pcglAuthzResponse.message);
 		}
 
-		// Update session with all user information retrieved from OIDC Provider
-		// TODO: can replace this object definition with a `toCamelCase` function
-		request.session.account = {
-			accessToken: tokenResponse.data.access_token,
-			idToken: tokenResponse.data.id_token,
-			refreshToken: tokenResponse.data.refresh_token,
-			refreshTokenIat: tokenResponse.data.refresh_token_iat,
-		};
-		request.session.user = {
-			userId: userDataResponse.data.sub,
-			familyName: userDataResponse.data.family_name,
-			givenName: userDataResponse.data.given_name,
-		};
+		const oidcDataResponse = await oidcAuthClient.getUserInfo(authConfig, tokenResponse.data.access_token);
+		if (!oidcDataResponse.success) {
+			throw new ExternalAuthError(oidcDataResponse.error, oidcDataResponse.message);
+		}
+
+		const userAccountAliasing = convertToSessionAccount(tokenResponse.data);
+		if (!userAccountAliasing.success) {
+			throw new Error(userAccountAliasing.message);
+		}
+
+		const sessionUserAliasing = convertToSessionUser(oidcDataResponse.data, pcglAuthzResponse.data);
+		if (!sessionUserAliasing.success) {
+			throw new Error(sessionUserAliasing.message);
+		}
+
+		request.session.account = userAccountAliasing.data;
+		request.session.user = sessionUserAliasing.data;
+
 		request.session.save();
 	} catch (error) {
-		logger.error(`Error thrown retrieving tokens from OIDC Provider`, error);
+		logger.error(`Error thrown while going through authentication and authorization flow: `, error);
 
-		// TODO: Redirect failed /token request to an error page.
-		// There should be communication to the user that an error occurred during the
-		//  login process. An error page, or error code in query parameter that can
-		//  trigger an error message are possible solutions.
-		response.redirect(urlJoin(serverConfig.UI_HOST, '/'));
+		const redirectURL = urlJoin(serverConfig.UI_HOST, authConfig.loginErrorPath);
+		const errorCode = error instanceof ExternalAuthError ? error.code : 'SYSTEM_ERROR';
+
+		const errorParams = new URLSearchParams({
+			code: errorCode,
+		});
+
+		response.redirect(`${redirectURL}/?${errorParams.toString()}`);
 		return;
 	}
 
