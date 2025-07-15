@@ -905,7 +905,7 @@ applicationRouter.post(
 // Endpoint for reps to request revisions
 applicationRouter.post(
 	'/:applicationId/rep/request-revisions',
-	authMiddleware({ requiredRoles: ['INSTITUTIONAL_REP'] }),
+	authMiddleware({}),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -916,7 +916,7 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<
 					ApplicationDTO,
-					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION']
+					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION', 'FORBIDDEN']
 				>,
 			) => {
 				try {
@@ -948,6 +948,15 @@ applicationRouter.post(
 					};
 
 					// TODO: Check that the institutional rep is the correct rep for this application
+					const result = await isAssociatedRep(request.session, applicationId);
+
+					if (!result) {
+						response.status(403).json({
+							error: 'FORBIDDEN',
+							message: 'You do not have permission to request revisions for this resource',
+						});
+						return;
+					}
 
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
