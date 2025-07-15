@@ -39,9 +39,6 @@ export function getUserRole(session: Partial<SessionData>): UserRole {
 
 /**
  * Based on user data stored in session data, determine the user's role & if the application is associated with them.
- * TODO: Use actual permissions stored in session to determine user role
- *
- * This is temporarily returning `true` for all applications.
  */
 export async function isAssociatedRep(session: Partial<SessionData>, applicationId: number): Promise<Boolean> {
 	const database = getDbInstance();
