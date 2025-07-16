@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
@@ -27,7 +26,6 @@ import {
 	type JoinedApplicationRecord,
 	type RevisionRequestModel,
 } from '@/service/types.js';
-import { SessionAccount, sessionAccount, sessionUser, SessionUser } from '@/session/types.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationResponseData,
@@ -40,7 +38,14 @@ import {
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
 	fileResponseSchema,
+	OIDCTokenResponse,
+	OIDCUserInfoResponse,
+	PCGLAuthZUserInfoResponse,
 	revisionDataResponseSchema,
+	SessionAccount,
+	sessionAccount,
+	sessionUser,
+	SessionUser,
 	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';

@@ -28,7 +28,7 @@ import {
 	oidcTokenResponseSchema,
 	OIDCUserInfoResponse,
 	oidcUserInfoResponseSchema,
-} from './types.ts';
+} from '@pcgl-daco/validation';
 
 const logger = BaseLogger.forModule('oidcAuthClient');
 

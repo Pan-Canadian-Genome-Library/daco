@@ -23,7 +23,7 @@ import { type AuthConfig } from '@/config/authConfig.ts';
 import { serverConfig } from '@/config/serverConfig.ts';
 import logger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
-import { authZUserInfo, type PCGLAuthZUserInfoResponse } from './types.ts';
+import { authZUserInfo, type PCGLAuthZUserInfoResponse } from '@pcgl-daco/validation';
 
 const authZClient = async ({
 	authConfig,
