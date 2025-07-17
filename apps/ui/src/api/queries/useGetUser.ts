@@ -25,7 +25,7 @@ import { ServerError } from '@/global/types';
 import type { SessionUser, UserRole } from '@pcgl-daco/validation';
 
 const useGetUser = () => {
-	return useQuery<SessionUser & { role: UserRole }, ServerError>({
+	return useQuery<{ user: SessionUser; role: UserRole }, ServerError>({
 		queryKey: ['user'],
 		queryFn: async () => {
 			const response = await fetch(`/auth/user`).then(withErrorResponseHandler);

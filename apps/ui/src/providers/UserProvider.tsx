@@ -46,7 +46,7 @@ export function UserProvider({ children }: PropsWithChildren) {
 	};
 
 	const userState: UserState & { role: UserRole } = {
-		user: data,
+		user: data?.user,
 		role: data?.role ?? 'ANONYMOUS',
 		isLoading,
 		isLoggedIn: !isLoading || data ? data?.role !== 'ANONYMOUS' : true,
