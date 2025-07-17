@@ -22,11 +22,11 @@ import urlJoin from 'url-join';
 
 import { type AuthConfig } from '@/config/authConfig.js';
 import BaseLogger from '@/logger.js';
-import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { type AsyncResult, failure, success } from '@/utils/results.js';
 import {
-	OIDCTokenResponse,
+	type OIDCTokenResponse,
 	oidcTokenResponseSchema,
-	OIDCUserInfoResponse,
+	type OIDCUserInfoResponse,
 	oidcUserInfoResponseSchema,
 } from './types.ts';
 

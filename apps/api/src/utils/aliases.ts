@@ -27,7 +27,7 @@ import {
 	type JoinedApplicationRecord,
 	type RevisionRequestModel,
 } from '@/service/types.js';
-import { SessionAccount, sessionAccount, sessionUser, SessionUser } from '@/session/types.ts';
+import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/types.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationResponseData,
