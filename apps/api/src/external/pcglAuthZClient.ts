@@ -23,24 +23,42 @@ import { type AuthConfig } from '@/config/authConfig.ts';
 import { serverConfig } from '@/config/serverConfig.ts';
 import logger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
-import { authZUserInfo, type PCGLAuthZUserInfoResponse } from '@pcgl-daco/validation';
+import { authZUserInfo, type PCGLAuthZUserInfoResponse } from './types.ts';
 
 const authZClient = async ({
 	authConfig,
+	httpMethod = 'GET',
 	endpointURL,
 	accessToken,
+	body,
 }: {
 	authConfig: AuthConfig;
+	httpMethod?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 	endpointURL: string;
 	accessToken?: string;
+	body?: any;
 }) => {
-	const defaultHeaders: AxiosRequestConfig = {
+	const axiosOptions: AxiosRequestConfig = {
 		headers: {
 			Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
 			'User-Agent': `PCGL DACO Service / ${serverConfig.npm_package_version}`,
+			'Content-Type': `application/json`,
 		},
+		data: body ? body : undefined,
 	};
-	return await axios.get(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, defaultHeaders);
+
+	switch (httpMethod) {
+		case 'GET':
+			return await axios.get(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
+		case 'POST':
+			return await axios.post(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
+		case 'DELETE':
+			return await axios.delete(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
+		case 'PATCH':
+			return await axios.patch(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
+		case 'PUT':
+			return await axios.put(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
+	}
 };
 
 export const getUserInformation = async (

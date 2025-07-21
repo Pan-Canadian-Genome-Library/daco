@@ -8,7 +8,7 @@
 			"descriptions": {
 				"NOT_FOUND": {
 					"subheading": "Account is not associated within the PCGL project.",
-					"description": "Looks like your account is currently not associated within the PCGL project and therefore cannot access the PCGL DACO Service. This may be due to the fact that you haven't completed the onboarding process for new accounts, or have logged in within an account not previously used. Please check and try again."
+					"description": "Looks like your account is currently not associated within the PCGL project and therefore cannot access the PCGL DACO Service. This may be due to the fact that you haven't completed the onboarding process for new accounts, or have logged in with an account not previously used to access the service."
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Looks like we ran into a little hiccup while completing the login process.",
