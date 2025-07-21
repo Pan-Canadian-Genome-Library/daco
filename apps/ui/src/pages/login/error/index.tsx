@@ -38,7 +38,7 @@ const LoginError = () => {
 	const code = searchParams.get('code');
 
 	const buttonContainerStyles: React.CSSProperties = {
-		margin: isLowResDevice ? '2rem 0' : '1.5rem 0',
+		margin: isLowResDevice ? '2rem 0' : '3rem 0',
 	};
 
 	return (
@@ -59,11 +59,11 @@ const LoginError = () => {
 						])}
 					</Text>
 				</Flex>
-				<div style={{ ...buttonContainerStyles }}>
+				<Flex style={{ ...buttonContainerStyles }}>
 					<Button href="/" type="primary">
 						{translate('global.loginError.buttons.home')}
 					</Button>
-				</div>
+				</Flex>
 			</Flex>
 		</Content>
 	);

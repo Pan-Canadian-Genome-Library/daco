@@ -36,7 +36,7 @@ export function getUserRole(session: Partial<SessionData>): UserRole {
 		return userRoleSchema.Values.ANONYMOUS;
 	}
 
-	const isDacMember = user?.groups?.some((group) => group.name === authConfig.AUTH_GROUP_DACO);
+	const isDacMember = user?.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DACO);
 
 	return isDacMember ? userRoleSchema.Values.DAC_MEMBER : userRoleSchema.Values.APPLICANT;
 }

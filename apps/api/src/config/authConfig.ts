@@ -35,7 +35,7 @@ const authConfigSchema = z.object({
 	AUTH_PROVIDER_HOST: z.string().url(),
 	AUTH_CLIENT_ID: z.string(),
 	AUTH_CLIENT_SECRET: z.string(),
-	AUTH_GROUP_DACO: z.string(),
+	AUTHZ_GROUP_DACO: z.string(),
 });
 
 const parseResult = authConfigSchema.safeParse(process.env);
