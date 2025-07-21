@@ -16,21 +16,15 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+class ExternalAuthError extends Error {
+	code: string;
 
-import type { SessionAccount, SessionUser } from '@/session/types.ts';
-import { type Request } from 'express';
-
-export { default as sessionMiddleware } from './sessionMiddleware.js';
-
-declare module 'express-session' {
-	interface SessionData {
-		user: SessionUser;
-		account: SessionAccount;
+	constructor(code: string, message: string) {
+		super(message);
+		this.code = code;
+		this.name = 'ExternalAuthError';
+		Object.setPrototypeOf(this, ExternalAuthError.prototype);
 	}
 }
 
-export function resetSession(session: Request['session']) {
-	session.user = undefined;
-	session.account = undefined;
-	session.save();
-}
+export default ExternalAuthError;

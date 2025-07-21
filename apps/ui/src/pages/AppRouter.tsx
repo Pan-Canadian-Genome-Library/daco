@@ -19,8 +19,9 @@
 
 import { Navigate, Route, Routes } from 'react-router';
 
+import { SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
+
 import PageLayout from '@/components/layouts/PageLayout';
-import NotFound from '@/components/pages/NotFound';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ApplicationViewer from '@/pages/applications';
 import AccessAgreement from '@/pages/applications/sections/access';
@@ -35,11 +36,12 @@ import RequestedStudy from '@/pages/applications/sections/requestedStudy';
 import SignAndSubmit from '@/pages/applications/sections/sign';
 import DashboardPage from '@/pages/dashboard';
 import HomePage from '@/pages/index';
+import LoginError from '@/pages/login/error';
 import LoginRedirect from '@/pages/login/redirect';
 import ManageApplicationsPage from '@/pages/manage/applications';
+import NotFound from '@/pages/NotFound';
 import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
-import { SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 
 export interface ApplicationSectionRouteTypes {
 	route: SectionRoutesValues;
@@ -105,6 +107,7 @@ function AppRouter() {
 		<Routes>
 			<Route element={<PageLayout />}>
 				<Route path="login/redirect" element={<LoginRedirect />} />
+				<Route path="login/error/*" element={<LoginError />} />
 
 				<Route index element={<HomePage />} />
 				<Route
