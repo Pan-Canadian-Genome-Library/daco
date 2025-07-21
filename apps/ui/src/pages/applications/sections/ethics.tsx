@@ -135,6 +135,7 @@ const Ethics = () => {
 			dispatch({
 				type: 'UPDATE_APPLICATION',
 				payload: {
+					...state,
 					fields: {
 						...state.fields,
 						ethicsLetter: info.file.response.id,
@@ -175,6 +176,7 @@ const Ethics = () => {
 								dispatch({
 									type: 'UPDATE_APPLICATION',
 									payload: {
+										...state,
 										fields: {
 											...state.fields,
 											ethicsReviewRequired: ethicsReviewReq,

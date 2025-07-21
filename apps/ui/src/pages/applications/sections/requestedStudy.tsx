@@ -80,6 +80,7 @@ const RequestedStudy = () => {
 		dispatch({
 			type: 'UPDATE_APPLICATION',
 			payload: {
+				...state,
 				fields: {
 					...state.fields,
 					requestedStudies,
