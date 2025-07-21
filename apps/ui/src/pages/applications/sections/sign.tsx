@@ -35,18 +35,18 @@ import { useApplicationContext } from '@/providers/context/application/Applicati
 const SignAndSubmit = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const {
-		state: { fields },
+		state: { fields, applicationState },
 	} = useApplicationContext();
-	const { isEditMode, appId, state } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const navigation = useNavigate();
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
-		if (!ValidateAllSections(fields) && state === 'DRAFT') {
+		if (!ValidateAllSections(fields) && applicationState === 'DRAFT') {
 			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
 		}
-	}, [appId, fields, isEditMode, navigation, state]);
+	}, [appId, fields, isEditMode, navigation, applicationState]);
 
 	return (
 		<>

@@ -38,9 +38,9 @@ export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: createSignature } = useCreateSignature();
 	const {
-		state: { applicationUserRole: role },
+		state: { applicationUserRole: role, applicationState },
 	} = useApplicationContext();
-	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, appId, revisions } = useOutletContext<ApplicationOutletContext>();
 	const form = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),
 	});
@@ -50,7 +50,7 @@ export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 		revisions,
 		isEditMode,
 		role,
-		state,
+		state: applicationState,
 		signatures: signatureData,
 	});
 

@@ -59,7 +59,6 @@ export interface ApplicationOutletContext {
 	appId: string | number;
 	isEditMode: boolean;
 	revisions: Partial<SectionRevision>;
-	state: ApplicationStateValues;
 	userRole: UserRole;
 }
 

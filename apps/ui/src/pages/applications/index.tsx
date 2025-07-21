@@ -119,7 +119,6 @@ const ApplicationViewer = () => {
 											appId: applicationData.id,
 											isEditMode,
 											revisions: applicationUserRole === userRoleSchema.Values.APPLICANT ? revisionsData : {}, // Only APPLICANTS should have the revisions logic
-											state: applicationData.state,
 										}}
 									/>
 								</Col>
