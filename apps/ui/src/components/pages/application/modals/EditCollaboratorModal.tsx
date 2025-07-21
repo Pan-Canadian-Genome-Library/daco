@@ -67,7 +67,6 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 	}, [rowData, reset]);
 
 	const onSubmit: SubmitHandler<CollaboratorsSchemaType> = (data) => {
-		console.log(rowData);
 		if (rowData?.collaboratorInstitutionalEmail) {
 			editCollaborator({
 				applicationId: appId,
