@@ -58,7 +58,7 @@ const DraftLogic = ({
 		return <LockOutlined />;
 	} else if (label === SectionRoutes.INTRO) {
 		// do not display intro icon
-		return <CheckCircleOutlined />;
+		return;
 	} else if (label === SectionRoutes.COLLABORATORS && isEditMode) {
 		// If has collaborators, show checkmark otherwise return null
 		return hasCollaborators ? <CheckCircleOutlined /> : null;
