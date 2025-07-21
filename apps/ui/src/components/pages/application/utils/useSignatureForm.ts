@@ -20,7 +20,7 @@
 import useCreateSignature from '@/api/mutations/useCreateSignature';
 import { ApplicationOutletContext } from '@/global/types';
 import { canSignSection } from '@/pages/applications/utils/canSignSection';
-import { useUserContext } from '@/providers/UserProvider';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { esignatureSchema, eSignatureSchemaType } from '@pcgl-daco/validation';
@@ -37,7 +37,9 @@ type SignatureProps = {
 export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: createSignature } = useCreateSignature();
-	const { role } = useUserContext();
+	const {
+		state: { applicationUserRole: role },
+	} = useApplicationContext();
 	const { isEditMode, appId, revisions, state } = useOutletContext<ApplicationOutletContext>();
 	const form = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),

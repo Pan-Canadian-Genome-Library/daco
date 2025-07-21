@@ -25,6 +25,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const initialState: ApplicationFormState = {
 	applicationState: ApplicationStates.DRAFT,
+	applicationUserRole: 'ANONYMOUS',
 	fields: {},
 	formState: {
 		isFormCompleted: false,

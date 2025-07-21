@@ -20,14 +20,17 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { withErrorResponseHandler } from '@/api/apiUtils';
+import { isRepUser } from '@/components/pages/application/utils/utils';
 import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useUserContext } from '@/providers/UserProvider';
 import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplication = (id?: string | number) => {
 	const { state, dispatch } = useApplicationContext();
+	const { role, user } = useUserContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [`application-${id}`],
@@ -46,7 +49,17 @@ const useGetApplication = (id?: string | number) => {
 						return acc;
 					}, {} as Partial<ApplicationContentsResponse>);
 
-					dispatch({ type: 'UPDATE_APPLICATION', payload: { ...state, applicationState: data.state, fields } });
+					dispatch({
+						type: 'UPDATE_APPLICATION',
+						payload: {
+							...state,
+							// INSTITUTIONAL_REP role is specific to Application page only,
+							// since reps are determined by email comparison, we can check it here
+							applicationUserRole: isRepUser(fields.institutionalRepEmail, user) ? 'INSTITUTIONAL_REP' : role,
+							applicationState: data.state,
+							fields,
+						},
+					});
 				}
 				return data;
 			});
