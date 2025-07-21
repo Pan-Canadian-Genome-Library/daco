@@ -41,8 +41,9 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 	const navigate = useNavigate();
 	const { id } = useParams();
 	const { state } = useApplicationContext();
-	const { appId, state: appLifecycleStep, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { appId, revisions } = useOutletContext<ApplicationOutletContext>();
 	const { mutate: editApplication } = useEditApplication();
+	const appLifecycleStep = state.applicationState;
 	const shouldNavigateToEditMode = appLifecycleStep === 'DRAFT' && isEditMode;
 	const showSignAndSubmit =
 		appLifecycleStep !== 'DRAFT' &&
