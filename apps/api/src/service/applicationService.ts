@@ -267,12 +267,14 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort = [],
 		page = 0,
 		pageSize = 20,
+		applicantView = false,
 	}: {
 		user_id?: string;
 		state?: ApplicationStateValues[];
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
+		applicantView?: boolean;
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			/**
@@ -332,13 +334,27 @@ const applicationSvc = (db: PostgresDb) => ({
 			 * 		- Keeping in mind that if it includes JUST DAC_REVIEW, then we skip
 			 * 		 since the sorting will already be handled by drizzle in this case.
 			 */
-			if (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW))) {
+			if (!applicantView && (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW)))) {
 				const reviewApplications = returnableApplications.filter(
 					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
 				);
 
 				const nonReviewApplications = returnableApplications.filter(
 					(applications) => applications.state !== ApplicationStates.DAC_REVIEW,
+				);
+
+				returnableApplications = [...reviewApplications, ...nonReviewApplications];
+			} else {
+				const reviewApplications = returnableApplications.filter(
+					(applications) =>
+						applications.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
+						applications.state === ApplicationStates.DAC_REVISIONS_REQUESTED,
+				);
+
+				const nonReviewApplications = returnableApplications.filter(
+					(applications) =>
+						applications.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW &&
+						applications.state !== ApplicationStates.DAC_REVISIONS_REQUESTED,
 				);
 
 				returnableApplications = [...reviewApplications, ...nonReviewApplications];

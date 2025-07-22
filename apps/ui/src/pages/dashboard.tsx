@@ -43,10 +43,6 @@ const DashboardPage = () => {
 	const { data: applicationData, error } = useGetApplicationList({
 		sort: [
 			{
-				column: 'state',
-				direction: 'desc',
-			},
-			{
 				column: 'created_at',
 				direction: 'desc',
 			},
