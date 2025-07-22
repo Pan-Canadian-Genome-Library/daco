@@ -326,7 +326,9 @@ const applicationSvc = (db: PostgresDb) => ({
 			let returnableApplications = rawApplicationRecord;
 
 			/**
-			 * Sort DAC_REVIEW records to the top to display on the front end, however...
+			 *
+			 * If Applicant view is true, records with revisions will be pushed to the top.
+			 * if applicant view is false, Sort DAC_REVIEW records to the top to display on the front end, however...
 			 *
 			 * We only want to sort DAC_REVIEW records to the top if:
 			 * 	- The user hasn't sorted by any filter
