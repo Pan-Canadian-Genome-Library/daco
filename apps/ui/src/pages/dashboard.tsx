@@ -48,6 +48,7 @@ const DashboardPage = () => {
 			},
 		],
 		pageSize: 100,
+		applicantView: true,
 	});
 
 	return (
