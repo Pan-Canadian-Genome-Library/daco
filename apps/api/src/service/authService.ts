@@ -56,9 +56,9 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 		return false;
 	}
 
-	const repEmail = app.data.contents?.institutional_rep_email?.toLocaleLowerCase();
+	const repEmail = app.data.contents?.institutional_rep_email?.toLocaleLowerCase().trim();
 
-	if (user?.emails.some((val) => val.address.toLocaleLowerCase() === repEmail)) {
+	if (user?.emails.some((val) => val.address.toLocaleLowerCase().trim() === repEmail)) {
 		return true;
 	}
 
