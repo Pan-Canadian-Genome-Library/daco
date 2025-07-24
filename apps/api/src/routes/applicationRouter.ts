@@ -905,7 +905,7 @@ applicationRouter.post(
 // Endpoint for reps to request revisions
 applicationRouter.post(
 	'/:applicationId/rep/request-revisions',
-	authMiddleware({}),
+	authMiddleware(),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
