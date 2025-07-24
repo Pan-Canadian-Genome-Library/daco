@@ -952,7 +952,7 @@ applicationRouter.post(
 					if (!result) {
 						response.status(403).json({
 							error: 'FORBIDDEN',
-							message: 'You do not have permission to request revisions for this resource',
+							message: 'You do not have permission to request revisions on this application.',
 						});
 						return;
 					}
