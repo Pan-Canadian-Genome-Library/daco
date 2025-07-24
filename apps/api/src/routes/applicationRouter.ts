@@ -947,7 +947,6 @@ applicationRouter.post(
 						sign_and_submit_notes: revisionData.signAndSubmitNotes,
 					};
 
-					// TODO: Check that the institutional rep is the correct rep for this application
 					const result = await isAssociatedRep(request.session, applicationId);
 
 					if (!result) {
