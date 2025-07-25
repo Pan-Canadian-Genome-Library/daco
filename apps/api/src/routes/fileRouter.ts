@@ -91,7 +91,7 @@ async function retrieveFile(
 
 fileRouter.get(
 	'/:fileId',
-	authMiddleware({}),
+	authMiddleware(),
 	withParamsSchemaValidation(
 		getFileByIdParamsSchema,
 		apiZodErrorMapping,
@@ -106,7 +106,7 @@ fileRouter.get(
 
 fileRouter.get(
 	'/:fileId/download',
-	authMiddleware({}),
+	authMiddleware(),
 	withParamsSchemaValidation(
 		getFileByIdParamsSchema,
 		apiZodErrorMapping,
