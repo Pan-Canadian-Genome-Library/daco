@@ -49,7 +49,7 @@ export function UserProvider({ children }: PropsWithChildren) {
 		user: data?.user,
 		role: data?.role ?? 'ANONYMOUS',
 		isLoading,
-		isLoggedIn: !isLoading || data ? data?.role !== 'ANONYMOUS' : true,
+		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : true,
 		refresh,
 	};
 	return <UserContext.Provider value={userState}>{children}</UserContext.Provider>;
