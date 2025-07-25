@@ -152,7 +152,7 @@ signatureRouter.post(
 				const { applicationId, signature } = data;
 				const role = getUserRole(request.session);
 
-				if (role !== userRoleSchema.Values.APPLICANT && role !== userRoleSchema.Values.INSTITUTIONAL_REP) {
+				if (role !== userRoleSchema.Values.APPLICANT) {
 					response.status(403).json({
 						error: 'FORBIDDEN',
 						message: 'User role is not allowed to create a signature for this application',
@@ -182,8 +182,7 @@ signatureRouter.post(
 
 				const isApplicationUser = role === userRoleSchema.Values.APPLICANT && applicationResult.data.userId === userId;
 
-				const isApplicationInstitutionalRep =
-					role === userRoleSchema.Values.INSTITUTIONAL_REP && (await isAssociatedRep(request.session, applicationId));
+				const isApplicationInstitutionalRep = await isAssociatedRep(request.session, applicationId);
 
 				if (!(isApplicationUser || isApplicationInstitutionalRep)) {
 					response
@@ -195,7 +194,7 @@ signatureRouter.post(
 				const result = await updateApplicationSignature({
 					applicationId,
 					signature,
-					signee: role,
+					signee: isApplicationInstitutionalRep ? 'INSTITUTIONAL_REP' : 'APPLICANT',
 				});
 
 				if (result.success) {
