@@ -25,7 +25,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { pdfService } from '@/service/pdf/pdfService.ts';
+import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -228,8 +228,10 @@ export const getApplicationStateTotals = async () => {
  */
 export const createApplicationPDF = async ({
 	applicationId,
+	trademark,
 }: {
 	applicationId: number;
+	trademark?: TrademarkValues;
 }): AsyncResult<Uint8Array<ArrayBufferLike>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
@@ -290,6 +292,7 @@ export const createApplicationPDF = async ({
 		collaboratorsContents: aliasedCollaboratorsContents,
 		fileContents: aliasedFileContents.data,
 		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
+		trademark,
 	});
 
 	if (!renderedPDF.success) {

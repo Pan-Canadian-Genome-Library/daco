@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { PDFDocument } from 'pdf-lib';
+import { degrees, PDFDocument, rgb } from 'pdf-lib';
 
 import { ApplicationResponseData, CollaboratorDTO, FilesDTO, SignatureDTO } from '@pcgl-daco/data-model';
 
@@ -56,6 +56,16 @@ const PDF_AUTHOR = `Data Access Compliance Office, Pan-Canadian Genome Library`;
  */
 const PDF_LANGUAGE = `en-ca`;
 
+export const TrademarkEnum = {
+	APPROVED: 'APPROVED',
+	NOT_APPROVED: 'NOT APPROVED',
+	REJECTED: 'REJECTED',
+	CLOSED: 'CLOSED',
+	REVOKED: 'REVOKED',
+} as const;
+
+export type TrademarkValues = (typeof TrademarkEnum)[keyof typeof TrademarkEnum];
+
 const pdfService = () => ({
 	renderPCGLApplicationPDF: async ({
 		applicationContents,
@@ -63,12 +73,14 @@ const pdfService = () => ({
 		collaboratorsContents,
 		fileContents,
 		filename,
+		trademark = 'APPROVED',
 	}: {
 		applicationContents: ApplicationResponseData;
 		signatureContents: SignatureDTO;
 		collaboratorsContents: CollaboratorDTO[];
 		fileContents: FilesDTO;
 		filename: string;
+		trademark?: TrademarkValues;
 	}) => {
 		/**
 		 * This acts as a title for the PDF, displayed at the top. Along with being displayed as
@@ -107,6 +119,31 @@ const pdfService = () => ({
 
 			const ethicsPages = await finalApplication.copyPages(ethicsPDF, ethicsPDF.getPageIndices());
 			ethicsPages.forEach((page) => finalApplication.addPage(page));
+
+			if (trademark !== TrademarkEnum.APPROVED) {
+				originalPDFPages.forEach((page) => {
+					const { height } = page.getSize();
+
+					page.drawText(trademark, {
+						x: 5,
+						y: height / 2 + 300,
+						size: 50,
+						color: rgb(0.95, 0.1, 0.1),
+						rotate: degrees(-45),
+					});
+				});
+				ethicsPages.forEach((page) => {
+					const { height } = page.getSize();
+
+					page.drawText(trademark, {
+						x: 5,
+						y: height / 2 + 300,
+						size: 50,
+						color: rgb(0.95, 0.1, 0.1),
+						rotate: degrees(-45),
+					});
+				});
+			}
 
 			return success(await finalApplication.save());
 		} catch (err) {
