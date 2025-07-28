@@ -91,9 +91,7 @@ async function retrieveFile(
 
 fileRouter.get(
 	'/:fileId',
-	authMiddleware({
-		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
-	}),
+	authMiddleware(),
 	withParamsSchemaValidation(
 		getFileByIdParamsSchema,
 		apiZodErrorMapping,
@@ -108,9 +106,7 @@ fileRouter.get(
 
 fileRouter.get(
 	'/:fileId/download',
-	authMiddleware({
-		requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP'],
-	}),
+	authMiddleware(),
 	withParamsSchemaValidation(
 		getFileByIdParamsSchema,
 		apiZodErrorMapping,

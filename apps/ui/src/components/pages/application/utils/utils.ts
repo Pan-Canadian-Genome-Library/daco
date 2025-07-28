@@ -17,22 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { SessionUser } from '@pcgl-daco/validation';
 
-import { withErrorResponseHandler } from '@/api/apiUtils';
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import type { SessionUser, UserRole } from '@pcgl-daco/validation';
+export const isRepUser = (repEmail?: string | null, userEmails?: Pick<SessionUser, 'emails'>) => {
+	if (!repEmail || !userEmails || !userEmails.emails) {
+		return false;
+	}
 
-const useGetUser = () => {
-	return useQuery<{ user: SessionUser; role: UserRole }, ServerError>({
-		queryKey: ['user'],
-		queryFn: async () => {
-			const response = await fetch(`/auth/user`).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-	});
+	return userEmails.emails.some((val) => val.address === repEmail.toLocaleLowerCase());
 };
-
-export default useGetUser;

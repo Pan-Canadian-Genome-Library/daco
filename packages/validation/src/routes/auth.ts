@@ -16,18 +16,110 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { z as zod } from 'zod';
+import { z } from 'zod';
 import { userRoleSchema } from '../user.js';
 
-export const userResponseSchema = zod.object({
-	user: zod
+export const userResponseSchema = z.object({
+	user: z
 		.object({
-			userId: zod.string(),
-			givenName: zod.string().optional(),
-			familyName: zod.string().optional(),
+			userId: z.string(),
+			givenName: z.string().optional(),
+			familyName: z.string().optional(),
 		})
 		.optional(),
 	role: userRoleSchema,
 });
-export type UserResponse = zod.infer<typeof userResponseSchema>;
+export type UserResponse = z.infer<typeof userResponseSchema>;
+
+export const oidcTokenResponseSchema = z.object({
+	access_token: z.string(),
+	refresh_token: z.string(),
+	refresh_token_iat: z.number(),
+	id_token: z.string(),
+});
+export type OIDCTokenResponse = z.infer<typeof oidcTokenResponseSchema>;
+
+export const oidcUserInfoResponseSchema = z.object({
+	sub: z.string(),
+	given_name: z.string().optional(),
+	family_name: z.string().optional(),
+	email: z.string().optional(),
+});
+export type OIDCUserInfoResponse = z.infer<typeof oidcUserInfoResponseSchema>;
+
+export const authZUserInfo = z.object({
+	userinfo: z.object({
+		emails: z.array(
+			z.object({
+				address: z.string().email(),
+				type: z
+					.literal('official')
+					.or(z.literal('delivery').or(z.literal('forwarding').or(z.literal('personal'))))
+					.optional(),
+			}),
+		),
+		pcgl_id: z.string(),
+		site_admin: z.boolean(),
+		site_curator: z.boolean(),
+	}),
+	study_authorizations: z.object({
+		editable_studies: z.array(z.string()).optional(),
+		readable_studies: z.array(z.string()).optional(),
+	}),
+	dac_authorizations: z.array(
+		z
+			.object({
+				study_id: z.string(),
+				start_date: z.string(),
+				end_date: z.string(),
+			})
+			.optional(),
+	),
+	groups: z
+		.array(
+			z.object({
+				description: z.string(),
+				id: z.number().int(),
+				name: z.string(),
+			}),
+		)
+		.optional(),
+});
+export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
+
+export const sessionUser = z.object({
+	userId: z.string(),
+	sub: z.string(),
+	givenName: z.string().optional(),
+	familyName: z.string().optional(),
+	emails: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ emails: true }).shape.emails,
+	siteAdmin: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_admin: true }).shape.site_admin,
+	siteCurator: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_curator: true }).shape.site_curator,
+	studyAuthorizations: z.object({
+		editableStudies: authZUserInfo
+			.pick({ study_authorizations: true })
+			.shape.study_authorizations.pick({ editable_studies: true }).shape.editable_studies,
+		readableStudies: authZUserInfo
+			.pick({ study_authorizations: true })
+			.shape.study_authorizations.pick({ readable_studies: true }).shape.readable_studies,
+	}),
+	dacAuthorizations: z.array(
+		z
+			.object({
+				studyId: z.string(),
+				startDate: z.string(),
+				endDate: z.string(),
+			})
+			.optional(),
+	),
+	groups: authZUserInfo.pick({ groups: true }).shape.groups,
+});
+export type SessionUser = z.infer<typeof sessionUser>;
+
+export const sessionAccount = z.object({
+	idToken: z.string(),
+	accessToken: z.string(),
+	refreshToken: z.string(),
+	refreshTokenIat: z.number().int(),
+});
+export type SessionAccount = z.infer<typeof sessionAccount>;

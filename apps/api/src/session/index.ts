@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { SessionAccount, SessionUser } from '@/session/types.ts';
+import type { SessionAccount, SessionUser } from '@pcgl-daco/validation';
 import { type Request } from 'express';
 
 export { default as sessionMiddleware } from './sessionMiddleware.js';
