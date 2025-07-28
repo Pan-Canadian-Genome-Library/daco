@@ -36,7 +36,7 @@ export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejec
                     Thank you for submitting <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
                 </mj-text>
                 <mj-text>
-                    This is the Data Access Committee's comments on your application: ${comment}.
+                    This is the Data Access Committee's comments on your application: ${comment}
                 </mj-text>
                 <mj-text>
                     We appreciate your interest in the PCGL controlled data, thank you again for your time!        

@@ -28,7 +28,7 @@ export const GenerateEmailApproval = ({ name }: Omit<GenerateApproveType, 'to'>)
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    I am pleased to inform you that your <a href="" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. 
+                    We are pleased to inform you that your <a href="" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. 
                 <mj-text>
                     Should you have any questions or need assistance, feel free to reach out to us. <br /> <br />
                 </mj-text>
@@ -44,7 +44,7 @@ export const GenerateEmailApproval = ({ name }: Omit<GenerateApproveType, 'to'>)
 
 export const GenerateEmailApprovalPlain = ({ name }: Omit<GenerateApproveType, 'to'>) => {
 	return ` Dear ${name},
-    \n I am pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. 
+    \n We are pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. 
     \n Should you have any questions or need assistance, feel free to reach out to us. 
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
