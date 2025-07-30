@@ -31,6 +31,7 @@ import { ValidateAllSections } from '@/components/pages/application/utils/valida
 import ProtectedComponent from '@/components/ProtectedComponent';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const SignAndSubmit = () => {
 	const [openModal, setOpenModal] = useState(false);
@@ -43,7 +44,7 @@ const SignAndSubmit = () => {
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
-		if (!ValidateAllSections(fields) && applicationState === 'DRAFT') {
+		if (!ValidateAllSections(fields) && applicationState === ApplicationStates.DRAFT) {
 			navigation(`/application/${appId}/intro${isEditMode ? '/edit' : ''}`, { replace: true });
 		}
 	}, [appId, fields, isEditMode, navigation, applicationState]);
