@@ -20,7 +20,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { withErrorResponseHandler } from '@/api/apiUtils';
-import { isRepUser } from '@/components/pages/application/utils/utils';
+import { isRepUser } from '@/components/pages/application/utils/authUtils';
 import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
