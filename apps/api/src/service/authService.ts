@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { serverConfig } from '@/config/serverConfig.ts';
+import { authConfig } from '@/config/authConfig.js';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
 import { userRoleSchema, type UserRole } from '@pcgl-daco/validation';
@@ -26,25 +26,28 @@ import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService } from './types.ts';
 
 /**
- * Based on user data stored in session data, determine the user's role.
- * TODO: Use actual permissions stored in session to determine user role
- *
- * This is temporarily returning only `APPLICANT` or `ANONYMOUS`
+ * getUserRole will check if the user is APPLICANT or DAC_MEMBER
+ * Since the INSTITUTIONAL_REP role is determined by its email comparisons between session and institutional_rep email from the application contents
  */
 export function getUserRole(session: Partial<SessionData>): UserRole {
-	// return session.user ? userRoleSchema.Values.INSTITUTIONAL_REP : userRoleSchema.Values.ANONYMOUS;
-	return session.user ? serverConfig.USER_ROLE : userRoleSchema.Values.ANONYMOUS;
+	const { user } = session;
+
+	if (!user) {
+		return userRoleSchema.Values.ANONYMOUS;
+	}
+
+	const isDacMember = user?.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DACO);
+
+	return isDacMember ? userRoleSchema.Values.DAC_MEMBER : userRoleSchema.Values.APPLICANT;
 }
 
 /**
  * Based on user data stored in session data, determine the user's role & if the application is associated with them.
- * TODO: Use actual permissions stored in session to determine user role
- *
- * This is temporarily returning `true` for all applications.
  */
 export async function isAssociatedRep(session: Partial<SessionData>, applicationId: number): Promise<Boolean> {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
+	const { user } = session;
 
 	const app = await applicationService.getApplicationWithContents({ id: applicationId });
 
@@ -53,15 +56,11 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 		return false;
 	}
 
-	if (getUserRole(session) === userRoleSchema.Values.INSTITUTIONAL_REP) {
-		/**
-		 * FIXME: This is a TEMPORARY logic, this **MUST** be fixed once we figure out how Inst. Reps are being stored
-		 * in auth. This will auto validate all reps as being associated with every applications.
-		 *
-		 * something like: `return app.data.instRep === session.user.id;`
-		 **/
+	const repEmail = app.data.contents?.institutional_rep_email?.toLocaleLowerCase().trim();
 
+	if (user?.emails.some((val) => val.address.toLocaleLowerCase().trim() === repEmail)) {
 		return true;
 	}
+
 	return false;
 }
