@@ -59,6 +59,22 @@ paths:
             type: number
             minimum: 0
           description: Max number of application items per page. Must be a positive number. If the property isn't provided, the default is 20.
+        - in: query
+          name: isApplicantView
+          schema:
+            type: boolean
+          description: |
+            Determines which applications are appended to the top of the list.
+            <br/>
+            <br/>
+            Applicant view will have applications that require changes/revisions to the top of the list.
+            <br/>
+            By default, applications that are in state DAC_REVIEW will be sorted to the top of the list.
+            <br/> 
+            <br/>
+            **Example:** `true` | `false`
+            <br/>
+
       responses:
         '500':
           description: 'Cannot return applications list'
