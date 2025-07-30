@@ -267,14 +267,14 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort = [],
 		page = 0,
 		pageSize = 20,
-		applicantView = false,
+		isApplicantView = false,
 	}: {
 		user_id?: string;
 		state?: ApplicationStateValues[];
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
-		applicantView?: boolean;
+		isApplicantView?: boolean;
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			/**
@@ -327,8 +327,8 @@ const applicationSvc = (db: PostgresDb) => ({
 
 			/**
 			 *
-			 * If Applicant view is true, records with revisions will be pushed to the top.
-			 * if applicant view is false, Sort DAC_REVIEW records to the top to display on the front end, however...
+			 * If applicant view is true, records with revisions will be pushed to the top.
+			 * if applicant view is false, sort DAC_REVIEW records to the top to display on the front end, however...
 			 *
 			 * We only want to sort DAC_REVIEW records to the top if:
 			 * 	- The user hasn't sorted by any filter
@@ -336,7 +336,10 @@ const applicationSvc = (db: PostgresDb) => ({
 			 * 		- Keeping in mind that if it includes JUST DAC_REVIEW, then we skip
 			 * 		 since the sorting will already be handled by drizzle in this case.
 			 */
-			if (!applicantView && (!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW)))) {
+			if (
+				!isApplicantView &&
+				(!state?.length || (state.length !== 1 && state?.includes(ApplicationStates.DAC_REVIEW)))
+			) {
 				const reviewApplications = returnableApplications.filter(
 					(applications) => applications.state === ApplicationStates.DAC_REVIEW,
 				);
@@ -349,13 +352,13 @@ const applicationSvc = (db: PostgresDb) => ({
 			} else {
 				const reviewApplications = returnableApplications.filter(
 					(applications) =>
-						applications.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW ||
+						applications.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
 						applications.state === ApplicationStates.DAC_REVISIONS_REQUESTED,
 				);
 
 				const nonReviewApplications = returnableApplications.filter(
 					(applications) =>
-						applications.state !== ApplicationStates.INSTITUTIONAL_REP_REVIEW &&
+						applications.state !== ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED &&
 						applications.state !== ApplicationStates.DAC_REVISIONS_REQUESTED,
 				);
 

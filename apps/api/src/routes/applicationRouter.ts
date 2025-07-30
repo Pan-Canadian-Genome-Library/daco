@@ -212,7 +212,7 @@ applicationRouter.get(
 
 		const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 
-		const { state: stateQuery, sort: sortQuery, page, pageSize, applicantView } = request.query;
+		const { state: stateQuery, sort: sortQuery, page, pageSize, isApplicantView: isApplicantViewQuery } = request.query;
 
 		const pageRequested = page ? Number(page) : undefined;
 		const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
@@ -238,7 +238,7 @@ applicationRouter.get(
 		try {
 			sort = typeof sortQuery === 'string' ? JSON.parse(sortQuery) : [];
 			state = typeof stateQuery === 'string' ? JSON.parse(stateQuery as any) : [];
-			isApplicantView = typeof applicantView === 'string' ? applicantView === 'true' : undefined;
+			isApplicantView = typeof isApplicantViewQuery === 'string' ? isApplicantViewQuery === 'true' : undefined;
 		} catch {
 			response.status(400).json({
 				error: 'INVALID_REQUEST',
@@ -254,7 +254,7 @@ applicationRouter.get(
 			page: pageRequested,
 			pageSize: pageSizeRequested,
 			isDACMember,
-			applicantView: isApplicantView,
+			isApplicantView,
 		});
 
 		if (result.success) {

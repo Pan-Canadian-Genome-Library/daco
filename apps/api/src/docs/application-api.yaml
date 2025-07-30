@@ -60,7 +60,7 @@ paths:
             minimum: 0
           description: Max number of application items per page. Must be a positive number. If the property isn't provided, the default is 20.
         - in: query
-          name: applicantView
+          name: isApplicantView
           schema:
             type: boolean
           description: |

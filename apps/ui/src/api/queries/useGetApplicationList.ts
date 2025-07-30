@@ -34,10 +34,10 @@ interface ApplicationListParams {
 	sort?: ApplicationListSortingOptions[];
 	page?: number;
 	pageSize?: number;
-	applicantView?: boolean;
+	isApplicantView?: boolean;
 }
 
-const useGetApplicationList = ({ state, sort, page, pageSize, applicantView }: ApplicationListParams) => {
+const useGetApplicationList = ({ state, sort, page, pageSize, isApplicantView }: ApplicationListParams) => {
 	const queryParams = new URLSearchParams();
 
 	if (state && state.length) {
@@ -52,8 +52,8 @@ const useGetApplicationList = ({ state, sort, page, pageSize, applicantView }: A
 	if (pageSize !== undefined) {
 		queryParams.set('pageSize', pageSize.toString());
 	}
-	if (applicantView !== undefined) {
-		queryParams.set('applicantView', applicantView.toString());
+	if (isApplicantView !== undefined) {
+		queryParams.set('isApplicantView', isApplicantView.toString());
 	}
 
 	return useQuery<ApplicationListResponse, ServerError>({
