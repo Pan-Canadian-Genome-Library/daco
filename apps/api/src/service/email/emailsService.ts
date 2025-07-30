@@ -59,9 +59,9 @@ import {
 const logger = BaseLogger.forModule('emailService');
 
 const dateConverter = (date: Date | string) => {
-	// America/New_York should account for DST and automatically switch between EST and EDT
-	const formatter = new Intl.DateTimeFormat('en-US', {
-		timeZone: 'America/New_York',
+	// America/Toronto should account for DST and automatically switch between EST and EDT
+	const formatter = new Intl.DateTimeFormat('en-CA', {
+		timeZone: 'America/Toronto',
 		dateStyle: 'medium',
 		timeStyle: 'long',
 	});
