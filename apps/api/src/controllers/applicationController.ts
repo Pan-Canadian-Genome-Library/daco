@@ -172,6 +172,7 @@ export const getAllApplications = async ({
 	page,
 	pageSize,
 	isDACMember,
+	isApplicantView,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
@@ -181,7 +182,14 @@ export const getAllApplications = async ({
 		userId = undefined;
 	}
 
-	const result = await applicationRepo.listApplications({ user_id: userId, state, sort, page, pageSize });
+	const result = await applicationRepo.listApplications({
+		user_id: userId,
+		state,
+		sort,
+		page,
+		pageSize,
+		isApplicantView,
+	});
 
 	return result;
 };
