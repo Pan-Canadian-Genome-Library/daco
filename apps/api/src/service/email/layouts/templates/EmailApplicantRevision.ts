@@ -53,7 +53,7 @@ export const GenerateEmailApplicantRevision = ({
                     We hope you are doing well. <br/>
                 </mj-text>
                 <mj-text>
-                    We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed. <br/>
+                    We would like to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed. <br/>
                 </mj-text>
                 <mj-text>
                     The following revisions have been requested:
@@ -115,7 +115,7 @@ export const GenerateEmailApplicantRevisionPlain = ({
 
 	return ` Dear ${applicantName},
     \n We hope you are doing well. 
-    \n\n We want to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.
+    \n\n We would like to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.
     \n\n The following revisions have been requested:
     \n
     \n A. Applicant Information: ${applicant_notes ?? ''} 

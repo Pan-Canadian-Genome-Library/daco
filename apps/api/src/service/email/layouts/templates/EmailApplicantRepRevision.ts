@@ -55,7 +55,7 @@ export const GenerateEmailApplicantRepRevision = ({
                     We hope you are doing well. <br/>
                 </mj-text>
                 <mj-text>
-                    We want to inform you that the institutional representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.                
+                    We would like to inform you that the institutional representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.                
                 </mj-text>
                 <mj-text>
                     The following revisions have been requested: <br />
