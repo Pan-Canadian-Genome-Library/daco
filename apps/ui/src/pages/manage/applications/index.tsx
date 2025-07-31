@@ -62,6 +62,7 @@ const ManageApplicationsPage = () => {
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
 		pagination: {
+			showSizeChanger: false,
 			current: 1,
 			pageSize: DEFAULT_NUMBER_OF_ROWS,
 			total: 0,
