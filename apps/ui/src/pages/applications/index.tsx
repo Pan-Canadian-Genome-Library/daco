@@ -29,7 +29,7 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 import useGetApplication from '@/api/queries/useGetApplication';
 import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
 import ErrorPage from '@/components/pages/global/ErrorPage';
-import { useUserContext } from '@/providers/UserProvider';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const { Content } = Layout;
@@ -37,7 +37,9 @@ const { Content } = Layout;
 const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
-	const { role } = useUserContext();
+	const {
+		state: { applicationUserRole },
+	} = useApplicationContext();
 	// grab current route and its relevant information
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
@@ -62,14 +64,14 @@ const ApplicationViewer = () => {
 			return;
 		}
 		// Application can only be in edit if the application-state is in DRAFT and if the user is an APPLICANT
-		// TODO: possibly need to change depending on the auth rework with authz
 		const forceToViewMode =
-			(applicationData.state !== ApplicationStates.DRAFT || role !== userRoleSchema.Values.APPLICANT) && isEditMode;
+			(applicationData.state !== ApplicationStates.DRAFT || applicationUserRole !== userRoleSchema.Values.APPLICANT) &&
+			isEditMode;
 
 		if (forceToViewMode) {
 			navigation(`/application/${applicationData.id}/`, { replace: true });
 		}
-	}, [applicationData, applicationError, isEditMode, navigation, role]);
+	}, [applicationData, applicationError, isEditMode, navigation, applicationUserRole]);
 
 	// scroll to top on page change
 	useEffect(() => {
@@ -116,8 +118,7 @@ const ApplicationViewer = () => {
 										context={{
 											appId: applicationData.id,
 											isEditMode,
-											revisions: role === userRoleSchema.Values.APPLICANT ? revisionsData : {}, // Only APPLICANTS should have the revisions logic
-											state: applicationData.state,
+											revisions: applicationUserRole === userRoleSchema.Values.APPLICANT ? revisionsData : {}, // Only APPLICANTS should have the revisions logic
 										}}
 									/>
 								</Col>

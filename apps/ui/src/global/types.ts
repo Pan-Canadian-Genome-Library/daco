@@ -18,7 +18,7 @@
  */
 
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { SectionRevision } from '@pcgl-daco/validation';
+import { SectionRevision, UserRole } from '@pcgl-daco/validation';
 import { RuleRender } from 'antd/es/form';
 import { ReactNode } from 'react';
 
@@ -59,7 +59,7 @@ export interface ApplicationOutletContext {
 	appId: string | number;
 	isEditMode: boolean;
 	revisions: Partial<SectionRevision>;
-	state: ApplicationStateValues;
+	userRole: UserRole;
 }
 
 export interface BasicFormFieldProps {
