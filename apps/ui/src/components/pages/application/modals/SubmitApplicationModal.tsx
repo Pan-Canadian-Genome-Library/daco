@@ -20,6 +20,7 @@
 import useSubmitApplication from '@/api/mutations/useSubmitApplication';
 import useSubmitRevisions from '@/api/mutations/useSubmitRevisions';
 import { ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { Flex, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -32,12 +33,15 @@ interface SuccessModalProps {
 }
 const SubmitApplicationModal = ({ isOpen, setIsOpen }: SuccessModalProps) => {
 	const { t: translate } = useTranslation();
-	const { appId, state } = useOutletContext<ApplicationOutletContext>();
+	const {
+		state: { applicationState },
+	} = useApplicationContext();
+	const { appId } = useOutletContext<ApplicationOutletContext>();
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
 	const { mutateAsync: submitRevisions, isPending: isSubmittingRevs } = useSubmitRevisions();
 
 	const modalSubmission = () => {
-		switch (state) {
+		switch (applicationState) {
 			case 'INSTITUTIONAL_REP_REVISION_REQUESTED':
 			case 'DAC_REVISIONS_REQUESTED':
 				submitRevisions({ applicationId: appId }).then(() => {

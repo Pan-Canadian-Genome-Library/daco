@@ -66,6 +66,7 @@ const AccessAgreement = () => {
 		dispatch({
 			type: 'UPDATE_APPLICATION',
 			payload: {
+				...state,
 				fields: {
 					...state.fields,
 					acceptedAgreements,
