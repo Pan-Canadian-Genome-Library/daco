@@ -563,7 +563,7 @@ export const submitRevision = async ({
 				id: application.id,
 				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
-				submittedDate: submittedRevision.data.created_at,
+				submittedDate: new Date(),
 			});
 		} else {
 			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
@@ -572,7 +572,7 @@ export const submitRevision = async ({
 				to: institutional_rep_email,
 				repName: institutional_rep_first_name || 'N/A',
 				applicantName: applicant_first_name || 'N/A',
-				submittedDate: submittedRevision.data.created_at,
+				submittedDate: new Date(),
 			});
 		}
 
@@ -856,7 +856,7 @@ export const submitApplication = async ({
 				to: institutional_rep_email,
 				applicantName: `${applicant_first_name} ${applicant_last_name}` || 'N/A',
 				repName: `${institutional_rep_first_name} ${institutional_rep_last_name}` || 'N/A',
-				submittedDate: submissionResult.data.created_at,
+				submittedDate: new Date(),
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
 			const {
@@ -868,7 +868,7 @@ export const submitApplication = async ({
 				id: application.id,
 				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
-				submittedDate: submissionResult.data.created_at,
+				submittedDate: new Date(),
 			});
 
 			//  send email to applicant that application is submitted to DAC
