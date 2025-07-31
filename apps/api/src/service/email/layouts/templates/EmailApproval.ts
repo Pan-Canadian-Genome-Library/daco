@@ -17,18 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { GenerateApproveType } from '../../types.ts';
+import { getEmailConfig } from '@/config/emailConfig.ts';
+import { GenerateApproveType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailApproval = ({ name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApproval = ({ id, name }: Omit<GenerateApproveType, 'to'>) => {
+	const {
+		express: { ui },
+	} = getEmailConfig;
+
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    We are pleased to inform you that your <a href="" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. 
+                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. 
                 <mj-text>
                     Should you have any questions or need assistance, feel free to reach out to us. <br /> <br />
                 </mj-text>
