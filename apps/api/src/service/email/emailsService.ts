@@ -58,6 +58,16 @@ import {
 
 const logger = BaseLogger.forModule('emailService');
 
+const dateConverter = (date: Date | string) => {
+	// America/Toronto should account for DST and automatically switch between EST and EDT
+	const formatter = new Intl.DateTimeFormat('en-CA', {
+		timeZone: 'America/Toronto',
+		dateStyle: 'medium',
+		timeStyle: 'long',
+	});
+	return formatter.format(new Date(date));
+};
+
 const emailSvc = () => ({
 	// Email to the Institutional Rep to Review Application
 	sendEmailInstitutionalRepForReview: async ({
@@ -84,13 +94,13 @@ const emailSvc = () => ({
 					id,
 					applicantName,
 					repName,
-					submittedDate,
+					submittedDate: dateConverter(submittedDate),
 				}),
 				text: GenerateEmailInstitutionalRepReviewPlain({
 					id,
 					applicantName,
 					repName,
-					submittedDate,
+					submittedDate: dateConverter(submittedDate),
 				}),
 			});
 
@@ -202,8 +212,8 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
-				html: GenerateEmailDacForReview({ id, applicantName, submittedDate }),
-				text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate }),
+				html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+				text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
 			});
 
 			return success(response);
@@ -268,8 +278,12 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
-				html: GenerateEmailDacForSubmittedRevision({ id, applicantName, submittedDate }),
-				text: GenerateEmailDacForSubmittedRevisionPlain({ id, applicantName, submittedDate }),
+				html: GenerateEmailDacForSubmittedRevision({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+				text: GenerateEmailDacForSubmittedRevisionPlain({
+					id,
+					applicantName,
+					submittedDate: dateConverter(submittedDate),
+				}),
 			});
 
 			return success(response);
