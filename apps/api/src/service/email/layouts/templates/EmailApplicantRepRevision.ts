@@ -119,7 +119,7 @@ export const GenerateEmailApplicantRepRevisionPlain = ({
 
 	return ` Dear ${applicantName},
     \n We hope you are doing well. 
-    \n\n We want to inform you that the institutional representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.  
+    \n\n We would like to inform you that the Institutional Representative ${institutionalRepFirstName} ${institutionalRepLastName} has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.  
     \n\n The following revisions have been requested:
     \n
     \n A. Applicant Information: ${applicant_notes ?? ''} 
