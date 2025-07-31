@@ -53,12 +53,14 @@ const AUTH_DISABLED = import.meta.env.VITE_DISABLE_AUTH === 'true';
  * </div>
  */
 const ProtectedComponent = ({ requiredRoles, requiredStates, children }: ProtectedComponentProps) => {
-	const { isLoading, isLoggedIn, role } = useUserContext();
-	const { state: currentApplication } = useApplicationContext();
+	const { isLoading, isLoggedIn } = useUserContext();
+	const {
+		state: { applicationState, applicationUserRole: role },
+	} = useApplicationContext();
 
 	if (AUTH_DISABLED) {
 		if (requiredStates) {
-			return requiredStates.includes(currentApplication.applicationState) ? children : null;
+			return requiredStates.includes(applicationState) ? children : null;
 		}
 		return children;
 	}
@@ -80,7 +82,7 @@ const ProtectedComponent = ({ requiredRoles, requiredStates, children }: Protect
 	}
 
 	if (requiredStates) {
-		if (!requiredStates.includes(currentApplication.applicationState)) {
+		if (!requiredStates.includes(applicationState)) {
 			return null;
 		}
 	}

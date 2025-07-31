@@ -26,55 +26,61 @@ import { ApplicationStates, ApplicationStateValues, RevisionsDTO } from '@pcgl-d
 import { SectionRevision } from '@pcgl-daco/validation';
 
 const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStateValues) => {
+	/**
+	 * We only want to display the approval status if we're in one of these status'
+	 */
+	const revisionDependant =
+		state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
+		state === ApplicationStates.DAC_REVISIONS_REQUESTED;
+
 	return useQuery<Partial<SectionRevision>, ServerError>({
 		queryKey: [`revisions-${id}`],
 		retry: 0,
 		enabled: state !== undefined,
 		queryFn: async () => {
+			// Prevent API being called for states that don't utilize revisions
+			if (!revisionDependant) {
+				return {};
+			}
+
 			const response = await fetch(`/applications/${id}/revisions`).then(withErrorResponseHandler);
-			/**
-			 * We only want to display the approval status if we're in one of these status'
-			 */
-			const revisionDependant =
-				state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
-				state === ApplicationStates.DAC_REVISIONS_REQUESTED;
 
 			return await response.json().then((data: RevisionsDTO[]) => {
 				const result: Partial<SectionRevision> = {
 					applicant: {
-						isApproved: revisionDependant ? data[0]?.applicantApproved : undefined,
+						isApproved: data[0]?.applicantApproved,
 						comment: data[0]?.applicantNotes ?? null,
 					},
 					institutional: {
-						isApproved: revisionDependant ? data[0]?.institutionRepApproved : undefined,
+						isApproved: data[0]?.institutionRepApproved,
 						comment: data[0]?.institutionRepNotes ?? null,
 					},
 					collaborators: {
-						isApproved: revisionDependant ? data[0]?.collaboratorsApproved : undefined,
+						isApproved: data[0]?.collaboratorsApproved,
 						comment: data[0]?.collaboratorsNotes ?? null,
 					},
 					project: {
-						isApproved: revisionDependant ? data[0]?.projectApproved : undefined,
+						isApproved: data[0]?.projectApproved,
 						comment: data[0]?.projectNotes ?? null,
 					},
 					study: {
-						isApproved: revisionDependant ? data[0]?.requestedStudiesApproved : undefined,
+						isApproved: data[0]?.requestedStudiesApproved,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					ethics: {
-						isApproved: revisionDependant ? data[0]?.ethicsApproved : undefined,
+						isApproved: data[0]?.ethicsApproved,
 						comment: data[0]?.requestedStudiesNotes ?? null,
 					},
 					agreement: {
-						isApproved: revisionDependant ? data[0]?.agreementsApproved : undefined,
+						isApproved: data[0]?.agreementsApproved,
 						comment: data[0]?.agreementsNotes ?? null,
 					},
 					appendices: {
-						isApproved: revisionDependant ? data[0]?.appendicesApproved : undefined,
+						isApproved: data[0]?.appendicesApproved,
 						comment: data[0]?.appendicesNotes ?? null,
 					},
 					sign: {
-						isApproved: revisionDependant ? data[0]?.signAndSubmitApproved : undefined,
+						isApproved: data[0]?.signAndSubmitApproved,
 						comment: data[0]?.signAndSubmitNotes ?? null,
 					},
 				};

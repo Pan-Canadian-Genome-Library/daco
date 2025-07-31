@@ -27,7 +27,6 @@ import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { useUserContext } from '@/providers/UserProvider';
 import { ApplicationStateValues } from '@pcgl-daco/data-model';
 import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 import { ValidateAllSections } from './utils/validatorFunctions';
@@ -42,13 +41,14 @@ type SectionMenuProps = {
 
 const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }: SectionMenuProps) => {
 	const navigate = useNavigate();
-	const { state } = useApplicationContext();
+	const {
+		state: { fields, formState, applicationUserRole },
+	} = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetCollaborators(appId);
-	const { role } = useUserContext();
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
-		if (state?.formState.isDirty) {
+		if (formState.isDirty) {
 			editApplication({ id: appId, revisions });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
@@ -56,13 +56,13 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 
 	// Check if the form on each section is valid
 	const SectionValidator = useMemo(() => {
-		return VerifyFormSections(state?.fields);
-	}, [state]);
+		return VerifyFormSections(fields);
+	}, [fields]);
 
 	// Check if the form has been dirtied at all
 	const SectionTouched = useMemo(() => {
-		return VerifySectionsTouched(state?.fields);
-	}, [state]);
+		return VerifySectionsTouched(fields);
+	}, [fields]);
 
 	/**
 	 * This could be more elegant, however, this is used to determine if a section should display as locked
@@ -109,10 +109,10 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 										isLocked={determineIfLocked(route)}
 										hasCollaborators={data && data.length > 0}
 										appState={appState}
-										role={role}
+										role={applicationUserRole}
 									/>
 								),
-								disabled: route === SectionRoutes.SIGN && !ValidateAllSections(state.fields),
+								disabled: route === SectionRoutes.SIGN && !ValidateAllSections(fields),
 							};
 						})
 					: []
