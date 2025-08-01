@@ -838,7 +838,7 @@ applicationRouter.post(
 					logger.error(`Application ${applicationId} failed to generate NOT APPROVED Application PDF.`);
 				}
 
-				response.status(200).json();
+				response.status(200).json(result.data);
 				return;
 			} catch (error) {
 				response.status(500).json({
