@@ -277,6 +277,15 @@ export const createApplicationPDF = async ({
 		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
 	}
 
+	// If we are creating PDF, check to see if a current pdf exists. If yes then remove it then proceed
+	const signedPDFId = applicationContents.data.contents?.signed_pdf;
+	if (signedPDFId) {
+		const lastPdf = await fileService.deleteFileById({ fileId: signedPDFId });
+		if (!lastPdf.success) {
+			return failure('SYSTEM_ERROR', 'Unable to remove previous application PDF file, unable to generate PDF');
+		}
+	}
+
 	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
 	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
 	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
