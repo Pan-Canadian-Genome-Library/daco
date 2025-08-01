@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import fontkit from '@pdf-lib/fontkit';
+import fs from 'fs';
 import { degrees, PDFDocument, rgb } from 'pdf-lib';
 
 import { ApplicationResponseData, CollaboratorDTO, FilesDTO, SignatureDTO } from '@pcgl-daco/data-model';
@@ -25,6 +27,7 @@ import { serverConfig } from '@/config/serverConfig.ts';
 import logger from '@/logger.ts';
 import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
 import { failure, success } from '@/utils/results.ts';
+import { standardStyles } from './components/standardStyling.ts';
 
 /**
  * These constants appear in the PDF metadata, either in Finder / Windows Explorer file metadata, or within
@@ -100,6 +103,7 @@ const pdfService = () => ({
 
 			const finalApplication = await PDFDocument.create();
 
+			finalApplication.registerFontkit(fontkit);
 			finalApplication.setLanguage(PDF_LANGUAGE);
 			finalApplication.setTitle(filename, {
 				showInWindowTitleBar: true,
@@ -121,26 +125,36 @@ const pdfService = () => ({
 			ethicsPages.forEach((page) => finalApplication.addPage(page));
 
 			if (trademark !== TrademarkEnum.APPROVED) {
+				const fontBytes = fs.readFileSync(standardStyles.textStyles.fonts.openSansBold);
+				const customFont = await finalApplication.embedFont(fontBytes);
+				const textSize = 40;
+				const textWidth = customFont.widthOfTextAtSize(trademark, textSize);
+				const textHeight = customFont.heightAtSize(textSize);
+
 				originalPDFPages.forEach((page) => {
-					const { height } = page.getSize();
+					const { height, width } = page.getSize();
 
 					page.drawText(trademark, {
-						x: 5,
-						y: height / 2 + 300,
-						size: 50,
-						color: rgb(0.95, 0.1, 0.1),
-						rotate: degrees(-45),
+						x: width / 2 - textWidth / 2,
+						y: height / 1.5 - textHeight / 2,
+						size: textSize,
+						font: customFont,
+						color: rgb(0.768, 0.113, 0.56),
+						opacity: 0.7,
+						rotate: degrees(-25),
 					});
 				});
 				ethicsPages.forEach((page) => {
-					const { height } = page.getSize();
+					const { height, width } = page.getSize();
 
 					page.drawText(trademark, {
-						x: 5,
-						y: height / 2 + 300,
-						size: 50,
-						color: rgb(0.95, 0.1, 0.1),
-						rotate: degrees(-45),
+						x: width / 2 - textWidth / 2,
+						y: height / 1.5 - textHeight / 2,
+						size: textSize,
+						font: customFont,
+						color: rgb(0.768, 0.113, 0.56),
+						opacity: 0.7,
+						rotate: degrees(-25),
 					});
 				});
 			}
