@@ -183,6 +183,10 @@
 		"generic": {
 			"title": "Something went wrong.",
 			"message": "Unable to process your request, please try again later."
+		},
+		"downloadNotFound": {
+			"title": "The PDF file you requested could not be found.",
+			"message": "Sorry, something went wrong while generating your Application PDF, please try again later."
 		}
 	},
 	"generic": {

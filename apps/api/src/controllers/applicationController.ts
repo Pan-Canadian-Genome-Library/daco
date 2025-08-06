@@ -25,7 +25,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { pdfService } from '@/service/pdf/pdfService.ts';
+import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -236,8 +236,10 @@ export const getApplicationStateTotals = async () => {
  */
 export const createApplicationPDF = async ({
 	applicationId,
+	trademark,
 }: {
 	applicationId: number;
+	trademark?: TrademarkValues;
 }): AsyncResult<Uint8Array<ArrayBufferLike>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
@@ -275,6 +277,15 @@ export const createApplicationPDF = async ({
 		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
 	}
 
+	// If we are creating PDF, check to see if a current pdf exists. If yes then remove it then proceed
+	const signedPDFId = applicationContents.data.contents?.signed_pdf;
+	if (signedPDFId) {
+		const lastPdf = await fileService.deleteFileById({ fileId: signedPDFId });
+		if (!lastPdf.success) {
+			return failure('SYSTEM_ERROR', 'Unable to remove previous application PDF file, unable to generate PDF');
+		}
+	}
+
 	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
 	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
 	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
@@ -298,6 +309,7 @@ export const createApplicationPDF = async ({
 		collaboratorsContents: aliasedCollaboratorsContents,
 		fileContents: aliasedFileContents.data,
 		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
+		trademark,
 	});
 
 	if (!renderedPDF.success) {

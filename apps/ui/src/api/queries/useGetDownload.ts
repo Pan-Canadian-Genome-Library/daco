@@ -21,14 +21,27 @@ import { useQuery } from '@tanstack/react-query';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { FilesDTO } from '@pcgl-daco/data-model';
+import { useTranslation } from 'react-i18next';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useGetDownload = ({ fileId }: { fileId?: number | null }) => {
+	const notification = useNotificationContext();
+	const { t: translate } = useTranslation();
+
 	return useQuery<FilesDTO, ServerError>({
 		queryKey: [`file-download-${fileId}`],
 		enabled: false,
 		queryFn: async () => {
+			if (!fileId) {
+				notification.openNotification({
+					type: 'error',
+					message: translate('errors.downloadNotFound.title'),
+					description: translate('errors.downloadNotFound.message'),
+				});
+				return;
+			}
 			const response = await fetch(`/file/${fileId}/download`).then(withErrorResponseHandler);
 
 			return await response.json();
