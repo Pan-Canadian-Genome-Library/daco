@@ -53,6 +53,7 @@ import {
 	editApplicationRequestSchema,
 	isPositiveInteger,
 	rejectApplicationRequestSchema,
+	revokeApplicationRequestSchema,
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
@@ -560,71 +561,75 @@ applicationRouter.post(
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
-		async (
-			request: Request,
-			response: ResponseWithData<
-				ApplicationDTO,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
-			>,
-		) => {
-			const applicationId = Number(request.params.applicationId);
+		withBodySchemaValidation(
+			revokeApplicationRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request: Request,
+				response: ResponseWithData<
+					ApplicationDTO,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				>,
+			) => {
+				const applicationId = Number(request.params.applicationId);
+				const { revokeReason } = request.body;
+				const { user } = request.session;
+				const { userId } = user || {};
 
-			const { user } = request.session;
-			const { userId } = user || {};
+				const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 
-			const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+				if (!userId) {
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
 
-			if (!userId) {
-				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-				return;
-			}
+				try {
+					const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
+					if (!userMayEditResult.success) {
+						switch (userMayEditResult.error) {
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+								return;
+							}
+							case 'FORBIDDEN': {
+								response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+								return;
+							}
+						}
+					}
 
-			try {
-				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
-				if (!userMayEditResult.success) {
-					switch (userMayEditResult.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+					const result = await revokeApplication(applicationId, isDACMember, revokeReason);
+
+					if (result.success) {
+						response.status(200).json(result.data);
+						return;
+					}
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
 							return;
 						}
 						case 'NOT_FOUND': {
-							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							response.status(404).json({ error: result.error, message: result.message });
 							return;
 						}
-						case 'FORBIDDEN': {
-							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
 							return;
 						}
 					}
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: 'Unexpected error.',
+					});
 				}
-
-				const result = await revokeApplication(applicationId, isDACMember);
-
-				if (result.success) {
-					response.status(200).json(result.data);
-					return;
-				}
-				switch (result.error) {
-					case 'INVALID_STATE_TRANSITION': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: result.error, message: result.message });
-						return;
-					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
-					}
-				}
-			} catch (error) {
-				response.status(500).json({
-					error: 'SYSTEM_ERROR',
-					message: 'Unexpected error.',
-				});
-			}
-		},
+			},
+		),
 	),
 );
 

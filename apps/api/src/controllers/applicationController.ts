@@ -588,6 +588,7 @@ export const submitRevision = async ({
 export const revokeApplication = async (
 	applicationId: number,
 	isDACMember: boolean,
+	revokeReason: string,
 ): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -634,13 +635,13 @@ export const revokeApplication = async (
 				id: application.id,
 				to: dacAddress,
 				name: 'DAC Member',
-				comment: 'test DAC',
+				comment: revokeReason,
 			});
 			emailService.sendEmailApplicantRevoke({
 				id: application.id,
 				to: applicationWithContents.data.contents?.applicant_institutional_email,
 				name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
-				comment: 'test Applicant',
+				comment: revokeReason,
 				dacRevoked: true,
 			});
 		} else {
@@ -648,7 +649,7 @@ export const revokeApplication = async (
 				id: application.id,
 				to: applicationWithContents.data.contents?.applicant_institutional_email,
 				name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
-				comment: 'test Applicant',
+				comment: revokeReason,
 			});
 		}
 
