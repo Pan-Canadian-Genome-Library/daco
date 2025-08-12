@@ -35,12 +35,17 @@ import {
 	GenerateEmailApplicantRevision,
 	GenerateEmailApplicantRevisionPlain,
 } from './layouts/templates/EmailApplicantRevision.ts';
+import {
+	GenerateEmailApplicantRevoke,
+	GenerateEmailApplicantRevokePlain,
+} from './layouts/templates/EmailApplicantRevoke.ts';
 import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
 import { GenerateEmailDacForReview, GenerateEmailDacForReviewPlain } from './layouts/templates/EmailDacReview.ts';
 import {
 	GenerateEmailDacForSubmittedRevision,
 	GenerateEmailDacForSubmittedRevisionPlain,
 } from './layouts/templates/EmailDacRevision.ts';
+import { GenerateEmailDacRevoke, GenerateEmailDacRevokePlain } from './layouts/templates/EmailDacRevoke.ts';
 import {
 	GenerateEmailInstitutionalRepReview,
 	GenerateEmailInstitutionalRepReviewPlain,
@@ -353,6 +358,72 @@ const emailSvc = () => ({
 			return success(response);
 		} catch (error) {
 			const message = `Error sending email - sendEmailReject`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	// Email to DAC for Revoke
+	sendEmailDacRevoke: async ({
+		id,
+		name,
+		to,
+		comment,
+	}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.DACO_APPLICATION_STATUS,
+				html: GenerateEmailDacRevoke({ id, name, comment }),
+				text: GenerateEmailDacRevokePlain({ id, name, comment }),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailDacRevoke`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	// Email to DAC for Revoke
+	sendEmailApplicantRevoke: async ({
+		id,
+		name,
+		to,
+		comment,
+	}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to: ${to}`);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.DACO_APPLICATION_STATUS,
+				html: GenerateEmailApplicantRevoke({ id, name, comment }),
+				text: GenerateEmailApplicantRevokePlain({ id, name, comment }),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailDacRevoke`;
 
 			logger.error(message, error);
 
