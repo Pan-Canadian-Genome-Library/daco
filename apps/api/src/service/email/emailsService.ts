@@ -403,7 +403,8 @@ const emailSvc = () => ({
 		name,
 		to,
 		comment,
-	}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		dacRevoked = false,
+	}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 		try {
 			const {
 				email: { fromAddress },
@@ -417,8 +418,8 @@ const emailSvc = () => ({
 				from: fromAddress,
 				to,
 				subject: EmailSubjects.DACO_APPLICATION_STATUS,
-				html: GenerateEmailApplicantRevoke({ id, name, comment }),
-				text: GenerateEmailApplicantRevokePlain({ id, name, comment }),
+				html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
+				text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
 			});
 
 			return success(response);

@@ -587,12 +587,14 @@ export const submitRevision = async ({
 
 export const revokeApplication = async (
 	applicationId: number,
+	isDACMember: boolean,
 ): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
 
 		if (!result.success) {
 			return result;
@@ -616,6 +618,39 @@ export const revokeApplication = async (
 		}
 
 		const applicationDTO = convertToBasicApplicationRecord(updatedResult.data);
+		const applicationWithContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!applicationWithContents.success) {
+			logger.error(`Unable to retrieve information to send revoke email: ${applicationId}`);
+			return applicationDTO;
+		}
+
+		if (isDACMember) {
+			const {
+				email: { dacAddress },
+			} = getEmailConfig;
+
+			emailService.sendEmailDacRevoke({
+				id: application.id,
+				to: dacAddress,
+				name: 'DAC Member',
+				comment: 'test DAC',
+			});
+			emailService.sendEmailApplicantRevoke({
+				id: application.id,
+				to: applicationWithContents.data.contents?.applicant_institutional_email,
+				name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
+				comment: 'test Applicant',
+				dacRevoked: true,
+			});
+		} else {
+			emailService.sendEmailApplicantRevoke({
+				id: application.id,
+				to: applicationWithContents.data.contents?.applicant_institutional_email,
+				name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
+				comment: 'test Applicant',
+			});
+		}
 
 		return applicationDTO;
 	} catch (error) {

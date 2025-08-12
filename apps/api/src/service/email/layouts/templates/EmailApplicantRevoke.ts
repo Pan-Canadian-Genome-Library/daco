@@ -22,7 +22,12 @@ import { GenerateRejectType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailApplicantRevoke = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
+export const GenerateEmailApplicantRevoke = ({
+	id,
+	name,
+	comment,
+	dacRevoked,
+}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -39,10 +44,8 @@ export const GenerateEmailApplicantRevoke = ({ id, name, comment }: Omit<Generat
                     ${comment}
                 </mj-text>
                 <mj-text>
-                    You and all the collaborators will no longer have access to PCGL controlled data.  
-                </mj-text>
-                <mj-text>
-                    We appreciate your interest in the PCGL controlled data, thank you again for your time! 
+                    You and all the collaborators will no longer have access to PCGL controlled data. 
+                    ${dacRevoked ? `If you disagree with the decision to revoke the application, or have any questions, please reach out to us.` : `We appreciate your interest in the PCGL controlled data, thank you again for your time!`} 
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -54,11 +57,16 @@ export const GenerateEmailApplicantRevoke = ({ id, name, comment }: Omit<Generat
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApplicantRevokePlain = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
+export const GenerateEmailApplicantRevokePlain = ({
+	id,
+	name,
+	comment,
+	dacRevoked,
+}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
 	return ` Dear ${name},
     \n We are writing to inform you that you have revoked the PCGL-${id}. This is the message you left on the revoked application: 
     \n ${comment}
     \n You and all the collaborators will no longer have access to PCGL controlled data.  
-    \n We appreciate your interest in the PCGL controlled data, thank you again for your time! 
+    \n ${dacRevoked ? `If you disagree with the decision to revoke the application, or have any questions, please reach out to us.` : `We appreciate your interest in the PCGL controlled data, thank you again for your time!`} 
     \n Best regards, \n The PCGL Data Access Compliance Office`;
 };

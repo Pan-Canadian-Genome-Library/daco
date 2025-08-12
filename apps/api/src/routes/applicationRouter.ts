@@ -572,6 +572,8 @@ applicationRouter.post(
 			const { user } = request.session;
 			const { userId } = user || {};
 
+			const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+
 			if (!userId) {
 				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
@@ -596,7 +598,7 @@ applicationRouter.post(
 					}
 				}
 
-				const result = await revokeApplication(applicationId);
+				const result = await revokeApplication(applicationId, isDACMember);
 
 				if (result.success) {
 					response.status(200).json(result.data);
