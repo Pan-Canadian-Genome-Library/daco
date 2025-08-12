@@ -29,6 +29,7 @@
 		"revokeApplication": {
 			"title": "Are you sure you want to revoke application PCGL-{{id}}?",
 			"description": "If so, the applicant and all collaborators will lose data access.",
+			"revokeLabel": "Reason for revoking this application:",
 			"buttons": {
 				"revoke": "Revoke"
 			},

@@ -67,6 +67,8 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const [showRevokeModal, setShowRevokeModal] = useState(false);
 	const [showApprovalModal, setShowApprovalModal] = useState(false);
 	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
+	const [showRevokeSuccessModal, setShowRevokeSuccessModal] = useState(false);
+
 	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
 	const {
 		state: { fields },
@@ -282,9 +284,16 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 
 			{/* Revoke Modal */}
 			<RevokeApplicationModal
-				applicationId={id}
-				showRevokeModal={showRevokeModal}
-				setShowRevokeModal={setShowRevokeModal}
+				id={id}
+				isOpen={showRevokeModal}
+				setIsOpen={setShowRevokeModal}
+				setShowRevokeSuccessModal={setShowRevokeSuccessModal}
+			/>
+			<SuccessModal
+				successText={translate('modals.revokeApplication.notifications.successTitle', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showRevokeSuccessModal}
+				onOk={() => setShowRevokeSuccessModal(false)}
 			/>
 			{/* Approval Modal */}
 			<ApproveApplicationModal
