@@ -66,10 +66,11 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showRevokeModal, setShowRevokeModal] = useState(false);
 	const [showApprovalModal, setShowApprovalModal] = useState(false);
+
 	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
 	const [showRevokeSuccessModal, setShowRevokeSuccessModal] = useState(false);
-
 	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
+
 	const {
 		state: { fields },
 	} = useApplicationContext();
@@ -243,14 +244,12 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				showEditModal={showEditModal}
 				setShowEditModal={setShowEditModal}
 			/>
-
 			{/* Close Modal */}
 			<CloseApplicationModal
 				id={id}
 				setShowCloseApplicationModal={setShowCloseApplicationModal}
 				showCloseApplicationModal={showCloseApplicationModal}
 			/>
-
 			{/* Reject Modal */}
 			<RejectApplicationModal
 				id={id}
@@ -258,19 +257,33 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				setIsOpen={setShowRejectModal}
 				setShowSuccessRejectsModal={setShowRejectSuccessModal}
 			/>
-			<SuccessModal
-				successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
-				okText={translate('modals.buttons.ok')}
-				isOpen={showRejectSuccessModal}
-				onOk={() => setShowRejectSuccessModal(false)}
-			/>
-
 			{/* Revisions Modal */}
 			<RequestRevisionsModal
 				id={id}
 				setSuccessModalOpen={setShowReqRevisionsSuccessModal}
 				isOpen={openRevisionsModal}
 				setIsOpen={setOpenRevisionsModal}
+			/>
+			{/* Revoke Modal */}
+			<RevokeApplicationModal
+				id={id}
+				isOpen={showRevokeModal}
+				setIsOpen={setShowRevokeModal}
+				setShowRevokeSuccessModal={setShowRevokeSuccessModal}
+			/>
+			{/* Approval Modal */}
+			<ApproveApplicationModal
+				id={id}
+				isOpen={showApprovalModal}
+				setIsOpen={setShowApprovalModal}
+				setShowSuccessApproveModal={setShowSuccessApproveModal}
+			/>
+			{/* Success Modals */}
+			<SuccessModal
+				successText={translate('modals.rejectApplication.notifications.rejectApplicationSuccess', { id })}
+				okText={translate('modals.buttons.ok')}
+				isOpen={showRejectSuccessModal}
+				onOk={() => setShowRejectSuccessModal(false)}
 			/>
 			<SuccessModal
 				successText={translate('modals.requestRevisions.notifications.revisionsRequested', { id })}
@@ -281,26 +294,11 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 					navigate('/dashboard');
 				}}
 			/>
-
-			{/* Revoke Modal */}
-			<RevokeApplicationModal
-				id={id}
-				isOpen={showRevokeModal}
-				setIsOpen={setShowRevokeModal}
-				setShowRevokeSuccessModal={setShowRevokeSuccessModal}
-			/>
 			<SuccessModal
 				successText={translate('modals.revokeApplication.notifications.successTitle', { id })}
 				okText={translate('modals.buttons.ok')}
 				isOpen={showRevokeSuccessModal}
 				onOk={() => setShowRevokeSuccessModal(false)}
-			/>
-			{/* Approval Modal */}
-			<ApproveApplicationModal
-				id={id}
-				isOpen={showApprovalModal}
-				setIsOpen={setShowApprovalModal}
-				setShowSuccessApproveModal={setShowSuccessApproveModal}
 			/>
 			<SuccessModal
 				successText={translate('modals.approveApplication.notifications.applicationApproveSuccess', { id })}
