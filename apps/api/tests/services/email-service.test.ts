@@ -157,4 +157,30 @@ describe('Email Service', () => {
 			assert.ok(!response.success);
 		});
 	});
+
+	describe('sendEmailRevoke DAC', () => {
+		it('Should throw an error if recipient email is undefined or null', async () => {
+			const response = await testEmailService.sendEmailDacRevoke({
+				id: 1,
+				to: null,
+				name: 'Terry',
+				comment: 'Revoke Application',
+			});
+
+			assert.ok(!response.success);
+		});
+	});
+
+	describe('sendEmailRevoke Applicant', () => {
+		it('Should throw an error if recipient email is undefined or null', async () => {
+			const response = await testEmailService.sendEmailApplicantRevoke({
+				id: 1,
+				to: null,
+				name: 'Terry',
+				comment: 'Revoke Application',
+			});
+
+			assert.ok(!response.success);
+		});
+	});
 });
