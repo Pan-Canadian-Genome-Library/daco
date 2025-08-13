@@ -22,7 +22,12 @@ import { GenerateRejectType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailDacRevoke = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
+export const GenerateEmailDacRevoke = ({
+	id,
+	name,
+	comment,
+	dacRevoked,
+}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -33,13 +38,13 @@ export const GenerateEmailDacRevoke = ({ id, name, comment }: Omit<GenerateRejec
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    We are writing to inform you that you have revoked the <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}</a> This is the message you left on the revoked application: 
+                    ${dacRevoked ? `We are writing to inform you that you have revoked the <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}.</a>` : `We are writing to inform you that the applicant has revoked the <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}.</a>`} This is the message we left on the revoked application: 
                 </mj-text>
                 <mj-text>
                     ${comment}
                 </mj-text>
                 <mj-text>
-                    The applicant has been notified and they will no longer have access to PCGL controlled data.                  
+                    The applicant has been notified and they will no longer have access to PCGL controlled data.  
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -51,10 +56,15 @@ export const GenerateEmailDacRevoke = ({ id, name, comment }: Omit<GenerateRejec
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailDacRevokePlain = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
+export const GenerateEmailDacRevokePlain = ({
+	id,
+	name,
+	comment,
+	dacRevoked,
+}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
 	return ` Dear ${name},
-    \n We are writing to inform you that you have revoked the PCGL-${id}. This is the message you left on the revoked application: 
+    \n ${dacRevoked ? `We are writing to inform you that you have revoked the >PCGL-${id}.` : `We are writing to inform you that the applicant has revoked the PCGL-${id}.`} This is the message we left on the revoked application: 
     \n ${comment}
-    \n The applicant has been notified and they will no longer have access to PCGL controlled data.                   
+    \n The applicant has been notified and they will no longer have access to PCGL controlled data.  
     \n Best regards, \n The PCGL Data Access Compliance Office`;
 };

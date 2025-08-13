@@ -38,13 +38,15 @@ export const GenerateEmailApplicantRevoke = ({
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    We are writing to inform you that you have revoked the <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}</a> This is the message you left on the revoked application: 
+                    ${dacRevoked ? `We are writing to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}</a> has been revoked by the PCGL Data Access Committee` : `We are writing to inform you that you have revoked <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}.</a>`} This is the message you left on the revoked application: 
                 </mj-text>
                 <mj-text>
                     ${comment}
                 </mj-text>
                 <mj-text>
-                    You and all the collaborators will no longer have access to PCGL controlled data. 
+                    You and all the collaborators will no longer have access to PCGL controlled data.
+                </mj-text>
+                <mj-text>
                     ${dacRevoked ? `If you disagree with the decision to revoke the application, or have any questions, please reach out to us.` : `We appreciate your interest in the PCGL controlled data, thank you again for your time!`} 
                 </mj-text>
                 <mj-text>
@@ -64,7 +66,7 @@ export const GenerateEmailApplicantRevokePlain = ({
 	dacRevoked,
 }: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
 	return ` Dear ${name},
-    \n We are writing to inform you that you have revoked the PCGL-${id}. This is the message you left on the revoked application: 
+    \n ${dacRevoked ? `We are writing to inform you that your PCGL-${id} has been revoked by the PCGL Data Access Committee` : `We are writing to inform you that you have revoked PCGL-${id}.`} This is the message you left on the revoked application: 
     \n ${comment}
     \n You and all the collaborators will no longer have access to PCGL controlled data.  
     \n ${dacRevoked ? `If you disagree with the decision to revoke the application, or have any questions, please reach out to us.` : `We appreciate your interest in the PCGL controlled data, thank you again for your time!`} 
