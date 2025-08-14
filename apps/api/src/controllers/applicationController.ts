@@ -625,18 +625,8 @@ export const revokeApplication = async (
 			logger.error(`Unable to retrieve information to send revoke email: ${applicationId}`);
 			return applicationDTO;
 		}
-		const {
-			email: { dacAddress },
-		} = getEmailConfig;
 
 		if (isDACMember) {
-			emailService.sendEmailDacRevoke({
-				id: application.id,
-				to: dacAddress,
-				name: 'DAC Member',
-				comment: revokeReason,
-				dacRevoked: true,
-			});
 			emailService.sendEmailApplicantRevoke({
 				id: application.id,
 				to: applicationWithContents.data.contents?.applicant_institutional_email,
@@ -645,13 +635,6 @@ export const revokeApplication = async (
 				dacRevoked: true,
 			});
 		} else {
-			emailService.sendEmailDacRevoke({
-				id: application.id,
-				to: dacAddress,
-				name: `DAC Member`,
-				comment: revokeReason,
-				dacRevoked: false,
-			});
 			emailService.sendEmailApplicantRevoke({
 				id: application.id,
 				to: applicationWithContents.data.contents?.applicant_institutional_email,

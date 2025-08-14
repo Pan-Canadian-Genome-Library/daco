@@ -45,7 +45,6 @@ import {
 	GenerateEmailDacForSubmittedRevision,
 	GenerateEmailDacForSubmittedRevisionPlain,
 } from './layouts/templates/EmailDacRevision.ts';
-import { GenerateEmailDacRevoke, GenerateEmailDacRevokePlain } from './layouts/templates/EmailDacRevoke.ts';
 import {
 	GenerateEmailInstitutionalRepReview,
 	GenerateEmailInstitutionalRepReviewPlain,
@@ -364,41 +363,7 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	// Email to DAC for Revoke
-	sendEmailDacRevoke: async ({
-		id,
-		name,
-		to,
-		comment,
-		dacRevoked = false,
-	}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
-
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
-			}
-
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.DACO_APPLICATION_STATUS,
-				html: GenerateEmailDacRevoke({ id, name, comment, dacRevoked }),
-				text: GenerateEmailDacRevokePlain({ id, name, comment, dacRevoked }),
-			});
-
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacRevoke`;
-
-			logger.error(message, error);
-
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to DAC for Revoke
+	// Email to Applicant that application has been revoked
 	sendEmailApplicantRevoke: async ({
 		id,
 		name,
