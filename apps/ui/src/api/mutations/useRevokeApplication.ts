@@ -29,10 +29,13 @@ const useRevokeApplication = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 
-	return useMutation<ApplicationDTO, ServerError, { applicationId?: string | number }>({
-		mutationFn: async ({ applicationId }) => {
+	return useMutation<ApplicationDTO, ServerError, { applicationId?: string | number; revokeReason?: string | null }>({
+		mutationFn: async ({ applicationId, revokeReason }) => {
 			const response = await fetch(`/applications/${applicationId}/revoke`, {
 				method: 'POST',
+				body: JSON.stringify({
+					revokeReason,
+				}),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();

@@ -158,3 +158,7 @@ export const submitApplicationRequestSchema = z
 export const rejectApplicationRequestSchema = z.object({
 	rejectionReason: z.string().nullable(),
 });
+
+export const revokeApplicationRequestSchema = z.object({
+	revokeReason: z.string().nullable(),
+});
