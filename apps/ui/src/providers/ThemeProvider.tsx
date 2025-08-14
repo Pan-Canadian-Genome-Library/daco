@@ -112,6 +112,9 @@ const pcglTheme: ThemeConfig = {
 		},
 		Select: {
 			colorBgContainer: pcglColours.white,
+			multipleItemBg: pcglColours.greyLight,
+			controlItemBgActive: pcglColours.white,
+			optionSelectedColor: pcglColours.grey,
 		},
 		Input: {
 			colorBgContainer: pcglColours.white,
