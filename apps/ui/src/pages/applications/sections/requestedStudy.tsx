@@ -119,7 +119,7 @@ const RequestedStudy = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<MultiSelectBox
 								label={translate('requested-study.section1.form.studyName')}
-								name="requestedStudies.0"
+								name="requestedStudies"
 								placeholder="Select"
 								control={control}
 								rule={rule}

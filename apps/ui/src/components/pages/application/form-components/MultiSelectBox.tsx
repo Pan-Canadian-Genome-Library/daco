@@ -26,7 +26,7 @@ import { CheckCircleFilled } from '@ant-design/icons';
 const { Item } = Form;
 
 interface SelectBoxProps extends BasicFormFieldProps {
-	options?: {
+	options: {
 		label: string;
 		value: string | number;
 	}[];
@@ -47,13 +47,14 @@ const MultiSelectBox = <T extends FieldValues>(props: UseControllerProps<T> & Se
 						rules={[props.rule]}
 						required={props.required}
 						initialValue={props.initialValue ?? field.value}
-						validateTrigger="onBlur"
+						validateTrigger="onChange"
 					>
 						<Select
 							{...field}
+							onChange={field.onChange}
 							mode="multiple"
+							removeIcon
 							disabled={props.disabled}
-							options={props.options}
 							showSearch={false}
 							menuItemSelectedIcon={
 								<Flex style={{ marginLeft: '10px' }}>
@@ -61,7 +62,13 @@ const MultiSelectBox = <T extends FieldValues>(props: UseControllerProps<T> & Se
 								</Flex>
 							}
 							placeholder={props.placeholder}
-						/>
+						>
+							{props.options.map((value) => (
+								<Select.Option value={value.value} key={value.label}>
+									{value.label}
+								</Select.Option>
+							))}
+						</Select>
 					</Item>
 				);
 			}}
