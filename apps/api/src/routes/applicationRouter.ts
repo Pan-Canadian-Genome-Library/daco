@@ -583,31 +583,28 @@ applicationRouter.post(
 					return;
 				}
 
-				try {
-					const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
-					if (!userMayEditResult.success) {
-						switch (userMayEditResult.error) {
-							case 'SYSTEM_ERROR': {
-								response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-								return;
-							}
-							case 'NOT_FOUND': {
-								response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-								return;
-							}
-							case 'FORBIDDEN': {
-								response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-								return;
-							}
+				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
+
+				if (!userMayEditResult.success) {
+					switch (userMayEditResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
+						case 'FORBIDDEN': {
+							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
 						}
 					}
+				}
 
-					const result = await revokeApplication(applicationId, isDACMember, revokeReason);
+				const result = await revokeApplication(applicationId, isDACMember, revokeReason);
 
-					if (result.success) {
-						response.status(200).json(result.data);
-						return;
-					}
+				if (!result.success) {
 					switch (result.error) {
 						case 'INVALID_STATE_TRANSITION': {
 							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
@@ -622,12 +619,10 @@ applicationRouter.post(
 							return;
 						}
 					}
-				} catch (error) {
-					response.status(500).json({
-						error: 'SYSTEM_ERROR',
-						message: 'Unexpected error.',
-					});
 				}
+
+				response.status(200).json(result.data);
+				return;
 			},
 		),
 	),
