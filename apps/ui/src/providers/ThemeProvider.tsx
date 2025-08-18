@@ -41,6 +41,7 @@ export const pcglColours = {
 	black: '#000000',
 	grey: '#D9D9D9',
 	greyLight: '#FAFAFA',
+	darkGrey: 'rgba(0, 0, 0, 0.45)',
 };
 
 // General Theme Configurations
@@ -114,7 +115,7 @@ const pcglTheme: ThemeConfig = {
 			colorBgContainer: pcglColours.white,
 			multipleItemBg: pcglColours.greyLight,
 			controlItemBgActive: pcglColours.white,
-			optionSelectedColor: pcglColours.grey,
+			colorPrimary: pcglColours.darkGrey, // Checkmark icon color
 		},
 		Input: {
 			colorBgContainer: pcglColours.white,

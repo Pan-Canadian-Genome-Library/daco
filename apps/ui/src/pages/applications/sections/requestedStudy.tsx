@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
-import MultiSelectBox from '@/components/pages/application/form-components/MultiSelectBox';
+import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -117,12 +117,13 @@ const RequestedStudy = () => {
 				<SectionContent showDivider={false}>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<MultiSelectBox
+							<SelectBox
 								label={translate('requested-study.section1.form.studyName')}
 								name="requestedStudies"
 								placeholder="Select"
 								control={control}
 								rule={rule}
+								mode="multiple"
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
 									return { value: study.studyName, label: study.studyName };
 								})}
