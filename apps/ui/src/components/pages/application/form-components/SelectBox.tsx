@@ -17,20 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Form, Select } from 'antd';
+import { Flex, Form, Select } from 'antd';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
+import { CheckCircleFilled } from '@ant-design/icons';
 
 const { Item } = Form;
 
 interface SelectBoxProps extends BasicFormFieldProps {
-	options?: {
+	options: {
 		label: string;
 		value: string | number;
 	}[];
 	initialValue?: object | string | null;
 	placeholder?: string;
+	mode?: 'multiple' | 'tags';
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
@@ -48,7 +50,20 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 						initialValue={props.initialValue ?? field.value}
 						validateTrigger="onBlur"
 					>
-						<Select {...field} disabled={props.disabled} options={props.options} placeholder={props.placeholder} />
+						<Select
+							{...field}
+							mode={props.mode}
+							disabled={props.disabled}
+							options={props.options}
+							placeholder={props.placeholder}
+							menuItemSelectedIcon={
+								<Flex style={{ marginLeft: '10px' }}>
+									<CheckCircleFilled />
+								</Flex>
+							}
+							removeIcon
+							showSearch={false}
+						/>
 					</Item>
 				);
 			}}
