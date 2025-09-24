@@ -17,57 +17,115 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import axios, { isAxiosError, type AxiosRequestConfig } from 'axios';
-
-import { type AuthConfig } from '@/config/authConfig.ts';
-import { serverConfig } from '@/config/serverConfig.ts';
+import { authConfig } from '@/config/authConfig.ts';
 import logger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
+import isValidServiceTokenRes from '@/utils/typeguards.ts';
+import urlJoin from 'url-join';
 import { authZUserInfo, type PCGLAuthZUserInfoResponse } from './types.ts';
 
-const authZClient = async ({
-	authConfig,
-	httpMethod = 'GET',
-	endpointURL,
-	accessToken,
-	body,
-}: {
-	authConfig: AuthConfig;
-	httpMethod?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-	endpointURL: string;
-	accessToken?: string;
-	body?: any;
-}) => {
-	const axiosOptions: AxiosRequestConfig = {
-		headers: {
-			Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
-			'User-Agent': `PCGL DACO Service / ${serverConfig.npm_package_version}`,
-			'Content-Type': `application/json`,
-		},
-		data: body ? body : undefined,
-	};
+let serviceToken: string | undefined = undefined;
 
-	switch (httpMethod) {
-		case 'GET':
-			return await axios.get(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
-		case 'POST':
-			return await axios.post(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
-		case 'DELETE':
-			return await axios.delete(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
-		case 'PATCH':
-			return await axios.patch(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
-		case 'PUT':
-			return await axios.put(`${authConfig.AUTHZ_ENDPOINT}${endpointURL}`, axiosOptions);
+/**
+ * Function to fetch AuthZ serviceToken to append to header requirement X-Service-Token
+ */
+export const refreshAuthZServiceToken = async () => {
+	const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_UUID, AUTHZ_SERVICE_ID } = authConfig;
+
+	try {
+		const url = urlJoin(AUTHZ_ENDPOINT, `/service/${AUTHZ_SERVICE_ID}/verify`);
+
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				service_uuid: AUTHZ_SERVICE_UUID,
+			}),
+		});
+		if (response.ok) {
+			throw new Error(`Failed to fetch service token with status ${response.status}`);
+		}
+		const tokenResponse = await response.json();
+
+		if (!isValidServiceTokenRes(tokenResponse)) {
+			throw new Error(`Malformed token response`);
+		}
+
+		serviceToken = tokenResponse.token;
+	} catch (error) {
+		if (typeof error === 'object') {
+			throw new Error(JSON.stringify(error));
+		}
+		// console.log(typeof error === 'object');
+
+		throw new Error(`${error}`);
 	}
 };
 
+/**
+ *  Function to perform fetch requests to AUTHZ service
+ *
+ * @param resource endpoint to query from authz
+ * @param token authorization token
+ * @param options optional additional request configurations for the fetch call
+ *
+ */
+export const fetchAuthZResource = async (resource: string, token: string, options?: RequestInit) => {
+	/**
+	 * Internal function that does the work of fetching the resource from AuthZ.
+	 * We will need to retry this if this is rejected due to an expired serviceToken.
+	 */
+	async function _fetchFromAuthZ() {
+		const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_ID } = authConfig;
+
+		const url = urlJoin(AUTHZ_ENDPOINT, resource);
+		const headers = new Headers({
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json',
+			'X-Service-ID': `${AUTHZ_SERVICE_ID}`,
+			'X-Service-Token': `${serviceToken}`,
+		});
+
+		try {
+			return await fetch(url, { headers, ...options });
+		} catch (error) {
+			logger.error(`[AUTHZ]: Something went wrong fetching authz service. ${error}`);
+			throw new Error('Something went wrong while verifying PCGL user account information, please try again later.');
+		}
+	}
+
+	// If the serviceToken doesn't exist, then call refresh service token
+	if (serviceToken === undefined) {
+		await refreshAuthZServiceToken();
+	}
+
+	const firstResponse = await _fetchFromAuthZ();
+
+	// CASE-1: Bad bearer token
+	if (!firstResponse.ok && firstResponse.status === 401) {
+		logger.error(`[AUTHZ]: Bearer token is invalid`);
+		throw new Error('Something went wrong while verifying PCGL user account information, please try again later.');
+	}
+	// CASE-2: Bad serviceToken
+	// Trigger refresh service token and recall with the new token
+	if (!firstResponse.ok && firstResponse.status === 403) {
+		await refreshAuthZServiceToken();
+		return await _fetchFromAuthZ();
+	}
+
+	return firstResponse;
+};
+
 export const getUserInformation = async (
-	authConfig: AuthConfig,
 	accessToken: string,
 ): AsyncResult<PCGLAuthZUserInfoResponse, 'SYSTEM_ERROR' | 'FORBIDDEN' | 'NOT_FOUND'> => {
 	try {
-		const request = await authZClient({ authConfig, endpointURL: '/user/me', accessToken });
-		const validatedAuthZData = authZUserInfo.safeParse(request.data);
+		const response = await fetchAuthZResource('/user/me', accessToken);
+		const res = await response.json();
+
+		const validatedAuthZData = authZUserInfo.safeParse(res);
 
 		if (!validatedAuthZData.success) {
 			logger.error(`PCGL AuthZ service returned unexpected, or malformed data. ${validatedAuthZData.error}`);
@@ -76,25 +134,7 @@ export const getUserInformation = async (
 
 		return success(validatedAuthZData.data);
 	} catch (error) {
-		if (!isAxiosError(error)) {
-			logger.error(`Unexpected error while getting user info from the AuthZ service.`, error);
-			return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
-		}
-
-		switch (error.status) {
-			case 401:
-			case 403:
-				return failure('FORBIDDEN', 'Access token is invalid, it may be expired.');
-			case 404:
-				return failure(
-					'NOT_FOUND',
-					'User does not exist within PCGL. They are not yet authorized to access the PCGL service.',
-				);
-			default:
-				logger.error(
-					`PCGL Authorization service returned an unexpected response.\n\t${error.response?.status} - ${error.response?.data}`,
-				);
-				return failure('SYSTEM_ERROR', 'Error contacting the PCGL Authorization Service.');
-		}
+		logger.error(`Unexpected error while getting user info from the AuthZ service.`, error);
+		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
 	}
 };
