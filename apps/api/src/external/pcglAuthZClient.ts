@@ -44,7 +44,7 @@ export const refreshAuthZServiceToken = async () => {
 				service_uuid: AUTHZ_SERVICE_UUID,
 			}),
 		});
-		if (response.ok) {
+		if (!response.ok) {
 			throw new Error(`Failed to fetch service token with status ${response.status}`);
 		}
 		const tokenResponse = await response.json();
