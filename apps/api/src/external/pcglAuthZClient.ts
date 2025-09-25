@@ -55,11 +55,6 @@ export const refreshAuthZServiceToken = async () => {
 
 		serviceToken = tokenResponse.token;
 	} catch (error) {
-		if (typeof error === 'object') {
-			throw new Error(JSON.stringify(error));
-		}
-		// console.log(typeof error === 'object');
-
 		throw new Error(`${error}`);
 	}
 };
