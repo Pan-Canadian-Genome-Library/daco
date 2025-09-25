@@ -20,9 +20,8 @@
 import { authConfig } from '@/config/authConfig.ts';
 import logger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
-import isValidServiceTokenRes from '@/utils/typeguards.ts';
 import urlJoin from 'url-join';
-import { authZUserInfo, type PCGLAuthZUserInfoResponse } from './types.ts';
+import { authZUserInfo, ServiceTokenResponse, type PCGLAuthZUserInfoResponse } from './types.ts';
 
 let serviceToken: string | undefined = undefined;
 
@@ -49,11 +48,12 @@ export const refreshAuthZServiceToken = async () => {
 		}
 		const tokenResponse = await response.json();
 
-		if (!isValidServiceTokenRes(tokenResponse)) {
+		const validatedAuthZData = ServiceTokenResponse.safeParse(tokenResponse);
+		if (!validatedAuthZData.success) {
 			throw new Error(`Malformed token response`);
 		}
 
-		serviceToken = tokenResponse.token;
+		serviceToken = validatedAuthZData.data.token;
 	} catch (error) {
 		throw new Error(`${error}`);
 	}
@@ -86,8 +86,7 @@ export const fetchAuthZResource = async (resource: string, token: string, option
 		try {
 			return await fetch(url, { headers, ...options });
 		} catch (error) {
-			logger.error(`[AUTHZ]: Something went wrong fetching authz service. ${error}`);
-			throw new Error('Something went wrong while verifying PCGL user account information, please try again later.');
+			throw new Error(`Something went wrong fetching authz service. ${error}`);
 		}
 	}
 
@@ -100,8 +99,7 @@ export const fetchAuthZResource = async (resource: string, token: string, option
 
 	// CASE-1: Bad bearer token
 	if (!firstResponse.ok && firstResponse.status === 401) {
-		logger.error(`[AUTHZ]: Bearer token is invalid`);
-		throw new Error('Something went wrong while verifying PCGL user account information, please try again later.');
+		throw new Error(`Bearer token is invalid`);
 	}
 	// CASE-2: Bad serviceToken
 	// Trigger refresh service token and recall with the new token
@@ -123,13 +121,13 @@ export const getUserInformation = async (
 		const validatedAuthZData = authZUserInfo.safeParse(res);
 
 		if (!validatedAuthZData.success) {
-			logger.error(`PCGL AuthZ service returned unexpected, or malformed data. ${validatedAuthZData.error}`);
+			logger.error(`[AUTHZ]: AuthZ service returned unexpected, or malformed data.`, validatedAuthZData.error);
 			return failure('SYSTEM_ERROR', 'Unable to retrieve user information from the PCGL AuthZ service.');
 		}
 
 		return success(validatedAuthZData.data);
 	} catch (error) {
-		logger.error(`Unexpected error while getting user info from the AuthZ service.`, error);
+		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
 		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
 	}
 };
