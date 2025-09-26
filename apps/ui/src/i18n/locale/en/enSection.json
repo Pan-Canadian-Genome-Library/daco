@@ -23,7 +23,7 @@
 	},
 	"institutional-section": {
 		"title": "Institutional Representative",
-		"description1": "An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
+		"description1": "An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section G: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
 		"section1": "Institutional Representative",
 		"section2": "Institution/Company Mailing Address",
 		"primaryEmailLabel": "Must be affiliated with the same institution as the Principal Investigator."
@@ -212,7 +212,7 @@
 		},
 		"modal": {
 			"title": "Are you sure you want to submit this application? ",
-			"description": "Are you sure you want to submit Application: PCGL-{{id}}? If so, the application will be locked for editing and the institutional Representative will be notified to begin the review process.",
+			"description": "Are you sure you want to submit Application: PCGL-{{id}}? If so, the application will be locked for editing and the {{reviewer}} will be notified to begin the review process.",
 			"submit": "Proceed with submission",
 			"cancel": "Cancel"
 		},

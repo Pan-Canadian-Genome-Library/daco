@@ -116,13 +116,14 @@ const RequestedStudy = () => {
 				/>
 				<SectionContent showDivider={false}>
 					<Row>
-						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
 								label={translate('requested-study.section1.form.studyName')}
-								name="requestedStudies.0"
+								name="requestedStudies"
 								placeholder="Select"
 								control={control}
 								rule={rule}
+								mode="multiple"
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
 									return { value: study.studyName, label: study.studyName };
 								})}

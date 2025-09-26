@@ -93,7 +93,7 @@ export type EthicsSchemaType = z.infer<typeof ethicsSchema>;
 
 export const requestedStudiesSchema = z.object({
 	requestedStudies: z.array(z.string()).superRefine((study, context) => {
-		if (study.length !== 1) {
+		if (study.length < 1) {
 			context.addIssue({
 				code: z.ZodIssueCode.custom,
 				params: { violation: 'requiredField' },

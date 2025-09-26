@@ -34,7 +34,7 @@ interface SuccessModalProps {
 const SubmitApplicationModal = ({ isOpen, setIsOpen }: SuccessModalProps) => {
 	const { t: translate } = useTranslation();
 	const {
-		state: { applicationState },
+		state: { applicationState, applicationUserRole },
 	} = useApplicationContext();
 	const { appId } = useOutletContext<ApplicationOutletContext>();
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
@@ -68,7 +68,13 @@ const SubmitApplicationModal = ({ isOpen, setIsOpen }: SuccessModalProps) => {
 			onCancel={() => setIsOpen(false)}
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }}>
-				<Text>{translate('sign-and-submit-section.modal.description', { id: appId })}</Text>
+				<Text>
+					{translate('sign-and-submit-section.modal.description', {
+						id: appId,
+						reviewer:
+							applicationUserRole === 'INSTITUTIONAL_REP' ? 'Data Access Committee' : 'Institutional Representative',
+					})}
+				</Text>
 			</Flex>
 		</Modal>
 	);
