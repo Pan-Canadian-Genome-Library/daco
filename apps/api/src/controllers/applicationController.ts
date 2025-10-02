@@ -626,23 +626,13 @@ export const revokeApplication = async (
 			return applicationDTO;
 		}
 
-		if (isDACMember) {
-			emailService.sendEmailApplicantRevoke({
-				id: application.id,
-				to: applicationWithContents.data.contents?.applicant_institutional_email,
-				name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
-				comment: revokeReason,
-				dacRevoked: true,
-			});
-		} else {
-			emailService.sendEmailApplicantRevoke({
-				id: application.id,
-				to: applicationWithContents.data.contents?.applicant_institutional_email,
-				name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
-				comment: revokeReason,
-				dacRevoked: false,
-			});
-		}
+		emailService.sendEmailApplicantRevoke({
+			id: application.id,
+			to: applicationWithContents.data.contents?.applicant_institutional_email,
+			name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
+			comment: revokeReason,
+			dacRevoked: isDACMember,
+		});
 
 		return applicationDTO;
 	} catch (error) {
