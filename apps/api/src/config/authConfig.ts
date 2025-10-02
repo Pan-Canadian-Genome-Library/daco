@@ -31,11 +31,14 @@ if (serverConfig.isProduction && !enabled) {
 }
 
 const authConfigSchema = z.object({
-	AUTHZ_ENDPOINT: z.string().url(),
 	AUTH_PROVIDER_HOST: z.string().url(),
 	AUTH_CLIENT_ID: z.string(),
 	AUTH_CLIENT_SECRET: z.string(),
+	AUTHZ_ENDPOINT: z.string().url(),
 	AUTHZ_GROUP_DACO: z.string(),
+	AUTHZ_GROUP_ADMIN: z.string().optional(),
+	AUTHZ_SERVICE_ID: z.string(),
+	AUTHZ_SERVICE_UUID: z.string(),
 });
 
 const parseResult = authConfigSchema.safeParse(process.env);

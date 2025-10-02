@@ -153,10 +153,10 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 			</ProtectedComponent>,
 			<ProtectedComponent key={'header-dac-controls'} requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
-				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
-				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
-				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
 				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
+				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
+				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
+				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 			</ProtectedComponent>,
 			<ProtectedComponent
 				key={'header-download'}

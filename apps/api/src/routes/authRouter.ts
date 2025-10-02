@@ -168,7 +168,8 @@ authRouter.get('/token', async (request, response) => {
 			throw new ExternalAuthError(tokenResponse.error, tokenResponse.message);
 		}
 
-		const pcglAuthzResponse = await pcglAuthZClient.getUserInformation(authConfig, tokenResponse.data.access_token);
+		const pcglAuthzResponse = await pcglAuthZClient.getUserInformation(tokenResponse.data.access_token);
+
 		if (!pcglAuthzResponse.success) {
 			throw new ExternalAuthError(pcglAuthzResponse.error, pcglAuthzResponse.message);
 		}
@@ -182,7 +183,6 @@ authRouter.get('/token', async (request, response) => {
 		if (!userAccountAliasing.success) {
 			throw new Error(userAccountAliasing.message);
 		}
-
 		const sessionUserAliasing = convertToSessionUser(oidcDataResponse.data, pcglAuthzResponse.data);
 		if (!sessionUserAliasing.success) {
 			throw new Error(sessionUserAliasing.message);
