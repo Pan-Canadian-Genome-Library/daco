@@ -17,7 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { PDFDocument } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+import fs from 'fs';
+import { degrees, PDFDocument, rgb } from 'pdf-lib';
 
 import { ApplicationResponseData, CollaboratorDTO, FilesDTO, SignatureDTO } from '@pcgl-daco/data-model';
 
@@ -25,6 +27,7 @@ import { serverConfig } from '@/config/serverConfig.ts';
 import logger from '@/logger.ts';
 import { renderApplicationPDF } from '@/service/pdf/documents/PCGLApplication.tsx';
 import { failure, success } from '@/utils/results.ts';
+import { standardStyles } from './components/standardStyling.ts';
 
 /**
  * These constants appear in the PDF metadata, either in Finder / Windows Explorer file metadata, or within
@@ -56,6 +59,16 @@ const PDF_AUTHOR = `Data Access Compliance Office, Pan-Canadian Genome Library`;
  */
 const PDF_LANGUAGE = `en-ca`;
 
+export const TrademarkEnum = {
+	APPROVED: 'APPROVED',
+	NOT_APPROVED: 'NOT APPROVED',
+	REJECTED: 'REJECTED',
+	CLOSED: 'CLOSED',
+	REVOKED: 'REVOKED',
+} as const;
+
+export type TrademarkValues = (typeof TrademarkEnum)[keyof typeof TrademarkEnum];
+
 const pdfService = () => ({
 	renderPCGLApplicationPDF: async ({
 		applicationContents,
@@ -63,12 +76,14 @@ const pdfService = () => ({
 		collaboratorsContents,
 		fileContents,
 		filename,
+		trademark = 'APPROVED',
 	}: {
 		applicationContents: ApplicationResponseData;
 		signatureContents: SignatureDTO;
 		collaboratorsContents: CollaboratorDTO[];
 		fileContents: FilesDTO;
 		filename: string;
+		trademark?: TrademarkValues;
 	}) => {
 		/**
 		 * This acts as a title for the PDF, displayed at the top. Along with being displayed as
@@ -88,6 +103,7 @@ const pdfService = () => ({
 
 			const finalApplication = await PDFDocument.create();
 
+			finalApplication.registerFontkit(fontkit);
 			finalApplication.setLanguage(PDF_LANGUAGE);
 			finalApplication.setTitle(filename, {
 				showInWindowTitleBar: true,
@@ -107,6 +123,41 @@ const pdfService = () => ({
 
 			const ethicsPages = await finalApplication.copyPages(ethicsPDF, ethicsPDF.getPageIndices());
 			ethicsPages.forEach((page) => finalApplication.addPage(page));
+
+			if (trademark !== TrademarkEnum.APPROVED) {
+				const fontBytes = fs.readFileSync(standardStyles.textStyles.fonts.openSansBold);
+				const customFont = await finalApplication.embedFont(fontBytes);
+				const textSize = 40;
+				const textWidth = customFont.widthOfTextAtSize(trademark, textSize);
+				const textHeight = customFont.heightAtSize(textSize);
+
+				originalPDFPages.forEach((page) => {
+					const { height, width } = page.getSize();
+
+					page.drawText(trademark, {
+						x: width / 2 - textWidth / 2,
+						y: height / 1.5 - textHeight / 2,
+						size: textSize,
+						font: customFont,
+						color: rgb(0.768, 0.113, 0.56),
+						opacity: 0.7,
+						rotate: degrees(-25),
+					});
+				});
+				ethicsPages.forEach((page) => {
+					const { height, width } = page.getSize();
+
+					page.drawText(trademark, {
+						x: width / 2 - textWidth / 2,
+						y: height / 1.5 - textHeight / 2,
+						size: textSize,
+						font: customFont,
+						color: rgb(0.768, 0.113, 0.56),
+						opacity: 0.7,
+						rotate: degrees(-25),
+					});
+				});
+			}
 
 			return success(await finalApplication.save());
 		} catch (err) {
