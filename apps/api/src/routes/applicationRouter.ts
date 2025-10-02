@@ -607,10 +607,10 @@ applicationRouter.post(
 				const result = await revokeApplication(applicationId);
 
 				if (result.success) {
-					const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REJECTED });
+					const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REVOKED });
 
 					if (!pdfGenerate.success) {
-						logger.error(`Application ${applicationId} failed to generate REJECTION Application PDF.`);
+						logger.error(`Application ${applicationId} failed to generate REVOKED Application PDF.`);
 						return;
 					}
 					response.status(200).json(result.data);
