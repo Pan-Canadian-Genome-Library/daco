@@ -37,6 +37,7 @@ import {
 } from '@/controllers/applicationController.js';
 
 import BaseLogger from '@/logger.js';
+import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { RevisionRequestModel, type ApplicationStateTotals } from '@/service/types.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
@@ -375,7 +376,7 @@ applicationRouter.post(
 					/**
 					 * We want to auto generate a PDF on successful approval, as such call the local createApplicationPDF function.
 					 */
-					const pdfGenerate = await createApplicationPDF({ applicationId });
+					const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.APPROVED });
 					if (pdfGenerate.success) {
 						response.status(200).json(approvalResult.data);
 						return;
@@ -443,29 +444,36 @@ applicationRouter.post(
 				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
 				const { rejectionReason } = request.body;
-				const { applicationId } = request.params;
+				const applicationId = Number(request.params.applicationId);
 
 				try {
-					const result = await dacRejectApplication({ applicationId: Number(applicationId), rejectionReason });
+					const result = await dacRejectApplication({ applicationId, rejectionReason });
 
-					if (result.success) {
-						response.status(200).json(result.data);
+					if (!result.success) {
+						switch (result.error) {
+							case 'INVALID_STATE_TRANSITION': {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+								return;
+							}
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: 'NOT_FOUND', message: result.message });
+								return;
+							}
+						}
+					}
+
+					const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REJECTED });
+
+					if (!pdfGenerate.success) {
+						logger.error(`Application ${applicationId} failed to generate REJECTION Application PDF.`);
 						return;
 					}
-					switch (result.error) {
-						case 'INVALID_STATE_TRANSITION': {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-							return;
-						}
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: 'NOT_FOUND', message: result.message });
-							return;
-						}
-					}
+					response.status(200).json(result.data);
+					return;
 				} catch (error) {
 					response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
 				}
@@ -620,7 +628,13 @@ applicationRouter.post(
 						}
 					}
 				}
+				const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REVOKED });
 
+				if (!pdfGenerate.success) {
+					logger.error(`Application ${applicationId} failed to generate REVOKED Application PDF.`);
+					response.status(500).json({ error: pdfGenerate.error, message: pdfGenerate.message });
+					return;
+				}
 				response.status(200).json(result.data);
 				return;
 			},
@@ -643,24 +657,31 @@ applicationRouter.post(
 			try {
 				const result = await closeApplication({ applicationId });
 
-				if (result.success) {
-					response.status(200).json(result.data);
-					return;
-				}
-				switch (result.error) {
-					case 'INVALID_STATE_TRANSITION': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: result.error, message: result.message });
-						return;
-					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
+				if (!result.success) {
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
 					}
 				}
+
+				const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.CLOSED });
+
+				if (!pdfGenerate.success) {
+					logger.error(`Application ${applicationId} failed to generate CLOSED Application PDF.`);
+				}
+
+				response.status(200).json(result.data);
+				return;
 			} catch (error) {
 				response.status(500).json({
 					error: 'SYSTEM_ERROR',
@@ -797,25 +818,30 @@ applicationRouter.post(
 
 				const result = await submitApplication({ applicationId });
 
-				if (result.success) {
-					response.status(200).json(result.data);
-					return;
+				if (!result.success) {
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+					}
+				}
+				const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.NOT_APPROVED });
+
+				if (!pdfGenerate.success) {
+					logger.error(`Application ${applicationId} failed to generate NOT APPROVED Application PDF.`);
 				}
 
-				switch (result.error) {
-					case 'INVALID_STATE_TRANSITION': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: result.error, message: result.message });
-						return;
-					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
-					}
-				}
+				response.status(200).json(result.data);
+				return;
 			} catch (error) {
 				response.status(500).json({
 					error: 'SYSTEM_ERROR',

@@ -161,7 +161,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			<ProtectedComponent
 				key={'header-download'}
 				requiredRoles={['DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP']}
-				requiredStates={['APPROVED']}
+				requiredStates={['INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW', 'APPROVED', 'REJECTED', 'CLOSED', 'REVOKED']}
 			>
 				<Button onClick={() => onPDFDownload()}>{translate('sign-and-submit-section.section.buttons.download')}</Button>
 			</ProtectedComponent>,
