@@ -87,7 +87,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -132,7 +132,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -176,7 +176,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -209,7 +209,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -242,7 +242,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -275,7 +275,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -311,7 +311,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -343,7 +343,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -377,7 +377,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
