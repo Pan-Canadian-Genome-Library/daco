@@ -165,6 +165,10 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
@@ -184,6 +188,10 @@ applicationRouter.post(
 					}
 					case 'NOT_FOUND': {
 						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					default: {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 						return;
 					}
 				}
@@ -272,6 +280,10 @@ applicationRouter.get(
 					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
 					return;
 				}
+				default: {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
 			}
 		}
 	},
@@ -327,6 +339,10 @@ applicationRouter.get(
 				}
 				case 'NOT_FOUND': {
 					response.status(404).json({ error: 'NOT_FOUND', message: result.message });
+					return;
+				}
+				default: {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 					return;
 				}
 			}
@@ -422,6 +438,10 @@ applicationRouter.post(
 						response.status(404).json({ error: approvalResult.error, message: 'Application not found.' });
 						return;
 					}
+					default: {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: approvalResult.message });
+						return;
+					}
 				}
 			} catch (error) {
 				response.status(500).json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later.` });
@@ -461,6 +481,10 @@ applicationRouter.post(
 							}
 							case 'NOT_FOUND': {
 								response.status(404).json({ error: 'NOT_FOUND', message: result.message });
+								return;
+							}
+							default: {
+								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 								return;
 							}
 						}
@@ -522,6 +546,10 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
@@ -539,6 +567,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 							return;
 						}
 					}
@@ -607,6 +639,10 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
@@ -624,6 +660,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 							return;
 						}
 					}
@@ -669,6 +709,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 							return;
 						}
 					}
@@ -813,6 +857,10 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
@@ -830,6 +878,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 							return;
 						}
 					}
@@ -921,6 +973,10 @@ applicationRouter.post(
 							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
+							return;
+						}
 					}
 				} catch (error) {
 					response.status(500).json({
@@ -1008,6 +1064,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
 							return;
 						}
 					}
