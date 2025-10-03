@@ -76,3 +76,9 @@ export type GenerateApplicantRepRevisionType = {
 	institutionalRepLastName: string;
 	comments: RevisionRequestModel;
 } & BaseEmailType;
+
+export type GenerateRevokeType = {
+	id: string | number;
+	name: string;
+	comment: string;
+} & BaseEmailType;

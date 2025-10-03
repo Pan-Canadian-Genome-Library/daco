@@ -54,6 +54,7 @@ import {
 	editApplicationRequestSchema,
 	isPositiveInteger,
 	rejectApplicationRequestSchema,
+	revokeApplicationRequestSchema,
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
@@ -164,6 +165,10 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
@@ -183,6 +188,10 @@ applicationRouter.post(
 					}
 					case 'NOT_FOUND': {
 						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					default: {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 						return;
 					}
 				}
@@ -271,6 +280,10 @@ applicationRouter.get(
 					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
 					return;
 				}
+				default: {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
 			}
 		}
 	},
@@ -326,6 +339,10 @@ applicationRouter.get(
 				}
 				case 'NOT_FOUND': {
 					response.status(404).json({ error: 'NOT_FOUND', message: result.message });
+					return;
+				}
+				default: {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 					return;
 				}
 			}
@@ -421,6 +438,10 @@ applicationRouter.post(
 						response.status(404).json({ error: approvalResult.error, message: 'Application not found.' });
 						return;
 					}
+					default: {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: approvalResult.message });
+						return;
+					}
 				}
 			} catch (error) {
 				response.status(500).json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later.` });
@@ -460,6 +481,10 @@ applicationRouter.post(
 							}
 							case 'NOT_FOUND': {
 								response.status(404).json({ error: 'NOT_FOUND', message: result.message });
+								return;
+							}
+							default: {
+								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 								return;
 							}
 						}
@@ -521,6 +546,10 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
@@ -538,6 +567,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 							return;
 						}
 					}
@@ -568,25 +601,30 @@ applicationRouter.post(
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
-		async (
-			request: Request,
-			response: ResponseWithData<
-				ApplicationDTO,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
-			>,
-		) => {
-			const applicationId = Number(request.params.applicationId);
+		withBodySchemaValidation(
+			revokeApplicationRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request: Request,
+				response: ResponseWithData<
+					ApplicationDTO,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				>,
+			) => {
+				const applicationId = Number(request.params.applicationId);
+				const { revokeReason } = request.body;
+				const { user } = request.session;
+				const { userId } = user || {};
 
-			const { user } = request.session;
-			const { userId } = user || {};
+				const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 
-			if (!userId) {
-				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-				return;
-			}
+				if (!userId) {
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
 
-			try {
 				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
+
 				if (!userMayEditResult.success) {
 					switch (userMayEditResult.error) {
 						case 'SYSTEM_ERROR': {
@@ -601,42 +639,46 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
-				const result = await revokeApplication(applicationId);
+				const result = await revokeApplication(applicationId, isDACMember, revokeReason);
 
-				if (result.success) {
-					const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REVOKED });
-
-					if (!pdfGenerate.success) {
-						logger.error(`Application ${applicationId} failed to generate REVOKED Application PDF.`);
-						return;
+				if (!result.success) {
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+							return;
+						}
 					}
-					response.status(200).json(result.data);
+				}
+				const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REVOKED });
+
+				if (!pdfGenerate.success) {
+					logger.error(`Application ${applicationId} failed to generate REVOKED Application PDF.`);
+					response.status(500).json({ error: pdfGenerate.error, message: pdfGenerate.message });
 					return;
 				}
-				switch (result.error) {
-					case 'INVALID_STATE_TRANSITION': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: result.error, message: result.message });
-						return;
-					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
-					}
-				}
-			} catch (error) {
-				response.status(500).json({
-					error: 'SYSTEM_ERROR',
-					message: 'Unexpected error.',
-				});
-			}
-		},
+				response.status(200).json(result.data);
+				return;
+			},
+		),
 	),
 );
 
@@ -667,6 +709,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 							return;
 						}
 					}
@@ -811,6 +857,10 @@ applicationRouter.post(
 							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
+							return;
+						}
 					}
 				}
 
@@ -828,6 +878,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 							return;
 						}
 					}
@@ -919,6 +973,10 @@ applicationRouter.post(
 							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
 							return;
 						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
+							return;
+						}
 					}
 				} catch (error) {
 					response.status(500).json({
@@ -1006,6 +1064,10 @@ applicationRouter.post(
 						}
 						case 'SYSTEM_ERROR': {
 							response.status(500).json({ error: updatedApplication.error, message: updatedApplication.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: updatedApplication.message });
 							return;
 						}
 					}
