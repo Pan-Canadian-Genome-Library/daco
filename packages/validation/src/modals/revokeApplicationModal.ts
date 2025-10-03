@@ -17,15 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './common/strings.js';
-export * from './localStorage/sessionExtras.js';
-export * from './modals/rejectApplicationModal.js';
-export * from './modals/requestRevisionsModal.js';
-export * from './modals/revokeApplicationModal.js';
-export * from './routes/index.js';
-export * from './schemas.js';
-export * from './section/index.js';
-export * from './types.js';
-export * from './user.js';
-export * from './utils/functions.js';
-export * from './utils/regex.js';
+import { z } from 'zod';
+import { Maximum300WordsString } from '../common/strings.js';
+
+export const revokeSchema = z.object({
+	revokeReason: Maximum300WordsString,
+});
+
+export type RevokeSchemaType = z.infer<typeof revokeSchema>;

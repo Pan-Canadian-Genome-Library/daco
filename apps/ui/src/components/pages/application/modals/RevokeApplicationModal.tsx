@@ -17,41 +17,53 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Modal, Typography } from 'antd';
+import { Flex, Form, Modal, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import useRevokeApplication from '@/api/mutations/useRevokeApplication';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { revokeSchema, RevokeSchemaType } from '@pcgl-daco/validation';
+import { createSchemaFieldRule } from 'antd-zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import TextAreaBox from '../form-components/TextAreaBox';
 
 interface RevokeApplicationModalProps {
-	applicationId: number | string;
-	showRevokeModal: boolean;
-	setShowRevokeModal: (show: boolean) => void;
+	id: number | string;
+	isOpen: boolean;
+	setIsOpen: (isOpen: boolean) => void;
+	setShowRevokeSuccessModal: (isOpen: boolean) => void;
 }
-const RevokeApplicationModal = ({
-	applicationId,
-	showRevokeModal,
-	setShowRevokeModal,
-}: RevokeApplicationModalProps) => {
+
+const rule = createSchemaFieldRule(revokeSchema);
+
+const RevokeApplicationModal = ({ id, isOpen, setIsOpen, setShowRevokeSuccessModal }: RevokeApplicationModalProps) => {
 	const { Text } = Typography;
 
 	const { t: translate } = useTranslation();
 	const { mutateAsync: revokeApplication, isPending: isRevoking } = useRevokeApplication();
 
-	const handleWithdrawApplication = () => {
-		revokeApplication({ applicationId: applicationId }).then(() => {
-			setShowRevokeModal(false);
+	const { handleSubmit, control, reset } = useForm<RevokeSchemaType>({
+		defaultValues: { revokeReason: '' },
+		resolver: zodResolver(revokeSchema),
+	});
+
+	const handleWithdrawApplication: SubmitHandler<RevokeSchemaType> = async (data) => {
+		revokeApplication({ applicationId: id, revokeReason: data.revokeReason }).then(() => {
+			setIsOpen(false);
+			reset();
+			setShowRevokeSuccessModal(true);
 		});
 	};
 
 	return (
 		<Modal
-			title={translate('modals.revokeApplication.title', { id: applicationId })}
+			title={translate('modals.revokeApplication.title', { id })}
 			okText={translate('modals.revokeApplication.buttons.revoke')}
 			cancelText={translate('modals.buttons.cancel')}
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-			open={showRevokeModal}
-			onOk={handleWithdrawApplication}
+			open={isOpen}
+			onOk={handleSubmit(handleWithdrawApplication)}
 			okType="danger"
 			okButtonProps={{
 				disabled: isRevoking,
@@ -59,10 +71,23 @@ const RevokeApplicationModal = ({
 			cancelButtonProps={{
 				type: 'default',
 			}}
-			onCancel={() => setShowRevokeModal(false)}
+			onCancel={() => setIsOpen(false)}
 		>
-			<Flex style={{ height: '100%', marginTop: 20 }}>
-				<Text>{translate('modals.revokeApplication.description', { id: applicationId })}</Text>
+			<Flex vertical style={{ height: '100%', marginTop: 20 }}>
+				<Text>{translate('modals.revokeApplication.description', { id })}</Text>
+				<Flex vertical gap="middle" style={{ marginTop: 20 }}>
+					<Form layout="vertical">
+						<TextAreaBox
+							name="revokeReason"
+							label={translate('modals.revokeApplication.revokeLabel')}
+							control={control}
+							showCount
+							rows={4}
+							maxWordCount={300}
+							rule={rule}
+						/>
+					</Form>
+				</Flex>
 			</Flex>
 		</Modal>
 	);
