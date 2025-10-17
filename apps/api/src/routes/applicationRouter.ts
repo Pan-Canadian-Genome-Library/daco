@@ -222,10 +222,18 @@ applicationRouter.get(
 
 		const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 
-		const { state: stateQuery, sort: sortQuery, page, pageSize, isApplicantView: isApplicantViewQuery } = request.query;
+		const {
+			state: stateQuery,
+			sort: sortQuery,
+			page,
+			pageSize,
+			isApplicantView: isApplicantViewQuery,
+			search,
+		} = request.query;
 
 		const pageRequested = page ? Number(page) : undefined;
 		const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
+		const searchResult = search ? String(search) : undefined;
 
 		/**
 		 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
@@ -263,6 +271,7 @@ applicationRouter.get(
 			sort,
 			page: pageRequested,
 			pageSize: pageSizeRequested,
+			search: searchResult,
 			isDACMember,
 			isApplicantView,
 		});

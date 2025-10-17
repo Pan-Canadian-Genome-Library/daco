@@ -171,6 +171,7 @@ export const getAllApplications = async ({
 	sort,
 	page,
 	pageSize,
+	search,
 	isDACMember,
 	isApplicantView,
 }: ApplicationListRequest) => {
@@ -188,6 +189,7 @@ export const getAllApplications = async ({
 		sort,
 		page,
 		pageSize,
+		search,
 		isApplicantView,
 	});
 

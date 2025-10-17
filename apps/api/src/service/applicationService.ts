@@ -24,7 +24,6 @@ import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
-import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import {
 	ApplicationStates,
@@ -45,6 +44,7 @@ import {
 	type RevisionRequestModel,
 	type RevisionRequestRecord,
 } from './types.js';
+import { applicationsQuery } from './utils.ts';
 
 const logger = BaseLogger.forModule('applicationService');
 
@@ -267,6 +267,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort = [],
 		page = 0,
 		pageSize = 20,
+		search,
 		isApplicantView = false,
 	}: {
 		user_id?: string;
@@ -274,6 +275,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
+		search?: string;
 		isApplicantView?: boolean;
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
@@ -286,6 +288,15 @@ const applicationSvc = (db: PostgresDb) => ({
 			} else if (page < 0 || pageSize < 0) {
 				throw Error('Page and/or page size must be non-negative values.');
 			}
+			const sanitizedSearch = search?.trim().replace(/\s+/g, ' | ');
+
+			const searchQuery = sql`(      
+				setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
+ 				setweight(to_tsvector('english', ${applicationContents.applicant_first_name} || ' ' || ${applicationContents.applicant_last_name}), 'B') ||
+			    setweight(to_tsvector('english', ${applicationContents.applicant_institutional_email}), 'C') ||
+    	  		setweight(to_tsvector('english', ${applicationContents.applicant_primary_affiliation}), 'D')
+				)
+     		 @@ to_tsquery('english', ${sanitizedSearch + ':*'})`;
 
 			const rawApplicationRecord = await db
 				.select({
@@ -308,6 +319,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					and(
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						state.length ? inArray(applications.state, state) : undefined,
+						search ? searchQuery : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
