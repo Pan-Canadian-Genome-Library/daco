@@ -22,29 +22,29 @@ import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/quer
 import ErrorPage from '@/components/pages/global/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
 import { isFilterKey, type FilterKeys } from '@/components/pages/manage/DashboardFilter';
-import ManagementDashboard, { FilterState } from '@/components/pages/manage/ManagementDashboard';
-import { ApplicationCountMetadata } from '@/global/types';
+import ManagementDashboard from '@/components/pages/manage/ManagementDashboard';
+import {
+	calculateFilterAmounts,
+	DEFAULT_FILTER_STATE,
+	DEFAULT_NUMBER_OF_ROWS,
+	isFilterKeySet,
+	isValidRowNumber,
+	parseFilters,
+	parsePageNumber,
+	parseRowNumber,
+	parseSortingOptions,
+} from '@/components/pages/manage/utils/manageUtils';
 import { isValidPageNumber } from '@/global/utils';
 import { ApplicationListSummary, isApplicationStateValue } from '@pcgl-daco/data-model';
 
 import { Flex, Layout, TablePaginationConfig } from 'antd';
-import { Key, SorterResult } from 'antd/es/table/interface';
+import { SorterResult } from 'antd/es/table/interface';
 import { useEffect, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
-
-/**
- * The default number of rows shown in the table, also known as PageSize
- */
-const DEFAULT_NUMBER_OF_ROWS = 20;
-
-/**
- * Default filter that's selected on page load, or when an unknown configuration is encountered.
- */
-const DEFAULT_FILTER_STATE: FilterKeys = 'TOTAL';
 
 export interface TableProperties {
 	pagination: TablePaginationConfig;
@@ -250,131 +250,3 @@ const ManageApplicationsPage = () => {
 };
 
 export default ManageApplicationsPage;
-
-/**
- * Used to translate between the key that represents each column, and
- * the names of the column's the API expects.
- * @param column The column object passed in by the `antd` table.
- * @returns A `ApplicationListSortingOptions` compatible column name.
- */
-const parseSortingOptions = (column: string | Key | readonly Key[]) => {
-	let key = column;
-	if (Array.isArray(column)) {
-		key = column[column.length - 1];
-	}
-
-	switch (key) {
-		case 'id':
-			return 'id';
-		case 'applicant':
-			return 'user_id';
-		case 'createdAt':
-			return 'created_at';
-		case 'approvedAt':
-			return 'approved_at';
-		case 'updatedAt':
-			return 'updated_at';
-		case 'expiresAt':
-			return 'expires_at';
-		case 'state':
-			return 'state';
-		default:
-			return 'id';
-	}
-};
-
-/**
- * Calculates the number shown beside the filter at the top of the page.
- * Example: 10 Total | 3 DAC Review, etc...
- * @param data The data provided via the backend `metadata/counts` endpoint.
- * @returns A `FilterState` object, containing the unique key of the filter and how many applications are filed under it.
- */
-const calculateFilterAmounts = (countMetadata: ApplicationCountMetadata): FilterState[] => {
-	const availableStates: FilterState[] = [];
-	for (const appState of Object.keys(countMetadata)) {
-		if (isFilterKey(appState))
-			availableStates.push({
-				key: appState,
-				amount: countMetadata[appState],
-			});
-	}
-	return availableStates;
-};
-
-/**
- * Processes a page number passed into it, checking if it's valid, and if it needs to be converted into a int.
- *
- * Additionally, since page numbers on the server count from 0, whereas `antd` counts from 1, it can convert from
- * either or using the `forAPI` param.
- * @param pageNumber The current page that the user is on in the UI from the URL
- * @param forAPI If the processed page number you'd like back is being sent to the server (count from zero)
- * @returns A `number` that has been validated and converted.
- */
-const parsePageNumber = (pageNumber?: number | string | null, forAPI?: boolean): number => {
-	if (pageNumber) {
-		const parsedPage = typeof pageNumber === 'string' ? Number(pageNumber) : pageNumber;
-		if (isValidPageNumber(parsedPage)) {
-			return forAPI ? parsedPage - 1 : parsedPage;
-		}
-	}
-	return forAPI ? 0 : 1;
-};
-
-/**
- * Gets and parses filters from the URL params. Given that the search param may be null or otherwise invalid
- * this function returns a normalized string array.
- *
- * @param rawFilters The raw string of filters from the query param.
- * @returns A standardized string array of potential filters.
- */
-const parseFilters = (rawFilters?: string | null): string[] => {
-	if (rawFilters) {
-		const decodedFilters = rawFilters.split(',');
-		return decodedFilters;
-	}
-	return [];
-};
-
-/**
- * Checks if the set of filters passed into it are a part of the possible filters set.
- * @param appliedFilters A string array containing the filters passed in via URL.
- * @returns `true` if filters are included in possible set, `false` if an unknown filter is encountered.
- */
-const isFilterKeySet = (appliedFilters: string[]): appliedFilters is FilterKeys[] => {
-	for (const appliedFilter of appliedFilters) {
-		if (!isFilterKey(appliedFilter)) {
-			return false;
-		}
-	}
-	return true;
-};
-
-/**
- * Ensures that the row number in the URL params is valid (within the appropriate range, is a number, etc..),
- * and converts it if needed.
- * @param appliedRowNumber `number` - The row number from the URL parameter pre-converted into an Int.
- * @returns `boolean` true if valid, false if not.
- */
-const isValidRowNumber = (appliedRowNumber: number) => {
-	if (
-		isValidPageNumber(appliedRowNumber) &&
-		(appliedRowNumber === 20 || appliedRowNumber === 50 || appliedRowNumber === 100)
-	) {
-		return true;
-	} else {
-		return false;
-	}
-};
-
-/**
- * Parses number for the number of rows requested. If it's valid, it re-returns that number as a `number`
- * otherwise, it returns the default of 20.
- * @param appliedRowNumber `number` - The current row number in the URL params
- * @returns `number` - A parsed number representing the number of rows requested.
- */
-const parseRowNumber = (appliedRowNumber: number) => {
-	if (isValidRowNumber(appliedRowNumber)) {
-		return appliedRowNumber;
-	}
-	return DEFAULT_NUMBER_OF_ROWS;
-};
