@@ -295,10 +295,10 @@ const applicationSvc = (db: PostgresDb) => ({
 				.replace(/\s+/g, ' | '); // add OR between phrases
 
 			const searchQuery = sql`(      
-				setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
- 				setweight(to_tsvector('english', ${applicationContents.applicant_first_name} || ' ' || ${applicationContents.applicant_last_name}), 'B') ||
-			    setweight(to_tsvector('english', ${applicationContents.applicant_institutional_email}), 'C') ||
-    	  		setweight(to_tsvector('english', ${applicationContents.applicant_primary_affiliation}), 'D')
+					setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||			    
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
 				)
      		 @@ to_tsquery('english', ${sanitizedSearch + ':*'})`;
 
