@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
@@ -288,7 +288,11 @@ const applicationSvc = (db: PostgresDb) => ({
 			} else if (page < 0 || pageSize < 0) {
 				throw Error('Page and/or page size must be non-negative values.');
 			}
-			const sanitizedSearch = search?.trim().replace(/\s+/g, ' | ');
+			const sanitizedSearch = search
+				?.trim()
+				.replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters
+				.trim() // apply trim again in-case user inputs a special characters as the first/last word
+				.replace(/\s+/g, ' | '); // add OR between phrases
 
 			const searchQuery = sql`(      
 				setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
@@ -327,13 +331,19 @@ const applicationSvc = (db: PostgresDb) => ({
 				.offset(page * pageSize)
 				.limit(pageSize);
 
-			const applicationRecordsCount = await db.$count(
-				applications,
-				and(
-					user_id ? eq(applications.user_id, String(user_id)) : undefined,
-					state.length ? inArray(applications.state, state) : undefined,
-				),
-			);
+			const countResult = await db
+				.select({
+					count: count(),
+				})
+				.from(applications)
+				.where(
+					and(
+						user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						state.length ? inArray(applications.state, state) : undefined,
+						search ? searchQuery : undefined,
+					),
+				)
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
 			let returnableApplications = rawApplicationRecord;
 
@@ -380,7 +390,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			const applicationsList = {
 				applications: returnableApplications,
 				pagingMetadata: {
-					totalRecords: applicationRecordsCount,
+					totalRecords: countResult[0]?.count || 0,
 					page: page,
 					pageSize: pageSize,
 				},
