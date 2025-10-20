@@ -268,6 +268,7 @@ export type ApplicationStateTotals = {
 export interface ApplicationListResponse {
 	applications: ApplicationListSummary[];
 	pagingMetadata: PagingMetadata;
+	totals: ApplicationStateTotals;
 }
 
 export type ApproveApplication = {
