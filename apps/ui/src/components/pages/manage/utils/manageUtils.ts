@@ -141,3 +141,21 @@ export const parseRowNumber = (appliedRowNumber: number) => {
 	}
 	return DEFAULT_NUMBER_OF_ROWS;
 };
+
+/**
+ * We do not store our id's as `PCGL-*` but as just the number value, remove the prefix as we search but ui will still display PCGL-*
+ * @param searchValue search text input by the user
+ * @returns string without pcgl- prefix
+ * @description if text needs to be altered in anyway, add it here
+ */
+export const transformSearchText = (searchValue: string): string => {
+	if (typeof searchValue !== 'string') {
+		throw new Error('Input must be a string');
+	}
+
+	if (searchValue.toLocaleLowerCase().startsWith('pcgl-')) {
+		return searchValue.slice(5);
+	}
+
+	return searchValue;
+};

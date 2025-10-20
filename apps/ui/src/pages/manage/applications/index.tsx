@@ -33,6 +33,7 @@ import {
 	parsePageNumber,
 	parseRowNumber,
 	parseSortingOptions,
+	transformSearchText,
 } from '@/components/pages/manage/utils/manageUtils';
 import { isValidPageNumber } from '@/global/utils';
 import { ApplicationListSummary, isApplicationStateValue } from '@pcgl-daco/data-model';
@@ -116,12 +117,12 @@ const ManageApplicationsPage = () => {
 		setRowCount(pageCount);
 	};
 	/**
-	 * Handle search request
-	 * @param searchText
+	 * Gets called whenever user inputs text into searchbar
+	 * @param searchText String of user input
 	 */
 	const handleSearchChange = (searchText: string) => {
 		setSearchParams((prev) => {
-			prev.set('search', searchText);
+			prev.set('search', transformSearchText(searchText));
 			return prev;
 		});
 		setSearchText(searchText);
@@ -253,7 +254,6 @@ const ManageApplicationsPage = () => {
 						<Search
 							placeholder="Search"
 							enterButton
-							size="large"
 							onSearch={(value) => {
 								handleSearchChange(value);
 							}}
