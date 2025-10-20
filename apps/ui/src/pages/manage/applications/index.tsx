@@ -41,10 +41,14 @@ import { Flex, Layout, TablePaginationConfig } from 'antd';
 import { SorterResult } from 'antd/es/table/interface';
 import { useEffect, useState } from 'react';
 
+import { CloseCircleOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
+
+const { Search } = Input;
 
 export interface TableProperties {
 	pagination: TablePaginationConfig;
@@ -56,9 +60,11 @@ const ManageApplicationsPage = () => {
 	const appliedFilters = searchParams.get('filters');
 	const appliedPage = searchParams.get('page');
 	const appliedRows = Number(searchParams.get('rows'));
+	const appliedSearch = searchParams.get('search');
 
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
 	const [rowCount, setRowCount] = useState<number>(DEFAULT_NUMBER_OF_ROWS);
+	const [search, setSearchText] = useState<string>('');
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
 		pagination: {
@@ -81,6 +87,7 @@ const ManageApplicationsPage = () => {
 		state: parseFilters(appliedFilters).filter((filter) => isApplicationStateValue(filter)),
 		page: parsePageNumber(tableParams.pagination?.current, true),
 		pageSize: parseRowNumber(appliedRows),
+		search: appliedSearch || '',
 	});
 
 	const { data: filterMetadata, error: filterMetaDataError, isLoading: areFiltersLoading } = useGetApplicationCounts();
@@ -107,6 +114,17 @@ const ManageApplicationsPage = () => {
 			return prev;
 		});
 		setRowCount(pageCount);
+	};
+	/**
+	 * Handle search request
+	 * @param searchText
+	 */
+	const handleSearchChange = (searchText: string) => {
+		setSearchParams((prev) => {
+			prev.set('search', searchText);
+			return prev;
+		});
+		setSearchText(searchText);
 	};
 
 	/**
@@ -203,7 +221,7 @@ const ManageApplicationsPage = () => {
 	 */
 	useEffect(() => {
 		tableDataRefetch();
-	}, [tableDataRefetch, tableParams, sorting, rowCount]);
+	}, [tableDataRefetch, tableParams, sorting, rowCount, search]);
 
 	/**
 	 * Once we receive data from the server, reapply it to our table.
@@ -231,7 +249,17 @@ const ManageApplicationsPage = () => {
 				<ErrorPage loading={areFiltersLoading} error={filterMetaDataError || tableError} />
 			) : (
 				<Flex vertical>
-					<PageHeader title={translate('manage.applications.title')} />
+					<PageHeader title={translate('manage.applications.title')}>
+						<Search
+							placeholder="Search"
+							enterButton
+							size="large"
+							onSearch={(value) => {
+								handleSearchChange(value);
+							}}
+							allowClear={{ clearIcon: <CloseCircleOutlined /> }}
+						/>
+					</PageHeader>
 					<ManagementDashboard
 						filterCounts={filterMetadata ? calculateFilterAmounts(filterMetadata) : []}
 						loading={isTableLoading}
