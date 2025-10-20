@@ -38,13 +38,14 @@ import {
 
 import BaseLogger from '@/logger.js';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { RevisionRequestModel, type ApplicationStateTotals } from '@/service/types.ts';
+import { RevisionRequestModel } from '@/service/types.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
 	ApplicationDTO,
 	ApplicationListResponse,
 	ApplicationResponseData,
+	ApplicationStateTotals,
 	RevisionsDTO,
 } from '@pcgl-daco/data-model';
 import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
