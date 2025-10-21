@@ -220,18 +220,6 @@ export const getApplicationById = async ({
 };
 
 /**
- * Gets the total of how many applications are in each state type, including a TOTAL count.
- * @param userId - The ID of the current user.
- * @returns Success with the details of the application / Failure with Error.
- */
-export const getApplicationStateTotals = async () => {
-	const database = getDbInstance();
-	const service: ApplicationService = applicationSvc(database);
-
-	return await service.applicationStateTotals();
-};
-
-/**
  * Generates a PDF with the application data provided in the various application tables.
  * @param applicationId - The ID of the application within the database.
  * @returns Success with a Buffer containing the PDF / Failure with Error.

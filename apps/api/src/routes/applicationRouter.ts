@@ -26,7 +26,6 @@ import {
 	editApplication,
 	getAllApplications,
 	getApplicationById,
-	getApplicationStateTotals,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByInstitutionalRep,
@@ -45,7 +44,6 @@ import type {
 	ApplicationDTO,
 	ApplicationListResponse,
 	ApplicationResponseData,
-	ApplicationStateTotals,
 	RevisionsDTO,
 } from '@pcgl-daco/data-model';
 import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
@@ -358,29 +356,6 @@ applicationRouter.get(
 			}
 		},
 	),
-);
-
-/**
- * Gets the total of how many applications are in each state type (APPROVED, REJECTED, etc...),
- * including a TOTAL count.
- *
- * Auth:
- * - only accessible by DAC members
- */
-applicationRouter.get(
-	'/metadata/counts',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
-	async (request: Request, response: ResponseWithData<ApplicationStateTotals, ['SYSTEM_ERROR']>) => {
-		const result = await getApplicationStateTotals();
-
-		if (result.success) {
-			response.status(200).json(result.data);
-			return;
-		} else {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-			return;
-		}
-	},
 );
 
 applicationRouter.post(

@@ -153,37 +153,6 @@ paths:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
 
-  /applications/metadata/counts:
-    get:
-      tags:
-        - Applications
-      summary: Gets the total number of applications in each state / status category.
-      responses:
-        '401':
-          description: Unauthorized. Will occur when the user is not logged in.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
-        '403':
-          description: Forbidden. You are not a **DAC Member** and therefore cannot access this endpoint.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ClientErrors'
-        '500':
-          description: 'Error getting the total number of applications in each state / status category'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
-        '200':
-          description: 'The object containing the metadata information'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApplicationsMetadata'
-
   /applications/create:
     post:
       tags:
