@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import useGetApplicationCounts from '@/api/metadata/useGetApplicationCounts';
 import useGetApplicationList, { ApplicationListSortingOptions } from '@/api/queries/useGetApplicationList';
 import ErrorPage from '@/components/pages/global/ErrorPage';
 import PageHeader from '@/components/pages/global/PageHeader';
@@ -90,8 +89,6 @@ const ManageApplicationsPage = () => {
 		pageSize: parseRowNumber(appliedRows),
 		search: appliedSearch || '',
 	});
-
-	const { data: filterMetadata, error: filterMetaDataError, isLoading: areFiltersLoading } = useGetApplicationCounts();
 
 	/**
 	 * Gets called whenever `DashboardFilter` updates its state.
@@ -246,11 +243,9 @@ const ManageApplicationsPage = () => {
 
 	return (
 		<Content>
-			{filterMetaDataError || areFiltersLoading ? (
-				<ErrorPage loading={areFiltersLoading} error={filterMetaDataError || tableError} />
-			) : (
-				<Flex vertical>
-					<PageHeader title={translate('manage.applications.title')}>
+			<Flex vertical>
+				<PageHeader title={translate('manage.applications.title')}>
+					{!isTableLoading || !tableError ? (
 						<Search
 							placeholder="Search"
 							enterButton
@@ -259,9 +254,13 @@ const ManageApplicationsPage = () => {
 							}}
 							allowClear={{ clearIcon: <CloseCircleOutlined /> }}
 						/>
-					</PageHeader>
+					) : null}
+				</PageHeader>
+				{isTableLoading ? (
+					<ErrorPage loading={isTableLoading} error={tableError} />
+				) : (
 					<ManagementDashboard
-						filterCounts={filterMetadata ? calculateFilterAmounts(filterMetadata) : []}
+						filterCounts={tableData?.totals ? calculateFilterAmounts(tableData?.totals) : []}
 						loading={isTableLoading}
 						rowsCount={tableParams.pagination.pageSize}
 						onRowsChange={handleRowChange}
@@ -271,8 +270,8 @@ const ManageApplicationsPage = () => {
 						onTableChange={handleTableChange}
 						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled)}
 					/>
-				</Flex>
-			)}
+				)}
+			</Flex>
 		</Content>
 	);
 };
