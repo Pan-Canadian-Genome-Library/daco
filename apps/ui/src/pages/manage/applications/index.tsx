@@ -63,8 +63,8 @@ const ManageApplicationsPage = () => {
 	const appliedSearch = searchParams.get('search');
 
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
-	const [rowCount, setRowCount] = useState<number>(DEFAULT_NUMBER_OF_ROWS);
-	const [search, setSearchText] = useState<string>('');
+	const [, setRowCount] = useState<number>(DEFAULT_NUMBER_OF_ROWS);
+	const [, setSearchText] = useState<string>('');
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
 		pagination: {
@@ -219,7 +219,7 @@ const ManageApplicationsPage = () => {
 	 */
 	useEffect(() => {
 		tableDataRefetch();
-	}, [tableDataRefetch, tableParams, sorting, rowCount, search]);
+	}, [tableDataRefetch, searchParams]);
 
 	/**
 	 * Once we receive data from the server, reapply it to our table.
