@@ -64,7 +64,7 @@ const ManageApplicationsPage = () => {
 
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
 	const [, setRowCount] = useState<number>(DEFAULT_NUMBER_OF_ROWS);
-	const [, setSearchText] = useState<string>('');
+	const [search, setSearchText] = useState<string>('');
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
 		pagination: {
@@ -247,7 +247,7 @@ const ManageApplicationsPage = () => {
 				<PageHeader title={translate('manage.applications.title')}>
 					{!isTableLoading || !tableError ? (
 						<Search
-							placeholder="Search"
+							placeholder={translate('manage.search')}
 							enterButton
 							onSearch={(value) => {
 								handleSearchChange(value);
@@ -269,6 +269,7 @@ const ManageApplicationsPage = () => {
 						pagination={tableParams.pagination ? tableParams.pagination : {}}
 						onTableChange={handleTableChange}
 						onFilterChange={(filtersEnabled) => handleFilterChange(filtersEnabled)}
+						search={search}
 					/>
 				)}
 			</Flex>
