@@ -23,8 +23,10 @@ import type { ErrorResponse, UserRole } from '@pcgl-daco/validation';
 import { RequestHandler } from 'express';
 import { getUserRole } from '../service/authService.js';
 
+export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
+
 export type AuthMiddlewareConfig = {
-	requiredRoles?: [UserRole, ...UserRole[]];
+	requiredRoles?: [UserRoleOmitRep, ...UserRoleOmitRep[]];
 };
 
 type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;

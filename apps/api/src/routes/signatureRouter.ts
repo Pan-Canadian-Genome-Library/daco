@@ -76,7 +76,6 @@ signatureRouter.get(
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
-				const userRole = getUserRole(request.session);
 
 				const applicationResult = await getApplicationById({ applicationId });
 				if (!applicationResult.success) {
@@ -91,11 +90,13 @@ signatureRouter.get(
 						}
 					}
 				}
+				const userRole = getUserRole(request.session);
 
-				const isApplicationUser = applicationResult.data.userId === userId;
-				const isDacMember = userRole === 'DAC_MEMBER';
+				const isApplicationUser = applicationResult.data.userId === userId; // Check if the user who created the app
+				const isDacMember = userRole === 'DAC_MEMBER'; // Check if user is a DAC_MEMBER
+				const isRep = await isAssociatedRep(request.session, applicationId); // Check if user is rep
 
-				if (!(isApplicationUser || isDacMember)) {
+				if (!(isApplicationUser || isDacMember || isRep)) {
 					response
 						.status(403)
 						.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
