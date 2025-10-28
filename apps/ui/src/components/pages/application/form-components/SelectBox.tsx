@@ -17,13 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Form, Select } from 'antd';
+import { Flex, Form, Select, Typography } from 'antd';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
 import { CheckCircleFilled } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Item } = Form;
+const { Text } = Typography;
 
 interface SelectBoxProps extends BasicFormFieldProps {
 	options: {
@@ -36,6 +38,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
+	const { t: translate } = useTranslation();
 	return (
 		<Controller
 			name={props.name}
@@ -50,20 +53,23 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 						initialValue={props.initialValue ?? field.value}
 						validateTrigger="onBlur"
 					>
-						<Select
-							{...field}
-							mode={props.mode}
-							disabled={props.disabled}
-							options={props.options}
-							placeholder={props.placeholder}
-							menuItemSelectedIcon={
-								<Flex style={{ marginLeft: '10px' }}>
-									<CheckCircleFilled />
-								</Flex>
-							}
-							removeIcon
-							showSearch={false}
-						/>
+						<Flex vertical>
+							<Text style={{ fontSize: '0.75rem' }}>{translate('requested-study.section1.form.studyLabel')}</Text>
+							<Select
+								{...field}
+								mode={props.mode}
+								disabled={props.disabled}
+								options={props.options}
+								placeholder={props.placeholder}
+								menuItemSelectedIcon={
+									<Flex style={{ marginLeft: '10px' }}>
+										<CheckCircleFilled />
+									</Flex>
+								}
+								removeIcon
+								showSearch={false}
+							/>
+						</Flex>
 					</Item>
 				);
 			}}
