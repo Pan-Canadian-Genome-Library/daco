@@ -22,7 +22,12 @@ import { type GenerateRejectType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
+export const GenerateEmailApplicantRevoke = ({
+	id,
+	name,
+	comment,
+	dacRevoked,
+}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -33,13 +38,16 @@ export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejec
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    Thank you for submitting <a href="${ui}/application/${id}" target="_blank" rel="nofollow">your application</a> to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
+                    ${dacRevoked ? `We are writing to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}</a> has been revoked by the PCGL Data Access Committee` : `We are writing to inform you that you have revoked <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL-${id}.</a>`} This is the message you left on the revoked application: 
                 </mj-text>
                 <mj-text>
-                    This is the Data Access Committee's comment on your application: ${comment}
+                    ${comment}
                 </mj-text>
                 <mj-text>
-                    We appreciate your interest in the PCGL controlled data, thank you again for your time!        
+                    You and all the collaborators will no longer have access to PCGL controlled data.
+                </mj-text>
+                <mj-text>
+                    ${dacRevoked ? `If you disagree with the decision to revoke the application, or have any questions, please reach out to us.` : `We appreciate your interest in the PCGL controlled data, thank you again for your time!`} 
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -51,10 +59,16 @@ export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejec
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailRejectionPlain = ({ name, comment }: Omit<GenerateRejectType, 'id' | 'to'>) => {
+export const GenerateEmailApplicantRevokePlain = ({
+	id,
+	name,
+	comment,
+	dacRevoked,
+}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
 	return ` Dear ${name},
-    \n Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
-    \n This is the Data Access Committee's comment on your application: ${comment}
-    \n We appreciate your interest in the PCGL controlled data, thank you again for your time! 
+    \n ${dacRevoked ? `We are writing to inform you that your PCGL-${id} has been revoked by the PCGL Data Access Committee` : `We are writing to inform you that you have revoked PCGL-${id}.`} This is the message you left on the revoked application: 
+    \n ${comment}
+    \n You and all the collaborators will no longer have access to PCGL controlled data.  
+    \n ${dacRevoked ? `If you disagree with the decision to revoke the application, or have any questions, please reach out to us.` : `We appreciate your interest in the PCGL controlled data, thank you again for your time!`} 
     \n Best regards, \n The PCGL Data Access Compliance Office`;
 };

@@ -74,3 +74,8 @@ export const authZUserInfo = z.object({
 		.optional(),
 });
 export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
+
+export const ServiceTokenResponse = z.object({
+	token: z.string(),
+});
+export type ServiceTokenResponse = z.infer<typeof ServiceTokenResponse>;

@@ -21,6 +21,7 @@ export * from './common/strings.js';
 export * from './localStorage/sessionExtras.js';
 export * from './modals/rejectApplicationModal.js';
 export * from './modals/requestRevisionsModal.js';
+export * from './modals/revokeApplicationModal.js';
 export * from './routes/index.js';
 export * from './schemas.js';
 export * from './section/index.js';

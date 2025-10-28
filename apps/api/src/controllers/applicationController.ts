@@ -25,7 +25,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { pdfService } from '@/service/pdf/pdfService.ts';
+import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -236,8 +236,10 @@ export const getApplicationStateTotals = async () => {
  */
 export const createApplicationPDF = async ({
 	applicationId,
+	trademark,
 }: {
 	applicationId: number;
+	trademark?: TrademarkValues;
 }): AsyncResult<Uint8Array<ArrayBufferLike>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
@@ -275,6 +277,15 @@ export const createApplicationPDF = async ({
 		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
 	}
 
+	// If we are creating PDF, check to see if a current pdf exists. If yes then remove it then proceed
+	const signedPDFId = applicationContents.data.contents?.signed_pdf;
+	if (signedPDFId) {
+		const lastPdf = await fileService.deleteFileById({ fileId: signedPDFId });
+		if (!lastPdf.success) {
+			return failure('SYSTEM_ERROR', 'Unable to remove previous application PDF file, unable to generate PDF');
+		}
+	}
+
 	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
 	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
 	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
@@ -298,6 +309,7 @@ export const createApplicationPDF = async ({
 		collaboratorsContents: aliasedCollaboratorsContents,
 		fileContents: aliasedFileContents.data,
 		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
+		trademark,
 	});
 
 	if (!renderedPDF.success) {
@@ -587,12 +599,15 @@ export const submitRevision = async ({
 
 export const revokeApplication = async (
 	applicationId: number,
+	isDACMember: boolean,
+	revokeReason: string,
 ): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
 
 		if (!result.success) {
 			return result;
@@ -616,6 +631,20 @@ export const revokeApplication = async (
 		}
 
 		const applicationDTO = convertToBasicApplicationRecord(updatedResult.data);
+		const applicationWithContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!applicationWithContents.success) {
+			logger.error(`Unable to retrieve information to send revoke email: ${applicationId}`);
+			return applicationDTO;
+		}
+
+		emailService.sendEmailApplicantRevoke({
+			id: application.id,
+			to: applicationWithContents.data.contents?.applicant_institutional_email,
+			name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
+			comment: revokeReason,
+			dacRevoked: isDACMember,
+		});
 
 		return applicationDTO;
 	} catch (error) {

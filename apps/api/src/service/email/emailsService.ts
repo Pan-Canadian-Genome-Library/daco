@@ -35,6 +35,10 @@ import {
 	GenerateEmailApplicantRevision,
 	GenerateEmailApplicantRevisionPlain,
 } from './layouts/templates/EmailApplicantRevision.ts';
+import {
+	GenerateEmailApplicantRevoke,
+	GenerateEmailApplicantRevokePlain,
+} from './layouts/templates/EmailApplicantRevoke.ts';
 import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
 import { GenerateEmailDacForReview, GenerateEmailDacForReviewPlain } from './layouts/templates/EmailDacReview.ts';
 import {
@@ -83,7 +87,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -128,7 +132,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -172,7 +176,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -205,7 +209,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -238,7 +242,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -271,7 +275,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -307,7 +311,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -339,7 +343,7 @@ const emailSvc = () => ({
 			} = getEmailConfig;
 
 			if (!to) {
-				throw new Error(`Error retrieving address to send email to: ${to}`);
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
 
 			const response = await emailClient.sendMail({
@@ -353,6 +357,40 @@ const emailSvc = () => ({
 			return success(response);
 		} catch (error) {
 			const message = `Error sending email - sendEmailReject`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	// Email to Applicant that application has been revoked
+	sendEmailApplicantRevoke: async ({
+		id,
+		name,
+		to,
+		comment,
+		dacRevoked = false,
+	}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.DACO_APPLICATION_STATUS,
+				html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
+				text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailDacRevoke`;
 
 			logger.error(message, error);
 
