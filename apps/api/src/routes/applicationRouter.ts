@@ -948,6 +948,7 @@ applicationRouter.post(
 						appendices_notes: revisions.appendicesNotes,
 						sign_and_submit_approved: revisions.signAndSubmitApproved,
 						sign_and_submit_notes: revisions.signAndSubmitNotes,
+						is_dac_request: true,
 					};
 
 					// Call service method to handle request
@@ -1032,6 +1033,7 @@ applicationRouter.post(
 						appendices_notes: revisionData.appendicesNotes,
 						sign_and_submit_approved: revisionData.signAndSubmitApproved,
 						sign_and_submit_notes: revisionData.signAndSubmitNotes,
+						is_dac_request: false,
 					};
 
 					const result = await isAssociatedRep(request.session, applicationId);
