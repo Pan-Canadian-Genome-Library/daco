@@ -762,7 +762,7 @@ applicationRouter.post(
 				const applicationResult = await getApplicationById({ applicationId });
 
 				if (!applicationResult.success) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Trouble' });
+					response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
 					return;
 				}
 
