@@ -766,8 +766,11 @@ applicationRouter.post(
 					return;
 				}
 
+				const isApplicationUser = applicationResult.data.userId === user.userId;
+				const isRep = await isAssociatedRep(request.session, applicationId);
+
 				// Only rep and applicant can submit an application
-				if (applicationResult.data.userId === user.userId || (await isAssociatedRep(request.session, applicationId))) {
+				if (isApplicationUser || isRep) {
 					const result = await submitApplication({ applicationId });
 
 					if (!result.success) {
