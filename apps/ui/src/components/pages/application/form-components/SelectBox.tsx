@@ -22,7 +22,7 @@ import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
 import { CheckCircleFilled } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
 const { Item } = Form;
 const { Text } = Typography;
@@ -35,10 +35,10 @@ interface SelectBoxProps extends BasicFormFieldProps {
 	initialValue?: object | string | null;
 	placeholder?: string;
 	mode?: 'multiple' | 'tags';
+	sublabel?: string | ReactNode;
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
-	const { t: translate } = useTranslation();
 	return (
 		<Controller
 			name={props.name}
@@ -54,7 +54,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 						validateTrigger="onBlur"
 					>
 						<Flex vertical>
-							<Text style={{ fontSize: '0.75rem' }}>{translate('requested-study.section1.form.studyLabel')}</Text>
+							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
 							<Select
 								{...field}
 								mode={props.mode}
