@@ -54,6 +54,8 @@ export const revisionRequests = pgTable('revision_requests', {
 
 	sign_and_submit_approved: boolean().notNull(),
 	sign_and_submit_notes: text(),
+
+	is_dac_request: boolean().notNull().default(false),
 });
 
 export const revisionRelations = relations(revisionRequests, ({ many, one }) => ({
