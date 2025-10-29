@@ -132,6 +132,7 @@ export const revisionDataSchema = z
 		appendicesNotes: z.string().nullish(),
 		signAndSubmitApproved: z.boolean(),
 		signAndSubmitNotes: z.string().nullish(),
+		isDacRequest: z.boolean(),
 	})
 	.strict();
 

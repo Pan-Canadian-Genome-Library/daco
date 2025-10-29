@@ -378,4 +378,5 @@ export interface RevisionsDTO {
 	appendicesNotes?: string | null;
 	signAndSubmitApproved: boolean;
 	signAndSubmitNotes?: string | null;
+	isDacRequest: boolean;
 }
