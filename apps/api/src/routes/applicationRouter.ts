@@ -26,7 +26,6 @@ import {
 	editApplication,
 	getAllApplications,
 	getApplicationById,
-	getApplicationStateTotals,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByInstitutionalRep,
@@ -38,7 +37,7 @@ import {
 
 import BaseLogger from '@/logger.js';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { RevisionRequestModel, type ApplicationStateTotals } from '@/service/types.ts';
+import { RevisionRequestModel } from '@/service/types.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
@@ -173,10 +172,18 @@ applicationRouter.get(
 
 		const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 
-		const { state: stateQuery, sort: sortQuery, page, pageSize, isApplicantView: isApplicantViewQuery } = request.query;
+		const {
+			state: stateQuery,
+			sort: sortQuery,
+			page,
+			pageSize,
+			isApplicantView: isApplicantViewQuery,
+			search,
+		} = request.query;
 
 		const pageRequested = page ? Number(page) : undefined;
 		const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
+		const searchResult = search ? String(search) : undefined;
 
 		/**
 		 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
@@ -214,6 +221,7 @@ applicationRouter.get(
 			sort,
 			page: pageRequested,
 			pageSize: pageSizeRequested,
+			search: searchResult,
 			isDACMember,
 			isApplicantView,
 		});
@@ -299,29 +307,6 @@ applicationRouter.get(
 			}
 		},
 	),
-);
-
-/**
- * Gets the total of how many applications are in each state type (APPROVED, REJECTED, etc...),
- * including a TOTAL count.
- *
- * Auth:
- * - only accessible by DAC members
- */
-applicationRouter.get(
-	'/metadata/counts',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
-	async (request: Request, response: ResponseWithData<ApplicationStateTotals, ['SYSTEM_ERROR']>) => {
-		const result = await getApplicationStateTotals();
-
-		if (result.success) {
-			response.status(200).json(result.data);
-			return;
-		} else {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-			return;
-		}
-	},
 );
 
 applicationRouter.post(

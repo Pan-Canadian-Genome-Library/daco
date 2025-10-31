@@ -171,6 +171,7 @@ export const getAllApplications = async ({
 	sort,
 	page,
 	pageSize,
+	search,
 	isDACMember,
 	isApplicantView,
 }: ApplicationListRequest) => {
@@ -188,6 +189,7 @@ export const getAllApplications = async ({
 		sort,
 		page,
 		pageSize,
+		search,
 		isApplicantView,
 	});
 
@@ -215,18 +217,6 @@ export const getApplicationById = async ({
 	}
 
 	return result;
-};
-
-/**
- * Gets the total of how many applications are in each state type, including a TOTAL count.
- * @param userId - The ID of the current user.
- * @returns Success with the details of the application / Failure with Error.
- */
-export const getApplicationStateTotals = async () => {
-	const database = getDbInstance();
-	const service: ApplicationService = applicationSvc(database);
-
-	return await service.applicationStateTotals();
 };
 
 /**

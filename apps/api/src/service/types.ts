@@ -89,19 +89,6 @@ export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'conten
 	contents: ApplicationContentUpdates | null;
 }
 
-export type ApplicationStateTotals = {
-	APPROVED: number;
-	CLOSED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	REJECTED: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	REVOKED: number;
-	TOTAL: number;
-};
-
 export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';
 	column: Key;
