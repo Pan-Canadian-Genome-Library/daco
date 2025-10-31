@@ -132,7 +132,6 @@ export const revisionDataSchema = z
 		appendicesNotes: z.string().nullish(),
 		signAndSubmitApproved: z.boolean(),
 		signAndSubmitNotes: z.string().nullish(),
-		isDacRequest: z.boolean(),
 	})
 	.strict();
 
@@ -141,6 +140,7 @@ export const revisionDataResponseSchema = revisionDataSchema
 		id: z.number().nonnegative(),
 		applicationId: z.number().nonnegative(),
 		createdAt: z.date(),
+		isDacRequest: z.boolean(),
 	})
 	.strict();
 
