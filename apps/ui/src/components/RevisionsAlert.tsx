@@ -35,30 +35,32 @@ const RevisionsAlert = ({ sectionRevisions }: RevisionsProps) => {
 	const [filterRevisions, setFilteredRevisions] = useState<CollapseProps['items'] | undefined>(undefined);
 
 	useEffect(() => {
-		const filteredRevisions: CollapseProps['items'] = sectionRevisions.map((value, key) => {
-			const expiresDate = translate('date.intlDateTime', {
-				val: new Date(value.createdAt ?? ''),
-				formatParams: {
-					val: { year: 'numeric', month: '2-digit', day: '2-digit' },
-				},
+		const filteredRevisions: CollapseProps['items'] = sectionRevisions
+			.filter((value) => !value.isApproved)
+			.map((value, key) => {
+				const expiresDate = translate('date.intlDateTime', {
+					val: new Date(value.createdAt ?? ''),
+					formatParams: {
+						val: { year: 'numeric', month: '2-digit', day: '2-digit' },
+					},
+				});
+				return {
+					key,
+					label: (
+						<Flex gap={'middle'}>
+							<ExclamationCircleFilled style={{ color: pcglColours.primary, fontSize: '1.1rem' }} />
+							<>{value.isDacRequest ? `DAC Revisions - ${expiresDate}` : `Rep Revisions - ${expiresDate}`}</>
+						</Flex>
+					),
+					children: <p>{value.comment}</p>,
+					style: {
+						marginBottom: 10,
+						background: pcglColours.tertiary,
+						borderRadius: token.borderRadiusLG,
+						border: `1px solid ${pcglColours.primary}`,
+					},
+				};
 			});
-			return {
-				key,
-				label: (
-					<Flex gap={'middle'}>
-						<ExclamationCircleFilled style={{ color: pcglColours.primary, fontSize: '1.1rem' }} />
-						<>{value.isDacRequest ? `DAC Revisions - ${expiresDate}` : `Rep Revisions - ${expiresDate}`}</>
-					</Flex>
-				),
-				children: <p>{value.comment}</p>,
-				style: {
-					marginBottom: 10,
-					background: pcglColours.tertiary,
-					borderRadius: token.borderRadiusLG,
-					border: `1px solid ${pcglColours.primary}`,
-				},
-			};
-		});
 		setFilteredRevisions(filteredRevisions);
 	}, [sectionRevisions, token.borderRadiusLG, token.colorFillAlter, translate]);
 
