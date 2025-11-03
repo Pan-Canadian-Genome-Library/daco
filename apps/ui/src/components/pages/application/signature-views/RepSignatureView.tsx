@@ -23,11 +23,14 @@ import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import SignatureViewer from '@/components/pages/application/SignatureViewer';
 import { useSignatureForm } from '@/components/pages/application/utils/useSignatureForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import TextList from '@/components/TextList';
+import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Col, Flex, Row, Typography } from 'antd';
 import { Trans, useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 
 const { Text } = Typography;
 
@@ -42,6 +45,7 @@ const RepSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 	const {
 		state: { fields },
 	} = useApplicationContext();
+	const { revisions } = useOutletContext<ApplicationOutletContext>();
 
 	const { applicantFirstName, applicantLastName } = fields;
 
@@ -69,6 +73,9 @@ const RepSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 					<TextList data={PointArray} />
 				</Flex>
 			</SectionTitle>
+			<Row>
+				<RevisionsAlert sectionRevisions={revisions['sign']} />
+			</Row>
 			<SectionContent showDivider={true}>
 				{!signatureLoading ? (
 					<SignatureViewer
