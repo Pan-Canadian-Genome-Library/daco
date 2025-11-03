@@ -51,6 +51,7 @@ const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStat
 					agreement: [],
 					appendices: [],
 					sign: [],
+					general: [],
 				};
 			}
 
@@ -136,6 +137,14 @@ const formatRevisionFeedback = (data: RevisionsDTO[]): SectionRevision => {
 			return {
 				comment: value.signAndSubmitNotes ?? null,
 				isApproved: value.signAndSubmitApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+				general: value.comments,
+			};
+		}),
+		general: data.map((value) => {
+			return {
+				comment: value.comments ?? null,
 				isDacRequest: value.isDacRequest,
 				createdAt: value.createdAt,
 			};
