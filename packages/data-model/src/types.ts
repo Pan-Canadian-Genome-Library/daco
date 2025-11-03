@@ -359,7 +359,7 @@ export interface RevisionsDTO {
 	id: number;
 	applicationId: number;
 	createdAt?: Date;
-	comments?: String | null;
+	comments?: string | null;
 	applicantApproved: boolean;
 	applicantNotes?: string | null;
 	institutionRepApproved: boolean;
