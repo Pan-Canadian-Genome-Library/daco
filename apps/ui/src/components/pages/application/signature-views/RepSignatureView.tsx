@@ -73,9 +73,11 @@ const RepSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 					<TextList data={PointArray} />
 				</Flex>
 			</SectionTitle>
-			<Row>
-				<RevisionsAlert sectionRevisions={revisions['sign']} />
-			</Row>
+			<SectionContent showDivider={false}>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />{' '}
+				</Row>
+			</SectionContent>
 			<SectionContent showDivider={true}>
 				{!signatureLoading ? (
 					<SignatureViewer

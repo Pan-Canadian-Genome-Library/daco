@@ -53,9 +53,11 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 				text={translate('sign-and-submit-section.description')}
 				showDivider={false}
 			/>
-			<Row>
-				<RevisionsAlert sectionRevisions={revisions['sign']} />
-			</Row>
+			<SectionContent showDivider={false}>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />
+				</Row>
+			</SectionContent>
 			<SectionContent
 				showDivider={false}
 				title={translate('sign-and-submit-section.section.title')}
