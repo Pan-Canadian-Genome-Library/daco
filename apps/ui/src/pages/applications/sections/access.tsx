@@ -104,9 +104,6 @@ const AccessAgreement = () => {
 					title={translate('data-access-section.title')}
 					text={[translate('data-access-section.description1')]}
 				/>
-				<Row>
-					<RevisionsAlert sectionRevisions={revisions['agreement']} />
-				</Row>
 				<SectionContent title={translate('data-access-section.section1.title')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
@@ -121,6 +118,9 @@ const AccessAgreement = () => {
 						</Col>
 					</Row>
 				</SectionContent>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['agreement']} />
+				</Row>
 				<SectionContent title={translate('data-access-section.section3.title')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
