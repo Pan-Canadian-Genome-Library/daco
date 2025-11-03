@@ -27,11 +27,13 @@ import { SectionRevision } from '@pcgl-daco/validation';
 
 const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStateValues) => {
 	/**
-	 * We only want to display the approval status if we're in one of these status'
+	 * Prevent API fetch if in one of these states
 	 */
-	const revisionDependant =
-		state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
-		state === ApplicationStates.DAC_REVISIONS_REQUESTED;
+	const preventFeedbackFetch =
+		state === ApplicationStates.DRAFT ||
+		state === ApplicationStates.CLOSED ||
+		state === ApplicationStates.REVOKED ||
+		state === ApplicationStates.APPROVED;
 
 	return useQuery<SectionRevision, ServerError>({
 		queryKey: [`revisions-${id}`],
@@ -39,7 +41,7 @@ const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStat
 		enabled: state !== undefined,
 		queryFn: async () => {
 			// Prevent API being called for states that don't utilize revisions
-			if (!revisionDependant) {
+			if (preventFeedbackFetch) {
 				return {
 					intro: [],
 					applicant: [],
