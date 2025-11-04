@@ -814,9 +814,9 @@ applicationRouter.post(
 		},
 	),
 
-	// Endpoint for reps to request revisions
+	// Endpoint for dac chair to request revisions
 	applicationRouter.post(
-		'/:applicationId/dac/request-revisions',
+		'/:applicationId/dac-chair/request-revisions',
 		authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
@@ -992,7 +992,7 @@ applicationRouter.post(
 
 applicationRouter.get(
 	'/:applicationId/revisions',
-	authMiddleware(),
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_CHAIR', 'DAC_MEMBER'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
