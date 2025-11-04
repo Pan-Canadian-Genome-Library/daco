@@ -159,7 +159,7 @@ applicationRouter.post(
  */
 applicationRouter.get(
 	'/',
-	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'DAC_CHAIR'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
@@ -171,7 +171,9 @@ applicationRouter.get(
 			return;
 		}
 
-		const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+		const userRole = getUserRole(request.session);
+
+		const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
 
 		const { state: stateQuery, sort: sortQuery, page, pageSize, isApplicantView: isApplicantViewQuery } = request.query;
 
@@ -214,7 +216,7 @@ applicationRouter.get(
 			sort,
 			page: pageRequested,
 			pageSize: pageSizeRequested,
-			isDACMember,
+			isDAC: isDAC,
 			isApplicantView,
 		});
 
@@ -326,7 +328,7 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/:applicationId/approve',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -403,7 +405,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/reject',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -537,7 +539,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/revoke',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -832,6 +834,7 @@ applicationRouter.post(
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
+					console.log('Called', applicationId);
 
 					response.status(200).json();
 					return;
@@ -1041,6 +1044,7 @@ applicationRouter.get(
 			const { applicationId } = request.params;
 
 			try {
+				console.log('Called', applicationId);
 				response.status(200).json();
 				return;
 			} catch (error) {
