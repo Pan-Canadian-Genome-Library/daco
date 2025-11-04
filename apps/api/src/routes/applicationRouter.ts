@@ -312,7 +312,7 @@ applicationRouter.get(
  */
 applicationRouter.get(
 	'/metadata/counts',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
 	async (request: Request, response: ResponseWithData<ApplicationStateTotals, ['SYSTEM_ERROR']>) => {
 		const result = await getApplicationStateTotals();
 
@@ -328,7 +328,7 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/:applicationId/approve',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
+	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -539,7 +539,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/revoke',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
+	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -603,7 +603,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
