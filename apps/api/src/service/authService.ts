@@ -20,7 +20,8 @@
 import { authConfig } from '@/config/authConfig.js';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
-import { userRoleSchema, type UserRole } from '@pcgl-daco/validation';
+import { UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
+import { userRoleSchema } from '@pcgl-daco/validation';
 import type { SessionData } from 'express-session';
 import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService } from './types.ts';
@@ -29,7 +30,7 @@ import type { ApplicationService } from './types.ts';
  * getUserRole will check if the user is APPLICANT or DAC_MEMBER
  * Since the INSTITUTIONAL_REP role is determined by its email comparisons between session and institutional_rep email from the application contents
  */
-export function getUserRole(session: Partial<SessionData>): UserRole {
+export function getUserRole(session: Partial<SessionData>): UserRoleOmitRep {
 	const { user } = session;
 
 	if (!user) {

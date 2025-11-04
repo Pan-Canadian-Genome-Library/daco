@@ -59,48 +59,10 @@ import {
 import express, { type Request } from 'express';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
 import { getUserRole, isAssociatedRep } from '../service/authService.ts';
-import { failure, success, type AsyncResult } from '../utils/results.ts';
 import type { ResponseWithData } from './types.ts';
 
 const applicationRouter = express.Router();
 const logger = BaseLogger.forModule('applicationRouter');
-/**
- * Ensure that the application requested is owned/created by the user making the request.
- * This will fetch the application from the database and check that the stored application's
- * user_id property matches the provided userId parameter, otherwise it will return a Result
- * of 'FORBIDDEN'.
- *
- * This function returns several error cases in order to handle cases where:
- * - NOT_FOUND: the application id was not found in the database
- * - SYSTEM_ERROR: something unexpected happened fetching the application
- * - FORBIDDEN: the application does not belong to this user
- * @param param0
- * @returns
- */
-async function validateUserPermissionForApplication({
-	userId,
-	applicationId,
-}: {
-	userId: string;
-	applicationId: number;
-}): AsyncResult<void, 'NOT_FOUND' | 'SYSTEM_ERROR' | 'FORBIDDEN'> {
-	try {
-		// We need to get the application to validate that this user can edit it
-		const applicationResult = await getApplicationById({ applicationId });
-		if (!applicationResult.success) {
-			return applicationResult;
-		}
-
-		// ensure application has this user's ID
-		if (applicationResult.data.userId !== userId) {
-			return failure('FORBIDDEN', 'User is not the creator of this application.');
-		}
-
-		return success(undefined);
-	} catch (error) {
-		return failure('SYSTEM_ERROR', 'Unexpected error.');
-	}
-}
 
 applicationRouter.post(
 	'/create',
@@ -139,41 +101,30 @@ applicationRouter.post(
 		) => {
 			const data = request.body;
 			const { id, update } = data;
-
-			// Need user ID to validate the user has access to this app.
-			const { user } = request.session;
-			const { userId } = user || {};
-
-			if (!userId) {
-				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-				return;
-			}
 			try {
-				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId: id });
-				if (!userMayEditResult.success) {
-					switch (userMayEditResult.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'FORBIDDEN': {
-							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						default: {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
-							return;
-						}
-					}
+				const user = request.session.user;
+
+				if (!user) {
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
+				// We need to get the application to validate that this user can edit it
+				const applicationResult = await getApplicationById({ applicationId: id });
+
+				if (!applicationResult.success) {
+					response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+					return;
+				}
+
+				// ensure application has this user's ID
+				if (applicationResult.data.userId !== user.userId) {
+					response.status(403).json({ error: 'FORBIDDEN', message: 'User is not the creator of this application.' });
+					return;
 				}
 
 				const result = await editApplication({ id, update });
 				if (result.success) {
-					response.json(result.data);
+					response.status(200).json(result.data);
 					return;
 				}
 				switch (result.error) {
@@ -506,36 +457,25 @@ applicationRouter.post(
 		) => {
 			const applicationId = Number(request.params.applicationId);
 
-			// Need user ID to validate the user has access to this app.
-			const { user } = request.session;
-			const { userId } = user || {};
-
-			if (!userId) {
+			const user = request.session.user;
+			if (!user) {
 				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
 			}
 
 			try {
-				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
-				if (!userMayEditResult.success) {
-					switch (userMayEditResult.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'FORBIDDEN': {
-							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						default: {
-							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-					}
+				// We need to get the application to validate that this user submit revisions
+				const applicationResult = await getApplicationById({ applicationId });
+
+				if (!applicationResult.success) {
+					response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+					return;
+				}
+
+				// ensure application has this user's ID
+				if (applicationResult.data.userId !== user.userId) {
+					response.status(403).json({ error: 'FORBIDDEN', message: 'User is not the creator of this application.' });
+					return;
 				}
 
 				const result = await submitRevision({ applicationId });
@@ -582,7 +522,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/revoke',
-	authMiddleware(),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -598,38 +538,15 @@ applicationRouter.post(
 			) => {
 				const applicationId = Number(request.params.applicationId);
 				const { revokeReason } = request.body;
-				const { user } = request.session;
-				const { userId } = user || {};
 
-				const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+				const user = request.session.user;
 
-				if (!userId) {
+				if (!user) {
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
 
-				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
-
-				if (!userMayEditResult.success) {
-					switch (userMayEditResult.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'FORBIDDEN': {
-							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						default: {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
-							return;
-						}
-					}
-				}
+				const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 
 				const result = await revokeApplication(applicationId, isDACMember, revokeReason);
 
@@ -821,63 +738,57 @@ applicationRouter.post(
 			try {
 				const applicationId = Number(request.params.applicationId);
 
-				const { userId } = request.session.user || {};
-				if (!userId) {
+				const user = request.session.user;
+				if (!user) {
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
 				}
 
-				const userMayEditResult = await validateUserPermissionForApplication({ userId, applicationId });
-				if (!userMayEditResult.success) {
-					switch (userMayEditResult.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						case 'FORBIDDEN': {
-							response.status(403).json({ error: userMayEditResult.error, message: userMayEditResult.message });
-							return;
-						}
-						default: {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: userMayEditResult.message });
-							return;
+				const applicationResult = await getApplicationById({ applicationId });
+
+				if (!applicationResult.success) {
+					response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+					return;
+				}
+
+				const isApplicationUser = applicationResult.data.userId === user.userId;
+				const isRep = await isAssociatedRep(request.session, applicationId);
+
+				// Only rep and applicant can submit an application
+				if (isApplicationUser || isRep) {
+					const result = await submitApplication({ applicationId });
+
+					if (!result.success) {
+						switch (result.error) {
+							case 'INVALID_STATE_TRANSITION': {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
+							default: {
+								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+								return;
+							}
 						}
 					}
-				}
+					const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.NOT_APPROVED });
 
-				const result = await submitApplication({ applicationId });
-
-				if (!result.success) {
-					switch (result.error) {
-						case 'INVALID_STATE_TRANSITION': {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
-						default: {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-							return;
-						}
+					if (!pdfGenerate.success) {
+						logger.error(`Application ${applicationId} failed to generate NOT APPROVED Application PDF.`);
 					}
-				}
-				const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.NOT_APPROVED });
 
-				if (!pdfGenerate.success) {
-					logger.error(`Application ${applicationId} failed to generate NOT APPROVED Application PDF.`);
+					response.status(200).json(result.data);
+					return;
 				}
 
-				response.status(200).json(result.data);
+				response.status(403).json({ error: 'FORBIDDEN', message: 'Unexpected error.' });
 				return;
 			} catch (error) {
 				response.status(500).json({
@@ -1078,7 +989,6 @@ applicationRouter.get(
 			response: ResponseWithData<RevisionsDTO[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const { applicationId } = request.params;
-			const userSession = request.session;
 
 			try {
 				const applicationInfo = await getApplicationById({ applicationId: Number(applicationId) });
@@ -1098,14 +1008,6 @@ applicationRouter.get(
 						message: applicationInfo.message,
 					});
 
-					return;
-				}
-
-				if (getUserRole(userSession) === 'APPLICANT' && applicationInfo.data.userId !== userSession.user?.userId) {
-					response.status(403).send({
-						error: 'FORBIDDEN',
-						message: 'User does not have permission to access or modify this application.',
-					});
 					return;
 				}
 
