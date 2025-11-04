@@ -38,7 +38,7 @@ import {
 
 import BaseLogger from '@/logger.js';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { RevisionRequestModel, type ApplicationStateTotals } from '@/service/types.ts';
+import { type ApplicationStateTotals } from '@/service/types.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
@@ -817,7 +817,7 @@ applicationRouter.post(
 	// Endpoint for reps to request revisions
 	applicationRouter.post(
 		'/:applicationId/dac/request-revisions',
-		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+		authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
@@ -838,34 +838,33 @@ applicationRouter.post(
 
 					const revisions = request.body;
 
-					const updatedRevisionData: RevisionRequestModel = {
-						application_id: applicationId,
-						comments: revisions.comments,
-						applicant_approved: revisions.applicantApproved,
-						applicant_notes: revisions.applicantNotes,
-						institution_rep_approved: revisions.institutionRepApproved,
-						institution_rep_notes: revisions.institutionRepNotes,
-						collaborators_approved: revisions.collaboratorsApproved,
-						collaborators_notes: revisions.collaboratorsNotes,
-						project_approved: revisions.projectApproved,
-						project_notes: revisions.projectNotes,
-						requested_studies_approved: revisions.requestedStudiesApproved,
-						requested_studies_notes: revisions.requestedStudiesNotes,
-						ethics_approved: revisions.ethicsApproved,
-						ethics_notes: revisions.ethicsNotes,
-						agreements_approved: revisions.agreementsApproved,
-						agreements_notes: revisions.agreementsNotes,
-						appendices_approved: revisions.appendicesApproved,
-						appendices_notes: revisions.appendicesNotes,
-						sign_and_submit_approved: revisions.signAndSubmitApproved,
-						sign_and_submit_notes: revisions.signAndSubmitNotes,
-					};
-
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByDac({
 						applicationId,
-						revisionData: updatedRevisionData,
+						revisionData: {
+							application_id: applicationId,
+							comments: revisions.comments,
+							applicant_approved: revisions.applicantApproved,
+							applicant_notes: revisions.applicantNotes,
+							institution_rep_approved: revisions.institutionRepApproved,
+							institution_rep_notes: revisions.institutionRepNotes,
+							collaborators_approved: revisions.collaboratorsApproved,
+							collaborators_notes: revisions.collaboratorsNotes,
+							project_approved: revisions.projectApproved,
+							project_notes: revisions.projectNotes,
+							requested_studies_approved: revisions.requestedStudiesApproved,
+							requested_studies_notes: revisions.requestedStudiesNotes,
+							ethics_approved: revisions.ethicsApproved,
+							ethics_notes: revisions.ethicsNotes,
+							agreements_approved: revisions.agreementsApproved,
+							agreements_notes: revisions.agreementsNotes,
+							appendices_approved: revisions.appendicesApproved,
+							appendices_notes: revisions.appendicesNotes,
+							sign_and_submit_approved: revisions.signAndSubmitApproved,
+							sign_and_submit_notes: revisions.signAndSubmitNotes,
+						},
 					});
+
 					if (updatedApplication.success) {
 						response.status(200).json(updatedApplication.data);
 						return;
@@ -903,7 +902,7 @@ applicationRouter.post(
 // Endpoint for reps to request revisions
 applicationRouter.post(
 	'/:applicationId/rep/request-revisions',
-	authMiddleware(),
+	authMiddleware(), // We determine the institutional rep by email comparison on a per application basis, not a role given by the Auth service
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -922,29 +921,6 @@ applicationRouter.post(
 
 					const revisionData = request.body;
 
-					const updatedRevisionData: RevisionRequestModel = {
-						application_id: applicationId,
-						comments: revisionData.comments,
-						applicant_approved: revisionData.applicantApproved,
-						applicant_notes: revisionData.applicantNotes,
-						institution_rep_approved: revisionData.institutionRepApproved,
-						institution_rep_notes: revisionData.institutionRepNotes,
-						collaborators_approved: revisionData.collaboratorsApproved,
-						collaborators_notes: revisionData.collaboratorsNotes,
-						project_approved: revisionData.projectApproved,
-						project_notes: revisionData.projectNotes,
-						requested_studies_approved: revisionData.requestedStudiesApproved,
-						requested_studies_notes: revisionData.requestedStudiesNotes,
-						ethics_approved: revisionData.ethicsApproved,
-						ethics_notes: revisionData.ethicsNotes,
-						agreements_approved: revisionData.agreementsApproved,
-						agreements_notes: revisionData.agreementsNotes,
-						appendices_approved: revisionData.appendicesApproved,
-						appendices_notes: revisionData.appendicesNotes,
-						sign_and_submit_approved: revisionData.signAndSubmitApproved,
-						sign_and_submit_notes: revisionData.signAndSubmitNotes,
-					};
-
 					const result = await isAssociatedRep(request.session, applicationId);
 
 					if (!result) {
@@ -958,7 +934,28 @@ applicationRouter.post(
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
 						applicationId,
-						revisionData: updatedRevisionData,
+						revisionData: {
+							application_id: applicationId,
+							comments: revisionData.comments,
+							applicant_approved: revisionData.applicantApproved,
+							applicant_notes: revisionData.applicantNotes,
+							institution_rep_approved: revisionData.institutionRepApproved,
+							institution_rep_notes: revisionData.institutionRepNotes,
+							collaborators_approved: revisionData.collaboratorsApproved,
+							collaborators_notes: revisionData.collaboratorsNotes,
+							project_approved: revisionData.projectApproved,
+							project_notes: revisionData.projectNotes,
+							requested_studies_approved: revisionData.requestedStudiesApproved,
+							requested_studies_notes: revisionData.requestedStudiesNotes,
+							ethics_approved: revisionData.ethicsApproved,
+							ethics_notes: revisionData.ethicsNotes,
+							agreements_approved: revisionData.agreementsApproved,
+							agreements_notes: revisionData.agreementsNotes,
+							appendices_approved: revisionData.appendicesApproved,
+							appendices_notes: revisionData.appendicesNotes,
+							sign_and_submit_approved: revisionData.signAndSubmitApproved,
+							sign_and_submit_notes: revisionData.signAndSubmitNotes,
+						},
 					});
 					if (updatedApplication.success) {
 						response.status(200).json(updatedApplication.data);
