@@ -297,7 +297,7 @@ const applicationSvc = (db: PostgresDb) => ({
 			};
 
 			const customCount = (state: ApplicationStateValues) => {
-				return sql<number>`COUNT(DISTINCT CASE WHEN ${applications.state} = ${state} THEN ${applications.state} END)`.mapWith(
+				return sql<number>`COUNT(CASE WHEN ${applications.state} = ${state} THEN ${applications.state} END)`.mapWith(
 					Number,
 				);
 			};
