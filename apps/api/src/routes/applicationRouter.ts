@@ -814,6 +814,37 @@ applicationRouter.post(
 		},
 	),
 
+	/**
+	 *  **==========WIP=============**
+	 *
+	 * POST endpoint to submit comments on a application
+	 * TODO: make swagger when implementations starts
+	 *
+	 */ applicationRouter.post(
+		'/:applicationId/dac-member/submit-comment',
+		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+		withBodySchemaValidation(
+			applicationRevisionRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request: Request,
+				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+			) => {
+				try {
+					const applicationId = Number(request.params.applicationId);
+
+					response.status(200).json();
+					return;
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: 'Unexpected error.',
+					});
+				}
+			},
+		),
+	),
+
 	// Endpoint for dac chair to request revisions
 	applicationRouter.post(
 		'/:applicationId/dac-chair/request-revisions',
@@ -987,6 +1018,39 @@ applicationRouter.post(
 				}
 			},
 		),
+	),
+);
+
+/**
+ *  **==========WIP=============**
+ *
+ * GET endpoint to retrieve comments on a application
+ * TODO: if the user is an applicant, make sure NOT to return chair only comments
+ *
+ */
+applicationRouter.get(
+	'/:applicationId/dac/comments',
+	authMiddleware({ requiredRoles: ['DAC_CHAIR', 'DAC_MEMBER', 'APPLICANT'] }),
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<RevisionsDTO[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+		) => {
+			const { applicationId } = request.params;
+
+			try {
+				response.status(200).json();
+				return;
+			} catch (error) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: "We're sorry, an unexpected error occurred. Please try again later.",
+				});
+				return;
+			}
+		},
 	),
 );
 

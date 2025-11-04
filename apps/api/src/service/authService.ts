@@ -27,8 +27,13 @@ import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService } from './types.ts';
 
 /**
- * getUserRole will check if the user is APPLICANT or DAC_MEMBER
- * Since the INSTITUTIONAL_REP role is determined by its email comparisons between session and institutional_rep email from the application contents
+ * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
+ *
+ * Since the INSTITUTIONAL_REP role is determined by users email
+ * comparisons between session and institutional_rep email from the application contents, the logic
+ * is not included here but instead custom to endpoints that require specific rep functionality.
+ * As such reps will have an APPLICANT role.
+ *
  */
 export function getUserRole(session: Partial<SessionData>): UserRoleOmitRep {
 	const { user } = session;
