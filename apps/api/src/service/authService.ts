@@ -37,9 +37,15 @@ export function getUserRole(session: Partial<SessionData>): UserRoleOmitRep {
 		return userRoleSchema.Values.ANONYMOUS;
 	}
 
-	const isDacMember = user?.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DACO);
+	const isDacReviewer = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_MEMBER);
+	const isDacChair = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_CHAIR);
 
-	return isDacMember ? userRoleSchema.Values.DAC_MEMBER : userRoleSchema.Values.APPLICANT;
+	if (isDacChair) {
+		return userRoleSchema.Values.DAC_CHAIR;
+	} else if (isDacReviewer) {
+		return userRoleSchema.Values.DAC_MEMBER;
+	}
+	return userRoleSchema.Values.APPLICANT;
 }
 
 /**
