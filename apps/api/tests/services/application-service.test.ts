@@ -59,19 +59,6 @@ describe('Application Service', () => {
 		testApplicationService = applicationSvc(db);
 	});
 
-	describe('Create Applications', () => {
-		it('should create applications with status DRAFT and submitted user_id', async () => {
-			const applicationResult = await testApplicationService.createApplication({ user_id });
-
-			assert.ok(applicationResult.success && applicationResult.data);
-
-			const application = applicationResult.data;
-
-			assert.strictEqual(application?.user_id, user_id);
-			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
-		});
-	});
-
 	describe('Get Applications', () => {
 		it('should get applications requested by id, with application_contents', async () => {
 			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
@@ -92,30 +79,6 @@ describe('Application Service', () => {
 			const requestedApplication = result.data;
 			assert.strictEqual(requestedApplication?.id, id);
 			assert.strictEqual(requestedApplication?.id, requestedApplication?.contents?.application_id);
-		});
-	});
-
-	describe('FindOneAndUpdate Application', () => {
-		it('should populate updated_at field', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			const applicationRecords = applicationRecordsResult.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords[0]);
-
-			const { id } = applicationRecords[0];
-			await testApplicationService.findOneAndUpdate({ id, update: {} });
-
-			const result = await testApplicationService.getApplicationById({ id });
-
-			assert.ok(result.success);
-
-			const updatedApplication = result.data;
-
-			assert.ok(!!updatedApplication?.updated_at);
 		});
 	});
 
@@ -180,40 +143,32 @@ describe('Application Service', () => {
 			assert.ok(date2 < date3);
 		});
 
-		it('should allow sorting records by updated_at', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({
-				user_id,
-				sort: [
-					{
-						direction: 'asc',
-						column: 'updated_at',
-					},
-				],
-			});
+		it('should allow record pagination', async () => {
+			const paginationResult = await testApplicationService.listApplications({ user_id, page: 2, pageSize: 10 });
 
-			assert.ok(applicationRecordsResult.success);
-			const applicationRecords = applicationRecordsResult.data.applications;
+			assert.ok(paginationResult.success);
+			const paginatedRecords = paginationResult.data.applications;
 
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords[0]);
-			assert.ok(applicationRecords[1]);
-			assert.ok(applicationRecords[2]);
+			assert.ok(Array.isArray(paginatedRecords));
+			assert.strictEqual(paginatedRecords.length, 10);
 
-			const { id: zeroRecordId } = applicationRecords[0];
-			const { id: firstRecordId } = applicationRecords[1];
-			const { id: secondRecordId } = applicationRecords[2];
+			const allRecordsResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 20 });
+			assert.ok(allRecordsResult.success);
 
-			// State values are used in the next test so first record remains in 'Draft', this is just populating `updatedAt`
-			await testApplicationService.findOneAndUpdate({ id: zeroRecordId, update: {} });
-			await testApplicationService.findOneAndUpdate({
-				id: firstRecordId,
-				update: { state: ApplicationStates.APPROVED },
-			});
-			await testApplicationService.findOneAndUpdate({
-				id: secondRecordId,
-				update: { state: ApplicationStates.REJECTED },
-			});
+			const allRecords = allRecordsResult.data.applications;
+			assert.ok(Array.isArray(allRecords));
 
+			//  Check if first record of paginationResult is equal to the middle record in allRecordsResult
+			const firstPaginatedIndex = paginatedRecords.length - 1;
+			const middleIndex = allRecords.length / 2 - 1;
+
+			assert.ok(paginatedRecords[firstPaginatedIndex]);
+			assert.ok(allRecords[middleIndex]);
+
+			assert.strictEqual(paginatedRecords[firstPaginatedIndex].id, allRecords[middleIndex].id);
+		});
+
+		it('should allow sorting records by updated_at asc', async () => {
 			const updatedRecordsResult = await testApplicationService.listApplications({
 				user_id,
 				sort: [
@@ -236,8 +191,37 @@ describe('Application Service', () => {
 			const date2 = updatedRecords[1].updatedAt?.valueOf();
 			const date3 = updatedRecords[2].updatedAt?.valueOf();
 
-			assert.ok(date1 && date2 && date1 < date2);
-			assert.ok(date2 && date3 && date2 < date3);
+			assert.ok(date1 && date2 && date3);
+			assert.ok(date1 < date2);
+			assert.ok(date2 < date3);
+		});
+
+		it('should allow sorting records by updated_at desc', async () => {
+			const updatedRecordsResult = await testApplicationService.listApplications({
+				user_id,
+				sort: [
+					{
+						direction: 'asc',
+						column: 'updated_at',
+					},
+				],
+			});
+
+			assert.ok(updatedRecordsResult.success);
+			const updatedRecords = updatedRecordsResult.data.applications;
+
+			assert.ok(Array.isArray(updatedRecords));
+			assert.ok(updatedRecords[0]);
+			assert.ok(updatedRecords[1]);
+			assert.ok(updatedRecords[2]);
+
+			const date1 = updatedRecords[0].updatedAt?.valueOf();
+			const date2 = updatedRecords[1].updatedAt?.valueOf();
+			const date3 = updatedRecords[2].updatedAt?.valueOf();
+
+			assert.ok(date1 && date2 && date3);
+			assert.ok(date1 < date2);
+			assert.ok(date2 < date3);
 		});
 
 		it('should allow sorting records by state', async () => {
@@ -263,38 +247,42 @@ describe('Application Service', () => {
 			assert.ok(draftRecordIndex < rejectedRecordIndex);
 			assert.ok(rejectedRecordIndex < approvedRecordIndex);
 		});
+	});
 
-		it('should allow record pagination', async () => {
-			const paginationResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 10 });
+	describe('Create Applications', () => {
+		it('should create applications with status DRAFT and submitted user_id', async () => {
+			const applicationResult = await testApplicationService.createApplication({ user_id });
 
-			assert.ok(paginationResult.success);
-			const paginatedRecords = paginationResult.data.applications;
+			assert.ok(applicationResult.success && applicationResult.data);
 
-			// Test that only 10 were returned
-			assert.ok(Array.isArray(paginatedRecords));
+			const application = applicationResult.data;
 
-			assert.strictEqual(paginatedRecords.length, 10);
+			assert.strictEqual(application?.user_id, user_id);
+			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
+		});
+	});
 
-			const allRecordsResult = await testApplicationService.listApplications({ user_id });
+	describe('FindOneAndUpdate Application', () => {
+		it('should populate updated_at field', async () => {
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
 
-			assert.ok(allRecordsResult.success);
+			assert.ok(applicationRecordsResult.success);
 
-			const allRecords = allRecordsResult.data.applications;
+			const applicationRecords = applicationRecordsResult.data.applications;
 
-			assert.ok(Array.isArray(allRecords));
+			assert.ok(Array.isArray(applicationRecords));
+			assert.ok(applicationRecords[0]);
 
-			const lastPaginatedIndex = paginatedRecords.length - 1;
-			const middleIndex = allRecords.length - 10;
-			const lastIndex = allRecords.length - 1;
+			const { id } = applicationRecords[0];
+			await testApplicationService.findOneAndUpdate({ id, update: {} });
 
-			assert.ok(paginatedRecords[0]);
-			assert.ok(paginatedRecords[lastPaginatedIndex]);
-			assert.ok(allRecords[middleIndex]);
-			assert.ok(allRecords[lastIndex]);
+			const result = await testApplicationService.getApplicationById({ id });
 
-			// Test that pagination returned 'page 2' of the results
-			assert.strictEqual(paginatedRecords[0].id, allRecords[middleIndex].id);
-			assert.strictEqual(paginatedRecords[lastPaginatedIndex].id, allRecords[lastIndex].id);
+			assert.ok(result.success);
+
+			const updatedApplication = result.data;
+
+			assert.ok(!!updatedApplication?.updated_at);
 		});
 	});
 

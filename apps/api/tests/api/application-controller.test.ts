@@ -275,7 +275,7 @@ describe('Application API', () => {
 				update: { state: ApplicationStates.APPROVED },
 			});
 
-			const result = await revokeApplication(id);
+			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT');
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.REVOKED);
@@ -299,7 +299,7 @@ describe('Application API', () => {
 				update: { state: ApplicationStates.DRAFT },
 			});
 
-			const result = await revokeApplication(id);
+			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT');
 
 			// Verify the revocation failed
 			assert.ok(!result.success);
@@ -309,7 +309,7 @@ describe('Application API', () => {
 		it('should fail if application does not exist', async () => {
 			const nonExistentId = 9999;
 
-			const result = await revokeApplication(nonExistentId);
+			const result = await revokeApplication(nonExistentId, true, 'TEST-REVOKE-COMMENT');
 
 			// Assert: Verify the revocation failed
 			assert.ok(!result.success);
