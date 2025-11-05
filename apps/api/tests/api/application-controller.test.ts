@@ -101,7 +101,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const { id } = applicationRecordsResult.data.applications[0];
+			const findRecord = applicationRecordsResult.data.applications.find((value) => value.state === 'DRAFT');
+			assert.ok(findRecord);
+
+			const { id } = findRecord;
 
 			const update = { applicantFirstName: 'Test' };
 
@@ -124,7 +127,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const { id, state } = applicationRecordsResult.data.applications[0];
+			const findRecord = applicationRecordsResult.data.applications.find((value) => value.state === 'DRAFT');
+			assert.ok(findRecord);
+
+			const { id, state } = findRecord;
 
 			assert.strictEqual(state, ApplicationStates.DRAFT);
 
@@ -199,7 +205,7 @@ describe('Application API', () => {
 
 			assert.ok(last_id?.id);
 
-			const result = await getApplicationById({ applicationId: last_id.id + 1 });
+			const result = await getApplicationById({ applicationId: 9999 });
 
 			assert.ok(!result.success);
 
