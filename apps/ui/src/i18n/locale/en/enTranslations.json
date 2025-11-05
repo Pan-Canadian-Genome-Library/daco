@@ -15,7 +15,7 @@
 					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
 				},
 				"FORBIDDEN": {
-					"subheading": "Looks like your browser used a stale session to attempt to login to the DCAO.",
+					"subheading": "Looks like your browser used a stale session to attempt to login to the DACO.",
 					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
 				}
 			},
@@ -37,7 +37,7 @@
 	},
 	"notFound": {
 		"title": "404 Page Not Found",
-		"description": "Sorry, that page doesn’t exist.",
+		"description": "Sorry, that page doesn't exist.",
 		"buttons": {
 			"home": "Go to Homepage"
 		}
@@ -72,7 +72,10 @@
 			"title": "Manage Applications",
 			"show": "Show",
 			"rows": "rows"
-		}
+		},
+		"noResults": "No applications match your search criteria",
+		"search": "Search",
+		"searchResults": "Search Results for \"{{search}}\""
 	},
 	"status": {
 		"404": "Oops, we couldn't find what you were looking for!"
@@ -143,8 +146,8 @@
 	},
 	"menu": {
 		"intro": "Introduction",
-		"institutional": "B. Institutional Representative",
 		"applicant": "A. Applicant Information",
+		"institutional": "B. Institutional Representative",
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
 		"study": "E. Requested Study",

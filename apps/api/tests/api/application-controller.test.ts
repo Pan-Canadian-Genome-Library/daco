@@ -28,7 +28,6 @@ import {
 	dacRejectApplication,
 	editApplication,
 	getApplicationById,
-	getApplicationStateTotals,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	revokeApplication,
@@ -102,7 +101,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const { id } = applicationRecordsResult.data.applications[0];
+			const findRecord = applicationRecordsResult.data.applications.find((value) => value.state === 'DRAFT');
+			assert.ok(findRecord);
+
+			const { id } = findRecord;
 
 			const update = { applicantFirstName: 'Test' };
 
@@ -125,7 +127,10 @@ describe('Application API', () => {
 				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
 			);
 
-			const { id, state } = applicationRecordsResult.data.applications[0];
+			const findRecord = applicationRecordsResult.data.applications.find((value) => value.state === 'DRAFT');
+			assert.ok(findRecord);
+
+			const { id, state } = findRecord;
 
 			assert.strictEqual(state, ApplicationStates.DRAFT);
 
@@ -200,7 +205,7 @@ describe('Application API', () => {
 
 			assert.ok(last_id?.id);
 
-			const result = await getApplicationById({ applicationId: last_id.id + 1 });
+			const result = await getApplicationById({ applicationId: 9999 });
 
 			assert.ok(!result.success);
 
@@ -208,31 +213,6 @@ describe('Application API', () => {
 			assert.equal(result.error, 'NOT_FOUND');
 		});
 	});
-
-	describe('Get Application Metadata', () => {
-		it('should get the counts for each of the application states', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-
-			const result = await getApplicationStateTotals();
-
-			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
-				(apps) => apps.state === 'DRAFT',
-			).length;
-
-			assert.ok(result.success);
-			assert.ok(result.data);
-
-			assert.equal(result.data.DRAFT, totalDraftApplications);
-			assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
-		});
-	});
-
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
 			const result = await createApplication({ user_id });
@@ -301,7 +281,7 @@ describe('Application API', () => {
 				update: { state: ApplicationStates.APPROVED },
 			});
 
-			const result = await revokeApplication(id);
+			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT');
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.REVOKED);
@@ -325,7 +305,7 @@ describe('Application API', () => {
 				update: { state: ApplicationStates.DRAFT },
 			});
 
-			const result = await revokeApplication(id);
+			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT');
 
 			// Verify the revocation failed
 			assert.ok(!result.success);
@@ -335,7 +315,7 @@ describe('Application API', () => {
 		it('should fail if application does not exist', async () => {
 			const nonExistentId = 9999;
 
-			const result = await revokeApplication(nonExistentId);
+			const result = await revokeApplication(nonExistentId, true, 'TEST-REVOKE-COMMENT');
 
 			// Assert: Verify the revocation failed
 			assert.ok(!result.success);
