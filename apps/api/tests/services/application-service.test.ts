@@ -54,7 +54,6 @@ describe('Application Service', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
-		await addPaginationDonors(db);
 
 		testApplicationService = applicationSvc(db);
 	});
@@ -143,31 +142,6 @@ describe('Application Service', () => {
 			assert.ok(date2 < date3);
 		});
 
-		it('should allow record pagination', async () => {
-			const paginationResult = await testApplicationService.listApplications({ user_id, page: 2, pageSize: 10 });
-
-			assert.ok(paginationResult.success);
-			const paginatedRecords = paginationResult.data.applications;
-
-			assert.ok(Array.isArray(paginatedRecords));
-			assert.strictEqual(paginatedRecords.length, 10);
-
-			const allRecordsResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 20 });
-			assert.ok(allRecordsResult.success);
-
-			const allRecords = allRecordsResult.data.applications;
-			assert.ok(Array.isArray(allRecords));
-
-			//  Check if first record of paginationResult is equal to the middle record in allRecordsResult
-			const firstPaginatedIndex = paginatedRecords.length - 1;
-			const middleIndex = allRecords.length / 2 - 1;
-
-			assert.ok(paginatedRecords[firstPaginatedIndex]);
-			assert.ok(allRecords[middleIndex]);
-
-			assert.strictEqual(paginatedRecords[firstPaginatedIndex].id, allRecords[middleIndex].id);
-		});
-
 		it('should allow sorting records by updated_at asc', async () => {
 			const updatedRecordsResult = await testApplicationService.listApplications({
 				user_id,
@@ -246,6 +220,99 @@ describe('Application Service', () => {
 
 			assert.ok(draftRecordIndex < rejectedRecordIndex);
 			assert.ok(rejectedRecordIndex < approvedRecordIndex);
+		});
+
+		it('should return proper totals amount', async () => {
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			const { applications, totals } = applicationRecordsResult.data;
+			assert.ok(totals);
+
+			const localTotals = applications.reduce(
+				(acc, currentApp) => {
+					switch (currentApp.state) {
+						case 'DRAFT':
+							acc.DRAFT++;
+							break;
+						case 'APPROVED':
+							acc.APPROVED++;
+							break;
+						case 'CLOSED':
+							acc.CLOSED++;
+							break;
+						case 'DAC_REVIEW':
+							acc.DAC_REVIEW++;
+							break;
+						case 'DAC_REVISIONS_REQUESTED':
+							acc.DAC_REVISIONS_REQUESTED++;
+							break;
+						case 'INSTITUTIONAL_REP_REVIEW':
+							acc.INSTITUTIONAL_REP_REVIEW++;
+							break;
+						case 'INSTITUTIONAL_REP_REVISION_REQUESTED':
+							acc.INSTITUTIONAL_REP_REVISION_REQUESTED++;
+							break;
+						case 'REJECTED':
+							acc.REJECTED++;
+							break;
+						case 'REVOKED':
+							acc.REVOKED++;
+							break;
+					}
+					acc.TOTAL++;
+					return acc;
+				},
+				{
+					DRAFT: 0,
+					INSTITUTIONAL_REP_REVIEW: 0,
+					INSTITUTIONAL_REP_REVISION_REQUESTED: 0,
+					DAC_REVIEW: 0,
+					DAC_REVISIONS_REQUESTED: 0,
+					REJECTED: 0,
+					APPROVED: 0,
+					CLOSED: 0,
+					REVOKED: 0,
+					TOTAL: 0,
+				},
+			);
+
+			assert.strictEqual(totals.DRAFT, localTotals.DRAFT);
+			assert.strictEqual(totals.INSTITUTIONAL_REP_REVIEW, localTotals.INSTITUTIONAL_REP_REVIEW);
+			assert.strictEqual(totals.INSTITUTIONAL_REP_REVISION_REQUESTED, localTotals.INSTITUTIONAL_REP_REVISION_REQUESTED);
+			assert.strictEqual(totals.DAC_REVIEW, localTotals.DAC_REVIEW);
+			assert.strictEqual(totals.DAC_REVISIONS_REQUESTED, localTotals.DAC_REVISIONS_REQUESTED);
+			assert.strictEqual(totals.REJECTED, localTotals.REJECTED);
+			assert.strictEqual(totals.APPROVED, localTotals.APPROVED);
+			assert.strictEqual(totals.CLOSED, localTotals.CLOSED);
+			assert.strictEqual(totals.REVOKED, localTotals.REVOKED);
+			assert.strictEqual(totals.TOTAL, localTotals.TOTAL);
+		});
+
+		it('should allow record pagination', async () => {
+			await addPaginationDonors(db); // Add extra pagination values
+
+			const paginationResult = await testApplicationService.listApplications({ user_id, page: 2, pageSize: 10 });
+
+			assert.ok(paginationResult.success);
+			const paginatedRecords = paginationResult.data.applications;
+
+			assert.ok(Array.isArray(paginatedRecords));
+			assert.strictEqual(paginatedRecords.length, 10);
+
+			const allRecordsResult = await testApplicationService.listApplications({ user_id, page: 1, pageSize: 20 });
+			assert.ok(allRecordsResult.success);
+
+			const allRecords = allRecordsResult.data.applications;
+			assert.ok(Array.isArray(allRecords));
+
+			//  Check if first record of paginationResult is equal to the middle record in allRecordsResult
+			const firstPaginatedIndex = paginatedRecords.length - 1;
+			const middleIndex = allRecords.length / 2 - 1;
+
+			assert.ok(paginatedRecords[firstPaginatedIndex]);
+			assert.ok(allRecords[middleIndex]);
+
+			assert.strictEqual(paginatedRecords[firstPaginatedIndex].id, allRecords[middleIndex].id);
 		});
 	});
 
