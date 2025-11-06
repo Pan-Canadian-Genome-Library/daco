@@ -171,13 +171,13 @@ export const getAllApplications = async ({
 	sort,
 	page,
 	pageSize,
-	isDACMember,
+	isDAC,
 	isApplicantView,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	if (isDACMember) {
+	if (isDAC) {
 		//If we set UserID to undefined, it will not add in the where clause for limiting by userID.
 		userId = undefined;
 	}

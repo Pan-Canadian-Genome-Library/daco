@@ -133,7 +133,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 		buttons.push(
 			<ProtectedComponent
 				key={'header-revoke'}
-				requiredRoles={['DAC_MEMBER', 'APPLICANT']}
+				requiredRoles={['DAC_CHAIR', 'APPLICANT']}
 				requiredStates={['APPROVED']}
 			>
 				<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
@@ -152,7 +152,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			>
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 			</ProtectedComponent>,
-			<ProtectedComponent key={'header-dac-controls'} requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
+			<ProtectedComponent key={'header-dac-controls'} requiredRoles={['DAC_CHAIR']} requiredStates={['DAC_REVIEW']}>
 				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
 				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
@@ -160,7 +160,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			</ProtectedComponent>,
 			<ProtectedComponent
 				key={'header-download'}
-				requiredRoles={['DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP']}
+				requiredRoles={['DAC_CHAIR', 'DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP']}
 				requiredStates={['INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW', 'APPROVED', 'REJECTED', 'CLOSED', 'REVOKED']}
 			>
 				<Button onClick={() => onPDFDownload()}>{translate('sign-and-submit-section.section.buttons.download')}</Button>
