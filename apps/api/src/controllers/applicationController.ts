@@ -163,6 +163,8 @@ export const editApplication = async ({
  * @param page - page offset
  * @param pageSize - page limit
  * @param isDACMember - Boolean which represents if the user is a DAC Member (they can see all applications)
+ * @param isApplicantView - Boolean which represents if the user is an applicant (they can only see their own applications)
+ * @param search - text to search
  * @returns Success with list of Applications / Failure with Error
  */
 export const getAllApplications = async ({
