@@ -279,11 +279,7 @@ const applicationSvc = (db: PostgresDb) => ({
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			const transformSearchIntoQuery = (searchText: string) => {
-				const sanitizedSearch = searchText
-					?.trim()
-					.replace(/[^a-zA-Z0-9\s@.\-]/g, '') // Remove special characters except @ . -
-					.trim() // apply trim again in-case user inputs a special characters as the first/last word
-					.replace(/\s+/g, ' | '); // add OR between phrases
+				const sanitizedSearch = searchText?.trim().replace(/\s+/g, ' | '); // add OR between phrases
 
 				let searchQuery;
 				// Use ILIKE for better partial matching
