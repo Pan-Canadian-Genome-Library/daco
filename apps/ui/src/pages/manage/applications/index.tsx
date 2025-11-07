@@ -63,7 +63,6 @@ const ManageApplicationsPage = () => {
 	const appliedSearch = searchParams.get('search');
 
 	const [sorting, setSorting] = useState<ApplicationListSortingOptions[]>();
-	const [, setRowCount] = useState<number>(DEFAULT_NUMBER_OF_ROWS);
 	const [search, setSearchText] = useState<string>('');
 
 	const [tableParams, setTableParams] = useState<TableProperties>({
@@ -111,7 +110,6 @@ const ManageApplicationsPage = () => {
 			prev.set('rows', String(pageCount));
 			return prev;
 		});
-		setRowCount(pageCount);
 	};
 	/**
 	 * Gets called whenever user inputs text into searchbar
@@ -159,8 +157,6 @@ const ManageApplicationsPage = () => {
 			}
 			setSorting(sortingOpt);
 		}
-
-		setRowCount(parseRowNumber(pagination.pageSize ?? DEFAULT_NUMBER_OF_ROWS));
 
 		setSearchParams((prev) => {
 			prev.set('page', parsePageNumber(page, false).toString());
