@@ -144,12 +144,14 @@ const formatRevisionFeedback = (data: RevisionsDTO[]): SectionRevision => {
 				general: value.comments,
 			};
 		}),
-		general: data.map((value) => {
-			return {
-				comment: value.comments ?? null,
-				isDacRequest: value.isDacRequest,
-				createdAt: value.createdAt,
-			};
-		}),
+		general: data
+			.filter((value) => value.comments)
+			.map((value) => {
+				return {
+					comment: value.comments ?? null,
+					isDacRequest: value.isDacRequest,
+					createdAt: value.createdAt,
+				};
+			}),
 	};
 };
