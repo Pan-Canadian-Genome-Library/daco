@@ -78,7 +78,7 @@ const DashboardFilter = ({ onFilterChange, filters, availableStates }: Dashboard
 		 *
 		 * Also if the user unselects all filters, default back to total.
 		 **/
-		if (selectedFilter === 'TOTAL' || (nextSelectedFilters.length === 0 && filters.length === 0)) {
+		if (selectedFilter === 'TOTAL' || (nextSelectedFilters.length === 0 && filters.length === 1)) {
 			nextSelectedFilters = ['TOTAL'];
 		} else if (filterStates.includes('TOTAL')) {
 			/**
