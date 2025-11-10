@@ -285,7 +285,6 @@ const applicationSvc = (db: PostgresDb) => ({
 					.trim() // apply trim again in-case user inputs a special characters as the first/last word
 					.replace(/\s+/g, ' | '); // add OR between phrases
 
-				// let searchQuery;
 				const searchQuery = sql`(
 									setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
 									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
@@ -293,7 +292,6 @@ const applicationSvc = (db: PostgresDb) => ({
 									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
 								)
      		 @@ to_tsquery('english', ${`%${sanitizedSearch}%` + ':*'})`;
-				console.log(sanitizedSearch);
 
 				return searchQuery;
 			};
