@@ -193,7 +193,6 @@ export interface ApplicationResponseData extends ApplicationDTO {
 }
 
 export interface PagingMetadata {
-	totalRecords: number;
 	page: number;
 	pageSize: number;
 }
@@ -211,11 +210,6 @@ export interface ApplicationListSummary extends ApplicationDTO {
 	applicant: ApplicantSummary | null;
 }
 
-export interface ApplicationListResponse {
-	applications: ApplicationListSummary[];
-	pagingMetadata: PagingMetadata;
-}
-
 export type ApplicationContentsResponse = {
 	applicationId?: number;
 	createdAt?: Date;
@@ -231,12 +225,6 @@ export type ApplicationContentsResponse = {
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;
-}
-
-export interface PagingMetadata {
-	totalRecords: number;
-	page: number;
-	pageSize: number;
 }
 
 export interface ApplicantSummary {

@@ -230,7 +230,7 @@ const ManageApplicationsPage = () => {
 					pagination: {
 						...prev.pagination,
 						pageSize: serverPaginationState.pageSize,
-						total: serverPaginationState.totalRecords,
+						total: tableData.totals.TOTAL,
 					},
 				};
 			});

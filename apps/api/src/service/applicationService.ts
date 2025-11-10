@@ -402,7 +402,6 @@ const applicationSvc = (db: PostgresDb) => ({
 			const applicationsList: ApplicationListResponse = {
 				applications: returnableApplications,
 				pagingMetadata: {
-					totalRecords: countResult[0].TOTAL,
 					page: page,
 					pageSize: pageSize,
 				},
