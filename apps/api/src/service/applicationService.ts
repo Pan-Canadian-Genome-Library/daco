@@ -279,17 +279,21 @@ const applicationSvc = (db: PostgresDb) => ({
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			const transformSearchIntoQuery = (searchText: string) => {
-				const sanitizedSearch = searchText?.trim().replace(/\s+/g, ' | '); // add OR between phrases
+				const sanitizedSearch = searchText
+					?.trim()
+					.replace(/[^a-zA-Z0-9\s@.\-]/g, '') // Remove special characters except @ . -
+					.trim() // apply trim again in-case user inputs a special characters as the first/last word
+					.replace(/\s+/g, ' | '); // add OR between phrases
 
-				let searchQuery;
-				// Use ILIKE for better partial matching
-				const search = `%${sanitizedSearch}%`;
-				searchQuery = sql`(
-						${applicationContents.application_id}::text ILIKE ${search} OR
-						(COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')) ILIKE ${search} OR
-						COALESCE(${applicationContents.applicant_institutional_email}, '') ILIKE ${search} OR
-						COALESCE(${applicationContents.applicant_primary_affiliation}, '') ILIKE ${search}
-					)`;
+				// let searchQuery;
+				const searchQuery = sql`(
+									setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
+								)
+     		 @@ to_tsquery('english', ${`%${sanitizedSearch}%` + ':*'})`;
+				console.log(sanitizedSearch);
 
 				return searchQuery;
 			};
