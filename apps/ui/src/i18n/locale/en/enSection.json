@@ -159,7 +159,8 @@
 		"description-link": "PCGL Research Portal - Studies.",
 		"section1": {
 			"form": {
-				"studyName": "Study Name:"
+				"studyName": "Study Name:",
+				"studyLabel": "Multiple selection available."
 			}
 		}
 	},
