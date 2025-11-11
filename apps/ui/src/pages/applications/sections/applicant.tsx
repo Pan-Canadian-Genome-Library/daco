@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -121,6 +122,9 @@ const Applicant = () => {
 					showLockIcon={!canEdit}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
+				<Row>
+					<DacComments sectionComments={[]} />
+				</Row>
 				<SectionContent title={translate('applicant-section.section1')}>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>
