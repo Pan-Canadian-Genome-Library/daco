@@ -119,6 +119,7 @@ const RequestedStudy = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 							<SelectBox
 								label={translate('requested-study.section1.form.studyName')}
+								sublabel={translate('requested-study.section1.form.studyLabel')}
 								name="requestedStudies"
 								placeholder="Select"
 								control={control}
