@@ -8,7 +8,13 @@
 			"descriptions": {
 				"NOT_FOUND": {
 					"subheading": "Account is not associated within the PCGL project.",
-					"description": "Looks like your account is currently not associated within the PCGL project and therefore cannot access the PCGL DACO Service. This may be due to the fact that you haven't completed the onboarding process for new accounts, or have logged in with an account not previously used to access the service."
+					"description": "Looks like your account is currently not associated within the PCGL project and therefore cannot access the PCGL DACO Service. This may be due to the fact that you haven't completed the onboarding process for new accounts, or have logged in with an account not previously used to access the service.",
+					"description2": "Please self-enroll by clicking the \"Get Started\" button bellow to complete your onboarding and gain access to the PCGL DACO Service."
+				},
+				"SELF_REGISTRATION_SENT": {
+					"subheading": "Your account is almost ready!",
+					"description": "Thanks for enroling to PCGL project. We've sent a verification email to your email address. Please open that message and follow the instructions to confirm your address and return to the PCGL DACO service.",
+					"description2": "If you didn't receive the email within a few minutes, you can resend the verification email or contact the PCGL support team"
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Looks like we ran into a little hiccup while completing the login process.",
