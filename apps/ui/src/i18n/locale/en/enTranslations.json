@@ -14,14 +14,14 @@
 				"SELF_REGISTRATION_SENT": {
 					"subheading": "Your account is almost ready!",
 					"description": "Thanks for enroling to PCGL project. We've sent a verification email to your email address. Please open that message and follow the instructions to confirm your address and return to the PCGL DACO service.",
-					"description2": "If you didn't receive the email within a few minutes, you can resend the verification email or contact the PCGL support team"
+					"description2": "If you didn't receive the email within a few minutes, you can resend the verification email or contact the PCGL support team."
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Looks like we ran into a little hiccup while completing the login process.",
 					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
 				},
 				"FORBIDDEN": {
-					"subheading": "Looks like your browser used a stale session to attempt to login to the DCAO.",
+					"subheading": "Looks like your browser used a stale session to attempt to login to the DACO.",
 					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
 				}
 			},

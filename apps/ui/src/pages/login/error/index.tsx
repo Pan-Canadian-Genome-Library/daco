@@ -50,7 +50,7 @@ const LoginError = () => {
 			}}
 		>
 			<Flex vertical>
-				<Title>{translate('global.loginError.title')}</Title>
+				<Title>{translate(code === 'SELF_REGISTRATION_SENT' ? '' : 'global.loginError.title')}</Title>
 				<Flex vertical gap={'1rem'}>
 					<Title level={2} style={{ marginTop: '-.2rem', fontSize: token.fontSizeHeading4 }}>
 						{translate([
@@ -65,11 +65,7 @@ const LoginError = () => {
 						])}
 					</Text>
 
-					{(code === 'NOT_FOUND' || code === 'SELF_REGISTRATION_SENT') && (
-						<>
-							<Text>{translate([`global.loginError.descriptions.${code}.description2`])}</Text>
-						</>
-					)}
+					<Text>{translate([`global.loginError.descriptions.${code}.description2`, ''])}</Text>
 				</Flex>
 				<Flex style={{ ...buttonContainerStyles }}>
 					{code === 'NOT_FOUND' ? (
