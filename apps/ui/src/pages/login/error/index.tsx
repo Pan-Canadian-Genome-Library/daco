@@ -19,7 +19,6 @@
 import { Button, Flex, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
 import { errorStyles, errorStylesCondensed } from '@/components/pages/global/ErrorPage';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
@@ -45,7 +44,11 @@ const LoginError = () => {
 	};
 
 	return (
-		<Content style={{ ...contentWrapperStyles, ...(isLowResDevice ? errorStylesCondensed : errorStyles) }}>
+		<Content
+			style={{
+				...(isLowResDevice ? errorStylesCondensed : { ...errorStyles }),
+			}}
+		>
 			<Flex vertical>
 				<Title>{translate('global.loginError.title')}</Title>
 				<Flex vertical gap={'1rem'}>
