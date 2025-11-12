@@ -23,3 +23,4 @@ To use environment variables, copy the file `.env.schema` to `.env` and modify a
 | Name           | Description                                                                                                                                                                 | Type     |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | `DISABLE_AUTH` | If set to `true`, all protected routes will be available regardless of the user. This allows development of protected pages withour required an authenticated user session. | `string` |
+| `SELF_ENROLMENT_URL` | Specifies the URL endpoint for user self-enrolment. (COmanage Self-enrolment flow) | `string` |

@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { API_PATH_LOGIN } from '@/api/paths';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Flex, Modal, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +28,9 @@ interface ApplyForAccessModalProps {
 	openModal: boolean;
 	setOpenModal: (show: boolean) => void;
 }
+
+const SELF_ENROLMENT_URL = import.meta.env.VITE_SELF_ENROLMENT_URL || '#';
+
 const ApplyForAccessModal = ({ openModal, setOpenModal }: ApplyForAccessModalProps) => {
 	const minWidth = useMinWidth();
 	const { t: translate } = useTranslation();
@@ -36,13 +38,13 @@ const ApplyForAccessModal = ({ openModal, setOpenModal }: ApplyForAccessModalPro
 
 	const handleLoginButton = () => {
 		setOpenModal(false);
-		window.location.href = API_PATH_LOGIN;
+		window.location.href = SELF_ENROLMENT_URL;
 	};
 
 	return (
 		<Modal
 			title={translate('links.apply')}
-			okText={translate('button.login')}
+			okText={translate('button.getStarted')}
 			width={'100%'}
 			style={{
 				top: '20%',
