@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
-import DacComments from '@/components/pages/application/DacComments';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -123,7 +123,73 @@ const Applicant = () => {
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
 				<Row>
-					<DacComments sectionComments={[]} />
+					<DacComments
+						sectionComments={[
+							{
+								id: 12,
+								application_id: 1,
+								comments: 'This is a comment',
+								dac_chair_only: true,
+								section: 'applicant',
+								username: 'John Doe',
+								created_at: '2022-01-01',
+							},
+							{
+								id: 14,
+								application_id: 1,
+								comments: 'This is a comment',
+								dac_chair_only: true,
+								section: 'applicant',
+								username: 'John Doe',
+								created_at: '2022-01-01',
+							},
+							{
+								id: 14,
+								application_id: 1,
+								comments: 'This is a comment',
+								dac_chair_only: true,
+								section: 'applicant',
+								username: 'John Doe',
+								created_at: '2022-01-01',
+							},
+							{
+								id: 14,
+								application_id: 1,
+								comments: 'This is a comment',
+								dac_chair_only: true,
+								section: 'applicant',
+								username: 'John Doe',
+								created_at: '2022-01-01',
+							},
+							{
+								id: 14,
+								application_id: 1,
+								comments: 'This is a comment',
+								dac_chair_only: true,
+								section: 'applicant',
+								username: 'John Doe',
+								created_at: '2022-01-01',
+							},
+							{
+								id: 14,
+								application_id: 1,
+								comments: 'This is a comment',
+								dac_chair_only: true,
+								section: 'applicant',
+								username: 'John Doe',
+								created_at: '2022-01-01',
+							},
+							{
+								id: 14,
+								application_id: 1,
+								comments: 'This is a comment',
+								dac_chair_only: true,
+								section: 'applicant',
+								username: 'John Doe',
+								created_at: '2022-01-01',
+							},
+						]}
+					/>
 				</Row>
 				<SectionContent title={translate('applicant-section.section1')}>
 					<Row>

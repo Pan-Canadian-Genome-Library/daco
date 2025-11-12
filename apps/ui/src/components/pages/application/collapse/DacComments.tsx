@@ -19,28 +19,78 @@
 
 import { pcglColours } from '@/providers/ThemeProvider';
 import { CaretRightFilled } from '@ant-design/icons';
-import { Collapse, theme } from 'antd';
-import { useEffect } from 'react';
+import { Collapse } from 'antd';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CommentLabel from './CommentLabel';
+
+type SectionComments = {
+	id: number;
+	application_id: number;
+	comments: string;
+	username: string;
+	dac_chair_only: boolean;
+	section: string;
+	created_at: Date | string;
+};
 
 interface DacCommentsProps {
-	sectionComments: {
-		id: number;
-		application_id: number;
-		comments: string;
-		username: string;
-		dac_chair_only: boolean;
-		section: string;
-		created_at: Date;
-	}[];
+	sectionComments: SectionComments[];
 }
 
 const DacComments = ({ sectionComments }: DacCommentsProps) => {
-	const { token } = theme.useToken();
-
 	const { t: translate } = useTranslation();
 
-	useEffect(() => {}, [sectionComments]);
+	const [comments, setComments] = useState<{
+		dacComments: SectionComments[];
+		chairOnly: SectionComments[];
+	}>({
+		dacComments: [],
+		chairOnly: [],
+	});
+
+	useEffect(() => {
+		setComments({
+			dacComments: sectionComments.filter((comment) => !comment.dac_chair_only),
+			chairOnly: sectionComments.filter((comment) => comment.dac_chair_only),
+		});
+	}, [sectionComments]);
+
+	/**
+	 * The Dac Comments and For Chair Only dropdown collapse UI.
+	 */
+	const DACOptions = [
+		{
+			key: '1',
+			label: <CommentLabel label="DAC Comments" numOfComments={comments.dacComments.length} />,
+			children: (
+				<div>
+					{comments.dacComments.map((comment) => (
+						<div key={comment.id}>
+							<p>{comment.comments}</p>
+							<p>{comment.username}</p>
+						</div>
+					))}
+				</div>
+			),
+			style: itemStyles,
+		},
+		{
+			key: '2',
+			label: <CommentLabel label="For Chair Only" numOfComments={comments.chairOnly.length} />,
+			children: (
+				<div style={{ overflow: 'auto' }}>
+					{comments.chairOnly.map((comment) => (
+						<div key={comment.id} style={{ zIndex: 1 }}>
+							<p>{comment.comments}</p>
+							<p>{comment.username}</p>
+						</div>
+					))}
+				</div>
+			),
+			style: itemStyles,
+		},
+	];
 
 	return (
 		<>
@@ -51,7 +101,7 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 				expandIcon={({ isActive }) => (
 					<CaretRightFilled style={{ color: pcglColours.darkGrey, fontSize: '1.4rem' }} rotate={isActive ? 90 : -90} />
 				)}
-				items={[]}
+				items={DACOptions}
 				expandIconPosition={'end'}
 			/>
 		</>
@@ -59,3 +109,11 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 };
 
 export default DacComments;
+
+const itemStyles = {
+	marginBottom: 10,
+	background: pcglColours.geekBlue,
+	borderRadius: 8,
+	border: `1px solid ${pcglColours.blue}`,
+	maxHeight: '375px',
+};
