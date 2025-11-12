@@ -31,24 +31,24 @@ sequenceDiagram
 sequenceDiagram
 	participant user
     participant ui
-    participant coManage
+    participant COmanage
     participant CILogon
 
 	user->>ui: Clicks "Self-Enrol" link
-	ui->>+coManage: /registry - Self Enrolment "PCGL DACO" Flow
-	Note over coManage: User provide name and email address
-	coManage-->>user: Sends invitation email with verification link
-	coManage->>-ui: /login/error?code=SELF_REGISTRATION_SENT
-	user->>+coManage: Opens coManage invitation page
+	ui->>+COmanage: /registry - Self Enrolment "PCGL DACO" Flow
+	Note over COmanage: User provide name and email address
+	COmanage-->>user: Sends invitation email with verification link
+	COmanage->>-ui: /login/error?code=SELF_REGISTRATION_SENT
+	user->>+COmanage: Opens COmanage invitation page
     alt Accept
-        coManage->>+CILogon: Redirects user for authentication
+        COmanage->>+CILogon: Redirects user for authentication
         user-->>CILogon: Logs in via CILogon
         CILogon->>-ui: Redirects back to UI home page
         ui->>user: Displays home page (login successful)
     else Deny
-		coManage->>+CILogon: Redirects user for authentication
+		COmanage->>+CILogon: Redirects user for authentication
         user-->>CILogon: Logs in via CILogon
-		CILogon->>-coManage: Redirects to error page
+		CILogon->>-COmanage: Redirects to error page
     end
 ```
 
