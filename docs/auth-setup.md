@@ -43,12 +43,12 @@ sequenceDiagram
     alt Accept
         coManage->>+CILogon: Redirects user for authentication
         user-->>CILogon: Logs in via CILogon
-        CILogon-->>-ui: Redirects back to UI home page
+        CILogon->>-ui: Redirects back to UI home page
         ui->>user: Displays home page (login successful)
     else Deny
 		coManage->>+CILogon: Redirects user for authentication
         user-->>CILogon: Logs in via CILogon
-		CILogon-->>-coManage: Redirects to error page
+		CILogon->>-coManage: Redirects to error page
     end
 ```
 
