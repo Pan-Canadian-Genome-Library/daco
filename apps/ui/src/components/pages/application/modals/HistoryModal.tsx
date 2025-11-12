@@ -17,16 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import useGetApplication from '@/api/queries/useGetApplication';
 import { Button, Flex, Modal, Typography } from 'antd';
 
 const { Title } = Typography;
 
 interface HistoryModalProps {
+	id: number;
 	isOpen: boolean;
 	onOk: () => void;
 	okText: string;
 }
-const HistoryModal = ({ isOpen, onOk, okText }: HistoryModalProps) => {
+
+const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
+	const applicationResponse = useGetApplication(id);
+
+	// TODO: Validation
+	const displayId = `PCGL-${id}`;
+
 	return (
 		<Modal
 			width={'100%'}
@@ -41,6 +49,19 @@ const HistoryModal = ({ isOpen, onOk, okText }: HistoryModalProps) => {
 				<Title level={3} aria-level={1}>
 					Application History
 				</Title>
+				<p>
+					<em>Application ID:</em> {displayId}
+				</p>
+				<p>
+					<em>Submission Date:</em> {`${applicationResponse.data?.updatedAt}`}{' '}
+				</p>
+				<p>
+					<em>Current Status:</em> {applicationResponse.data?.state}
+				</p>
+				<p>
+					<em>Last Updated: </em>
+					{`${applicationResponse.data?.updatedAt}`}
+				</p>
 				<Button type="primary" onClick={onOk}>
 					{okText}
 				</Button>

@@ -318,6 +318,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				onOk={() => setShowSuccessApproveModal(false)}
 			/>
 			<HistoryModal
+				id={id}
 				okText={translate('modals.buttons.ok')}
 				isOpen={showHistoryModal}
 				onOk={() => setShowHistoryModal(false)}
