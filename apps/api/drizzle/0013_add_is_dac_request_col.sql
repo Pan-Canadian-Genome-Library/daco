@@ -1,1 +1,0 @@
-ALTER TABLE "revision_requests" ADD COLUMN "is_dac_request" boolean DEFAULT false NOT NULL;
