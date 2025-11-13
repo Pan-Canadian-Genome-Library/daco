@@ -21,9 +21,6 @@ components:
       type: object
       description: Information regarding what current page of results.
       properties:
-        totalRecords:
-          type: number
-          description: The total number of records in the current result set.
         page:
           type: number
           description: The current page of results, starts from 0. Default is 0.

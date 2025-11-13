@@ -323,31 +323,6 @@ describe('Application Service', () => {
 		});
 	});
 
-	describe('Get Application Metadata', () => {
-		it('should list statistics for how many applications are in each state category', async () => {
-			const appStateTotals = await testApplicationService.applicationStateTotals();
-			assert.ok(appStateTotals.success);
-
-			const allStates = appStateTotals.data;
-
-			const allApplications = await testApplicationService.listApplications({
-				user_id,
-				pageSize: allRecordsPageSize,
-			});
-			assert.ok(allApplications.success);
-
-			const applicationRecords = allApplications.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(allStates);
-
-			const allDraftRecords = applicationRecords.filter((records) => records.state === 'DRAFT');
-
-			assert.equal(allStates.DRAFT, allDraftRecords.length);
-			assert.equal(allStates.TOTAL, applicationRecords.length);
-		});
-	});
-
 	after(async () => {
 		await container.stop();
 		process.exit(0);

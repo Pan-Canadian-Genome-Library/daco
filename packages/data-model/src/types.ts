@@ -193,7 +193,6 @@ export interface ApplicationResponseData extends ApplicationDTO {
 }
 
 export interface PagingMetadata {
-	totalRecords: number;
 	page: number;
 	pageSize: number;
 }
@@ -209,11 +208,6 @@ export interface ApplicantSummary {
 
 export interface ApplicationListSummary extends ApplicationDTO {
 	applicant: ApplicantSummary | null;
-}
-
-export interface ApplicationListResponse {
-	applications: ApplicationListSummary[];
-	pagingMetadata: PagingMetadata;
 }
 
 export type ApplicationContentsResponse = {
@@ -233,12 +227,6 @@ export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;
 }
 
-export interface PagingMetadata {
-	totalRecords: number;
-	page: number;
-	pageSize: number;
-}
-
 export interface ApplicantSummary {
 	createdAt: Date;
 	firstName: string | null;
@@ -252,9 +240,23 @@ export interface ApplicationListSummary extends ApplicationDTO {
 	applicant: ApplicantSummary | null;
 }
 
+export type ApplicationStateTotals = {
+	APPROVED: number;
+	CLOSED: number;
+	DAC_REVIEW: number;
+	DAC_REVISIONS_REQUESTED: number;
+	DRAFT: number;
+	INSTITUTIONAL_REP_REVIEW: number;
+	REJECTED: number;
+	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
+	REVOKED: number;
+	TOTAL: number;
+};
+
 export interface ApplicationListResponse {
 	applications: ApplicationListSummary[];
 	pagingMetadata: PagingMetadata;
+	totals: ApplicationStateTotals;
 }
 
 export type ApproveApplication = {

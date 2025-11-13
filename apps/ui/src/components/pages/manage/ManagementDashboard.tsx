@@ -26,8 +26,9 @@ import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/Dash
 import RowCount from '@/components/pages/manage/RowCount';
 import { pcglTableTheme } from '@/providers/ThemeProvider';
 import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
+import { useTranslation } from 'react-i18next';
 
-const { Link } = Typography;
+const { Link, Text } = Typography;
 const { useToken } = theme;
 
 export interface FilterState {
@@ -57,6 +58,7 @@ interface ManagementDashboardProps {
 	data: ApplicationListSummary[];
 	loading: boolean;
 	pagination: TablePaginationConfig;
+	search?: string;
 }
 
 const tableColumnConfiguration = [
@@ -128,8 +130,10 @@ const ManagementDashboard = ({
 	pagination,
 	data,
 	loading,
+	search,
 }: ManagementDashboardProps) => {
 	const { token } = useToken();
+	const { t: translate } = useTranslation();
 
 	return (
 		<Flex
@@ -137,16 +141,28 @@ const ManagementDashboard = ({
 			gap={token.paddingSM}
 			vertical
 		>
-			<Flex justify="right" align="center">
-				<DashboardFilter
-					onFilterChange={(filtersActive) => onFilterChange(filtersActive)}
-					filters={filters}
-					availableStates={filterCounts}
-				/>
+			<Flex justify={search ? 'space-between' : 'end'} align="center" wrap gap={'large'}>
+				<Flex justify="center" align="center">
+					{search ? <Text strong>{translate('manage.searchResults', { search })}</Text> : null}
+				</Flex>
+				<Flex justify="center" align="center">
+					<DashboardFilter
+						onFilterChange={(filtersActive) => onFilterChange(filtersActive)}
+						filters={filters}
+						availableStates={filterCounts}
+					/>
+				</Flex>
 			</Flex>
 			<Flex style={{ width: '100%', height: '100%', margin: '.5rem 0' }} vertical>
 				<ConfigProvider theme={pcglTableTheme}>
 					<Table
+						locale={{
+							emptyText: (
+								<Flex justify="center" align="center" style={{ height: '10rem' }}>
+									<Text>{translate('manage.noResults')}</Text>
+								</Flex>
+							),
+						}}
 						rowKey={(record) => {
 							return `${record.id}-${record.createdAt}`;
 						}}
