@@ -140,7 +140,6 @@ export const revisionDataResponseSchema = revisionDataSchema
 		id: z.number().nonnegative(),
 		applicationId: z.number().nonnegative(),
 		createdAt: z.date(),
-		isDacRequest: z.boolean(),
 	})
 	.strict();
 

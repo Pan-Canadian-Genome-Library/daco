@@ -42,10 +42,9 @@ import {
 	convertToBasicApplicationRecord,
 	convertToCollaboratorRecords,
 	convertToFileRecord,
-	convertToRevisionsRecord,
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
-import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
+import { failure, type AsyncResult, type Result } from '@/utils/results.js';
 import { validateRevisedFields } from '@/utils/validation.ts';
 import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
@@ -1028,16 +1027,7 @@ export const getRevisions = async ({
 			return revisionsResult;
 		}
 
-		const aliasedRevs = revisionsResult.data.map((rev) => convertToRevisionsRecord(rev));
-
-		const filteredFailures = aliasedRevs.filter((results) => !results.success);
-		const filteredSuccesses = aliasedRevs.filter((results) => results.success).map((results) => results.data);
-
-		if (filteredFailures.length) {
-			throw new Error('Failed to alias Revisions Record');
-		} else {
-			return success(filteredSuccesses);
-		}
+		return revisionsResult;
 	} catch (error) {
 		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
 		logger.error(message, error);

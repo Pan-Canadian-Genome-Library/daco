@@ -17,15 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
+import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { RevisionsDTO } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
 	type ApplicationListResponse,
@@ -451,19 +453,58 @@ const applicationSvc = (db: PostgresDb) => ({
 		}
 	},
 
-	getRevisions: async ({
-		applicationId,
-	}: {
-		applicationId: number;
-	}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
+	getRevisions: async ({ applicationId }: { applicationId: number }): AsyncResult<RevisionsDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const results = await db
-				.select()
-				.from(revisionRequests)
-				.where(eq(revisionRequests.application_id, applicationId))
+				.select({
+					applicationsId: revisionRequests.application_id,
+					applicationActionId: applicationActions.id,
+					applicationAction: applicationActions.action,
+					comments: revisionRequests.comments,
+					applicantNotes: revisionRequests.appendices_notes,
+					applicantApproved: revisionRequests.applicant_approved,
+					institutionRepApproved: revisionRequests.institution_rep_approved,
+					institutionRepNotes: revisionRequests.institution_rep_notes,
+					collaboratorsApproved: revisionRequests.collaborators_approved,
+					collaboratorsNotes: revisionRequests.collaborators_notes,
+					projectApproved: revisionRequests.project_approved,
+					projectNotes: revisionRequests.project_notes,
+					requestedStudiesApproved: revisionRequests.requested_studies_approved,
+					requestedStudiesNotes: revisionRequests.requested_studies_notes,
+					ethicsApproved: revisionRequests.ethics_approved,
+					ethicsNotes: revisionRequests.ethics_notes,
+					agreementsApproved: revisionRequests.agreements_approved,
+					agreementsNotes: revisionRequests.agreements_notes,
+					appendicesApproved: revisionRequests.appendices_approved,
+					appendicesNotes: revisionRequests.appendices_notes,
+					signAndSubmitApproved: revisionRequests.sign_and_submit_approved,
+					signAndSubmitNotes: revisionRequests.sign_and_submit_notes,
+					createdAt: revisionRequests.created_at,
+				})
+				.from(applicationActions)
+				.where(
+					and(
+						eq(revisionRequests.application_id, applicationId),
+						or(
+							eq(applicationActions.action, 'DAC_REVIEW_REVISION_REQUEST'),
+							eq(applicationActions.action, 'INSTITUTIONAL_REP_REVISION_REQUEST'),
+						),
+					),
+				)
+				.innerJoin(revisionRequests, eq(revisionRequests.id, applicationActions.revisions_request_id))
 				.orderBy(desc(revisionRequests.created_at));
 
-			return success(results);
+			// console.log(results);
+
+			const transformResult: RevisionsDTO[] = results.map((revision) => {
+				return {
+					...revision,
+					isDacRequest: revision.applicationAction === 'DAC_REVIEW_REVISION_REQUEST',
+					// applicationAction: undefined, // remove application-action
+				};
+			});
+
+			return success(transformResult);
 		} catch (error) {
 			const message = `Error while fetching revisions for applicationId: ${applicationId}`;
 			logger.error(message, error);
