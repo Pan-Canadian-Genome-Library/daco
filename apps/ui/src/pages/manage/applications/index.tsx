@@ -256,7 +256,7 @@ const ManageApplicationsPage = () => {
 					<ErrorPage loading={isTableLoading} error={tableError} />
 				) : (
 					<ManagementDashboard
-						filterCounts={tableData?.totals ? calculateFilterAmounts(tableData?.totals) : []}
+						filterCounts={tableData?.totals ? calculateFilterAmounts(tableData.totals) : []}
 						loading={isTableLoading}
 						rowsCount={tableParams.pagination.pageSize}
 						onRowsChange={handleRowChange}
