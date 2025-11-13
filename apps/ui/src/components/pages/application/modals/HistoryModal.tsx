@@ -45,23 +45,25 @@ const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
 			footer={[]}
 			destroyOnClose
 		>
-			<Flex justify="center" align="center" vertical>
-				<Title level={3} aria-level={1}>
+			<Flex justify="start" align="top" vertical>
+				<Title level={3} aria-level={1} style={{ marginTop: '0.5em' }}>
 					Application History
 				</Title>
-				<p>
-					<em>Application ID:</em> {displayId}
-				</p>
-				<p>
-					<em>Submission Date:</em> {`${applicationResponse.data?.updatedAt}`}{' '}
-				</p>
-				<p>
-					<em>Current Status:</em> {applicationResponse.data?.state}
-				</p>
-				<p>
-					<em>Last Updated: </em>
-					{`${applicationResponse.data?.updatedAt}`}
-				</p>
+				<div style={{ marginBottom: '2em' }}>
+					<p style={{ margin: 0 }}>
+						<span style={{ fontWeight: 'bold' }}>Application ID:</span> {displayId}
+					</p>
+					<p style={{ margin: 0 }}>
+						<span style={{ fontWeight: 'bold' }}>Submission Date:</span> {`${applicationResponse.data?.updatedAt}`}{' '}
+					</p>
+					<p style={{ margin: 0 }}>
+						<span style={{ fontWeight: 'bold' }}>Current Status:</span> {applicationResponse.data?.state}
+					</p>
+					<p style={{ margin: 0 }}>
+						<span style={{ fontWeight: 'bold' }}>Last Updated: </span>
+						{`${applicationResponse.data?.updatedAt}`}
+					</p>
+				</div>
 				<Button type="primary" onClick={onOk}>
 					{okText}
 				</Button>
