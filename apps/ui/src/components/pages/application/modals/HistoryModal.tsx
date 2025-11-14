@@ -17,9 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { Button, Flex, Modal, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
+
 import useGetApplication from '@/api/queries/useGetApplication';
 import { pcglColours } from '@/providers/ThemeProvider';
-import { Button, Flex, Modal, Typography } from 'antd';
 
 const { Title, Text } = Typography;
 
@@ -29,16 +31,16 @@ interface HistoryModalProps {
 	id: number;
 	isOpen: boolean;
 	onOk: () => void;
-	okText: string;
 }
 
-const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
+const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
 	const applicationResponse = useGetApplication(id);
 	const applicationData = applicationResponse.data;
-	// TODO: Validation
 	const displayId = `PCGL-${id}`;
-	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
+	// TODO: Validation
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
+	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
+	const { t: translate } = useTranslation();
 
 	return (
 		<Modal
@@ -52,25 +54,25 @@ const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
 		>
 			<Flex justify="start" align="top" vertical>
 				<Title level={3} aria-level={1} style={{ marginTop: '0.5em', marginBottom: '1em' }}>
-					Application History
+					{translate('modals.history.title')}
 				</Title>
 				{applicationData ? (
 					<>
 						<div style={{ marginBottom: '2em' }}>
 							<div>
-								<Text strong>Application ID:</Text>
+								<Text strong>{translate('modals.history.applicationId')}:</Text>
 								<Text> {displayId}</Text>
 							</div>
 							<div>
-								<Text strong>Submission Date:</Text>
+								<Text strong>{translate('modals.history.submissionDate')}:</Text>
 								<Text> {`${submissionDate}`}</Text>
 							</div>
 							<div>
-								<Text strong>Current Status:</Text>
+								<Text strong>{translate('modals.history.currentStatus')}:</Text>
 								<Text> {applicationData.state}</Text>
 							</div>
 							<div>
-								<Text strong>Last Updated:</Text>
+								<Text strong>{translate('modals.history.lastUpdated')}:</Text>
 								<Text> {`${lastUpdated}`}</Text>
 							</div>
 						</div>
@@ -113,10 +115,10 @@ const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
 						</div>
 					</>
 				) : (
-					<div style={{ margin: '1em 0' }}>Application Not Found</div>
+					<div style={{ margin: '1em 0' }}>translate('modals.history.notFound')</div>
 				)}
-				<Button type="primary" onClick={onOk}>
-					{okText}
+				<Button style={{ width: '10%' }} type="primary" onClick={onOk}>
+					{translate('modals.buttons.close')}
 				</Button>
 			</Flex>
 		</Modal>

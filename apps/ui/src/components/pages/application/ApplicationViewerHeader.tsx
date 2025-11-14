@@ -317,12 +317,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				isOpen={showSuccessApproveModal}
 				onOk={() => setShowSuccessApproveModal(false)}
 			/>
-			<HistoryModal
-				id={id}
-				okText={translate('modals.buttons.ok')}
-				isOpen={showHistoryModal}
-				onOk={() => setShowHistoryModal(false)}
-			/>
+			<HistoryModal id={id} isOpen={showHistoryModal} onOk={() => setShowHistoryModal(false)} />
 		</PageHeader>
 	);
 };
