@@ -662,9 +662,9 @@ export const requestApplicationRevisionsByDac = async ({
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const applicationService = applicationSvc(database);
 		const emailService = await emailSvc();
-		const result = await service.getApplicationById({ id: applicationId });
+		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -680,19 +680,28 @@ export const requestApplicationRevisionsByDac = async ({
 			);
 		}
 
-		const revisionResult = await appStateManager.reviseDacReview();
+		const actionResult = await appStateManager.reviseDacReview();
 
-		if (!revisionResult.success) {
-			return revisionResult;
+		if (!actionResult.success) {
+			return actionResult;
 		}
 
-		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+		const revisionRequestResult = await applicationService.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
 			return revisionRequestResult;
 		}
 
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
+		const updateAction = await applicationService.updateApplicationActionRecordRevisionId({
+			actionId: actionResult.data.actionId,
+			revisionId: revisionRequestResult.data.id,
+		});
+
+		if (!updateAction.success) {
+			return updateAction;
+		}
+
+		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
@@ -705,7 +714,7 @@ export const requestApplicationRevisionsByDac = async ({
 		}
 
 		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
 			logger.error(

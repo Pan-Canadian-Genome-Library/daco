@@ -35,6 +35,7 @@ import {
 } from '@pcgl-daco/data-model/src/types.js';
 import { collaborators } from '../db/schemas/collaborators.ts';
 import {
+	type ApplicationActionRecord,
 	type ApplicationContentModel,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
@@ -425,7 +426,6 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to retrieve application counts.');
 		}
 	},
-
 	createRevisionRequest: async ({
 		applicationId,
 		revisionData,
@@ -452,7 +452,6 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-
 	getRevisions: async ({ applicationId }: { applicationId: number }): AsyncResult<RevisionsDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const results = await db
@@ -508,6 +507,27 @@ const applicationSvc = (db: PostgresDb) => ({
 		} catch (error) {
 			const message = `Error while fetching revisions for applicationId: ${applicationId}`;
 			logger.error(message, error);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	updateApplicationActionRecordRevisionId: async ({
+		actionId,
+		revisionId,
+	}: {
+		actionId: number;
+		revisionId: number;
+	}): AsyncResult<ApplicationActionRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const result = await db
+				.update(applicationActions)
+				.set({ revisions_request_id: revisionId })
+				.where(eq(applicationActions.id, actionId))
+				.returning();
+
+			return success(result);
+		} catch (err) {
+			const message = `Error at updateApplicationActionRecord with action id: ${actionId}`;
+			logger.error(message, err);
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
