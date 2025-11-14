@@ -22,6 +22,8 @@ import { Button, Flex, Modal, Typography } from 'antd';
 
 const { Title } = Typography;
 
+const displayHistoryItems = ['Submitted', 'Reviewed', 'Revoked', 'Approved'];
+
 interface HistoryModalProps {
 	id: number;
 	isOpen: boolean;
@@ -34,8 +36,8 @@ const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
 	const applicationData = applicationResponse.data;
 	// TODO: Validation
 	const displayId = `PCGL-${id}`;
-	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt) : null;
-	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt) : null;
+	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
+	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
 
 	return (
 		<Modal
@@ -48,24 +50,33 @@ const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
 			destroyOnClose
 		>
 			<Flex justify="start" align="top" vertical>
-				<Title level={3} aria-level={1} style={{ marginTop: '0.5em' }}>
+				<Title level={3} aria-level={1} style={{ marginTop: '0.5em', marginBottom: '1em' }}>
 					Application History
 				</Title>
 				{applicationData ? (
-					<div style={{ marginBottom: '2em' }}>
-						<p style={{ margin: 0 }}>
-							<span style={{ fontWeight: 'bold' }}>Application ID:</span> {displayId}
-						</p>
-						<p style={{ margin: 0 }}>
-							<span style={{ fontWeight: 'bold' }}>Submission Date:</span> {`${submissionDate}`}
-						</p>
-						<p style={{ margin: 0 }}>
-							<span style={{ fontWeight: 'bold' }}>Current Status:</span> {applicationData.state}
-						</p>
-						<p style={{ margin: 0 }}>
-							<span style={{ fontWeight: 'bold' }}>Last Updated:</span> {`${lastUpdated}`}
-						</p>
-					</div>
+					<>
+						<div style={{ marginBottom: '2em' }}>
+							<p style={{ margin: 0 }}>
+								<span style={{ fontWeight: 'bold' }}>Application ID:</span> {displayId}
+							</p>
+							<p style={{ margin: 0 }}>
+								<span style={{ fontWeight: 'bold' }}>Submission Date:</span> {`${submissionDate}`}
+							</p>
+							<p style={{ margin: 0 }}>
+								<span style={{ fontWeight: 'bold' }}>Current Status:</span> {applicationData.state}
+							</p>
+							<p style={{ margin: 0 }}>
+								<span style={{ fontWeight: 'bold' }}>Last Updated:</span> {`${lastUpdated}`}
+							</p>
+						</div>
+						<div style={{ marginBottom: '2em' }}>
+							{displayHistoryItems.map((item) => (
+								<p>
+									<span style={{ fontWeight: 'bold' }}>{item}:</span> by {applicationData.userId} at {submissionDate}
+								</p>
+							))}
+						</div>
+					</>
 				) : (
 					<div style={{ margin: '1em 0' }}>Application Not Found</div>
 				)}
