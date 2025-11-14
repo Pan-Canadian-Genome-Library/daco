@@ -27,68 +27,131 @@ import { SectionRevision } from '@pcgl-daco/validation';
 
 const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStateValues) => {
 	/**
-	 * We only want to display the approval status if we're in one of these status'
+	 * Prevent API fetch if in one of these states
 	 */
-	const revisionDependant =
-		state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED ||
-		state === ApplicationStates.DAC_REVISIONS_REQUESTED;
+	const preventFeedbackFetch =
+		state === ApplicationStates.DRAFT ||
+		state === ApplicationStates.CLOSED ||
+		state === ApplicationStates.REVOKED ||
+		state === ApplicationStates.APPROVED;
 
-	return useQuery<Partial<SectionRevision>, ServerError>({
+	return useQuery<SectionRevision, ServerError>({
 		queryKey: [`revisions-${id}`],
 		retry: 0,
 		enabled: state !== undefined,
 		queryFn: async () => {
 			// Prevent API being called for states that don't utilize revisions
-			if (!revisionDependant) {
-				return {};
+			if (preventFeedbackFetch) {
+				return {
+					intro: [],
+					applicant: [],
+					institutional: [],
+					collaborators: [],
+					project: [],
+					ethics: [],
+					study: [],
+					agreement: [],
+					appendices: [],
+					sign: [],
+					general: [],
+				};
 			}
 
 			const response = await fetch(`/applications/${id}/revisions`).then(withErrorResponseHandler);
 
 			return await response.json().then((data: RevisionsDTO[]) => {
-				const result: Partial<SectionRevision> = {
-					applicant: {
-						isApproved: data[0]?.applicantApproved,
-						comment: data[0]?.applicantNotes ?? null,
-					},
-					institutional: {
-						isApproved: data[0]?.institutionRepApproved,
-						comment: data[0]?.institutionRepNotes ?? null,
-					},
-					collaborators: {
-						isApproved: data[0]?.collaboratorsApproved,
-						comment: data[0]?.collaboratorsNotes ?? null,
-					},
-					project: {
-						isApproved: data[0]?.projectApproved,
-						comment: data[0]?.projectNotes ?? null,
-					},
-					study: {
-						isApproved: data[0]?.requestedStudiesApproved,
-						comment: data[0]?.requestedStudiesNotes ?? null,
-					},
-					ethics: {
-						isApproved: data[0]?.ethicsApproved,
-						comment: data[0]?.requestedStudiesNotes ?? null,
-					},
-					agreement: {
-						isApproved: data[0]?.agreementsApproved,
-						comment: data[0]?.agreementsNotes ?? null,
-					},
-					appendices: {
-						isApproved: data[0]?.appendicesApproved,
-						comment: data[0]?.appendicesNotes ?? null,
-					},
-					sign: {
-						isApproved: data[0]?.signAndSubmitApproved,
-						comment: data[0]?.signAndSubmitNotes ?? null,
-					},
-				};
-
-				return result;
+				return formatRevisionFeedback(data);
 			});
 		},
 	});
 };
 
 export default useGetApplicationFeedback;
+
+const formatRevisionFeedback = (data: RevisionsDTO[]): SectionRevision => {
+	return {
+		intro: [],
+		applicant: data.map((value) => {
+			return {
+				comment: value.applicantNotes ?? null,
+				isApproved: value.applicantApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		institutional: data.map((value) => {
+			return {
+				comment: value.institutionRepNotes ?? null,
+				isApproved: value.institutionRepApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		collaborators: data.map((value) => {
+			return {
+				comment: value.collaboratorsNotes ?? null,
+				isApproved: value.collaboratorsApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		project: data.map((value) => {
+			return {
+				comment: value.projectNotes ?? null,
+				isApproved: value.projectApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		study: data.map((value) => {
+			return {
+				comment: value.requestedStudiesNotes ?? null,
+				isApproved: value.requestedStudiesApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		ethics: data.map((value) => {
+			return {
+				comment: value.ethicsNotes ?? null,
+				isApproved: value.ethicsApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		agreement: data.map((value) => {
+			return {
+				comment: value.agreementsNotes ?? null,
+				isApproved: value.agreementsApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		appendices: data.map((value) => {
+			return {
+				comment: value.appendicesNotes ?? null,
+				isApproved: value.appendicesApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+			};
+		}),
+		sign: data.map((value) => {
+			return {
+				comment: value.signAndSubmitNotes ?? null,
+				isApproved: value.signAndSubmitApproved,
+				isDacRequest: value.isDacRequest,
+				createdAt: value.createdAt,
+				general: value.comments,
+			};
+		}),
+		general: data
+			.filter((value) => value.comments)
+			.map((value) => {
+				return {
+					comment: value.comments ?? null,
+					isDacRequest: value.isDacRequest,
+					createdAt: value.createdAt,
+				};
+			}),
+	};
+};

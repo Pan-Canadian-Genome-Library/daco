@@ -33,6 +33,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -114,6 +115,9 @@ const Project = () => {
 					text={[translate('project-section.description')]}
 					showLockIcon={!canEdit}
 				/>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['project']} />
+				</Row>
 				<Row gutter={26}>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<InputBox

@@ -31,6 +31,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { Nullable, type ApplicationOutletContext } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -117,6 +118,9 @@ const AccessAgreement = () => {
 						</Col>
 					</Row>
 				</SectionContent>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['agreement']} />
+				</Row>
 				<SectionContent title={translate('data-access-section.section3.title')}>
 					<Row gutter={26}>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>

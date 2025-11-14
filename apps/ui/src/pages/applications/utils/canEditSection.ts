@@ -47,11 +47,15 @@ const canEditSection = ({
 	section,
 	isEditMode,
 }: {
-	revisions: Partial<SectionRevision>;
+	revisions: SectionRevision;
 	section: SectionRoutesValues;
 	isEditMode: boolean;
 }) => {
-	if ((revisions[section]?.isApproved !== undefined && !revisions[section]?.isApproved) || isEditMode) {
+	const currentRevision = revisions[section];
+
+	if (!currentRevision) {
+		return false;
+	} else if ((currentRevision[0]?.isApproved !== undefined && !currentRevision[0]?.isApproved) || isEditMode) {
 		return true;
 	}
 	return false;
