@@ -18,9 +18,10 @@
  */
 
 import useGetApplication from '@/api/queries/useGetApplication';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { Button, Flex, Modal, Typography } from 'antd';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const displayHistoryItems = ['Submitted', 'Reviewed', 'Revoked', 'Approved'];
 
@@ -56,34 +57,58 @@ const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
 				{applicationData ? (
 					<>
 						<div style={{ marginBottom: '2em' }}>
-							<p style={{ margin: 0 }}>
-								<span style={{ fontWeight: 'bold' }}>Application ID:</span> {displayId}
-							</p>
-							<p style={{ margin: 0 }}>
-								<span style={{ fontWeight: 'bold' }}>Submission Date:</span> {`${submissionDate}`}
-							</p>
-							<p style={{ margin: 0 }}>
-								<span style={{ fontWeight: 'bold' }}>Current Status:</span> {applicationData.state}
-							</p>
-							<p style={{ margin: 0 }}>
-								<span style={{ fontWeight: 'bold' }}>Last Updated:</span> {`${lastUpdated}`}
-							</p>
+							<div>
+								<Text strong>Application ID:</Text>
+								<Text> {displayId}</Text>
+							</div>
+							<div>
+								<Text strong>Submission Date:</Text>
+								<Text> {`${submissionDate}`}</Text>
+							</div>
+							<div>
+								<Text strong>Current Status:</Text>
+								<Text> {applicationData.state}</Text>
+							</div>
+							<div>
+								<Text strong>Last Updated:</Text>
+								<Text> {`${lastUpdated}`}</Text>
+							</div>
 						</div>
 						<div style={{ marginBottom: '2em' }}>
-							{displayHistoryItems.map((item) => (
-								<p style={{ display: 'flex', alignItems: 'center' }}>
+							{displayHistoryItems.map((item, index, itemArray) => (
+								<div key={`history-${index}`} style={{ display: 'flex', alignItems: 'center', marginBottom: '1em' }}>
 									<div
 										style={{
-											border: '2px solid #C41D7F',
+											border: `3px solid ${pcglColours.primary}`,
 											borderRadius: '100%',
 											display: 'inline-flex',
-											height: '1em',
-											width: '1em',
+											height: '0.75em',
+											position: 'relative',
+											top: index === itemArray.length - 1 ? '6px' : '0px',
+											width: '0.75em',
 										}}
 									/>
-									<span style={{ fontWeight: 'bold', marginLeft: '1em' }}>{item}</span> by{' '}
-									{applicationData.contents?.applicantFirstName} at {submissionDate}
-								</p>
+									{index < itemArray.length - 1 && (
+										<div
+											style={{
+												border: `2px solid ${pcglColours.primary}`,
+												display: 'inline-flex',
+												height: '2.5em',
+												left: '-10px',
+												position: 'relative',
+												top: 'calc(2em - 1px)',
+											}}
+										/>
+									)}
+									<span style={{ marginLeft: '1em' }}>
+										{' '}
+										<Text strong>{item}</Text>
+										<Text>
+											{' '}
+											by {applicationData.contents?.applicantFirstName} at {submissionDate}
+										</Text>
+									</span>
+								</div>
 							))}
 						</div>
 					</>
