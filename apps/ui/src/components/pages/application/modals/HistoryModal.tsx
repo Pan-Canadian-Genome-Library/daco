@@ -71,8 +71,18 @@ const HistoryModal = ({ id, isOpen, onOk, okText }: HistoryModalProps) => {
 						</div>
 						<div style={{ marginBottom: '2em' }}>
 							{displayHistoryItems.map((item) => (
-								<p>
-									<span style={{ fontWeight: 'bold' }}>{item}:</span> by {applicationData.userId} at {submissionDate}
+								<p style={{ display: 'flex', alignItems: 'center' }}>
+									<div
+										style={{
+											border: '2px solid #C41D7F',
+											borderRadius: '100%',
+											display: 'inline-flex',
+											height: '1em',
+											width: '1em',
+										}}
+									/>
+									<span style={{ fontWeight: 'bold', marginLeft: '1em' }}>{item}</span> by{' '}
+									{applicationData.contents?.applicantFirstName} at {submissionDate}
 								</p>
 							))}
 						</div>
