@@ -45,7 +45,7 @@ export const dacComments = pgTable('comments', {
 	created_at: timestamp().notNull().defaultNow(),
 });
 
-export const commentsRelations = relations(dacComments, ({ one }) => ({
+export const dacCommentsRelations = relations(dacComments, ({ one }) => ({
 	application_id: one(applications, {
 		fields: [dacComments.application_id],
 		references: [applications.id],
