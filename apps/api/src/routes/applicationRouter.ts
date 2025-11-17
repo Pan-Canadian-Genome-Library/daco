@@ -32,6 +32,7 @@ import {
 	requestApplicationRevisionsByInstitutionalRep,
 	revokeApplication,
 	submitApplication,
+	submitDacComment,
 	submitRevision,
 	withdrawApplication,
 } from '@/controllers/applicationController.js';
@@ -55,6 +56,7 @@ import {
 	isPositiveInteger,
 	rejectApplicationRequestSchema,
 	revokeApplicationRequestSchema,
+	submitDacCommentsSchema,
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
@@ -817,7 +819,6 @@ applicationRouter.post(
 	),
 
 	/**
-	 *  **==========WIP=============**
 	 *
 	 * POST endpoint to submit comments on a application
 	 * TODO: make swagger when implementations starts
@@ -825,23 +826,47 @@ applicationRouter.post(
 	 */ applicationRouter.post(
 		'/:applicationId/dac-member/submit-comment',
 		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
-		withBodySchemaValidation(
-			applicationRevisionRequestSchema,
+		withParamsSchemaValidation(
+			basicApplicationParamSchema,
 			apiZodErrorMapping,
-			async (request: Request, response: ResponseWithData<any, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>) => {
-				try {
-					const applicationId = Number(request.params.applicationId);
-					console.log('Called', applicationId);
+			withBodySchemaValidation(
+				submitDacCommentsSchema,
+				apiZodErrorMapping,
+				async (request, response: ResponseWithData<any, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
+					try {
+						const applicationId = Number(request.params.applicationId);
+						const { message, section, toDacChair } = request.body;
 
-					response.status(500).send('Not implemented');
-					return;
-				} catch (error) {
-					response.status(500).json({
-						error: 'SYSTEM_ERROR',
-						message: 'Unexpected error.',
-					});
-				}
-			},
+						const user = request.session.user;
+						if (!user) {
+							response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+							return;
+						}
+
+						const result = await submitDacComment({
+							applicationId,
+							userId: user?.userId ?? 'hai',
+							userName: user?.givenName || user?.userId || 'hai',
+							message,
+							section,
+							toDacChair,
+						});
+
+						if (!result.success) {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+
+						response.status(201).json(result.data);
+						return;
+					} catch (error) {
+						response.status(500).json({
+							error: 'SYSTEM_ERROR',
+							message: 'Unexpected error.',
+						});
+					}
+				},
+			),
 		),
 	),
 
