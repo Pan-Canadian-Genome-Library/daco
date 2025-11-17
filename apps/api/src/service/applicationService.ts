@@ -493,13 +493,10 @@ const applicationSvc = (db: PostgresDb) => ({
 				.innerJoin(revisionRequests, eq(revisionRequests.id, applicationActions.revisions_request_id))
 				.orderBy(desc(revisionRequests.created_at));
 
-			// console.log(results);
-
 			const transformResult: RevisionsDTO[] = results.map((revision) => {
 				return {
 					...revision,
 					isDacRequest: revision.applicationAction === 'DAC_REVIEW_REVISION_REQUEST',
-					// applicationAction: undefined, // remove application-action
 				};
 			});
 
