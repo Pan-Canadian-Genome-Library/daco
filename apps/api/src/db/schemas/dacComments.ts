@@ -25,14 +25,14 @@ import { applications } from './applications.ts';
 export const sectionsEnum = pgEnum('sections', [
 	SectionRoutes.INTRO.toUpperCase(),
 	SectionRoutes.APPLICANT.toUpperCase(),
-	SectionRoutes.INSTITUTIONAL.toLowerCase(),
-	SectionRoutes.COLLABORATORS.toLowerCase(),
-	SectionRoutes.PROJECT.toLowerCase(),
-	SectionRoutes.STUDY.toLowerCase(),
-	SectionRoutes.ETHICS.toLowerCase(),
-	SectionRoutes.AGREEMENT.toLowerCase(),
-	SectionRoutes.APPENDICES.toLowerCase(),
-	SectionRoutes.SIGN.toLowerCase(),
+	SectionRoutes.INSTITUTIONAL.toUpperCase(),
+	SectionRoutes.COLLABORATORS.toUpperCase(),
+	SectionRoutes.PROJECT.toUpperCase(),
+	SectionRoutes.STUDY.toUpperCase(),
+	SectionRoutes.ETHICS.toUpperCase(),
+	SectionRoutes.AGREEMENT.toUpperCase(),
+	SectionRoutes.APPENDICES.toUpperCase(),
+	SectionRoutes.SIGN.toUpperCase(),
 ]);
 
 export const dacComments = pgTable('comments', {
