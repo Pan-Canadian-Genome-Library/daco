@@ -22,15 +22,18 @@ import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { dacComments } from '@/db/schemas/dacComments.ts';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
 import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { DacCommentRecord } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
 	type ApplicationListResponse,
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
+import { SectionRoutesValues } from '@pcgl-daco/validation';
 import { collaborators } from '../db/schemas/collaborators.ts';
 import {
 	type ApplicationContentModel,
@@ -467,6 +470,60 @@ const applicationSvc = (db: PostgresDb) => ({
 		} catch (error) {
 			const message = `Error while fetching revisions for applicationId: ${applicationId}`;
 			logger.error(message, error);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	createDacComment: async ({
+		applicationId,
+		message,
+		userId,
+		userName,
+		section,
+		toDacChair,
+		transaction,
+	}: {
+		applicationId: number;
+		message: string;
+		userId: string;
+		userName: string;
+		section: SectionRoutesValues;
+		toDacChair: boolean;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<DacCommentRecord, 'SYSTEM_ERROR'> => {
+		try {
+			const dbTransaction = transaction ? transaction : db;
+
+			const result = await dbTransaction.transaction(async (tx) => {
+				const commentRecord = await tx
+					.insert(dacComments)
+					.values({
+						application_id: applicationId,
+						user_id: userId,
+						message,
+						user_name: userName,
+						section: section.toUpperCase(),
+						dac_chair_only: toDacChair,
+					})
+					.returning({
+						id: dacComments.id,
+						applicationId: dacComments.application_id,
+						userId: dacComments.user_id,
+						message: dacComments.message,
+						userName: dacComments.user_name,
+						section: dacComments.section,
+						dacChairOnly: dacComments.dac_chair_only,
+						created_at: dacComments.created_at,
+					});
+				if (!commentRecord[0]) throw new Error('Failed to insert dac comment');
+				// Returning the inserted comment
+				return commentRecord[0];
+			});
+
+			return success(result);
+		} catch (error) {
+			const message = `Error creating DAC comment for applicationId: ${applicationId}`;
+			logger.error(message, error);
+
 			return failure('SYSTEM_ERROR', message);
 		}
 	},

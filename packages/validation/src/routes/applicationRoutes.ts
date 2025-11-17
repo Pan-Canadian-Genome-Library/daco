@@ -19,6 +19,7 @@
 
 import { agreementEnum, appendicesEnum, ApplicationStates } from '@pcgl-daco/data-model';
 import { z } from 'zod';
+import { SectionRoutes } from '../section/sections.js';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
@@ -161,4 +162,10 @@ export const rejectApplicationRequestSchema = z.object({
 
 export const revokeApplicationRequestSchema = z.object({
 	revokeReason: z.string().nullable(),
+});
+
+export const submitDacCommentsSchema = z.object({
+	message: z.string().min(5),
+	section: z.nativeEnum(SectionRoutes),
+	toDacChair: z.boolean(),
 });
