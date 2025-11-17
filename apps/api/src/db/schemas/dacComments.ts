@@ -17,21 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { SectionRoutes } from '@pcgl-daco/validation';
 import { relations } from 'drizzle-orm';
 import { bigint, boolean, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { applications } from './applications.ts';
 
 export const sectionsEnum = pgEnum('sections', [
-	'INTRO',
-	'APPLICANT',
-	'INSTITUTIONAL',
-	'COLLABORATORS',
-	'PROJECT',
-	'STUDY',
-	'ETHICS',
-	'AGREEMENT',
-	'APPENDICES',
-	'SIGN',
+	SectionRoutes.INTRO.toUpperCase(),
+	SectionRoutes.APPLICANT.toUpperCase(),
+	SectionRoutes.INSTITUTIONAL.toLowerCase(),
+	SectionRoutes.COLLABORATORS.toLowerCase(),
+	SectionRoutes.PROJECT.toLowerCase(),
+	SectionRoutes.STUDY.toLowerCase(),
+	SectionRoutes.ETHICS.toLowerCase(),
+	SectionRoutes.AGREEMENT.toLowerCase(),
+	SectionRoutes.APPENDICES.toLowerCase(),
+	SectionRoutes.SIGN.toLowerCase(),
 ]);
 
 export const dacComments = pgTable('comments', {
