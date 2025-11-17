@@ -21,5 +21,6 @@ export * from './applicationActions.ts';
 export * from './applicationContents.ts';
 export * from './applications.ts';
 export * from './collaborators.ts';
+export * from './dacComments.ts';
 export * from './files.ts';
 export * from './revisionRequests.ts';
