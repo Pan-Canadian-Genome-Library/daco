@@ -92,6 +92,13 @@
 			"when": 1745518656239,
 			"tag": "0012_remove_id_from_collaborators",
 			"breakpoints": true
+		},
+		{
+			"idx": 14,
+			"version": "7",
+			"when": 1763393749637,
+			"tag": "0013_add_dac_comments_table",
+			"breakpoints": true
 		}
 	]
 }
