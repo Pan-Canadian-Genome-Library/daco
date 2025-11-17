@@ -460,7 +460,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					applicationActionId: applicationActions.id,
 					applicationAction: applicationActions.action,
 					comments: revisionRequests.comments,
-					applicantNotes: revisionRequests.appendices_notes,
+					applicantNotes: revisionRequests.applicant_notes,
 					applicantApproved: revisionRequests.applicant_approved,
 					institutionRepApproved: revisionRequests.institution_rep_approved,
 					institutionRepNotes: revisionRequests.institution_rep_notes,
