@@ -11,7 +11,7 @@
 			"submissionDate": "Submission Date",
 			"currentStatus": "Current Status",
 			"lastUpdated": "Last Updated",
-			"notFound": "Application Not Found"
+			"error": "There was an error retrieving your Application History"
 		},
 		"requestRevisions": {
 			"title": "Request Revisions",

@@ -92,7 +92,11 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	};
 
 	const onHistoryButtonClick = () => {
-		setShowHistoryModal(!showHistoryModal);
+		setShowHistoryModal(true);
+	};
+
+	const onHistoryClose = () => {
+		setShowHistoryModal(false);
 	};
 
 	// Generate download url and then remove the link after downloading
@@ -129,8 +133,8 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 		const canShowEdit = (appState === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
 
 		buttons.push(
-			<Button onClick={() => onHistoryButtonClick()}>{translate('button.history')}</Button>,
 			<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>,
+			<Button onClick={() => onHistoryButtonClick()}>{translate('button.history')}</Button>,
 		);
 
 		if (canShowEdit) {
@@ -317,7 +321,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				isOpen={showSuccessApproveModal}
 				onOk={() => setShowSuccessApproveModal(false)}
 			/>
-			<HistoryModal id={id} isOpen={showHistoryModal} onOk={() => setShowHistoryModal(false)} />
+			<HistoryModal id={id} isOpen={showHistoryModal} closeModal={onHistoryClose} />
 		</PageHeader>
 	);
 };

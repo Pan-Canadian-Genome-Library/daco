@@ -25,19 +25,20 @@ import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Title, Text } = Typography;
 
+// TODO: Replace Mock Data
 const displayHistoryItems = ['Submitted', 'Reviewed', 'Revoked', 'Approved'];
 
 interface HistoryModalProps {
 	id: number;
 	isOpen: boolean;
-	onOk: () => void;
+	closeModal: () => void;
 }
 
-const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
+const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
+	// TODO: Replace Mock Data
 	const applicationResponse = useGetApplication(id);
 	const applicationData = applicationResponse.data;
 	const displayId = `PCGL-${id}`;
-	// TODO: Validation
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
 	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
 	const { t: translate } = useTranslation();
@@ -47,8 +48,9 @@ const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
 			width={'100%'}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
 			open={isOpen}
-			closeIcon={false}
-			onOk={onOk}
+			closeIcon={true}
+			onClose={closeModal}
+			onOk={closeModal}
 			footer={[]}
 			destroyOnClose
 		>
@@ -56,7 +58,7 @@ const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
 				<Title level={3} aria-level={1} style={{ marginTop: '0.5em', marginBottom: '1em' }}>
 					{translate('modals.history.title')}
 				</Title>
-				{applicationData ? (
+				{applicationData !== undefined ? (
 					<>
 						<div style={{ marginBottom: '2em' }}>
 							<div>
@@ -65,7 +67,7 @@ const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
 							</div>
 							<div>
 								<Text strong>{translate('modals.history.submissionDate')}:</Text>
-								<Text> {`${submissionDate}`}</Text>
+								<Text> {submissionDate}</Text>
 							</div>
 							<div>
 								<Text strong>{translate('modals.history.currentStatus')}:</Text>
@@ -73,7 +75,7 @@ const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
 							</div>
 							<div>
 								<Text strong>{translate('modals.history.lastUpdated')}:</Text>
-								<Text> {`${lastUpdated}`}</Text>
+								<Text> {lastUpdated}</Text>
 							</div>
 						</div>
 						<div style={{ marginBottom: '2em' }}>
@@ -107,6 +109,7 @@ const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
 										<Text strong>{item}</Text>
 										<Text>
 											{' '}
+											{/* TODO: by / at Translation */}
 											by {applicationData.contents?.applicantFirstName} at {submissionDate}
 										</Text>
 									</span>
@@ -115,9 +118,9 @@ const HistoryModal = ({ id, isOpen, onOk }: HistoryModalProps) => {
 						</div>
 					</>
 				) : (
-					<div style={{ margin: '1em 0' }}>translate('modals.history.notFound')</div>
+					<div style={{ margin: '1em 0' }}>{translate('modals.history.error')}</div>
 				)}
-				<Button style={{ width: '10%' }} type="primary" onClick={onOk}>
+				<Button style={{ width: '10%' }} type="primary" onClick={closeModal}>
 					{translate('modals.buttons.close')}
 				</Button>
 			</Flex>
