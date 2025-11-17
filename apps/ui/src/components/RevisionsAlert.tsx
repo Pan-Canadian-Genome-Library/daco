@@ -97,7 +97,6 @@ const RevisionsAlert = ({ sectionRevisions, general }: RevisionsProps) => {
 									val: { year: 'numeric', month: '2-digit', day: '2-digit' },
 								},
 							});
-							console.log('keh--', value);
 
 							return {
 								key,
