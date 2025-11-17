@@ -828,15 +828,12 @@ applicationRouter.post(
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
-			async (
-				request: Request,
-				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
-			) => {
+			async (request: Request, response: ResponseWithData<any, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 					console.log('Called', applicationId);
 
-					response.status(200).json();
+					response.status(500).send('Not implemented');
 					return;
 				} catch (error) {
 					response.status(500).json({
@@ -1039,13 +1036,13 @@ applicationRouter.get(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<RevisionsDTO[], ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<any, ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const { applicationId } = request.params;
 
 			try {
 				console.log('Called', applicationId);
-				response.status(200).json();
+				response.status(500).send('Not Implemented');
 				return;
 			} catch (error) {
 				response.status(500).json({
