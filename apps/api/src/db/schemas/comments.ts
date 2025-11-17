@@ -34,19 +34,20 @@ export const sectionsEnum = pgEnum('sections', [
 	'SIGN',
 ]);
 
-export const comments = pgTable('comments', {
+export const dacComments = pgTable('comments', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
 	application_id: bigint({ mode: 'number' }).notNull(),
-	comments: text().notNull(),
-	username: varchar({ length: 255 }).notNull(),
+	user_id: varchar({ length: 255 }).notNull(),
+	message: text().notNull(),
+	user_name: varchar({ length: 255 }).notNull(),
 	dac_chair_only: boolean().notNull(),
 	section: sectionsEnum().notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 });
 
-export const commentsRelations = relations(comments, ({ one }) => ({
+export const commentsRelations = relations(dacComments, ({ one }) => ({
 	application_id: one(applications, {
-		fields: [comments.application_id],
+		fields: [dacComments.application_id],
 		references: [applications.id],
 	}),
 }));
