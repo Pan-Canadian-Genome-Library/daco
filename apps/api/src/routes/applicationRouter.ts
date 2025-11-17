@@ -38,7 +38,7 @@ import {
 
 import BaseLogger from '@/logger.js';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { RevisionRequestModel, type ApplicationStateTotals } from '@/service/types.ts';
+import { type ApplicationStateTotals } from '@/service/types.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
@@ -159,7 +159,7 @@ applicationRouter.post(
  */
 applicationRouter.get(
 	'/',
-	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'DAC_CHAIR'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
@@ -171,7 +171,9 @@ applicationRouter.get(
 			return;
 		}
 
-		const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+		const userRole = getUserRole(request.session);
+
+		const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
 
 		const { state: stateQuery, sort: sortQuery, page, pageSize, isApplicantView: isApplicantViewQuery } = request.query;
 
@@ -214,7 +216,7 @@ applicationRouter.get(
 			sort,
 			page: pageRequested,
 			pageSize: pageSizeRequested,
-			isDACMember,
+			isDAC: isDAC,
 			isApplicantView,
 		});
 
@@ -310,7 +312,7 @@ applicationRouter.get(
  */
 applicationRouter.get(
 	'/metadata/counts',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
 	async (request: Request, response: ResponseWithData<ApplicationStateTotals, ['SYSTEM_ERROR']>) => {
 		const result = await getApplicationStateTotals();
 
@@ -326,7 +328,7 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/:applicationId/approve',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -403,7 +405,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/reject',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -537,7 +539,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/revoke',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -601,7 +603,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	authMiddleware({ requiredRoles: ['DAC_MEMBER', 'APPLICANT'] }),
+	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -814,10 +816,39 @@ applicationRouter.post(
 		},
 	),
 
-	// Endpoint for reps to request revisions
-	applicationRouter.post(
-		'/:applicationId/dac/request-revisions',
+	/**
+	 *  **==========WIP=============**
+	 *
+	 * POST endpoint to submit comments on a application
+	 * TODO: make swagger when implementations starts
+	 *
+	 */ applicationRouter.post(
+		'/:applicationId/dac-member/submit-comment',
 		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+		withBodySchemaValidation(
+			applicationRevisionRequestSchema,
+			apiZodErrorMapping,
+			async (request: Request, response: ResponseWithData<any, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>) => {
+				try {
+					const applicationId = Number(request.params.applicationId);
+					console.log('Called', applicationId);
+
+					response.status(500).send('Not implemented');
+					return;
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: 'Unexpected error.',
+					});
+				}
+			},
+		),
+	),
+
+	// Endpoint for dac chair to request revisions
+	applicationRouter.post(
+		'/:applicationId/dac-chair/request-revisions',
+		authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
@@ -838,34 +869,33 @@ applicationRouter.post(
 
 					const revisions = request.body;
 
-					const updatedRevisionData: RevisionRequestModel = {
-						application_id: applicationId,
-						comments: revisions.comments,
-						applicant_approved: revisions.applicantApproved,
-						applicant_notes: revisions.applicantNotes,
-						institution_rep_approved: revisions.institutionRepApproved,
-						institution_rep_notes: revisions.institutionRepNotes,
-						collaborators_approved: revisions.collaboratorsApproved,
-						collaborators_notes: revisions.collaboratorsNotes,
-						project_approved: revisions.projectApproved,
-						project_notes: revisions.projectNotes,
-						requested_studies_approved: revisions.requestedStudiesApproved,
-						requested_studies_notes: revisions.requestedStudiesNotes,
-						ethics_approved: revisions.ethicsApproved,
-						ethics_notes: revisions.ethicsNotes,
-						agreements_approved: revisions.agreementsApproved,
-						agreements_notes: revisions.agreementsNotes,
-						appendices_approved: revisions.appendicesApproved,
-						appendices_notes: revisions.appendicesNotes,
-						sign_and_submit_approved: revisions.signAndSubmitApproved,
-						sign_and_submit_notes: revisions.signAndSubmitNotes,
-					};
-
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByDac({
 						applicationId,
-						revisionData: updatedRevisionData,
+						revisionData: {
+							application_id: applicationId,
+							comments: revisions.comments,
+							applicant_approved: revisions.applicantApproved,
+							applicant_notes: revisions.applicantNotes,
+							institution_rep_approved: revisions.institutionRepApproved,
+							institution_rep_notes: revisions.institutionRepNotes,
+							collaborators_approved: revisions.collaboratorsApproved,
+							collaborators_notes: revisions.collaboratorsNotes,
+							project_approved: revisions.projectApproved,
+							project_notes: revisions.projectNotes,
+							requested_studies_approved: revisions.requestedStudiesApproved,
+							requested_studies_notes: revisions.requestedStudiesNotes,
+							ethics_approved: revisions.ethicsApproved,
+							ethics_notes: revisions.ethicsNotes,
+							agreements_approved: revisions.agreementsApproved,
+							agreements_notes: revisions.agreementsNotes,
+							appendices_approved: revisions.appendicesApproved,
+							appendices_notes: revisions.appendicesNotes,
+							sign_and_submit_approved: revisions.signAndSubmitApproved,
+							sign_and_submit_notes: revisions.signAndSubmitNotes,
+						},
 					});
+
 					if (updatedApplication.success) {
 						response.status(200).json(updatedApplication.data);
 						return;
@@ -903,7 +933,7 @@ applicationRouter.post(
 // Endpoint for reps to request revisions
 applicationRouter.post(
 	'/:applicationId/rep/request-revisions',
-	authMiddleware(),
+	authMiddleware(), // We determine the institutional rep by email comparison on a per application basis, not a role given by the Auth service
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -922,29 +952,6 @@ applicationRouter.post(
 
 					const revisionData = request.body;
 
-					const updatedRevisionData: RevisionRequestModel = {
-						application_id: applicationId,
-						comments: revisionData.comments,
-						applicant_approved: revisionData.applicantApproved,
-						applicant_notes: revisionData.applicantNotes,
-						institution_rep_approved: revisionData.institutionRepApproved,
-						institution_rep_notes: revisionData.institutionRepNotes,
-						collaborators_approved: revisionData.collaboratorsApproved,
-						collaborators_notes: revisionData.collaboratorsNotes,
-						project_approved: revisionData.projectApproved,
-						project_notes: revisionData.projectNotes,
-						requested_studies_approved: revisionData.requestedStudiesApproved,
-						requested_studies_notes: revisionData.requestedStudiesNotes,
-						ethics_approved: revisionData.ethicsApproved,
-						ethics_notes: revisionData.ethicsNotes,
-						agreements_approved: revisionData.agreementsApproved,
-						agreements_notes: revisionData.agreementsNotes,
-						appendices_approved: revisionData.appendicesApproved,
-						appendices_notes: revisionData.appendicesNotes,
-						sign_and_submit_approved: revisionData.signAndSubmitApproved,
-						sign_and_submit_notes: revisionData.signAndSubmitNotes,
-					};
-
 					const result = await isAssociatedRep(request.session, applicationId);
 
 					if (!result) {
@@ -958,7 +965,28 @@ applicationRouter.post(
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
 						applicationId,
-						revisionData: updatedRevisionData,
+						revisionData: {
+							application_id: applicationId,
+							comments: revisionData.comments,
+							applicant_approved: revisionData.applicantApproved,
+							applicant_notes: revisionData.applicantNotes,
+							institution_rep_approved: revisionData.institutionRepApproved,
+							institution_rep_notes: revisionData.institutionRepNotes,
+							collaborators_approved: revisionData.collaboratorsApproved,
+							collaborators_notes: revisionData.collaboratorsNotes,
+							project_approved: revisionData.projectApproved,
+							project_notes: revisionData.projectNotes,
+							requested_studies_approved: revisionData.requestedStudiesApproved,
+							requested_studies_notes: revisionData.requestedStudiesNotes,
+							ethics_approved: revisionData.ethicsApproved,
+							ethics_notes: revisionData.ethicsNotes,
+							agreements_approved: revisionData.agreementsApproved,
+							agreements_notes: revisionData.agreementsNotes,
+							appendices_approved: revisionData.appendicesApproved,
+							appendices_notes: revisionData.appendicesNotes,
+							sign_and_submit_approved: revisionData.signAndSubmitApproved,
+							sign_and_submit_notes: revisionData.signAndSubmitNotes,
+						},
 					});
 					if (updatedApplication.success) {
 						response.status(200).json(updatedApplication.data);
@@ -993,9 +1021,43 @@ applicationRouter.post(
 	),
 );
 
+/**
+ *  **==========WIP=============**
+ *
+ * GET endpoint to retrieve comments on a application
+ * TODO: if the user is an applicant, make sure NOT to return chair only comments
+ *
+ */
+applicationRouter.get(
+	'/:applicationId/dac/comments',
+	authMiddleware({ requiredRoles: ['DAC_CHAIR', 'DAC_MEMBER', 'APPLICANT'] }),
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<any, ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+		) => {
+			const { applicationId } = request.params;
+
+			try {
+				console.log('Called', applicationId);
+				response.status(500).send('Not Implemented');
+				return;
+			} catch (error) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: "We're sorry, an unexpected error occurred. Please try again later.",
+				});
+				return;
+			}
+		},
+	),
+);
+
 applicationRouter.get(
 	'/:applicationId/revisions',
-	authMiddleware(),
+	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_CHAIR', 'DAC_MEMBER'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
