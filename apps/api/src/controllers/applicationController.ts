@@ -1079,3 +1079,26 @@ export const submitDacComment = async ({
 		return failure('SYSTEM_ERROR', message);
 	}
 };
+
+export const getDacComments = async ({
+	applicationId,
+	section,
+	isDac,
+}: {
+	applicationId: number;
+	section: string;
+	isDac: boolean;
+}): AsyncResult<DacCommentRecord[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.getDacComment({ applicationId, section, isDac });
+
+		return result;
+	} catch (error) {
+		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};

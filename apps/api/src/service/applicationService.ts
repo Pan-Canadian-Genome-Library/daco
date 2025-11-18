@@ -527,6 +527,44 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	getDacComment: async ({
+		applicationId,
+		section,
+		isDac,
+	}: {
+		applicationId: number;
+		section: string;
+		isDac: boolean;
+	}): AsyncResult<DacCommentRecord[], 'SYSTEM_ERROR'> => {
+		try {
+			const commentRecord = await db
+				.select({
+					id: dacComments.id,
+					applicationId: dacComments.application_id,
+					userId: dacComments.user_id,
+					message: dacComments.message,
+					userName: dacComments.user_name,
+					section: dacComments.section,
+					dacChairOnly: dacComments.dac_chair_only,
+					created_at: dacComments.created_at,
+				})
+				.from(dacComments)
+				.where(
+					and(
+						eq(dacComments.application_id, applicationId), // Grab specific application id
+						eq(dacComments.section, section.toUpperCase()), // Grab specific section
+						eq(dacComments.dac_chair_only, isDac), // if is dac, then we can return chair comments
+					),
+				);
+
+			return success(commentRecord);
+		} catch (error) {
+			const message = `Error retrieving DAC comments for applicationId: ${applicationId}`;
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 });
 
 export { applicationSvc };

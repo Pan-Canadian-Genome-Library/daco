@@ -27,6 +27,7 @@ import {
 	getAllApplications,
 	getApplicationById,
 	getApplicationStateTotals,
+	getDacComments,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByInstitutionalRep,
@@ -46,12 +47,14 @@ import type {
 	ApplicationDTO,
 	ApplicationListResponse,
 	ApplicationResponseData,
+	DacCommentRecord,
 	RevisionsDTO,
 } from '@pcgl-daco/data-model';
 import { ErrorType, withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	applicationRevisionRequestSchema,
 	basicApplicationParamSchema,
+	dacCommentsGetParamSchema,
 	editApplicationRequestSchema,
 	isPositiveInteger,
 	rejectApplicationRequestSchema,
@@ -821,7 +824,6 @@ applicationRouter.post(
 	/**
 	 *
 	 * POST endpoint to submit comments on a application
-	 * TODO: make swagger when implementations starts
 	 *
 	 */ applicationRouter.post(
 		'/:applicationId/dac-member/submit-comment',
@@ -832,7 +834,7 @@ applicationRouter.post(
 			withBodySchemaValidation(
 				submitDacCommentsSchema,
 				apiZodErrorMapping,
-				async (request, response: ResponseWithData<any, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
+				async (request, response: ResponseWithData<DacCommentRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 					try {
 						const applicationId = Number(request.params.applicationId);
 						const { message, section, toDacChair } = request.body;
@@ -845,8 +847,8 @@ applicationRouter.post(
 
 						const result = await submitDacComment({
 							applicationId,
-							userId: user?.userId ?? 'hai',
-							userName: user?.givenName || user?.userId || 'hai',
+							userId: user?.userId,
+							userName: user?.givenName || user?.userId,
 							message,
 							section,
 							toDacChair,
@@ -1047,27 +1049,47 @@ applicationRouter.post(
 );
 
 /**
- *  **==========WIP=============**
  *
  * GET endpoint to retrieve comments on a application
- * TODO: if the user is an applicant, make sure NOT to return chair only comments
  *
  */
 applicationRouter.get(
-	'/:applicationId/dac/comments',
+	'/:applicationId/dac/comments/:section',
 	authMiddleware({ requiredRoles: ['DAC_CHAIR', 'DAC_MEMBER', 'APPLICANT'] }),
 	withParamsSchemaValidation(
-		basicApplicationParamSchema,
+		dacCommentsGetParamSchema,
 		apiZodErrorMapping,
 		async (
-			request: Request,
-			response: ResponseWithData<any, ['FORBIDDEN', 'INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+			request,
+			response: ResponseWithData<DacCommentRecord[], ['UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
-			const { applicationId } = request.params;
+			const { applicationId, section } = request.params;
+			const userRole = getUserRole(request.session);
 
 			try {
-				console.log('Called', applicationId);
-				response.status(500).send('Not Implemented');
+				const user = request.session.user;
+				if (!user) {
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
+
+				if (!section) {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
+					return;
+				}
+
+				const result = await getDacComments({
+					applicationId: Number(applicationId),
+					section,
+					isDac: userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER',
+				});
+
+				if (!result.success) {
+					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+
+				response.status(201).json(result.data);
 				return;
 			} catch (error) {
 				response.status(500).json({

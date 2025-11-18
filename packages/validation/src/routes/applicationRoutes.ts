@@ -29,6 +29,11 @@ export const basicApplicationParamSchema = z.object({
 	applicationId: z.coerce.number().int().nonnegative().min(1),
 });
 
+export const dacCommentsGetParamSchema = z.object({
+	applicationId: z.coerce.number().int().nonnegative().min(1),
+	section: z.nativeEnum(SectionRoutes),
+});
+
 export const applicationContentsSchema = z
 	.object({
 		applicantFirstName: z.string().nullable(),
