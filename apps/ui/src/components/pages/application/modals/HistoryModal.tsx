@@ -120,7 +120,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 				) : (
 					<div style={{ margin: '1em 0' }}>{translate('modals.history.error')}</div>
 				)}
-				<Button style={{ width: '10%' }} type="primary" onClick={closeModal}>
+				<Button style={{ width: '10%', alignSelf: 'end' }} type="primary" onClick={closeModal}>
 					{translate('modals.buttons.close')}
 				</Button>
 			</Flex>
