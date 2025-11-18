@@ -100,3 +100,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+  /applications/{applicationId}/dac/comments/{section}:
+    get:
+      tags:
+        - Comments
+      summary: Retrieve an array of comments for the application and section provided
+      description: |
+        <br/> Allows users to retrieve dac comments by application id and section.
+        <br/> section must match the following [`intro`,`applicant`,`institutional`,`collaborators`, `project`, `study`, `ethics`, `agreement`, `appendices`, `sign`]
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            parameters:
+        - name: section
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Comment successfully retrieved'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Comment ID
+                    applicationId:
+                      type: integer
+                      description: Application ID the comment belongs to
+                    userId:
+                      type: string
+                      description: ID of the user who created the comment
+                    message:
+                      type: string
+                      description: Comment message content
+                    userName:
+                      type: string
+                      description: Name of the user who created the comment
+                    section:
+                      type: string
+                      description: Application section the comment relates to
+                    dacChairOnly:
+                      type: boolean
+                      description: Whether this comment is only visible to DAC chair
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: Comment creation timestamp
+        '500':
+          description: 'Server Error - unable to submit comment request.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
