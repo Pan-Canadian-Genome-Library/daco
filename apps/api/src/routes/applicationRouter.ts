@@ -827,7 +827,7 @@ applicationRouter.post(
 	 *
 	 */ applicationRouter.post(
 		'/:applicationId/dac-member/submit-comment',
-		authMiddleware({ requiredRoles: ['DAC_MEMBER'] }),
+		authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
 		withParamsSchemaValidation(
 			basicApplicationParamSchema,
 			apiZodErrorMapping,
@@ -1061,16 +1061,34 @@ applicationRouter.get(
 		apiZodErrorMapping,
 		async (
 			request,
-			response: ResponseWithData<DacCommentRecord[], ['UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<
+				DacCommentRecord[],
+				['UNAUTHORIZED', 'NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']
+			>,
 		) => {
 			const { applicationId, section } = request.params;
+			const user = request.session.user;
 			const userRole = getUserRole(request.session);
 
 			try {
-				const user = request.session.user;
 				if (!user) {
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
+				}
+
+				//  Need to check if user belongs to this application to retrieve comments
+				if (userRole === 'APPLICANT') {
+					const applicationResult = await getApplicationById({ applicationId: Number(applicationId) });
+
+					if (!applicationResult.success) {
+						response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+						return;
+					}
+
+					if (applicationResult.data.userId !== user.userId) {
+						response.status(403).json({ error: 'FORBIDDEN', message: 'User is not the creator of this application.' });
+						return;
+					}
 				}
 
 				if (!section) {
