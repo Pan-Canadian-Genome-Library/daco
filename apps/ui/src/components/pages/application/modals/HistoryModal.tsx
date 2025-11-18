@@ -17,16 +17,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Flex, Modal, Typography } from 'antd';
+import { Button, Flex, Modal, Timeline, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import useGetApplication from '@/api/queries/useGetApplication';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Title, Text } = Typography;
 
 // TODO: Replace Mock Data
 const displayHistoryItems = ['Submitted', 'Reviewed', 'Revoked', 'Approved'];
+
+const TimelineDot = (
+	<div
+		style={{
+			border: `3px solid ${pcglColours.primary}`,
+			borderRadius: '100%',
+			height: '0.75em',
+			width: '0.75em',
+		}}
+	/>
+);
 
 interface HistoryModalProps {
 	id: number;
@@ -36,12 +48,28 @@ interface HistoryModalProps {
 
 const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 	// TODO: Replace Mock Data
-	const applicationResponse = useGetApplication(id);
-	const applicationData = applicationResponse.data;
+	const { data: applicationData, isError, isLoading } = useGetApplication(id);
 	const displayId = `PCGL-${id}`;
+	const isHistoryLoaded = !isLoading && applicationData !== undefined && !isError;
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
 	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
 	const { t: translate } = useTranslation();
+
+	// TODO: Replace Mock Data
+	const timelineHistoryItems = displayHistoryItems.map((item) => ({
+		dot: TimelineDot,
+		children: (
+			<span>
+				<Text strong>{item}</Text>
+				<Text>
+					{translate('modals.history.timelineItem', {
+						applicantFirstName: applicationData?.contents?.applicantFirstName,
+						submissionDate,
+					})}
+				</Text>
+			</span>
+		),
+	}));
 
 	return (
 		<Modal
@@ -58,7 +86,11 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 				<Title level={3} aria-level={1} style={{ marginTop: '0.5em', marginBottom: '1em' }}>
 					{translate('modals.history.title')}
 				</Title>
-				{applicationData !== undefined ? (
+				{isLoading ? (
+					<div style={{ margin: '1em 0' }}>
+						<SkeletonLoader />
+					</div>
+				) : isHistoryLoaded ? (
 					<>
 						<div style={{ marginBottom: '2em' }}>
 							<div>
@@ -78,44 +110,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 								<Text> {lastUpdated}</Text>
 							</div>
 						</div>
-						<div style={{ marginBottom: '2em' }}>
-							{displayHistoryItems.map((item, index, itemArray) => (
-								<div key={`history-${index}`} style={{ display: 'flex', alignItems: 'center', marginBottom: '1em' }}>
-									<div
-										style={{
-											border: `3px solid ${pcglColours.primary}`,
-											borderRadius: '100%',
-											display: 'inline-flex',
-											height: '0.75em',
-											position: 'relative',
-											top: index === itemArray.length - 1 ? '6px' : '0px',
-											width: '0.75em',
-										}}
-									/>
-									{index < itemArray.length - 1 && (
-										<div
-											style={{
-												border: `2px solid ${pcglColours.primary}`,
-												display: 'inline-flex',
-												height: '2.5em',
-												left: '-10px',
-												position: 'relative',
-												top: 'calc(2em - 1px)',
-											}}
-										/>
-									)}
-									<span style={{ marginLeft: '1em' }}>
-										{' '}
-										<Text strong>{item}</Text>
-										<Text>
-											{' '}
-											{/* TODO: by / at Translation */}
-											by {applicationData.contents?.applicantFirstName} at {submissionDate}
-										</Text>
-									</span>
-								</div>
-							))}
-						</div>
+						<Timeline items={timelineHistoryItems} style={{ padding: 0 }} />
 					</>
 				) : (
 					<div style={{ margin: '1em 0' }}>{translate('modals.history.error')}</div>
