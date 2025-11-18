@@ -19,7 +19,9 @@
 
 import { pcglColours } from '@/providers/ThemeProvider';
 import { CommentOutlined } from '@ant-design/icons';
-import { Flex } from 'antd';
+import { Flex, Typography } from 'antd';
+
+const { Text } = Typography;
 
 type CommentLabelProps = {
 	label: string;
@@ -38,7 +40,9 @@ const CommentLabel = ({ label, numOfComments }: CommentLabelProps) => {
 					fontSize: '0.75rem',
 				}}
 			/>
-			<Flex align="center">{`${label}- (${numOfComments})`}</Flex>
+			<Flex align="center">
+				<Text>{`${label} - (${numOfComments})`}</Text>
+			</Flex>
 		</Flex>
 	);
 };

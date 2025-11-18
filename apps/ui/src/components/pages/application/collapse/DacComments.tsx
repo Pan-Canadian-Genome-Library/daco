@@ -19,9 +19,9 @@
 
 import { pcglColours } from '@/providers/ThemeProvider';
 import { CaretRightFilled } from '@ant-design/icons';
-import { Collapse } from 'antd';
-import { useEffect, useState } from 'react';
+import { Button, Collapse, Flex, Input, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
+import CommentEntry from './CommentEntry';
 import CommentLabel from './CommentLabel';
 
 type SectionComments = {
@@ -41,20 +41,8 @@ interface DacCommentsProps {
 const DacComments = ({ sectionComments }: DacCommentsProps) => {
 	const { t: translate } = useTranslation();
 
-	const [comments, setComments] = useState<{
-		dacComments: SectionComments[];
-		chairOnly: SectionComments[];
-	}>({
-		dacComments: [],
-		chairOnly: [],
-	});
-
-	useEffect(() => {
-		setComments({
-			dacComments: sectionComments.filter((comment) => !comment.dac_chair_only),
-			chairOnly: sectionComments.filter((comment) => comment.dac_chair_only),
-		});
-	}, [sectionComments]);
+	const dacComments = sectionComments.filter((comment) => !comment.dac_chair_only);
+	const chairOnlyComments = sectionComments.filter((comment) => comment.dac_chair_only);
 
 	/**
 	 * The Dac Comments and For Chair Only dropdown collapse UI.
@@ -62,31 +50,53 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 	const DACOptions = [
 		{
 			key: '1',
-			label: <CommentLabel label="DAC Comments" numOfComments={comments.dacComments.length} />,
+			label: <CommentLabel label={translate('generic.dacComment')} numOfComments={dacComments.length} />,
 			children: (
-				<div>
-					{comments.dacComments.map((comment) => (
-						<div key={comment.id}>
-							<p>{comment.comments}</p>
-							<p>{comment.username}</p>
-						</div>
-					))}
-				</div>
+				<>
+					<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
+						{chairOnlyComments.map((comment) => (
+							<CommentEntry
+								key={comment.id}
+								id={comment.id}
+								username={comment.username}
+								comments={comment.comments}
+								submittedAt={new Date()}
+							/>
+						))}
+					</Flex>
+					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
+						<Input />
+						<Button style={{ background: pcglColours.blue }} type="primary">
+							{translate('generic.send')}
+						</Button>
+					</Space.Compact>
+				</>
 			),
 			style: itemStyles,
 		},
 		{
 			key: '2',
-			label: <CommentLabel label="For Chair Only" numOfComments={comments.chairOnly.length} />,
+			label: <CommentLabel label={translate('generic.chairOnly')} numOfComments={chairOnlyComments.length} />,
 			children: (
-				<div style={{ overflow: 'auto' }}>
-					{comments.chairOnly.map((comment) => (
-						<div key={comment.id} style={{ zIndex: 1 }}>
-							<p>{comment.comments}</p>
-							<p>{comment.username}</p>
-						</div>
-					))}
-				</div>
+				<>
+					<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
+						{chairOnlyComments.map((comment) => (
+							<CommentEntry
+								key={comment.id}
+								id={comment.id}
+								username={comment.username}
+								comments={comment.comments}
+								submittedAt={new Date()}
+							/>
+						))}
+					</Flex>
+					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
+						<Input />
+						<Button style={{ background: pcglColours.blue }} type="primary">
+							{translate('generic.send')}
+						</Button>
+					</Space.Compact>
+				</>
 			),
 			style: itemStyles,
 		},
@@ -97,7 +107,9 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 			<Collapse
 				accordion
 				bordered={false}
-				style={{ width: '100%' }}
+				style={{
+					width: '100%',
+				}}
 				expandIcon={({ isActive }) => (
 					<CaretRightFilled style={{ color: pcglColours.darkGrey, fontSize: '1.4rem' }} rotate={isActive ? 90 : -90} />
 				)}

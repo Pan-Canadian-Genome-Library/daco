@@ -192,6 +192,9 @@
 	"generic": {
 		"notApplicable": "N/A",
 		"applicant": "Applicant",
-		"rep": "Institutional Representative"
+		"rep": "Institutional Representative",
+		"dacComment": "DAC Comments",
+		"chairOnly": "For Chair Only",
+		"send": "Send"
 	}
 }

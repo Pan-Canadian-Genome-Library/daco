@@ -17,30 +17,54 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pcglColours } from '@/providers/ThemeProvider';
-import { CommentOutlined } from '@ant-design/icons';
-import { Flex } from 'antd';
+import { Flex, Typography } from 'antd';
+
+const { Text, Paragraph } = Typography;
 
 type CommentEntryProps = {
-	label: string;
-	numOfComments: number;
+	id: string | number;
+	username: string;
+	comments: string;
+	submittedAt: Date | string;
 };
 
-const CommentEntry = ({ label, numOfComments }: CommentEntryProps) => {
+const CommentEntry = ({ id, username, comments, submittedAt }: CommentEntryProps) => {
 	return (
 		<Flex gap={'middle'}>
-			<CommentOutlined
-				style={{
-					backgroundColor: pcglColours.lighterBlue,
-					borderRadius: 20,
-					padding: 5,
-					color: 'white',
-					fontSize: '0.75rem',
-				}}
-			/>
-			<Flex align="center">{`${label}- (${numOfComments})`}</Flex>
+			<div key={id}>
+				<Flex vertical gap={'middle'}>
+					<Flex align="center">
+						<Text style={{ fontSize: '15px' }} strong>
+							{`${username}, ${formatToShortDate(submittedAt)}`}
+						</Text>
+					</Flex>
+				</Flex>
+				<Flex>
+					<Paragraph style={{ fontSize: '13px' }}>{comments}</Paragraph>
+				</Flex>
+			</div>
 		</Flex>
 	);
 };
 
 export default CommentEntry;
+
+/**
+ * Formats a Date or date string into MM/dd/yy format
+ * @param date - Date object or date string to format
+ * @returns Formatted date string in MM/dd/yy format
+ */
+export function formatToShortDate(date: Date | string): string {
+	const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+	// Check if the date is valid
+	if (isNaN(dateObj.getTime())) {
+		return '';
+	}
+
+	const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-indexed
+	const day = String(dateObj.getDate()).padStart(2, '0');
+	const year = String(dateObj.getFullYear()).slice(-2); // Get last 2 digits of year
+
+	return `${month}/${day}/${year}`;
+}

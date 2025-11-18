@@ -128,14 +128,15 @@ const Applicant = () => {
 							{
 								id: 12,
 								application_id: 1,
-								comments: 'This is a comment',
+								comments:
+									'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras viverra ante sed ornare congue. Suspendisse vel velit lacinia, mattis est eu, congue odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque suscipit velit nec nulla efficitur dictum. Nam blandit sem elit, at tempus dui facilisis sed. Integer gravida viverra mi, eu tincidunt massa pellentesque et. Phasellus vel lacus eu turpis gravida fringilla. Maecenas egestas sem nulla, id finibus elit lacinia at. Fusce ornare at nisl vel volutpat. Praesent pulvinar sapien id nunc varius, in porttitor libero pellentesque.',
 								dac_chair_only: true,
 								section: 'applicant',
 								username: 'John Doe',
 								created_at: '2022-01-01',
 							},
 							{
-								id: 14,
+								id: 13,
 								application_id: 1,
 								comments: 'This is a comment',
 								dac_chair_only: true,
