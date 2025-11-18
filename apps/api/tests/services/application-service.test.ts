@@ -348,6 +348,100 @@ describe('Application Service', () => {
 		});
 	});
 
+	describe('Application Comments', () => {
+		const testApplicationId = 4;
+		// Create test data
+		before(async () => {
+			await testApplicationService.createDacComment({
+				applicationId: testApplicationId,
+				section: 'intro',
+				message: 'Intro comment',
+				toDacChair: false,
+				userId: 'TEST-003',
+				userName: 'Jeff',
+			});
+			await testApplicationService.createDacComment({
+				applicationId: testApplicationId,
+				section: 'intro',
+				message: 'Intro comment again',
+				toDacChair: false,
+				userId: 'TEST-003',
+				userName: 'Jeff',
+			});
+			await testApplicationService.createDacComment({
+				applicationId: testApplicationId,
+				section: 'project',
+				message: 'Trying this out',
+				toDacChair: false,
+				userId: 'TEST-005',
+				userName: 'Mina',
+			});
+			await testApplicationService.createDacComment({
+				applicationId: testApplicationId,
+				section: 'project',
+				message: 'Lispsum',
+				toDacChair: true,
+				userId: 'TEST-005',
+				userName: 'Mina',
+			});
+		});
+
+		it('should create a dac comment and also retrieve created comment', async () => {
+			const result = await testApplicationService.createDacComment({
+				applicationId: 1,
+				section: 'project',
+				message: 'Hello test comment',
+				toDacChair: false,
+				userId: 'TEST-001',
+				userName: 'Julia',
+			});
+
+			assert.ok(result.success);
+			const dacCommentResult = await testApplicationService.getDacComment({
+				applicationId: 1,
+				section: 'project',
+				isDac: false,
+			});
+
+			assert.ok(dacCommentResult.success);
+			assert.ok(Array.isArray(dacCommentResult.data) && dacCommentResult.data.length > 0);
+			assert.ok(dacCommentResult.data[0]?.applicationId === 1);
+		});
+
+		it('should only retrieve the intro', async () => {
+			const dacCommentResult = await testApplicationService.getDacComment({
+				applicationId: testApplicationId,
+				section: 'intro',
+				isDac: false,
+			});
+
+			assert.ok(dacCommentResult.success);
+			assert.ok(Array.isArray(dacCommentResult.data) && dacCommentResult.data.length === 2);
+		});
+
+		it('should retrieve dac comments if dac_chair_only is false', async () => {
+			const dacCommentResult = await testApplicationService.getDacComment({
+				applicationId: testApplicationId,
+				section: 'project',
+				isDac: false,
+			});
+
+			assert.ok(dacCommentResult.success);
+			assert.ok(Array.isArray(dacCommentResult.data) && dacCommentResult.data.length === 1);
+		});
+
+		it('should retrieve all dac comments regardless dac_chair_only because user is DAC', async () => {
+			const dacCommentResult = await testApplicationService.getDacComment({
+				applicationId: testApplicationId,
+				section: 'project',
+				isDac: true,
+			});
+
+			assert.ok(dacCommentResult.success);
+			assert.ok(Array.isArray(dacCommentResult.data) && dacCommentResult.data.length === 2);
+		});
+	});
+
 	after(async () => {
 		await container.stop();
 		process.exit(0);

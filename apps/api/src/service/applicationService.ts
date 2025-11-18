@@ -553,7 +553,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					and(
 						eq(dacComments.application_id, applicationId), // Grab specific application id
 						eq(dacComments.section, section.toUpperCase()), // Grab specific section
-						eq(dacComments.dac_chair_only, isDac), // if is dac, then we can return chair comments
+						isDac ? undefined : eq(dacComments.dac_chair_only, false), // if is dac, then we can return chair comments
 					),
 				);
 
