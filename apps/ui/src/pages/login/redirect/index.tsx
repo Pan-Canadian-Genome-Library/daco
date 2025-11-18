@@ -46,6 +46,7 @@ const LoginRedirect = () => {
 			case 'APPLICANT':
 				navigate('/dashboard', { replace: true });
 				break;
+			case 'DAC_CHAIR':
 			case 'DAC_MEMBER':
 				navigate('/manage/applications', { replace: true });
 				break;
