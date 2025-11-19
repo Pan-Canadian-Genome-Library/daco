@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.ts';
@@ -25,9 +25,8 @@ import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
-import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { RevisionsDTO } from '@pcgl-daco/data-model';
+import { ApplicationStateTotals, RevisionsDTO } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
 	type ApplicationListResponse,
@@ -40,7 +39,6 @@ import {
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
 	type ApplicationsColumnName,
-	type ApplicationStateTotals,
 	type ApplicationUpdates,
 	type JoinedApplicationRecord,
 	type OrderBy,
@@ -48,6 +46,7 @@ import {
 	type RevisionRequestModel,
 	type RevisionRequestRecord,
 } from './types.js';
+import { applicationsQuery } from './utils.ts';
 
 const logger = BaseLogger.forModule('applicationService');
 
@@ -270,6 +269,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort = [],
 		page = 0,
 		pageSize = 20,
+		search,
 		isApplicantView = false,
 	}: {
 		user_id?: string;
@@ -277,18 +277,33 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
+		search?: string;
 		isApplicantView?: boolean;
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
-			/**
-			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
-			 * This should be handled at at the router layer, but just in-case.
-			 */
-			if (Number.isNaN(page) || Number.isNaN(pageSize)) {
-				throw Error('Page and/or page size must be a positive integer.');
-			} else if (page < 0 || pageSize < 0) {
-				throw Error('Page and/or page size must be non-negative values.');
-			}
+			const transformSearchIntoQuery = (searchText: string) => {
+				const sanitizedSearch = searchText
+					?.trim()
+					.replace(/[^a-zA-Z0-9\s@.\-]/g, '') // Remove special characters except @ . -
+					.trim() // apply trim again in-case user inputs a special characters as the first/last word
+					.replace(/\s+/g, ' | '); // add OR between phrases
+
+				const searchQuery = sql`(
+									setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
+								)
+     		 @@ to_tsquery('english', ${`%${sanitizedSearch}%` + ':*'})`;
+
+				return searchQuery;
+			};
+
+			const customCount = (state: ApplicationStateValues) => {
+				return sql<number>`COUNT(CASE WHEN ${applications.state} = ${state} THEN ${applications.state} END)`.mapWith(
+					Number,
+				);
+			};
 
 			const rawApplicationRecord = await db
 				.select({
@@ -311,6 +326,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					and(
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						state.length ? inArray(applications.state, state) : undefined,
+						search ? transformSearchIntoQuery(search) : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
@@ -318,13 +334,31 @@ const applicationSvc = (db: PostgresDb) => ({
 				.offset(page * pageSize)
 				.limit(pageSize);
 
-			const applicationRecordsCount = await db.$count(
-				applications,
-				and(
-					user_id ? eq(applications.user_id, String(user_id)) : undefined,
-					state.length ? inArray(applications.state, state) : undefined,
-				),
-			);
+			const countResult = await db
+				.select({
+					APPROVED: customCount(ApplicationStates.APPROVED),
+					CLOSED: customCount(ApplicationStates.CLOSED),
+					DAC_REVIEW: customCount(ApplicationStates.DAC_REVIEW),
+					DAC_REVISIONS_REQUESTED: customCount(ApplicationStates.DAC_REVISIONS_REQUESTED),
+					DRAFT: customCount(ApplicationStates.DRAFT),
+					INSTITUTIONAL_REP_REVIEW: customCount(ApplicationStates.INSTITUTIONAL_REP_REVIEW),
+					REJECTED: customCount(ApplicationStates.REJECTED),
+					INSTITUTIONAL_REP_REVISION_REQUESTED: customCount(ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED),
+					REVOKED: customCount(ApplicationStates.REVOKED),
+					TOTAL: count(),
+				})
+				.from(applications)
+				.where(
+					and(
+						user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						search ? transformSearchIntoQuery(search) : undefined,
+					),
+				)
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+
+			if (!countResult[0]) {
+				return failure('SYSTEM_ERROR', 'Failed to retrieve application totals');
+			}
 
 			let returnableApplications = rawApplicationRecord;
 
@@ -368,12 +402,14 @@ const applicationSvc = (db: PostgresDb) => ({
 				returnableApplications = [...reviewApplications, ...nonReviewApplications];
 			}
 
-			const applicationsList = {
+			const applicationsList: ApplicationListResponse = {
 				applications: returnableApplications,
 				pagingMetadata: {
-					totalRecords: applicationRecordsCount,
 					page: page,
 					pageSize: pageSize,
+				},
+				totals: {
+					...countResult[0],
 				},
 			};
 

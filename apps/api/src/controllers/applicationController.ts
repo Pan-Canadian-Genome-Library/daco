@@ -162,6 +162,8 @@ export const editApplication = async ({
  * @param page - page offset
  * @param pageSize - page limit
  * @param isDACMember - Boolean which represents if the user is a DAC Member (they can see all applications)
+ * @param isApplicantView - Boolean which represents if the user is an applicant (they can only see their own applications)
+ * @param search - text to search
  * @returns Success with list of Applications / Failure with Error
  */
 export const getAllApplications = async ({
@@ -170,6 +172,7 @@ export const getAllApplications = async ({
 	sort,
 	page,
 	pageSize,
+	search,
 	isDACMember,
 	isApplicantView,
 }: ApplicationListRequest) => {
@@ -187,6 +190,7 @@ export const getAllApplications = async ({
 		sort,
 		page,
 		pageSize,
+		search,
 		isApplicantView,
 	});
 
@@ -214,18 +218,6 @@ export const getApplicationById = async ({
 	}
 
 	return result;
-};
-
-/**
- * Gets the total of how many applications are in each state type, including a TOTAL count.
- * @param userId - The ID of the current user.
- * @returns Success with the details of the application / Failure with Error.
- */
-export const getApplicationStateTotals = async () => {
-	const database = getDbInstance();
-	const service: ApplicationService = applicationSvc(database);
-
-	return await service.applicationStateTotals();
 };
 
 /**
