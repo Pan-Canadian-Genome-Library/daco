@@ -19,7 +19,6 @@
 
 import { z } from 'zod';
 
-import { userRoleSchema } from '@pcgl-daco/validation';
 import EnvironmentConfigError from './EnvironmentConfigError.js';
 
 const serverConfigSchema = z.object({
@@ -36,9 +35,6 @@ const serverConfigSchema = z.object({
 		.optional()
 		.default(1000 * 60 * 30), // default 30 minutes
 	UI_HOST: z.string().url(),
-
-	//FIXME: Remove once testing is done - TEMP
-	USER_ROLE: userRoleSchema.default('APPLICANT'),
 });
 
 const parseResult = serverConfigSchema.safeParse(process.env);

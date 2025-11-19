@@ -19,7 +19,7 @@
 
 import { CloseOutlined, UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Flex, Form, theme, Typography, Upload, UploadFile } from 'antd';
+import { Button, Flex, Form, Row, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
 import { useState } from 'react';
@@ -37,6 +37,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -159,6 +160,9 @@ const Ethics = () => {
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}
 				/>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['ethics']} />
+				</Row>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>
 					<Form
 						form={form}
@@ -172,6 +176,7 @@ const Ethics = () => {
 								update: {
 									ethicsReviewRequired: ethicsReviewReq,
 								},
+								revisions,
 							}).then(() => {
 								dispatch({
 									type: 'UPDATE_APPLICATION',

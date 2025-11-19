@@ -193,7 +193,6 @@ export interface ApplicationResponseData extends ApplicationDTO {
 }
 
 export interface PagingMetadata {
-	totalRecords: number;
 	page: number;
 	pageSize: number;
 }
@@ -211,11 +210,6 @@ export interface ApplicationListSummary extends ApplicationDTO {
 	applicant: ApplicantSummary | null;
 }
 
-export interface ApplicationListResponse {
-	applications: ApplicationListSummary[];
-	pagingMetadata: PagingMetadata;
-}
-
 export type ApplicationContentsResponse = {
 	applicationId?: number;
 	createdAt?: Date;
@@ -231,12 +225,6 @@ export type ApplicationContentsResponse = {
 
 export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;
-}
-
-export interface PagingMetadata {
-	totalRecords: number;
-	page: number;
-	pageSize: number;
 }
 
 export interface ApplicantSummary {
@@ -369,11 +357,11 @@ export const agreementEnum = [
 ] as const;
 
 export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as const;
+
 export interface RevisionsDTO {
-	id: number;
-	applicationId: number;
-	createdAt?: Date;
-	comments?: String | null;
+	applicationActionId: number;
+	applicationsId: number | null;
+	comments?: string | null;
 	applicantApproved: boolean;
 	applicantNotes?: string | null;
 	institutionRepApproved: boolean;
@@ -392,4 +380,6 @@ export interface RevisionsDTO {
 	appendicesNotes?: string | null;
 	signAndSubmitApproved: boolean;
 	signAndSubmitNotes?: string | null;
+	createdAt?: Date;
+	isDacRequest: boolean;
 }

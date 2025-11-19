@@ -32,6 +32,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import ErrorPage from '@/components/pages/global/ErrorPage';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { type CollaboratorsResponseDTO } from '@pcgl-daco/data-model';
@@ -124,6 +125,9 @@ const Collaborators = () => {
 					]}
 					showDivider={false}
 				/>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['collaborators']} />
+				</Row>
 				<SectionContent showDivider={false}>
 					<Table
 						rowKey={(record) => `PCGL-${record.collaboratorInstitutionalEmail}`}
