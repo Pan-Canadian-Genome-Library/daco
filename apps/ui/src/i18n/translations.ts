@@ -48,6 +48,9 @@ i18n.use(initReactI18next).init({
 	lng: 'en',
 	fallbackLng: 'en',
 	supportedLngs: ['en', 'fr'],
+	interpolation: {
+		escapeValue: false,
+	},
 });
 
 /**

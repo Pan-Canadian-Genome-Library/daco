@@ -17,16 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
+import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { dacComments } from '@/db/schemas/dacComments.ts';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { DacCommentRecord } from '@pcgl-daco/data-model';
+import { ApplicationStateTotals, DacCommentRecord, RevisionsDTO } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
 	type ApplicationListResponse,
@@ -35,6 +36,7 @@ import {
 import { SectionRoutesValues } from '@pcgl-daco/validation';
 import { collaborators } from '../db/schemas/collaborators.ts';
 import {
+	type ApplicationActionRecord,
 	type ApplicationContentModel,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
@@ -419,7 +421,49 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to list applications.');
 		}
 	},
+	/** @method applicationStateTotals: Obtain count for all Application records with each State */
+	applicationStateTotals: async (): AsyncResult<ApplicationStateTotals, 'SYSTEM_ERROR'> => {
+		try {
+			const rawApplicationRecord = await db
+				.select({
+					APPROVED: db.$count(applications, eq(applications.state, 'APPROVED')),
+					CLOSED: db.$count(applications, eq(applications.state, 'CLOSED')),
+					DAC_REVIEW: db.$count(applications, eq(applications.state, 'DAC_REVIEW')),
+					DAC_REVISIONS_REQUESTED: db.$count(applications, eq(applications.state, 'DAC_REVISIONS_REQUESTED')),
+					DRAFT: db.$count(applications, eq(applications.state, 'DRAFT')),
+					INSTITUTIONAL_REP_REVIEW: db.$count(applications, eq(applications.state, 'INSTITUTIONAL_REP_REVIEW')),
+					REJECTED: db.$count(applications, eq(applications.state, 'REJECTED')),
+					INSTITUTIONAL_REP_REVISION_REQUESTED: db.$count(
+						applications,
+						eq(applications.state, 'INSTITUTIONAL_REP_REVISION_REQUESTED'),
+					),
+					REVOKED: db.$count(applications, eq(applications.state, 'REVOKED')),
+					TOTAL: db.$count(applications),
+				})
+				.from(applications)
+				.limit(1);
 
+			if (rawApplicationRecord[0] && rawApplicationRecord.length) {
+				return success(rawApplicationRecord[0]);
+			} else {
+				return success({
+					APPROVED: 0,
+					CLOSED: 0,
+					DAC_REVIEW: 0,
+					DAC_REVISIONS_REQUESTED: 0,
+					DRAFT: 0,
+					INSTITUTIONAL_REP_REVIEW: 0,
+					REJECTED: 0,
+					INSTITUTIONAL_REP_REVISION_REQUESTED: 0,
+					REVOKED: 0,
+					TOTAL: 0,
+				});
+			}
+		} catch (err) {
+			logger.error(`Error querying applicationStateTotals`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to retrieve application counts.');
+		}
+	},
 	createRevisionRequest: async ({
 		applicationId,
 		revisionData,
@@ -446,23 +490,79 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-
-	getRevisions: async ({
-		applicationId,
-	}: {
-		applicationId: number;
-	}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
+	getRevisions: async ({ applicationId }: { applicationId: number }): AsyncResult<RevisionsDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const results = await db
-				.select()
-				.from(revisionRequests)
-				.where(eq(revisionRequests.application_id, applicationId))
+				.select({
+					applicationsId: revisionRequests.application_id,
+					applicationActionId: applicationActions.id,
+					applicationAction: applicationActions.action,
+					comments: revisionRequests.comments,
+					applicantNotes: revisionRequests.applicant_notes,
+					applicantApproved: revisionRequests.applicant_approved,
+					institutionRepApproved: revisionRequests.institution_rep_approved,
+					institutionRepNotes: revisionRequests.institution_rep_notes,
+					collaboratorsApproved: revisionRequests.collaborators_approved,
+					collaboratorsNotes: revisionRequests.collaborators_notes,
+					projectApproved: revisionRequests.project_approved,
+					projectNotes: revisionRequests.project_notes,
+					requestedStudiesApproved: revisionRequests.requested_studies_approved,
+					requestedStudiesNotes: revisionRequests.requested_studies_notes,
+					ethicsApproved: revisionRequests.ethics_approved,
+					ethicsNotes: revisionRequests.ethics_notes,
+					agreementsApproved: revisionRequests.agreements_approved,
+					agreementsNotes: revisionRequests.agreements_notes,
+					appendicesApproved: revisionRequests.appendices_approved,
+					appendicesNotes: revisionRequests.appendices_notes,
+					signAndSubmitApproved: revisionRequests.sign_and_submit_approved,
+					signAndSubmitNotes: revisionRequests.sign_and_submit_notes,
+					createdAt: revisionRequests.created_at,
+				})
+				.from(applicationActions)
+				.where(
+					and(
+						eq(revisionRequests.application_id, applicationId),
+						or(
+							eq(applicationActions.action, 'DAC_REVIEW_REVISION_REQUEST'),
+							eq(applicationActions.action, 'INSTITUTIONAL_REP_REVISION_REQUEST'),
+						),
+					),
+				)
+				.innerJoin(revisionRequests, eq(revisionRequests.id, applicationActions.revisions_request_id))
 				.orderBy(desc(revisionRequests.created_at));
 
-			return success(results);
+			const transformResult: RevisionsDTO[] = results.map((revision) => {
+				return {
+					...revision,
+					isDacRequest: revision.applicationAction === 'DAC_REVIEW_REVISION_REQUEST',
+				};
+			});
+
+			return success(transformResult);
 		} catch (error) {
 			const message = `Error while fetching revisions for applicationId: ${applicationId}`;
 			logger.error(message, error);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	updateApplicationActionRecordRevisionId: async ({
+		actionId,
+		revisionId,
+	}: {
+		actionId: number;
+		revisionId: number;
+	}): AsyncResult<ApplicationActionRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const result = await db
+				.update(applicationActions)
+				.set({ revisions_request_id: revisionId })
+				.where(eq(applicationActions.id, actionId))
+				.returning();
+
+			return success(result);
+		} catch (err) {
+			const message = `Error at updateApplicationActionRecord with action id: ${actionId}`;
+			logger.error(message, err);
 			return failure('SYSTEM_ERROR', message);
 		}
 	},

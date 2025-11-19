@@ -35,7 +35,7 @@ type SectionMenuProps = {
 	currentSection: string;
 	isEditMode: boolean;
 	appId: string | number;
-	revisions: Partial<SectionRevision>;
+	revisions: SectionRevision;
 	appState: ApplicationStateValues;
 };
 
@@ -74,13 +74,17 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 	 * @returns a `boolean` weather a route should be locked or not.
 	 */
 	const determineIfLocked = (route: SectionRoutesValues) => {
-		if (route === 'intro' && isEditMode === false) {
-			return true;
-		} else if (revisions[route]?.isApproved !== undefined && revisions[route].isApproved === true) {
-			return true;
-		} else if (revisions[route]?.isApproved !== undefined && revisions[route].isApproved === false) {
+		const currentRevision = revisions[route][0];
+
+		if (!currentRevision) {
 			return false;
-		} else if (revisions[route]?.isApproved === undefined && isEditMode === false) {
+		} else if (route === 'intro' && isEditMode === false) {
+			return true;
+		} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === true) {
+			return true;
+		} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === false) {
+			return false;
+		} else if (currentRevision.isApproved === undefined && isEditMode === false) {
 			return true;
 		}
 

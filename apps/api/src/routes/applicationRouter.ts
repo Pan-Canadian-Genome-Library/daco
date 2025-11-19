@@ -228,7 +228,7 @@ applicationRouter.get(
 			page: pageRequested,
 			pageSize: pageSizeRequested,
 			search: searchResult,
-			isDAC: isDAC,
+			isDAC,
 			isApplicantView,
 		});
 

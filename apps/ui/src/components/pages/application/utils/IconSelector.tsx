@@ -39,6 +39,11 @@ export const RenderIcon = (props: SectionMenuItemProps) => {
 			return RevisionsRequested(props);
 		case ApplicationStates.DAC_REVISIONS_REQUESTED:
 			return RevisionsRequested(props);
+		case ApplicationStates.APPROVED:
+		case ApplicationStates.CLOSED:
+		case ApplicationStates.REJECTED:
+		case ApplicationStates.REVOKED:
+			return; // return no icon if in the following states
 		default:
 			return DraftLogic(props);
 	}
