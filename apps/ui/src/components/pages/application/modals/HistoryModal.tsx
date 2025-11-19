@@ -20,6 +20,8 @@
 import { Button, Flex, Modal, Timeline, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import type { ApplicationResponseData } from '@pcgl-daco/data-model';
+
 import useGetApplication from '@/api/queries/useGetApplication';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { pcglColours } from '@/providers/ThemeProvider';
@@ -40,21 +42,14 @@ const TimelineDot = (
 	/>
 );
 
-interface HistoryModalProps {
-	id: number;
-	isOpen: boolean;
-	closeModal: () => void;
-}
-
-const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
-	// TODO: Replace Mock Data
-	const { data: applicationData, isError, isLoading } = useGetApplication(id);
-	const displayId = `PCGL-${id}`;
-	const isHistoryLoaded = !isLoading && applicationData !== undefined && !isError;
-	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
-	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
+const HistoryTimeline = ({
+	applicationData,
+	submissionDate,
+}: {
+	applicationData: ApplicationResponseData;
+	submissionDate: string;
+}) => {
 	const { t: translate } = useTranslation();
-
 	// TODO: Replace Mock Data
 	const timelineHistoryItems = displayHistoryItems.map((item) => ({
 		dot: TimelineDot,
@@ -70,6 +65,24 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 			</span>
 		),
 	}));
+
+	return <Timeline items={timelineHistoryItems} style={{ padding: 0 }} />;
+};
+
+interface HistoryModalProps {
+	id: number;
+	isOpen: boolean;
+	closeModal: () => void;
+}
+
+const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
+	// TODO: Replace Mock Data
+	const { data: applicationData, isError, isLoading } = useGetApplication(id);
+	const displayId = `PCGL-${id}`;
+	const isHistoryLoaded = !isLoading && applicationData !== undefined && !isError;
+	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
+	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
+	const { t: translate } = useTranslation();
 
 	return (
 		<Modal
@@ -110,7 +123,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 								<Text> {lastUpdated}</Text>
 							</div>
 						</div>
-						<Timeline items={timelineHistoryItems} style={{ padding: 0 }} />
+						<HistoryTimeline applicationData={applicationData} submissionDate={submissionDate} />
 					</>
 				) : (
 					<div style={{ margin: '1em 0' }}>{translate('modals.history.error')}</div>
