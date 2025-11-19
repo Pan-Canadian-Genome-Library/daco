@@ -22,9 +22,12 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSignatureForm } from '@/components/pages/application/utils/useSignatureForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
+import { ApplicationOutletContext } from '@/global/types';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Col, Row } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 
 type Props = {
 	signatureData?: SignatureDTO;
@@ -34,7 +37,7 @@ type Props = {
 
 const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Props) => {
 	const { t: translate } = useTranslation();
-
+	const { revisions } = useOutletContext<ApplicationOutletContext>();
 	const { form, disableSignature, disableSubmit, signatureRef, onSaveClicked } = useSignatureForm({
 		signatureData: signatureData,
 	});
@@ -50,6 +53,11 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 				text={translate('sign-and-submit-section.description')}
 				showDivider={false}
 			/>
+			<SectionContent showDivider={false}>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />
+				</Row>
+			</SectionContent>
 			<SectionContent
 				showDivider={false}
 				title={translate('sign-and-submit-section.section.title')}
