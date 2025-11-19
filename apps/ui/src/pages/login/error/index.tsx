@@ -50,7 +50,7 @@ const LoginError = () => {
 			}}
 		>
 			<Flex vertical>
-				<Title>{translate(code === 'SELF_REGISTRATION_SENT' ? '' : 'global.loginError.title')}</Title>
+				{code !== 'SELF_REGISTRATION_SENT' && <Title>{translate('global.loginError.title')}</Title>}
 				<Flex vertical gap={'1rem'}>
 					<Title level={2} style={{ marginTop: '-.2rem', fontSize: token.fontSizeHeading4 }}>
 						{translate([
@@ -76,11 +76,9 @@ const LoginError = () => {
 							<ApplyForAccessModal openModal={applyForAccessOpen} setOpenModal={setApplyForAccessOpen} />
 						</>
 					) : (
-						<>
-							<Button href="/" type="primary">
-								{translate('global.loginError.buttons.home')}
-							</Button>
-						</>
+						<Button href="/" type="primary">
+							{translate('global.loginError.buttons.home')}
+						</Button>
 					)}
 				</Flex>
 			</Flex>
