@@ -22,7 +22,7 @@ To use environment variables, copy the file `.env.schema` to `.env` and modify a
 
 | Name           | Description                                                                                                                                                                 | Type     |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `VITE_DISABLE_AUTH` | If set to `true`, all protected routes will be available regardless of the user. This allows development of protected pages withour required an authenticated user session. | `string` |
+| `API_URL` | The base URL used to proxy all requests to the DACO API. Default is 'http://localhost:3000' | `string` |
 | `VITE_SELF_ENROLMENT_URL` | Specifies the URL endpoint for user self-enrolment. (COmanage Self-enrolment flow) | `string` |
 
 ### Production Environment Variables
