@@ -383,3 +383,14 @@ export interface RevisionsDTO {
 	createdAt?: Date;
 	isDacRequest: boolean;
 }
+
+export type DacCommentRecord = {
+	id: number;
+	applicationId: number;
+	userId: string;
+	message: string;
+	userName: string;
+	section: string;
+	dacChairOnly: boolean;
+	created_at: Date;
+};

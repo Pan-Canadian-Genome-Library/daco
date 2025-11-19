@@ -19,6 +19,7 @@
 
 import { agreementEnum, appendicesEnum, ApplicationStates } from '@pcgl-daco/data-model';
 import { z } from 'zod';
+import { SectionRoutes } from '../section/sections.js';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
@@ -26,6 +27,11 @@ export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationR
 
 export const basicApplicationParamSchema = z.object({
 	applicationId: z.coerce.number().int().nonnegative().min(1),
+});
+
+export const dacCommentsGetParamSchema = z.object({
+	applicationId: z.coerce.number().int().nonnegative().min(1),
+	section: z.nativeEnum(SectionRoutes),
 });
 
 export const applicationContentsSchema = z
@@ -161,4 +167,10 @@ export const rejectApplicationRequestSchema = z.object({
 
 export const revokeApplicationRequestSchema = z.object({
 	revokeReason: z.string().nullable(),
+});
+
+export const submitDacCommentsSchema = z.object({
+	message: z.string().min(5),
+	section: z.nativeEnum(SectionRoutes),
+	toDacChair: z.boolean(),
 });
