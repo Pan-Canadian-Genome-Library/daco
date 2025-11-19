@@ -29,7 +29,7 @@ interface ApplyForAccessModalProps {
 	setOpenModal: (show: boolean) => void;
 }
 
-const SELF_ENROLMENT_URL = import.meta.env.VITE_SELF_ENROLMENT_URL || '#';
+const SELF_ENROLMENT_URL = __SELF_ENROLMENT_URL__ || '#';
 
 const ApplyForAccessModal = ({ openModal, setOpenModal }: ApplyForAccessModalProps) => {
 	const minWidth = useMinWidth();
