@@ -18,91 +18,105 @@
  */
 
 import { agreementEnum, appendicesEnum } from '@pcgl-daco/data-model';
-import { relations } from 'drizzle-orm';
-import { bigint, boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import { bigint, boolean, index, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { applications } from './applications.ts';
 import { collaborators } from './collaborators.ts';
 import { files } from './files.ts';
 import { revisionRequests } from './revisionRequests.ts';
 
-export const applicationContents = pgTable('application_contents', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_id: bigint({ mode: 'number' }).notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	updated_at: timestamp().notNull(),
+export const applicationContents = pgTable(
+	'application_contents',
+	{
+		id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+		application_id: bigint({ mode: 'number' }).notNull(),
+		created_at: timestamp().notNull().defaultNow(),
+		updated_at: timestamp().notNull(),
 
-	// Applicant
-	applicant_first_name: varchar({ length: 255 }),
-	applicant_middle_name: varchar({ length: 255 }),
-	applicant_last_name: varchar({ length: 255 }),
-	applicant_title: varchar({ length: 255 }),
-	applicant_suffix: varchar({ length: 255 }),
-	applicant_position_title: varchar({ length: 255 }),
-	applicant_primary_affiliation: varchar({ length: 500 }),
-	applicant_institutional_email: varchar({ length: 320 }),
-	applicant_profile_url: text(),
+		// Applicant
+		applicant_first_name: varchar({ length: 255 }),
+		applicant_middle_name: varchar({ length: 255 }),
+		applicant_last_name: varchar({ length: 255 }),
+		applicant_title: varchar({ length: 255 }),
+		applicant_suffix: varchar({ length: 255 }),
+		applicant_position_title: varchar({ length: 255 }),
+		applicant_primary_affiliation: varchar({ length: 500 }),
+		applicant_institutional_email: varchar({ length: 320 }),
+		applicant_profile_url: text(),
 
-	//Applicant Institutional Mailing
-	applicant_institution_country: varchar({ length: 255 }),
-	applicant_institution_state: varchar({ length: 255 }),
-	applicant_institution_city: varchar({ length: 255 }),
-	applicant_institution_street_address: text(),
-	applicant_institution_postal_code: varchar({ length: 255 }),
-	applicant_institution_building: varchar({ length: 255 }),
+		//Applicant Institutional Mailing
+		applicant_institution_country: varchar({ length: 255 }),
+		applicant_institution_state: varchar({ length: 255 }),
+		applicant_institution_city: varchar({ length: 255 }),
+		applicant_institution_street_address: text(),
+		applicant_institution_postal_code: varchar({ length: 255 }),
+		applicant_institution_building: varchar({ length: 255 }),
 
-	// Institutional Rep
-	institutional_rep_title: varchar({ length: 255 }),
-	institutional_rep_first_name: varchar({ length: 255 }),
-	institutional_rep_middle_name: varchar({ length: 255 }),
-	institutional_rep_last_name: varchar({ length: 255 }),
-	institutional_rep_suffix: varchar({ length: 255 }),
-	institutional_rep_primary_affiliation: varchar({ length: 255 }),
-	institutional_rep_email: varchar({ length: 255 }),
-	institutional_rep_profile_url: varchar({ length: 255 }),
-	institutional_rep_position_title: varchar({ length: 255 }),
+		// Institutional Rep
+		institutional_rep_title: varchar({ length: 255 }),
+		institutional_rep_first_name: varchar({ length: 255 }),
+		institutional_rep_middle_name: varchar({ length: 255 }),
+		institutional_rep_last_name: varchar({ length: 255 }),
+		institutional_rep_suffix: varchar({ length: 255 }),
+		institutional_rep_primary_affiliation: varchar({ length: 255 }),
+		institutional_rep_email: varchar({ length: 255 }),
+		institutional_rep_profile_url: varchar({ length: 255 }),
+		institutional_rep_position_title: varchar({ length: 255 }),
 
-	// Institution
-	institution_country: varchar({ length: 255 }),
-	institution_state: varchar({ length: 255 }),
-	institution_city: varchar({ length: 255 }),
-	institution_street_address: text(),
-	institution_postal_code: varchar({ length: 255 }),
-	institution_building: varchar({ length: 255 }),
+		// Institution
+		institution_country: varchar({ length: 255 }),
+		institution_state: varchar({ length: 255 }),
+		institution_city: varchar({ length: 255 }),
+		institution_street_address: text(),
+		institution_postal_code: varchar({ length: 255 }),
+		institution_building: varchar({ length: 255 }),
 
-	// Project
-	project_title: text(),
-	project_website: text(),
-	project_background: text(),
-	project_methodology: text(),
-	project_aims: text(),
-	project_summary: text(),
-	project_publication_urls: text().array(),
+		// Project
+		project_title: text(),
+		project_website: text(),
+		project_background: text(),
+		project_methodology: text(),
+		project_aims: text(),
+		project_summary: text(),
+		project_publication_urls: text().array(),
 
-	// Signature for Sign & Submit
-	applicant_signature: text(),
-	applicant_signed_at: timestamp(),
-	institutional_rep_signature: text(),
-	institutional_rep_signed_at: timestamp(),
+		// Signature for Sign & Submit
+		applicant_signature: text(),
+		applicant_signed_at: timestamp(),
+		institutional_rep_signature: text(),
+		institutional_rep_signed_at: timestamp(),
 
-	//Agreements
-	accepted_agreements: text({
-		enum: agreementEnum,
-	}).array(),
+		//Agreements
+		accepted_agreements: text({
+			enum: agreementEnum,
+		}).array(),
 
-	//Appendices
-	accepted_appendices: text({
-		enum: appendicesEnum,
-	}).array(),
+		//Appendices
+		accepted_appendices: text({
+			enum: appendicesEnum,
+		}).array(),
 
-	// Studies
-	// TODO: requested study information
-	requested_studies: text().array(),
+		// Studies
+		// TODO: requested study information
+		requested_studies: text().array(),
 
-	// Agreements & Ethics
-	ethics_review_required: boolean(),
-	ethics_letter: bigint({ mode: 'number' }),
-	signed_pdf: bigint({ mode: 'number' }),
-});
+		// Agreements & Ethics
+		ethics_review_required: boolean(),
+		ethics_letter: bigint({ mode: 'number' }),
+		signed_pdf: bigint({ mode: 'number' }),
+	},
+	(table) => [
+		index('search_index').using(
+			'gin',
+			sql`(
+				setweight(to_tsvector('english', ${table.application_id}::text), 'A') ||
+				setweight(to_tsvector('english', ${table.applicant_first_name} || ' ' || ${table.applicant_last_name}), 'B') ||
+				setweight(to_tsvector('english', ${table.applicant_institutional_email}), 'C') ||
+				setweight(to_tsvector('english', ${table.applicant_primary_affiliation}), 'D') 
+	  		)`,
+		),
+	],
+);
 
 export const applicationContentsRelations = relations(applicationContents, ({ many, one }) => ({
 	application_id: one(applications, {

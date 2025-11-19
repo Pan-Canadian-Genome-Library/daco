@@ -29,6 +29,7 @@ export type ApplicationListRequest = {
 	sort?: Array<OrderBy<ApplicationsColumnName>>;
 	page?: number;
 	pageSize?: number;
+	search?: string;
 	isDAC?: boolean;
 	isApplicantView?: boolean;
 };
