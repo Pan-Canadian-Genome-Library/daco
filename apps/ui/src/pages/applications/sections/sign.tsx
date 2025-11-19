@@ -59,7 +59,7 @@ const SignAndSubmit = () => {
 					<ProtectedComponent requiredRoles={['INSTITUTIONAL_REP']}>
 						<RepSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
 					</ProtectedComponent>
-					<ProtectedComponent requiredRoles={['DAC_MEMBER']}>
+					<ProtectedComponent requiredRoles={['DAC_CHAIR', 'DAC_MEMBER']}>
 						<DacSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
 					</ProtectedComponent>
 				</Form>

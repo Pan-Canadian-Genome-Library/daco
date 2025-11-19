@@ -69,12 +69,12 @@ paths:
               schema:
                 $ref: '#/components/responses/ServerErrors'
 
-  /applications/{applicationId}/dac/request-revisions:
+  /applications/{applicationId}/dac-chair/request-revisions:
     post:
       tags:
         - Revisions
-      summary: 'Allows a DAC member to request revisions for an application.'
-      description: 'Allows a DAC Member to request revisions for an application, including approval status and comments on various sections.'
+      summary: 'Allows a DAC chair to request revisions for an application.'
+      description: 'Allows a DAC chair to request revisions for an application, including approval status and comments on various sections.'
       parameters:
         - in: path
           name: applicationId
