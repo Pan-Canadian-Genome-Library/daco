@@ -104,7 +104,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	async _dispatchAndUpdateAction(
 		action: ApplicationStateEvents,
 		actionMethod: AddActionMethods,
-	): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
+	): AsyncResult<ApplicationRecord & { actionId: number }, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		try {
 			await this.dispatch(action);
 			const updateResult = await this._updateRecords(actionMethod);
@@ -116,7 +116,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async _updateRecords(method: AddActionMethods): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
+	async _updateRecords(
+		method: AddActionMethods,
+	): AsyncResult<ApplicationRecord & { actionId: number }, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		const db = getDbInstance();
 		const applicationRepo = applicationSvc(db);
 		const applicationActionRepo = applicationActionSvc(db);
@@ -139,11 +141,13 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 					transaction: tx,
 				});
 
-				if (applicationResult.success && applicationResult.data) {
-					this._application = applicationResult.data;
+				if (!applicationResult.success) {
+					return applicationResult;
 				}
 
-				return applicationResult;
+				this._application = applicationResult.data;
+
+				return success({ ...applicationResult.data, actionId: actionResult.data.id });
 			} catch (error) {
 				logger.error(`Unexpected error updating an application in the database.`, error);
 				return failure(

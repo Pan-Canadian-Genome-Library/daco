@@ -25,7 +25,6 @@ import {
 	type CollaboratorRecord,
 	type FilesRecord,
 	type JoinedApplicationRecord,
-	type RevisionRequestModel,
 } from '@/service/types.js';
 import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/types.ts';
 import {
@@ -33,14 +32,12 @@ import {
 	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
 	type FilesDTO,
-	type RevisionsDTO,
 	type SignatureDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
 	fileResponseSchema,
-	revisionDataResponseSchema,
 	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
@@ -202,21 +199,4 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
 	});
 
 	return formattedUpdate;
-};
-
-/**
- * Helper function to convert Postgres snake_case to FE camelCase for the Revisions Service
- * @param data type `RevisionRequestModel` - File fields from the DB
- * @returns type `RevisionsDTO` - camelCase variation of a Postgres success response.
- */
-export const convertToRevisionsRecord = (data: RevisionRequestModel): Result<RevisionsDTO, 'SYSTEM_ERROR'> => {
-	const camelCaseRecord = objectToCamel(data);
-	const validationResult = revisionDataResponseSchema.safeParse(camelCaseRecord);
-	const result = validationResult.success
-		? success(validationResult.data)
-		: failure(
-				'SYSTEM_ERROR',
-				`Validation Error while aliasing data at convertToRevisionRecord: \n${validationResult.error.issues[0]?.message || ''}`,
-			);
-	return result;
 };

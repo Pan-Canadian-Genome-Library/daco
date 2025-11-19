@@ -30,7 +30,7 @@ export type ApplicationListRequest = {
 	page?: number;
 	pageSize?: number;
 	search?: string;
-	isDACMember?: boolean;
+	isDAC?: boolean;
 	isApplicantView?: boolean;
 };
 

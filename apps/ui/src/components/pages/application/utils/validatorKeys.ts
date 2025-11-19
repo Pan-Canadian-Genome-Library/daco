@@ -77,23 +77,23 @@ export function isProjectKey(value: string): value is keyof ProjectDTO {
 }
 
 // Grab fields that have revision requests
-export function parseRevisedFields(fields: ApplicationContentsResponse, revisedFields: Partial<SectionRevision>) {
+export function parseRevisedFields(fields: ApplicationContentsResponse, revisedFields: SectionRevision) {
 	const result = Object.entries(fields).reduce((acc, item) => {
 		const [key, value] = item;
 
-		if (!revisedFields.applicant?.isApproved && isApplicantKey(key)) {
+		if (!revisedFields.applicant[0]?.isApproved && isApplicantKey(key)) {
 			acc[key] = value;
-		} else if (!revisedFields.institutional?.isApproved && isInstitutionalKey(key)) {
+		} else if (!revisedFields.institutional[0]?.isApproved && isInstitutionalKey(key)) {
 			acc[key] = value;
-		} else if (!revisedFields.project?.isApproved && isProjectKey(key)) {
+		} else if (!revisedFields.project[0]?.isApproved && isProjectKey(key)) {
 			acc[key] = value;
-		} else if (!revisedFields.agreement?.isApproved && isAgreementKey(key)) {
+		} else if (!revisedFields.agreement[0]?.isApproved && isAgreementKey(key)) {
 			acc[key] = value;
-		} else if (!revisedFields.appendices?.isApproved && isAppendicesKey(key)) {
+		} else if (!revisedFields.appendices[0]?.isApproved && isAppendicesKey(key)) {
 			acc[key] = value;
-		} else if (!revisedFields.ethics?.isApproved && isEthicsKey(key)) {
+		} else if (!revisedFields.ethics[0]?.isApproved && isEthicsKey(key)) {
 			acc[key] = value;
-		} else if (!revisedFields.study?.isApproved && isRequestedStudies(key)) {
+		} else if (!revisedFields.study[0]?.isApproved && isRequestedStudies(key)) {
 			acc[key] = value;
 		}
 
