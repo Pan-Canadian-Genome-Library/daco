@@ -42,10 +42,9 @@ import {
 	convertToBasicApplicationRecord,
 	convertToCollaboratorRecords,
 	convertToFileRecord,
-	convertToRevisionsRecord,
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
-import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
+import { failure, type AsyncResult, type Result } from '@/utils/results.js';
 import { validateRevisedFields } from '@/utils/validation.ts';
 import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
@@ -655,9 +654,9 @@ export const requestApplicationRevisionsByDac = async ({
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const applicationService = applicationSvc(database);
 		const emailService = await emailSvc();
-		const result = await service.getApplicationById({ id: applicationId });
+		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -673,19 +672,28 @@ export const requestApplicationRevisionsByDac = async ({
 			);
 		}
 
-		const revisionResult = await appStateManager.reviseDacReview();
+		const actionResult = await appStateManager.reviseDacReview();
 
-		if (!revisionResult.success) {
-			return revisionResult;
+		if (!actionResult.success) {
+			return actionResult;
 		}
 
-		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+		const revisionRequestResult = await applicationService.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
 			return revisionRequestResult;
 		}
 
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
+		const updateAction = await applicationService.updateApplicationActionRecordRevisionId({
+			actionId: actionResult.data.actionId,
+			revisionId: revisionRequestResult.data.id,
+		});
+
+		if (!updateAction.success) {
+			return updateAction;
+		}
+
+		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
@@ -698,7 +706,7 @@ export const requestApplicationRevisionsByDac = async ({
 		}
 
 		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
 			logger.error(
@@ -736,10 +744,10 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const applicationService = applicationSvc(database);
 		const emailService = await emailSvc();
 
-		const result = await service.getApplicationById({ id: applicationId });
+		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -755,26 +763,35 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			);
 		}
 
-		const revisionResult = await appStateManager.reviseRepReview();
+		const actionResult = await appStateManager.reviseRepReview();
 
-		if (!revisionResult.success) {
-			return revisionResult;
+		if (!actionResult.success) {
+			return actionResult;
 		}
 
-		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+		const revisionRequestResult = await applicationService.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
 			return revisionRequestResult;
 		}
 
+		const updateAction = await applicationService.updateApplicationActionRecordRevisionId({
+			actionId: actionResult.data.actionId,
+			revisionId: revisionRequestResult.data.id,
+		});
+
+		if (!updateAction.success) {
+			return updateAction;
+		}
+
 		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success) {
 			return resultContents;
 		}
 
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
+		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
@@ -1020,16 +1037,7 @@ export const getRevisions = async ({
 			return revisionsResult;
 		}
 
-		const aliasedRevs = revisionsResult.data.map((rev) => convertToRevisionsRecord(rev));
-
-		const filteredFailures = aliasedRevs.filter((results) => !results.success);
-		const filteredSuccesses = aliasedRevs.filter((results) => results.success).map((results) => results.data);
-
-		if (filteredFailures.length) {
-			throw new Error('Failed to alias Revisions Record');
-		} else {
-			return success(filteredSuccesses);
-		}
+		return revisionsResult;
 	} catch (error) {
 		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
 		logger.error(message, error);

@@ -33,6 +33,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
@@ -121,6 +122,9 @@ const Applicant = () => {
 					showLockIcon={!canEdit}
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
+				<Row>
+					<RevisionsAlert sectionRevisions={revisions['applicant']} />
+				</Row>
 				<SectionContent title={translate('applicant-section.section1')}>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>

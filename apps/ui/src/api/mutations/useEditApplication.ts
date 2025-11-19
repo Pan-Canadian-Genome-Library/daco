@@ -33,7 +33,7 @@ const useEditApplication = () => {
 	return useMutation<
 		ApplicationResponseData,
 		ServerError,
-		{ id: number | string; update?: Partial<ApplicationContentsResponse>; revisions?: Partial<SectionRevision> }
+		{ id: number | string; update?: Partial<ApplicationContentsResponse>; revisions: SectionRevision }
 	>({
 		mutationFn: async ({ id, update, revisions }) => {
 			let fields = state.fields;
