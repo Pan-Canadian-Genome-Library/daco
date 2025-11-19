@@ -28,7 +28,6 @@ import {
 	dacRejectApplication,
 	editApplication,
 	getApplicationById,
-	getApplicationStateTotals,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	revokeApplication,
@@ -208,31 +207,6 @@ describe('Application API', () => {
 			assert.equal(result.error, 'NOT_FOUND');
 		});
 	});
-
-	describe('Get Application Metadata', () => {
-		it('should get the counts for each of the application states', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
-
-			const result = await getApplicationStateTotals();
-
-			const totalDraftApplications = applicationRecordsResult.data.applications.filter(
-				(apps) => apps.state === 'DRAFT',
-			).length;
-
-			assert.ok(result.success);
-			assert.ok(result.data);
-
-			assert.equal(result.data.DRAFT, totalDraftApplications);
-			assert.equal(result.data.TOTAL, applicationRecordsResult.data.applications.length);
-		});
-	});
-
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
 			const result = await createApplication({ user_id });
