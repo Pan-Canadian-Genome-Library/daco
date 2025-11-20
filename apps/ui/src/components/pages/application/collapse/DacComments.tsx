@@ -17,32 +17,29 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { CaretRightFilled } from '@ant-design/icons';
+import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { Button, Collapse, Flex, Input, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import CommentEntry from './CommentEntry';
 import CommentLabel from './CommentLabel';
 
-type SectionComments = {
-	id: number;
-	application_id: number;
-	comments: string;
-	username: string;
-	dac_chair_only: boolean;
-	section: string;
-	created_at: Date | string;
-};
-
 interface DacCommentsProps {
-	sectionComments: SectionComments[];
+	sectionComments: DacCommentRecord[];
 }
 
 const DacComments = ({ sectionComments }: DacCommentsProps) => {
+	const {
+		state: { applicationUserRole },
+	} = useApplicationContext();
 	const { t: translate } = useTranslation();
 
-	const dacComments = sectionComments.filter((comment) => !comment.dac_chair_only);
-	const chairOnlyComments = sectionComments.filter((comment) => comment.dac_chair_only);
+	const shouldDisplayChairUI = applicationUserRole === 'DAC_CHAIR' || applicationUserRole === 'DAC_MEMBER';
+
+	const dacComments = sectionComments.filter((comment) => !comment.dacChairOnly);
+	const chairOnlyComments = sectionComments.filter((comment) => comment.dacChairOnly);
 
 	/**
 	 * The Dac Comments and For Chair Only dropdown collapse UI.
@@ -54,12 +51,12 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 			children: (
 				<>
 					<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
-						{chairOnlyComments.map((comment) => (
+						{dacComments.map((comment) => (
 							<CommentEntry
 								key={comment.id}
 								id={comment.id}
-								username={comment.username}
-								comments={comment.comments}
+								username={comment.userName}
+								comments={comment.message}
 								submittedAt={new Date()}
 							/>
 						))}
@@ -74,32 +71,36 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 			),
 			style: itemStyles,
 		},
-		{
-			key: '2',
-			label: <CommentLabel label={translate('generic.chairOnly')} numOfComments={chairOnlyComments.length} />,
-			children: (
-				<>
-					<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
-						{chairOnlyComments.map((comment) => (
-							<CommentEntry
-								key={comment.id}
-								id={comment.id}
-								username={comment.username}
-								comments={comment.comments}
-								submittedAt={new Date()}
-							/>
-						))}
-					</Flex>
-					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-						<Input />
-						<Button style={{ background: pcglColours.blue }} type="primary">
-							{translate('generic.send')}
-						</Button>
-					</Space.Compact>
-				</>
-			),
-			style: itemStyles,
-		},
+		...(shouldDisplayChairUI
+			? [
+					{
+						key: '2',
+						label: <CommentLabel label={translate('generic.chairOnly')} numOfComments={chairOnlyComments.length} />,
+						children: (
+							<>
+								<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
+									{chairOnlyComments.map((comment) => (
+										<CommentEntry
+											key={comment.id}
+											id={comment.id}
+											username={comment.userName}
+											comments={comment.message}
+											submittedAt={new Date()}
+										/>
+									))}
+								</Flex>
+								<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
+									<Input />
+									<Button style={{ background: pcglColours.blue }} type="primary">
+										{translate('generic.send')}
+									</Button>
+								</Space.Compact>
+							</>
+						),
+						style: itemStyles,
+					},
+				]
+			: []),
 	];
 
 	return (

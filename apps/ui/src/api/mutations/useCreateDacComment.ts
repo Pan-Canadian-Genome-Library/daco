@@ -46,7 +46,6 @@ const useCreateDacComments = () => {
 				message: error.message,
 			});
 		},
-		onSuccess: (data) => {},
 	});
 };
 
