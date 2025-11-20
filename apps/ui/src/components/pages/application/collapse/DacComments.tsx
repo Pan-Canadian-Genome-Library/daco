@@ -36,7 +36,7 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 	} = useApplicationContext();
 	const { t: translate } = useTranslation();
 
-	const shouldDisplayChairUI = applicationUserRole === 'DAC_CHAIR' || applicationUserRole === 'DAC_MEMBER';
+	const shouldEnableCreateComment = applicationUserRole === 'DAC_CHAIR' || applicationUserRole === 'DAC_MEMBER';
 
 	const dacComments = sectionComments.filter((comment) => !comment.dacChairOnly);
 	const chairOnlyComments = sectionComments.filter((comment) => comment.dacChairOnly);
@@ -61,17 +61,19 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 							/>
 						))}
 					</Flex>
-					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-						<Input />
-						<Button style={{ background: pcglColours.blue }} type="primary">
-							{translate('generic.send')}
-						</Button>
-					</Space.Compact>
+					{shouldEnableCreateComment ? (
+						<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
+							<Input />
+							<Button style={{ background: pcglColours.blue }} type="primary">
+								{translate('generic.send')}
+							</Button>
+						</Space.Compact>
+					) : null}
 				</>
 			),
 			style: itemStyles,
 		},
-		...(shouldDisplayChairUI
+		...(shouldEnableCreateComment && chairOnlyComments.length > 0
 			? [
 					{
 						key: '2',

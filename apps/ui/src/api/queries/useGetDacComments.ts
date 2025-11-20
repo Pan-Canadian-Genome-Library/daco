@@ -50,7 +50,7 @@ const useGetDacComments = ({
 		queryKey: [`comments-${applicationId}-${section}`],
 		enabled: shouldFetchComments,
 		queryFn: async () => {
-			if (shouldFetchComments) {
+			if (!shouldFetchComments) {
 				return [];
 			}
 			const response = await fetch(`/applications/${applicationId}/dac/comments/${section}`, {
