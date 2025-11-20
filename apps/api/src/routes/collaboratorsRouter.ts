@@ -153,7 +153,7 @@ collaboratorsRouter.get(
 			// TODO: Identify if the user role is institutional rep and is the rep for this application
 			const isApplicationInstitutionalRep = await isAssociatedRep(request.session, applicationId);
 
-			const isDacMember = userRole === 'DAC_MEMBER';
+			const isDacMember = userRole === 'DAC_MEMBER' || userRole === 'DAC_CHAIR';
 
 			if (!(isApplicationUser || isApplicationInstitutionalRep || isDacMember)) {
 				response
