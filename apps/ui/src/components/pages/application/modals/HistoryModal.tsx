@@ -89,7 +89,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 			destroyOnClose
 			footer={[]}
 			loading={isLoading}
-			onClose={closeModal}
+			onCancel={closeModal}
 			onOk={closeModal}
 			open={isOpen}
 			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
