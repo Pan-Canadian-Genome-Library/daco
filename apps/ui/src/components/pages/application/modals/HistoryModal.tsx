@@ -23,10 +23,9 @@ import { useTranslation } from 'react-i18next';
 import type { ApplicationResponseData } from '@pcgl-daco/data-model';
 
 import useGetApplication from '@/api/queries/useGetApplication';
-import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { pcglColours } from '@/providers/ThemeProvider';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 // TODO: Replace Mock Data
 const displayHistoryItems = ['Submitted', 'Reviewed', 'Revoked', 'Approved'];
@@ -86,24 +85,19 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 
 	return (
 		<Modal
-			width={'100%'}
-			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
-			open={isOpen}
 			closeIcon={true}
+			destroyOnClose
+			footer={[]}
+			loading={isLoading}
 			onClose={closeModal}
 			onOk={closeModal}
-			footer={[]}
-			destroyOnClose
+			open={isOpen}
+			style={{ top: '20%', maxWidth: '800px', paddingInline: 10 }}
+			title={translate('modals.history.title')}
+			width={'100%'}
 		>
 			<Flex justify="start" align="top" vertical>
-				<Title level={3} aria-level={1} style={{ marginTop: '0.5em', marginBottom: '1em' }}>
-					{translate('modals.history.title')}
-				</Title>
-				{isLoading ? (
-					<div style={{ margin: '1em 0' }}>
-						<SkeletonLoader />
-					</div>
-				) : isHistoryLoaded ? (
+				{isHistoryLoaded ? (
 					<>
 						<div style={{ marginBottom: '2em' }}>
 							<div>
@@ -126,7 +120,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 						<HistoryTimeline applicationData={applicationData} submissionDate={submissionDate} />
 					</>
 				) : (
-					<div style={{ margin: '1em 0' }}>{translate('modals.history.error')}</div>
+					<Text style={{ margin: '1em 0' }}>{translate('modals.history.error')}</Text>
 				)}
 				<Button style={{ width: '10%', alignSelf: 'end' }} type="primary" onClick={closeModal}>
 					{translate('modals.buttons.close')}
