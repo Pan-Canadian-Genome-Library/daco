@@ -34,8 +34,7 @@ type ErrorProps = {
 };
 
 export const errorStyles: React.CSSProperties = {
-	marginLeft: '18.25rem',
-	paddingRight: '5%',
+	paddingInline: '21%',
 	paddingTop: '1.75rem',
 };
 export const errorStylesCondensed: React.CSSProperties = {
