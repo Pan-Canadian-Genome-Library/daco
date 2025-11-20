@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ApplicationResponseData } from '@pcgl-daco/data-model';
 
-import useGetApplication from '@/api/queries/useGetApplication';
+import useGetApplicationHistory from '@/api/queries/useGetApplicationHistory';
 import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Text } = Typography;
@@ -75,8 +75,7 @@ interface HistoryModalProps {
 }
 
 const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
-	// TODO: Replace Mock Data
-	const { data: applicationData, isError, isLoading } = useGetApplication(id);
+	const { data: applicationData, isError, isLoading } = useGetApplicationHistory(id);
 	const displayId = `PCGL-${id}`;
 	const isHistoryLoaded = !isLoading && applicationData !== undefined && !isError;
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
