@@ -1,0 +1,163 @@
+# Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+paths:
+  /applications/{applicationId}/dac-member/submit-comment:
+    post:
+      tags:
+        - Comments
+      summary: Submit a comment to an application. Can be used to comment specifically for the DAC chair.
+      description: Allows DAC members to submit comments to an application.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Request body containing comment request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+                - section
+                - toDacChair
+              properties:
+                message:
+                  type: string
+                  minLength: 5
+                  description: Comment message content
+                section:
+                  type: string
+                  description: Application section the comment relates to. Must be one of the allowed enum values.
+                  enum:
+                    - intro
+                    - applicant
+                    - institutional
+                    - collaborators
+                    - project
+                    - study
+                    - ethics
+                    - agreement
+                    - appendices
+                    - sign
+                toDacChair:
+                  type: boolean
+                  description: Whether this comment is specifically for the DAC chair
+      responses:
+        '200':
+          description: 'Comment successfully submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Comment ID
+                  applicationId:
+                    type: integer
+                    description: Application ID the comment belongs to
+                  userId:
+                    type: string
+                    description: ID of the user who created the comment
+                  message:
+                    type: string
+                    description: Comment message content
+                  userName:
+                    type: string
+                    description: Name of the user who created the comment
+                  section:
+                    type: string
+                    description: Application section the comment relates to
+                  dacChairOnly:
+                    type: boolean
+                    description: Whether this comment is only visible to DAC chair
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Comment creation timestamp
+        '500':
+          description: 'Server Error - unable to submit comment request.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+  /applications/{applicationId}/dac/comments/{section}:
+    get:
+      tags:
+        - Comments
+      summary: Retrieve an array of comments for the application and section provided
+      description: |
+        <br/> Allows users to retrieve dac comments by application id and section.
+        <br/> section must match the following [`intro`,`applicant`,`institutional`,`collaborators`, `project`, `study`, `ethics`, `agreement`, `appendices`, `sign`]
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            parameters:
+        - name: section
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Comment successfully retrieved'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Comment ID
+                    applicationId:
+                      type: integer
+                      description: Application ID the comment belongs to
+                    userId:
+                      type: string
+                      description: ID of the user who created the comment
+                    message:
+                      type: string
+                      description: Comment message content
+                    userName:
+                      type: string
+                      description: Name of the user who created the comment
+                    section:
+                      type: string
+                      description: Application section the comment relates to
+                    dacChairOnly:
+                      type: boolean
+                      description: Whether this comment is only visible to DAC chair
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: Comment creation timestamp
+        '500':
+          description: 'Server Error - unable to submit comment request.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
