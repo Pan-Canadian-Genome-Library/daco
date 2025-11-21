@@ -42,6 +42,9 @@ export const pcglColours = {
 	grey: '#D9D9D9',
 	greyLight: '#FAFAFA',
 	darkGrey: 'rgba(0, 0, 0, 0.45)',
+	blue: '#2F54EB',
+	lighterBlue: '#1677FF',
+	geekBlue: '#F0F5FF',
 };
 
 // General Theme Configurations
