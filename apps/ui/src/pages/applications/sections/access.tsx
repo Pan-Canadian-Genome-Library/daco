@@ -43,8 +43,8 @@ const rule = createSchemaFieldRule(agreementsSchema);
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'agreement', isEditMode });
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'agreement', isEditMode, userRole: state.applicationUserRole });
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {
 		control,
