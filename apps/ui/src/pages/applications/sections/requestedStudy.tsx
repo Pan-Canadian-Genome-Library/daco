@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
@@ -59,7 +60,7 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const canEdit = canEditSection({ revisions, section: 'study', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
@@ -116,6 +117,7 @@ const RequestedStudy = () => {
 					}
 				/>
 				<Row>
+					<DacComments sectionComments={dacComments} section="study" />
 					<RevisionsAlert sectionRevisions={revisions['study']} />
 				</Row>
 				<SectionContent showDivider={false}>
