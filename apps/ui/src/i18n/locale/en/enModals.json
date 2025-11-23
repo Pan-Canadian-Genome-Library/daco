@@ -2,7 +2,17 @@
 	"modals": {
 		"buttons": {
 			"cancel": "Cancel",
+			"close": "Close",
 			"ok": "OK"
+		},
+		"history": {
+			"title": "Application History",
+			"applicationId": "Application ID",
+			"submissionDate": "Submission Date",
+			"currentStatus": "Current Status",
+			"lastUpdated": "Last Updated",
+			"timelineItem": " by {{applicantFirstName}} at {{submissionDate}}",
+			"error": "There was an error retrieving your Application History"
 		},
 		"requestRevisions": {
 			"title": "Request Revisions",

@@ -12,13 +12,15 @@ The primary motivation is that this allows the static web application to know ho
 
 ### Managing Configuration
 
-For the DACO UI, there is a single environment variable that needs to be provided, that is the URL to use to proxy requests to the API: `API_URL`.
+For the DACO UI, there are some environment variables that needs to be provided, one is the URL to use to proxy requests to the API: `API_URL`.
 
-In development, this variable is set in the `/apps/ui/.env` file, as described in the [`/apps/ui/.env.schema`](../apps/ui/.env.schema). The default value `http://localhost:3001` will connect to the DACO API when running locally with the default configuration.
+In development, this variable is set in the `/apps/ui/.env` file, as described in the [`/apps/ui/.env.schema`](../apps/ui/.env.schema). The default value `http://localhost:3000` will connect to the DACO API when running locally with the default configuration.
 
 This variable is not required when building the DACO UI Docker image.
 
 When running the DACO UI Docker image, the `API_URL` variable needs to be provided as an environment variable. When the Docker container starts, this variable will be used to update the nginx configuation to proxy requests to wherever the DACO API is hosted.
+
+Another environment variable required by DACO UI is `VITE_SELF_ENROLMENT_URL`, this value specifies the URL used for new user registration, typically pointing to the CoManage self-enrolment flow
 
 ### The Proxy Path
 
