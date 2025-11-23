@@ -64,14 +64,14 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 			label: <CommentLabel label={translate('generic.dacComment')} numOfComments={dacComments.length} />,
 			children: (
 				<>
-					<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
-						{dacComments.map((comment) => (
+					<Flex style={{ flexDirection: 'column-reverse', overflow: 'scroll', maxHeight: '200px' }}>
+						{dacComments.reverse().map((comment) => (
 							<CommentEntry
 								key={comment.id}
 								id={comment.id}
 								username={comment.userName}
 								comments={comment.message}
-								submittedAt={new Date()}
+								submittedAt={comment.created_at} // TODO: update casing after backend is updated
 							/>
 						))}
 					</Flex>
@@ -95,14 +95,14 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 			label: <CommentLabel label={translate('generic.chairOnly')} numOfComments={chairOnlyComments.length} />,
 			children: (
 				<>
-					<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
-						{chairOnlyComments.map((comment) => (
+					<Flex style={{ flexDirection: 'column-reverse', overflow: 'auto', maxHeight: '200px' }}>
+						{chairOnlyComments.reverse().map((comment) => (
 							<CommentEntry
 								key={comment.id}
 								id={comment.id}
 								username={comment.userName}
 								comments={comment.message}
-								submittedAt={new Date()}
+								submittedAt={comment.created_at}
 							/>
 						))}
 					</Flex>
