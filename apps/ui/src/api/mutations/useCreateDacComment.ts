@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { useMutation } from '@tanstack/react-query';
-import { notification } from 'antd';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { queryClient } from '@/providers/Providers';
 import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { SectionRoutesValues } from '@pcgl-daco/validation';
+import { useTranslation } from 'react-i18next';
 import { withErrorResponseHandler } from '../apiUtils';
 
 type CreateDacCommentsType = {
@@ -38,6 +39,9 @@ const useCreateDacComments = ({
 	applicationId: string | number;
 	section: SectionRoutesValues;
 }) => {
+	const notification = useNotificationContext();
+	const { t: translate } = useTranslation();
+
 	return useMutation<DacCommentRecord, ServerError, CreateDacCommentsType>({
 		mutationFn: async ({ message, toDacChair }) => {
 			const response = await fetch(`/applications/${applicationId}/dac-member/submit-comment`, {
@@ -52,13 +56,20 @@ const useCreateDacComments = ({
 			return await response.json();
 		},
 		onError: (error) => {
-			notification.error({
+			notification.openNotification({
+				type: 'error',
 				message: error.message,
 			});
 		},
 		onSuccess: async (data) => {
 			await queryClient.setQueryData([`comments-${applicationId}-${section}`], (prev: DacCommentRecord[]) => {
 				return [...prev, data];
+			});
+
+			notification.openNotification({
+				type: 'success',
+				message: translate('notifications.createDacComment.successTitle'),
+				description: translate('notifications.createDacComment.successMessage'),
 			});
 		},
 	});

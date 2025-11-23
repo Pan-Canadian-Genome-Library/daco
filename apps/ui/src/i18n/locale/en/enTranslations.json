@@ -199,5 +199,11 @@
 		"dacComment": "DAC Comments",
 		"chairOnly": "For Chair Only",
 		"send": "Send"
+	},
+	"notifications": {
+		"createDacComment": {
+			"successTitle": "DAC Comment Submitted",
+			"successMessage": "DAC comment submitted successfully"
+		}
 	}
 }
