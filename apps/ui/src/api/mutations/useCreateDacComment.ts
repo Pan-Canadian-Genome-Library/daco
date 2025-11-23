@@ -21,22 +21,32 @@ import { notification } from 'antd';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { queryClient } from '@/providers/Providers';
 import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { SectionRoutesValues } from '@pcgl-daco/validation';
 import { withErrorResponseHandler } from '../apiUtils';
 
 type CreateDacCommentsType = {
-	applicationId: string | number;
 	message: string;
 	toDacChair: boolean;
-	section: SectionRoutesValues;
 };
 
-const useCreateDacComments = () => {
+const useCreateDacComments = ({
+	applicationId,
+	section,
+}: {
+	applicationId: string | number;
+	section: SectionRoutesValues;
+}) => {
 	return useMutation<DacCommentRecord, ServerError, CreateDacCommentsType>({
-		mutationFn: async ({ applicationId }) => {
+		mutationFn: async ({ message, toDacChair }) => {
 			const response = await fetch(`/applications/${applicationId}/dac-member/submit-comment`, {
 				method: 'POST',
+				body: JSON.stringify({
+					message,
+					toDacChair,
+					section,
+				}),
 			}).then(withErrorResponseHandler);
 
 			return await response.json();
@@ -44,6 +54,11 @@ const useCreateDacComments = () => {
 		onError: (error) => {
 			notification.error({
 				message: error.message,
+			});
+		},
+		onSuccess: async (data) => {
+			await queryClient.setQueryData([`comments-${applicationId}-${section}`], (prev: DacCommentRecord[]) => {
+				return [...prev, data];
 			});
 		},
 	});

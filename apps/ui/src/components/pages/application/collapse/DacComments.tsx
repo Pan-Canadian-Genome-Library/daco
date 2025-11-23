@@ -17,29 +17,43 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import useCreateDacComments from '@/api/mutations/useCreateDacComment';
+import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { CaretRightFilled } from '@ant-design/icons';
 import { DacCommentRecord } from '@pcgl-daco/data-model';
+import { SectionRoutesValues } from '@pcgl-daco/validation';
 import { Button, Collapse, Flex, Input, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 import CommentEntry from './CommentEntry';
 import CommentLabel from './CommentLabel';
 
+const { Search } = Input;
+
 interface DacCommentsProps {
 	sectionComments: DacCommentRecord[];
+	section: SectionRoutesValues;
 }
 
-const DacComments = ({ sectionComments }: DacCommentsProps) => {
+const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
+	const { appId } = useOutletContext<ApplicationOutletContext>();
+
 	const {
 		state: { applicationUserRole },
 	} = useApplicationContext();
 	const { t: translate } = useTranslation();
+	const { mutate: createComment } = useCreateDacComments({ applicationId: appId, section });
 
-	const shouldEnableCreateComment = applicationUserRole === 'DAC_CHAIR' || applicationUserRole === 'DAC_MEMBER';
+	const shouldShowDacComments = applicationUserRole === 'DAC_CHAIR' || applicationUserRole === 'DAC_MEMBER';
 
 	const dacComments = sectionComments.filter((comment) => !comment.dacChairOnly);
 	const chairOnlyComments = sectionComments.filter((comment) => comment.dacChairOnly);
+
+	const onCreateCommentHandler = async (comment: string, toDacChair: boolean) => {
+		createComment({ message: comment, toDacChair });
+	};
 
 	/**
 	 * The Dac Comments and For Chair Only dropdown collapse UI.
@@ -61,66 +75,67 @@ const DacComments = ({ sectionComments }: DacCommentsProps) => {
 							/>
 						))}
 					</Flex>
-					{shouldEnableCreateComment ? (
-						<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-							<Input />
-							<Button style={{ background: pcglColours.blue }} type="primary">
-								{translate('generic.send')}
-							</Button>
-						</Space.Compact>
-					) : null}
+					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
+						<Search
+							min={5}
+							onSearch={(value) => onCreateCommentHandler(value, false)}
+							enterButton={
+								<Button style={{ background: pcglColours.blue }} type="primary">
+									{translate('generic.send')}
+								</Button>
+							}
+						/>
+					</Space.Compact>
 				</>
 			),
 			style: itemStyles,
 		},
-		...(shouldEnableCreateComment && chairOnlyComments.length > 0
-			? [
-					{
-						key: '2',
-						label: <CommentLabel label={translate('generic.chairOnly')} numOfComments={chairOnlyComments.length} />,
-						children: (
-							<>
-								<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
-									{chairOnlyComments.map((comment) => (
-										<CommentEntry
-											key={comment.id}
-											id={comment.id}
-											username={comment.userName}
-											comments={comment.message}
-											submittedAt={new Date()}
-										/>
-									))}
-								</Flex>
-								<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-									<Input />
-									<Button style={{ background: pcglColours.blue }} type="primary">
-										{translate('generic.send')}
-									</Button>
-								</Space.Compact>
-							</>
-						),
-						style: itemStyles,
-					},
-				]
-			: []),
+		{
+			key: '2',
+			label: <CommentLabel label={translate('generic.chairOnly')} numOfComments={chairOnlyComments.length} />,
+			children: (
+				<>
+					<Flex vertical style={{ overflow: 'auto', maxHeight: '200px' }}>
+						{chairOnlyComments.map((comment) => (
+							<CommentEntry
+								key={comment.id}
+								id={comment.id}
+								username={comment.userName}
+								comments={comment.message}
+								submittedAt={new Date()}
+							/>
+						))}
+					</Flex>
+					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
+						<Search
+							onSearch={(value) => onCreateCommentHandler(value, true)}
+							enterButton={
+								<Button style={{ background: pcglColours.blue }} type="primary">
+									{translate('generic.send')}
+								</Button>
+							}
+						/>
+					</Space.Compact>
+				</>
+			),
+			style: itemStyles,
+		},
 	];
 
-	return (
-		<>
-			<Collapse
-				accordion
-				bordered={false}
-				style={{
-					width: '100%',
-				}}
-				expandIcon={({ isActive }) => (
-					<CaretRightFilled style={{ color: pcglColours.darkGrey, fontSize: '1.4rem' }} rotate={isActive ? 90 : -90} />
-				)}
-				items={DACOptions}
-				expandIconPosition={'end'}
-			/>
-		</>
-	);
+	return shouldShowDacComments ? (
+		<Collapse
+			accordion
+			bordered={false}
+			style={{
+				width: '100%',
+			}}
+			expandIcon={({ isActive }) => (
+				<CaretRightFilled style={{ color: pcglColours.darkGrey, fontSize: '1.4rem' }} rotate={isActive ? 90 : -90} />
+			)}
+			items={DACOptions}
+			expandIconPosition={'end'}
+		/>
+	) : null;
 };
 
 export default DacComments;

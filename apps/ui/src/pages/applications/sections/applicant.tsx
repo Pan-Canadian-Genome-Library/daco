@@ -124,7 +124,7 @@ const Applicant = () => {
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} />
+					<DacComments sectionComments={dacComments} section="applicant" />
 					<RevisionsAlert sectionRevisions={revisions['applicant']} />
 				</Row>
 				<SectionContent title={translate('applicant-section.section1')}>
