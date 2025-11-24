@@ -25,6 +25,7 @@ import useGetDownload from '@/api/queries/useGetDownload';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import ApproveApplicationModal from '@/components/pages/application/modals/ApproveApplicationModal';
 import CloseApplicationModal from '@/components/pages/application/modals/CloseApplicationModal';
+import HistoryModal from '@/components/pages/application/modals/HistoryModal';
 import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import RevokeApplicationModal from '@/components/pages/application/modals/RevokeApplicationModal';
@@ -59,6 +60,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLGMax;
+
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showReqRevisionsSuccessModal, setShowReqRevisionsSuccessModal] = useState(false);
@@ -66,7 +68,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showRevokeModal, setShowRevokeModal] = useState(false);
 	const [showApprovalModal, setShowApprovalModal] = useState(false);
-
+	const [showHistoryModal, setShowHistoryModal] = useState(false);
 	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
 	const [showRevokeSuccessModal, setShowRevokeSuccessModal] = useState(false);
 	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
@@ -121,6 +123,17 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const renderHeaderButtons = () => {
 		const buttons = [];
 		const canShowEdit = (appState === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
+
+		buttons.push(
+			<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>,
+			<Button
+				onClick={() => {
+					setShowHistoryModal(true);
+				}}
+			>
+				{translate('button.history')}
+			</Button>,
+		);
 
 		if (canShowEdit) {
 			buttons.push(
@@ -305,6 +318,13 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				okText={translate('modals.buttons.ok')}
 				isOpen={showSuccessApproveModal}
 				onOk={() => setShowSuccessApproveModal(false)}
+			/>
+			<HistoryModal
+				id={id}
+				isOpen={showHistoryModal}
+				closeModal={() => {
+					setShowHistoryModal(false);
+				}}
 			/>
 		</PageHeader>
 	);
