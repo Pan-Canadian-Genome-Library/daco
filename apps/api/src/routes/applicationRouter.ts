@@ -1060,6 +1060,11 @@ applicationRouter.get(
 					return;
 				}
 
+				if (!section) {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
+					return;
+				}
+
 				//  Need to check if user belongs to this application to retrieve comments
 				if (userRole === 'APPLICANT') {
 					const applicationResult = await getApplicationById({ applicationId: Number(applicationId) });
@@ -1075,11 +1080,6 @@ applicationRouter.get(
 					}
 				}
 
-				if (!section) {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
-					return;
-				}
-
 				const result = await getDacComments({
 					applicationId: Number(applicationId),
 					section,
@@ -1091,7 +1091,21 @@ applicationRouter.get(
 					return;
 				}
 
-				response.status(201).json(result.data);
+				// Return all comments if user is DAC chair
+				if (userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER') {
+					response.status(201).json(result.data);
+					return;
+				}
+
+				//  Return dacChairOnly comments if user made the comment
+				const filteredComments = result.data.filter((comment) => {
+					if (comment.dacChairOnly && comment.userId !== user.userId) {
+						return false;
+					}
+					return true;
+				});
+
+				response.status(201).json(filteredComments);
 				return;
 			} catch (error) {
 				response.status(500).json({
