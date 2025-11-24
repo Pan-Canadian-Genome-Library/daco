@@ -170,7 +170,7 @@ export const revokeApplicationRequestSchema = z.object({
 });
 
 export const submitDacCommentsSchema = z.object({
-	message: z.string().min(5),
+	message: z.string().min(2),
 	section: z.nativeEnum(SectionRoutes),
 	toDacChair: z.boolean(),
 });
