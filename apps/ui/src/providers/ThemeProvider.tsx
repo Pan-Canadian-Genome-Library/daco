@@ -87,6 +87,14 @@ const pcglTheme: ThemeConfig = {
 			defaultColor: pcglColours.black,
 			defaultBg: pcglColours.white,
 		},
+		Timeline: {
+			dotBorderWidth: 3,
+			dotBg: pcglColours.white,
+			itemPaddingBottom: 40,
+			paddingXXS: 0,
+			tailColor: pcglColours.primary,
+			tailWidth: 4,
+		},
 		Typography: {
 			fontSize: 16,
 		},

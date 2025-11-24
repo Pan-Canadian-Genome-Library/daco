@@ -605,7 +605,7 @@ const applicationSvc = (db: PostgresDb) => ({
 						userName: dacComments.user_name,
 						section: dacComments.section,
 						dacChairOnly: dacComments.dac_chair_only,
-						created_at: dacComments.created_at,
+						createdAt: dacComments.created_at,
 					});
 				if (!commentRecord[0]) throw new Error('Failed to insert dac comment');
 				// Returning the inserted comment
@@ -639,7 +639,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					userName: dacComments.user_name,
 					section: dacComments.section,
 					dacChairOnly: dacComments.dac_chair_only,
-					created_at: dacComments.created_at,
+					createdAt: dacComments.created_at,
 				})
 				.from(dacComments)
 				.where(

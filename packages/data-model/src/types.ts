@@ -392,5 +392,5 @@ export type DacCommentRecord = {
 	userName: string;
 	section: string;
 	dacChairOnly: boolean;
-	created_at: Date;
+	createdAt: Date;
 };
