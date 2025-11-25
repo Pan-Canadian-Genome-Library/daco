@@ -28,8 +28,8 @@ import {
 	dacRejectApplication,
 	editApplication,
 	getApplicationById,
-	getRevisions,
 	requestApplicationRevisionsByDac,
+	requestApplicationRevisionsByInstitutionalRep,
 	revokeApplication,
 	submitApplication,
 	submitRevision,
@@ -532,18 +532,22 @@ describe('Application API', () => {
 	});
 
 	describe('getRevisions', () => {
-		it('should fetch revisions for a valid applicationId where revisions exist', async () => {
-			// Arrange: Add revisions to the database for a specific application
-			const applicationId = testApplicationId;
-			await testApplicationRepo.createRevisionRequest({
-				applicationId,
+		it('DAC revisions request should fail if not state is NOT in DAC_REVIEW', async () => {
+			// Find application that is not in DAC_REVIEW state
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id, state: ['APPROVED'] });
+			assert.ok(applicationRecordsResult.success);
+			const testAppId = applicationRecordsResult.data.applications[0]?.id;
+			assert.ok(testAppId);
+
+			const result = await requestApplicationRevisionsByDac({
+				applicationId: testAppId,
 				revisionData: {
+					application_id: testAppId,
 					agreements_approved: false,
 					appendices_approved: false,
 					ethics_approved: false,
 					sign_and_submit_approved: true,
-					application_id: applicationId,
-					comments: 'Initial revision',
+					comments: 'SHOULD FAIL',
 					applicant_approved: false,
 					institution_rep_approved: false,
 					collaborators_approved: false,
@@ -553,13 +557,37 @@ describe('Application API', () => {
 				},
 			});
 
-			// Act: Call the getRevisions method
-			const result = await getRevisions({ applicationId });
+			assert.ok(!result.success);
+			assert.ok(result.error === 'INVALID_STATE_TRANSITION');
+		});
 
-			// Assert: Verify that revisions are fetched successfully
-			assert.ok(result.success, 'Expected revisions to be fetched successfully');
-			assert.ok(Array.isArray(result.data), 'Expected revisions to be an array');
-			assert.strictEqual(result.data.length, 1, 'Expected one revision to be returned');
+		it('REP revisions request should fail if not state is NOT in INSTITUTIONAL_REP_REVIEW', async () => {
+			// Find application that is not in DAC_REVIEW state
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id, state: ['APPROVED'] });
+			assert.ok(applicationRecordsResult.success);
+			const testAppId = applicationRecordsResult.data.applications[0]?.id;
+			assert.ok(testAppId);
+
+			const result = await requestApplicationRevisionsByInstitutionalRep({
+				applicationId: testAppId,
+				revisionData: {
+					application_id: testAppId,
+					agreements_approved: false,
+					appendices_approved: false,
+					ethics_approved: false,
+					sign_and_submit_approved: true,
+					comments: 'SHOULD FAIL',
+					applicant_approved: false,
+					institution_rep_approved: false,
+					collaborators_approved: false,
+					project_approved: false,
+					requested_studies_approved: false,
+					created_at: new Date(),
+				},
+			});
+
+			assert.ok(!result.success);
+			assert.ok(result.error === 'INVALID_STATE_TRANSITION');
 		});
 	});
 
