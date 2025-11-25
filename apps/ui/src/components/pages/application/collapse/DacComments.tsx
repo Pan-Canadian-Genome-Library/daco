@@ -71,7 +71,7 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 								id={comment.id}
 								username={comment.userName}
 								comments={comment.message}
-								submittedAt={comment.created_at} // TODO: update casing after backend is updated
+								submittedAt={comment.createdAt}
 							/>
 						))}
 					</Flex>
@@ -102,7 +102,7 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 								id={comment.id}
 								username={comment.userName}
 								comments={comment.message}
-								submittedAt={comment.created_at}
+								submittedAt={comment.createdAt}
 							/>
 						))}
 					</Flex>
