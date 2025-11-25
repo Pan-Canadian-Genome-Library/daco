@@ -28,3 +28,5 @@ tags:
     description: Operations related to files associated with a PCGL Application.
   - name: Health
     description: Meta information related to the health of the application, and various application components.
+  - name: Comments
+    description: Operations related to DAC comments associated with a PCGL Application.

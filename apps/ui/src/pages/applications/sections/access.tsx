@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import CheckboxGroup, { type CheckboxGroupOptions } from '@/components/pages/application/form-components/CheckboxGroup';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
@@ -42,7 +43,7 @@ const rule = createSchemaFieldRule(agreementsSchema);
 
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const canEdit = canEditSection({ revisions, section: 'agreement', isEditMode });
 	const { state, dispatch } = useApplicationContext();
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
@@ -119,6 +120,7 @@ const AccessAgreement = () => {
 					</Row>
 				</SectionContent>
 				<Row>
+					<DacComments sectionComments={dacComments} section="agreement" />
 					<RevisionsAlert sectionRevisions={revisions['agreement']} />
 				</Row>
 				<SectionContent title={translate('data-access-section.section3.title')}>

@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { SectionRevision, UserRole } from '@pcgl-daco/validation';
 import { RuleRender } from 'antd/es/form';
@@ -60,6 +61,7 @@ export interface ApplicationOutletContext {
 	isEditMode: boolean;
 	revisions: SectionRevision;
 	userRole: UserRole;
+	dacComments: DacCommentRecord[];
 }
 
 export interface BasicFormFieldProps {

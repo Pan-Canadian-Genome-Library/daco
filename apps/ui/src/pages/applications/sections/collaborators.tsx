@@ -25,6 +25,7 @@ import { useOutletContext } from 'react-router';
 
 import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
 import DeleteCollaboratorModal from '@/components/pages/application/modals/DeleteCollaboratorModal';
 import EditCollaboratorModal from '@/components/pages/application/modals/EditCollaboratorModal';
@@ -50,7 +51,7 @@ export interface ModalStateProps extends ModalState {
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const canEdit = canEditSection({ revisions, section: 'collaborators', isEditMode });
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);
@@ -126,6 +127,7 @@ const Collaborators = () => {
 					showDivider={false}
 				/>
 				<Row>
+					<DacComments sectionComments={dacComments} section="collaborators" />
 					<RevisionsAlert sectionRevisions={revisions['collaborators']} />
 				</Row>
 				<SectionContent showDivider={false}>
