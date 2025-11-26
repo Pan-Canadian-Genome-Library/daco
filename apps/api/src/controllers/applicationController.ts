@@ -1074,7 +1074,7 @@ export const submitDacComment = async ({
 
 		return result;
 	} catch (error) {
-		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
+		const message = `Failed to submit dac comment for applicationId: ${applicationId}`;
 		logger.error(message, error);
 		return failure('SYSTEM_ERROR', message);
 	}
@@ -1097,7 +1097,7 @@ export const getDacComments = async ({
 
 		return result;
 	} catch (error) {
-		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
+		const message = `Failed to retrieve dac comments for applicationId: ${applicationId} on section: ${section}`;
 		logger.error(message, error);
 		return failure('SYSTEM_ERROR', message);
 	}

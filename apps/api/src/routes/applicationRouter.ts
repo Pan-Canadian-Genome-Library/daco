@@ -1080,10 +1080,12 @@ applicationRouter.get(
 					}
 				}
 
+				const isDacRole = userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER';
+
 				const result = await getDacComments({
 					applicationId: Number(applicationId),
 					section,
-					isDac: userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER',
+					isDac: isDacRole,
 				});
 
 				if (!result.success) {
@@ -1092,7 +1094,7 @@ applicationRouter.get(
 				}
 
 				// Return all comments if user is DAC chair
-				if (userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER') {
+				if (isDacRole) {
 					response.status(201).json(result.data);
 					return;
 				}

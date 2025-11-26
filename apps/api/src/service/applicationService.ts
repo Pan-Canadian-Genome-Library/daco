@@ -23,18 +23,18 @@ import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.ts';
 import { dacComments } from '@/db/schemas/dacComments.ts';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { ApplicationStateTotals, DacCommentRecord, RevisionsDTO } from '@pcgl-daco/data-model';
+import { RevisionsDTO, type ApplicationStateTotals, type DacCommentRecord } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
 	type ApplicationListResponse,
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { SectionRoutesValues } from '@pcgl-daco/validation';
-import { collaborators } from '../db/schemas/collaborators.ts';
+import { type SectionRoutesValues } from '@pcgl-daco/validation';
 import {
 	type ApplicationActionRecord,
 	type ApplicationContentModel,
