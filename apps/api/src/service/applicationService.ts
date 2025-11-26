@@ -23,16 +23,18 @@ import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.ts';
+import { dacComments } from '@/db/schemas/dacComments.ts';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { ApplicationStateTotals, RevisionsDTO } from '@pcgl-daco/data-model';
+import { RevisionsDTO, type ApplicationStateTotals, type DacCommentRecord } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
 	type ApplicationListResponse,
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { collaborators } from '../db/schemas/collaborators.ts';
+import { type SectionRoutesValues } from '@pcgl-daco/validation';
 import {
 	type ApplicationActionRecord,
 	type ApplicationContentModel,
@@ -561,6 +563,98 @@ const applicationSvc = (db: PostgresDb) => ({
 		} catch (err) {
 			const message = `Error at updateApplicationActionRecord with action id: ${actionId}`;
 			logger.error(message, err);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	createDacComment: async ({
+		applicationId,
+		message,
+		userId,
+		userName,
+		section,
+		toDacChair,
+		transaction,
+	}: {
+		applicationId: number;
+		message: string;
+		userId: string;
+		userName: string;
+		section: SectionRoutesValues;
+		toDacChair: boolean;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<DacCommentRecord, 'SYSTEM_ERROR'> => {
+		try {
+			const dbTransaction = transaction ? transaction : db;
+
+			const result = await dbTransaction.transaction(async (tx) => {
+				const commentRecord = await tx
+					.insert(dacComments)
+					.values({
+						application_id: applicationId,
+						user_id: userId,
+						message,
+						user_name: userName,
+						section: section.toUpperCase(),
+						dac_chair_only: toDacChair,
+					})
+					.returning({
+						id: dacComments.id,
+						applicationId: dacComments.application_id,
+						userId: dacComments.user_id,
+						message: dacComments.message,
+						userName: dacComments.user_name,
+						section: dacComments.section,
+						dacChairOnly: dacComments.dac_chair_only,
+						createdAt: dacComments.created_at,
+					});
+				if (!commentRecord[0]) throw new Error('Failed to insert dac comment');
+				// Returning the inserted comment
+				return commentRecord[0];
+			});
+
+			return success(result);
+		} catch (error) {
+			const message = `Error creating DAC comment for applicationId: ${applicationId}`;
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	getDacComment: async ({
+		applicationId,
+		section,
+		isDac,
+	}: {
+		applicationId: number;
+		section: string;
+		isDac: boolean;
+	}): AsyncResult<DacCommentRecord[], 'SYSTEM_ERROR'> => {
+		try {
+			const commentRecord = await db
+				.select({
+					id: dacComments.id,
+					applicationId: dacComments.application_id,
+					userId: dacComments.user_id,
+					message: dacComments.message,
+					userName: dacComments.user_name,
+					section: dacComments.section,
+					dacChairOnly: dacComments.dac_chair_only,
+					createdAt: dacComments.created_at,
+				})
+				.from(dacComments)
+				.where(
+					and(
+						eq(dacComments.application_id, applicationId), // Grab specific application id
+						eq(dacComments.section, section.toUpperCase()), // Grab specific section
+						isDac ? undefined : eq(dacComments.dac_chair_only, false), // if is dac, then we can return chair comments
+					),
+				);
+
+			return success(commentRecord);
+		} catch (error) {
+			const message = `Error retrieving DAC comments for applicationId: ${applicationId}`;
+			logger.error(message, error);
+
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
