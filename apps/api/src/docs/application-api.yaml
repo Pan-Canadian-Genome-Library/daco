@@ -575,3 +575,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
+  /applications/{applicationId}/history:
+    get:
+      tags:
+        - Applications
+      summary: Gets all Actions for a specified application ID.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: string
+          description: Retrieve the history for the specified application.
+          required: true
+      responses:
+        '401':
+          description: Unauthorized. Will occur when the user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '403':
+          description: Forbidden. You do not own, or have the rights to access this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Cannot retrieve application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
+        '404':
+          description: 'Error retrieving application by ID - Application not found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '200':
+          description: 'Application retrieved'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ApplicationResponse'
