@@ -20,50 +20,17 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { withErrorResponseHandler } from '@/api/apiUtils';
-import { isRepUser } from '@/components/pages/application/utils/authUtils';
-import { isRestrictedApplicationContentsKey } from '@/components/pages/application/utils/validatorKeys';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { useUserContext } from '@/providers/UserProvider';
-import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model';
-import { userRoleSchema } from '@pcgl-daco/validation';
+import { type ApplicationResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplicationHistory = (id?: string | number) => {
-	const { state, dispatch } = useApplicationContext();
-	const { role, user } = useUserContext();
-
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [`application-${id}`],
 		queryFn: async () => {
-			const response = await fetch(`/applications/${id}`).then(withErrorResponseHandler);
+			const response = await fetch(`/applications/${id}/history`).then(withErrorResponseHandler);
 
 			return await response.json().then((data: ApplicationResponseData) => {
-				// Filter out data if they contain null values and application metadata
-				if (data.contents) {
-					const fields = Object.entries(data.contents).reduce((acc, item) => {
-						const [key, value] = item;
-						if (value !== null && isRestrictedApplicationContentsKey(key)) {
-							acc[key] = value;
-						}
-
-						return acc;
-					}, {} as Partial<ApplicationContentsResponse>);
-
-					dispatch({
-						type: 'UPDATE_APPLICATION',
-						payload: {
-							...state,
-							// INSTITUTIONAL_REP role is specific to Application page only,
-							// since reps are determined by email comparison, we can check it here
-							applicationUserRole: isRepUser(fields.institutionalRepEmail, user)
-								? userRoleSchema.Values.INSTITUTIONAL_REP
-								: role,
-							applicationState: data.state,
-							fields,
-						},
-					});
-				}
 				return data;
 			});
 		},

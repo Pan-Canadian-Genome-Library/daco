@@ -1093,4 +1093,60 @@ applicationRouter.get(
 	),
 );
 
+applicationRouter.get(
+	'/:applicationId/history',
+	authMiddleware(),
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<
+				ApplicationResponseData,
+				['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
+			>,
+		) => {
+			const { applicationId } = request.params;
+
+			try {
+				const applicationInfo = await getApplicationById({ applicationId: Number(applicationId) });
+
+				if (!applicationInfo.success) {
+					switch (applicationInfo.error) {
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						case 'SYSTEM_ERROR':
+						default:
+							response.status(500);
+							break;
+					}
+					response.send({
+						error: applicationInfo.error,
+						message: applicationInfo.message,
+					});
+
+					return;
+				}
+
+				// const result = await getRevisions({ applicationId: Number(applicationId) });
+
+				// if (!result.success) {
+				// response.status(500).json({ error: result.error, message: result.message });
+				// return;
+				// }
+
+				response.status(200).json(applicationInfo.data);
+				return;
+			} catch (error) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: "We're sorry, an unexpected error occurred. Please try again later.",
+				});
+				return;
+			}
+		},
+	),
+);
+
 export default applicationRouter;

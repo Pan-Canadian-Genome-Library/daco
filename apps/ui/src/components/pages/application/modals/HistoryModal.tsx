@@ -76,6 +76,7 @@ interface HistoryModalProps {
 
 const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 	const { data: applicationData, isError, isLoading } = useGetApplicationHistory(id);
+	console.log('applicationData', applicationData);
 	const displayId = `PCGL-${id}`;
 	const isHistoryLoaded = !isLoading && applicationData !== undefined && !isError;
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
