@@ -11,7 +11,7 @@
 			"submissionDate": "Submission Date",
 			"currentStatus": "Current Status",
 			"lastUpdated": "Last Updated",
-			"timelineItem": " by {{applicantFirstName}} at {{submissionDate}}",
+			"timelineItem": " by {{userName}} at {{actionDate}}",
 			"error": "There was an error retrieving your Application History"
 		},
 		"requestRevisions": {

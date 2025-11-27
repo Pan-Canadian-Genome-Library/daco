@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { agreementEnum, appendicesEnum, ApplicationStates } from '@pcgl-daco/data-model';
+import { agreementEnum, appendicesEnum, ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model';
 import { z } from 'zod';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
@@ -110,6 +110,17 @@ export const approveApplicationRequestSchema = z
 		applicationId: z.coerce.number().nonnegative().min(1).int(),
 	})
 	.strict();
+
+export const applicationHistoryResponseSchema = z.object({
+	action: z.nativeEnum(ApplicationActions),
+	id: z.number(),
+	userId: z.string(),
+	applicationId: z.number(),
+	stateAfter: z.nativeEnum(ApplicationStates),
+	stateBefore: z.nativeEnum(ApplicationStates),
+	createdAt: z.date(),
+	revisionsRequestId: z.number().nullable(),
+});
 
 export const revisionDataSchema = z
 	.object({

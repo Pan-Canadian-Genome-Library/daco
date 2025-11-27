@@ -317,6 +317,21 @@ export type ApplicationActionDTO = {
 	revisionsRequestId: number;
 };
 
+export type ApplicationActionResponse = {
+	id: number;
+	applicationId: number;
+	createdAt: Date;
+	userId: string;
+	action: ApplicationActionValues;
+	stateBefore: string;
+	stateAfter: string;
+	// stateBefore: ApplicationStateValues | undefined;
+	// stateAfter: ApplicationStateValues | undefined;
+	revisionsRequestId: number | null;
+};
+
+export type ApplicationHistoryResponseData = ApplicationActionResponse[];
+
 export interface AgreementsDTO {
 	id: number;
 	userId: string;

@@ -22,15 +22,14 @@ import { useQuery } from '@tanstack/react-query';
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type ApplicationResponseData } from '@pcgl-daco/data-model';
+import { type ApplicationHistoryResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplicationHistory = (id?: string | number) => {
-	return useQuery<ApplicationResponseData, ServerError>({
-		queryKey: [`application-${id}`],
+	return useQuery<ApplicationHistoryResponseData, ServerError>({
+		queryKey: [`history-${id}`],
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}/history`).then(withErrorResponseHandler);
-
-			return await response.json().then((data: ApplicationResponseData) => {
+			return await response.json().then((data: ApplicationHistoryResponseData) => {
 				return data;
 			});
 		},

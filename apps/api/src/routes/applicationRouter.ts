@@ -26,6 +26,7 @@ import {
 	editApplication,
 	getAllApplications,
 	getApplicationById,
+	getApplicationHistory,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByInstitutionalRep,
@@ -41,6 +42,7 @@ import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
 	ApplicationDTO,
+	ApplicationHistoryResponseData,
 	ApplicationListResponse,
 	ApplicationResponseData,
 	RevisionsDTO,
@@ -1101,18 +1103,25 @@ applicationRouter.get(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<
-				ApplicationResponseData,
-				['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
-			>,
+			response: ResponseWithData<ApplicationHistoryResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']>,
 		) => {
 			const { applicationId } = request.params;
 
-			try {
-				const applicationInfo = await getApplicationById({ applicationId: Number(applicationId) });
+			if (!applicationId) {
+				response.status(400);
+				response.send({
+					error: 'INVALID_REQUEST',
+					message: 'Application Id is Required',
+				});
 
-				if (!applicationInfo.success) {
-					switch (applicationInfo.error) {
+				return;
+			}
+
+			try {
+				const result = await getApplicationHistory({ applicationId: Number(applicationId) });
+
+				if (!result.success) {
+					switch (result.error) {
 						case 'NOT_FOUND':
 							response.status(404);
 							break;
@@ -1122,21 +1131,14 @@ applicationRouter.get(
 							break;
 					}
 					response.send({
-						error: applicationInfo.error,
-						message: applicationInfo.message,
+						error: result.error,
+						message: result.message,
 					});
 
 					return;
 				}
 
-				// const result = await getRevisions({ applicationId: Number(applicationId) });
-
-				// if (!result.success) {
-				// response.status(500).json({ error: result.error, message: result.message });
-				// return;
-				// }
-
-				response.status(200).json(applicationInfo.data);
+				response.status(200).json(result.data);
 				return;
 			} catch (error) {
 				response.status(500).json({
