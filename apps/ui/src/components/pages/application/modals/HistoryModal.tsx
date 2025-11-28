@@ -27,6 +27,12 @@ import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Text } = Typography;
 
+interface HistoryModalProps {
+	id: number;
+	isOpen: boolean;
+	closeModal: () => void;
+}
+
 const TimelineDot = (
 	<div
 		style={{
@@ -44,36 +50,29 @@ const HistoryTimeline = ({ historyData }: { historyData: ApplicationHistoryRespo
 		dot: TimelineDot,
 		children: (
 			<span>
-				<Text strong>{item.action}</Text>
+				<Text strong>{translate(`modals.history.actions.${item.action}`)}</Text>
 				<Text>
 					{translate('modals.history.timelineItem', {
 						userName: item.userId,
-						actionDate: item.createdAt,
+						actionDate: new Date(item.createdAt).toDateString(),
 					})}
 				</Text>
 			</span>
 		),
 	}));
 
-	return <Timeline items={timelineHistoryItems} style={{ padding: 0 }} />;
+	return <Timeline items={timelineHistoryItems} />;
 };
-
-interface HistoryModalProps {
-	id: number;
-	isOpen: boolean;
-	closeModal: () => void;
-}
 
 const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 	const { data: applicationData, isError, isLoading } = useGetApplication(id);
 	const { data: historyData, isError: isHistoryError, isLoading: isHistoryLoading } = useGetApplicationHistory(id);
+	const { t: translate } = useTranslation();
 
 	const displayId = `PCGL-${id}`;
 	const isHistoryLoaded = !isLoading && !isHistoryLoading && !isError && !isHistoryError && historyData !== undefined;
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
 	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
-
-	const { t: translate } = useTranslation();
 
 	return (
 		<Modal
@@ -102,7 +101,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 							</div>
 							<div>
 								<Text strong>{translate('modals.history.currentStatus')}:</Text>
-								<Text> {applicationData?.state}</Text>
+								<Text> {translate(`application.states.${applicationData?.state}`)}</Text>
 							</div>
 							<div>
 								<Text strong>{translate('modals.history.lastUpdated')}:</Text>
