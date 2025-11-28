@@ -145,24 +145,23 @@ export const convertToApplicationContentsRecord = (
 };
 
 /** Converts database Application Action Records into camelCase response records
- * @param data Application Action Record - Snake case database Application Action record array
- * @returns ApplicationHistoryResponseData - Application record with updated keys
+ * @param data ApplicationActionRecord - Snake case database Application Action record array
+ * @returns ApplicationHistoryResponseData - Array of Action records with updated keys
  */
 export const convertToApplicationHistoryRecord = (
 	data: ApplicationActionRecord[],
 ): Result<ApplicationHistoryResponseData, 'SYSTEM_ERROR'> => {
 	const aliasedRecords = data.map((action) => objectToCamel(action));
 	const validationResults = aliasedRecords.map((record) => applicationHistoryResponseSchema.safeParse(record));
-	const failedResults = validationResults.filter((result) => !result.success);
 	const successResults: ApplicationHistoryResponseData = validationResults
 		.filter((item) => item.success)
 		.map((item) => item.data);
-	const result = !failedResults.length
+	const failedResult = validationResults.find((result) => !result.success);
+	const result = !failedResult
 		? success(successResults)
 		: failure(
 				'SYSTEM_ERROR',
-				`Validation Error while aliasing data at convertToApplicationHistoryRecord:`,
-				// `\n${validationResult.error.issues[0]?.message || ''}`,
+				`Validation Error while aliasing data at convertToApplicationHistoryRecord: \n${failedResult.error.issues[0]?.message || ''}`,
 			);
 	return result;
 };

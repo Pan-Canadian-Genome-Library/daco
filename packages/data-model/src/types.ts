@@ -323,10 +323,8 @@ export type ApplicationActionResponse = {
 	createdAt: Date;
 	userId: string;
 	action: ApplicationActionValues;
-	stateBefore: string;
-	stateAfter: string;
-	// stateBefore: ApplicationStateValues | undefined;
-	// stateAfter: ApplicationStateValues | undefined;
+	stateBefore: ApplicationStateValues;
+	stateAfter: ApplicationStateValues;
 	revisionsRequestId: number | null;
 };
 
