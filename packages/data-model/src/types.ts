@@ -317,6 +317,19 @@ export type ApplicationActionDTO = {
 	revisionsRequestId: number;
 };
 
+export type ApplicationActionResponse = {
+	id: number;
+	applicationId: number;
+	createdAt: Date;
+	userId: string;
+	action: ApplicationActionValues;
+	stateBefore: ApplicationStateValues;
+	stateAfter: ApplicationStateValues;
+	revisionsRequestId: number | null;
+};
+
+export type ApplicationHistoryResponseData = ApplicationActionResponse[];
+
 export interface AgreementsDTO {
 	id: number;
 	userId: string;

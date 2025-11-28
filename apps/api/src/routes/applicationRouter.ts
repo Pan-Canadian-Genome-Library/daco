@@ -26,6 +26,7 @@ import {
 	editApplication,
 	getAllApplications,
 	getApplicationById,
+	getApplicationHistory,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	requestApplicationRevisionsByInstitutionalRep,
@@ -41,6 +42,7 @@ import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
 	ApplicationDTO,
+	ApplicationHistoryResponseData,
 	ApplicationListResponse,
 	ApplicationResponseData,
 	RevisionsDTO,
@@ -1077,6 +1079,62 @@ applicationRouter.get(
 				//Service only returns this if a SYSTEM_ERROR occurs, set to HTTP code 500 and bail if this is the case.
 				if (!result.success) {
 					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+
+				response.status(200).json(result.data);
+				return;
+			} catch (error) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: "We're sorry, an unexpected error occurred. Please try again later.",
+				});
+				return;
+			}
+		},
+	),
+);
+
+applicationRouter.get(
+	'/:applicationId/history',
+	authMiddleware(),
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<ApplicationHistoryResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']>,
+		) => {
+			const { applicationId } = request.params;
+
+			if (!applicationId) {
+				response.status(400);
+				response.send({
+					error: 'INVALID_REQUEST',
+					message: 'Application Id is Required',
+				});
+
+				return;
+			}
+
+			try {
+				const result = await getApplicationHistory({ applicationId: Number(applicationId) });
+
+				if (!result.success) {
+					switch (result.error) {
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						case 'SYSTEM_ERROR':
+						default:
+							response.status(500);
+							break;
+					}
+					response.send({
+						error: result.error,
+						message: result.message,
+					});
+
 					return;
 				}
 

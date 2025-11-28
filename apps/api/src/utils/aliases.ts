@@ -19,6 +19,7 @@
 
 import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
+	type ApplicationActionRecord,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
 	type ApplicationSignatureUpdate,
@@ -29,12 +30,14 @@ import {
 import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/types.ts';
 import {
 	type ApplicationDTO,
+	type ApplicationHistoryResponseData,
 	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
 	type FilesDTO,
 	type SignatureDTO,
 } from '@pcgl-daco/data-model';
 import {
+	applicationHistoryResponseSchema,
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
 	fileResponseSchema,
@@ -137,6 +140,28 @@ export const convertToApplicationContentsRecord = (
 		: failure(
 				'SYSTEM_ERROR',
 				`Validation Error while aliasing data at convertToApplicationContentsRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
+
+/** Converts database Application Action Records into camelCase response records
+ * @param data ApplicationActionRecord - Snake case database Application Action record array
+ * @returns ApplicationHistoryResponseData - Array of Action records with updated keys
+ */
+export const convertToApplicationHistoryRecord = (
+	data: ApplicationActionRecord[],
+): Result<ApplicationHistoryResponseData, 'SYSTEM_ERROR'> => {
+	const aliasedRecords = data.map((action) => objectToCamel(action));
+	const validationResults = aliasedRecords.map((record) => applicationHistoryResponseSchema.safeParse(record));
+	const successResults: ApplicationHistoryResponseData = validationResults
+		.filter((item) => item.success)
+		.map((item) => item.data);
+	const failedResult = validationResults.find((result) => !result.success);
+	const result = !failedResult
+		? success(successResults)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToApplicationHistoryRecord: \n${failedResult.error.issues[0]?.message || ''}`,
 			);
 	return result;
 };
