@@ -141,4 +141,10 @@ export const applicationArray: (typeof applications.$inferInsert)[] = [
 		created_at: new Date('2025-01-02T20:00:00Z'),
 		updated_at: new Date('2025-01-02T20:30:00Z'),
 	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		state: ApplicationStates.DAC_REVIEW,
+		created_at: new Date('2025-01-02T20:00:00Z'),
+		updated_at: new Date('2025-01-02T20:30:00Z'),
+	},
 ];
