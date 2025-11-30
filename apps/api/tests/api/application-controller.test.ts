@@ -93,6 +93,11 @@ describe('Application API', () => {
 		testApplicationRepo = applicationSvc(db);
 	});
 
+	/**
+	 * Function returns the first application based on the state provided if provided.
+	 * @param state
+	 * @returns ApplicationListSummary
+	 */
 	const getFirstApplicationTestByState = async (
 		applicationState?: ApplicationStateValues,
 	): Promise<ApplicationListSummary> => {

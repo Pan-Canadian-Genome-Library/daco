@@ -59,9 +59,8 @@ describe('Application Service', () => {
 		testApplicationService = applicationSvc(db);
 	});
 
-	//  HELPER TESTS FUNCTION
 	/**
-	 * Application Ids inserted from initTestMigration doesn't always insert sequentially, this function returns the first id of an application based on the state provided
+	 * Function returns the first id of an application based on the state provided.
 	 * @param state
 	 * @returns id
 	 */
