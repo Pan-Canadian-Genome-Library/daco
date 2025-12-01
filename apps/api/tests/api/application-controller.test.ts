@@ -28,6 +28,7 @@ import {
 	dacRejectApplication,
 	editApplication,
 	getApplicationById,
+	getApplicationHistory,
 	getRevisions,
 	requestApplicationRevisionsByDac,
 	revokeApplication,
@@ -602,6 +603,21 @@ describe('Application API', () => {
 			// Assert
 			assert.ok(!result.success);
 			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
+		});
+	});
+
+	describe('Application History', () => {
+		it('should successfully retrieve Application History for a given ID', async () => {
+			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
+			assert.ok(applicationRecordsResult.success);
+			assert.ok(
+				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			);
+
+			const { id: applicationId } = applicationRecordsResult.data.applications[0];
+			const result = await getApplicationHistory({ applicationId });
+
+			assert.ok(result.success);
 		});
 	});
 
