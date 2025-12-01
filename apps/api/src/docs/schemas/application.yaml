@@ -526,3 +526,4 @@ components:
         revisionsRequestId:
           type: number
           description: ID of associated Revision Request record, if any.
+          nullable: true

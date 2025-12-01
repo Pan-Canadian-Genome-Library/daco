@@ -186,18 +186,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
-        '500':
-          description: 'Error retrieving application by ID'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ServerErrors'
         '404':
           description: 'Error retrieving application history by ID - Application not found.'
           content:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: 'Error retrieving application by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'
         '200':
           description: 'Application History retrieved'
           content:

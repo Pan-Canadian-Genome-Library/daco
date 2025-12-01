@@ -233,7 +233,7 @@ export const getApplicationById = async ({
 /**
  * Gets Action History for a corresponding application ID
  * @param applicationId - The ID of the application within the database.
- * @returns Success with the details of the application / Failure with Error.
+ * @returns Success with the history of the application / Failure with Error.
  */
 export const getApplicationHistory = async ({
 	applicationId,
