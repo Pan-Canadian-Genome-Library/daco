@@ -22,10 +22,11 @@ import type {
 	ApplicationHistoryResponseData,
 	ApplicationResponseData,
 	ApproveApplication,
+	DacCommentRecord,
 	RevisionsDTO,
 } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
-import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
+import type { SectionRoutesValues, UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import { getDbInstance } from '@/db/index.js';
@@ -58,7 +59,6 @@ import {
 } from '@/utils/aliases.js';
 import { failure, type AsyncResult, type Result } from '@/utils/results.js';
 import { validateRevisedFields } from '@/utils/validation.ts';
-
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
 const logger = BaseLogger.forModule('applicationController');
@@ -1071,6 +1071,58 @@ export const getRevisions = async ({
 		return revisionsResult;
 	} catch (error) {
 		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+export const submitDacComment = async ({
+	applicationId,
+	message,
+	userId,
+	userName,
+	section,
+	toDacChair,
+}: {
+	applicationId: number;
+	message: string;
+	userId: string;
+	userName: string;
+	section: SectionRoutesValues;
+	toDacChair: boolean;
+}): AsyncResult<DacCommentRecord, 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.createDacComment({ applicationId, message, userId, userName, section, toDacChair });
+
+		return result;
+	} catch (error) {
+		const message = `Failed to submit dac comment for applicationId: ${applicationId}`;
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+export const getDacComments = async ({
+	applicationId,
+	section,
+	isDac,
+}: {
+	applicationId: number;
+	section: string;
+	isDac: boolean;
+}): AsyncResult<DacCommentRecord[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.getDacComment({ applicationId, section, isDac });
+
+		return result;
+	} catch (error) {
+		const message = `Failed to retrieve dac comments for applicationId: ${applicationId} on section: ${section}`;
 		logger.error(message, error);
 		return failure('SYSTEM_ERROR', message);
 	}
