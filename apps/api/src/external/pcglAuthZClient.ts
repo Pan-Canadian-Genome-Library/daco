@@ -50,8 +50,6 @@ export const refreshAuthZServiceToken = async () => {
 
 		const validatedAuthZData = ServiceTokenResponse.safeParse(tokenResponse);
 
-		console.log('test---', tokenResponse);
-
 		if (!validatedAuthZData.success) {
 			throw new Error(`Malformed token response`);
 		}
