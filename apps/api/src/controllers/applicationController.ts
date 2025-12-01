@@ -25,7 +25,7 @@ import type {
 	DacCommentRecord,
 	RevisionsDTO,
 } from '@pcgl-daco/data-model';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
+import { ApplicationStates } from '@pcgl-daco/data-model';
 import type { SectionRoutesValues, UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
 import { getEmailConfig } from '@/config/emailConfig.ts';

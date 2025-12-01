@@ -608,16 +608,17 @@ describe('Application API', () => {
 
 	describe('Application History', () => {
 		it('should successfully retrieve Application History for a given ID', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
-			);
+			const applicationHistoryResult = await getApplicationHistory({ applicationId: testApplicationId });
 
-			const { id: applicationId } = applicationRecordsResult.data.applications[0];
-			const result = await getApplicationHistory({ applicationId });
+			assert.ok(applicationHistoryResult.success);
+			assert.ok(Array.isArray(applicationHistoryResult.data) && applicationHistoryResult.data[0]);
+		});
 
-			assert.ok(result.success);
+		it('should fail when requesting an application ID with no actions', async () => {
+			const applicationHistoryResult = await getApplicationHistory({ applicationId: 1000 });
+
+			assert.ok(!applicationHistoryResult.success);
+			assert.strictEqual(applicationHistoryResult.error, 'NOT_FOUND');
 		});
 	});
 

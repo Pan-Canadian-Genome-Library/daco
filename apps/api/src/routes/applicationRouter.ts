@@ -1194,7 +1194,6 @@ applicationRouter.get(
 					error: 'INVALID_REQUEST',
 					message: 'Application Id is Required',
 				});
-
 				return;
 			}
 
@@ -1215,7 +1214,6 @@ applicationRouter.get(
 						error: result.error,
 						message: result.message,
 					});
-
 					return;
 				}
 

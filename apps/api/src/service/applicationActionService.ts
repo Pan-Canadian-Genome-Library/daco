@@ -173,7 +173,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 			sort?: Array<OrderBy<ApplicationActionsColumnName>>;
 			page?: number;
 			pageSize?: number;
-		}): AsyncResult<ApplicationActionRecord[], 'SYSTEM_ERROR'> => {
+		}): AsyncResult<ApplicationActionRecord[], 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
 			try {
 				const allActions = await db
 					.select()
@@ -187,6 +187,10 @@ const applicationActionSvc = (db: PostgresDb) => {
 					.orderBy(...applicationActionsQuery(sort))
 					.offset(page * pageSize)
 					.limit(pageSize);
+
+				if (!allActions.length) {
+					return failure('NOT_FOUND', `No application history found with the ID: ${application_id}`);
+				}
 
 				return success(allActions);
 			} catch (err) {
