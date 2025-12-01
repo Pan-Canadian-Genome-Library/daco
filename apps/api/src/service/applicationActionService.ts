@@ -17,19 +17,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, eq } from 'drizzle-orm';
-
-import { type PostgresDb } from '@/db/index.js';
-import { applicationActions } from '@/db/schemas/applicationActions.js';
-import BaseLogger from '@/logger.js';
-import { applicationActionsQuery } from '@/service/utils.js';
-import { type AsyncResult, failure, success } from '@/utils/results.js';
 import {
 	ApplicationActions,
 	ApplicationActionValues,
 	ApplicationStates,
 	ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
+import { and, eq } from 'drizzle-orm';
+import { type SessionData } from 'express-session';
+
+import { type PostgresDb } from '@/db/index.js';
+import { applicationActions } from '@/db/schemas/applicationActions.js';
+import BaseLogger from '@/logger.js';
+import { applicationActionsQuery } from '@/service/utils.js';
+import { type AsyncResult, failure, success } from '@/utils/results.js';
 import {
 	type ApplicationActionRecord,
 	type ApplicationActionsColumnName,
@@ -52,8 +53,12 @@ const applicationActionSvc = (db: PostgresDb) => {
 		action: ApplicationActionValues,
 		state_after: ApplicationStateValues,
 		transaction?: PostgresTransaction,
+		user?: SessionData['user'],
 	): AsyncResult<ApplicationActionRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		const { id: application_id, user_id, state: state_before } = application;
+		const { givenName = '', familyName = '' } = user;
+		console.log(givenName);
+		console.log(familyName);
 		const newAction: typeof applicationActions.$inferInsert = {
 			application_id,
 			user_id,

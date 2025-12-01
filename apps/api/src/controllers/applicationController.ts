@@ -382,6 +382,7 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
+	user,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -403,7 +404,7 @@ export const approveApplication = async ({
 			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
 		}
 
-		const approvalResult = await appStateManager.approveDacReview();
+		const approvalResult = await appStateManager.approveDacReview(user);
 
 		if (!approvalResult.success) {
 			return failure('SYSTEM_ERROR', approvalResult.message);

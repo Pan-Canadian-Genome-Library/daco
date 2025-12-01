@@ -328,9 +328,10 @@ applicationRouter.post(
 			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
+			const user = request.session.user;
 
 			try {
-				const approvalResult = await approveApplication({ applicationId });
+				const approvalResult = await approveApplication({ applicationId, user });
 
 				if (approvalResult.success) {
 					/**
@@ -409,9 +410,10 @@ applicationRouter.post(
 			) => {
 				const { rejectionReason } = request.body;
 				const applicationId = Number(request.params.applicationId);
+				const user = request.session.user;
 
 				try {
-					const result = await dacRejectApplication({ applicationId, rejectionReason });
+					const result = await dacRejectApplication({ applicationId, rejectionReason, user });
 
 					if (!result.success) {
 						switch (result.error) {
@@ -486,7 +488,7 @@ applicationRouter.post(
 					return;
 				}
 
-				const result = await submitRevision({ applicationId });
+				const result = await submitRevision({ applicationId, user });
 
 				if (!result.success) {
 					switch (result.error) {
@@ -556,7 +558,7 @@ applicationRouter.post(
 
 				const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 
-				const result = await revokeApplication(applicationId, isDACMember, revokeReason);
+				const result = await revokeApplication(applicationId, isDACMember, revokeReason, user);
 
 				if (!result.success) {
 					switch (result.error) {
@@ -604,8 +606,10 @@ applicationRouter.post(
 		) => {
 			const applicationId = Number(request.params.applicationId);
 
+			const user = request.session.user;
+
 			try {
-				const result = await closeApplication({ applicationId });
+				const result = await closeApplication({ applicationId, user });
 
 				if (!result.success) {
 					switch (result.error) {
@@ -698,7 +702,7 @@ applicationRouter.post(
 					});
 				}
 
-				const result = await withdrawApplication({ applicationId });
+				const result = await withdrawApplication({ applicationId, user });
 
 				if (result.success) {
 					response.status(200).json(result.data);
@@ -764,7 +768,7 @@ applicationRouter.post(
 
 				// Only rep and applicant can submit an application
 				if (isApplicationUser || isRep) {
-					const result = await submitApplication({ applicationId });
+					const result = await submitApplication({ applicationId, user });
 
 					if (!result.success) {
 						switch (result.error) {
@@ -833,8 +837,7 @@ applicationRouter.post(
 
 						const result = await submitDacComment({
 							applicationId,
-							userId: user?.userId,
-							userName: user?.givenName || user?.userId,
+							user,
 							message,
 							section,
 							toDacChair,
@@ -871,6 +874,7 @@ applicationRouter.post(
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
+					const user = request.session.user;
 
 					if (!isPositiveInteger(applicationId)) {
 						response.status(400).json({
@@ -885,6 +889,7 @@ applicationRouter.post(
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByDac({
 						applicationId,
+						user,
 						revisionData: {
 							application_id: applicationId,
 							comments: revisions.comments,
@@ -962,6 +967,7 @@ applicationRouter.post(
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
+					const user = request.session.user;
 
 					const revisionData = request.body;
 
@@ -978,6 +984,7 @@ applicationRouter.post(
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
 						applicationId,
+						user,
 						revisionData: {
 							application_id: applicationId,
 							comments: revisionData.comments,
