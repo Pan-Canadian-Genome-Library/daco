@@ -382,7 +382,7 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
-	user,
+	userName,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -404,7 +404,7 @@ export const approveApplication = async ({
 			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
 		}
 
-		const approvalResult = await appStateManager.approveDacReview(user);
+		const approvalResult = await appStateManager.approveDacReview(userName);
 
 		if (!approvalResult.success) {
 			return failure('SYSTEM_ERROR', approvalResult.message);
@@ -473,9 +473,11 @@ export const approveApplication = async ({
 export const dacRejectApplication = async ({
 	applicationId,
 	rejectionReason,
+	userName,
 }: {
 	applicationId: number;
 	rejectionReason: string;
+	userName?: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -492,7 +494,7 @@ export const dacRejectApplication = async ({
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		const rejectResult = await appStateManager.rejectDacReview();
+		const rejectResult = await appStateManager.rejectDacReview(userName);
 
 		if (!rejectResult.success) {
 			return failure('INVALID_STATE_TRANSITION', rejectResult.message || 'Failed to reject application.');
@@ -539,8 +541,10 @@ export const dacRejectApplication = async ({
 
 export const submitRevision = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName?: string;
 }): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -566,9 +570,9 @@ export const submitRevision = async ({
 
 		let submittedRevision;
 		if (appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-			submittedRevision = await appStateManager.submitDacRevision();
+			submittedRevision = await appStateManager.submitDacRevision(userName);
 		} else {
-			submittedRevision = await appStateManager.submitRepRevision();
+			submittedRevision = await appStateManager.submitRepRevision(userName);
 		}
 
 		if (!submittedRevision.success) {
@@ -624,6 +628,7 @@ export const revokeApplication = async (
 	applicationId: number,
 	isDACMember: boolean,
 	revokeReason: string,
+	userName?: string,
 ): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -640,7 +645,7 @@ export const revokeApplication = async (
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		const revokeApplicationResult = await appStateManager.revokeApproval();
+		const revokeApplicationResult = await appStateManager.revokeApproval(userName);
 
 		if (!revokeApplicationResult.success) {
 			return revokeApplicationResult;
@@ -680,9 +685,11 @@ export const revokeApplication = async (
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
 	revisionData,
+	userName,
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
+	userName?: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -704,7 +711,7 @@ export const requestApplicationRevisionsByDac = async ({
 			);
 		}
 
-		const actionResult = await appStateManager.reviseDacReview();
+		const actionResult = await appStateManager.reviseDacReview(userName);
 
 		if (!actionResult.success) {
 			return actionResult;
@@ -770,9 +777,11 @@ export const requestApplicationRevisionsByDac = async ({
 export const requestApplicationRevisionsByInstitutionalRep = async ({
 	applicationId,
 	revisionData,
+	userName,
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
+	userName?: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -795,8 +804,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			);
 		}
 
-		const actionResult = await appStateManager.reviseRepReview();
-
+		const actionResult = await appStateManager.reviseRepReview(userName);
 		if (!actionResult.success) {
 			return actionResult;
 		}
@@ -865,8 +873,10 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 
 export const submitApplication = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName?: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -889,11 +899,11 @@ export const submitApplication = async ({
 		let submissionResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
-			submissionResult = await appStateManager.submitDraft();
+			submissionResult = await appStateManager.submitDraft(userName);
 		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			submissionResult = await appStateManager.approveRepReview();
+			submissionResult = await appStateManager.approveRepReview(userName);
 		} else {
-			submissionResult = await appStateManager.submitRepRevision();
+			submissionResult = await appStateManager.submitRepRevision(userName);
 		}
 
 		if (!submissionResult.success) {
@@ -959,8 +969,10 @@ export const submitApplication = async ({
 
 export const closeApplication = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName?: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -983,13 +995,13 @@ export const closeApplication = async ({
 
 		switch (appStateManager.state) {
 			case ApplicationStates.DRAFT:
-				closeResult = await appStateManager.closeDraft();
+				closeResult = await appStateManager.closeDraft(userName);
 				break;
 			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-				closeResult = await appStateManager.closeRepReview();
+				closeResult = await appStateManager.closeRepReview(userName);
 				break;
 			case ApplicationStates.DAC_REVIEW:
-				closeResult = await appStateManager.closeDacReview();
+				closeResult = await appStateManager.closeDacReview(userName);
 				break;
 			default:
 				return failure('INVALID_STATE_TRANSITION', `Cannot close application in state ${appStateManager.state}.`);
@@ -1012,8 +1024,10 @@ export const closeApplication = async ({
 
 export const withdrawApplication = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName?: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -1029,9 +1043,9 @@ export const withdrawApplication = async ({
 
 		let withdrawalRequest;
 		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
-			withdrawalRequest = await appStateManager.withdrawDacReview();
+			withdrawalRequest = await appStateManager.withdrawDacReview(userName);
 		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			withdrawalRequest = await appStateManager.withdrawRepReview();
+			withdrawalRequest = await appStateManager.withdrawRepReview(userName);
 		} else {
 			return failure(
 				'INVALID_STATE_TRANSITION',

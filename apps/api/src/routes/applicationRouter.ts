@@ -325,13 +325,20 @@ applicationRouter.post(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
 			const user = request.session.user;
 
+			if (!user) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
+			}
+
 			try {
-				const approvalResult = await approveApplication({ applicationId, user });
+				const { givenName, familyName } = user;
+				const userName = `${givenName} ${familyName}`;
+				const approvalResult = await approveApplication({ applicationId, userName });
 
 				if (approvalResult.success) {
 					/**
@@ -412,8 +419,15 @@ applicationRouter.post(
 				const applicationId = Number(request.params.applicationId);
 				const user = request.session.user;
 
+				if (!user) {
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+					return;
+				}
+
 				try {
-					const result = await dacRejectApplication({ applicationId, rejectionReason, user });
+					const { givenName, familyName } = user;
+					const userName = `${givenName} ${familyName}`;
+					const result = await dacRejectApplication({ applicationId, rejectionReason, userName });
 
 					if (!result.success) {
 						switch (result.error) {
@@ -466,8 +480,8 @@ applicationRouter.post(
 			>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
-
 			const user = request.session.user;
+
 			if (!user) {
 				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 				return;
@@ -488,7 +502,9 @@ applicationRouter.post(
 					return;
 				}
 
-				const result = await submitRevision({ applicationId, user });
+				const { givenName, familyName } = user;
+				const userName = `${givenName} ${familyName}`;
+				const result = await submitRevision({ applicationId, userName });
 
 				if (!result.success) {
 					switch (result.error) {
@@ -557,8 +573,9 @@ applicationRouter.post(
 				}
 
 				const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
-
-				const result = await revokeApplication(applicationId, isDACMember, revokeReason, user);
+				const { givenName, familyName } = user;
+				const userName = `${givenName} ${familyName}`;
+				const result = await revokeApplication(applicationId, isDACMember, revokeReason, userName);
 
 				if (!result.success) {
 					switch (result.error) {
@@ -602,14 +619,21 @@ applicationRouter.post(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
 
 			const user = request.session.user;
 
+			if (!user) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
+			}
+
 			try {
-				const result = await closeApplication({ applicationId, user });
+				const { givenName, familyName } = user;
+				const userName = `${givenName} ${familyName}`;
+				const result = await closeApplication({ applicationId, userName });
 
 				if (!result.success) {
 					switch (result.error) {
@@ -668,7 +692,7 @@ applicationRouter.post(
 			const { user } = request.session;
 			const { userId } = user || {};
 
-			if (!userId) {
+			if (!user || !userId) {
 				response.status(401).json({ error: ErrorType.UNAUTHORIZED, message: 'User is not authenticated.' });
 				return;
 			}
@@ -702,7 +726,9 @@ applicationRouter.post(
 					});
 				}
 
-				const result = await withdrawApplication({ applicationId, user });
+				const { givenName, familyName } = user;
+				const userName = `${givenName} ${familyName}`;
+				const result = await withdrawApplication({ applicationId, userName });
 
 				if (result.success) {
 					response.status(200).json(result.data);
@@ -751,6 +777,7 @@ applicationRouter.post(
 				const applicationId = Number(request.params.applicationId);
 
 				const user = request.session.user;
+
 				if (!user) {
 					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
 					return;
@@ -768,7 +795,9 @@ applicationRouter.post(
 
 				// Only rep and applicant can submit an application
 				if (isApplicationUser || isRep) {
-					const result = await submitApplication({ applicationId, user });
+					const { givenName, familyName } = user;
+					const userName = `${givenName} ${familyName}`;
+					const result = await submitApplication({ applicationId, userName });
 
 					if (!result.success) {
 						switch (result.error) {
@@ -835,9 +864,12 @@ applicationRouter.post(
 							return;
 						}
 
+						const { givenName, familyName, userId } = user;
+						const userName = `${givenName} ${familyName}`;
 						const result = await submitDacComment({
 							applicationId,
-							user,
+							userId,
+							userName,
 							message,
 							section,
 							toDacChair,
@@ -870,11 +902,16 @@ applicationRouter.post(
 			apiZodErrorMapping,
 			async (
 				request: Request,
-				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
+
+					if (!user) {
+						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+						return;
+					}
 
 					if (!isPositiveInteger(applicationId)) {
 						response.status(400).json({
@@ -885,11 +922,13 @@ applicationRouter.post(
 					}
 
 					const revisions = request.body;
+					const { givenName, familyName } = user;
+					const userName = `${givenName} ${familyName}`;
 
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByDac({
 						applicationId,
-						user,
+						userName,
 						revisionData: {
 							application_id: applicationId,
 							comments: revisions.comments,
@@ -962,12 +1001,17 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<
 					ApplicationDTO,
-					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'INVALID_STATE_TRANSITION', 'FORBIDDEN']
+					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'UNAUTHORIZED', 'INVALID_STATE_TRANSITION', 'FORBIDDEN']
 				>,
 			) => {
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
+
+					if (!user) {
+						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+						return;
+					}
 
 					const revisionData = request.body;
 
@@ -981,10 +1025,13 @@ applicationRouter.post(
 						return;
 					}
 
+					const { givenName, familyName } = user;
+					const userName = `${givenName} ${familyName}`;
+
 					// Call service method to handle request
 					const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({
 						applicationId,
-						user,
+						userName,
 						revisionData: {
 							application_id: applicationId,
 							comments: revisionData.comments,
