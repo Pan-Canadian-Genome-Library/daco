@@ -66,7 +66,11 @@ const HistoryTimeline = ({ historyData }: { historyData: ApplicationHistoryRespo
 
 const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 	const { data: applicationData, isError, isLoading } = useGetApplication(id);
-	const { data: historyData, isError: isHistoryError, isLoading: isHistoryLoading } = useGetApplicationHistory(id);
+	const {
+		data: historyData,
+		isError: isHistoryError,
+		isLoading: isHistoryLoading,
+	} = useGetApplicationHistory(id, isOpen);
 	const { t: translate } = useTranslation();
 
 	const displayId = `PCGL-${id}`;

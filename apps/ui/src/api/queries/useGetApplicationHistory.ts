@@ -24,8 +24,9 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type ApplicationHistoryResponseData } from '@pcgl-daco/data-model';
 
-const useGetApplicationHistory = (id?: string | number) => {
+const useGetApplicationHistory = (id: string | number, isOpen: boolean) => {
 	return useQuery<ApplicationHistoryResponseData, ServerError>({
+		enabled: isOpen,
 		queryKey: [`history-${id}`],
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}/history`).then(withErrorResponseHandler);
@@ -33,6 +34,7 @@ const useGetApplicationHistory = (id?: string | number) => {
 				return data;
 			});
 		},
+		retry: 0,
 	});
 };
 
