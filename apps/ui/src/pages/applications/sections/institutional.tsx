@@ -44,8 +44,13 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 const Institutional = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'institutional', isEditMode });
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({
+		revisions,
+		section: 'institutional',
+		isEditMode,
+		userRole: state.applicationUserRole,
+	});
 	const { fields, formState } = state;
 
 	const form = useSectionForm({ section: 'institutional', sectionVisited: formState.sectionsVisited.institutional });
