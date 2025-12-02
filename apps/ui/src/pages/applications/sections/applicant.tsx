@@ -45,8 +45,8 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode });
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode, userRole: state.applicationUserRole });
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 
 	const {

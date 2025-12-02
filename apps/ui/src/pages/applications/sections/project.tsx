@@ -44,8 +44,8 @@ const rule = createSchemaFieldRule(projectInformationSchema);
 const Project = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'project', isEditMode });
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'project', isEditMode, userRole: state.applicationUserRole });
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 
 	const { control, getValues } = useForm<Nullable<ProjectInformationSchemaType>>({
