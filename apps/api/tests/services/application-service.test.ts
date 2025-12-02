@@ -234,7 +234,7 @@ describe('Application Service', () => {
 		});
 
 		it('should return proper totals amount', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id, pageSize: 1000 });
 			assert.ok(applicationRecordsResult.success);
 			const { applications, totals } = applicationRecordsResult.data;
 			assert.ok(totals);
