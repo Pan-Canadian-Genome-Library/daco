@@ -99,7 +99,6 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 						{chairOnlyComments.reverse().map((comment) => (
 							<CommentEntry
 								key={comment.id}
-								id={comment.id}
 								username={comment.userName}
 								comments={comment.message}
 								submittedAt={comment.createdAt}

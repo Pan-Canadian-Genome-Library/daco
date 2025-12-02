@@ -22,16 +22,15 @@ import { Flex, Typography } from 'antd';
 const { Text, Paragraph } = Typography;
 
 type CommentEntryProps = {
-	id: string | number;
 	username: string;
 	comments: string;
 	submittedAt: Date | string;
 };
 
-const CommentEntry = ({ id, username, comments, submittedAt }: CommentEntryProps) => {
+const CommentEntry = ({ username, comments, submittedAt }: CommentEntryProps) => {
 	return (
 		<Flex gap={'middle'}>
-			<div key={id}>
+			<Flex vertical>
 				<Flex vertical gap={'middle'}>
 					<Flex align="center">
 						<Text style={{ fontSize: '15px' }} strong>
@@ -42,7 +41,7 @@ const CommentEntry = ({ id, username, comments, submittedAt }: CommentEntryProps
 				<Flex>
 					<Paragraph style={{ fontSize: '13px' }}>{comments}</Paragraph>
 				</Flex>
-			</div>
+			</Flex>
 		</Flex>
 	);
 };
