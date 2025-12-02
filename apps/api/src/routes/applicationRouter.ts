@@ -1188,15 +1188,6 @@ applicationRouter.get(
 		) => {
 			const { applicationId } = request.params;
 
-			if (!applicationId) {
-				response.status(400);
-				response.send({
-					error: 'INVALID_REQUEST',
-					message: 'Application Id is Required',
-				});
-				return;
-			}
-
 			try {
 				const result = await getApplicationHistory({ applicationId: Number(applicationId) });
 
