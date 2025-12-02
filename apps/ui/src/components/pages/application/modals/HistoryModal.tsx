@@ -65,18 +65,28 @@ const HistoryTimeline = ({ historyData }: { historyData: ApplicationHistoryRespo
 };
 
 const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
-	const { data: applicationData, isError, isLoading } = useGetApplication(id);
+	const {
+		data: applicationData,
+		isError: isApplicationError,
+		error: applicationError,
+		isLoading: isApplicationLoading,
+	} = useGetApplication(id);
 	const {
 		data: historyData,
 		isError: isHistoryError,
+		error: historyError,
 		isLoading: isHistoryLoading,
 	} = useGetApplicationHistory(id, isOpen);
 	const { t: translate } = useTranslation();
-
+	console.log('history data', historyData);
 	const displayId = `PCGL-${id}`;
-	const isHistoryLoaded = !isLoading && !isHistoryLoading && !isError && !isHistoryError && historyData !== undefined;
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
 	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
+
+	const isError = isApplicationError || isHistoryError;
+	const isLoading = isApplicationLoading || isHistoryLoading;
+	const isNotFound = historyData !== undefined && historyData.length === 0;
+	const isHistoryLoaded = !isLoading && !isError && !isNotFound;
 
 	return (
 		<Modal
@@ -112,10 +122,16 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 								<Text> {lastUpdated}</Text>
 							</div>
 						</div>
-						<HistoryTimeline historyData={historyData} />
+						<HistoryTimeline historyData={historyData || []} />
 					</>
 				) : (
-					<Text style={{ margin: '1em 0' }}>{translate('modals.history.error')}</Text>
+					<Text style={{ margin: '1em 0' }}>
+						{isNotFound
+							? translate('modals.history.notFound')
+							: isHistoryError
+								? historyError?.error
+								: applicationError?.error}
+					</Text>
 				)}
 				<Button style={{ width: '10%', alignSelf: 'end' }} type="primary" onClick={closeModal}>
 					{translate('modals.buttons.close')}

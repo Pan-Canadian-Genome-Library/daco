@@ -1192,15 +1192,7 @@ applicationRouter.get(
 				const result = await getApplicationHistory({ applicationId: Number(applicationId) });
 
 				if (!result.success) {
-					switch (result.error) {
-						case 'NOT_FOUND':
-							response.status(404);
-							break;
-						case 'SYSTEM_ERROR':
-						default:
-							response.status(500);
-							break;
-					}
+					response.status(500);
 					response.send({
 						error: result.error,
 						message: result.message,

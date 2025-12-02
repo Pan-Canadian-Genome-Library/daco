@@ -239,7 +239,7 @@ export const getApplicationHistory = async ({
 	applicationId,
 }: {
 	applicationId: number;
-}): AsyncResult<ApplicationHistoryResponseData, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<ApplicationHistoryResponseData, 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
 	const applicationActionRepo = applicationActionSvc(database);
 
