@@ -43,8 +43,8 @@ const rule = createSchemaFieldRule(appendicesSchema);
 const Appendices = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode });
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode, userRole: state.applicationUserRole });
 	const {
 		control,
 		getValues,
