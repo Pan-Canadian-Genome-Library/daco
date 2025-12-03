@@ -30,10 +30,9 @@ const useGetApplicationHistory = (id: string | number, isOpen: boolean) => {
 		enabled: isOpen,
 		retry: 0,
 		queryFn: async () => {
-			const response = await fetch(`/applications/${id}/history`).then(withErrorResponseHandler);
-			return await response.json().then((data: ApplicationHistoryResponseData) => {
-				return data;
-			});
+			const response = await fetch(`/applications/${id}/history`);
+			const handledResponse = withErrorResponseHandler(response);
+			return await handledResponse.json();
 		},
 	});
 };
