@@ -26,15 +26,15 @@ import { type ApplicationHistoryResponseData } from '@pcgl-daco/data-model';
 
 const useGetApplicationHistory = (id: string | number, isOpen: boolean) => {
 	return useQuery<ApplicationHistoryResponseData, ServerError>({
-		enabled: isOpen,
 		queryKey: [`history-${id}`],
+		enabled: isOpen,
+		retry: 0,
 		queryFn: async () => {
 			const response = await fetch(`/applications/${id}/history`).then(withErrorResponseHandler);
 			return await response.json().then((data: ApplicationHistoryResponseData) => {
 				return data;
 			});
 		},
-		retry: 0,
 	});
 };
 

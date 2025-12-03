@@ -78,7 +78,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 		isLoading: isHistoryLoading,
 	} = useGetApplicationHistory(id, isOpen);
 	const { t: translate } = useTranslation();
-	console.log('history data', historyData);
+
 	const displayId = `PCGL-${id}`;
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
 	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
