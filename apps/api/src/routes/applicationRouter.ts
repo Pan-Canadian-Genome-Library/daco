@@ -17,31 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {
-	approveApplication,
-	closeApplication,
-	createApplication,
-	createApplicationPDF,
-	dacRejectApplication,
-	editApplication,
-	getAllApplications,
-	getApplicationById,
-	getApplicationHistory,
-	getDacComments,
-	getRevisions,
-	requestApplicationRevisionsByDac,
-	requestApplicationRevisionsByInstitutionalRep,
-	revokeApplication,
-	submitApplication,
-	submitDacComment,
-	submitRevision,
-	withdrawApplication,
-} from '@/controllers/applicationController.js';
-
-import BaseLogger from '@/logger.js';
-import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
-import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
 	ApplicationDTO,
 	ApplicationHistoryResponseData,
@@ -63,6 +38,31 @@ import {
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
+
+import {
+	approveApplication,
+	closeApplication,
+	createApplication,
+	createApplicationPDF,
+	dacRejectApplication,
+	editApplication,
+	getAllApplications,
+	getApplicationById,
+	getApplicationHistory,
+	getDacComments,
+	getRevisions,
+	requestApplicationRevisionsByDac,
+	requestApplicationRevisionsByInstitutionalRep,
+	revokeApplication,
+	submitApplication,
+	submitDacComment,
+	submitRevision,
+	withdrawApplication,
+} from '@/controllers/applicationController.js';
+import BaseLogger from '@/logger.js';
+import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
+import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
+import { apiZodErrorMapping } from '@/utils/validation.js';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
 import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
