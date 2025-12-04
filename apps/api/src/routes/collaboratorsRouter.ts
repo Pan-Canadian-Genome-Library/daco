@@ -153,9 +153,9 @@ collaboratorsRouter.get(
 			// TODO: Identify if the user role is institutional rep and is the rep for this application
 			const isApplicationInstitutionalRep = await isAssociatedRep(request.session, applicationId);
 
-			const isDacMember = userRole === 'DAC_MEMBER';
+			const isDac = userRole === 'DAC_MEMBER' || userRole === 'DAC_CHAIR';
 
-			if (!(isApplicationUser || isApplicationInstitutionalRep || isDacMember)) {
+			if (!(isApplicationUser || isApplicationInstitutionalRep || isDac)) {
 				response
 					.status(403)
 					.json({ error: 'FORBIDDEN', message: 'User does not have permission to access this application.' });
