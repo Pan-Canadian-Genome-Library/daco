@@ -83,14 +83,13 @@ export const authMiddleware =
 			}
 		}
 
-		console.log('request.params', request.params);
 		if (request.params.applicationId) {
 			// Validate User is allowed access to this specific Application
 			const applicationId = Number(request.params.applicationId);
 			const hasSpecialAccess =
 				userRole === userRoleSchema.Values.DAC_MEMBER ||
 				userRole === userRoleSchema.Values.DAC_CHAIR ||
-				isAssociatedRep(request.session, applicationId);
+				(await isAssociatedRep(request.session, applicationId));
 
 			const result = await getApplicationById({ applicationId });
 			if (result.success) {
