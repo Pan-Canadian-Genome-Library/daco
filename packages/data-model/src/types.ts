@@ -323,6 +323,7 @@ export type ApplicationActionResponse = {
 	applicationId: number;
 	createdAt: Date;
 	userId: string;
+	userName?: string | null;
 	action: ApplicationActionValues;
 	stateBefore: ApplicationStateValues;
 	stateAfter: ApplicationStateValues;
