@@ -278,36 +278,20 @@ applicationRouter.get(
 			}
 
 			const applicationId = Number(request.params.applicationId);
-
 			const result = await getApplicationById({ applicationId });
 
 			if (result.success) {
 				const { data } = result;
-
-				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
-				const hasSpecialAccess =
-					getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
-					isAssociatedRep(request.session, applicationId);
-
-				const canAccess = data.userId === userId || hasSpecialAccess;
-
-				if (!canAccess) {
-					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
-					return;
-				}
-
 				response.status(200).json(data);
 				return;
 			}
+
 			switch (result.error) {
-				case 'SYSTEM_ERROR': {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-					return;
-				}
 				case 'NOT_FOUND': {
 					response.status(404).json({ error: 'NOT_FOUND', message: result.message });
 					return;
 				}
+				case 'SYSTEM_ERROR':
 				default: {
 					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 					return;

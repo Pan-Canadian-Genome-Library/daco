@@ -17,11 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type Response } from 'express';
-
-import type { ErrorResponse, UserRole } from '@pcgl-daco/validation';
-import { RequestHandler } from 'express';
-import { getUserRole } from '../service/authService.js';
+import { getApplicationById } from '@/controllers/applicationController.ts';
+import { userRoleSchema, type ErrorResponse, type UserRole } from '@pcgl-daco/validation';
+import { RequestHandler, type Response } from 'express';
+import { getUserRole, isAssociatedRep } from '../service/authService.js';
 
 export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
 
@@ -55,11 +54,16 @@ type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
  */
 export const authMiddleware =
 	(config: AuthMiddlewareConfig = {}): RequestHandler =>
-	(request, response: Response<AuthenticationErrorResponse>, next) => {
+	async (
+		request,
+		response: Response<AuthenticationErrorResponse | ErrorResponse<['NOT_FOUND', 'SYSTEM_ERROR']>>,
+		next,
+	) => {
 		const { requiredRoles } = config;
 		const { user } = request.session;
+		const { userId } = user || {};
 
-		if (!user) {
+		if (!user || !userId) {
 			response.status(401).send({
 				error: 'UNAUTHORIZED',
 				message: 'This resource is protected and requires authorization.',
@@ -67,12 +71,48 @@ export const authMiddleware =
 			return;
 		}
 
+		const userRole = getUserRole(request.session);
+
 		if (requiredRoles) {
-			const role = getUserRole(request.session);
-			if (!requiredRoles.includes(role)) {
+			if (!requiredRoles.includes(userRole)) {
 				response.status(403).send({
 					error: 'FORBIDDEN',
 					message: 'You do not have the proper permissions to access or modify this resource.',
+				});
+				return;
+			}
+		}
+
+		console.log('request.params', request.params);
+		if (request.params.applicationId) {
+			// Validate User is allowed access to this specific Application
+			const applicationId = Number(request.params.applicationId);
+			const hasSpecialAccess =
+				userRole === userRoleSchema.Values.DAC_MEMBER ||
+				userRole === userRoleSchema.Values.DAC_CHAIR ||
+				isAssociatedRep(request.session, applicationId);
+
+			const result = await getApplicationById({ applicationId });
+			if (result.success) {
+				const { data } = result;
+				const canAccess = data.userId === userId || hasSpecialAccess;
+				if (!canAccess) {
+					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+					return;
+				}
+			} else {
+				switch (result.error) {
+					case 'NOT_FOUND':
+						response.status(404);
+						break;
+					case 'SYSTEM_ERROR':
+					default:
+						response.status(500);
+						break;
+				}
+				response.send({
+					error: result.error,
+					message: result.message,
 				});
 				return;
 			}
