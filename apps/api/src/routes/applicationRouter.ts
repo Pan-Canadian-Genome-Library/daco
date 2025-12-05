@@ -63,6 +63,7 @@ import {
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
+
 import { authMiddleware } from '../middleware/authMiddleware.ts';
 import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
@@ -1222,24 +1223,19 @@ applicationRouter.get(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<ApplicationHistoryResponseData, ['INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']>,
+			response: ResponseWithData<
+				ApplicationHistoryResponseData,
+				['FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']
+			>,
 		) => {
-			const { applicationId } = request.params;
-
-			if (!applicationId) {
-				response.status(400);
-				response.send({
-					error: 'INVALID_REQUEST',
-					message: 'Application Id is Required',
-				});
-				return;
-			}
+			const applicationId = Number(request.params.applicationId);
+			const { user } = request.session;
+			const { userId } = user || {};
 
 			try {
-				const result = await getApplicationHistory({ applicationId: Number(applicationId) });
-
-				if (!result.success) {
-					switch (result.error) {
+				const applicationInfo = await getApplicationById({ applicationId });
+				if (!applicationInfo.success) {
+					switch (applicationInfo.error) {
 						case 'NOT_FOUND':
 							response.status(404);
 							break;
@@ -1248,6 +1244,31 @@ applicationRouter.get(
 							response.status(500);
 							break;
 					}
+					response.send({
+						error: applicationInfo.error,
+						message: applicationInfo.message,
+					});
+					return;
+				}
+
+				const { data: applicationData } = applicationInfo;
+				const userRole = getUserRole(request.session);
+				const hasSpecialAccess =
+					userRole === userRoleSchema.Values.DAC_MEMBER ||
+					userRole === userRoleSchema.Values.DAC_CHAIR ||
+					isAssociatedRep(request.session, applicationId);
+
+				const canAccess = applicationData.userId === userId || hasSpecialAccess;
+
+				if (!canAccess) {
+					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+					return;
+				}
+
+				const result = await getApplicationHistory({ applicationId });
+
+				if (!result.success) {
+					response.status(500);
 					response.send({
 						error: result.error,
 						message: result.message,

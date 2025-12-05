@@ -24,14 +24,15 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { type ApplicationHistoryResponseData } from '@pcgl-daco/data-model';
 
-const useGetApplicationHistory = (id?: string | number) => {
+const useGetApplicationHistory = (id: string | number, isOpen: boolean) => {
 	return useQuery<ApplicationHistoryResponseData, ServerError>({
 		queryKey: [`history-${id}`],
+		enabled: isOpen,
+		retry: 0,
 		queryFn: async () => {
-			const response = await fetch(`/applications/${id}/history`).then(withErrorResponseHandler);
-			return await response.json().then((data: ApplicationHistoryResponseData) => {
-				return data;
-			});
+			const response = await fetch(`/applications/${id}/history`);
+			const handledResponse = withErrorResponseHandler(response);
+			return await handledResponse.json();
 		},
 	});
 };

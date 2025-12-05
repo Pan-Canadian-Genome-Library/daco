@@ -12,7 +12,7 @@
 			"currentStatus": "Current Status",
 			"lastUpdated": "Last Updated",
 			"timelineItem": " by {{userName}} at {{actionDate}}",
-			"error": "There was an error retrieving your Application History",
+			"notFound": "There are no History items related to your Application yet.",
 			"actions": {
 				"CLOSE": "Closed",
 				"INSTITUTIONAL_REP_REVISION_REQUEST": "Institutional Rep Revision Requested",
