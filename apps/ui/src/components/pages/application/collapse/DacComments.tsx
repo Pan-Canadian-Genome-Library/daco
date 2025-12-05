@@ -64,7 +64,7 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 			label: <CommentLabel label={translate('generic.dacComment')} numOfComments={dacComments.length} />,
 			children: (
 				<>
-					<Flex style={{ flexDirection: 'column-reverse', overflow: 'scroll', maxHeight: '200px' }}>
+					<Flex style={{ flexDirection: 'column-reverse', overflowY: 'scroll', maxHeight: '200px' }}>
 						{dacComments.reverse().map((comment) => (
 							<CommentEntry
 								key={comment.id}
@@ -94,7 +94,7 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 			label: <CommentLabel label={translate('generic.chairOnly')} numOfComments={chairOnlyComments.length} />,
 			children: (
 				<>
-					<Flex style={{ flexDirection: 'column-reverse', overflow: 'auto', maxHeight: '200px' }}>
+					<Flex style={{ flexDirection: 'column-reverse', overflowY: 'auto', maxHeight: '200px' }}>
 						{chairOnlyComments.reverse().map((comment) => (
 							<CommentEntry
 								key={comment.id}
