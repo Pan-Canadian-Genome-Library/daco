@@ -127,7 +127,7 @@ const Institutional = () => {
 					text={[translate('institutional-section.description1')]}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="ethics" />
+					<DacComments sectionComments={dacComments} section="institutional" />
 					<RevisionsAlert sectionRevisions={revisions['institutional']} />
 				</Row>
 				<SectionContent title={translate('institutional-section.section1')}>

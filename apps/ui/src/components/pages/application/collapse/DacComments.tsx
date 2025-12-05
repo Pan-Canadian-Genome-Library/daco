@@ -77,7 +77,10 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
 						<Search
 							min={5}
-							onSearch={(value) => onCreateCommentHandler(value, false)}
+							onSearch={(value, _, typeofEvent) => {
+								if (typeofEvent?.source === 'input') onCreateCommentHandler(value, false);
+							}}
+							allowClear
 							enterButton={
 								<Button style={{ background: pcglColours.blue }} type="primary">
 									{translate('generic.send')}
@@ -106,7 +109,10 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 					</Flex>
 					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
 						<Search
-							onSearch={(value) => onCreateCommentHandler(value, true)}
+							onSearch={(value, _, typeofEvent) => {
+								if (typeofEvent?.source === 'input') onCreateCommentHandler(value, true);
+							}}
+							allowClear
 							enterButton={
 								<Button style={{ background: pcglColours.blue }} type="primary">
 									{translate('generic.send')}
