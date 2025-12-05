@@ -17,9 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getApplicationById } from '@/controllers/applicationController.ts';
 import { userRoleSchema, type ErrorResponse, type UserRole } from '@pcgl-daco/validation';
 import { RequestHandler, type Response } from 'express';
+
+import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getUserRole, isAssociatedRep } from '../service/authService.js';
 
 export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
