@@ -110,10 +110,6 @@ applicationRouter.post(
 			try {
 				const user = request.session.user;
 
-				if (!user) {
-					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-					return;
-				}
 				// We need to get the application to validate that this user can edit it
 				const applicationResult = await getApplicationById({ applicationId: id });
 
@@ -314,11 +310,6 @@ applicationRouter.post(
 			const applicationId = Number(request.params.applicationId);
 			const user = request.session.user;
 
-			if (!user) {
-				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-				return;
-			}
-
 			try {
 				const { givenName, familyName } = user;
 				const userName = `${givenName} ${familyName}`;
@@ -403,11 +394,6 @@ applicationRouter.post(
 				const applicationId = Number(request.params.applicationId);
 				const user = request.session.user;
 
-				if (!user) {
-					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-					return;
-				}
-
 				try {
 					const { givenName, familyName } = user;
 					const userName = `${givenName} ${familyName}`;
@@ -465,11 +451,6 @@ applicationRouter.post(
 		) => {
 			const applicationId = Number(request.params.applicationId);
 			const user = request.session.user;
-
-			if (!user) {
-				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-				return;
-			}
 
 			try {
 				// We need to get the application to validate that this user submit revisions
@@ -551,11 +532,6 @@ applicationRouter.post(
 
 				const user = request.session.user;
 
-				if (!user) {
-					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-					return;
-				}
-
 				const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
 				const { givenName, familyName } = user;
 				const userName = `${givenName} ${familyName}`;
@@ -608,11 +584,6 @@ applicationRouter.post(
 			const applicationId = Number(request.params.applicationId);
 
 			const user = request.session.user;
-
-			if (!user) {
-				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-				return;
-			}
 
 			try {
 				const { givenName, familyName } = user;
@@ -762,11 +733,6 @@ applicationRouter.post(
 
 				const user = request.session.user;
 
-				if (!user) {
-					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-					return;
-				}
-
 				const applicationResult = await getApplicationById({ applicationId });
 
 				if (!applicationResult.success) {
@@ -843,10 +809,6 @@ applicationRouter.post(
 						const { message, section, toDacChair } = request.body;
 
 						const user = request.session.user;
-						if (!user) {
-							response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-							return;
-						}
 
 						const { givenName, familyName, userId } = user;
 						const userName = `${givenName} ${familyName}`;
@@ -891,11 +853,6 @@ applicationRouter.post(
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
-
-					if (!user) {
-						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-						return;
-					}
 
 					if (!isPositiveInteger(applicationId)) {
 						response.status(400).json({
@@ -991,11 +948,6 @@ applicationRouter.post(
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
-
-					if (!user) {
-						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-						return;
-					}
 
 					const revisionData = request.body;
 
@@ -1095,11 +1047,6 @@ applicationRouter.get(
 			const userRole = getUserRole(request.session);
 
 			try {
-				if (!user) {
-					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-					return;
-				}
-
 				if (!section) {
 					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
 					return;
