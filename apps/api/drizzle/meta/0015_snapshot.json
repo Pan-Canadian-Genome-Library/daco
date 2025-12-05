@@ -1,6 +1,6 @@
 {
-	"id": "b518ecd5-b943-42f8-b4c7-35ec417bf244",
-	"prevId": "8b078191-1217-401f-9fa3-6d4ab281be7c",
+	"id": "f7b0cab2-8cc1-40bf-9a40-f4f59505fc42",
+	"prevId": "b518ecd5-b943-42f8-b4c7-35ec417bf244",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
@@ -59,13 +59,15 @@
 				},
 				"state_before": {
 					"name": "state_before",
-					"type": "varchar(255)",
+					"type": "application_states",
+					"typeSchema": "public",
 					"primaryKey": false,
 					"notNull": true
 				},
 				"state_after": {
 					"name": "state_after",
-					"type": "varchar(255)",
+					"type": "application_states",
+					"typeSchema": "public",
 					"primaryKey": false,
 					"notNull": true
 				}
@@ -401,7 +403,23 @@
 					"notNull": false
 				}
 			},
-			"indexes": {},
+			"indexes": {
+				"search_index": {
+					"name": "search_index",
+					"columns": [
+						{
+							"expression": "(\n\t\t\t\tsetweight(to_tsvector('english', \"application_id\"::text), 'A') ||\n\t\t\t\tsetweight(to_tsvector('english', \"applicant_first_name\" || ' ' || \"applicant_last_name\"), 'B') ||\n\t\t\t\tsetweight(to_tsvector('english', \"applicant_institutional_email\"), 'C') ||\n\t\t\t\tsetweight(to_tsvector('english', \"applicant_primary_affiliation\"), 'D') \n\t  \t\t)",
+							"asc": true,
+							"isExpression": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "gin",
+					"with": {}
+				}
+			},
 			"foreignKeys": {},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {},

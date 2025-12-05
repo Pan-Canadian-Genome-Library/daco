@@ -17,32 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {
-	approveApplication,
-	closeApplication,
-	createApplication,
-	createApplicationPDF,
-	dacRejectApplication,
-	editApplication,
-	getAllApplications,
-	getApplicationById,
-	getDacComments,
-	getRevisions,
-	requestApplicationRevisionsByDac,
-	requestApplicationRevisionsByInstitutionalRep,
-	revokeApplication,
-	submitApplication,
-	submitDacComment,
-	submitRevision,
-	withdrawApplication,
-} from '@/controllers/applicationController.js';
-
-import BaseLogger from '@/logger.js';
-import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
-import { apiZodErrorMapping } from '@/utils/validation.js';
 import type {
 	ApplicationDTO,
+	ApplicationHistoryResponseData,
 	ApplicationListResponse,
 	ApplicationResponseData,
 	DacCommentRecord,
@@ -61,6 +38,31 @@ import {
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
+
+import {
+	approveApplication,
+	closeApplication,
+	createApplication,
+	createApplicationPDF,
+	dacRejectApplication,
+	editApplication,
+	getAllApplications,
+	getApplicationById,
+	getApplicationHistory,
+	getDacComments,
+	getRevisions,
+	requestApplicationRevisionsByDac,
+	requestApplicationRevisionsByInstitutionalRep,
+	revokeApplication,
+	submitApplication,
+	submitDacComment,
+	submitRevision,
+	withdrawApplication,
+} from '@/controllers/applicationController.js';
+import BaseLogger from '@/logger.js';
+import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
+import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
+import { apiZodErrorMapping } from '@/utils/validation.js';
 import { authMiddleware } from '../middleware/authMiddleware.ts';
 import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
@@ -281,10 +283,10 @@ applicationRouter.get(
 
 			if (result.success) {
 				const { data } = result;
-
-				// TODO: Only return application if either it belongs to the requesting user, or the user is a DAC_MEMBER of if they're an associated inst-rep
+				const userRole = getUserRole(request.session);
 				const hasSpecialAccess =
-					getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER ||
+					userRole === userRoleSchema.Values.DAC_MEMBER ||
+					userRole === userRoleSchema.Values.DAC_CHAIR ||
 					isAssociatedRep(request.session, applicationId);
 
 				const canAccess = data.userId === userId || hasSpecialAccess;
@@ -1158,6 +1160,80 @@ applicationRouter.get(
 				//Service only returns this if a SYSTEM_ERROR occurs, set to HTTP code 500 and bail if this is the case.
 				if (!result.success) {
 					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+
+				response.status(200).json(result.data);
+				return;
+			} catch (error) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: "We're sorry, an unexpected error occurred. Please try again later.",
+				});
+				return;
+			}
+		},
+	),
+);
+
+applicationRouter.get(
+	'/:applicationId/history',
+	authMiddleware(),
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
+		apiZodErrorMapping,
+		async (
+			request: Request,
+			response: ResponseWithData<
+				ApplicationHistoryResponseData,
+				['FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']
+			>,
+		) => {
+			const applicationId = Number(request.params.applicationId);
+			const { user } = request.session;
+			const { userId } = user || {};
+
+			try {
+				const applicationInfo = await getApplicationById({ applicationId });
+				if (!applicationInfo.success) {
+					switch (applicationInfo.error) {
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						case 'SYSTEM_ERROR':
+						default:
+							response.status(500);
+							break;
+					}
+					response.send({
+						error: applicationInfo.error,
+						message: applicationInfo.message,
+					});
+					return;
+				}
+
+				const { data: applicationData } = applicationInfo;
+				const userRole = getUserRole(request.session);
+				const hasSpecialAccess =
+					userRole === userRoleSchema.Values.DAC_MEMBER ||
+					userRole === userRoleSchema.Values.DAC_CHAIR ||
+					isAssociatedRep(request.session, applicationId);
+
+				const canAccess = applicationData.userId === userId || hasSpecialAccess;
+
+				if (!canAccess) {
+					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+					return;
+				}
+
+				const result = await getApplicationHistory({ applicationId });
+
+				if (!result.success) {
+					response.status(500);
+					response.send({
+						error: result.error,
+						message: result.message,
+					});
 					return;
 				}
 

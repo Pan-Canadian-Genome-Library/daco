@@ -17,18 +17,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { type ApplicationHistoryResponseData } from '@pcgl-daco/data-model';
 import { Button, Flex, Modal, Timeline, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import type { ApplicationResponseData } from '@pcgl-daco/data-model';
-
 import useGetApplication from '@/api/queries/useGetApplication';
+import useGetApplicationHistory from '@/api/queries/useGetApplicationHistory';
 import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Text } = Typography;
 
-// TODO: Replace Mock Data
-const displayHistoryItems = ['Submitted', 'Reviewed', 'Revoked', 'Approved'];
+interface HistoryModalProps {
+	id: number;
+	isOpen: boolean;
+	closeModal: () => void;
+}
 
 const TimelineDot = (
 	<div
@@ -41,47 +44,49 @@ const TimelineDot = (
 	/>
 );
 
-const HistoryTimeline = ({
-	applicationData,
-	submissionDate,
-}: {
-	applicationData: ApplicationResponseData;
-	submissionDate: string;
-}) => {
+const HistoryTimeline = ({ historyData }: { historyData: ApplicationHistoryResponseData }) => {
 	const { t: translate } = useTranslation();
-	// TODO: Replace Mock Data
-	const timelineHistoryItems = displayHistoryItems.map((item) => ({
+	const timelineHistoryItems = historyData.map((item) => ({
 		dot: TimelineDot,
 		children: (
 			<span>
-				<Text strong>{item}</Text>
+				<Text strong>{translate(`modals.history.actions.${item.action}`)}</Text>
 				<Text>
 					{translate('modals.history.timelineItem', {
-						applicantFirstName: applicationData?.contents?.applicantFirstName,
-						submissionDate,
+						userName: item.userId,
+						actionDate: new Date(item.createdAt).toDateString(),
 					})}
 				</Text>
 			</span>
 		),
 	}));
 
-	return <Timeline items={timelineHistoryItems} style={{ padding: 0 }} />;
+	return <Timeline items={timelineHistoryItems} />;
 };
 
-interface HistoryModalProps {
-	id: number;
-	isOpen: boolean;
-	closeModal: () => void;
-}
-
 const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
-	// TODO: Replace Mock Data
-	const { data: applicationData, isError, isLoading } = useGetApplication(id);
+	const {
+		data: applicationData,
+		isError: isApplicationError,
+		error: applicationError,
+		isLoading: isApplicationLoading,
+	} = useGetApplication(id);
+	const {
+		data: historyData,
+		isError: isHistoryError,
+		error: historyError,
+		isLoading: isHistoryLoading,
+	} = useGetApplicationHistory(id, isOpen);
+	const { t: translate } = useTranslation();
+
 	const displayId = `PCGL-${id}`;
-	const isHistoryLoaded = !isLoading && applicationData !== undefined && !isError;
 	const lastUpdated = applicationData?.updatedAt ? new Date(applicationData.updatedAt).toDateString() : '';
 	const submissionDate = applicationData?.createdAt ? new Date(applicationData.createdAt).toDateString() : '';
-	const { t: translate } = useTranslation();
+
+	const isError = isApplicationError || isHistoryError;
+	const isLoading = isApplicationLoading || isHistoryLoading;
+	const isNotFound = historyData !== undefined && historyData.length === 0;
+	const isHistoryLoaded = !isLoading && !isError && !isNotFound;
 
 	return (
 		<Modal
@@ -110,17 +115,23 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 							</div>
 							<div>
 								<Text strong>{translate('modals.history.currentStatus')}:</Text>
-								<Text> {applicationData.state}</Text>
+								<Text> {translate(`application.states.${applicationData?.state}`)}</Text>
 							</div>
 							<div>
 								<Text strong>{translate('modals.history.lastUpdated')}:</Text>
 								<Text> {lastUpdated}</Text>
 							</div>
 						</div>
-						<HistoryTimeline applicationData={applicationData} submissionDate={submissionDate} />
+						<HistoryTimeline historyData={historyData || []} />
 					</>
 				) : (
-					<Text style={{ margin: '1em 0' }}>{translate('modals.history.error')}</Text>
+					<Text style={{ margin: '1em 0' }}>
+						{isNotFound
+							? translate('modals.history.notFound')
+							: isHistoryError
+								? historyError?.error
+								: applicationError?.error}
+					</Text>
 				)}
 				<Button style={{ width: '10%', alignSelf: 'end' }} type="primary" onClick={closeModal}>
 					{translate('modals.buttons.close')}

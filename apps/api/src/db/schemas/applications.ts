@@ -18,21 +18,10 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { applicationActions } from './applicationActions.ts';
 import { applicationContents } from './applicationContents.ts';
-
-export const applicationStatesEnum = pgEnum('application_states', [
-	'DRAFT',
-	'INSTITUTIONAL_REP_REVIEW',
-	'INSTITUTIONAL_REP_REVISION_REQUESTED',
-	'DAC_REVIEW',
-	'DAC_REVISIONS_REQUESTED',
-	'REJECTED',
-	'APPROVED',
-	'CLOSED',
-	'REVOKED',
-]);
+import { applicationStatesEnum } from './common.ts';
 
 export const applications = pgTable('applications', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
