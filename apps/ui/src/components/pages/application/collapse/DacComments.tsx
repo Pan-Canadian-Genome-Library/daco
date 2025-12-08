@@ -37,6 +37,14 @@ interface DacCommentsProps {
 	section: SectionRoutesValues;
 }
 
+const itemStyles = {
+	marginBottom: 10,
+	background: pcglColours.geekBlue,
+	borderRadius: 8,
+	border: `1px solid ${pcglColours.blue}`,
+	maxHeight: '375px',
+};
+
 const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 	const { appId } = useOutletContext<ApplicationOutletContext>();
 
@@ -143,11 +151,3 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 };
 
 export default DacComments;
-
-const itemStyles = {
-	marginBottom: 10,
-	background: pcglColours.geekBlue,
-	borderRadius: 8,
-	border: `1px solid ${pcglColours.blue}`,
-	maxHeight: '375px',
-};
