@@ -16,6 +16,9 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { Button, Collapse, Flex, Input, Space } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
 
 import useCreateDacComments from '@/api/mutations/useCreateDacComment';
 import { ApplicationOutletContext } from '@/global/types';
@@ -24,9 +27,6 @@ import { pcglColours } from '@/providers/ThemeProvider';
 import { CaretRightFilled } from '@ant-design/icons';
 import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { SectionRoutesValues } from '@pcgl-daco/validation';
-import { Button, Collapse, Flex, Input, Space } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { useOutletContext } from 'react-router';
 import CommentEntry from './CommentEntry';
 import CommentLabel from './CommentLabel';
 
