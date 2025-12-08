@@ -1096,7 +1096,7 @@ applicationRouter.get(
 				}
 
 				// Return all comments if user is DAC chair
-				if (isDacRole) {
+				if (userRole === 'DAC_CHAIR') {
 					response.status(201).json(result.data);
 					return;
 				}
