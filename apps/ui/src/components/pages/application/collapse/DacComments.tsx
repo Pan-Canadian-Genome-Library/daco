@@ -31,8 +31,6 @@ import { useState } from 'react';
 import CommentEntry from './CommentEntry';
 import CommentLabel from './CommentLabel';
 
-const { Search } = Input;
-
 interface DacCommentsProps {
 	sectionComments: DacCommentRecord[];
 	section: SectionRoutesValues;
