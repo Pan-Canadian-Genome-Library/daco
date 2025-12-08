@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import express, { type Request } from 'express';
+
 import type {
 	ApplicationDTO,
 	ApplicationHistoryResponseData,
@@ -37,7 +39,6 @@ import {
 	submitDacCommentsSchema,
 	userRoleSchema,
 } from '@pcgl-daco/validation';
-import express, { type Request } from 'express';
 
 import {
 	approveApplication,
@@ -63,7 +64,7 @@ import BaseLogger from '@/logger.js';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { authMiddleware } from '../middleware/authMiddleware.ts';
+import { authMiddleware, type AuthReq } from '../middleware/authMiddleware.ts';
 import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
 
@@ -73,7 +74,7 @@ const logger = BaseLogger.forModule('applicationRouter');
 applicationRouter.post(
 	'/create',
 	authMiddleware({ requiredRoles: ['APPLICANT'] }),
-	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
+	async (request: AuthReq, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
 		const { userId } = user || {};
 
@@ -99,7 +100,7 @@ applicationRouter.post(
 		editApplicationRequestSchema,
 		apiZodErrorMapping,
 		async (
-			request: Request,
+			request,
 			response: ResponseWithData<
 				ApplicationResponseData,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']

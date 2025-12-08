@@ -18,9 +18,10 @@
  */
 
 import { userRoleSchema, type ErrorResponse, type UserRole } from '@pcgl-daco/validation';
-import { RequestHandler, type Response } from 'express';
+import { RequestHandler, type Request, type Response } from 'express';
 
 import { getApplicationById } from '@/controllers/applicationController.ts';
+import { type SessionUser } from '@/session/types.ts';
 import { getUserRole, isAssociatedRep } from '../service/authService.js';
 
 export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
@@ -30,6 +31,24 @@ export type AuthMiddlewareConfig = {
 };
 
 type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
+
+type SessionType = Request['session'];
+
+interface UserSession extends SessionType {
+	user: SessionUser;
+}
+
+export interface AuthReq extends Request {
+	session: UserSession;
+}
+
+const isUserSession = (session: SessionType): session is UserSession => {
+	return typeof session.user !== 'undefined';
+};
+
+const isAuthenticatedRequest = (request: Request): request is AuthReq => {
+	return request.session && isUserSession(request.session);
+};
 
 /**
  * Auth Middleware will check that the request is being made by an authenticated user.
@@ -60,63 +79,63 @@ export const authMiddleware =
 		response: Response<AuthenticationErrorResponse | ErrorResponse<['NOT_FOUND', 'SYSTEM_ERROR']>>,
 		next,
 	) => {
-		const { requiredRoles } = config;
-		const { user } = request.session;
-		const { userId } = user || {};
+		if (isAuthenticatedRequest(request)) {
+			const { user } = request.session;
+			const userRole = getUserRole(request.session);
+			const { requiredRoles } = config;
 
-		if (!user || !userId) {
-			response.status(401).send({
-				error: 'UNAUTHORIZED',
-				message: 'This resource is protected and requires authorization.',
-			});
-			return;
-		}
-
-		const userRole = getUserRole(request.session);
-
-		if (requiredRoles) {
-			if (!requiredRoles.includes(userRole)) {
-				response.status(403).send({
-					error: 'FORBIDDEN',
-					message: 'You do not have the proper permissions to access or modify this resource.',
-				});
-				return;
-			}
-		}
-
-		if (request.params.applicationId) {
-			// Validate User is allowed access to this specific Application
-			const applicationId = Number(request.params.applicationId);
-			const hasSpecialAccess =
-				userRole === userRoleSchema.Values.DAC_MEMBER ||
-				userRole === userRoleSchema.Values.DAC_CHAIR ||
-				(await isAssociatedRep(request.session, applicationId));
-
-			const result = await getApplicationById({ applicationId });
-			if (result.success) {
-				const { data } = result;
-				const canAccess = data.userId === userId || hasSpecialAccess;
-				if (!canAccess) {
-					response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+			if (requiredRoles) {
+				if (!requiredRoles.includes(userRole)) {
+					response.status(403).send({
+						error: 'FORBIDDEN',
+						message: 'You do not have the proper permissions to access or modify this resource.',
+					});
 					return;
 				}
-			} else {
-				switch (result.error) {
-					case 'NOT_FOUND':
-						response.status(404);
-						break;
-					case 'SYSTEM_ERROR':
-					default:
-						response.status(500);
-						break;
-				}
-				response.send({
-					error: result.error,
-					message: result.message,
-				});
-				return;
 			}
+
+			if (request.params.applicationId || request.body.applicationId) {
+				// Validate User is allowed access to this specific Application
+				const requestedId = request.params.applicationId || request.body.applicationId;
+				const applicationId = Number(requestedId);
+				const hasSpecialAccess =
+					userRole === userRoleSchema.Values.DAC_MEMBER ||
+					userRole === userRoleSchema.Values.DAC_CHAIR ||
+					(await isAssociatedRep(request.session, applicationId));
+
+				const result = await getApplicationById({ applicationId });
+				if (result.success) {
+					const { data } = result;
+					const { userId } = user;
+					const canAccess = data.userId === userId || hasSpecialAccess;
+					if (!canAccess) {
+						response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+						return;
+					}
+				} else {
+					switch (result.error) {
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						case 'SYSTEM_ERROR':
+						default:
+							response.status(500);
+							break;
+					}
+					response.send({
+						error: result.error,
+						message: result.message,
+					});
+					return;
+				}
+			}
+
+			return next();
 		}
 
-		return next();
+		response.status(401).send({
+			error: 'UNAUTHORIZED',
+			message: 'This resource is protected and requires authorization.',
+		});
+		return;
 	};
