@@ -27,6 +27,7 @@ import { pcglColours } from '@/providers/ThemeProvider';
 import { CaretRightFilled } from '@ant-design/icons';
 import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { SectionRoutesValues } from '@pcgl-daco/validation';
+import { useState } from 'react';
 import CommentEntry from './CommentEntry';
 import CommentLabel from './CommentLabel';
 
@@ -47,6 +48,8 @@ const itemStyles = {
 
 const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 	const { appId } = useOutletContext<ApplicationOutletContext>();
+	const [dacComment, setDacComment] = useState('');
+	const [dacCommentChairOnly, setDacCommentChairOnly] = useState('');
 
 	const {
 		state: { applicationUserRole },
@@ -83,18 +86,18 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 						))}
 					</Flex>
 					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-						<Search
-							min={5}
-							onSearch={(value, _, typeofEvent) => {
-								if (typeofEvent?.source === 'input') onCreateCommentHandler(value, false);
+						<Input allowClear value={dacComment} onChange={(e) => setDacComment(e.target.value)} />
+						<Button
+							style={{ background: pcglColours.blue }}
+							type="primary"
+							onClick={(e) => {
+								e.preventDefault();
+								onCreateCommentHandler(dacComment, false);
+								setDacComment('');
 							}}
-							allowClear
-							enterButton={
-								<Button style={{ background: pcglColours.blue }} type="primary">
-									{translate('generic.send')}
-								</Button>
-							}
-						/>
+						>
+							{translate('generic.send')}
+						</Button>
 					</Space.Compact>
 				</>
 			),
@@ -116,17 +119,19 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 						))}
 					</Flex>
 					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-						<Search
-							onSearch={(value, _, typeofEvent) => {
-								if (typeofEvent?.source === 'input') onCreateCommentHandler(value, true);
+						<Input onChange={(e) => setDacCommentChairOnly(e.target.value)} allowClear value={dacCommentChairOnly} />
+						<Button
+							style={{ background: pcglColours.blue }}
+							type="primary"
+							onClick={(e) => {
+								e.preventDefault();
+
+								onCreateCommentHandler(dacCommentChairOnly, true);
+								setDacCommentChairOnly('');
 							}}
-							allowClear
-							enterButton={
-								<Button style={{ background: pcglColours.blue }} type="primary">
-									{translate('generic.send')}
-								</Button>
-							}
-						/>
+						>
+							{translate('generic.send')}
+						</Button>
 					</Space.Compact>
 				</>
 			),
