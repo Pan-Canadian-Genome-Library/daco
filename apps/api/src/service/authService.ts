@@ -17,14 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { type Request } from 'express';
+import type { SessionData } from 'express-session';
+
+import { userRoleSchema } from '@pcgl-daco/validation';
+
 import { authConfig } from '@/config/authConfig.js';
+import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
 import { UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
-import { userRoleSchema } from '@pcgl-daco/validation';
-import type { SessionData } from 'express-session';
+import type { ResponseWithData } from '@/routes/types.ts';
 import { applicationSvc } from './applicationService.ts';
-import type { ApplicationService } from './types.ts';
+import type { ApplicationService, AuthorizedRequest, SessionType, UserSession } from './types.ts';
+
+/**
+ * Type Guards to validate request contains session data
+ * @param session
+ * @param request Express request
+ * @returns boolean
+ */
+
+export const isUserSession = (session: SessionType): session is UserSession => {
+	return typeof session.user !== 'undefined';
+};
+
+export const isAuthenticatedRequest = (request: Request): request is AuthorizedRequest => {
+	return request.session && isUserSession(request.session);
+};
 
 /**
  * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
@@ -74,5 +94,59 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 		return true;
 	}
 
+	return false;
+}
+
+export async function canAccessApplication(
+	request: Request,
+	response: ResponseWithData<any, ['UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+): Promise<Boolean> {
+	if (isAuthenticatedRequest(request)) {
+		const { session } = request;
+		const { user } = session;
+
+		// Validate User is allowed access to this specific Application
+		const userRole = getUserRole(session);
+		const requestedId = request.params.applicationId || request.body.applicationId;
+
+		// Validate User is allowed access to this specific Application
+		const hasSpecialAccess =
+			userRole === userRoleSchema.Values.DAC_MEMBER ||
+			userRole === userRoleSchema.Values.DAC_CHAIR ||
+			(await isAssociatedRep(session, requestedId));
+
+		const result = await getApplicationById({ applicationId: requestedId });
+		if (result.success) {
+			const { data } = result;
+			const { userId } = user;
+			const canAccess = data.userId === userId || hasSpecialAccess;
+			if (!canAccess) {
+				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+				return false;
+			}
+		} else {
+			switch (result.error) {
+				case 'NOT_FOUND':
+					response.status(404);
+					break;
+				case 'SYSTEM_ERROR':
+				default:
+					response.status(500);
+					break;
+			}
+			response.send({
+				error: result.error,
+				message: result.message,
+			});
+			return false;
+		}
+
+		return true;
+	}
+
+	response.status(401).send({
+		error: 'UNAUTHORIZED',
+		message: 'This resource is protected and requires authorization.',
+	});
 	return false;
 }

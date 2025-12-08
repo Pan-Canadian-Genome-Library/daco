@@ -61,11 +61,11 @@ import {
 	withdrawApplication,
 } from '@/controllers/applicationController.js';
 import BaseLogger from '@/logger.js';
+import { authMiddleware } from '@/middleware/authMiddleware.ts';
+import { getUserRole, isAssociatedRep, isAuthenticatedRequest } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { authMiddleware, type AuthReq } from '../middleware/authMiddleware.ts';
-import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
 
 const applicationRouter = express.Router();
@@ -74,21 +74,23 @@ const logger = BaseLogger.forModule('applicationRouter');
 applicationRouter.post(
 	'/create',
 	authMiddleware({ requiredRoles: ['APPLICANT'] }),
-	async (request: AuthReq, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
-		const { user } = request.session;
-		const { userId } = user || {};
+	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
+		if (isAuthenticatedRequest(request)) {
+			const { user } = request.session;
+			const { userId } = user || {};
 
-		if (!userId) {
-			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-			return;
-		}
+			if (!userId) {
+				response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
+				return;
+			}
 
-		const result = await createApplication({ user_id: userId });
+			const result = await createApplication({ user_id: userId });
 
-		if (result.success) {
-			response.status(201).json(result.data);
-		} else {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+			if (result.success) {
+				response.status(201).json(result.data);
+			} else {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+			}
 		}
 	},
 );
