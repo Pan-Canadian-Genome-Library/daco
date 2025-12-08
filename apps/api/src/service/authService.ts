@@ -38,12 +38,12 @@ import type { ApplicationService, AuthorizedRequest, SessionType, UserSession } 
  * @returns boolean
  */
 
-export const isUserSession = (session: SessionType): session is UserSession => {
-	return typeof session.user !== 'undefined';
+export const isSessionWithUser = (session: SessionType): session is UserSession => {
+	return typeof session.user !== 'undefined' && !!session.user.userId;
 };
 
-export const isAuthenticatedRequest = (request: Request): request is AuthorizedRequest => {
-	return request.session && isUserSession(request.session);
+export const isRequestWithSession = (request: Request): request is AuthorizedRequest => {
+	return request.session && isSessionWithUser(request.session);
 };
 
 /**
@@ -97,56 +97,61 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 	return false;
 }
 
-export async function canAccessApplication(
+export const isAuthenticatedRequestHandler = (
 	request: Request,
-	response: ResponseWithData<any, ['UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
-): Promise<Boolean> {
-	if (isAuthenticatedRequest(request)) {
-		const { session } = request;
-		const { user } = session;
-
-		// Validate User is allowed access to this specific Application
-		const userRole = getUserRole(session);
-		const requestedId = request.params.applicationId || request.body.applicationId;
-
-		// Validate User is allowed access to this specific Application
-		const hasSpecialAccess =
-			userRole === userRoleSchema.Values.DAC_MEMBER ||
-			userRole === userRoleSchema.Values.DAC_CHAIR ||
-			(await isAssociatedRep(session, requestedId));
-
-		const result = await getApplicationById({ applicationId: requestedId });
-		if (result.success) {
-			const { data } = result;
-			const { userId } = user;
-			const canAccess = data.userId === userId || hasSpecialAccess;
-			if (!canAccess) {
-				response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
-				return false;
-			}
-		} else {
-			switch (result.error) {
-				case 'NOT_FOUND':
-					response.status(404);
-					break;
-				case 'SYSTEM_ERROR':
-				default:
-					response.status(500);
-					break;
-			}
-			response.send({
-				error: result.error,
-				message: result.message,
-			});
-			return false;
-		}
-
+	response: ResponseWithData<any, ['UNAUTHORIZED']>,
+): request is AuthorizedRequest => {
+	if (isRequestWithSession(request)) {
 		return true;
 	}
-
 	response.status(401).send({
 		error: 'UNAUTHORIZED',
 		message: 'This resource is protected and requires authorization.',
 	});
 	return false;
+};
+
+export async function canAccessRequestHandler(
+	request: AuthorizedRequest,
+	response: ResponseWithData<any, ['UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
+): Promise<Boolean> {
+	const { session } = request;
+	const { user } = session;
+
+	// Validate User is allowed access to this specific Application
+	const userRole = getUserRole(session);
+	const requestedId = request.params.applicationId || request.body.applicationId;
+
+	const hasSpecialAccess =
+		userRole === userRoleSchema.Values.DAC_MEMBER ||
+		userRole === userRoleSchema.Values.DAC_CHAIR ||
+		(await isAssociatedRep(session, requestedId));
+
+	const result = await getApplicationById({ applicationId: requestedId });
+	if (result.success) {
+		const { data } = result;
+		const { userId } = user;
+		const canAccess = data.userId === userId || hasSpecialAccess;
+		if (!canAccess) {
+			response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+			return false;
+		}
+	} else {
+		switch (result.error) {
+			case 'NOT_FOUND':
+				response.status(404);
+				break;
+			case 'SYSTEM_ERROR':
+			default:
+				response.status(500);
+				break;
+		}
+		response.send({
+			error: result.error,
+			message: result.message,
+		});
+		return false;
+	}
+
+	return true;
 }
