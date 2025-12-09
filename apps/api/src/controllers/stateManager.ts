@@ -106,7 +106,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	async _dispatchAndUpdateAction(
 		action: ApplicationStateEvents,
 		actionMethod: AddActionMethods,
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord & { actionId: number }, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		try {
 			await this.dispatch(action);
@@ -121,7 +121,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	async _updateRecords(
 		method: AddActionMethods,
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord & { actionId: number }, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		const db = getDbInstance();
 		const applicationRepo = applicationSvc(db);
@@ -165,7 +165,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	// Handler Methods
 	// Submit
 	// TODO: Add Validation + Edit Content service methods
-	async submitDraft(userName?: string) {
+	async submitDraft(userName: string) {
 		const transitionResult = this._canPerformAction(submit);
 		if (!transitionResult.success) {
 			return transitionResult;
@@ -179,7 +179,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async submitRepRevision(userName?: string) {
+	async submitRepRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_rep_revisions);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(submit_rep_revisions, 'repSubmit', userName);
@@ -188,7 +188,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async submitDacRevision(userName?: string) {
+	async submitDacRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_dac_revisions);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(submit_dac_revisions, 'dacSubmit', userName);
@@ -240,7 +240,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Revise
-	async reviseRepReview(userName?: string) {
+	async reviseRepReview(userName: string) {
 		const transitionResult = this._canPerformAction(rep_revision_request);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(rep_revision_request, 'repRevision', userName);
@@ -249,7 +249,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	async reviseDacReview(userName?: string) {
+	async reviseDacReview(userName: string) {
 		const transitionResult = this._canPerformAction(dac_revision_request);
 		if (transitionResult.success) {
 			return await this._dispatchAndUpdateAction(dac_revision_request, 'dacRevision', userName);
@@ -264,7 +264,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Close
 	async closeDraft(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(close);
 		if (transitionResult.success) {
@@ -275,7 +275,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async closeRepReview(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(close);
 		if (transitionResult.success) {
@@ -286,7 +286,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async closeDacReview(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(close);
 		if (transitionResult.success) {
@@ -302,7 +302,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Approve
 	async approveRepReview(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(rep_approve_review);
 		if (transitionResult.success) {
@@ -313,7 +313,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async approveDacReview(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(dac_approve_review);
 		if (transitionResult.success) {
@@ -329,7 +329,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Reject
 	async rejectDacReview(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(dac_reject);
 		if (transitionResult.success) {
@@ -345,7 +345,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Revoke
 	async revokeApproval(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(revoked);
 		if (transitionResult.success) {
@@ -361,7 +361,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Withdraw
 	async withdrawRepReview(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(rep_review_withdraw);
 		if (transitionResult.success) {
@@ -372,7 +372,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	async withdrawDacReview(
-		userName?: string,
+		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 		const transitionResult = this._canPerformAction(dac_review_withdraw);
 		if (transitionResult.success) {

@@ -477,7 +477,7 @@ export const dacRejectApplication = async ({
 }: {
 	applicationId: number;
 	rejectionReason: string;
-	userName?: string;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -544,7 +544,7 @@ export const submitRevision = async ({
 	userName,
 }: {
 	applicationId: number;
-	userName?: string;
+	userName: string;
 }): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -628,7 +628,7 @@ export const revokeApplication = async (
 	applicationId: number,
 	isDACMember: boolean,
 	revokeReason: string,
-	userName?: string,
+	userName: string,
 ): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -689,7 +689,7 @@ export const requestApplicationRevisionsByDac = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-	userName?: string;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -781,7 +781,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
-	userName?: string;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -876,7 +876,7 @@ export const submitApplication = async ({
 	userName,
 }: {
 	applicationId: number;
-	userName?: string;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -972,7 +972,7 @@ export const closeApplication = async ({
 	userName,
 }: {
 	applicationId: number;
-	userName?: string;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -1027,7 +1027,7 @@ export const withdrawApplication = async ({
 	userName,
 }: {
 	applicationId: number;
-	userName?: string;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
