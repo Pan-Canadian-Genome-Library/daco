@@ -31,8 +31,6 @@ export type AuthMiddlewareConfig = {
 
 type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
 
-// if (isAuthenticatedRequest(request)) {
-
 /**
  * Auth Middleware will check that the request is being made by an authenticated user.
  *
@@ -57,11 +55,7 @@ type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
  */
 export const authMiddleware =
 	(config: AuthMiddlewareConfig = {}): RequestHandler =>
-	async (
-		request,
-		response: Response<AuthenticationErrorResponse | ErrorResponse<['NOT_FOUND', 'SYSTEM_ERROR']>>,
-		next,
-	) => {
+	async (request, response: Response<AuthenticationErrorResponse>, next) => {
 		const { user } = request.session;
 		const userRole = getUserRole(request.session);
 		const { requiredRoles } = config;

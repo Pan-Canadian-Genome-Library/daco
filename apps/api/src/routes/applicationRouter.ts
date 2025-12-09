@@ -64,6 +64,7 @@ import BaseLogger from '@/logger.js';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { canAccessRequest, getUserRole, isAssociatedRep, isAuthenticatedRequest } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
+import { getUserName } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -98,7 +99,7 @@ applicationRouter.post(
 		editApplicationRequestSchema,
 		apiZodErrorMapping,
 		async (
-			request,
+			request: Request,
 			response: ResponseWithData<
 				ApplicationResponseData,
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
@@ -301,8 +302,7 @@ applicationRouter.post(
 				const user = request.session.user;
 
 				try {
-					const { givenName, familyName } = user;
-					const userName = givenName && familyName ? `${givenName} ${familyName}` : '';
+					const userName = getUserName(user);
 					const approvalResult = await approveApplication({ applicationId, userName });
 
 					if (approvalResult.success) {
@@ -389,8 +389,7 @@ applicationRouter.post(
 					const user = request.session.user;
 
 					try {
-						const { givenName, familyName } = user;
-						const userName = `${givenName} ${familyName}`;
+						const userName = getUserName(user);
 						const result = await dacRejectApplication({ applicationId, rejectionReason, userName });
 
 						if (!result.success) {
@@ -457,8 +456,7 @@ applicationRouter.post(
 						return;
 					}
 
-					const { givenName, familyName } = user;
-					const userName = `${givenName} ${familyName}`;
+					const userName = getUserName(user);
 					const result = await submitRevision({ applicationId, userName });
 
 					if (!result.success) {
@@ -525,8 +523,7 @@ applicationRouter.post(
 					const user = request.session.user;
 
 					const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
-					const { givenName, familyName } = user;
-					const userName = `${givenName} ${familyName}`;
+					const userName = getUserName(user);
 					const result = await revokeApplication(applicationId, isDACMember, revokeReason, userName);
 
 					if (!result.success) {
@@ -580,8 +577,7 @@ applicationRouter.post(
 				const user = request.session.user;
 
 				try {
-					const { givenName, familyName } = user;
-					const userName = `${givenName} ${familyName}`;
+					const userName = getUserName(user);
 					const result = await closeApplication({ applicationId, userName });
 
 					if (!result.success) {
@@ -663,8 +659,7 @@ applicationRouter.post(
 						return;
 					}
 
-					const { givenName, familyName } = user;
-					const userName = `${givenName} ${familyName}`;
+					const userName = getUserName(user);
 					const result = await withdrawApplication({ applicationId, userName });
 
 					if (result.success) {
@@ -727,8 +722,7 @@ applicationRouter.post(
 
 					// Only rep and applicant can submit an application
 					if (isApplicationUser || isRep) {
-						const { givenName, familyName } = user;
-						const userName = `${givenName} ${familyName}`;
+						const userName = getUserName(user);
 						const result = await submitApplication({ applicationId, userName });
 
 						if (!result.success) {
@@ -792,8 +786,8 @@ applicationRouter.post(
 							const applicationId = Number(request.params.applicationId);
 							const { message, section, toDacChair } = request.body;
 							const user = request.session.user;
-							const { givenName, familyName, userId } = user;
-							const userName = `${givenName} ${familyName}`;
+							const { userId } = user;
+							const userName = getUserName(user);
 							const result = await submitDacComment({
 								applicationId,
 								userId,
@@ -847,8 +841,7 @@ applicationRouter.post(
 						}
 
 						const revisions = request.body;
-						const { givenName, familyName } = user;
-						const userName = `${givenName} ${familyName}`;
+						const userName = getUserName(user);
 
 						// Call service method to handle request
 						const updatedApplication = await requestApplicationRevisionsByDac({
@@ -944,8 +937,7 @@ applicationRouter.post(
 							return;
 						}
 
-						const { givenName, familyName } = user;
-						const userName = `${givenName} ${familyName}`;
+						const userName = getUserName(user);
 
 						// Call service method to handle request
 						const updatedApplication = await requestApplicationRevisionsByInstitutionalRep({

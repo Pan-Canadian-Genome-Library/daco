@@ -84,8 +84,8 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 }
 
 /**
- * Handler to Enforce Request is Authorized, or send Unauthorized Error Response
- * Acts as a Middleware/Request Handler that enforces Type safety
+ * Handler to enforce Request is Authorized, or send Unauthorized Error Response
+ * Acts as a Middleware/Request Handler that insures Type safety
  * due to limitations with Express Type definitions
  * @param request Express request
  * @param response Accepts any ResponseWithData

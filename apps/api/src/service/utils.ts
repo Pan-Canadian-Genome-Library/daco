@@ -22,6 +22,7 @@ import { type Request } from 'express';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
+import { type SessionUser } from '@/session/types.ts';
 import {
 	type ApplicationActionsColumnName,
 	type ApplicationsColumnName,
@@ -69,3 +70,13 @@ export const isSessionWithUser = (session: SessionType): session is UserSession 
 export const isRequestWithSession = (request: Request): request is AuthorizedRequest => {
 	return request.session && isSessionWithUser(request.session);
 };
+
+/**
+ * Convenience function to obtain standard userName string from user data
+ * @returns string | undefined
+ */
+export function getUserName(user: SessionUser): string {
+	const { givenName, familyName, userId } = user;
+	const userName = givenName && familyName ? `${givenName} ${familyName}` : userId;
+	return userName;
+}
