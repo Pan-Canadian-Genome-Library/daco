@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
 import { LabelWithLink } from '@/components/pages/application/form-components/labels/LabelWithLink';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -42,7 +43,7 @@ const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode, userRole: state.applicationUserRole });
 	const {
@@ -90,6 +91,7 @@ const Appendices = () => {
 					text={[translate('appendices.description')]}
 				/>
 				<Row>
+					<DacComments sectionComments={dacComments} section="appendices" />
 					<RevisionsAlert sectionRevisions={revisions['appendices']} />
 				</Row>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>

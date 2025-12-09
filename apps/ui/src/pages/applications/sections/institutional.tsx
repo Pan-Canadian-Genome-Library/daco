@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -43,7 +44,7 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({
 		revisions,
@@ -126,6 +127,7 @@ const Institutional = () => {
 					text={[translate('institutional-section.description1')]}
 				/>
 				<Row>
+					<DacComments sectionComments={dacComments} section="institutional" />
 					<RevisionsAlert sectionRevisions={revisions['institutional']} />
 				</Row>
 				<SectionContent title={translate('institutional-section.section1')}>
