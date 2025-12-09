@@ -26,25 +26,11 @@ import { authConfig } from '@/config/authConfig.js';
 import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
-import { UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
+import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
 import type { ResponseWithData } from '@/routes/types.ts';
 import { applicationSvc } from './applicationService.ts';
-import type { ApplicationService, AuthorizedRequest, SessionType, UserSession } from './types.ts';
-
-/**
- * Type Guards to validate request contains session data
- * @param session
- * @param request Express request
- * @returns boolean
- */
-
-export const isSessionWithUser = (session: SessionType): session is UserSession => {
-	return typeof session.user !== 'undefined' && !!session.user.userId;
-};
-
-export const isRequestWithSession = (request: Request): request is AuthorizedRequest => {
-	return request.session && isSessionWithUser(request.session);
-};
+import type { ApplicationService, AuthorizedRequest } from './types.ts';
+import { isRequestWithSession } from './utils.ts';
 
 /**
  * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
@@ -97,7 +83,15 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 	return false;
 }
 
-export const isAuthenticatedRequestHandler = (
+/**
+ * Handler to Enforce Request is Authorized, or send Unauthorized Error Response
+ * Acts as a Middleware/Request Handler that enforces Type safety
+ * due to limitations with Express Type definitions
+ * @param request Express request
+ * @param response Accepts any ResponseWithData
+ * @returns boolean
+ */
+export const isAuthenticatedRequest = (
 	request: Request,
 	response: ResponseWithData<any, ['UNAUTHORIZED']>,
 ): request is AuthorizedRequest => {
@@ -111,14 +105,18 @@ export const isAuthenticatedRequestHandler = (
 	return false;
 };
 
-export async function canAccessRequestHandler(
+/**
+ * Validate User is allowed access to this specific Application based on userRole or userId
+ * @param request AuthorizedRequest with session, user and userId
+ * @param response
+ * @returns boolean
+ */
+export async function canAccessRequest(
 	request: AuthorizedRequest,
 	response: ResponseWithData<any, ['UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 ): Promise<Boolean> {
 	const { session } = request;
 	const { user } = session;
-
-	// Validate User is allowed access to this specific Application
 	const userRole = getUserRole(session);
 	const requestedId = request.params.applicationId || request.body.applicationId;
 

@@ -62,12 +62,7 @@ import {
 } from '@/controllers/applicationController.js';
 import BaseLogger from '@/logger.js';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
-import {
-	canAccessRequestHandler,
-	getUserRole,
-	isAssociatedRep,
-	isAuthenticatedRequestHandler,
-} from '@/service/authService.ts';
+import { canAccessRequest, getUserRole, isAssociatedRep, isAuthenticatedRequest } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
@@ -80,7 +75,7 @@ applicationRouter.post(
 	'/create',
 	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
-		if (isAuthenticatedRequestHandler(request, response)) {
+		if (isAuthenticatedRequest(request, response)) {
 			const {
 				user: { userId },
 			} = request.session;
@@ -111,7 +106,7 @@ applicationRouter.post(
 		) => {
 			const data = request.body;
 			const { id, update } = data;
-			if (isAuthenticatedRequestHandler(request, response) && (await canAccessRequestHandler(request, response))) {
+			if (isAuthenticatedRequest(request, response) && (await canAccessRequest(request, response))) {
 				try {
 					// We need to get the application to validate that this user can edit it
 					const applicationResult = await getApplicationById({ applicationId: id });
@@ -170,7 +165,7 @@ applicationRouter.get(
 		request: Request,
 		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
 	) => {
-		if (isAuthenticatedRequestHandler(request, response)) {
+		if (isAuthenticatedRequest(request, response)) {
 			const { userId } = request.session.user;
 			const userRole = getUserRole(request.session);
 			const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
@@ -265,7 +260,7 @@ applicationRouter.get(
 				['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
 			>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response)) {
+			if (isAuthenticatedRequest(request, response)) {
 				const applicationId = Number(request.params.applicationId);
 				const result = await getApplicationById({ applicationId });
 
@@ -301,7 +296,7 @@ applicationRouter.post(
 			request: Request,
 			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response)) {
+			if (isAuthenticatedRequest(request, response)) {
 				const applicationId = Number(request.params.applicationId);
 				const user = request.session.user;
 
@@ -388,7 +383,7 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
-				if (isAuthenticatedRequestHandler(request, response)) {
+				if (isAuthenticatedRequest(request, response)) {
 					const { rejectionReason } = request.body;
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
@@ -449,7 +444,7 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response) && (await canAccessRequestHandler(request, response))) {
+			if (isAuthenticatedRequest(request, response) && (await canAccessRequest(request, response))) {
 				const applicationId = Number(request.params.applicationId);
 				const user = request.session.user;
 
@@ -523,7 +518,7 @@ applicationRouter.post(
 					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 				>,
 			) => {
-				if (isAuthenticatedRequestHandler(request, response)) {
+				if (isAuthenticatedRequest(request, response)) {
 					const applicationId = Number(request.params.applicationId);
 					const { revokeReason } = request.body;
 
@@ -579,7 +574,7 @@ applicationRouter.post(
 			request: Request,
 			response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response)) {
+			if (isAuthenticatedRequest(request, response)) {
 				const applicationId = Number(request.params.applicationId);
 
 				const user = request.session.user;
@@ -642,7 +637,7 @@ applicationRouter.post(
 				['INVALID_REQUEST', 'FORBIDDEN', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']
 			>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response) && (await canAccessRequestHandler(request, response))) {
+			if (isAuthenticatedRequest(request, response) && (await canAccessRequest(request, response))) {
 				const applicationId = Number(request.params.applicationId);
 				const { user } = request.session;
 
@@ -716,7 +711,7 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response)) {
+			if (isAuthenticatedRequest(request, response)) {
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
@@ -792,7 +787,7 @@ applicationRouter.post(
 				submitDacCommentsSchema,
 				apiZodErrorMapping,
 				async (request, response: ResponseWithData<DacCommentRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
-					if (isAuthenticatedRequestHandler(request, response)) {
+					if (isAuthenticatedRequest(request, response)) {
 						try {
 							const applicationId = Number(request.params.applicationId);
 							const { message, section, toDacChair } = request.body;
@@ -838,7 +833,7 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
-				if (isAuthenticatedRequestHandler(request, response)) {
+				if (isAuthenticatedRequest(request, response)) {
 					try {
 						const applicationId = Number(request.params.applicationId);
 						const user = request.session.user;
@@ -935,7 +930,7 @@ applicationRouter.post(
 					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'UNAUTHORIZED', 'INVALID_STATE_TRANSITION', 'FORBIDDEN']
 				>,
 			) => {
-				if (isAuthenticatedRequestHandler(request, response)) {
+				if (isAuthenticatedRequest(request, response)) {
 					try {
 						const applicationId = Number(request.params.applicationId);
 						const user = request.session.user;
@@ -1031,7 +1026,7 @@ applicationRouter.get(
 				['UNAUTHORIZED', 'NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']
 			>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response) && (await canAccessRequestHandler(request, response))) {
+			if (isAuthenticatedRequest(request, response) && (await canAccessRequest(request, response))) {
 				const { applicationId, section } = request.params;
 				const user = request.session.user;
 				const userRole = getUserRole(request.session);
@@ -1160,7 +1155,7 @@ applicationRouter.get(
 				['FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']
 			>,
 		) => {
-			if (isAuthenticatedRequestHandler(request, response) && (await canAccessRequestHandler(request, response))) {
+			if (isAuthenticatedRequest(request, response) && (await canAccessRequest(request, response))) {
 				const applicationId = Number(request.params.applicationId);
 
 				try {
