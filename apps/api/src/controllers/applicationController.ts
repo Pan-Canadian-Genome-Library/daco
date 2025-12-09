@@ -17,10 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type {
+	ApplicationDTO,
+	ApplicationHistoryResponseData,
+	ApplicationResponseData,
+	ApproveApplication,
+	DacCommentRecord,
+	RevisionsDTO,
+} from '@pcgl-daco/data-model';
+import { ApplicationStates } from '@pcgl-daco/data-model';
+import type { SectionRoutesValues, UpdateEditApplicationRequest } from '@pcgl-daco/validation';
+
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
+import { applicationActionSvc } from '@/service/applicationActionService.ts';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
@@ -38,6 +50,7 @@ import {
 } from '@/service/types.js';
 import {
 	convertToApplicationContentsRecord,
+	convertToApplicationHistoryRecord,
 	convertToApplicationRecord,
 	convertToBasicApplicationRecord,
 	convertToCollaboratorRecords,
@@ -46,15 +59,6 @@ import {
 } from '@/utils/aliases.js';
 import { failure, type AsyncResult, type Result } from '@/utils/results.js';
 import { validateRevisedFields } from '@/utils/validation.ts';
-import type {
-	ApplicationDTO,
-	ApplicationResponseData,
-	ApproveApplication,
-	DacCommentRecord,
-	RevisionsDTO,
-} from '@pcgl-daco/data-model';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
-import type { SectionRoutesValues, UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
 const logger = BaseLogger.forModule('applicationController');
@@ -224,6 +228,27 @@ export const getApplicationById = async ({
 	}
 
 	return result;
+};
+
+/**
+ * Gets Action History for a corresponding application ID
+ * @param applicationId - The ID of the application within the database.
+ * @returns Success with the history of the application / Failure with Error.
+ */
+export const getApplicationHistory = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationHistoryResponseData, 'SYSTEM_ERROR'> => {
+	const database = getDbInstance();
+	const applicationActionRepo = applicationActionSvc(database);
+
+	const result = await applicationActionRepo.listActions({ application_id: applicationId });
+	if (!result.success) return result;
+
+	const aliasedResult = convertToApplicationHistoryRecord(result.data);
+
+	return aliasedResult;
 };
 
 /**

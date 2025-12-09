@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,11 +17,37 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './applicationActions.ts';
-export * from './applicationContents.ts';
-export * from './applications.ts';
-export * from './collaborators.ts';
-export * from './common.ts';
-export * from './dacComments.ts';
-export * from './files.ts';
-export * from './revisionRequests.ts';
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { DacCommentRecord } from '@pcgl-daco/data-model';
+import { SectionRoutesValues } from '@pcgl-daco/validation';
+import { useQuery } from '@tanstack/react-query';
+import { withErrorResponseHandler } from '../apiUtils';
+
+const useGetDacComments = ({
+	applicationId,
+	section,
+}: {
+	applicationId?: string | number;
+	section?: SectionRoutesValues | string;
+}) => {
+	// Do not fetch if its intro section
+	const preventSection = section !== 'intro';
+
+	return useQuery<DacCommentRecord[], ServerError>({
+		queryKey: [`comments-${applicationId}-${section}`],
+		enabled: preventSection,
+		queryFn: async () => {
+			if (!preventSection) {
+				return [];
+			}
+			const response = await fetch(`/applications/${applicationId}/dac/comments/${section}`, {
+				method: 'GET',
+			}).then(withErrorResponseHandler);
+
+			return await response.json();
+		},
+	});
+};
+
+export default useGetDacComments;

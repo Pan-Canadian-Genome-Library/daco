@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import LabelWithExample from '@/components/pages/application/form-components/labels/LabelWithExample';
 import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
@@ -42,7 +43,7 @@ const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({ revisions, section: 'project', isEditMode, userRole: state.applicationUserRole });
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
@@ -116,6 +117,7 @@ const Project = () => {
 					showLockIcon={!canEdit}
 				/>
 				<Row>
+					<DacComments sectionComments={dacComments} section="project" />
 					<RevisionsAlert sectionRevisions={revisions['project']} />
 				</Row>
 				<Row gutter={26}>

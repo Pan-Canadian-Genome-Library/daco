@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -43,7 +44,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode, userRole: state.applicationUserRole });
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
@@ -123,6 +124,7 @@ const Applicant = () => {
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
 				<Row>
+					<DacComments sectionComments={dacComments} section="applicant" />
 					<RevisionsAlert sectionRevisions={revisions['applicant']} />
 				</Row>
 				<SectionContent title={translate('applicant-section.section1')}>

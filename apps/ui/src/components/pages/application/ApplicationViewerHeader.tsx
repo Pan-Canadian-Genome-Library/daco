@@ -124,17 +124,6 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 		const buttons = [];
 		const canShowEdit = (appState === ApplicationStates.DRAFT || isWithdrawable) && !isEditMode;
 
-		buttons.push(
-			<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>,
-			<Button
-				onClick={() => {
-					setShowHistoryModal(true);
-				}}
-			>
-				{translate('button.history')}
-			</Button>,
-		);
-
 		if (canShowEdit) {
 			buttons.push(
 				<ProtectedComponent key={'header-edit'} requiredRoles={['APPLICANT']}>
@@ -144,6 +133,13 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 		}
 
 		buttons.push(
+			<Button
+				onClick={() => {
+					setShowHistoryModal(true);
+				}}
+			>
+				{translate('button.history')}
+			</Button>,
 			<ProtectedComponent
 				key={'header-revoke'}
 				requiredRoles={['DAC_CHAIR', 'APPLICANT', 'INSTITUTIONAL_REP']}

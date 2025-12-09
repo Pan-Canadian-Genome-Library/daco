@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,11 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './applicationActions.ts';
-export * from './applicationContents.ts';
-export * from './applications.ts';
-export * from './collaborators.ts';
-export * from './common.ts';
-export * from './dacComments.ts';
-export * from './files.ts';
-export * from './revisionRequests.ts';
+import { pcglColours } from '@/providers/ThemeProvider';
+import { CommentOutlined } from '@ant-design/icons';
+import { Flex, Typography } from 'antd';
+
+const { Text } = Typography;
+
+type CommentLabelProps = {
+	label: string;
+	numOfComments: number;
+};
+
+const CommentLabel = ({ label, numOfComments }: CommentLabelProps) => {
+	return (
+		<Flex gap={'middle'}>
+			<CommentOutlined
+				style={{
+					backgroundColor: pcglColours.lighterBlue,
+					borderRadius: 20,
+					padding: 5,
+					color: 'white',
+					fontSize: '0.75rem',
+				}}
+			/>
+			<Flex align="center">
+				<Text>{`${label} - (${numOfComments})`}</Text>
+			</Flex>
+		</Flex>
+	);
+};
+
+export default CommentLabel;
