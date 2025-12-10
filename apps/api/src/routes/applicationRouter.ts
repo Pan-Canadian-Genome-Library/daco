@@ -89,7 +89,7 @@ applicationRouter.post(
 				response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 			}
 		} else {
-			authErrorResponseHandler(response);
+			authErrorResponseHandler(response, false);
 		}
 	},
 );
@@ -111,7 +111,6 @@ applicationRouter.post(
 			const { id, update } = data;
 			if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
 				try {
-					// ensure application has this user's ID
 					const result = await editApplication({ id, update });
 					if (result.success) {
 						response.status(200).json(result.data);
@@ -140,7 +139,7 @@ applicationRouter.post(
 					return;
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -235,7 +234,7 @@ applicationRouter.get(
 				}
 			}
 		} else {
-			authErrorResponseHandler(response);
+			authErrorResponseHandler(response, false);
 		}
 	},
 );
@@ -275,7 +274,7 @@ applicationRouter.get(
 					}
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -360,7 +359,7 @@ applicationRouter.post(
 						.json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later.` });
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -421,7 +420,7 @@ applicationRouter.post(
 						response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
 					}
 				} else {
-					authErrorResponseHandler(response);
+					authErrorResponseHandler(response, false);
 				}
 			},
 		),
@@ -494,7 +493,7 @@ applicationRouter.post(
 					});
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -556,7 +555,7 @@ applicationRouter.post(
 					response.status(200).json(result.data);
 					return;
 				} else {
-					authErrorResponseHandler(response);
+					authErrorResponseHandler(response, false);
 				}
 			},
 		),
@@ -618,7 +617,7 @@ applicationRouter.post(
 					});
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -693,7 +692,7 @@ applicationRouter.post(
 					});
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -770,7 +769,7 @@ applicationRouter.post(
 					});
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -819,7 +818,7 @@ applicationRouter.post(
 							});
 						}
 					} else {
-						authErrorResponseHandler(response);
+						authErrorResponseHandler(response, false);
 					}
 				},
 			),
@@ -911,7 +910,7 @@ applicationRouter.post(
 						});
 					}
 				} else {
-					authErrorResponseHandler(response);
+					authErrorResponseHandler(response, false);
 				}
 			},
 		),
@@ -1007,7 +1006,7 @@ applicationRouter.post(
 						});
 					}
 				} else {
-					authErrorResponseHandler(response);
+					authErrorResponseHandler(response, false);
 				}
 			},
 		),
@@ -1090,7 +1089,7 @@ applicationRouter.get(
 					return;
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),
@@ -1206,7 +1205,7 @@ applicationRouter.get(
 					return;
 				}
 			} else {
-				authErrorResponseHandler(response);
+				authErrorResponseHandler(response, false);
 			}
 		},
 	),

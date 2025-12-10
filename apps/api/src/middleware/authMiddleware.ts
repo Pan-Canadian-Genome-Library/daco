@@ -60,6 +60,15 @@ export const authMiddleware =
 		const userRole = getUserRole(request.session);
 		const { requiredRoles } = config;
 
+		if (!user) {
+			response.status(401).send({
+				error: 'UNAUTHORIZED',
+				message: 'This resource is protected and requires authorization.',
+			});
+
+			return;
+		}
+
 		if (requiredRoles) {
 			if (!requiredRoles.includes(userRole)) {
 				response.status(403).send({
@@ -68,15 +77,6 @@ export const authMiddleware =
 				});
 				return;
 			}
-		}
-
-		if (!user) {
-			response.status(401).send({
-				error: 'UNAUTHORIZED',
-				message: 'This resource is protected and requires authorization.',
-			});
-
-			return;
 		}
 
 		return next();

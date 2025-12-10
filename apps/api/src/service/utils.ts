@@ -24,6 +24,7 @@ import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { type SessionUser } from '@/session/types.ts';
+import { Result } from '@/utils/results.ts';
 import {
 	type ApplicationActionsColumnName,
 	type ApplicationsColumnName,
@@ -89,34 +90,43 @@ export function getUserName(user: SessionUser): string {
  * @param response Accepts any ResponseWithData
  * @returns boolean
  */
-export const authErrorResponseHandler = (response: ResponseWithData<any, ['UNAUTHORIZED']>) => {
-	response.status(401).send({
-		error: 'UNAUTHORIZED',
-		message: 'This resource is protected and requires authorization.',
-	});
+export const authErrorResponseHandler = (
+	response: ResponseWithData<any, ['UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR']>,
+	isAuthenticated: boolean,
+	canAccessResult?: Result<any, 'FORBIDDEN'>,
+) => {
+	if (!isAuthenticated) {
+		response.status(401).send({
+			error: 'UNAUTHORIZED',
+			message: 'This resource is protected and requires authorization.',
+		});
+	}
 
-	// ??
-	// if (!applicationResult.success) {
-	// 	response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-	// 	return;
-	// }
-	// if (!canAccess) {
-	// response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
-	// return false;
-	// }
-	// } else if !result {
-	// switch (result.error) {
-	// 	case 'NOT_FOUND':
-	// 		response.status(404);
-	// 		break;
-	// 	case 'SYSTEM_ERROR':
-	// 	default:
-	// 		response.status(500);
-	// 		break;
-	// }
-	// response.send({
-	// 	error: result.error,
-	// 	message: result.message,
-	// });
-	// }
+	if (canAccessResult) {
+		// if (!applicationResult.success) {
+		// 	response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+		// 	return;
+		// }
+		// if (!canAccess) {
+		// response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+		// return false;
+		// }
+		// } else if !result {
+		// switch (result.error) {
+		// 	case 'NOT_FOUND':
+		// 		response.status(404);
+		// 		break;
+		// 	case 'SYSTEM_ERROR':
+		// 	default:
+		// 		response.status(500);
+		// 		break;
+		// }
+		// response.send({
+		// 	error: result.error,
+		// 	message: result.message,
+		// });
+		// }
+	}
+
+	return;
 };
