@@ -113,6 +113,7 @@ export async function canAccessRequest(request: AuthorizedRequest): Promise<Bool
 		const { data } = result;
 		const { userId } = user;
 		const canAccess = data.userId === userId || hasSpecialAccess;
+
 		if (!canAccess) {
 			return false;
 		}
@@ -121,3 +122,5 @@ export async function canAccessRequest(request: AuthorizedRequest): Promise<Bool
 	}
 	return true;
 }
+
+// return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to get application record.');

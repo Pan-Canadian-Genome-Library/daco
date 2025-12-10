@@ -88,12 +88,14 @@ export function getUserName(user: SessionUser): string {
  * Standardized handler for common Auth error cases
  * Insures Type safety for downstream Request Handler due to limitations with Express Type definitions
  * @param response Accepts any ResponseWithData
+ * @param isAuthenticated Indicates User Session Data is missing
+ * @param canAccessResult Result type w/ specific reason User is not allowed to access the current application
  * @returns boolean
  */
 export const authErrorResponseHandler = (
 	response: ResponseWithData<any, ['UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR']>,
 	isAuthenticated: boolean,
-	canAccessResult?: Result<any, 'FORBIDDEN'>,
+	canAccessResult?: Result<any, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'>,
 ) => {
 	if (!isAuthenticated) {
 		response.status(401).send({
