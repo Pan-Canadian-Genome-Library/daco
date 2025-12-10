@@ -18,7 +18,7 @@
  */
 
 import { type Request } from 'express';
-import type { SessionData } from 'express-session';
+import { type SessionData } from 'express-session';
 
 import { userRoleSchema } from '@pcgl-daco/validation';
 
@@ -27,7 +27,6 @@ import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
 import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
-import type { ResponseWithData } from '@/routes/types.ts';
 import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService, AuthorizedRequest } from './types.ts';
 import { isRequestWithSession } from './utils.ts';
@@ -84,37 +83,21 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 }
 
 /**
- * Handler to enforce Request is Authorized, or send Unauthorized Error Response
- * Acts as a Middleware/Request Handler that insures Type safety
- * due to limitations with Express Type definitions
+ * Handler to enforce Request is Authorized
+ * Insures Type safety for downstream Request Handler due to limitations with Express Type definitions
  * @param request Express request
- * @param response Accepts any ResponseWithData
  * @returns boolean
  */
-export const isAuthenticatedRequest = (
-	request: Request,
-	response: ResponseWithData<any, ['UNAUTHORIZED']>,
-): request is AuthorizedRequest => {
-	if (isRequestWithSession(request)) {
-		return true;
-	}
-	response.status(401).send({
-		error: 'UNAUTHORIZED',
-		message: 'This resource is protected and requires authorization.',
-	});
-	return false;
+export const isAuthenticatedRequest = (request: Request): request is AuthorizedRequest => {
+	return isRequestWithSession(request);
 };
 
 /**
  * Validate User is allowed access to this specific Application based on userRole or userId
  * @param request AuthorizedRequest with session, user and userId
- * @param response
  * @returns boolean
  */
-export async function canAccessRequest(
-	request: AuthorizedRequest,
-	response: ResponseWithData<any, ['UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
-): Promise<Boolean> {
+export async function canAccessRequest(request: AuthorizedRequest): Promise<Boolean> {
 	const { session } = request;
 	const { user } = session;
 	const userRole = getUserRole(session);
@@ -131,25 +114,10 @@ export async function canAccessRequest(
 		const { userId } = user;
 		const canAccess = data.userId === userId || hasSpecialAccess;
 		if (!canAccess) {
-			response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
 			return false;
 		}
 	} else {
-		switch (result.error) {
-			case 'NOT_FOUND':
-				response.status(404);
-				break;
-			case 'SYSTEM_ERROR':
-			default:
-				response.status(500);
-				break;
-		}
-		response.send({
-			error: result.error,
-			message: result.message,
-		});
 		return false;
 	}
-
 	return true;
 }

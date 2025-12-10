@@ -22,6 +22,7 @@ import { type Request } from 'express';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
+import { type ResponseWithData } from '@/routes/types.ts';
 import { type SessionUser } from '@/session/types.ts';
 import {
 	type ApplicationActionsColumnName,
@@ -72,11 +73,50 @@ export const isRequestWithSession = (request: Request): request is AuthorizedReq
 };
 
 /**
- * Convenience function to obtain standard userName string from user data
- * @returns string | undefined
+ * Function to obtain standardized userName string from user data
+ * userId is used as a default fallback value
+ * @returns string
  */
 export function getUserName(user: SessionUser): string {
 	const { givenName, familyName, userId } = user;
-	const userName = givenName && familyName ? `${givenName} ${familyName}` : userId;
-	return userName;
+	const userName = givenName || familyName ? `${givenName || ''} ${familyName || ''}` : userId;
+	return userName.trim();
 }
+
+/**
+ * Standardized handler for common Auth error cases
+ * Insures Type safety for downstream Request Handler due to limitations with Express Type definitions
+ * @param response Accepts any ResponseWithData
+ * @returns boolean
+ */
+export const authErrorResponseHandler = (response: ResponseWithData<any, ['UNAUTHORIZED']>) => {
+	response.status(401).send({
+		error: 'UNAUTHORIZED',
+		message: 'This resource is protected and requires authorization.',
+	});
+
+	// ??
+	// if (!applicationResult.success) {
+	// 	response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+	// 	return;
+	// }
+	// if (!canAccess) {
+	// response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
+	// return false;
+	// }
+	// } else if !result {
+	// switch (result.error) {
+	// 	case 'NOT_FOUND':
+	// 		response.status(404);
+	// 		break;
+	// 	case 'SYSTEM_ERROR':
+	// 	default:
+	// 		response.status(500);
+	// 		break;
+	// }
+	// response.send({
+	// 	error: result.error,
+	// 	message: result.message,
+	// });
+	// }
+};
