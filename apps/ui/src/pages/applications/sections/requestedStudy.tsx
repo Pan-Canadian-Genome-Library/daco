@@ -44,17 +44,21 @@ const rule = createSchemaFieldRule(requestedStudiesSchema);
 
 interface RequestedStudy {
 	studyName: string;
-	studyID: number;
+	studyID: string;
 }
 
 const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 	{
+		studyName: 'TEST-CA',
+		studyID: 'TEST-CA',
+	},
+	{
 		studyName: 'OICR Study',
-		studyID: 1,
+		studyID: 'OICR-STUDY',
 	},
 	{
 		studyName: 'Government of Canada Pan-Canadian Collaboration Study',
-		studyID: 2,
+		studyID: 'GCPCS-STUDY',
 	},
 ];
 
