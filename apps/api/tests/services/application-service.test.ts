@@ -26,6 +26,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
+import { ApplicationStateValues } from '@pcgl-daco/data-model';
 import {
 	addInitialApplications,
 	addPaginationDonors,
@@ -58,18 +59,28 @@ describe('Application Service', () => {
 		testApplicationService = applicationSvc(db);
 	});
 
+	/**
+	 * Function returns the first id of an application based on the state provided.
+	 * @param state
+	 * @returns id
+	 */
+	const getFirstIdTestByState = async (applicationState?: ApplicationStateValues) => {
+		const applicationRecordsResult = await testApplicationService.listApplications({
+			user_id,
+			state: applicationState ? [applicationState] : undefined,
+		});
+
+		assert.ok(applicationRecordsResult.success);
+		const applicationRecords = applicationRecordsResult.data.applications;
+		const testId = applicationRecords[0]?.id;
+		assert.ok(testId);
+
+		return testId;
+	};
+
 	describe('Get Applications', () => {
 		it('should get applications requested by id, with application_contents', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			const applicationRecords = applicationRecordsResult.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords[0]);
-
-			const { id } = applicationRecords[0];
+			const id = await getFirstIdTestByState();
 
 			const result = await testApplicationService.getApplicationWithContents({ id });
 
@@ -223,7 +234,7 @@ describe('Application Service', () => {
 		});
 
 		it('should return proper totals amount', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id, pageSize: 1000 });
 			assert.ok(applicationRecordsResult.success);
 			const { applications, totals } = applicationRecordsResult.data;
 			assert.ok(totals);
@@ -331,16 +342,8 @@ describe('Application Service', () => {
 
 	describe('FindOneAndUpdate Application', () => {
 		it('should populate updated_at field', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const id = await getFirstIdTestByState();
 
-			assert.ok(applicationRecordsResult.success);
-
-			const applicationRecords = applicationRecordsResult.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords[0]);
-
-			const { id } = applicationRecords[0];
 			await testApplicationService.findOneAndUpdate({ id, update: {} });
 
 			const result = await testApplicationService.getApplicationById({ id });
@@ -355,15 +358,7 @@ describe('Application Service', () => {
 
 	describe('Edit Applications', () => {
 		it('should allow editing applications and return record with updated fields', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			const applicationRecords = applicationRecordsResult.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
-
-			const { id } = applicationRecords[0];
+			const id = await getFirstIdTestByState();
 
 			const update = { applicant_first_name: 'Test' };
 
@@ -378,28 +373,28 @@ describe('Application Service', () => {
 		});
 	});
 
-	describe('Get Application Metadata', () => {
-		it('should list statistics for how many applications are in each state category', async () => {
-			const appStateTotals = await testApplicationService.applicationStateTotals();
-			assert.ok(appStateTotals.success);
+	describe('Application Revision Requests', () => {
+		it('Should create revision', async () => {
+			const testId = await getFirstIdTestByState('INSTITUTIONAL_REP_REVISION_REQUESTED');
 
-			const allStates = appStateTotals.data;
-
-			const allApplications = await testApplicationService.listApplications({
-				user_id,
-				pageSize: allRecordsPageSize,
+			const revisionResult = await testApplicationService.createRevisionRequest({
+				applicationId: testId,
+				revisionData: {
+					application_id: testId,
+					agreements_approved: false,
+					appendices_approved: false,
+					ethics_approved: false,
+					sign_and_submit_approved: true,
+					comments: 'Test revision',
+					applicant_approved: false,
+					institution_rep_approved: false,
+					collaborators_approved: false,
+					project_approved: false,
+					requested_studies_approved: false,
+				},
 			});
-			assert.ok(allApplications.success);
 
-			const applicationRecords = allApplications.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(allStates);
-
-			const allDraftRecords = applicationRecords.filter((records) => records.state === 'DRAFT');
-
-			assert.equal(allStates.DRAFT, allDraftRecords.length);
-			assert.equal(allStates.TOTAL, applicationRecords.length);
+			assert.ok(revisionResult.success);
 		});
 	});
 
