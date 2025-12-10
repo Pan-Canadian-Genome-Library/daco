@@ -37,8 +37,8 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
-import { assignUserPermissionsAndNotify } from '@/service/permissionService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
+import { assignUserPermissionsAndNotify } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -384,14 +384,13 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
-	approverAccessToken
+	approverAccessToken,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
 		const collaboratorsService = await collaboratorsSvc(database);
 
 		if (!result.success) {
@@ -441,8 +440,7 @@ export const approveApplication = async ({
 
 		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
 
-		if(applicant_institutional_email && requested_studies && requested_studies.length) {
-
+		if (applicant_institutional_email && requested_studies && requested_studies.length) {
 			await assignUserPermissionsAndNotify({
 				institutionalEmail: applicant_institutional_email,
 				approverAccessToken,
@@ -463,8 +461,7 @@ export const approveApplication = async ({
 		}
 
 		collaboratorResponse.data.forEach(async (collab) => {
-
-			if(collab.institutional_email && requested_studies && requested_studies.length) {
+			if (collab.institutional_email && requested_studies && requested_studies.length) {
 				await assignUserPermissionsAndNotify({
 					institutionalEmail: collab.institutional_email,
 					approverAccessToken,
