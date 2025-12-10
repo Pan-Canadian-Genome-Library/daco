@@ -31,6 +31,7 @@ import useEditApplication from '@/api/mutations/useEditApplication';
 import useGetDownload from '@/api/queries/useGetDownload';
 import useGetFile from '@/api/queries/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
 import DeleteEthicsFileModal from '@/components/pages/application/modals/DeleteEthicsFileModal';
 import SectionContent from '@/components/pages/application/SectionContent';
@@ -54,7 +55,7 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({ revisions, section: 'ethics', isEditMode, userRole: state.applicationUserRole });
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -161,6 +162,7 @@ const Ethics = () => {
 					showDivider={true}
 				/>
 				<Row>
+					<DacComments sectionComments={dacComments} section="ethics" />
 					<RevisionsAlert sectionRevisions={revisions['ethics']} />
 				</Row>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>

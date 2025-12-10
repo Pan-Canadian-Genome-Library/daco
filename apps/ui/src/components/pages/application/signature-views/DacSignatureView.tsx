@@ -29,6 +29,7 @@ import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Flex, Row, Typography } from 'antd';
 import { Trans, useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
+import DacComments from '../collapse/DacComments';
 
 const { Text } = Typography;
 
@@ -43,7 +44,7 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 	const {
 		state: { fields },
 	} = useApplicationContext();
-	const { revisions } = useOutletContext<ApplicationOutletContext>();
+	const { revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 
 	const { applicantFirstName, applicantLastName, institutionalRepFirstName, institutionalRepLastName } = fields;
 
@@ -64,6 +65,7 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 			</SectionTitle>
 			<SectionContent showDivider={false}>
 				<Row>
+					<DacComments sectionComments={dacComments} section="sign" />
 					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />{' '}
 				</Row>
 			</SectionContent>

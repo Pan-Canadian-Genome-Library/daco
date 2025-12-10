@@ -142,7 +142,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			</Button>,
 			<ProtectedComponent
 				key={'header-revoke'}
-				requiredRoles={['DAC_CHAIR', 'APPLICANT']}
+				requiredRoles={['DAC_CHAIR', 'APPLICANT', 'INSTITUTIONAL_REP']}
 				requiredStates={['APPROVED']}
 			>
 				<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
