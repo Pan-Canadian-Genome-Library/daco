@@ -37,6 +37,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
+import { assignUserPermissionsAndNotify } from '@/service/permissionService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
@@ -373,6 +374,7 @@ export const createApplicationPDF = async ({
  * @async
  * @param {ApproveApplication} param0
  * @param {ApproveApplication} param0.applicationId
+ * @param {ApproveApplication} param1.approverAccessToken
  * @returns {Promise<{
  * 	success: boolean;
  * 	message?: string;
@@ -382,6 +384,7 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
+	approverAccessToken
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -436,13 +439,18 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
+		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
 
-		emailService.sendEmailApproval({
-			id: application.id,
-			to: applicant_institutional_email,
-			name: applicant_first_name || 'N/A',
-		});
+		if(applicant_institutional_email && requested_studies && requested_studies.length) {
+
+			await assignUserPermissionsAndNotify({
+				institutionalEmail: applicant_institutional_email,
+				approverAccessToken,
+				requestedStudies: requested_studies,
+				applicationId: application.id,
+				applicantFirstName: applicant_first_name,
+			});
+		}
 
 		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
 
@@ -454,12 +462,17 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		collaboratorResponse.data.forEach((collab) => {
-			emailService.sendEmailApproval({
-				id: application.id,
-				to: collab.institutional_email,
-				name: collab.first_name || 'N/A',
-			});
+		collaboratorResponse.data.forEach(async (collab) => {
+
+			if(collab.institutional_email && requested_studies && requested_studies.length) {
+				await assignUserPermissionsAndNotify({
+					institutionalEmail: collab.institutional_email,
+					approverAccessToken,
+					requestedStudies: requested_studies,
+					applicationId: application.id,
+					applicantFirstName: applicant_first_name,
+				});
+			}
 		});
 
 		return dtoFriendlyData;

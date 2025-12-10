@@ -330,7 +330,8 @@ applicationRouter.post(
 			const applicationId = Number(request.params.applicationId);
 
 			try {
-				const approvalResult = await approveApplication({ applicationId });
+				const approverAccessToken = request.session.account?.accessToken || ''
+				const approvalResult = await approveApplication({ applicationId, approverAccessToken });
 
 				if (approvalResult.success) {
 					/**

@@ -75,6 +75,19 @@ export const authZUserInfo = z.object({
 });
 export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
 
+export const lookupUserResponse = z.array(z.string());
+
+export type PCGLAuthzLookupUserResponse = z.infer<typeof lookupUserResponse>;
+
+export const addUserToStudyPermissionResponse = z.array(
+	z.object({
+		end_date: z.string(),
+		start_date: z.string(),
+		study_id: z.string(),
+	}),
+);
+export type PCGLAddUserToStudyPermissionResponse = z.infer<typeof addUserToStudyPermissionResponse>;
+
 export const ServiceTokenResponse = z.object({
 	token: z.string(),
 });

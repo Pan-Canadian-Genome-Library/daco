@@ -31,6 +31,7 @@ if (serverConfig.isProduction && !enabled) {
 }
 
 const authConfigSchema = z.object({
+	APPROVED_PERMISSION_EXPIRES_IN_DAYS: z.coerce.number().int().optional().default(365),
 	AUTH_PROVIDER_HOST: z.string().url(),
 	AUTH_CLIENT_ID: z.string(),
 	AUTH_CLIENT_SECRET: z.string(),

@@ -18,12 +18,30 @@
  */
 
 import { authConfig } from '@/config/authConfig.ts';
-import logger from '@/logger.ts';
+import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 import urlJoin from 'url-join';
-import { authZUserInfo, ServiceTokenResponse, type PCGLAuthZUserInfoResponse } from './types.ts';
+import {
+	addUserToStudyPermissionResponse,
+	authZUserInfo,
+	lookupUserResponse,
+	ServiceTokenResponse,
+	type PCGLAddUserToStudyPermissionResponse,
+	type PCGLAuthzLookupUserResponse,
+	type PCGLAuthZUserInfoResponse,
+} from './types.ts';
+
+const logger = BaseLogger.forModule('authZClient');
 
 let serviceToken: string | undefined = undefined;
+
+const today = new Date().toISOString();
+
+const addDaysToDateString = (dateString: string, days: number) => {
+	const date = new Date(dateString);
+	date.setDate(date.getDate() + days);
+	return date.toISOString();
+};
 
 /**
  * Function to fetch AuthZ serviceToken to append to header requirement X-Service-Token
@@ -135,5 +153,91 @@ export const getUserInformation = async (
 	} catch (error) {
 		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
 		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
+	}
+};
+
+/**
+ * Function to lookup a user by their email address in the AuthZ service
+ * @param emailAddress
+ * @param accessToken
+ * @returns a list of PCGL IDs that match the email provided
+ */
+export const lookupUserByEmail = async (
+	emailAddress: string,
+	accessToken: string,
+): AsyncResult<PCGLAuthzLookupUserResponse, 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
+	try {
+		const queryParams = new URLSearchParams();
+		queryParams.set('email', emailAddress);
+		const response = await fetchAuthZResource(`/user/lookup?${queryParams.toString()}`, accessToken);
+
+		if (response.status === 404) {
+			const message = `No user found with email ${emailAddress} in the AuthZ service.`;
+			logger.info('[AUTHZ]:', message);
+			return failure('NOT_FOUND', message);
+		}
+
+		const res = await response.json();
+
+		const resultLookUpUser = lookupUserResponse.safeParse(res);
+
+		if (!resultLookUpUser.success) {
+			const message = `AuthZ service returned unexpected data to find user with email ${emailAddress}`;
+			logger.error(`[AUTHZ]: ${message}`, resultLookUpUser.error);
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultLookUpUser.data);
+	} catch (error) {
+		const message = `Unexpected error while getting user with email ${emailAddress} in the AuthZ service.`;
+		logger.error('[AUTHZ]:', message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+/**
+ * Function to Add user to study permission in the AuthZ service
+ * @param studyId
+ * @param userPcglId
+ * @param accessToken
+ * @returns a list of study permissions for the user, otherwise returns failure with SYSTEM_ERROR
+ */
+export const addUserToStudyPermission = async (
+	studyId: string,
+	userPcglId: string,
+	accessToken: string,
+): AsyncResult<PCGLAddUserToStudyPermissionResponse, 'SYSTEM_ERROR'> => {
+	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
+	try {
+		const response = await fetchAuthZResource(`/user/${userPcglId}`, accessToken, {
+			method: 'POST',
+			body: JSON.stringify({
+				study_id: studyId,
+				start_date: today,
+				end_date: addDaysToDateString(today, APPROVED_PERMISSION_EXPIRES_IN_DAYS),
+			}),
+		});
+
+		if (!response.ok) {
+			const message = `Failed to add user '${userPcglId}' to study '${studyId}'`;
+			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${await response.text()}`);
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		const res = await response.json();
+
+		const resultAddPermission = addUserToStudyPermissionResponse.safeParse(res);
+
+		if (!resultAddPermission.success) {
+			const message = `AuthZ service returned unexpected data to add user to study permission`;
+			logger.error(`[AUTHZ]: ${message}`, resultAddPermission.error);
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultAddPermission.data);
+	} catch (error) {
+		const message = `Unexpected error while adding ${userPcglId} to study ${studyId} in the AuthZ service.`;
+		logger.error('[AUTHZ]:', message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };
