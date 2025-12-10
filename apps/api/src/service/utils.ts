@@ -24,7 +24,7 @@ import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { type SessionUser } from '@/session/types.ts';
-import { Result } from '@/utils/results.ts';
+import { type Failure } from '@/utils/results.ts';
 import {
 	type ApplicationActionsColumnName,
 	type ApplicationsColumnName,
@@ -89,13 +89,13 @@ export function getUserName(user: SessionUser): string {
  * Insures Type safety for downstream Request Handler due to limitations with Express Type definitions
  * @param response Accepts any ResponseWithData
  * @param isAuthenticated Indicates User Session Data is missing
- * @param canAccessResult Result type w/ specific reason User is not allowed to access the current application
+ * @param canAccessResult Failure Result with Error code & message
  * @returns boolean
  */
 export const authErrorResponseHandler = (
 	response: ResponseWithData<any, ['UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR']>,
 	isAuthenticated: boolean,
-	canAccessResult?: Result<any, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'>,
+	canAccessResult?: Failure<'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'>,
 ) => {
 	if (!isAuthenticated) {
 		response.status(401).send({
@@ -105,29 +105,22 @@ export const authErrorResponseHandler = (
 	}
 
 	if (canAccessResult) {
-		// if (!applicationResult.success) {
-		// 	response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-		// 	return;
-		// }
-		// if (!canAccess) {
-		// response.status(403).json({ error: 'FORBIDDEN', message: 'User cannot access this application.' });
-		// return false;
-		// }
-		// } else if !result {
-		// switch (result.error) {
-		// 	case 'NOT_FOUND':
-		// 		response.status(404);
-		// 		break;
-		// 	case 'SYSTEM_ERROR':
-		// 	default:
-		// 		response.status(500);
-		// 		break;
-		// }
-		// response.send({
-		// 	error: result.error,
-		// 	message: result.message,
-		// });
-		// }
+		switch (canAccessResult.error) {
+			case 'FORBIDDEN':
+				response.status(403);
+				break;
+			case 'NOT_FOUND':
+				response.status(404);
+				break;
+			case 'SYSTEM_ERROR':
+			default:
+				response.status(500);
+				break;
+		}
+		response.send({
+			error: canAccessResult.error,
+			message: canAccessResult.message,
+		});
 	}
 
 	return;

@@ -27,6 +27,7 @@ import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
 import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService, AuthorizedRequest } from './types.ts';
 import { isRequestWithSession } from './utils.ts';
@@ -97,7 +98,9 @@ export const isAuthenticatedRequest = (request: Request): request is AuthorizedR
  * @param request AuthorizedRequest with session, user and userId
  * @returns boolean
  */
-export async function canAccessRequest(request: AuthorizedRequest): Promise<Boolean> {
+export async function canAccessRequest(
+	request: AuthorizedRequest,
+): AsyncResult<AuthorizedRequest, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 	const { session } = request;
 	const { user } = session;
 	const userRole = getUserRole(session);
@@ -115,12 +118,10 @@ export async function canAccessRequest(request: AuthorizedRequest): Promise<Bool
 		const canAccess = data.userId === userId || hasSpecialAccess;
 
 		if (!canAccess) {
-			return false;
+			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');
 		}
 	} else {
-		return false;
+		return result;
 	}
-	return true;
+	return success(request);
 }
-
-// return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to get application record.');
