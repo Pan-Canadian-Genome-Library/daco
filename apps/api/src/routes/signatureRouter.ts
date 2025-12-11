@@ -93,10 +93,10 @@ signatureRouter.get(
 				const userRole = getUserRole(request.session);
 
 				const isApplicationUser = applicationResult.data.userId === userId; // Check if the user who created the app
-				const isDacMember = userRole === 'DAC_MEMBER' || userRole === 'DAC_CHAIR'; // Check if user is a DAC_MEMBER
+				const isDac = userRole === 'DAC_MEMBER' || userRole === 'DAC_CHAIR'; // Check if user is a DAC_MEMBER or DAC_CHAIR
 				const isRep = await isAssociatedRep(request.session, applicationId); // Check if user is rep
 
-				if (!(isApplicationUser || isDacMember || isRep)) {
+				if (!(isApplicationUser || isDac || isRep)) {
 					response
 						.status(403)
 						.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
