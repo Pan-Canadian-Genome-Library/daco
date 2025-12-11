@@ -38,7 +38,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
-import { assignUserPermissionsAndNotify } from '@/service/permissionService.ts';
+import { assignUserPermissions } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -391,6 +391,7 @@ export const approveApplication = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
+		const emailService = await emailSvc();
 		const collaboratorsService = await collaboratorsSvc(database);
 
 		if (!result.success) {
@@ -441,13 +442,19 @@ export const approveApplication = async ({
 		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
 
 		if (applicant_institutional_email && requested_studies && requested_studies.length) {
-			await assignUserPermissionsAndNotify({
+			const permissionAdded = await assignUserPermissions({
 				institutionalEmail: applicant_institutional_email,
 				approverAccessToken,
 				requestedStudies: requested_studies,
-				applicationId: application.id,
-				applicantFirstName: applicant_first_name,
 			});
+
+			if (permissionAdded) {
+				emailService.sendEmailApproval({
+					id: application.id,
+					to: applicant_institutional_email,
+					name: applicant_first_name || 'N/A',
+				});
+			}
 		}
 
 		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
@@ -462,13 +469,19 @@ export const approveApplication = async ({
 
 		collaboratorResponse.data.forEach(async (collab) => {
 			if (collab.institutional_email && requested_studies && requested_studies.length) {
-				await assignUserPermissionsAndNotify({
+				const permissionAdded = await assignUserPermissions({
 					institutionalEmail: collab.institutional_email,
 					approverAccessToken,
 					requestedStudies: requested_studies,
-					applicationId: application.id,
-					applicantFirstName: applicant_first_name,
 				});
+
+				if (permissionAdded) {
+					emailService.sendEmailApproval({
+						id: application.id,
+						to: collab.institutional_email,
+						name: collab.first_name || 'N/A',
+					});
+				}
 			}
 		});
 

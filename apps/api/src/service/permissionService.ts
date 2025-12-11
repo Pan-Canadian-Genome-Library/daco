@@ -18,48 +18,37 @@
  */
 
 import { addUserToStudyPermission, lookupUserByEmail } from '@/external/pcglAuthZClient.ts';
-import { emailSvc } from '@/service/email/emailsService.ts';
-
-const emailService = await emailSvc();
 
 type AssignUserPermissionsAndNotifyParams = {
 	institutionalEmail: string;
 	approverAccessToken: string;
 	requestedStudies: string[];
-	applicationId: number;
-	applicantFirstName: string | null | undefined;
 };
 
 /**
  * This function assigns user permissions to the requested studies
  * First it looks for the associated PCGL user ID using the institutional email
  * Then it assigns the study permissions using the approver's access token
- * Lastly, it sends an email notification to the user upon successful assignment
  *
  * @param param0
  * @returns
  */
-export const assignUserPermissionsAndNotify = async ({
+export const assignUserPermissions = async ({
 	institutionalEmail,
 	approverAccessToken,
 	requestedStudies,
-	applicationId,
-	applicantFirstName,
 }: AssignUserPermissionsAndNotifyParams) => {
 	const lookup = await lookupUserByEmail(institutionalEmail, approverAccessToken);
 	if (!lookup.success || lookup.data.length === 0) return;
 
+	let permissionAdded = false;
+
 	for (const studyId of requestedStudies ?? []) {
 		for (const userPcglId of lookup.data) {
 			const result = await addUserToStudyPermission(studyId, userPcglId, approverAccessToken);
-
-			if (result.success) {
-				emailService.sendEmailApproval({
-					id: applicationId,
-					to: institutionalEmail,
-					name: applicantFirstName || 'N/A',
-				});
-			}
+			permissionAdded = result.success;
 		}
 	}
+
+	return permissionAdded;
 };
