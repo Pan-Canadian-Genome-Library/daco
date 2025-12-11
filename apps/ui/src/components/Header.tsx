@@ -27,7 +27,7 @@ import { useLocation } from 'react-router';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { clearExtraSessionInformation } from '@/global/localStorage';
-import { pcglHeaderTheme } from '@/providers/ThemeProvider';
+import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
 import ApplyForAccessModal from './modals/ApplyForAccessModal';
@@ -42,6 +42,7 @@ interface MenuItem {
 }
 
 interface MenuButton extends MenuItem {
+	children?: JSX.Element;
 	buttonProps: ButtonProps;
 	onClickAction?: VoidFunction;
 }
@@ -60,10 +61,10 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, role } = useUserContext();
+	const { isLoggedIn, user, role } = useUserContext();
+	const { emails = [], familyName = '', givenName = '' } = user || {};
 
 	const isResponsiveMode = minWidth <= token.screenXL;
-
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
 	const [applyForAccessOpen, setApplyForAccessOpen] = useState(false);
 
@@ -141,8 +142,22 @@ const HeaderComponent = () => {
 		},
 		position: 'right',
 	};
+
+	const displayName = givenName || familyName ? `${givenName || ''} ${familyName || ''}` : givenName;
+	const displayEmail = emails[0]?.address;
+	console.log(displayEmail);
+	console.log(familyName);
+	console.log(givenName);
+	const UserInfo = (
+		<>
+			<p>{displayName}</p>
+			<p style={{ margin: 0, height: 20, fontWeight: 400, color: pcglColours.primary }}>{displayEmail}</p>
+		</>
+	);
+
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
+		children: UserInfo,
 		onClickAction: () => clearExtraSessionInformation(),
 		buttonProps: {
 			type: `${isHome ? 'default' : 'text'}`,
@@ -151,6 +166,7 @@ const HeaderComponent = () => {
 			icon: !isHome ? <LogoutOutlined /> : null,
 			iconPosition: 'end',
 			href: API_PATH_LOGOUT,
+			style: { height: 'auto', lineHeight: 0.5, textAlign: 'left' },
 		},
 		position: 'right',
 	};
@@ -201,7 +217,7 @@ const HeaderComponent = () => {
 							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
 							onClick={clickAction ? () => onMenuButtonClick(clickAction) : undefined}
 						>
-							{menuItem.name}
+							{menuItem.children ? menuItem.children : menuItem.name}
 						</Button>
 					);
 				} else {
