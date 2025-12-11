@@ -53,12 +53,12 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 		studyID: 'TEST-CA',
 	},
 	{
-		studyName: 'OICR Study',
-		studyID: 'OICR-STUDY',
+		studyName: 'EXAMPLE-CA',
+		studyID: 'EXAMPLE-CA',
 	},
 	{
-		studyName: 'Government of Canada Pan-Canadian Collaboration Study',
-		studyID: 'GCPCS-STUDY',
+		studyName: 'TEST-C3G',
+		studyID: 'TEST-C3G',
 	},
 ];
 
