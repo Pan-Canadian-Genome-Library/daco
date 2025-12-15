@@ -160,11 +160,13 @@ export const getUserInformation = async (
  * Function to lookup a user by their email address in the AuthZ service
  * @param emailAddress
  * @param accessToken
+ * @param retry
  * @returns a list of PCGL IDs that match the email provided
  */
 export const lookupUserByEmail = async (
 	emailAddress: string,
 	accessToken: string,
+	retry = 0,
 ): AsyncResult<PCGLAuthzLookupUserResponse, 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
 	try {
 		const queryParams = new URLSearchParams();
@@ -172,8 +174,11 @@ export const lookupUserByEmail = async (
 		const response = await fetchAuthZResource(`/user/lookup?${queryParams.toString()}`, accessToken);
 
 		if (response.status === 404) {
-			const message = `No user found with email ${emailAddress} in the AuthZ service.`;
-			logger.info('[AUTHZ]:', message);
+			const message = `No user found with email ${emailAddress}.`;
+			logger.info('[AUTHZ]:', `retry: ${retry}`, message);
+			if (retry > 0) {
+				return await lookupUserByEmail(emailAddress, accessToken, retry - 1);
+			}
 			return failure('NOT_FOUND', message);
 		}
 
@@ -183,14 +188,20 @@ export const lookupUserByEmail = async (
 
 		if (!resultLookUpUser.success) {
 			const message = `AuthZ service returned unexpected data to find user with email ${emailAddress}`;
-			logger.error(`[AUTHZ]: ${message}`, resultLookUpUser.error);
+			logger.error(`[AUTHZ]: ${message}`, `retry: ${retry}`, resultLookUpUser.error);
+			if (retry > 0) {
+				return await lookupUserByEmail(emailAddress, accessToken, retry - 1);
+			}
 			return failure('SYSTEM_ERROR', message);
 		}
 
 		return success(resultLookUpUser.data);
 	} catch (error) {
-		const message = `Unexpected error while getting user with email ${emailAddress} in the AuthZ service.`;
-		logger.error('[AUTHZ]:', message, error);
+		const message = `Unexpected error while getting user with email ${emailAddress}`;
+		logger.error('[AUTHZ]:', `retry: ${retry}`, message, error);
+		if (retry > 0) {
+			return await lookupUserByEmail(emailAddress, accessToken, retry - 1);
+		}
 		return failure('SYSTEM_ERROR', message);
 	}
 };
@@ -200,12 +211,14 @@ export const lookupUserByEmail = async (
  * @param studyId
  * @param userPcglId
  * @param accessToken
+ * @param retry
  * @returns a list of study permissions for the user, otherwise returns failure with SYSTEM_ERROR
  */
 export const addUserToStudyPermission = async (
 	studyId: string,
 	userPcglId: string,
 	accessToken: string,
+	retry = 0,
 ): AsyncResult<PCGLAddUserToStudyPermissionResponse, 'SYSTEM_ERROR'> => {
 	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
 	try {
@@ -220,7 +233,16 @@ export const addUserToStudyPermission = async (
 
 		if (!response.ok) {
 			const message = `Failed to add user '${userPcglId}' to study '${studyId}'`;
-			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${await response.text()}`);
+			logger.error(
+				'[AUTHZ]:',
+				message,
+				`retry: ${retry}`,
+				`Status: ${response.status}, Message: ${await response.text()}`,
+			);
+			if (retry > 0) {
+				return await addUserToStudyPermission(studyId, userPcglId, accessToken, retry - 1);
+			}
+
 			return failure('SYSTEM_ERROR', message);
 		}
 
@@ -230,14 +252,20 @@ export const addUserToStudyPermission = async (
 
 		if (!resultAddPermission.success) {
 			const message = `AuthZ service returned unexpected data to add user to study permission`;
-			logger.error(`[AUTHZ]: ${message}`, resultAddPermission.error);
+			logger.error(`[AUTHZ]: ${message}`, `retry: ${retry}`, resultAddPermission.error);
+			if (retry > 0) {
+				return await addUserToStudyPermission(studyId, userPcglId, accessToken, retry - 1);
+			}
 			return failure('SYSTEM_ERROR', message);
 		}
 
 		return success(resultAddPermission.data);
 	} catch (error) {
-		const message = `Unexpected error while adding ${userPcglId} to study ${studyId} in the AuthZ service.`;
-		logger.error('[AUTHZ]:', message, error);
+		const message = `Unexpected error while adding ${userPcglId} to study ${studyId}`;
+		logger.error('[AUTHZ]:', `retry: ${retry}`, message, error);
+		if (retry > 0) {
+			return await addUserToStudyPermission(studyId, userPcglId, accessToken, retry - 1);
+		}
 		return failure('SYSTEM_ERROR', message);
 	}
 };
