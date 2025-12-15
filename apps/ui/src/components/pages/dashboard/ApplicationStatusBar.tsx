@@ -37,6 +37,8 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLG;
+	const todayDate = new Date();
+	const hasAccess = expiresAt ? todayDate < expiresAt : false;
 
 	return (
 		<StatusBarWrapper>
@@ -60,7 +62,7 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 							align="center"
 							gap={20}
 						>
-							{expiresAt ? (
+							{hasAccess ? (
 								<>
 									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
 									<Flex vertical>
