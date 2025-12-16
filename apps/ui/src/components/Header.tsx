@@ -19,17 +19,16 @@
 
 import React, { useState } from 'react';
 
-import { CloseOutlined, LogoutOutlined, MenuOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 
+import { API_PATH_LOGIN, API_PATH_LOGOUT } from '@/api/paths';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { clearExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
-import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
 import ApplyForAccessModal from './modals/ApplyForAccessModal';
 
 const { Link } = Typography;
@@ -63,6 +62,7 @@ const HeaderComponent = () => {
 	const { token } = useToken();
 	const { isLoggedIn, user, role } = useUserContext();
 	const { emails = [], familyName = '', givenName = '' } = user || {};
+	const [isLogoutOpen, setLogoutOpen] = useState(false);
 
 	const isResponsiveMode = minWidth <= token.screenXL;
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -128,9 +128,6 @@ const HeaderComponent = () => {
 		}
 	};
 
-	const location = useLocation();
-	const isHome = location.pathname === '/';
-
 	const loginButton: MenuButton = {
 		name: translate(`button.login`),
 		buttonProps: {
@@ -145,27 +142,48 @@ const HeaderComponent = () => {
 
 	const displayName = givenName || familyName ? `${givenName || ''} ${familyName || ''}` : givenName;
 	const displayEmail = emails[0]?.address;
-	console.log(displayEmail);
-	console.log(familyName);
-	console.log(givenName);
+
 	const UserInfo = (
 		<>
 			<p>{displayName}</p>
 			<p style={{ margin: 0, height: 20, fontWeight: 400, color: pcglColours.primary }}>{displayEmail}</p>
+			{isLogoutOpen && (
+				<Button
+					href={API_PATH_LOGOUT}
+					onClick={() => {
+						clearExtraSessionInformation();
+					}}
+					style={{
+						boxShadow: '0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08)',
+						fontWeight: 'normal',
+						height: 45,
+						justifyContent: 'left',
+						left: 0,
+						position: 'absolute',
+						width: '100%',
+					}}
+				>
+					{translate(`button.logout`)} <LogoutOutlined style={{ color: pcglColours.darkGrey, marginLeft: 10 }} />
+				</Button>
+			)}
 		</>
 	);
 
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
 		children: UserInfo,
-		onClickAction: () => clearExtraSessionInformation(),
+		onClickAction: () => {
+			setLogoutOpen(!isLogoutOpen);
+		},
 		buttonProps: {
-			type: `${isHome ? 'default' : 'text'}`,
-			color: `${isHome ? 'primary' : 'default'}`,
-			variant: `${isHome ? 'solid' : 'text'}`,
-			icon: !isHome ? <LogoutOutlined /> : null,
+			type: 'text',
+			variant: 'text',
+			icon: isLogoutOpen ? (
+				<DownOutlined style={{ color: pcglColours.primary }} />
+			) : (
+				<UpOutlined style={{ color: pcglColours.primary }} />
+			),
 			iconPosition: 'end',
-			href: API_PATH_LOGOUT,
 			style: { height: 'auto', lineHeight: 0.5, textAlign: 'left' },
 		},
 		position: 'right',
