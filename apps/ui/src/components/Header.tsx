@@ -147,7 +147,7 @@ const HeaderComponent = () => {
 		<>
 			<p>{displayName}</p>
 			<p style={{ margin: 0, height: 20, fontWeight: 400, color: pcglColours.primary }}>{displayEmail}</p>
-			{isLogoutOpen && (
+			{(isLogoutOpen || isResponsiveMode) && (
 				<Button
 					href={API_PATH_LOGOUT}
 					onClick={() => {
@@ -172,17 +172,21 @@ const HeaderComponent = () => {
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
 		children: UserInfo,
-		onClickAction: () => {
-			setLogoutOpen(!isLogoutOpen);
-		},
 		buttonProps: {
+			onMouseOver: () => {
+				setLogoutOpen(true);
+			},
+			onMouseOut: () => {
+				setLogoutOpen(false);
+			},
 			type: 'text',
 			variant: 'text',
-			icon: isLogoutOpen ? (
-				<DownOutlined style={{ color: pcglColours.primary }} />
-			) : (
-				<UpOutlined style={{ color: pcglColours.primary }} />
-			),
+			icon:
+				isLogoutOpen || isResponsiveMode ? (
+					<DownOutlined style={{ color: pcglColours.primary }} />
+				) : (
+					<UpOutlined style={{ color: pcglColours.primary }} />
+				),
 			iconPosition: 'end',
 			style: { height: 'auto', lineHeight: 0.5, textAlign: 'left' },
 		},
