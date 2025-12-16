@@ -27,6 +27,7 @@ export const EmailSubjects = {
 	NOTIFY_REVISION: 'Revisions Requested on Your PCGL DACO Application',
 	NOTIFY_APPROVAL: 'Congratulations! Your DACO Application Has Been Approved',
 	DACO_APPLICATION_STATUS: 'DACO Application Status',
+	NOTIFY_APPROVER_ERROR_APPROVING_APPLICATION: 'Error Processing Application Approval',
 } as const;
 
 export type EmailSubjectsType = (typeof EmailSubjects)[keyof typeof EmailSubjects];
@@ -55,6 +56,12 @@ export type GenerateApproveType = {
 	id: string | number;
 	name: string;
 	lang?: string;
+} & BaseEmailType;
+
+export type GenerateErrorApproveType = {
+	id: string | number;
+	applicantName: string;
+	errors: string[];
 } & BaseEmailType;
 
 export type GenerateDacRevisionType = {

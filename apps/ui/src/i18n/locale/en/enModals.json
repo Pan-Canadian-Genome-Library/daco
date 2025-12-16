@@ -98,7 +98,9 @@
 			"description": "If so, the applicant and collaborators will be notified and will receive access to PCGL Controlled Data.",
 			"notifications": {
 				"applicationApproveSuccess": "Application, PCGL-{{id}}, has been approved.",
-				"applicationApproveFailed": "Sorry, there was an unexpected error while approving your application. Please try again later."
+				"applicationApproveFailed": "Sorry, there was an unexpected error while approving your application. Please try again later.",
+				"applicationUserAccountsNotFound": "The application cannot be approved until the following user accounts are verified: {{emails}}.",
+				"grantUserPermissionsError": "Application approved, but an error occurred while processing the data access request. Please contact the PCGL DACO support for further assistance"
 			},
 			"buttons": {
 				"sendRequest": "Send Request"

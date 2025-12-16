@@ -325,13 +325,17 @@ applicationRouter.post(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
+			response: ResponseWithData<
+				ApplicationDTO,
+				['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR', 'APPLICATION_USERS_NOT_FOUND', 'GRANT_USER_PERMISSIONS_ERROR']
+			>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
 
 			try {
+				const approverEmailAddress = request.session.user?.emails[0]?.address || '';
 				const approverAccessToken = request.session.account?.accessToken || '';
-				const approvalResult = await approveApplication({ applicationId, approverAccessToken });
+				const approvalResult = await approveApplication({ applicationId, approverAccessToken, approverEmailAddress });
 
 				if (approvalResult.success) {
 					/**
@@ -381,6 +385,14 @@ applicationRouter.post(
 					}
 					case 'NOT_FOUND': {
 						response.status(404).json({ error: approvalResult.error, message: 'Application not found.' });
+						return;
+					}
+					case 'GRANT_USER_PERMISSIONS_ERROR': {
+						response.status(400).json({ error: approvalResult.error, message: approvalResult.message });
+						return;
+					}
+					case 'APPLICATION_USERS_NOT_FOUND': {
+						response.status(400).json({ error: approvalResult.error, message: approvalResult.message });
 						return;
 					}
 					default: {

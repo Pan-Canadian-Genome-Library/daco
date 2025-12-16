@@ -38,7 +38,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
-import { assignUserPermissions } from '@/service/permissionService.ts';
+import { grantUserPermissions, verifyApplicationUserAccounts } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -385,7 +385,15 @@ export const createApplicationPDF = async ({
 export const approveApplication = async ({
 	applicationId,
 	approverAccessToken,
-}: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	approverEmailAddress,
+}: ApproveApplication): AsyncResult<
+	ApplicationDTO,
+	| 'INVALID_STATE_TRANSITION'
+	| 'NOT_FOUND'
+	| 'SYSTEM_ERROR'
+	| 'GRANT_USER_PERMISSIONS_ERROR'
+	| 'APPLICATION_USERS_NOT_FOUND'
+> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
@@ -404,6 +412,12 @@ export const approveApplication = async ({
 
 		if (appStateManager.state === ApplicationStates.APPROVED) {
 			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
+		}
+
+		const verifyUserAccountsResult = await verifyApplicationUserAccounts(applicationId, approverAccessToken);
+
+		if (!verifyUserAccountsResult.success) {
+			return verifyUserAccountsResult;
 		}
 
 		const approvalResult = await appStateManager.approveDacReview();
@@ -442,18 +456,29 @@ export const approveApplication = async ({
 		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
 
 		if (applicant_institutional_email && requested_studies && requested_studies.length) {
-			const permissionAdded = await assignUserPermissions({
+			const permissionAdded = await grantUserPermissions({
 				institutionalEmail: applicant_institutional_email,
 				approverAccessToken,
 				requestedStudies: requested_studies,
 			});
 
-			if (permissionAdded) {
-				emailService.sendEmailApproval({
+			if (!permissionAdded.success) {
+				// Notify DAC Approver of errors during approval process
+				emailService.sendEmailDacApprovalWithError({
+					id: application.id,
+					to: approverEmailAddress,
+					applicantName: applicant_first_name || 'N/A',
+					errors: permissionAdded.failureMessages,
+				});
+				// Notify Applicant of errors during approval process
+				emailService.sendEmailApprovalWithError({
 					id: application.id,
 					to: applicant_institutional_email,
 					name: applicant_first_name || 'N/A',
 				});
+
+				// No permissions were granted at this point so we can just return the error
+				return failure('GRANT_USER_PERMISSIONS_ERROR', permissionAdded.failureMessages.join('; '));
 			}
 		}
 
@@ -467,15 +492,19 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		collaboratorResponse.data.forEach(async (collab) => {
+		const failureMessages: string[] = [];
+		for (const collab of collaboratorResponse.data) {
 			if (collab.institutional_email && requested_studies && requested_studies.length) {
-				const permissionAdded = await assignUserPermissions({
+				const permissionAdded = await grantUserPermissions({
 					institutionalEmail: collab.institutional_email,
 					approverAccessToken,
 					requestedStudies: requested_studies,
 				});
 
-				if (permissionAdded) {
+				if (!permissionAdded.success) {
+					failureMessages.push(...permissionAdded.failureMessages);
+				} else {
+					// Notify each collaborator of approval
 					emailService.sendEmailApproval({
 						id: application.id,
 						to: collab.institutional_email,
@@ -483,7 +512,33 @@ export const approveApplication = async ({
 					});
 				}
 			}
-		});
+		}
+
+		// Notify DAC Approver of errors during approval process
+		if (failureMessages.length > 0) {
+			emailService.sendEmailDacApprovalWithError({
+				id: application.id,
+				to: approverEmailAddress,
+				applicantName: applicant_first_name || 'N/A',
+				errors: failureMessages,
+			});
+			// Notify Applicant of errors during approval process
+			emailService.sendEmailApprovalWithError({
+				id: application.id,
+				to: applicant_institutional_email,
+				name: applicant_first_name || 'N/A',
+			});
+			// Should we move back application to DAC_REVIEW until errors are resolved?
+			// Permission were granted to applicant, but failed for collaborator(s)
+			return failure('GRANT_USER_PERMISSIONS_ERROR', failureMessages.join('; '));
+		} else {
+			// Notify Applicant of approval
+			emailService.sendEmailApproval({
+				id: application.id,
+				to: applicant_institutional_email,
+				name: applicant_first_name || 'N/A',
+			});
+		}
 
 		return dtoFriendlyData;
 	} catch (error) {

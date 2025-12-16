@@ -262,6 +262,7 @@ export interface ApplicationListResponse {
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 	approverAccessToken: string; // The access token of the user approving the application
+	approverEmailAddress: string; // The email address of the user approving the application
 };
 
 export interface CollaboratorDTO {

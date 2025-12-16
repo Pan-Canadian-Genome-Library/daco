@@ -40,10 +40,14 @@ const ApproveApplicationModal = ({
 	const { mutateAsync: approveApplication, isPending: isApproving } = useApproveApplication();
 
 	const handleApprove = async () => {
-		approveApplication({ applicationId: id }).then(() => {
-			setIsOpen(false);
-			setShowSuccessApproveModal(true);
-		});
+		approveApplication({ applicationId: id })
+			.then(() => {
+				setIsOpen(false);
+				setShowSuccessApproveModal(true);
+			})
+			.catch(() => {
+				setIsOpen(false);
+			});
 	};
 
 	return (

@@ -17,38 +17,102 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getDbInstance } from '@/db/index.ts';
 import { addUserToStudyPermission, lookupUserByEmail } from '@/external/pcglAuthZClient.ts';
+import { failure, type AsyncResult } from '@/utils/results.ts';
 
-type AssignUserPermissionsAndNotifyParams = {
-	institutionalEmail: string;
-	approverAccessToken: string;
-	requestedStudies: string[];
-};
+import { applicationSvc } from './applicationService.ts';
+import { collaboratorsSvc } from './collaboratorsService.ts';
+import type { ApplicationService, GrantUserPermissionsParams, GrantUserPermissionsResult } from './types.ts';
 
 /**
- * This function assigns user permissions to the requested studies
- * First it looks for the associated PCGL user ID using the institutional email
- * Then it assigns the study permissions using the approver's access token
+ * This function grants a user access to the requested studies
+ * First, it looks for the associated PCGL user ID using the institutional email
+ * Then, it grants the study permissions using the approver's access token
+ * Returns the list of successfully granted study IDs and any failure messages
  *
  * @param param0
  * @returns
  */
-export const assignUserPermissions = async ({
+export const grantUserPermissions = async ({
 	institutionalEmail,
 	approverAccessToken,
 	requestedStudies,
-}: AssignUserPermissionsAndNotifyParams) => {
-	const lookup = await lookupUserByEmail(institutionalEmail, approverAccessToken);
-	if (!lookup.success || lookup.data.length === 0) return;
+}: GrantUserPermissionsParams): Promise<GrantUserPermissionsResult> => {
+	const retry = 2;
 
-	let permissionAdded = false;
+	const lookup = await lookupUserByEmail(institutionalEmail, approverAccessToken, retry);
 
+	if (!lookup.success) {
+		return { success: false, failureMessages: [lookup.message] };
+	}
+
+	const failureMessages = [];
 	for (const studyId of requestedStudies ?? []) {
 		for (const userPcglId of lookup.data) {
-			const result = await addUserToStudyPermission(studyId, userPcglId, approverAccessToken);
-			permissionAdded = result.success;
+			const result = await addUserToStudyPermission(studyId, userPcglId, approverAccessToken, retry);
+			if (!result.success) {
+				failureMessages.push(result.message);
+			}
 		}
 	}
 
-	return permissionAdded;
+	return { success: failureMessages.length === 0, failureMessages };
+};
+
+/**
+ * Verifies that the applicant and all collaborators associated with an application
+ * have active user accounts and returns their user IDs.
+ * @param applicationId
+ * @param approverAccessToken
+ * @returns
+ */
+export const verifyApplicationUserAccounts = async (
+	applicationId: number,
+	approverAccessToken: string,
+): AsyncResult<{ userIds: string[] }, 'SYSTEM_ERROR' | 'APPLICATION_USERS_NOT_FOUND'> => {
+	const database = getDbInstance();
+
+	const applicationService: ApplicationService = applicationSvc(database);
+	const collaboratorsService = await collaboratorsSvc(database);
+
+	const emailLookupFailures: string[] = [];
+	const verifiedUserIds: string[] = [];
+
+	const retry = 2;
+
+	// Check if applicant has an active account
+	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
+	if (!applicationContents.success) {
+		return failure('SYSTEM_ERROR', 'Unable to retrieve application contents.');
+	}
+
+	const applicantEmail = applicationContents.data.contents?.applicant_institutional_email || '';
+
+	const applicantLookup = await lookupUserByEmail(applicantEmail, approverAccessToken, retry);
+	if (!applicantLookup.success) {
+		emailLookupFailures.push(applicantEmail);
+	} else {
+		verifiedUserIds.push(...applicantLookup.data);
+	}
+
+	// Check if collaborators have active accounts
+	const collaboratorResp = await collaboratorsService.listCollaborators(applicationId);
+	if (!collaboratorResp.success) {
+		return failure('SYSTEM_ERROR', `Unable to retrieve collaborators: ${collaboratorResp.message}`);
+	}
+	for (const collaborator of collaboratorResp.data) {
+		const collabEmail = collaborator.institutional_email || '';
+		const collabLookup = await lookupUserByEmail(collabEmail, approverAccessToken, retry);
+		if (!collabLookup.success) {
+			emailLookupFailures.push(collabEmail);
+		} else {
+			verifiedUserIds.push(...collabLookup.data);
+		}
+	}
+
+	if (emailLookupFailures.length > 0) {
+		return failure('APPLICATION_USERS_NOT_FOUND', emailLookupFailures.join('; '));
+	}
+	return { success: true, data: { userIds: verifiedUserIds } };
 };
