@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useState } from 'react';
+import React, { useState, type PropsWithChildren } from 'react';
 
 import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
@@ -40,8 +40,7 @@ interface MenuItem {
 	position: 'left' | 'right';
 }
 
-interface MenuButton extends MenuItem {
-	children?: JSX.Element;
+interface MenuButton extends PropsWithChildren<MenuItem> {
 	buttonProps: ButtonProps;
 	onClickAction?: VoidFunction;
 }
