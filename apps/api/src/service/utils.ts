@@ -86,7 +86,7 @@ export function getUserName(user: SessionUser): string {
 
 /**
  * Standardized handler for common Auth error cases
- * Insures Type safety for downstream Request Handler due to limitations with Express Type definitions
+ * Ensures type safety for downstream Request Handler due to limitations with Express type definitions
  * @param response Accepts any ResponseWithData
  * @param isAuthenticated Indicates User Session Data is missing
  * @param canAccessResult Failure Result with Error code & message
