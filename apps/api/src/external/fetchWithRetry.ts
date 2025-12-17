@@ -38,7 +38,7 @@ export async function fetchWithRetry(url: string, init: RequestInit): Promise<Re
 		try {
 			const response = await fetch(url, init);
 
-			if (response.status >= 400) {
+			if (response.status >= 400 && attempt < FETCH_RETRIES) {
 				attempt++;
 				await sleep(FETCH_RETRY_DELAY_MS);
 				continue;
