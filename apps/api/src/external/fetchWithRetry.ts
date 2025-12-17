@@ -17,38 +17,40 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
+import { serverConfig } from '@/config/serverConfig.js';
 
-import EnvironmentConfigError from './EnvironmentConfigError.js';
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
-const serverConfigSchema = z.object({
-	// Node built in env variables
-	NODE_ENV: z.string().optional().default('development'),
-	npm_package_version: z.string().optional().default('unknown'),
+/**
+ * This is a fetch wrapper with a configurable retry mechanism.
+ * It will retry when an error occurs based on configured retry settings.
+ *
+ * @param url
+ * @param init
+ * @returns
+ */
+export async function fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
+	const { FETCH_RETRIES, FETCH_RETRY_DELAY_MS, FETCH_TIMEOUT_MS } = serverConfig;
 
-	// Fetch configs
-	FETCH_RETRIES: z.coerce.number().optional().default(3),
-	FETCH_RETRY_DELAY_MS: z.coerce.number().optional().default(500),
-	FETCH_TIMEOUT_MS: z.coerce.number().optional().default(10000),
+	let attempt = 0;
 
-	// Custom env variables
-	PORT: z.coerce.number().optional().default(3000),
-	SESSION_KEYS: z.string(),
-	SESSION_MAX_AGE: z.coerce
-		.number()
-		.int()
-		.optional()
-		.default(1000 * 60 * 30), // default 30 minutes
-	UI_HOST: z.string().url(),
-});
+	while (true) {
+		try {
+			const response = await fetch(url, init);
 
-const parseResult = serverConfigSchema.safeParse(process.env);
+			if (response.status >= 400) {
+				attempt++;
+				await sleep(FETCH_RETRY_DELAY_MS);
+				continue;
+			}
 
-if (!parseResult.success) {
-	throw new EnvironmentConfigError(`server`, parseResult.error);
+			return response;
+		} catch (error) {
+			if (attempt >= FETCH_RETRIES) {
+				throw error;
+			}
+			attempt++;
+			await sleep(FETCH_TIMEOUT_MS);
+		}
+	}
 }
-export const serverConfig = {
-	...parseResult.data,
-	isProduction: parseResult.data.NODE_ENV === 'production',
-	sessionKeys: parseResult.data.SESSION_KEYS.split(','),
-};

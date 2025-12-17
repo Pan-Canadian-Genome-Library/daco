@@ -39,9 +39,7 @@ export const grantUserPermissions = async ({
 	approverAccessToken,
 	requestedStudies,
 }: GrantUserPermissionsParams): Promise<GrantUserPermissionsResult> => {
-	const retry = 2;
-
-	const lookup = await lookupUserByEmail(institutionalEmail, approverAccessToken, retry);
+	const lookup = await lookupUserByEmail(institutionalEmail, approverAccessToken);
 
 	if (!lookup.success) {
 		return { success: false, failureMessages: [lookup.message] };
@@ -50,7 +48,7 @@ export const grantUserPermissions = async ({
 	const failureMessages = [];
 	for (const studyId of requestedStudies ?? []) {
 		for (const userPcglId of lookup.data) {
-			const result = await addUserToStudyPermission(studyId, userPcglId, approverAccessToken, retry);
+			const result = await addUserToStudyPermission(studyId, userPcglId, approverAccessToken);
 			if (!result.success) {
 				failureMessages.push(result.message);
 			}
@@ -79,8 +77,6 @@ export const verifyApplicationUserAccounts = async (
 	const emailLookupFailures: string[] = [];
 	const verifiedUserIds: string[] = [];
 
-	const retry = 2;
-
 	// Check if applicant has an active account
 	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
 	if (!applicationContents.success) {
@@ -89,7 +85,7 @@ export const verifyApplicationUserAccounts = async (
 
 	const applicantEmail = applicationContents.data.contents?.applicant_institutional_email || '';
 
-	const applicantLookup = await lookupUserByEmail(applicantEmail, approverAccessToken, retry);
+	const applicantLookup = await lookupUserByEmail(applicantEmail, approverAccessToken);
 	if (!applicantLookup.success) {
 		emailLookupFailures.push(applicantEmail);
 	} else {
@@ -103,7 +99,7 @@ export const verifyApplicationUserAccounts = async (
 	}
 	for (const collaborator of collaboratorResp.data) {
 		const collabEmail = collaborator.institutional_email || '';
-		const collabLookup = await lookupUserByEmail(collabEmail, approverAccessToken, retry);
+		const collabLookup = await lookupUserByEmail(collabEmail, approverAccessToken);
 		if (!collabLookup.success) {
 			emailLookupFailures.push(collabEmail);
 		} else {
