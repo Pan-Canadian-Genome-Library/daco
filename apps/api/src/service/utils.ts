@@ -18,21 +18,13 @@
  */
 
 import { asc, desc } from 'drizzle-orm';
-import { type Request } from 'express';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
 import { type ResponseWithData } from '@/routes/types.ts';
-import { type SessionUser } from '@/session/types.ts';
+import { type SessionUser } from '@/session/validation.ts';
 import { type Failure, failure } from '@/utils/results.ts';
-import {
-	type ApplicationActionsColumnName,
-	type ApplicationsColumnName,
-	AuthorizedRequest,
-	type OrderBy,
-	type SessionType,
-	UserSession,
-} from './types.js';
+import { type ApplicationActionsColumnName, type ApplicationsColumnName, type OrderBy } from './types.js';
 
 export const applicationsQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
 	const orderByArguments =
@@ -53,24 +45,6 @@ export const applicationActionsQuery = (sort?: Array<OrderBy<ApplicationActionsC
 		: [asc(applicationActions.created_at)];
 
 	return orderByArguments;
-};
-
-/**
- * Type Guard to validate session contains user data with userId
- * @param session express-session session object / Express Request['session']
- * @returns boolean
- */
-export const isSessionWithUser = (session: SessionType): session is UserSession => {
-	return typeof session.user !== 'undefined' && !!session.user.userId;
-};
-
-/**
- * Type Guard to validate request contains session data
- * @param request Express request
- * @returns boolean
- */
-export const isRequestWithSession = (request: Request): request is AuthorizedRequest => {
-	return request.session && isSessionWithUser(request.session);
 };
 
 /**

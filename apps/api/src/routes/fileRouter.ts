@@ -26,7 +26,7 @@ import formidable from 'formidable';
 import { deleteFile, getFile, uploadEthicsFile } from '@/controllers/fileController.ts';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { canAccessRequest } from '@/service/authService.ts';
-import { authErrorResponseHandler, authFailure, isRequestWithSession } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure } from '@/service/utils.ts';
 import { apiZodErrorMapping } from '@/utils/validation.ts';
 import type { ResponseWithData } from './types.ts';
 
@@ -45,10 +45,11 @@ async function retrieveFile(
 	res: ResponseWithData<FilesDTO, ['NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 	hasContent?: boolean,
 ) {
-	if (isRequestWithSession(req)) {
+	const { user } = req.session;
+	if (user) {
 		const { fileId } = req.params;
 		const id = parseInt(fileId ? fileId : '');
-		const requestAuthResult = await canAccessRequest(req.session, id);
+		const requestAuthResult = await canAccessRequest(user, id);
 		if (requestAuthResult.success) {
 			if (!isPositiveInteger(id)) {
 				res.status(400).send({ error: ErrorType.INVALID_REQUEST, message: 'Invalid fileId' });
@@ -78,9 +79,11 @@ async function retrieveFile(
 			return;
 		} else {
 			authErrorResponseHandler(res, requestAuthResult);
+			return;
 		}
 	} else {
 		authErrorResponseHandler(res, authFailure);
+		return;
 	}
 }
 
@@ -127,10 +130,11 @@ fileRouter.post(
 				['SYSTEM_ERROR', 'FORBIDDEN', 'NOT_FOUND', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isRequestWithSession(req)) {
+			const { user } = req.session;
+			if (user) {
 				const { applicationId } = req.params;
 				const id = parseInt(applicationId ? applicationId : '');
-				const requestAuthResult = await canAccessRequest(req.session, id);
+				const requestAuthResult = await canAccessRequest(user, id);
 				if (requestAuthResult.success) {
 					const { file } = req.body;
 					if (!isPositiveInteger(id)) {
@@ -165,9 +169,11 @@ fileRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(res, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(res, authFailure);
+				return;
 			}
 		},
 	),

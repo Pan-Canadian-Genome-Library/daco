@@ -17,9 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type SessionData } from 'express-session';
-
-import { userRoleSchema } from '@pcgl-daco/validation';
+import { SessionUser, userRoleSchema } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import { getApplicationById } from '@/controllers/applicationController.ts';
@@ -28,7 +26,7 @@ import logger from '@/logger.ts';
 import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
-import type { ApplicationService, UserSession } from './types.ts';
+import type { ApplicationService } from './types.ts';
 
 /**
  * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
@@ -39,9 +37,7 @@ import type { ApplicationService, UserSession } from './types.ts';
  * As such reps will have an APPLICANT role.
  *
  */
-export function getUserRole(session: Partial<SessionData>): UserRoleOmitRep {
-	const { user } = session;
-
+export function getUserRole(user: SessionUser | undefined): UserRoleOmitRep {
 	if (!user) {
 		return userRoleSchema.Values.ANONYMOUS;
 	}
@@ -60,10 +56,9 @@ export function getUserRole(session: Partial<SessionData>): UserRoleOmitRep {
 /**
  * Based on user data stored in session data, determine the user's role & if the application is associated with them.
  */
-export async function isAssociatedRep(session: Partial<SessionData>, applicationId: number): Promise<Boolean> {
+export async function isAssociatedRep(user: SessionUser, applicationId: number): Promise<Boolean> {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
-	const { user } = session;
 
 	const app = await applicationService.getApplicationWithContents({ id: applicationId });
 
@@ -83,20 +78,20 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 
 /**
  * Validate User is allowed access to this specific Application based on userRole or userId
- * @param request AuthorizedRequest with session, user and userId
+ * @param session Session data with user info used to confirm their role and id
+ * @param applicationId - The ID of the application to confirm User's association
  * @returns boolean
  */
 export async function canAccessRequest(
-	session: UserSession,
+	user: SessionUser,
 	applicationId: number,
 ): AsyncResult<void, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
-	const { user } = session;
-	const userRole = getUserRole(session);
+	const userRole = getUserRole(user);
 
 	const hasSpecialAccess =
 		userRole === userRoleSchema.Values.DAC_MEMBER ||
 		userRole === userRoleSchema.Values.DAC_CHAIR ||
-		(await isAssociatedRep(session, applicationId));
+		(await isAssociatedRep(user, applicationId));
 
 	const result = await getApplicationById({ applicationId });
 	if (result.success) {

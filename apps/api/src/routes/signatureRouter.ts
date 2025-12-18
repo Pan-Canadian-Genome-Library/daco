@@ -41,7 +41,7 @@ import {
 } from '@/controllers/signatureController.ts';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { canAccessRequest, isAssociatedRep } from '@/service/authService.ts';
-import { authErrorResponseHandler, authFailure, isRequestWithSession } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure } from '@/service/utils.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
 
@@ -63,14 +63,15 @@ signatureRouter.get(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const applicationId = Number(request.params.applicationId);
-
 				if (!isPositiveInteger(applicationId)) {
 					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 					return;
 				}
-				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 				if (requestAuthResult.success) {
 					try {
 						const applicationResult = await getApplicationById({ applicationId });
@@ -109,9 +110,11 @@ signatureRouter.get(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -137,14 +140,15 @@ signatureRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const data = request.body;
 				const { applicationId, signature } = data;
-				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 
 				if (requestAuthResult.success) {
 					try {
-						const isApplicationInstitutionalRep = await isAssociatedRep(request.session, applicationId);
+						const isApplicationInstitutionalRep = await isAssociatedRep(user, applicationId);
 
 						const result = await updateApplicationSignature({
 							applicationId,
@@ -173,9 +177,11 @@ signatureRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -194,9 +200,10 @@ signatureRouter.delete(
 				request: Request,
 				response: ResponseWithData<void, ['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']>,
 			) => {
-				if (isRequestWithSession(request)) {
+				const { user } = request.session;
+				if (user) {
 					const applicationId = Number(request.params.applicationId);
-					const requestAuthResult = await canAccessRequest(request.session, applicationId);
+					const requestAuthResult = await canAccessRequest(user, applicationId);
 					if (requestAuthResult.success) {
 						try {
 							const { signee } = request.query;
@@ -239,9 +246,11 @@ signatureRouter.delete(
 						}
 					} else {
 						authErrorResponseHandler(response, requestAuthResult);
+						return;
 					}
 				} else {
 					authErrorResponseHandler(response, authFailure);
+					return;
 				}
 			},
 		),

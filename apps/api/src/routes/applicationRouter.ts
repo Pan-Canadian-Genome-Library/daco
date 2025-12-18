@@ -64,7 +64,7 @@ import BaseLogger from '@/logger.js';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { canAccessRequest, getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { authErrorResponseHandler, authFailure, getUserName, isRequestWithSession } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure, getUserName } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -76,10 +76,9 @@ applicationRouter.post(
 	'/create',
 	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
-		if (isRequestWithSession(request)) {
-			const {
-				user: { userId },
-			} = request.session;
+		const { user } = request.session;
+		if (user) {
+			const { userId } = user;
 
 			const result = await createApplication({ user_id: userId });
 
@@ -90,6 +89,7 @@ applicationRouter.post(
 			}
 		} else {
 			authErrorResponseHandler(response, authFailure);
+			return;
 		}
 	},
 );
@@ -107,10 +107,11 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const data = request.body;
 				const { id, update } = data;
-				const requestAuthResult = await canAccessRequest(request.session, id);
+				const requestAuthResult = await canAccessRequest(user, id);
 				if (requestAuthResult.success) {
 					try {
 						const result = await editApplication({ id, update });
@@ -142,9 +143,11 @@ applicationRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -160,9 +163,10 @@ applicationRouter.get(
 		request: Request,
 		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
 	) => {
-		if (isRequestWithSession(request)) {
-			const { userId } = request.session.user;
-			const userRole = getUserRole(request.session);
+		const { user } = request.session;
+		if (user) {
+			const { userId } = user;
+			const userRole = getUserRole(user);
 			const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
 
 			const {
@@ -240,6 +244,7 @@ applicationRouter.get(
 			}
 		} else {
 			authErrorResponseHandler(response, authFailure);
+			return;
 		}
 	},
 );
@@ -257,7 +262,8 @@ applicationRouter.get(
 				['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const applicationId = Number(request.params.applicationId);
 				const result = await getApplicationById({ applicationId });
 
@@ -280,6 +286,7 @@ applicationRouter.get(
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -295,11 +302,10 @@ applicationRouter.post(
 			request: Request,
 			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
-			if (isRequestWithSession(request)) {
-				const applicationId = Number(request.params.applicationId);
-				const user = request.session.user;
-
+			const { user } = request.session;
+			if (user) {
 				try {
+					const applicationId = Number(request.params.applicationId);
 					const userName = getUserName(user);
 					const approvalResult = await approveApplication({ applicationId, userName });
 
@@ -365,6 +371,7 @@ applicationRouter.post(
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -383,12 +390,11 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
-				if (isRequestWithSession(request)) {
-					const { rejectionReason } = request.body;
-					const applicationId = Number(request.params.applicationId);
-					const user = request.session.user;
-
+				const { user } = request.session;
+				if (user) {
 					try {
+						const { rejectionReason } = request.body;
+						const applicationId = Number(request.params.applicationId);
 						const userName = getUserName(user);
 						const result = await dacRejectApplication({ applicationId, rejectionReason, userName });
 
@@ -426,6 +432,7 @@ applicationRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(response, authFailure);
+					return;
 				}
 			},
 		),
@@ -445,12 +452,11 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 				if (requestAuthResult.success) {
-					const user = request.session.user;
-
 					try {
 						// We need to get the application to validate that this user submit revisions
 						const applicationResult = await getApplicationById({ applicationId });
@@ -501,9 +507,11 @@ applicationRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -525,13 +533,11 @@ applicationRouter.post(
 					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 				>,
 			) => {
-				if (isRequestWithSession(request)) {
+				const { user } = request.session;
+				if (user) {
 					const applicationId = Number(request.params.applicationId);
 					const { revokeReason } = request.body;
-
-					const user = request.session.user;
-
-					const isDACMember = getUserRole(request.session) === userRoleSchema.Values.DAC_MEMBER;
+					const isDACMember = getUserRole(user) === userRoleSchema.Values.DAC_MEMBER;
 					const userName = getUserName(user);
 					const result = await revokeApplication(applicationId, isDACMember, revokeReason, userName);
 
@@ -566,6 +572,7 @@ applicationRouter.post(
 					return;
 				} else {
 					authErrorResponseHandler(response, authFailure);
+					return;
 				}
 			},
 		),
@@ -582,12 +589,10 @@ applicationRouter.post(
 			request: Request,
 			response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
-			if (isRequestWithSession(request)) {
-				const applicationId = Number(request.params.applicationId);
-
-				const user = request.session.user;
-
+			const { user } = request.session;
+			if (user) {
 				try {
+					const applicationId = Number(request.params.applicationId);
 					const userName = getUserName(user);
 					const result = await closeApplication({ applicationId, userName });
 
@@ -628,6 +633,7 @@ applicationRouter.post(
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -646,12 +652,11 @@ applicationRouter.post(
 				['INVALID_REQUEST', 'FORBIDDEN', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 				if (requestAuthResult.success) {
-					const { user } = request.session;
-
 					try {
 						const application = await getApplicationById({ applicationId });
 
@@ -705,9 +710,11 @@ applicationRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -726,11 +733,10 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				try {
 					const applicationId = Number(request.params.applicationId);
-					const user = request.session.user;
-
 					const applicationResult = await getApplicationById({ applicationId });
 					if (!applicationResult.success) {
 						response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
@@ -738,7 +744,7 @@ applicationRouter.post(
 					}
 
 					const isApplicationUser = applicationResult.data.userId === user.userId;
-					const isRep = await isAssociatedRep(request.session, applicationId);
+					const isRep = await isAssociatedRep(user, applicationId);
 
 					// Only rep and applicant can submit an application
 					if (isApplicationUser || isRep) {
@@ -785,6 +791,7 @@ applicationRouter.post(
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -803,11 +810,11 @@ applicationRouter.post(
 				submitDacCommentsSchema,
 				apiZodErrorMapping,
 				async (request, response: ResponseWithData<DacCommentRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
-					if (isRequestWithSession(request)) {
+					const { user } = request.session;
+					if (user) {
 						try {
 							const applicationId = Number(request.params.applicationId);
 							const { message, section, toDacChair } = request.body;
-							const user = request.session.user;
 							const { userId } = user;
 							const userName = getUserName(user);
 							const result = await submitDacComment({
@@ -834,6 +841,7 @@ applicationRouter.post(
 						}
 					} else {
 						authErrorResponseHandler(response, authFailure);
+						return;
 					}
 				},
 			),
@@ -851,10 +859,10 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
-				if (isRequestWithSession(request)) {
+				const { user } = request.session;
+				if (user) {
 					try {
 						const applicationId = Number(request.params.applicationId);
-						const user = request.session.user;
 
 						if (!isPositiveInteger(applicationId)) {
 							response.status(400).json({
@@ -926,6 +934,7 @@ applicationRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(response, authFailure);
+					return;
 				}
 			},
 		),
@@ -949,12 +958,12 @@ applicationRouter.post(
 					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'UNAUTHORIZED', 'INVALID_STATE_TRANSITION', 'FORBIDDEN']
 				>,
 			) => {
-				if (isRequestWithSession(request)) {
+				const { user } = request.session;
+				if (user) {
 					try {
 						const applicationId = Number(request.params.applicationId);
-						const user = request.session.user;
 						const revisionData = request.body;
-						const result = await isAssociatedRep(request.session, applicationId);
+						const result = await isAssociatedRep(user, applicationId);
 						if (!result) {
 							response.status(403).json({
 								error: 'FORBIDDEN',
@@ -1022,6 +1031,7 @@ applicationRouter.post(
 					}
 				} else {
 					authErrorResponseHandler(response, authFailure);
+					return;
 				}
 			},
 		),
@@ -1046,13 +1056,13 @@ applicationRouter.get(
 				['UNAUTHORIZED', 'NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const { applicationId: paramsId, section } = request.params;
 				const applicationId = Number(paramsId);
-				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 				if (requestAuthResult.success) {
-					const user = request.session.user;
-					const userRole = getUserRole(request.session);
+					const userRole = getUserRole(user);
 
 					try {
 						if (!section) {
@@ -1108,9 +1118,11 @@ applicationRouter.get(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -1183,9 +1195,10 @@ applicationRouter.get(
 				['FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 				if (requestAuthResult.success) {
 					try {
 						const applicationInfo = await getApplicationById({ applicationId });
@@ -1228,9 +1241,11 @@ applicationRouter.get(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),

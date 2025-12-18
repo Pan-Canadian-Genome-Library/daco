@@ -36,7 +36,7 @@ import {
 } from '@/controllers/collaboratorsController.js';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { canAccessRequest } from '@/service/authService.ts';
-import { authErrorResponseHandler, authFailure, isRequestWithSession } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure } from '@/service/utils.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
 
@@ -58,16 +58,11 @@ collaboratorsRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
+				const { userId } = user;
 				try {
 					const { applicationId: application_id, collaborators } = request.body;
-
-					const { userId } = request.session.user || {};
-
-					if (!userId) {
-						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-						return;
-					}
 
 					const result = await createCollaborators({
 						application_id,
@@ -106,6 +101,7 @@ collaboratorsRouter.post(
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -124,9 +120,10 @@ collaboratorsRouter.get(
 			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 		>,
 	) => {
-		if (isRequestWithSession(request)) {
+		const { user } = request.session;
+		if (user) {
 			const applicationId = Number(request.params.applicationId);
-			const requestAuthResult = await canAccessRequest(request.session, applicationId);
+			const requestAuthResult = await canAccessRequest(user, applicationId);
 			if (requestAuthResult.success) {
 				try {
 					if (!isPositiveInteger(applicationId)) {
@@ -154,9 +151,11 @@ collaboratorsRouter.get(
 				}
 			} else {
 				authErrorResponseHandler(response, requestAuthResult);
+				return;
 			}
 		} else {
 			authErrorResponseHandler(response, authFailure);
+			return;
 		}
 	},
 );
@@ -177,9 +176,10 @@ collaboratorsRouter.delete(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 				if (requestAuthResult.success) {
 					try {
 						const collaboratorEmail = request.params.collaboratorEmail;
@@ -226,9 +226,11 @@ collaboratorsRouter.delete(
 					}
 				} else {
 					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
@@ -249,11 +251,11 @@ collaboratorsRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
 			>,
 		) => {
-			if (isRequestWithSession(request)) {
+			const { user } = request.session;
+			if (user) {
 				try {
 					const { applicationId: application_id, collaboratorEmail, collaboratorUpdates } = request.body;
-
-					const { userId } = request.session.user;
+					const { userId } = user;
 
 					const result = await updateCollaborator({
 						application_id,
@@ -294,6 +296,7 @@ collaboratorsRouter.post(
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
+				return;
 			}
 		},
 	),
