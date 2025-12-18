@@ -19,7 +19,7 @@
 
 import { RequestHandler, type Response } from 'express';
 
-import { type ErrorResponse, type UserRole } from '@pcgl-daco/validation';
+import type { ErrorResponse, UserRole } from '@pcgl-daco/validation';
 
 import { getUserRole } from '@/service/authService.js';
 
@@ -56,9 +56,8 @@ type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
 export const authMiddleware =
 	(config: AuthMiddlewareConfig = {}): RequestHandler =>
 	(request, response: Response<AuthenticationErrorResponse>, next) => {
-		const { user } = request.session;
-		const userRole = getUserRole(request.session);
 		const { requiredRoles } = config;
+		const { user } = request.session;
 
 		if (!user) {
 			response.status(401).send({
@@ -70,6 +69,7 @@ export const authMiddleware =
 		}
 
 		if (requiredRoles) {
+			const userRole = getUserRole(request.session);
 			if (!requiredRoles.includes(userRole)) {
 				response.status(403).send({
 					error: 'FORBIDDEN',
