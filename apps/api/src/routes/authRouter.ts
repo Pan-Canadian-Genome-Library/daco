@@ -225,7 +225,7 @@ authRouter.get('/user', async (request, response: ResponseWithData<UserResponse,
 	const { user } = request.session;
 
 	const output: UserResponse = {
-		role: getUserRole(request.session),
+		role: getUserRole(user),
 		user,
 	};
 
