@@ -55,7 +55,7 @@ type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
  */
 export const authMiddleware =
 	(config: AuthMiddlewareConfig = {}): RequestHandler =>
-	async (request, response: Response<AuthenticationErrorResponse>, next) => {
+	(request, response: Response<AuthenticationErrorResponse>, next) => {
 		const { user } = request.session;
 		const userRole = getUserRole(request.session);
 		const { requiredRoles } = config;

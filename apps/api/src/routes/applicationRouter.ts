@@ -62,9 +62,9 @@ import {
 } from '@/controllers/applicationController.js';
 import BaseLogger from '@/logger.js';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
-import { canAccessRequest, getUserRole, isAssociatedRep, isAuthenticatedRequest } from '@/service/authService.ts';
+import { canAccessRequest, getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { authErrorResponseHandler, getUserName } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure, getUserName, isRequestWithSession } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -76,7 +76,7 @@ applicationRouter.post(
 	'/create',
 	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
-		if (isAuthenticatedRequest(request)) {
+		if (isRequestWithSession(request)) {
 			const {
 				user: { userId },
 			} = request.session;
@@ -89,7 +89,7 @@ applicationRouter.post(
 				response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
 			}
 		} else {
-			authErrorResponseHandler(response, false);
+			authErrorResponseHandler(response, authFailure);
 		}
 	},
 );
@@ -107,39 +107,44 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			const data = request.body;
-			const { id, update } = data;
-			if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
-				try {
-					const result = await editApplication({ id, update });
-					if (result.success) {
-						response.status(200).json(result.data);
+			if (isRequestWithSession(request)) {
+				const data = request.body;
+				const { id, update } = data;
+				const requestAuthResult = await canAccessRequest(request.session, id);
+				if (requestAuthResult.success) {
+					try {
+						const result = await editApplication({ id, update });
+						if (result.success) {
+							response.status(200).json(result.data);
+							return;
+						}
+						switch (result.error) {
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'INVALID_STATE_TRANSITION': {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							default: {
+								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+								return;
+							}
+						}
+					} catch (error) {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 						return;
 					}
-					switch (result.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'INVALID_STATE_TRANSITION': {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: result.error, message: result.message });
-							return;
-						}
-						default: {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-							return;
-						}
-					}
-				} catch (error) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
-					return;
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -155,7 +160,7 @@ applicationRouter.get(
 		request: Request,
 		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
 	) => {
-		if (isAuthenticatedRequest(request)) {
+		if (isRequestWithSession(request)) {
 			const { userId } = request.session.user;
 			const userRole = getUserRole(request.session);
 			const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
@@ -234,7 +239,7 @@ applicationRouter.get(
 				}
 			}
 		} else {
-			authErrorResponseHandler(response, false);
+			authErrorResponseHandler(response, authFailure);
 		}
 	},
 );
@@ -252,7 +257,7 @@ applicationRouter.get(
 				['INVALID_REQUEST', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'NOT_FOUND']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request)) {
+			if (isRequestWithSession(request)) {
 				const applicationId = Number(request.params.applicationId);
 				const result = await getApplicationById({ applicationId });
 
@@ -274,7 +279,7 @@ applicationRouter.get(
 					}
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -290,7 +295,7 @@ applicationRouter.post(
 			request: Request,
 			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'UNAUTHORIZED', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
-			if (isAuthenticatedRequest(request)) {
+			if (isRequestWithSession(request)) {
 				const applicationId = Number(request.params.applicationId);
 				const user = request.session.user;
 
@@ -359,7 +364,7 @@ applicationRouter.post(
 						.json({ error: 'SYSTEM_ERROR', message: `Something went wrong, please try again later.` });
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -378,7 +383,7 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
-				if (isAuthenticatedRequest(request)) {
+				if (isRequestWithSession(request)) {
 					const { rejectionReason } = request.body;
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
@@ -420,7 +425,7 @@ applicationRouter.post(
 						response.status(500).json({ error: 'SYSTEM_ERROR', message: `Unexpected error.` });
 					}
 				} else {
-					authErrorResponseHandler(response, false);
+					authErrorResponseHandler(response, authFailure);
 				}
 			},
 		),
@@ -440,60 +445,65 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
+			if (isRequestWithSession(request)) {
 				const applicationId = Number(request.params.applicationId);
-				const user = request.session.user;
+				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				if (requestAuthResult.success) {
+					const user = request.session.user;
 
-				try {
-					// We need to get the application to validate that this user submit revisions
-					const applicationResult = await getApplicationById({ applicationId });
+					try {
+						// We need to get the application to validate that this user submit revisions
+						const applicationResult = await getApplicationById({ applicationId });
 
-					if (!applicationResult.success) {
-						response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-						return;
-					}
+						if (!applicationResult.success) {
+							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
+						}
 
-					const userName = getUserName(user);
-					const result = await submitRevision({ applicationId, userName });
+						const userName = getUserName(user);
+						const result = await submitRevision({ applicationId, userName });
 
-					if (!result.success) {
-						switch (result.error) {
-							case 'INVALID_STATE_TRANSITION': {
-								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-								return;
-							}
-							case 'NOT_FOUND': {
-								response.status(404).json({ error: result.error, message: result.message });
-								return;
-							}
-							case 'SYSTEM_ERROR': {
-								response.status(500).json({ error: result.error, message: result.message });
-								return;
-							}
-							default: {
-								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-								return;
+						if (!result.success) {
+							switch (result.error) {
+								case 'INVALID_STATE_TRANSITION': {
+									response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+									return;
+								}
+								case 'NOT_FOUND': {
+									response.status(404).json({ error: result.error, message: result.message });
+									return;
+								}
+								case 'SYSTEM_ERROR': {
+									response.status(500).json({ error: result.error, message: result.message });
+									return;
+								}
+								default: {
+									response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+									return;
+								}
 							}
 						}
-					}
 
-					const aliasedResponse = convertToBasicApplicationRecord(result.data);
+						const aliasedResponse = convertToBasicApplicationRecord(result.data);
 
-					if (!aliasedResponse.success) {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: aliasedResponse.message });
+						if (!aliasedResponse.success) {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: aliasedResponse.message });
+							return;
+						}
+
+						response.status(200).json(aliasedResponse.data);
 						return;
+					} catch (error) {
+						response.status(500).json({
+							error: 'SYSTEM_ERROR',
+							message: 'Sorry something went wrong, please try again later.',
+						});
 					}
-
-					response.status(200).json(aliasedResponse.data);
-					return;
-				} catch (error) {
-					response.status(500).json({
-						error: 'SYSTEM_ERROR',
-						message: 'Sorry something went wrong, please try again later.',
-					});
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -515,7 +525,7 @@ applicationRouter.post(
 					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 				>,
 			) => {
-				if (isAuthenticatedRequest(request)) {
+				if (isRequestWithSession(request)) {
 					const applicationId = Number(request.params.applicationId);
 					const { revokeReason } = request.body;
 
@@ -555,7 +565,7 @@ applicationRouter.post(
 					response.status(200).json(result.data);
 					return;
 				} else {
-					authErrorResponseHandler(response, false);
+					authErrorResponseHandler(response, authFailure);
 				}
 			},
 		),
@@ -572,7 +582,7 @@ applicationRouter.post(
 			request: Request,
 			response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']>,
 		) => {
-			if (isAuthenticatedRequest(request)) {
+			if (isRequestWithSession(request)) {
 				const applicationId = Number(request.params.applicationId);
 
 				const user = request.session.user;
@@ -617,7 +627,7 @@ applicationRouter.post(
 					});
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -636,63 +646,68 @@ applicationRouter.post(
 				['INVALID_REQUEST', 'FORBIDDEN', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
+			if (isRequestWithSession(request)) {
 				const applicationId = Number(request.params.applicationId);
-				const { user } = request.session;
+				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				if (requestAuthResult.success) {
+					const { user } = request.session;
 
-				try {
-					const application = await getApplicationById({ applicationId });
+					try {
+						const application = await getApplicationById({ applicationId });
 
-					if (!application.success) {
-						switch (application.error) {
+						if (!application.success) {
+							switch (application.error) {
+								case 'NOT_FOUND':
+									response.status(404);
+									break;
+								case 'SYSTEM_ERROR':
+									response.status(500);
+									break;
+								default:
+									response.status(500);
+							}
+
+							response.send({
+								error: application.error,
+								message: application.message,
+							});
+							return;
+						}
+
+						const userName = getUserName(user);
+						const result = await withdrawApplication({ applicationId, userName });
+
+						if (result.success) {
+							response.status(200).json(result.data);
+							return;
+						}
+
+						switch (result.error) {
+							case 'INVALID_STATE_TRANSITION':
+								response.status(400);
+								break;
 							case 'NOT_FOUND':
 								response.status(404);
-								break;
-							case 'SYSTEM_ERROR':
-								response.status(500);
 								break;
 							default:
 								response.status(500);
 						}
 
 						response.send({
-							error: application.error,
-							message: application.message,
+							error: result.error === 'INVALID_STATE_TRANSITION' ? 'INVALID_REQUEST' : result.error,
+							message: result.message,
 						});
-						return;
+					} catch (error) {
+						response.status(500).json({
+							error: 'SYSTEM_ERROR',
+							message: 'Something went wrong, please try again later.',
+						});
 					}
-
-					const userName = getUserName(user);
-					const result = await withdrawApplication({ applicationId, userName });
-
-					if (result.success) {
-						response.status(200).json(result.data);
-						return;
-					}
-
-					switch (result.error) {
-						case 'INVALID_STATE_TRANSITION':
-							response.status(400);
-							break;
-						case 'NOT_FOUND':
-							response.status(404);
-							break;
-						default:
-							response.status(500);
-					}
-
-					response.send({
-						error: result.error === 'INVALID_STATE_TRANSITION' ? 'INVALID_REQUEST' : result.error,
-						message: result.message,
-					});
-				} catch (error) {
-					response.status(500).json({
-						error: 'SYSTEM_ERROR',
-						message: 'Something went wrong, please try again later.',
-					});
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -711,7 +726,7 @@ applicationRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request)) {
+			if (isRequestWithSession(request)) {
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const user = request.session.user;
@@ -769,7 +784,7 @@ applicationRouter.post(
 					});
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -788,7 +803,7 @@ applicationRouter.post(
 				submitDacCommentsSchema,
 				apiZodErrorMapping,
 				async (request, response: ResponseWithData<DacCommentRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
-					if (isAuthenticatedRequest(request)) {
+					if (isRequestWithSession(request)) {
 						try {
 							const applicationId = Number(request.params.applicationId);
 							const { message, section, toDacChair } = request.body;
@@ -818,7 +833,7 @@ applicationRouter.post(
 							});
 						}
 					} else {
-						authErrorResponseHandler(response, false);
+						authErrorResponseHandler(response, authFailure);
 					}
 				},
 			),
@@ -836,7 +851,7 @@ applicationRouter.post(
 				request: Request,
 				response: ResponseWithData<ApplicationDTO, ['INVALID_REQUEST', 'NOT_FOUND', 'SYSTEM_ERROR', 'UNAUTHORIZED']>,
 			) => {
-				if (isAuthenticatedRequest(request)) {
+				if (isRequestWithSession(request)) {
 					try {
 						const applicationId = Number(request.params.applicationId);
 						const user = request.session.user;
@@ -910,7 +925,7 @@ applicationRouter.post(
 						});
 					}
 				} else {
-					authErrorResponseHandler(response, false);
+					authErrorResponseHandler(response, authFailure);
 				}
 			},
 		),
@@ -934,7 +949,7 @@ applicationRouter.post(
 					['NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'UNAUTHORIZED', 'INVALID_STATE_TRANSITION', 'FORBIDDEN']
 				>,
 			) => {
-				if (isAuthenticatedRequest(request)) {
+				if (isRequestWithSession(request)) {
 					try {
 						const applicationId = Number(request.params.applicationId);
 						const user = request.session.user;
@@ -1006,7 +1021,7 @@ applicationRouter.post(
 						});
 					}
 				} else {
-					authErrorResponseHandler(response, false);
+					authErrorResponseHandler(response, authFailure);
 				}
 			},
 		),
@@ -1031,65 +1046,71 @@ applicationRouter.get(
 				['UNAUTHORIZED', 'NOT_FOUND', 'FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
-				const { applicationId, section } = request.params;
-				const user = request.session.user;
-				const userRole = getUserRole(request.session);
+			if (isRequestWithSession(request)) {
+				const { applicationId: paramsId, section } = request.params;
+				const applicationId = Number(paramsId);
+				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				if (requestAuthResult.success) {
+					const user = request.session.user;
+					const userRole = getUserRole(request.session);
 
-				try {
-					if (!section) {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
-						return;
-					}
-
-					//  Need to check if user belongs to this application to retrieve comments
-					if (userRole === 'APPLICANT') {
-						const applicationResult = await getApplicationById({ applicationId: Number(applicationId) });
-
-						if (!applicationResult.success) {
-							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+					try {
+						if (!section) {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
 							return;
 						}
-					}
 
-					const isDacRole = userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER';
+						//  Need to check if user belongs to this application to retrieve comments
+						if (userRole === 'APPLICANT') {
+							const applicationResult = await getApplicationById({ applicationId: applicationId });
 
-					const result = await getDacComments({
-						applicationId: Number(applicationId),
-						section,
-						isDac: isDacRole,
-					});
-
-					if (!result.success) {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
-					}
-
-					// Return all comments if user is DAC chair
-					if (userRole === 'DAC_CHAIR') {
-						response.status(201).json(result.data);
-						return;
-					}
-
-					//  Return dacChairOnly comments if user made the comment
-					const filteredComments = result.data.filter((comment) => {
-						if (comment.dacChairOnly && comment.userId !== user.userId) {
-							return false;
+							if (!applicationResult.success) {
+								response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+								return;
+							}
 						}
-						return true;
-					});
 
-					response.status(201).json(filteredComments);
-					return;
-				} catch (error) {
-					response.status(500).json({
-						error: 'SYSTEM_ERROR',
-						message: "We're sorry, an unexpected error occurred. Please try again later.",
-					});
-					return;
+						const isDacRole = userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER';
+
+						const result = await getDacComments({
+							applicationId: Number(applicationId),
+							section,
+							isDac: isDacRole,
+						});
+
+						if (!result.success) {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+
+						// Return all comments if user is DAC chair
+						if (userRole === 'DAC_CHAIR') {
+							response.status(201).json(result.data);
+							return;
+						}
+
+						//  Return dacChairOnly comments if user made the comment
+						const filteredComments = result.data.filter((comment) => {
+							if (comment.dacChairOnly && comment.userId !== user.userId) {
+								return false;
+							}
+							return true;
+						});
+
+						response.status(201).json(filteredComments);
+						return;
+					} catch (error) {
+						response.status(500).json({
+							error: 'SYSTEM_ERROR',
+							message: "We're sorry, an unexpected error occurred. Please try again later.",
+						});
+						return;
+					}
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -1162,50 +1183,54 @@ applicationRouter.get(
 				['FORBIDDEN', 'INVALID_REQUEST', 'SYSTEM_ERROR', 'NOT_FOUND']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
+			if (isRequestWithSession(request)) {
 				const applicationId = Number(request.params.applicationId);
-
-				try {
-					const applicationInfo = await getApplicationById({ applicationId });
-					if (!applicationInfo.success) {
-						switch (applicationInfo.error) {
-							case 'NOT_FOUND':
-								response.status(404);
-								break;
-							case 'SYSTEM_ERROR':
-							default:
-								response.status(500);
-								break;
+				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				if (requestAuthResult.success) {
+					try {
+						const applicationInfo = await getApplicationById({ applicationId });
+						if (!applicationInfo.success) {
+							switch (applicationInfo.error) {
+								case 'NOT_FOUND':
+									response.status(404);
+									break;
+								case 'SYSTEM_ERROR':
+								default:
+									response.status(500);
+									break;
+							}
+							response.send({
+								error: applicationInfo.error,
+								message: applicationInfo.message,
+							});
+							return;
 						}
-						response.send({
-							error: applicationInfo.error,
-							message: applicationInfo.message,
+
+						const result = await getApplicationHistory({ applicationId });
+
+						if (!result.success) {
+							response.status(500);
+							response.send({
+								error: result.error,
+								message: result.message,
+							});
+							return;
+						}
+
+						response.status(200).json(result.data);
+						return;
+					} catch (error) {
+						response.status(500).json({
+							error: 'SYSTEM_ERROR',
+							message: "We're sorry, an unexpected error occurred. Please try again later.",
 						});
 						return;
 					}
-
-					const result = await getApplicationHistory({ applicationId });
-
-					if (!result.success) {
-						response.status(500);
-						response.send({
-							error: result.error,
-							message: result.message,
-						});
-						return;
-					}
-
-					response.status(200).json(result.data);
-					return;
-				} catch (error) {
-					response.status(500).json({
-						error: 'SYSTEM_ERROR',
-						message: "We're sorry, an unexpected error occurred. Please try again later.",
-					});
-					return;
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),

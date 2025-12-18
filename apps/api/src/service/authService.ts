@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type Request } from 'express';
 import { type SessionData } from 'express-session';
 
 import { userRoleSchema } from '@pcgl-daco/validation';
@@ -29,8 +28,7 @@ import logger from '@/logger.ts';
 import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
-import type { ApplicationService, AuthorizedRequest } from './types.ts';
-import { isRequestWithSession } from './utils.ts';
+import type { ApplicationService, UserSession } from './types.ts';
 
 /**
  * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
@@ -84,34 +82,23 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 }
 
 /**
- * Handler to enforce Request is Authorized
- * Insures Type safety for downstream Request Handler due to limitations with Express Type definitions
- * @param request Express request
- * @returns boolean
- */
-export const isAuthenticatedRequest = (request: Request): request is AuthorizedRequest => {
-	return isRequestWithSession(request);
-};
-
-/**
  * Validate User is allowed access to this specific Application based on userRole or userId
  * @param request AuthorizedRequest with session, user and userId
  * @returns boolean
  */
 export async function canAccessRequest(
-	request: AuthorizedRequest,
-): AsyncResult<AuthorizedRequest, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
-	const { session } = request;
+	session: UserSession,
+	applicationId: number,
+): AsyncResult<void, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 	const { user } = session;
 	const userRole = getUserRole(session);
-	const requestedId = request.params.applicationId || request.body.applicationId;
 
 	const hasSpecialAccess =
 		userRole === userRoleSchema.Values.DAC_MEMBER ||
 		userRole === userRoleSchema.Values.DAC_CHAIR ||
-		(await isAssociatedRep(session, requestedId));
+		(await isAssociatedRep(session, applicationId));
 
-	const result = await getApplicationById({ applicationId: requestedId });
+	const result = await getApplicationById({ applicationId });
 	if (result.success) {
 		const { data } = result;
 		const { userId } = user;
@@ -123,5 +110,5 @@ export async function canAccessRequest(
 	} else {
 		return result;
 	}
-	return success(request);
+	return success(undefined);
 }

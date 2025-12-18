@@ -24,7 +24,7 @@ import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { type SessionUser } from '@/session/types.ts';
-import { type Failure } from '@/utils/results.ts';
+import { type Failure, failure } from '@/utils/results.ts';
 import {
 	type ApplicationActionsColumnName,
 	type ApplicationsColumnName,
@@ -84,6 +84,8 @@ export function getUserName(user: SessionUser): string {
 	return userName.trim();
 }
 
+export const authFailure = failure('UNAUTHORIZED', 'This resource is protected and requires authorization.');
+
 /**
  * Standardized handler for common Auth error cases
  * Ensures type safety for downstream Request Handler due to limitations with Express type definitions
@@ -94,34 +96,26 @@ export function getUserName(user: SessionUser): string {
  */
 export const authErrorResponseHandler = (
 	response: ResponseWithData<any, ['UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR']>,
-	isAuthenticated: boolean,
-	canAccessResult?: Failure<'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'>,
+	authenticationResult: Failure<'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'>,
 ) => {
-	if (!isAuthenticated) {
-		response.status(401).send({
-			error: 'UNAUTHORIZED',
-			message: 'This resource is protected and requires authorization.',
-		});
+	const { error, message } = authenticationResult;
+	switch (authenticationResult.error) {
+		case 'UNAUTHORIZED':
+			response.status(401);
+			break;
+		case 'FORBIDDEN':
+			response.status(403);
+			break;
+		case 'NOT_FOUND':
+			response.status(404);
+			break;
+		case 'SYSTEM_ERROR':
+		default:
+			response.status(500);
+			break;
 	}
-
-	if (canAccessResult) {
-		switch (canAccessResult.error) {
-			case 'FORBIDDEN':
-				response.status(403);
-				break;
-			case 'NOT_FOUND':
-				response.status(404);
-				break;
-			case 'SYSTEM_ERROR':
-			default:
-				response.status(500);
-				break;
-		}
-		response.send({
-			error: canAccessResult.error,
-			message: canAccessResult.message,
-		});
-	}
-
-	return;
+	response.send({
+		error,
+		message,
+	});
 };

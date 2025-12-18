@@ -35,8 +35,8 @@ import {
 	updateCollaborator,
 } from '@/controllers/collaboratorsController.js';
 import { authMiddleware } from '@/middleware/authMiddleware.ts';
-import { canAccessRequest, isAuthenticatedRequest } from '@/service/authService.ts';
-import { authErrorResponseHandler } from '@/service/utils.ts';
+import { canAccessRequest } from '@/service/authService.ts';
+import { authErrorResponseHandler, authFailure, isRequestWithSession } from '@/service/utils.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
 
@@ -58,7 +58,7 @@ collaboratorsRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request)) {
+			if (isRequestWithSession(request)) {
 				try {
 					const { applicationId: application_id, collaborators } = request.body;
 
@@ -105,7 +105,7 @@ collaboratorsRouter.post(
 					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -124,35 +124,39 @@ collaboratorsRouter.get(
 			['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 		>,
 	) => {
-		if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
-			try {
-				const applicationId = Number(request.params.applicationId);
-
-				if (!isPositiveInteger(applicationId)) {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
-					return;
-				}
-
-				const result = await listCollaborators({
-					applicationId,
-				});
-
-				if (result.success) {
-					response.status(201).json(result.data);
-					return;
-				}
-				switch (result.error) {
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
+		if (isRequestWithSession(request)) {
+			const applicationId = Number(request.params.applicationId);
+			const requestAuthResult = await canAccessRequest(request.session, applicationId);
+			if (requestAuthResult.success) {
+				try {
+					if (!isPositiveInteger(applicationId)) {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 						return;
 					}
+
+					const result = await listCollaborators({
+						applicationId,
+					});
+
+					if (result.success) {
+						response.status(201).json(result.data);
+						return;
+					}
+					switch (result.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+					}
+				} catch (error) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+					return;
 				}
-			} catch (error) {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
-				return;
+			} else {
+				authErrorResponseHandler(response, requestAuthResult);
 			}
 		} else {
-			authErrorResponseHandler(response, false);
+			authErrorResponseHandler(response, authFailure);
 		}
 	},
 );
@@ -173,52 +177,58 @@ collaboratorsRouter.delete(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request) && (await canAccessRequest(request))) {
-				try {
-					const collaboratorEmail = request.params.collaboratorEmail;
+			if (isRequestWithSession(request)) {
+				const applicationId = Number(request.params.applicationId);
+				const requestAuthResult = await canAccessRequest(request.session, applicationId);
+				if (requestAuthResult.success) {
+					try {
+						const collaboratorEmail = request.params.collaboratorEmail;
 
-					if (!collaboratorEmail) {
-						response
-							.status(400)
-							.json({ error: 'INVALID_REQUEST', message: 'Collaborator Email must be included in delete request.' });
-						return;
-					}
-
-					const applicationId = Number(request.params.applicationId);
-
-					if (!isPositiveInteger(applicationId)) {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
-						return;
-					}
-
-					const result = await deleteCollaborator({
-						application_id: applicationId,
-						collaborator_email: collaboratorEmail,
-					});
-
-					if (result.success) {
-						response.status(201).json(result.data);
-						return;
-					}
-					switch (result.error) {
-						case 'INVALID_STATE_TRANSITION': {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						if (!collaboratorEmail) {
+							response
+								.status(400)
+								.json({ error: 'INVALID_REQUEST', message: 'Collaborator Email must be included in delete request.' });
 							return;
 						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: result.error, message: result.message });
+
+						const applicationId = Number(request.params.applicationId);
+
+						if (!isPositiveInteger(applicationId)) {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 							return;
 						}
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
+
+						const result = await deleteCollaborator({
+							application_id: applicationId,
+							collaborator_email: collaboratorEmail,
+						});
+
+						if (result.success) {
+							response.status(201).json(result.data);
 							return;
 						}
+						switch (result.error) {
+							case 'INVALID_STATE_TRANSITION': {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
+						}
+					} catch (error) {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 					}
-				} catch (error) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
@@ -239,7 +249,7 @@ collaboratorsRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
 			>,
 		) => {
-			if (isAuthenticatedRequest(request)) {
+			if (isRequestWithSession(request)) {
 				try {
 					const { applicationId: application_id, collaboratorEmail, collaboratorUpdates } = request.body;
 
@@ -283,7 +293,7 @@ collaboratorsRouter.post(
 					return;
 				}
 			} else {
-				authErrorResponseHandler(response, false);
+				authErrorResponseHandler(response, authFailure);
 			}
 		},
 	),
