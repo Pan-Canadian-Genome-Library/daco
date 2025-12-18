@@ -69,7 +69,7 @@ export const authMiddleware =
 		}
 
 		if (requiredRoles) {
-			const userRole = getUserRole(request.session);
+			const userRole = getUserRole(user);
 			if (!requiredRoles.includes(userRole)) {
 				response.status(403).send({
 					error: 'FORBIDDEN',
