@@ -39,16 +39,7 @@ import {
 	GenerateEmailApplicantRevoke,
 	GenerateEmailApplicantRevokePlain,
 } from './layouts/templates/EmailApplicantRevoke.ts';
-import {
-	GenerateEmailApproval,
-	GenerateEmailApprovalPlain,
-	GenerateEmailApprovalWithError,
-	GenerateEmailApprovalWithErrorPlain,
-} from './layouts/templates/EmailApproval.ts';
-import {
-	GenerateEmailDACApprovalWithError,
-	GenerateEmailDACApprovalWithErrorPlain,
-} from './layouts/templates/EmailDacApprovalWithErrors.ts';
+import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
 import { GenerateEmailDacForReview, GenerateEmailDacForReviewPlain } from './layouts/templates/EmailDacReview.ts';
 import {
 	GenerateEmailDacForSubmittedRevision,
@@ -65,7 +56,6 @@ import {
 	type GenerateApplicantRevisionType,
 	type GenerateApproveType,
 	type GenerateDacRevisionType,
-	type GenerateErrorApproveType,
 	type GenerateInstitutionalRepType,
 	type GenerateRejectType,
 } from './types.ts';
@@ -340,39 +330,6 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	// Email to Applicant & Notify Approval had errors
-	sendEmailApprovalWithError: async ({
-		id,
-		name,
-		to,
-	}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
-
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to approver`);
-			}
-
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_APPROVER_ERROR_APPROVING_APPLICATION,
-				html: GenerateEmailApprovalWithError({ id, name }),
-				text: GenerateEmailApprovalWithErrorPlain({ id, name }),
-			});
-
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailApprovalWithError`;
-
-			logger.error(message, error);
-
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-
 	// Email to Applicant & Notify Disapproval
 	sendEmailReject: async ({
 		id,
@@ -434,39 +391,6 @@ const emailSvc = () => ({
 			return success(response);
 		} catch (error) {
 			const message = `Error sending email - sendEmailDacRevoke`;
-
-			logger.error(message, error);
-
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	//Email to Approver that the approval had errors
-	sendEmailDacApprovalWithError: async ({
-		id,
-		applicantName,
-		to,
-		errors,
-	}: GenerateErrorApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
-
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to approver`);
-			}
-
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_APPROVER_ERROR_APPROVING_APPLICATION,
-				html: GenerateEmailDACApprovalWithError({ id, applicantName, errors }),
-				text: GenerateEmailDACApprovalWithErrorPlain({ id, applicantName, errors }),
-			});
-
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacApprovalWithError`;
 
 			logger.error(message, error);
 

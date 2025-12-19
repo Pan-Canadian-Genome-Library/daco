@@ -54,33 +54,3 @@ export const GenerateEmailApprovalPlain = ({ name }: Omit<GenerateApproveType, '
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };
-
-export const GenerateEmailApprovalWithError = ({ id, name }: Omit<GenerateApproveType, 'to'>) => {
-	const {
-		express: { ui },
-	} = getEmailConfig;
-
-	const template = `  
-            <mj-column css-class="section-wrapper">
-                <mj-text>
-                    Dear ${name},
-                </mj-text>
-                <mj-text>
-                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. However, we encountered an issue while processing your application for data access. Please contact the PCGL Data Access Compliance Office for further assistance.
-                </mj-text>
-                <mj-text>
-                    Best regards,<br />
-                    The PCGL Data Access Compliance Office
-                </mj-text>
-            </mj-column>
-`;
-
-	return basicLayout({ body: template }).html;
-};
-
-export const GenerateEmailApprovalWithErrorPlain = ({ name }: Omit<GenerateApproveType, 'to'>) => {
-	return ` Dear ${name},
-    \n We are pleased to inform you that your DACO application has been approved by the PCGL Data Access Committee. However, we encountered an issue while processing your application for data access. Please contact the PCGL Data Access Compliance Office for further assistance.
-    \n Best regards, \n The PCGL Data Access Compliance Office 
-    `;
-};

@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
@@ -33,41 +34,18 @@ const useApproveApplication = () => {
 		mutationFn: async ({ applicationId }) => {
 			const response = await fetch(`/applications/${applicationId}/approve`, {
 				method: 'POST',
-			}).then(async (response: Response) => {
-				if (response.ok) {
-					return await response.json();
-				}
+			}).then(withErrorResponseHandler);
 
-				throw await response.json();
-			});
-			return response;
+			return await response.json();
 		},
 		onSuccess: async (data) => {
 			await queryClient.invalidateQueries({ queryKey: [`application-${data.id}`] });
 		},
-		onError: async (data, { applicationId }) => {
-			switch (data.error) {
-				case 'APPLICATION_USERS_NOT_FOUND':
-					notification.openNotification({
-						type: 'error',
-						message: translate('modals.approveApplication.notifications.applicationUserAccountsNotFound', {
-							emails: data.message,
-						}),
-					});
-					break;
-				case 'GRANT_USER_PERMISSIONS_ERROR':
-					notification.openNotification({
-						type: 'error',
-						message: translate('modals.approveApplication.notifications.grantUserPermissionsError'),
-					});
-					break;
-				default:
-					notification.openNotification({
-						type: 'error',
-						message: translate('modals.approveApplication.notifications.applicationApproveFailed'),
-					});
-			}
-			await queryClient.invalidateQueries({ queryKey: [`application-${applicationId}`] });
+		onError: () => {
+			notification.openNotification({
+				type: 'error',
+				message: translate('modals.approveApplication.notifications.applicationApproveFailed'),
+			});
 		},
 	});
 };

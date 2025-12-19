@@ -17,13 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getDbInstance } from '@/db/index.ts';
 import { addUserToStudyPermission, lookupUserByEmail } from '@/external/pcglAuthZClient.ts';
-import { failure, type AsyncResult } from '@/utils/results.ts';
 
-import { applicationSvc } from './applicationService.ts';
-import { collaboratorsSvc } from './collaboratorsService.ts';
-import type { ApplicationService, GrantUserPermissionsParams, GrantUserPermissionsResult } from './types.ts';
+import type { GrantUserPermissionsParams, GrantUserPermissionsResult } from './types.ts';
 
 /**
  * This function grants a user access to the requested studies
@@ -56,59 +52,4 @@ export const grantUserPermissions = async ({
 	}
 
 	return { success: failureMessages.length === 0, failureMessages };
-};
-
-/**
- * Verifies that the applicant and all collaborators associated with an application
- * have active user accounts and returns their user IDs.
- * @param applicationId
- * @param approverAccessToken
- * @returns
- */
-export const verifyApplicationUserAccounts = async (
-	applicationId: number,
-	approverAccessToken: string,
-): AsyncResult<{ userIds: string[] }, 'SYSTEM_ERROR' | 'APPLICATION_USERS_NOT_FOUND'> => {
-	const database = getDbInstance();
-
-	const applicationService: ApplicationService = applicationSvc(database);
-	const collaboratorsService = await collaboratorsSvc(database);
-
-	const emailLookupFailures: string[] = [];
-	const verifiedUserIds: string[] = [];
-
-	// Check if applicant has an active account
-	const applicationContents = await applicationService.getApplicationWithContents({ id: applicationId });
-	if (!applicationContents.success) {
-		return failure('SYSTEM_ERROR', 'Unable to retrieve application contents.');
-	}
-
-	const applicantEmail = applicationContents.data.contents?.applicant_institutional_email || '';
-
-	const applicantLookup = await lookupUserByEmail(applicantEmail, approverAccessToken);
-	if (!applicantLookup.success) {
-		emailLookupFailures.push(applicantEmail);
-	} else {
-		verifiedUserIds.push(...applicantLookup.data);
-	}
-
-	// Check if collaborators have active accounts
-	const collaboratorResp = await collaboratorsService.listCollaborators(applicationId);
-	if (!collaboratorResp.success) {
-		return failure('SYSTEM_ERROR', `Unable to retrieve collaborators: ${collaboratorResp.message}`);
-	}
-	for (const collaborator of collaboratorResp.data) {
-		const collabEmail = collaborator.institutional_email || '';
-		const collabLookup = await lookupUserByEmail(collabEmail, approverAccessToken);
-		if (!collabLookup.success) {
-			emailLookupFailures.push(collabEmail);
-		} else {
-			verifiedUserIds.push(...collabLookup.data);
-		}
-	}
-
-	if (emailLookupFailures.length > 0) {
-		return failure('APPLICATION_USERS_NOT_FOUND', emailLookupFailures.join('; '));
-	}
-	return { success: true, data: { userIds: verifiedUserIds } };
 };

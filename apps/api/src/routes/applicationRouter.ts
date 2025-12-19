@@ -325,10 +325,7 @@ applicationRouter.post(
 		apiZodErrorMapping,
 		async (
 			request: Request,
-			response: ResponseWithData<
-				ApplicationDTO,
-				['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR', 'APPLICATION_USERS_NOT_FOUND', 'GRANT_USER_PERMISSIONS_ERROR']
-			>,
+			response: ResponseWithData<ApplicationDTO, ['NOT_FOUND', 'INVALID_REQUEST', 'SYSTEM_ERROR']>,
 		) => {
 			const applicationId = Number(request.params.applicationId);
 
@@ -385,14 +382,6 @@ applicationRouter.post(
 					}
 					case 'NOT_FOUND': {
 						response.status(404).json({ error: approvalResult.error, message: 'Application not found.' });
-						return;
-					}
-					case 'GRANT_USER_PERMISSIONS_ERROR': {
-						response.status(400).json({ error: approvalResult.error, message: approvalResult.message });
-						return;
-					}
-					case 'APPLICATION_USERS_NOT_FOUND': {
-						response.status(400).json({ error: approvalResult.error, message: approvalResult.message });
 						return;
 					}
 					default: {
