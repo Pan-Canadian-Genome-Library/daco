@@ -263,6 +263,7 @@ export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
 	approverAccessToken: string; // The access token of the user approving the application
 	approverEmailAddress: string; // The email address of the user approving the application
+	userName: string; // Name of User who Approved application
 };
 
 export interface CollaboratorDTO {
@@ -324,6 +325,7 @@ export type ApplicationActionResponse = {
 	applicationId: number;
 	createdAt: Date;
 	userId: string;
+	userName?: string | null;
 	action: ApplicationActionValues;
 	stateBefore: ApplicationStateValues;
 	stateAfter: ApplicationStateValues;

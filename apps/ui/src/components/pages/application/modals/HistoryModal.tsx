@@ -53,7 +53,7 @@ const HistoryTimeline = ({ historyData }: { historyData: ApplicationHistoryRespo
 				<Text strong>{translate(`modals.history.actions.${item.action}`)}</Text>
 				<Text>
 					{translate('modals.history.timelineItem', {
-						userName: item.userId,
+						userName: item.userName || item.userId,
 						actionDate: new Date(item.createdAt).toDateString(),
 					})}
 				</Text>

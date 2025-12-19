@@ -48,6 +48,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testApplicationId,
+	testUserName,
 	testUserId as user_id,
 } from '../utils/testUtils.ts';
 
@@ -144,7 +145,7 @@ describe('Application API', () => {
 			/**
 			 * Applications must be withdrawn before they can be edited.
 			 */
-			const withdrawResult = await withdrawApplication({ applicationId: id });
+			const withdrawResult = await withdrawApplication({ applicationId: id, userName: testUserName });
 
 			assert.ok(withdrawResult.success);
 
@@ -239,7 +240,7 @@ describe('Application API', () => {
 			const { id } = applicationRecordsResult.data.applications[0];
 			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
 
-			const result = await dacRejectApplication({ applicationId: id, rejectionReason });
+			const result = await dacRejectApplication({ applicationId: id, rejectionReason, userName: testUserName });
 			assert.ok(result.success);
 
 			const rejectedApplication = await getApplicationById({ applicationId: id });
@@ -254,14 +255,14 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
 			});
-			const result = await submitRevision({ applicationId: testApplicationId });
+			const result = await submitRevision({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 		});
 
 		it('should fail to submit a revision for a non-existent application', async () => {
-			const result = await submitRevision({ applicationId: 9999 });
+			const result = await submitRevision({ applicationId: 9999, userName: testUserName });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.error, 'NOT_FOUND');
@@ -282,7 +283,7 @@ describe('Application API', () => {
 				update: { state: ApplicationStates.APPROVED },
 			});
 
-			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT');
+			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT', testUserName);
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.REVOKED);
@@ -306,7 +307,7 @@ describe('Application API', () => {
 				update: { state: ApplicationStates.DRAFT },
 			});
 
-			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT');
+			const result = await revokeApplication(id, true, 'TEST-REVOKE-COMMENT', testUserName);
 
 			// Verify the revocation failed
 			assert.ok(!result.success);
@@ -316,7 +317,7 @@ describe('Application API', () => {
 		it('should fail if application does not exist', async () => {
 			const nonExistentId = 9999;
 
-			const result = await revokeApplication(nonExistentId, true, 'TEST-REVOKE-COMMENT');
+			const result = await revokeApplication(nonExistentId, true, 'TEST-REVOKE-COMMENT', testUserName);
 
 			// Assert: Verify the revocation failed
 			assert.ok(!result.success);
@@ -330,7 +331,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
 			});
-			const result = await withdrawApplication({ applicationId: testApplicationId });
+			const result = await withdrawApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.DRAFT);
@@ -341,7 +342,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW },
 			});
-			const result = await withdrawApplication({ applicationId: testApplicationId });
+			const result = await withdrawApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.DRAFT);
@@ -352,7 +353,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DRAFT },
 			});
-			const result = await withdrawApplication({ applicationId: testApplicationId });
+			const result = await withdrawApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 		});
@@ -362,7 +363,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.REJECTED },
 			});
-			const result = await withdrawApplication({ applicationId: testApplicationId });
+			const result = await withdrawApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 		});
@@ -372,7 +373,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED },
 			});
-			const result = await withdrawApplication({ applicationId: testApplicationId });
+			const result = await withdrawApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 		});
@@ -382,7 +383,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVISIONS_REQUESTED },
 			});
-			const result = await withdrawApplication({ applicationId: testApplicationId });
+			const result = await withdrawApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 		});
@@ -392,13 +393,13 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.APPROVED },
 			});
-			const result = await withdrawApplication({ applicationId: testApplicationId });
+			const result = await withdrawApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 		});
 
 		it('should fail for non-existent application', async () => {
-			const result = await withdrawApplication({ applicationId: 9999 });
+			const result = await withdrawApplication({ applicationId: 9999, userName: testUserName });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.error, 'NOT_FOUND');
@@ -410,7 +411,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DRAFT },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId });
+			const result = await closeApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -421,7 +422,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId });
+			const result = await closeApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -432,7 +433,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId });
+			const result = await closeApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -443,7 +444,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.DAC_REVIEW },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId });
+			const result = await closeApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.CLOSED);
@@ -454,7 +455,7 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.CLOSED },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId });
+			const result = await closeApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.message, 'Application is already closed.');
@@ -465,14 +466,14 @@ describe('Application API', () => {
 				id: testApplicationId,
 				update: { state: ApplicationStates.APPROVED },
 			});
-			const result = await closeApplication({ applicationId: testApplicationId });
+			const result = await closeApplication({ applicationId: testApplicationId, userName: testUserName });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.message, `Cannot close application in state ${ApplicationStates.APPROVED}.`);
 		});
 
 		it('should fail for non-existent application', async () => {
-			const result = await closeApplication({ applicationId: 9999 });
+			const result = await closeApplication({ applicationId: 9999, userName: testUserName });
 
 			assert.ok(!result.success);
 			assert.strictEqual(result.error, 'NOT_FOUND');
@@ -492,6 +493,7 @@ describe('Application API', () => {
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
 				revisionData: revisionRequestData,
+				userName: testUserName,
 			});
 
 			assert.ok(!result.success);
@@ -510,6 +512,7 @@ describe('Application API', () => {
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: id,
 				revisionData: revisionRequestData,
+				userName: testUserName,
 			});
 
 			// Assert: Should return a failure message
@@ -524,6 +527,7 @@ describe('Application API', () => {
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: invalidApplicationId,
 				revisionData: revisionRequestData,
+				userName: testUserName,
 			});
 
 			// Assert: Should return an error message
@@ -576,7 +580,7 @@ describe('Application API', () => {
 			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DRAFT } });
 
 			// Act
-			const result = await submitApplication({ applicationId: id });
+			const result = await submitApplication({ applicationId: id, userName: testUserName });
 
 			// Assert
 			assert.ok(result.success);
@@ -598,7 +602,7 @@ describe('Application API', () => {
 			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
 
 			// Act
-			const result = await submitApplication({ applicationId: id });
+			const result = await submitApplication({ applicationId: id, userName: testUserName });
 
 			// Assert
 			assert.ok(!result.success);
