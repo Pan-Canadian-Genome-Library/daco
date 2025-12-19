@@ -121,6 +121,7 @@ export const applicationHistoryResponseSchema = z.object({
 	action: z.nativeEnum(ApplicationActions),
 	id: z.number(),
 	userId: z.string(),
+	userName: z.string().nullable(),
 	applicationId: z.number(),
 	stateAfter: z.nativeEnum(ApplicationStates),
 	stateBefore: z.nativeEnum(ApplicationStates),

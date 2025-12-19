@@ -38,6 +38,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testApplicationId,
+	testUserName,
 } from '../utils/testUtils.ts';
 
 describe('File API', () => {
@@ -119,14 +120,14 @@ describe('File API', () => {
 					id: testApplicationId,
 					update: { state: ApplicationStates.DAC_REVIEW },
 				});
-				const result = await submitRevision({ applicationId: testApplicationId });
+				const result = await submitRevision({ applicationId: testApplicationId, userName: testUserName });
 
 				assert.ok(!result.success);
 				assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 			});
 
 			it('should fail to submit a revision for a non-existent application', async () => {
-				const result = await submitRevision({ applicationId: 9999 });
+				const result = await submitRevision({ applicationId: 9999, userName: testUserName });
 
 				assert.ok(!result.success);
 				assert.strictEqual(String(result.error), 'NOT_FOUND');

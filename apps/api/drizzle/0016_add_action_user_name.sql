@@ -1,0 +1,1 @@
+ALTER TABLE "application_actions" ADD COLUMN "user_name" varchar(100);

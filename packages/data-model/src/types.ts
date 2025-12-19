@@ -261,6 +261,7 @@ export interface ApplicationListResponse {
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
+	userName: string; // Name of User who Approved application
 };
 
 export interface CollaboratorDTO {
@@ -322,6 +323,7 @@ export type ApplicationActionResponse = {
 	applicationId: number;
 	createdAt: Date;
 	userId: string;
+	userName?: string | null;
 	action: ApplicationActionValues;
 	stateBefore: ApplicationStateValues;
 	stateAfter: ApplicationStateValues;
