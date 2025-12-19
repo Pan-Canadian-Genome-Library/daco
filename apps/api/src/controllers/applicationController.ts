@@ -385,7 +385,6 @@ export const createApplicationPDF = async ({
 export const approveApplication = async ({
 	applicationId,
 	approverAccessToken,
-	approverEmailAddress,
 	userName,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {

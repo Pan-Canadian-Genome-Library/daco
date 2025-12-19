@@ -307,12 +307,10 @@ applicationRouter.post(
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const userName = getUserName(user);
-					const approverEmailAddress = request.session.user?.emails[0]?.address || '';
 					const approverAccessToken = request.session.account?.accessToken || '';
 					const approvalResult = await approveApplication({
 						applicationId,
 						approverAccessToken,
-						approverEmailAddress,
 						userName,
 					});
 
