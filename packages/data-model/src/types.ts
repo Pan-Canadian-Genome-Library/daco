@@ -261,6 +261,7 @@ export interface ApplicationListResponse {
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
+	approverAccessToken: string; // The access token of the user approving the application
 	userName: string; // Name of User who Approved application
 };
 
