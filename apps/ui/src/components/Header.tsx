@@ -17,19 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useState } from 'react';
+import React, { useState, type PropsWithChildren } from 'react';
 
-import { CloseOutlined, LogoutOutlined, MenuOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 
+import { API_PATH_LOGIN, API_PATH_LOGOUT } from '@/api/paths';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { clearExtraSessionInformation } from '@/global/localStorage';
-import { pcglHeaderTheme } from '@/providers/ThemeProvider';
+import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
-import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
 import ApplyForAccessModal from './modals/ApplyForAccessModal';
 
 const { Link } = Typography;
@@ -41,7 +40,7 @@ interface MenuItem {
 	position: 'left' | 'right';
 }
 
-interface MenuButton extends MenuItem {
+interface MenuButton extends PropsWithChildren<MenuItem> {
 	buttonProps: ButtonProps;
 	onClickAction?: VoidFunction;
 }
@@ -60,10 +59,11 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, role } = useUserContext();
+	const { isLoggedIn, user, role } = useUserContext();
+	const { emails = [], familyName = '', givenName = '' } = user || {};
+	const [isLogoutOpen, setLogoutOpen] = useState(false);
 
 	const isResponsiveMode = minWidth <= token.screenXL;
-
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
 	const [applyForAccessOpen, setApplyForAccessOpen] = useState(false);
 
@@ -127,9 +127,6 @@ const HeaderComponent = () => {
 		}
 	};
 
-	const location = useLocation();
-	const isHome = location.pathname === '/';
-
 	const loginButton: MenuButton = {
 		name: translate(`button.login`),
 		buttonProps: {
@@ -141,16 +138,56 @@ const HeaderComponent = () => {
 		},
 		position: 'right',
 	};
+
+	const displayName = givenName || familyName ? `${givenName || ''} ${familyName || ''}` : givenName;
+	const displayEmail = emails[0]?.address;
+
+	const UserInfo = (
+		<>
+			<p>{displayName}</p>
+			<p style={{ margin: 0, height: 20, fontWeight: 400, color: pcglColours.primary }}>{displayEmail}</p>
+			{(isLogoutOpen || isResponsiveMode) && (
+				<Button
+					href={API_PATH_LOGOUT}
+					onClick={() => {
+						clearExtraSessionInformation();
+					}}
+					style={{
+						boxShadow: '0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08)',
+						fontWeight: 'normal',
+						height: 45,
+						justifyContent: 'left',
+						left: 0,
+						position: 'absolute',
+						width: '100%',
+					}}
+				>
+					{translate(`button.logout`)} <LogoutOutlined style={{ color: pcglColours.darkGrey, marginLeft: 10 }} />
+				</Button>
+			)}
+		</>
+	);
+
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
-		onClickAction: () => clearExtraSessionInformation(),
+		children: UserInfo,
 		buttonProps: {
-			type: `${isHome ? 'default' : 'text'}`,
-			color: `${isHome ? 'primary' : 'default'}`,
-			variant: `${isHome ? 'solid' : 'text'}`,
-			icon: !isHome ? <LogoutOutlined /> : null,
+			onMouseOver: () => {
+				setLogoutOpen(true);
+			},
+			onMouseOut: () => {
+				setLogoutOpen(false);
+			},
+			type: 'text',
+			variant: 'text',
+			icon:
+				isLogoutOpen || isResponsiveMode ? (
+					<DownOutlined style={{ color: pcglColours.primary }} />
+				) : (
+					<UpOutlined style={{ color: pcglColours.primary }} />
+				),
 			iconPosition: 'end',
-			href: API_PATH_LOGOUT,
+			style: { height: 'auto', lineHeight: 0.5, textAlign: 'left' },
 		},
 		position: 'right',
 	};
@@ -201,7 +238,7 @@ const HeaderComponent = () => {
 							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
 							onClick={clickAction ? () => onMenuButtonClick(clickAction) : undefined}
 						>
-							{menuItem.name}
+							{menuItem.children ? menuItem.children : menuItem.name}
 						</Button>
 					);
 				} else {
