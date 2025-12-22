@@ -32,6 +32,7 @@ import { applicationArray } from './mock/application-data.ts';
 const logger = BaseLogger.forModule('testUtils');
 
 export const testUserId = 'testUser@oicr.on.ca';
+export const testUserName = 'Test User';
 export const testApplicationId = 1;
 export const testActionId = 1;
 export const PG_DATABASE = 'testUser';

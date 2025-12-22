@@ -21,7 +21,10 @@ import { asc, desc } from 'drizzle-orm';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
-import { type ApplicationActionsColumnName, type ApplicationsColumnName, type OrderBy } from '@/service/types.js';
+import { type ResponseWithData } from '@/routes/types.ts';
+import { type SessionUser } from '@/session/validation.ts';
+import { type Failure, failure } from '@/utils/results.ts';
+import { type ApplicationActionsColumnName, type ApplicationsColumnName, type OrderBy } from './types.js';
 
 export const applicationsQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
 	const orderByArguments =
@@ -42,4 +45,51 @@ export const applicationActionsQuery = (sort?: Array<OrderBy<ApplicationActionsC
 		: [asc(applicationActions.created_at)];
 
 	return orderByArguments;
+};
+
+/**
+ * Function to obtain standardized userName string from user data
+ * userId is used as a default fallback value
+ * @returns string
+ */
+export function getUserName(user: SessionUser): string {
+	const { givenName, familyName, userId } = user;
+	const userName = givenName || familyName ? `${givenName || ''} ${familyName || ''}` : userId;
+	return userName.trim();
+}
+
+export const authFailure = failure('UNAUTHORIZED', 'This resource is protected and requires authorization.');
+
+/**
+ * Standardized handler for common Auth error cases
+ * Ensures type safety for downstream Request Handler due to limitations with Express type definitions
+ * @param response Accepts any ResponseWithData
+ * @param isAuthenticated Indicates User Session Data is missing
+ * @param canAccessResult Failure Result with Error code & message
+ * @returns boolean
+ */
+export const authErrorResponseHandler = (
+	response: ResponseWithData<any, ['UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR']>,
+	authenticationResult: Failure<'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'>,
+) => {
+	const { error, message } = authenticationResult;
+	switch (authenticationResult.error) {
+		case 'UNAUTHORIZED':
+			response.status(401);
+			break;
+		case 'FORBIDDEN':
+			response.status(403);
+			break;
+		case 'NOT_FOUND':
+			response.status(404);
+			break;
+		case 'SYSTEM_ERROR':
+		default:
+			response.status(500);
+			break;
+	}
+	response.send({
+		error,
+		message,
+	});
 };
