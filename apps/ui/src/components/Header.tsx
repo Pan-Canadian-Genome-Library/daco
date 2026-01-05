@@ -60,8 +60,10 @@ const HeaderComponent = () => {
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 	const { isLoggedIn, user, role } = useUserContext();
+
 	const { emails = [], familyName = '', givenName = '' } = user || {};
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
+	const [isLogoutHover, setLogoutHover] = useState(false);
 
 	const isResponsiveMode = minWidth <= token.screenXL;
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -144,15 +146,32 @@ const HeaderComponent = () => {
 
 	const UserInfo = (
 		<>
-			<p>{displayName}</p>
-			<p style={{ margin: 0, height: 20, fontWeight: 400, color: pcglColours.primary }}>{displayEmail}</p>
+			<p style={{ fontSize: isResponsiveMode ? 10 : 14 }}>{displayName}</p>
+			<p
+				style={{
+					color: pcglColours.primary,
+					fontSize: isResponsiveMode ? 10 : 14,
+					fontWeight: 400,
+					height: 20,
+					margin: 0,
+				}}
+			>
+				{displayEmail}
+			</p>
 			{(isLogoutOpen || isResponsiveMode) && (
 				<Button
 					href={API_PATH_LOGOUT}
 					onClick={() => {
 						clearExtraSessionInformation();
 					}}
+					onMouseOver={() => {
+						setLogoutHover(true);
+					}}
+					onMouseOut={() => {
+						setLogoutHover(false);
+					}}
 					style={{
+						backgroundColor: isResponsiveMode ? pcglColours.tertiary : pcglColours.white,
 						boxShadow: '0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08)',
 						fontWeight: 'normal',
 						height: 45,
@@ -162,7 +181,13 @@ const HeaderComponent = () => {
 						width: '100%',
 					}}
 				>
-					{translate(`button.logout`)} <LogoutOutlined style={{ color: pcglColours.darkGrey, marginLeft: 10 }} />
+					{translate(`button.logout`)}{' '}
+					<LogoutOutlined
+						style={{
+							color: isLogoutHover ? pcglColours.primary : pcglColours.darkGrey,
+							marginLeft: 10,
+						}}
+					/>
 				</Button>
 			)}
 		</>
@@ -180,14 +205,19 @@ const HeaderComponent = () => {
 			},
 			type: 'text',
 			variant: 'text',
-			icon:
-				isLogoutOpen || isResponsiveMode ? (
-					<DownOutlined style={{ color: pcglColours.primary }} />
-				) : (
-					<UpOutlined style={{ color: pcglColours.primary }} />
-				),
+			icon: isResponsiveMode ? null : isLogoutOpen ? (
+				<DownOutlined style={{ color: pcglColours.primary }} />
+			) : (
+				<UpOutlined style={{ color: pcglColours.primary }} />
+			),
 			iconPosition: 'end',
-			style: { height: 'auto', lineHeight: 0.5, textAlign: 'left' },
+			style: {
+				height: 'auto',
+				justifyContent: isResponsiveMode ? 'left' : 'center',
+				lineHeight: 0.5,
+				paddingLeft: isResponsiveMode ? 0 : 15,
+				textAlign: 'left',
+			},
 		},
 		position: 'right',
 	};
