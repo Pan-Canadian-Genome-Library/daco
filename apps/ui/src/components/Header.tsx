@@ -59,7 +59,7 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, user, role } = useUserContext();
+	const { isLoggedIn, role, user } = useUserContext();
 
 	const { emails = [], familyName = '', givenName = '' } = user || {};
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
@@ -177,6 +177,7 @@ const HeaderComponent = () => {
 						height: 45,
 						justifyContent: 'left',
 						left: 0,
+						minWidth: 100,
 						position: 'absolute',
 						width: '100%',
 					}}
