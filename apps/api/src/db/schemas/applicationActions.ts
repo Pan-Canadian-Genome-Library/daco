@@ -43,6 +43,7 @@ export const applicationActions = pgTable('application_actions', {
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 	user_id: varchar({ length: 100 }).notNull(),
+	user_name: varchar({ length: 100 }),
 	action: applicationActionTypesEnum().notNull(),
 	revisions_request_id: bigint({ mode: 'number' }),
 	state_before: applicationStatesEnum().notNull(),

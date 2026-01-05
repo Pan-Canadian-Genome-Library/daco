@@ -27,7 +27,7 @@ import {
 	type FilesRecord,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/types.ts';
+import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/validation.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationHistoryResponseData,

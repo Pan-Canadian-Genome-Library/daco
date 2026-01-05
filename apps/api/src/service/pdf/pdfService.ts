@@ -140,7 +140,7 @@ const pdfService = () => ({
 						size: textSize,
 						font: customFont,
 						color: rgb(0.768, 0.113, 0.56),
-						opacity: 0.7,
+						opacity: 0.3,
 						rotate: degrees(-25),
 					});
 				});
@@ -153,7 +153,7 @@ const pdfService = () => ({
 						size: textSize,
 						font: customFont,
 						color: rgb(0.768, 0.113, 0.56),
-						opacity: 0.7,
+						opacity: 0.3,
 						rotate: degrees(-25),
 					});
 				});

@@ -27,7 +27,14 @@ import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationActionService, type ApplicationService } from '@/service/types.js';
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
-import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
+import {
+	addInitialApplications,
+	initTestMigration,
+	PG_DATABASE,
+	PG_PASSWORD,
+	PG_USER,
+	testUserName,
+} from '../utils/testUtils.ts';
 
 const {
 	APPROVED,
@@ -92,7 +99,7 @@ describe('State Machine', () => {
 		});
 
 		it('should change from DRAFT to INSTITUTIONAL_REP_REVIEW on submit', async () => {
-			await testStateManager.submitDraft();
+			await testStateManager.submitDraft(testUserName);
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 
@@ -116,7 +123,7 @@ describe('State Machine', () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 
-			const revisionResult = await testStateManager.reviseRepReview();
+			const revisionResult = await testStateManager.reviseRepReview(testUserName);
 			stateValue = testStateManager.getState();
 			assert.ok(revisionResult.success);
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
@@ -144,7 +151,7 @@ describe('State Machine', () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVISION_REQUESTED);
 
-			await testStateManager.submitRepRevision();
+			await testStateManager.submitRepRevision(testUserName);
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 
@@ -164,7 +171,7 @@ describe('State Machine', () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 
-			await testStateManager.approveRepReview();
+			await testStateManager.approveRepReview(testUserName);
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
@@ -188,13 +195,13 @@ describe('State Machine', () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			await testStateManager.submitDraft();
-			await testStateManager.submitRepRevision();
-			await testStateManager.approveRepReview();
+			await testStateManager.submitDraft(testUserName);
+			await testStateManager.submitRepRevision(testUserName);
+			await testStateManager.approveRepReview(testUserName);
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			await testStateManager.reviseDacReview();
+			await testStateManager.reviseDacReview(testUserName);
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
 
@@ -214,8 +221,8 @@ describe('State Machine', () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
 
-			await testStateManager.submitDraft();
-			await testStateManager.approveRepReview();
+			await testStateManager.submitDraft(testUserName);
+			await testStateManager.approveRepReview(testUserName);
 			const editResult = await testStateManager.editDacReview();
 
 			stateValue = testStateManager.getState();
@@ -227,7 +234,7 @@ describe('State Machine', () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVISIONS_REQUESTED);
 
-			await testStateManager.submitDacRevision();
+			await testStateManager.submitDacRevision(testUserName);
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
@@ -247,7 +254,7 @@ describe('State Machine', () => {
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			await testStateManager.approveDacReview();
+			await testStateManager.approveDacReview(testUserName);
 			stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, APPROVED);
 
@@ -288,7 +295,7 @@ describe('State Machine', () => {
 
 			const draftReviewManager = result.data;
 
-			await draftReviewManager.closeDraft();
+			await draftReviewManager.closeDraft(testUserName);
 			const stateValue = draftReviewManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
 
@@ -323,10 +330,10 @@ describe('State Machine', () => {
 			assert.ok(result.success);
 
 			const repReviewStateManager = result.data;
-			await repReviewStateManager.submitDraft();
+			await repReviewStateManager.submitDraft(testUserName);
 			assert.ok(result.data.state === 'INSTITUTIONAL_REP_REVIEW');
 
-			await repReviewStateManager.withdrawRepReview();
+			await repReviewStateManager.withdrawRepReview(testUserName);
 			const stateValue = repReviewStateManager.getState();
 			assert.strictEqual(stateValue, DRAFT);
 
@@ -361,11 +368,11 @@ describe('State Machine', () => {
 			assert.ok(result.success);
 
 			const repReviewStateManager = result.data;
-			await repReviewStateManager.submitDraft();
+			await repReviewStateManager.submitDraft(testUserName);
 			let stateValue = repReviewStateManager.getState();
 			assert.strictEqual(stateValue, INSTITUTIONAL_REP_REVIEW);
 
-			await repReviewStateManager.closeRepReview();
+			await repReviewStateManager.closeRepReview(testUserName);
 			stateValue = repReviewStateManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
 
@@ -401,12 +408,12 @@ describe('State Machine', () => {
 			assert.ok(result.success);
 
 			const dacReviewManager = result.data;
-			await dacReviewManager.submitDraft();
-			await dacReviewManager.approveRepReview();
+			await dacReviewManager.submitDraft(testUserName);
+			await dacReviewManager.approveRepReview(testUserName);
 
 			assert.ok(result.data.state === 'DAC_REVIEW');
 
-			await dacReviewManager.withdrawDacReview();
+			await dacReviewManager.withdrawDacReview(testUserName);
 			const stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, DRAFT);
 
@@ -441,12 +448,12 @@ describe('State Machine', () => {
 			assert.ok(result.success);
 
 			const dacReviewManager = result.data;
-			await dacReviewManager.submitDraft();
-			await dacReviewManager.approveRepReview();
+			await dacReviewManager.submitDraft(testUserName);
+			await dacReviewManager.approveRepReview(testUserName);
 			let stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			await dacReviewManager.rejectDacReview();
+			await dacReviewManager.rejectDacReview(testUserName);
 			stateValue = dacReviewManager.getState();
 			assert.strictEqual(stateValue, REJECTED);
 
@@ -482,13 +489,13 @@ describe('State Machine', () => {
 			assert.ok(result.success);
 
 			const dacStateManager = result.data;
-			await dacStateManager.submitDraft();
-			await dacStateManager.approveRepReview();
+			await dacStateManager.submitDraft(testUserName);
+			await dacStateManager.approveRepReview(testUserName);
 
 			let stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, DAC_REVIEW);
 
-			await dacStateManager.closeDacReview();
+			await dacStateManager.closeDacReview(testUserName);
 
 			stateValue = dacStateManager.getState();
 			assert.strictEqual(stateValue, CLOSED);
@@ -526,7 +533,7 @@ describe('State Machine', () => {
 			const testStateManager = result.data;
 			assert.ok(testStateManager.getState() === ApplicationStates.APPROVED);
 
-			await testStateManager.revokeApproval();
+			await testStateManager.revokeApproval(testUserName);
 			const stateValue = testStateManager.getState();
 			assert.strictEqual(stateValue, REVOKED);
 
