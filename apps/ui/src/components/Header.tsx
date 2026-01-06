@@ -145,17 +145,19 @@ const HeaderComponent = () => {
 	const UserInfo = (
 		<Flex vertical>
 			<Typography style={{ fontSize: isResponsiveMode ? 10 : 14 }}>{displayName}</Typography>
-			<Typography
-				style={{
-					color: pcglColours.primary,
-					fontSize: isResponsiveMode ? 10 : 14,
-					fontWeight: 400,
-					height: 20,
-					margin: 0,
-				}}
-			>
-				{displayEmail}
-			</Typography>
+			{displayEmail && (
+				<Typography
+					style={{
+						color: pcglColours.primary,
+						fontSize: isResponsiveMode ? 10 : 14,
+						fontWeight: 400,
+						height: 20,
+						margin: 0,
+					}}
+				>
+					{displayEmail}
+				</Typography>
+			)}
 			{(isLogoutOpen || isResponsiveMode) && (
 				<Button
 					href={API_PATH_LOGOUT}
@@ -177,7 +179,7 @@ const HeaderComponent = () => {
 						left: 0,
 						minWidth: 100,
 						position: 'absolute',
-						top: 40,
+						top: displayEmail ? 40 : 22,
 						width: '100%',
 					}}
 				>
