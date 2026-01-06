@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import cron from 'node-cron';
+
 import type {
 	ApplicationDTO,
 	ApplicationHistoryResponseData,
@@ -77,6 +79,10 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 	if (!result.success) {
 		return result;
 	}
+
+	cron.schedule('0 0 */7 * *', () => {
+		console.log('\nRunning Every 7th Day\n');
+	});
 
 	const applicationDTO = convertToBasicApplicationRecord(result.data);
 
