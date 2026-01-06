@@ -60,14 +60,15 @@ const HeaderComponent = () => {
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 	const { isLoggedIn, role, user } = useUserContext();
-
-	const { emails = [], familyName = '', givenName = '' } = user || {};
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
-
-	const isResponsiveMode = minWidth <= token.screenXL;
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
 	const [applyForAccessOpen, setApplyForAccessOpen] = useState(false);
+
+	const { emails = [], familyName = '', givenName = '' } = user || {};
+	const displayName = givenName || familyName ? `${givenName} ${familyName}` : givenName;
+	const displayEmail = emails[0]?.address;
+	const isResponsiveMode = minWidth <= token.screenXL;
 
 	const menuButtonStyle: React.CSSProperties = {
 		width: isResponsiveMode ? '100%' : 'auto',
@@ -140,9 +141,6 @@ const HeaderComponent = () => {
 		},
 		position: 'right',
 	};
-
-	const displayName = givenName || familyName ? `${givenName || ''} ${familyName || ''}` : givenName;
-	const displayEmail = emails[0]?.address;
 
 	const UserInfo = (
 		<Flex vertical>
