@@ -145,9 +145,9 @@ const HeaderComponent = () => {
 	const displayEmail = emails[0]?.address;
 
 	const UserInfo = (
-		<>
-			<p style={{ fontSize: isResponsiveMode ? 10 : 14 }}>{displayName}</p>
-			<p
+		<Flex vertical>
+			<Typography style={{ fontSize: isResponsiveMode ? 10 : 14 }}>{displayName}</Typography>
+			<Typography
 				style={{
 					color: pcglColours.primary,
 					fontSize: isResponsiveMode ? 10 : 14,
@@ -157,7 +157,7 @@ const HeaderComponent = () => {
 				}}
 			>
 				{displayEmail}
-			</p>
+			</Typography>
 			{(isLogoutOpen || isResponsiveMode) && (
 				<Button
 					href={API_PATH_LOGOUT}
@@ -179,6 +179,7 @@ const HeaderComponent = () => {
 						left: 0,
 						minWidth: 100,
 						position: 'absolute',
+						top: 40,
 						width: '100%',
 					}}
 				>
@@ -191,7 +192,7 @@ const HeaderComponent = () => {
 					/>
 				</Button>
 			)}
-		</>
+		</Flex>
 	);
 
 	const logoutButton: MenuButton = {
