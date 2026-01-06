@@ -18,6 +18,7 @@
  */
 
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
+import cron from 'node-cron';
 import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
 
 import { getDbInstance } from '@/db/index.js';
@@ -179,6 +180,15 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
+	private async _onSubmitDraft() {
+		cron.schedule('0 0 */7 * *', () => {
+			// Moves to Rep Review, if still in review -> send email reminder
+			console.log('\nRunning Every 7th Day\n');
+		});
+
+		return success(`Submit Draft email reminder set for application ${this._id}`);
+	}
+
 	async submitRepRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_rep_revisions);
 		if (transitionResult.success) {
@@ -249,6 +259,15 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
+	private async _onRepReviewRevision() {
+		cron.schedule('0 0 */7 * *', () => {
+			// if still waiting rep revision submission -> send email reminder
+			console.log('\nRunning Every 7th Day\n');
+		});
+
+		return success(`Submit Rep Review Revision email reminder set for application ${this._id}`);
+	}
+
 	async reviseDacReview(userName: string) {
 		const transitionResult = this._canPerformAction(dac_revision_request);
 		if (transitionResult.success) {
@@ -258,8 +277,13 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onRevision() {
-		return success('post dispatch on revision');
+	private async _onDacReviewRevision() {
+		cron.schedule('0 0 */7 * *', () => {
+			// if still waiting dac revision submission -> send email reminder
+			console.log('\nRunning Every 7th Day\n');
+		});
+
+		return success(`Submit DAC Review Revision email reminder set for application ${this._id}`);
 	}
 
 	// Close
@@ -310,6 +334,15 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
+	}
+
+	private async _onApproveRepReview() {
+		cron.schedule('0 0 */7 * *', () => {
+			// Moves to Dac review, if still in review -> send email reminder for approval
+			console.log('\nRunning Every 7th Day\n');
+		});
+
+		return success(`Submit Draft email reminder set for application ${this._id}`);
 	}
 
 	async approveDacReview(
@@ -390,7 +423,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	 * Transitions *
 	 * *********** */
 	// Draft
-	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
+	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmitDraft);
 	private draftEditTransition = transition(DRAFT, edit, DRAFT, this._onEdit);
 	private draftCloseTransition = transition(DRAFT, close, CLOSED, this._onClose);
 
@@ -406,13 +439,13 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVIEW,
 		rep_revision_request,
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
-		this._onRevision,
+		this._onRepReviewRevision,
 	);
 	private repReviewApproveTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
 		rep_approve_review,
 		DAC_REVIEW,
-		this._onApproved,
+		this._onApproveRepReview,
 	);
 	private repReviewWithdrawTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
@@ -437,7 +470,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVIEW,
 		dac_revision_request,
 		DAC_REVISIONS_REQUESTED,
-		this._onRevision,
+		this._onDacReviewRevision,
 	);
 	private dacReviewRejectTransition = transition(DAC_REVIEW, dac_reject, REJECTED, this._onReject);
 	private dacReviewWithdrawTransition = transition(DAC_REVIEW, dac_review_withdraw, DRAFT, this._onWithdrawal);

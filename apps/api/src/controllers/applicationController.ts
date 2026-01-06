@@ -81,6 +81,12 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 	}
 
 	cron.schedule('0 0 */7 * *', () => {
+		// if still in draft after 7 days -> send email reminder
+		console.log('\nRunning Every 7th Day\n');
+	});
+
+	cron.schedule('0 0 */30 * *', () => {
+		// close after 30 days
 		console.log('\nRunning Every 7th Day\n');
 	});
 
