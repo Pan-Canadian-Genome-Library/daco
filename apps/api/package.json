@@ -1,7 +1,7 @@
 {
 	"name": "@pcgl-daco/api",
 	"private": true,
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"type": "module",
 	"scripts": {
 		"build": "rimraf ./dist && tsc -p './tsconfig.build.json'",
