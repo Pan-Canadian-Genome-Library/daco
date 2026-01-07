@@ -25,6 +25,7 @@ import { useOutletContext } from 'react-router';
 
 import useGetCollaborators from '@/api/queries/useGetCollaborators';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import AddCollaboratorModal from '@/components/pages/application/modals/AddCollaboratorModal';
 import DeleteCollaboratorModal from '@/components/pages/application/modals/DeleteCollaboratorModal';
 import EditCollaboratorModal from '@/components/pages/application/modals/EditCollaboratorModal';
@@ -32,8 +33,10 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import ErrorPage from '@/components/pages/global/ErrorPage';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { type CollaboratorsResponseDTO } from '@pcgl-daco/data-model';
 
 const { useToken } = theme;
@@ -49,8 +52,15 @@ export interface ModalStateProps extends ModalState {
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'collaborators', isEditMode });
+	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { state } = useApplicationContext();
+
+	const canEdit = canEditSection({
+		revisions,
+		section: 'collaborators',
+		isEditMode,
+		userRole: state.applicationUserRole,
+	});
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);
 
@@ -124,6 +134,10 @@ const Collaborators = () => {
 					]}
 					showDivider={false}
 				/>
+				<Row>
+					<DacComments sectionComments={dacComments} section="collaborators" />
+					<RevisionsAlert sectionRevisions={revisions['collaborators']} />
+				</Row>
 				<SectionContent showDivider={false}>
 					<Table
 						rowKey={(record) => `PCGL-${record.collaboratorInstitutionalEmail}`}

@@ -2,7 +2,30 @@
 	"modals": {
 		"buttons": {
 			"cancel": "Cancel",
+			"close": "Close",
 			"ok": "OK"
+		},
+		"history": {
+			"title": "Application History",
+			"applicationId": "Application ID",
+			"submissionDate": "Submission Date",
+			"currentStatus": "Current Status",
+			"lastUpdated": "Last Updated",
+			"timelineItem": " by {{userName}} at {{actionDate}}",
+			"notFound": "There are no History items related to your Application yet.",
+			"actions": {
+				"CLOSE": "Closed",
+				"INSTITUTIONAL_REP_REVISION_REQUEST": "Institutional Rep Revision Requested",
+				"INSTITUTIONAL_REP_SUBMIT": "Institutional Rep Submission",
+				"INSTITUTIONAL_REP_APPROVED": "Institutional Rep Approved",
+				"DAC_REVIEW_APPROVED": "DAC Review Approved",
+				"DAC_REVIEW_SUBMIT": "DAC Review Submitted",
+				"DAC_REVIEW_REJECTED": "DAC Review Rejected",
+				"DAC_REVIEW_REVISION_REQUEST": "DAC Review Revision Requested",
+				"REVOKE": "Revoked",
+				"SUBMIT_DRAFT": "Draft Submitted",
+				"WITHDRAW": "Withdrawn"
+			}
 		},
 		"requestRevisions": {
 			"title": "Request Revisions",
@@ -28,7 +51,7 @@
 		},
 		"revokeApplication": {
 			"title": "Are you sure you want to revoke application PCGL-{{id}}?",
-			"description": "If so, the applicant and all collaborators will lose data access.",
+			"description": "If you proceed, the applicant and all collaborators will lose access to the data. Please provide your comments explaining why you are revoking the application.",
 			"revokeLabel": "Reason for revoking this application:",
 			"buttons": {
 				"revoke": "Revoke"

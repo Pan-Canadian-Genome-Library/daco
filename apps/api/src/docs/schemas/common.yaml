@@ -16,14 +16,27 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 components:
+  constants:
+    ApplicationStates:
+      type: string
+      enum:
+        [
+          DRAFT,
+          INSTITUTIONAL_REP_REVIEW,
+          DAC_REVIEW,
+          INSTITUTIONAL_REP_REVISION_REQUESTED,
+          DAC_REVISIONS_REQUESTED,
+          REJECTED,
+          APPROVED,
+          CLOSED,
+          REVOKED,
+        ]
+
   schemas:
     PagingMetadata:
       type: object
       description: Information regarding what current page of results.
       properties:
-        totalRecords:
-          type: number
-          description: The total number of records in the current result set.
         page:
           type: number
           description: The current page of results, starts from 0. Default is 0.

@@ -19,28 +19,28 @@
 
 import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
+	type ApplicationActionRecord,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
 	type FilesRecord,
 	type JoinedApplicationRecord,
-	type RevisionRequestModel,
 } from '@/service/types.js';
-import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/types.ts';
+import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/validation.ts';
 import {
 	type ApplicationDTO,
+	type ApplicationHistoryResponseData,
 	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
 	type FilesDTO,
-	type RevisionsDTO,
 	type SignatureDTO,
 } from '@pcgl-daco/data-model';
 import {
+	applicationHistoryResponseSchema,
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
 	fileResponseSchema,
-	revisionDataResponseSchema,
 	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
@@ -144,6 +144,28 @@ export const convertToApplicationContentsRecord = (
 	return result;
 };
 
+/** Converts database Application Action Records into camelCase response records
+ * @param data ApplicationActionRecord - Snake case database Application Action record array
+ * @returns ApplicationHistoryResponseData - Array of Action records with updated keys
+ */
+export const convertToApplicationHistoryRecord = (
+	data: ApplicationActionRecord[],
+): Result<ApplicationHistoryResponseData, 'SYSTEM_ERROR'> => {
+	const aliasedRecords = data.map((action) => objectToCamel(action));
+	const validationResults = aliasedRecords.map((record) => applicationHistoryResponseSchema.safeParse(record));
+	const successResults: ApplicationHistoryResponseData = validationResults
+		.filter((item) => item.success)
+		.map((item) => item.data);
+	const failedResult = validationResults.find((result) => !result.success);
+	const result = !failedResult
+		? success(successResults)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToApplicationHistoryRecord: \n${failedResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
+
 /**
  * Helper function to convert Postgres snake_case to FE camelCase for the Signature Service
  * @param data type `ApplicationSignatureUpdate` - Signature fields + application_id from the DB
@@ -202,21 +224,4 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
 	});
 
 	return formattedUpdate;
-};
-
-/**
- * Helper function to convert Postgres snake_case to FE camelCase for the Revisions Service
- * @param data type `RevisionRequestModel` - File fields from the DB
- * @returns type `RevisionsDTO` - camelCase variation of a Postgres success response.
- */
-export const convertToRevisionsRecord = (data: RevisionRequestModel): Result<RevisionsDTO, 'SYSTEM_ERROR'> => {
-	const camelCaseRecord = objectToCamel(data);
-	const validationResult = revisionDataResponseSchema.safeParse(camelCaseRecord);
-	const result = validationResult.success
-		? success(validationResult.data)
-		: failure(
-				'SYSTEM_ERROR',
-				`Validation Error while aliasing data at convertToRevisionRecord: \n${validationResult.error.issues[0]?.message || ''}`,
-			);
-	return result;
 };

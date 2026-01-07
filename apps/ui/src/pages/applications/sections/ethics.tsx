@@ -19,7 +19,7 @@
 
 import { CloseOutlined, UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Flex, Form, theme, Typography, Upload, UploadFile } from 'antd';
+import { Button, Flex, Form, Row, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
 import { useState } from 'react';
@@ -31,12 +31,14 @@ import useEditApplication from '@/api/mutations/useEditApplication';
 import useGetDownload from '@/api/queries/useGetDownload';
 import useGetFile from '@/api/queries/useGetFile';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import BlockRadioBox from '@/components/pages/application/form-components/BlockRadioBox';
 import DeleteEthicsFileModal from '@/components/pages/application/modals/DeleteEthicsFileModal';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -53,10 +55,10 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'ethics', isEditMode });
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'ethics', isEditMode, userRole: state.applicationUserRole });
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const { mutateAsync: editApplication } = useEditApplication();
 
 	const form = useSectionForm({
@@ -159,6 +161,10 @@ const Ethics = () => {
 					text={[translate('ethics-section.description1'), translate('ethics-section.description2')]}
 					showDivider={true}
 				/>
+				<Row>
+					<DacComments sectionComments={dacComments} section="ethics" />
+					<RevisionsAlert sectionRevisions={revisions['ethics']} />
+				</Row>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>
 					<Form
 						form={form}
@@ -172,6 +178,7 @@ const Ethics = () => {
 								update: {
 									ethicsReviewRequired: ethicsReviewReq,
 								},
+								revisions,
 							}).then(() => {
 								dispatch({
 									type: 'UPDATE_APPLICATION',

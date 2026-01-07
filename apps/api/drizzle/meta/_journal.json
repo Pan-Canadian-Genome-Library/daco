@@ -92,6 +92,34 @@
 			"when": 1745518656239,
 			"tag": "0012_remove_id_from_collaborators",
 			"breakpoints": true
+		},
+		{
+			"idx": 13,
+			"version": "7",
+			"when": 1760645159370,
+			"tag": "0013_search_index",
+			"breakpoints": true
+		},
+		{
+			"idx": 14,
+			"version": "7",
+			"when": 1763393749637,
+			"tag": "0014_add_dac_comments_table",
+			"breakpoints": true
+		},
+		{
+			"idx": 15,
+			"version": "7",
+			"when": 1764368609405,
+			"tag": "0015_use_state_enum",
+			"breakpoints": true
+		},
+		{
+			"idx": 16,
+			"version": "7",
+			"when": 1764886967791,
+			"tag": "0016_add_action_user_name",
+			"breakpoints": true
 		}
 	]
 }
