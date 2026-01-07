@@ -196,7 +196,7 @@ describe('Application API', () => {
 			assert.strictEqual(rejectedApplication.data.state, ApplicationStates.REJECTED);
 		});
 
-		it('should failed to reject an application in NOT in DAC_REVIEW state', async () => {
+		it('should fail to reject an application thats NOT in DAC_REVIEW state', async () => {
 			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.CLOSED);
 
 			const result = await dacRejectApplication({
@@ -442,7 +442,7 @@ describe('Application API', () => {
 	});
 
 	describe('Get Revisions', () => {
-		it('DAC revisions request should fail if not state is NOT in DAC_REVIEW', async () => {
+		it('DAC revisions request should fail if state is NOT in DAC_REVIEW', async () => {
 			// Find application that is not in DAC_REVIEW state
 			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id, state: ['APPROVED'] });
 			assert.ok(applicationRecordsResult.success);
@@ -473,8 +473,8 @@ describe('Application API', () => {
 			assert.ok(result.error === 'INVALID_STATE_TRANSITION');
 		});
 
-		it('REP revisions request should fail if not state is NOT in INSTITUTIONAL_REP_REVIEW', async () => {
-			// Find application that is not in DAC_REVIEW state
+		it('REP revisions request should fail if state is NOT in INSTITUTIONAL_REP_REVIEW', async () => {
+			// Find application that is not in INSTITUTIONAL_REP_REVIEW state
 			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id, state: ['APPROVED'] });
 			assert.ok(applicationRecordsResult.success);
 			const testAppId = applicationRecordsResult.data.applications[0]?.id;
