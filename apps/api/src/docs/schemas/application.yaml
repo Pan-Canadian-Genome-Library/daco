@@ -28,18 +28,7 @@ components:
           description: The user ID associated with the application.
         state:
           type: string
-          enum:
-            [
-              DRAFT,
-              INSTITUTIONAL_REP_REVIEW,
-              DAC_REVIEW,
-              DAC_REVISIONS_REQUESTED,
-              INSTITUTIONAL_REP_REVISION_REQUESTED,
-              REJECTED,
-              APPROVED,
-              CLOSED,
-              REVOKED,
-            ]
+          $ref: '#/components/constants/ApplicationStates'
           description: The current state that the application is in.
         createdAt:
           type: string
@@ -101,18 +90,7 @@ components:
           description: The user ID associated with the application.
         state:
           type: string
-          enum:
-            [
-              DRAFT,
-              INSTITUTIONAL_REP_REVIEW,
-              DAC_REVIEW,
-              INSTITUTIONAL_REP_REVISION_REQUESTED,
-              DAC_REVISIONS_REQUESTED,
-              REJECTED,
-              APPROVED,
-              CLOSED,
-              REVOKED,
-            ]
+          $ref: '#/components/constants/ApplicationStates'
           description: The current state that the application is in.
         createdAt:
           type: string
@@ -356,18 +334,7 @@ components:
           description: The user ID associated with the application.
         state:
           type: string
-          enum:
-            [
-              DRAFT,
-              INSTITUTIONAL_REP_REVIEW,
-              DAC_REVIEW,
-              INSTITUTIONAL_REP_REVISION_REQUESTED,
-              DAC_REVISIONS_REQUESTED,
-              REJECTED,
-              APPROVED,
-              CLOSED,
-              REVOKED,
-            ]
+          $ref: '#/components/constants/ApplicationStates'
           description: The current state that the application is in.
         createdAt:
           type: string
@@ -400,18 +367,7 @@ components:
           description: The user ID associated with the application.
         state:
           type: string
-          enum:
-            [
-              DRAFT,
-              INSTITUTIONAL_REP_REVIEW,
-              DAC_REVIEW,
-              INSTITUTIONAL_REP_REVISION_REQUESTED,
-              DAC_REVISIONS_REQUESTED,
-              REJECTED,
-              APPROVED,
-              CLOSED,
-              REVOKED,
-            ]
+          $ref: '#/components/constants/ApplicationStates'
           description: The current state that the application is in.
         createdAt:
           type: string
@@ -541,3 +497,33 @@ components:
         requestedStudies:
           type: array
           description: List of studies
+
+    ApplicationHistoryResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique ID of the Action record in the database.
+        userId:
+          type: string
+          description: The user ID associated with the application.
+        applicationId:
+          type: number
+          description: The unique ID of the Application record.
+        action:
+          type: string
+          description: The type of Action performed.
+        stateAfter:
+          $ref: '#/components/constants/ApplicationStates'
+          description: The state of the application after the Action was submitted.
+        stateBefore:
+          $ref: '#/components/constants/ApplicationStates'
+          description: The state of the application before the Action was submitted.
+        createdAt:
+          type: string
+          format: date-time
+          description: Date when the Action was created.
+        revisionsRequestId:
+          type: number
+          description: ID of associated Revision Request record, if any.
+          nullable: true

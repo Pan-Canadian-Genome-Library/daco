@@ -30,7 +30,7 @@ export const canSignSection = ({
 	signatures?: SignatureDTO;
 	role?: UserRole;
 	state: ApplicationStateValues;
-	revisions: Partial<SectionRevision>;
+	revisions: SectionRevision;
 	isEditMode: boolean;
 }) => {
 	// If signatures are still loading, then disable signature functionality
@@ -51,7 +51,7 @@ export const canSignSection = ({
 			};
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
 			return {
-				disableSignature: !(role === 'APPLICANT' && !revisions['sign']?.isApproved),
+				disableSignature: !(role === 'APPLICANT' && !revisions['sign'][0]?.isApproved),
 				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature),
 			};
 		case ApplicationStates.DAC_REVIEW:
@@ -61,7 +61,7 @@ export const canSignSection = ({
 			};
 		case ApplicationStates.DAC_REVISIONS_REQUESTED:
 			return {
-				disableSignature: !(role === 'APPLICANT' && !revisions['sign']?.isApproved),
+				disableSignature: !(role === 'APPLICANT' && !revisions['sign'][0]?.isApproved),
 				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature),
 			};
 		default:

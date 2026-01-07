@@ -17,6 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import {
+	ApplicationActions,
+	ApplicationActionValues,
+	ApplicationStates,
+	ApplicationStateValues,
+} from '@pcgl-daco/data-model/src/types.js';
 import { and, eq } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
@@ -24,12 +30,6 @@ import { applicationActions } from '@/db/schemas/applicationActions.js';
 import BaseLogger from '@/logger.js';
 import { applicationActionsQuery } from '@/service/utils.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
-import {
-	ApplicationActions,
-	ApplicationActionValues,
-	ApplicationStates,
-	ApplicationStateValues,
-} from '@pcgl-daco/data-model/src/types.js';
 import {
 	type ApplicationActionRecord,
 	type ApplicationActionsColumnName,
@@ -47,16 +47,25 @@ const logger = BaseLogger.forModule('applicationActionService');
 const applicationActionSvc = (db: PostgresDb) => {
 	/** @method addActionRecord: Template method for adding an Action record */
 	/** New actions are created on every transition from one state to the next */
-	const addActionRecord = async (
-		application: ApplicationRecord,
-		action: ApplicationActionValues,
-		state_after: ApplicationStateValues,
-		transaction?: PostgresTransaction,
-	): AsyncResult<ApplicationActionRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	const addActionRecord = async ({
+		application,
+		action,
+		state_after,
+		transaction,
+		user_name,
+	}: {
+		application: ApplicationRecord;
+		action: ApplicationActionValues;
+		state_after: ApplicationStateValues;
+		transaction?: PostgresTransaction;
+		user_name?: string;
+	}): AsyncResult<ApplicationActionRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		const { id: application_id, user_id, state: state_before } = application;
+
 		const newAction: typeof applicationActions.$inferInsert = {
 			application_id,
 			user_id,
+			user_name,
 			action,
 			state_before,
 			state_after,
@@ -79,68 +88,94 @@ const applicationActionSvc = (db: PostgresDb) => {
 
 	return {
 		/** @method: Aliased methods for each state transition */
-		close: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(application, ApplicationActions.CLOSE, ApplicationStates.CLOSED, transaction),
-		draftSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+		close: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.SUBMIT_DRAFT,
-				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+				action: ApplicationActions.CLOSE,
+				state_after: ApplicationStates.CLOSED,
 				transaction,
-			),
-		dacApproved: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+				user_name,
+			}),
+		draftSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.DAC_REVIEW_APPROVED,
-				ApplicationStates.APPROVED,
+				action: ApplicationActions.SUBMIT_DRAFT,
+				state_after: ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 				transaction,
-			),
-		dacRejected: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+				user_name,
+			}),
+		dacApproved: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.DAC_REVIEW_REJECTED,
-				ApplicationStates.REJECTED,
+				action: ApplicationActions.DAC_REVIEW_APPROVED,
+				state_after: ApplicationStates.APPROVED,
 				transaction,
-			),
-		dacRevision: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+				user_name,
+			}),
+		dacRejected: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
-				ApplicationStates.DAC_REVISIONS_REQUESTED,
+				action: ApplicationActions.DAC_REVIEW_REJECTED,
+				state_after: ApplicationStates.REJECTED,
 				transaction,
-			),
-		dacSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+				user_name,
+			}),
+		dacRevision: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.DAC_REVIEW_SUBMIT,
-				ApplicationStates.DAC_REVIEW,
+				action: ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
+				state_after: ApplicationStates.DAC_REVISIONS_REQUESTED,
 				transaction,
-			),
-		repRevision: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+				user_name,
+			}),
+		dacSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
-				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+				action: ApplicationActions.DAC_REVIEW_SUBMIT,
+				state_after: ApplicationStates.DAC_REVIEW,
 				transaction,
-			),
-		repSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+				user_name,
+			}),
+		repRevision: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
-				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+				action: ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
+				state_after: ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
 				transaction,
-			),
-		repApproved: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(
+				user_name,
+			}),
+		repSubmit: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
 				application,
-				ApplicationActions.INSTITUTIONAL_REP_APPROVED,
-				ApplicationStates.DAC_REVIEW,
+				action: ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
+				state_after: ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 				transaction,
-			),
-		revoke: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(application, ApplicationActions.REVOKE, ApplicationStates.REVOKED, transaction),
-		withdraw: async (application: ApplicationRecord, transaction?: PostgresTransaction) =>
-			await addActionRecord(application, ApplicationActions.WITHDRAW, ApplicationStates.DRAFT, transaction),
+				user_name,
+			}),
+		repApproved: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
+				application,
+				action: ApplicationActions.INSTITUTIONAL_REP_APPROVED,
+				state_after: ApplicationStates.DAC_REVIEW,
+				transaction,
+				user_name,
+			}),
+		revoke: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
+				application,
+				action: ApplicationActions.REVOKE,
+				state_after: ApplicationStates.REVOKED,
+				transaction,
+				user_name,
+			}),
+		withdraw: async (application: ApplicationRecord, transaction?: PostgresTransaction, user_name?: string) =>
+			await addActionRecord({
+				application,
+				action: ApplicationActions.WITHDRAW,
+				state_after: ApplicationStates.DRAFT,
+				transaction,
+				user_name,
+			}),
 		/** @method getActionById: Find a specific Action record */
 		getActionById: async ({
 			id,
@@ -173,7 +208,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 			sort?: Array<OrderBy<ApplicationActionsColumnName>>;
 			page?: number;
 			pageSize?: number;
-		}): AsyncResult<ApplicationActionRecord[], 'SYSTEM_ERROR'> => {
+		}): AsyncResult<ApplicationActionRecord[], 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
 			try {
 				const allActions = await db
 					.select()
@@ -187,6 +222,10 @@ const applicationActionSvc = (db: PostgresDb) => {
 					.orderBy(...applicationActionsQuery(sort))
 					.offset(page * pageSize)
 					.limit(pageSize);
+
+				if (!allActions.length) {
+					return failure('NOT_FOUND', `No application history found with the ID: ${application_id}`);
+				}
 
 				return success(allActions);
 			} catch (err) {

@@ -19,5 +19,5 @@
 
 import { z as zod } from 'zod';
 
-export const userRoleSchema = zod.enum(['DAC_MEMBER', 'INSTITUTIONAL_REP', 'APPLICANT', 'ANONYMOUS']);
+export const userRoleSchema = zod.enum(['DAC_CHAIR', 'DAC_MEMBER', 'INSTITUTIONAL_REP', 'APPLICANT', 'ANONYMOUS']);
 export type UserRole = zod.infer<typeof userRoleSchema>;

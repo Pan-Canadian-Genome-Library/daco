@@ -193,7 +193,6 @@ export interface ApplicationResponseData extends ApplicationDTO {
 }
 
 export interface PagingMetadata {
-	totalRecords: number;
 	page: number;
 	pageSize: number;
 }
@@ -209,11 +208,6 @@ export interface ApplicantSummary {
 
 export interface ApplicationListSummary extends ApplicationDTO {
 	applicant: ApplicantSummary | null;
-}
-
-export interface ApplicationListResponse {
-	applications: ApplicationListSummary[];
-	pagingMetadata: PagingMetadata;
 }
 
 export type ApplicationContentsResponse = {
@@ -233,12 +227,6 @@ export interface ApplicationResponseData extends ApplicationDTO {
 	contents: ApplicationContentsResponse | null;
 }
 
-export interface PagingMetadata {
-	totalRecords: number;
-	page: number;
-	pageSize: number;
-}
-
 export interface ApplicantSummary {
 	createdAt: Date;
 	firstName: string | null;
@@ -252,13 +240,28 @@ export interface ApplicationListSummary extends ApplicationDTO {
 	applicant: ApplicantSummary | null;
 }
 
+export type ApplicationStateTotals = {
+	APPROVED: number;
+	CLOSED: number;
+	DAC_REVIEW: number;
+	DAC_REVISIONS_REQUESTED: number;
+	DRAFT: number;
+	INSTITUTIONAL_REP_REVIEW: number;
+	REJECTED: number;
+	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
+	REVOKED: number;
+	TOTAL: number;
+};
+
 export interface ApplicationListResponse {
 	applications: ApplicationListSummary[];
 	pagingMetadata: PagingMetadata;
+	totals: ApplicationStateTotals;
 }
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
+	userName: string; // Name of User who Approved application
 };
 
 export interface CollaboratorDTO {
@@ -315,6 +318,20 @@ export type ApplicationActionDTO = {
 	revisionsRequestId: number;
 };
 
+export type ApplicationActionResponse = {
+	id: number;
+	applicationId: number;
+	createdAt: Date;
+	userId: string;
+	userName?: string | null;
+	action: ApplicationActionValues;
+	stateBefore: ApplicationStateValues;
+	stateAfter: ApplicationStateValues;
+	revisionsRequestId: number | null;
+};
+
+export type ApplicationHistoryResponseData = ApplicationActionResponse[];
+
 export interface AgreementsDTO {
 	id: number;
 	userId: string;
@@ -355,11 +372,11 @@ export const agreementEnum = [
 ] as const;
 
 export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as const;
+
 export interface RevisionsDTO {
-	id: number;
-	applicationId: number;
-	createdAt?: Date;
-	comments?: String | null;
+	applicationActionId: number;
+	applicationsId: number | null;
+	comments?: string | null;
 	applicantApproved: boolean;
 	applicantNotes?: string | null;
 	institutionRepApproved: boolean;
@@ -378,4 +395,17 @@ export interface RevisionsDTO {
 	appendicesNotes?: string | null;
 	signAndSubmitApproved: boolean;
 	signAndSubmitNotes?: string | null;
+	createdAt?: Date;
+	isDacRequest: boolean;
 }
+
+export type DacCommentRecord = {
+	id: number;
+	applicationId: number;
+	userId: string;
+	message: string;
+	userName: string;
+	section: string;
+	dacChairOnly: boolean;
+	createdAt: Date;
+};

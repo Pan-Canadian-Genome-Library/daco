@@ -27,7 +27,7 @@ const useRequestRevisions = (currentState: ApplicationStateValues) => {
 	return useMutation<ApplicantDTO, ServerError, RevisionsModalSchemaType & { applicationId: string | number }>({
 		mutationFn: async (payload) => {
 			const response = await fetch(
-				`/applications/${payload.applicationId}/${currentState === ApplicationStates.DAC_REVIEW ? 'dac' : 'rep'}/request-revisions`,
+				`/applications/${payload.applicationId}/${currentState === ApplicationStates.DAC_REVIEW ? 'dac-chair' : 'rep'}/request-revisions`,
 				{
 					method: 'POST',
 					body: JSON.stringify({

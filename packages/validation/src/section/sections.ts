@@ -35,10 +35,20 @@ export type SectionRoutesValues = (typeof SectionRoutes)[keyof typeof SectionRou
 export type RevisionType = {
 	isApproved: boolean | undefined;
 	comment: string | null;
-};
+	isDacRequest: boolean;
+	createdAt?: Date;
+}[];
+
+export type GeneralType = {
+	comment: string | null;
+	isDacRequest: boolean;
+	createdAt?: Date;
+}[];
 
 export type VerifySectionRevisionType<T extends string> = {
 	[section in T]: RevisionType;
 };
 
-export type SectionRevision = VerifySectionRevisionType<SectionRoutesValues>;
+export type SectionRevision = VerifySectionRevisionType<SectionRoutesValues> & {
+	general: GeneralType;
+};

@@ -19,6 +19,7 @@
 import { type ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
+import { type Request } from 'express';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
@@ -31,6 +32,7 @@ import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import { type SessionUser } from '@/session/validation.ts';
 import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';
 import { pdfService } from './pdf/pdfService.ts';
@@ -89,19 +91,6 @@ export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'conten
 	contents: ApplicationContentUpdates | null;
 }
 
-export type ApplicationStateTotals = {
-	APPROVED: number;
-	CLOSED: number;
-	DAC_REVIEW: number;
-	DAC_REVISIONS_REQUESTED: number;
-	DRAFT: number;
-	INSTITUTIONAL_REP_REVIEW: number;
-	REJECTED: number;
-	INSTITUTIONAL_REP_REVISION_REQUESTED: number;
-	REVOKED: number;
-	TOTAL: number;
-};
-
 export type OrderBy<Key extends SchemaKeys> = {
 	direction: 'asc' | 'desc';
 	column: Key;
@@ -117,3 +106,11 @@ export type RevisionRequestModel = typeof revisionRequests.$inferInsert;
 export type RevisionRequestRecord = typeof revisionRequests.$inferSelect;
 
 export type EmailService = ReturnType<typeof emailSvc>;
+
+export type SessionType = Request['session'];
+export interface UserSession extends SessionType {
+	user: SessionUser;
+}
+export interface AuthorizedRequest extends Request {
+	session: UserSession;
+}

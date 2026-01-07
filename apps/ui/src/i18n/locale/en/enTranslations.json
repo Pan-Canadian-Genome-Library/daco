@@ -8,14 +8,20 @@
 			"descriptions": {
 				"NOT_FOUND": {
 					"subheading": "Account is not associated within the PCGL project.",
-					"description": "Looks like your account is currently not associated within the PCGL project and therefore cannot access the PCGL DACO Service. This may be due to the fact that you haven't completed the onboarding process for new accounts, or have logged in with an account not previously used to access the service."
+					"description": "Looks like your account is currently not associated within the PCGL project and therefore cannot access the PCGL DACO Service. This may be due to the fact that you haven't completed the onboarding process for new accounts, or have logged in with an account not previously used to access the service.",
+					"description2": "Please self-enroll by clicking the \"Get Started\" button bellow to complete your onboarding and gain access to the PCGL DACO Service."
+				},
+				"SELF_REGISTRATION_SENT": {
+					"subheading": "Your account is almost ready!",
+					"description": "Thanks for enroling to PCGL project. We've sent a verification email to your email address. Please open that message and follow the instructions to confirm your address and return to the PCGL DACO service.",
+					"description2": "If you didn't receive the email within a few minutes, you can resend the verification email or contact the PCGL support team."
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Looks like we ran into a little hiccup while completing the login process.",
 					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
 				},
 				"FORBIDDEN": {
-					"subheading": "Looks like your browser used a stale session to attempt to login to the DCAO.",
+					"subheading": "Looks like your browser used a stale session to attempt to login to the DACO.",
 					"description": "Please try again by clicking the \"Login\" button above or by navigating back to our homepage below."
 				}
 			},
@@ -37,7 +43,7 @@
 	},
 	"notFound": {
 		"title": "404 Page Not Found",
-		"description": "Sorry, that page doesn’t exist.",
+		"description": "Sorry, that page doesn't exist.",
 		"buttons": {
 			"home": "Go to Homepage"
 		}
@@ -72,7 +78,10 @@
 			"title": "Manage Applications",
 			"show": "Show",
 			"rows": "rows"
-		}
+		},
+		"noResults": "No applications match your search criteria",
+		"search": "Search",
+		"searchResults": "Search Results for \"{{search}}\""
 	},
 	"status": {
 		"404": "Oops, we couldn't find what you were looking for!"
@@ -143,8 +152,8 @@
 	},
 	"menu": {
 		"intro": "Introduction",
-		"institutional": "B. Institutional Representative",
 		"applicant": "A. Applicant Information",
+		"institutional": "B. Institutional Representative",
 		"collaborators": "C. Collaborators",
 		"project": "D. Project Information",
 		"study": "E. Requested Study",
@@ -192,6 +201,15 @@
 	"generic": {
 		"notApplicable": "N/A",
 		"applicant": "Applicant",
-		"rep": "Institutional Representative"
+		"rep": "Institutional Representative",
+		"dacComment": "DAC Comments",
+		"chairOnly": "For Chair Only",
+		"send": "Send"
+	},
+	"notifications": {
+		"createDacComment": {
+			"successTitle": "DAC Comment Submitted",
+			"successMessage": "DAC comment submitted successfully"
+		}
 	}
 }

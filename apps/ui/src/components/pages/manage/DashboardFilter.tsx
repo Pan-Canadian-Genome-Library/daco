@@ -73,12 +73,9 @@ const DashboardFilter = ({ onFilterChange, filters, availableStates }: Dashboard
 			: filterStates.filter((t) => t !== selectedFilter);
 
 		/**
-		 * If the user selects total, it makes no sense to have any other filters selected,
-		 * in this case, we empty out the selected filters, adn replace them with just TOTAL
-		 *
-		 * Also if the user unselects all filters, default back to total.
+		 * If the user selects total, replace them with just TOTAL or if the user unselects all filters, default back to TOTAL.
 		 **/
-		if (selectedFilter === 'TOTAL' || (nextSelectedFilters.length === 0 && filters.length === 0)) {
+		if (selectedFilter === 'TOTAL' || nextSelectedFilters.length === 0) {
 			nextSelectedFilters = ['TOTAL'];
 		} else if (filterStates.includes('TOTAL')) {
 			/**

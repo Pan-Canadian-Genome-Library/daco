@@ -49,7 +49,7 @@ const Ethics = ({ ethicsReviewRequired }: EthicsLetterDTO) => {
 					}
 				>
 					You represent and warrant that your country/region does not require your research project to undergo ethics
-					review.
+					review. An ethics exemption letter has been uploaded
 				</Checkbox>
 				<Checkbox unchecked={!ethicsReviewRequired}>
 					Your country/region requires your Research Project to undergo ethics review, and therefore, this research

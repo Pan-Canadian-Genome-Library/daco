@@ -13,7 +13,7 @@
 //   dac_agreement_certify_application [Note: "You certify that the contents in the application are ture and correct to the best of your knowledge and belief."]
 //   dac_agreement_read_and_agreed [Note: "You have read and agree to abide by the terms and conditions outlined in the Data Access Agreement."]
 // }
-// enum 
+// enum
 
 enum application_states {
 	DRAFT [Note: 'Initial state; applicant able to modify application content.']
@@ -21,7 +21,7 @@ enum application_states {
 	DAC_REVIEW
 	DAC_REVISIONS_REQUESTED [Note: "DAC reviewer has requested changes. Applicant can modify and resubmit for review."]
 	REJECTED [Note: "Rejected by DAC reviewer. No opportunity for revisions."]
-	APPROVED 
+	APPROVED
 	CLOSED [Note: "Closed by applicant."]
 	REVOKED [Note: "Revoked by an admin after approval."]
 }
@@ -51,6 +51,19 @@ enum application_action_types {
   REVOKE
 }
 
+enum section {
+  INTRO
+  APPLICANT
+  INSTITUTIONAL
+  COLLABORATORS
+  PROJECT
+  STUDY
+  ETHICS
+  AGREEMENT
+  APPENDICES
+  SIGN
+}
+
 Table applications {
 	id bigint [pk, increment, not null]
 	user_id varchar(100) [not null] // User ID set to a string since we don't have details atm about how this will be communicated. This will either be email address or a unique token from the auth system
@@ -68,7 +81,7 @@ Table application_contents {
       All fields here are nullable as this allows us to store partially complete
       applications as the user is working through the submission form.
 
-      Validation rules for the application content needs to be implemented in the 
+      Validation rules for the application content needs to be implemented in the
       software, not at the database level.
     '''
     id bigint [pk, not null]
@@ -106,7 +119,7 @@ Table application_contents {
     institutional_rep_email varchar(255)
     institutional_rep_profile_url varchar(255)
     institutional_rep_position_title varchar(255)
-    
+
     institution_country vachar(255)
     institution_state vachar(255)
     institution_city vachar(255)
@@ -135,7 +148,7 @@ Table application_contents {
 
     // TODO: need to store user agreement to terms
     ethics_review_required boolean
-    ethics_letter bigint 
+    ethics_letter bigint
 
     signed_pdf bigint [ref: - files.id]
 }
@@ -182,7 +195,7 @@ Table revision_requests {
   sign_and_submit_notes text
 }
 
-table collaborators {
+Table collaborators {
 	id bigint [pk, not null]
 	application_id bigint [not null, ref: > applications.id]
 	first_name varchar(255) [not null]
@@ -196,7 +209,7 @@ table collaborators {
 	collaborator_type text
 }
 
-table files {
+Table files {
   id bigint [pk, not null]
   application_id bigint [not null, ref: - applications.id]
   type file_types [not null]
@@ -204,4 +217,15 @@ table files {
   submitted_at timestamp [not null]
   content bytea [not null]
   filename varchar(255)
+}
+
+Table dac_comments {
+  id bigint [pk, not null]
+  application_id bigint [not null, ref: > applications.id]
+  user_id text [not null]
+  user_name text [not null]
+  message text
+  dac_chair_only boolean
+  section section [not null]
+  created_at timestamp [not null, default: `now()`]
 }

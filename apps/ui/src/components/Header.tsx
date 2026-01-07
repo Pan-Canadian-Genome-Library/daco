@@ -17,19 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useState } from 'react';
+import React, { useState, type PropsWithChildren } from 'react';
 
-import { CloseOutlined, LogoutOutlined, MenuOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 
+import { API_PATH_LOGIN, API_PATH_LOGOUT } from '@/api/paths';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { clearExtraSessionInformation } from '@/global/localStorage';
-import { pcglHeaderTheme } from '@/providers/ThemeProvider';
+import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
-import { API_PATH_LOGIN, API_PATH_LOGOUT } from '../api/paths';
 import ApplyForAccessModal from './modals/ApplyForAccessModal';
 
 const { Link } = Typography;
@@ -41,7 +40,7 @@ interface MenuItem {
 	position: 'left' | 'right';
 }
 
-interface MenuButton extends MenuItem {
+interface MenuButton extends PropsWithChildren<MenuItem> {
 	buttonProps: ButtonProps;
 	onClickAction?: VoidFunction;
 }
@@ -60,12 +59,16 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, role } = useUserContext();
-
-	const isResponsiveMode = minWidth <= token.screenXL;
-
+	const { isLoggedIn, role, user } = useUserContext();
+	const [isLogoutOpen, setLogoutOpen] = useState(false);
+	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
 	const [applyForAccessOpen, setApplyForAccessOpen] = useState(false);
+
+	const { emails = [], familyName = '', givenName = '' } = user || {};
+	const displayName = givenName || familyName ? `${givenName} ${familyName}` : givenName;
+	const displayEmail = emails[0]?.address;
+	const isResponsiveMode = minWidth <= token.screenXL;
 
 	const menuButtonStyle: React.CSSProperties = {
 		width: isResponsiveMode ? '100%' : 'auto',
@@ -108,7 +111,7 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
-		} else if (role === 'DAC_MEMBER') {
+		} else if (role === 'DAC_MEMBER' || role === 'DAC_CHAIR') {
 			return {
 				name: translate('links.manageApplications'),
 				href: '/manage/applications',
@@ -127,9 +130,6 @@ const HeaderComponent = () => {
 		}
 	};
 
-	const location = useLocation();
-	const isHome = location.pathname === '/';
-
 	const loginButton: MenuButton = {
 		name: translate(`button.login`),
 		buttonProps: {
@@ -141,16 +141,85 @@ const HeaderComponent = () => {
 		},
 		position: 'right',
 	};
+
+	const UserInfo = (
+		<Flex vertical>
+			<Typography style={{ fontSize: isResponsiveMode ? 10 : 14 }}>{displayName}</Typography>
+			{displayEmail && (
+				<Typography
+					style={{
+						color: pcglColours.primary,
+						fontSize: isResponsiveMode ? 10 : 14,
+						fontWeight: 400,
+						height: 20,
+						margin: 0,
+					}}
+				>
+					{displayEmail}
+				</Typography>
+			)}
+			{(isLogoutOpen || isResponsiveMode) && (
+				<Button
+					href={API_PATH_LOGOUT}
+					onClick={() => {
+						clearExtraSessionInformation();
+					}}
+					onMouseOver={() => {
+						setLogoutHover(true);
+					}}
+					onMouseOut={() => {
+						setLogoutHover(false);
+					}}
+					style={{
+						backgroundColor: isResponsiveMode ? pcglColours.tertiary : pcglColours.white,
+						boxShadow: '0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08)',
+						fontWeight: 'normal',
+						height: 45,
+						justifyContent: 'left',
+						left: 0,
+						minWidth: 100,
+						position: 'absolute',
+						top: displayEmail ? 40 : 22,
+						width: '100%',
+					}}
+				>
+					{translate(`button.logout`)}{' '}
+					<LogoutOutlined
+						style={{
+							color: isLogoutHover ? pcglColours.primary : pcglColours.darkGrey,
+							marginLeft: 10,
+						}}
+					/>
+				</Button>
+			)}
+		</Flex>
+	);
+
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
-		onClickAction: () => clearExtraSessionInformation(),
+		children: UserInfo,
 		buttonProps: {
-			type: `${isHome ? 'default' : 'text'}`,
-			color: `${isHome ? 'primary' : 'default'}`,
-			variant: `${isHome ? 'solid' : 'text'}`,
-			icon: !isHome ? <LogoutOutlined /> : null,
+			onMouseOver: () => {
+				setLogoutOpen(true);
+			},
+			onMouseOut: () => {
+				setLogoutOpen(false);
+			},
+			type: 'text',
+			variant: 'text',
+			icon: isResponsiveMode ? null : isLogoutOpen ? (
+				<DownOutlined style={{ color: pcglColours.primary }} />
+			) : (
+				<UpOutlined style={{ color: pcglColours.primary }} />
+			),
 			iconPosition: 'end',
-			href: API_PATH_LOGOUT,
+			style: {
+				height: 'auto',
+				justifyContent: isResponsiveMode ? 'left' : 'center',
+				lineHeight: 0.5,
+				paddingLeft: isResponsiveMode ? 0 : 15,
+				textAlign: 'left',
+			},
 		},
 		position: 'right',
 	};
@@ -201,7 +270,7 @@ const HeaderComponent = () => {
 							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
 							onClick={clickAction ? () => onMenuButtonClick(clickAction) : undefined}
 						>
-							{menuItem.name}
+							{menuItem.children ? menuItem.children : menuItem.name}
 						</Button>
 					);
 				} else {

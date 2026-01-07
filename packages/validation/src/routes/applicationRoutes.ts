@@ -17,8 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { agreementEnum, appendicesEnum, ApplicationStates } from '@pcgl-daco/data-model';
+import { agreementEnum, appendicesEnum, ApplicationActions, ApplicationStates } from '@pcgl-daco/data-model';
 import { z } from 'zod';
+import { SectionRoutes } from '../section/sections.js';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export type EditApplicationRequest = z.infer<typeof editApplicationRequestSchema>;
@@ -26,6 +27,11 @@ export type UpdateEditApplicationRequest = z.infer<typeof updateEditApplicationR
 
 export const basicApplicationParamSchema = z.object({
 	applicationId: z.coerce.number().int().nonnegative().min(1),
+});
+
+export const dacCommentsGetParamSchema = z.object({
+	applicationId: z.coerce.number().int().nonnegative().min(1),
+	section: z.nativeEnum(SectionRoutes),
 });
 
 export const applicationContentsSchema = z
@@ -111,6 +117,18 @@ export const approveApplicationRequestSchema = z
 	})
 	.strict();
 
+export const applicationHistoryResponseSchema = z.object({
+	action: z.nativeEnum(ApplicationActions),
+	id: z.number(),
+	userId: z.string(),
+	userName: z.string().nullable(),
+	applicationId: z.number(),
+	stateAfter: z.nativeEnum(ApplicationStates),
+	stateBefore: z.nativeEnum(ApplicationStates),
+	createdAt: z.date(),
+	revisionsRequestId: z.number().nullable(),
+});
+
 export const revisionDataSchema = z
 	.object({
 		comments: z.string().nullish(),
@@ -161,4 +179,10 @@ export const rejectApplicationRequestSchema = z.object({
 
 export const revokeApplicationRequestSchema = z.object({
 	revokeReason: z.string().nullable(),
+});
+
+export const submitDacCommentsSchema = z.object({
+	message: z.string().min(2),
+	section: z.nativeEnum(SectionRoutes),
+	toDacChair: z.boolean(),
 });

@@ -19,7 +19,6 @@
 import { Button, Flex, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { errorStyles, errorStylesCondensed } from '@/components/pages/global/ErrorPage';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
@@ -39,7 +38,7 @@ const NotFound = () => {
 	};
 
 	return (
-		<Content style={{ ...contentWrapperStyles, ...(isLowResDevice ? errorStylesCondensed : errorStyles) }}>
+		<Content style={{ ...(isLowResDevice ? errorStylesCondensed : errorStyles) }}>
 			<Flex vertical>
 				<Title>{translate('notFound.title')}</Title>
 				<Text>{translate('notFound.description')}</Text>

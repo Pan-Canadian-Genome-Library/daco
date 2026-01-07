@@ -51,7 +51,6 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 						rules={[props.rule]}
 						required={props.required}
 						initialValue={props.initialValue ?? field.value}
-						validateTrigger="onBlur"
 					>
 						<Flex vertical>
 							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}

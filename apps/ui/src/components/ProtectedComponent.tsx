@@ -30,8 +30,6 @@ type ProtectedComponentProps = PropsWithChildren<{
 	requiredStates?: [ApplicationStateValues, ...ApplicationStateValues[]];
 }>;
 
-const AUTH_DISABLED = import.meta.env.VITE_DISABLE_AUTH === 'true';
-
 /**
  * Restrict a component from rendering if authorization rules are not met. Can be added
  * around any component to prevent the component from rendering if the user roles are not
@@ -57,13 +55,6 @@ const ProtectedComponent = ({ requiredRoles, requiredStates, children }: Protect
 	const {
 		state: { applicationState, applicationUserRole: role },
 	} = useApplicationContext();
-
-	if (AUTH_DISABLED) {
-		if (requiredStates) {
-			return requiredStates.includes(applicationState) ? children : null;
-		}
-		return children;
-	}
 
 	if (isLoading) {
 		return <Skeleton />;

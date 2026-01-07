@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import LabelWithExample from '@/components/pages/application/form-components/labels/LabelWithExample';
 import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
@@ -33,6 +34,7 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -41,9 +43,9 @@ const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'project', isEditMode });
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'project', isEditMode, userRole: state.applicationUserRole });
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 
 	const { control, getValues } = useForm<Nullable<ProjectInformationSchemaType>>({
@@ -114,6 +116,10 @@ const Project = () => {
 					text={[translate('project-section.description')]}
 					showLockIcon={!canEdit}
 				/>
+				<Row>
+					<DacComments sectionComments={dacComments} section="project" />
+					<RevisionsAlert sectionRevisions={revisions['project']} />
+				</Row>
 				<Row gutter={26}>
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 						<InputBox

@@ -19,9 +19,10 @@
 import { Button, Flex, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
 import { errorStyles, errorStylesCondensed } from '@/components/pages/global/ErrorPage';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
@@ -34,6 +35,7 @@ const LoginError = () => {
 	const { token } = useToken();
 	const [searchParams] = useSearchParams();
 	const isLowResDevice = minWidth <= token.screenLGMin;
+	const [applyForAccessOpen, setApplyForAccessOpen] = useState(false);
 
 	const code = searchParams.get('code');
 
@@ -42,9 +44,13 @@ const LoginError = () => {
 	};
 
 	return (
-		<Content style={{ ...contentWrapperStyles, ...(isLowResDevice ? errorStylesCondensed : errorStyles) }}>
+		<Content
+			style={{
+				...(isLowResDevice ? errorStylesCondensed : { ...errorStyles }),
+			}}
+		>
 			<Flex vertical>
-				<Title>{translate('global.loginError.title')}</Title>
+				{code !== 'SELF_REGISTRATION_SENT' && <Title>{translate('global.loginError.title')}</Title>}
 				<Flex vertical gap={'1rem'}>
 					<Title level={2} style={{ marginTop: '-.2rem', fontSize: token.fontSizeHeading4 }}>
 						{translate([
@@ -58,11 +64,22 @@ const LoginError = () => {
 							'global.loginError.descriptions.SYSTEM_ERROR.description',
 						])}
 					</Text>
+
+					<Text>{translate([`global.loginError.descriptions.${code}.description2`, ''])}</Text>
 				</Flex>
 				<Flex style={{ ...buttonContainerStyles }}>
-					<Button href="/" type="primary">
-						{translate('global.loginError.buttons.home')}
-					</Button>
+					{code === 'NOT_FOUND' ? (
+						<>
+							<Button type="link" color="primary" variant="solid" onClick={() => setApplyForAccessOpen(true)}>
+								{translate('button.getStarted')}
+							</Button>
+							<ApplyForAccessModal openModal={applyForAccessOpen} setOpenModal={setApplyForAccessOpen} />
+						</>
+					) : (
+						<Button href="/" type="primary">
+							{translate('global.loginError.buttons.home')}
+						</Button>
+					)}
 				</Flex>
 			</Flex>
 		</Content>

@@ -28,6 +28,7 @@ import SectionMenu from '@/components/pages/application/SectionMenu';
 
 import useGetApplication from '@/api/queries/useGetApplication';
 import useGetApplicationFeedback from '@/api/queries/useGetApplicationFeedback';
+import useGetDacComments from '@/api/queries/useGetDacComments';
 import ErrorPage from '@/components/pages/global/ErrorPage';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationStates } from '@pcgl-daco/data-model';
@@ -59,6 +60,16 @@ const ApplicationViewer = () => {
 		isLoading: revisionsLoading,
 	} = useGetApplicationFeedback(params.id, applicationData?.state);
 
+	const {
+		data: dacCommentsData,
+		isLoading: dacCommentsIsLoading,
+		isError: dacCommentsIsErrored,
+		error: dacCommentsError,
+	} = useGetDacComments({
+		applicationId: params.id,
+		section: currentSection,
+	});
+
 	useEffect(() => {
 		if (!applicationData || applicationError) {
 			return;
@@ -84,9 +95,16 @@ const ApplicationViewer = () => {
 		applicationIsErrored ||
 		applicationIsLoading ||
 		revisionsLoading ||
-		revisionsIsErrored
+		revisionsIsErrored ||
+		dacCommentsIsLoading ||
+		dacCommentsIsErrored
 	)
-		return <ErrorPage loading={applicationIsLoading || revisionsLoading} error={applicationError || revisionsError} />;
+		return (
+			<ErrorPage
+				loading={applicationIsLoading || revisionsLoading || dacCommentsIsLoading}
+				error={applicationError || revisionsError || dacCommentsError}
+			/>
+		);
 
 	return (
 		<Content>
@@ -118,7 +136,8 @@ const ApplicationViewer = () => {
 										context={{
 											appId: applicationData.id,
 											isEditMode,
-											revisions: applicationUserRole === userRoleSchema.Values.APPLICANT ? revisionsData : {}, // Only APPLICANTS should have the revisions logic
+											revisions: revisionsData,
+											dacComments: dacCommentsData,
 										}}
 									/>
 								</Col>

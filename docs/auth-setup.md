@@ -26,6 +26,32 @@ sequenceDiagram
 	api->>-ui: Redirect to user dashboard
 ```
 
+## User Self-Enrolment Flow
+```mermaid
+sequenceDiagram
+	participant user
+    participant ui
+    participant COmanage
+    participant CILogon
+
+	user->>ui: Clicks "Self-Enrol" link
+	ui->>+COmanage: /registry - Self Enrolment "PCGL DACO" Flow
+	Note over COmanage: User provide name and email address
+	COmanage-->>user: Sends invitation email with verification link
+	COmanage->>-ui: /login/error?code=SELF_REGISTRATION_SENT
+	user->>+COmanage: Opens COmanage invitation page
+    alt Accept
+        COmanage->>+CILogon: Redirects user for authentication
+        user-->>CILogon: Logs in via CILogon
+        CILogon->>-ui: Redirects back to UI home page
+        ui->>user: Displays home page (login successful)
+    else Deny
+		COmanage->>+CILogon: Redirects user for authentication
+        user-->>CILogon: Logs in via CILogon
+		CILogon->>-COmanage: Redirects to error page
+    end
+```
+
 ## Dependencies
 In order to run the authentication flow, an OIDC provider is required. Additionally, a private client needs to be registered with the provider and the client_id and client_secret be added to the DACO API configuration.
 

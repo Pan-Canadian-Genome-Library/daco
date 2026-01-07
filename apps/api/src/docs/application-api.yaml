@@ -74,7 +74,12 @@ paths:
             <br/>
             **Example:** `true` | `false`
             <br/>
-
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: |
+            Search records using the entered text. The system will look for matching values in IDs, first and last names, institution names, and email addresses.
       responses:
         '500':
           description: 'Cannot return applications list'
@@ -108,12 +113,15 @@ paths:
                   pagingMetadata:
                     type: object
                     $ref: '#/components/schemas/PagingMetadata'
+                  totals:
+                    type: object
+                    $ref: '#/components/schemas/ApplicationsMetadata'
 
   /applications/{applicationId}:
     get:
       tags:
         - Applications
-      summary: Gets a application for a specified application ID.
+      summary: Gets an Application for a specified application ID.
       parameters:
         - in: path
           name: applicationId
@@ -153,11 +161,18 @@ paths:
               schema:
                 $ref: '#/components/responses/ApplicationResponse'
 
-  /applications/metadata/counts:
+  /applications/{applicationId}/history:
     get:
       tags:
         - Applications
-      summary: Gets the total number of applications in each state / status category.
+      summary: Gets all Actions for a specified application ID.
+      parameters:
+        - in: path
+          name: applicationId
+          schema:
+            type: string
+          description: Retrieve the history for the specified application.
+          required: true
       responses:
         '401':
           description: Unauthorized. Will occur when the user is not logged in.
@@ -166,23 +181,29 @@ paths:
               schema:
                 $ref: '#/components/responses/ClientErrors'
         '403':
-          description: Forbidden. You are not a **DAC Member** and therefore cannot access this endpoint.
+          description: Forbidden. You do not own, or have the rights to access this application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '404':
+          description: 'Error retrieving application history by ID - Application not found.'
           content:
             application/json:
               schema:
                 $ref: '#/components/responses/ClientErrors'
         '500':
-          description: 'Error getting the total number of applications in each state / status category'
+          description: 'Error retrieving application by ID'
           content:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
         '200':
-          description: 'The object containing the metadata information'
+          description: 'Application History retrieved'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationsMetadata'
+                $ref: '#/components/responses/ApplicationHistoryResponse'
 
   /applications/create:
     post:

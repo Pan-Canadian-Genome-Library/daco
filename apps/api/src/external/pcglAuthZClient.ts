@@ -116,6 +116,12 @@ export const getUserInformation = async (
 ): AsyncResult<PCGLAuthZUserInfoResponse, 'SYSTEM_ERROR' | 'FORBIDDEN' | 'NOT_FOUND'> => {
 	try {
 		const response = await fetchAuthZResource('/user/me', accessToken);
+
+		if (response.status === 204) {
+			// A "204 No content" response is returned when the user is not registered.
+			return failure('NOT_FOUND', 'Unable to retrieve user information from the PCGL AuthZ service.');
+		}
+
 		const res = await response.json();
 
 		const validatedAuthZData = authZUserInfo.safeParse(res);

@@ -25,6 +25,7 @@ import useGetDownload from '@/api/queries/useGetDownload';
 import ApplicationStatusSteps from '@/components/pages/application/ApplicationStatusSteps';
 import ApproveApplicationModal from '@/components/pages/application/modals/ApproveApplicationModal';
 import CloseApplicationModal from '@/components/pages/application/modals/CloseApplicationModal';
+import HistoryModal from '@/components/pages/application/modals/HistoryModal';
 import RejectApplicationModal from '@/components/pages/application/modals/RejectApplicationModal';
 import RequestRevisionsModal from '@/components/pages/application/modals/RequestRevisionsModal';
 import RevokeApplicationModal from '@/components/pages/application/modals/RevokeApplicationModal';
@@ -59,6 +60,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const { token } = useToken();
 	const minWidth = useMinWidth();
 	const isLowResDevice = minWidth <= token.screenLGMax;
+
 	const [showCloseApplicationModal, setShowCloseApplicationModal] = useState(false);
 	const [openRevisionsModal, setOpenRevisionsModal] = useState(false);
 	const [showReqRevisionsSuccessModal, setShowReqRevisionsSuccessModal] = useState(false);
@@ -66,7 +68,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 	const [showRejectModal, setShowRejectModal] = useState(false);
 	const [showRevokeModal, setShowRevokeModal] = useState(false);
 	const [showApprovalModal, setShowApprovalModal] = useState(false);
-
+	const [showHistoryModal, setShowHistoryModal] = useState(false);
 	const [showRejectSuccessModal, setShowRejectSuccessModal] = useState(false);
 	const [showRevokeSuccessModal, setShowRevokeSuccessModal] = useState(false);
 	const [showSuccessApproveModal, setShowSuccessApproveModal] = useState(false);
@@ -131,9 +133,16 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 		}
 
 		buttons.push(
+			<Button
+				onClick={() => {
+					setShowHistoryModal(true);
+				}}
+			>
+				{translate('button.history')}
+			</Button>,
 			<ProtectedComponent
 				key={'header-revoke'}
-				requiredRoles={['DAC_MEMBER', 'APPLICANT']}
+				requiredRoles={['DAC_CHAIR', 'APPLICANT', 'INSTITUTIONAL_REP']}
 				requiredStates={['APPROVED']}
 			>
 				<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
@@ -152,7 +161,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			>
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 			</ProtectedComponent>,
-			<ProtectedComponent key={'header-dac-controls'} requiredRoles={['DAC_MEMBER']} requiredStates={['DAC_REVIEW']}>
+			<ProtectedComponent key={'header-dac-controls'} requiredRoles={['DAC_CHAIR']} requiredStates={['DAC_REVIEW']}>
 				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
 				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
@@ -160,7 +169,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			</ProtectedComponent>,
 			<ProtectedComponent
 				key={'header-download'}
-				requiredRoles={['DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP']}
+				requiredRoles={['DAC_CHAIR', 'DAC_MEMBER', 'APPLICANT', 'INSTITUTIONAL_REP']}
 				requiredStates={['INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW', 'APPROVED', 'REJECTED', 'CLOSED', 'REVOKED']}
 			>
 				<Button onClick={() => onPDFDownload()}>{translate('sign-and-submit-section.section.buttons.download')}</Button>
@@ -305,6 +314,13 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				okText={translate('modals.buttons.ok')}
 				isOpen={showSuccessApproveModal}
 				onOk={() => setShowSuccessApproveModal(false)}
+			/>
+			<HistoryModal
+				id={id}
+				isOpen={showHistoryModal}
+				closeModal={() => {
+					setShowHistoryModal(false);
+				}}
 			/>
 		</PageHeader>
 	);

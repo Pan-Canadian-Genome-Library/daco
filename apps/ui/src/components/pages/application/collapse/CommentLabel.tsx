@@ -17,22 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { pcglColours } from '@/providers/ThemeProvider';
+import { CommentOutlined } from '@ant-design/icons';
+import { Flex, Typography } from 'antd';
 
-import { withErrorResponseHandler } from '@/api/apiUtils';
-import { fetch } from '@/global/FetchClient';
-import { ApplicationCountMetadata, ServerError } from '@/global/types';
+const { Text } = Typography;
 
-const useGetApplicationCounts = () => {
-	return useQuery<ApplicationCountMetadata, ServerError>({
-		queryKey: ['counts'],
-
-		queryFn: async () => {
-			const response = await fetch(`/applications/metadata/counts`).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-	});
+type CommentLabelProps = {
+	label: string;
+	numOfComments: number;
 };
 
-export default useGetApplicationCounts;
+const CommentLabel = ({ label, numOfComments }: CommentLabelProps) => {
+	return (
+		<Flex gap={'middle'}>
+			<CommentOutlined
+				style={{
+					backgroundColor: pcglColours.lighterBlue,
+					borderRadius: 20,
+					padding: 5,
+					color: 'white',
+					fontSize: '0.75rem',
+				}}
+			/>
+			<Flex align="center">
+				<Text>{`${label} - (${numOfComments})`}</Text>
+			</Flex>
+		</Flex>
+	);
+};
+
+export default CommentLabel;

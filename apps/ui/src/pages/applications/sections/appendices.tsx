@@ -18,19 +18,21 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form } from 'antd';
+import { Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
 import { LabelWithLink } from '@/components/pages/application/form-components/labels/LabelWithLink';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -41,9 +43,9 @@ const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode });
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode, userRole: state.applicationUserRole });
 	const {
 		control,
 		getValues,
@@ -88,6 +90,10 @@ const Appendices = () => {
 					showLockIcon={!canEdit}
 					text={[translate('appendices.description')]}
 				/>
+				<Row>
+					<DacComments sectionComments={dacComments} section="appendices" />
+					<RevisionsAlert sectionRevisions={revisions['appendices']} />
+				</Row>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>
 					<Form
 						form={form}

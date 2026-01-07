@@ -26,11 +26,13 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -58,9 +60,9 @@ const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'study', isEditMode });
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({ revisions, section: 'study', isEditMode, userRole: state.applicationUserRole });
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
 	const {
@@ -114,6 +116,10 @@ const RequestedStudy = () => {
 						</Col>
 					}
 				/>
+				<Row>
+					<DacComments sectionComments={dacComments} section="study" />
+					<RevisionsAlert sectionRevisions={revisions['study']} />
+				</Row>
 				<SectionContent showDivider={false}>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>

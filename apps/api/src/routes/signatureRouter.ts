@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { SignatureDTO } from '@pcgl-daco/data-model';
 import {
 	withBodySchemaValidation,
 	withParamsSchemaValidation,
@@ -28,21 +29,20 @@ import {
 	editSignatureRequestSchema,
 	getSignatureParamsSchema,
 	isPositiveInteger,
-	userRoleSchema,
 	type EditSignatureResponse,
 } from '@pcgl-daco/validation';
 import express, { type Request } from 'express';
 
+import { getApplicationById } from '@/controllers/applicationController.ts';
 import {
 	deleteApplicationSignature,
 	getApplicationSignature,
 	updateApplicationSignature,
 } from '@/controllers/signatureController.ts';
+import { authMiddleware } from '@/middleware/authMiddleware.ts';
+import { canAccessRequest, isAssociatedRep } from '@/service/authService.ts';
+import { authErrorResponseHandler, authFailure } from '@/service/utils.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import type { SignatureDTO } from '@pcgl-daco/data-model';
-import { getApplicationById } from '../controllers/applicationController.ts';
-import { authMiddleware } from '../middleware/authMiddleware.ts';
-import { getUserRole, isAssociatedRep } from '../service/authService.ts';
 import type { ResponseWithData } from './types.ts';
 
 const signatureRouter = express.Router();
@@ -63,65 +63,57 @@ signatureRouter.get(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			try {
+			const { user } = request.session;
+			if (user) {
 				const applicationId = Number(request.params.applicationId);
-
 				if (!isPositiveInteger(applicationId)) {
 					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 					return;
 				}
 
-				const { userId } = request.session.user || {};
-				if (!userId) {
-					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-					return;
-				}
+				const requestAuthResult = await canAccessRequest(user, applicationId);
+				if (requestAuthResult.success) {
+					try {
+						const applicationResult = await getApplicationById({ applicationId });
+						if (!applicationResult.success) {
+							switch (applicationResult.error) {
+								case 'SYSTEM_ERROR': {
+									response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+									return;
+								}
+								case 'NOT_FOUND': {
+									response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+									return;
+								}
+							}
+						}
 
-				const applicationResult = await getApplicationById({ applicationId });
-				if (!applicationResult.success) {
-					switch (applicationResult.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+						const result = await getApplicationSignature({ applicationId: Number(applicationId) });
+						if (result.success) {
+							response.status(200).json(result.data);
 							return;
 						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-							return;
+
+						switch (result.error) {
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
 						}
-					}
-				}
-				const userRole = getUserRole(request.session);
-
-				const isApplicationUser = applicationResult.data.userId === userId; // Check if the user who created the app
-				const isDacMember = userRole === 'DAC_MEMBER'; // Check if user is a DAC_MEMBER
-				const isRep = await isAssociatedRep(request.session, applicationId); // Check if user is rep
-
-				if (!(isApplicationUser || isDacMember || isRep)) {
-					response
-						.status(403)
-						.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
-					return;
-				}
-
-				const result = await getApplicationSignature({ applicationId: Number(applicationId) });
-
-				if (result.success) {
-					response.status(200).json(result.data);
-					return;
-				}
-
-				switch (result.error) {
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: result.error, message: result.message });
+					} catch (error) {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 						return;
 					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
-					}
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
-			} catch (error) {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+			} else {
+				authErrorResponseHandler(response, authFailure);
 				return;
 			}
 		},
@@ -148,73 +140,47 @@ signatureRouter.post(
 				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 			>,
 		) => {
-			try {
+			const { user } = request.session;
+			if (user) {
 				const data = request.body;
 				const { applicationId, signature } = data;
-				const role = getUserRole(request.session);
+				const requestAuthResult = await canAccessRequest(user, applicationId);
 
-				if (role !== userRoleSchema.Values.APPLICANT) {
-					response.status(403).json({
-						error: 'FORBIDDEN',
-						message: 'User role is not allowed to create a signature for this application',
-					});
-					return;
-				}
+				if (requestAuthResult.success) {
+					try {
+						const isApplicationInstitutionalRep = await isAssociatedRep(user, applicationId);
 
-				const { userId } = request.session.user || {};
-				if (!userId) {
-					response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-					return;
-				}
+						const result = await updateApplicationSignature({
+							applicationId,
+							signature,
+							signee: isApplicationInstitutionalRep ? 'INSTITUTIONAL_REP' : 'APPLICANT',
+						});
 
-				const applicationResult = await getApplicationById({ applicationId });
-				if (!applicationResult.success) {
-					switch (applicationResult.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+						if (result.success) {
+							response.json(result.data);
 							return;
 						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-							return;
+
+						switch (result.error) {
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
 						}
-					}
-				}
-
-				const isApplicationUser = role === userRoleSchema.Values.APPLICANT && applicationResult.data.userId === userId;
-
-				const isApplicationInstitutionalRep = await isAssociatedRep(request.session, applicationId);
-
-				if (!(isApplicationUser || isApplicationInstitutionalRep)) {
-					response
-						.status(403)
-						.json({ error: 'FORBIDDEN', message: `User does not have permission to access this application.` });
-					return;
-				}
-
-				const result = await updateApplicationSignature({
-					applicationId,
-					signature,
-					signee: isApplicationInstitutionalRep ? 'INSTITUTIONAL_REP' : 'APPLICANT',
-				});
-
-				if (result.success) {
-					response.json(result.data);
-					return;
-				}
-
-				switch (result.error) {
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: result.error, message: result.message });
+					} catch (error) {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 						return;
 					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
-					}
+				} else {
+					authErrorResponseHandler(response, requestAuthResult);
+					return;
 				}
-			} catch (error) {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+			} else {
+				authErrorResponseHandler(response, authFailure);
 				return;
 			}
 		},
@@ -234,70 +200,56 @@ signatureRouter.delete(
 				request: Request,
 				response: ResponseWithData<void, ['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']>,
 			) => {
-				try {
-					// Validate Parameter
+				const { user } = request.session;
+				if (user) {
 					const applicationId = Number(request.params.applicationId);
-					const { signee } = request.query;
+					const requestAuthResult = await canAccessRequest(user, applicationId);
+					if (requestAuthResult.success) {
+						try {
+							const { signee } = request.query;
+							const isValidSignee = signee && (signee === 'APPLICANT' || signee === 'INSTITUTIONAL_REP');
 
-					// Get user from session and validate that they can act on this application
-					const { userId } = request.session.user || {};
-					if (!userId) {
-						response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not authenticated.' });
-						return;
-					}
+							if (isValidSignee) {
+								// Perform deletion
+								const result = await deleteApplicationSignature({
+									applicationId,
+									signee: signee,
+								});
 
-					const applicationResult = await getApplicationById({ applicationId });
-					if (!applicationResult.success) {
-						switch (applicationResult.error) {
-							case 'SYSTEM_ERROR': {
-								response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+								if (result.success) {
+									/**
+									 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
+									 */
+									response.status(204).json();
+									return;
+								}
+
+								switch (result.error) {
+									case 'NOT_FOUND': {
+										response.status(404).json({ error: result.error, message: result.message });
+										return;
+									}
+									case 'SYSTEM_ERROR': {
+										response.status(500).json({ error: result.error, message: result.message });
+										return;
+									}
+								}
+							} else {
+								response
+									.status(403)
+									.json({ error: 'FORBIDDEN', message: `User does not have permission to modify this signature.` });
 								return;
 							}
-							case 'NOT_FOUND': {
-								response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-								return;
-							}
-						}
-					}
-
-					const isApplicationUser = signee === 'APPLICANT' && applicationResult.data.userId === userId;
-
-					const isApplicationInstitutionalRep =
-						signee === 'INSTITUTIONAL_REP' && (await isAssociatedRep(request.session, applicationId));
-
-					if (!(isApplicationUser || isApplicationInstitutionalRep)) {
-						response
-							.status(403)
-							.json({ error: 'FORBIDDEN', message: `User does not have permission to modify this signature.` });
-						return;
-					}
-
-					// Perform deletion
-					const result = await deleteApplicationSignature({
-						applicationId: Number(applicationId),
-						signee: signee,
-					});
-
-					if (result.success) {
-						/**
-						 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
-						 */
-						response.status(204).json();
-						return;
-					}
-
-					switch (result.error) {
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: result.error, message: result.message });
+						} catch (error) {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 							return;
 						}
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
+					} else {
+						authErrorResponseHandler(response, requestAuthResult);
+						return;
 					}
-				} catch (error) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				} else {
+					authErrorResponseHandler(response, authFailure);
 					return;
 				}
 			},
