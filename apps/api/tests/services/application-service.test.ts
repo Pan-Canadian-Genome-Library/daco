@@ -26,11 +26,11 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-import { ApplicationStateValues } from '@pcgl-daco/data-model';
 import {
 	addInitialApplications,
 	addPaginationDonors,
 	allRecordsPageSize,
+	getFirstApplicationTestByState,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
@@ -59,28 +59,9 @@ describe('Application Service', () => {
 		testApplicationService = applicationSvc(db);
 	});
 
-	/**
-	 * Function returns the first id of an application based on the state provided.
-	 * @param state
-	 * @returns id
-	 */
-	const getFirstIdTestByState = async (applicationState?: ApplicationStateValues) => {
-		const applicationRecordsResult = await testApplicationService.listApplications({
-			user_id,
-			state: applicationState ? [applicationState] : undefined,
-		});
-
-		assert.ok(applicationRecordsResult.success);
-		const applicationRecords = applicationRecordsResult.data.applications;
-		const testId = applicationRecords[0]?.id;
-		assert.ok(testId);
-
-		return testId;
-	};
-
 	describe('Get Applications', () => {
 		it('should get applications requested by id, with application_contents', async () => {
-			const id = await getFirstIdTestByState();
+			const { id } = await getFirstApplicationTestByState(testApplicationService);
 
 			const result = await testApplicationService.getApplicationWithContents({ id });
 
@@ -342,7 +323,7 @@ describe('Application Service', () => {
 
 	describe('FindOneAndUpdate Application', () => {
 		it('should populate updated_at field', async () => {
-			const id = await getFirstIdTestByState();
+			const { id } = await getFirstApplicationTestByState(testApplicationService);
 
 			await testApplicationService.findOneAndUpdate({ id, update: {} });
 
@@ -358,7 +339,7 @@ describe('Application Service', () => {
 
 	describe('Edit Applications', () => {
 		it('should allow editing applications and return record with updated fields', async () => {
-			const id = await getFirstIdTestByState();
+			const { id } = await getFirstApplicationTestByState(testApplicationService);
 
 			const update = { applicant_first_name: 'Test' };
 
@@ -375,7 +356,10 @@ describe('Application Service', () => {
 
 	describe('Application Revision Requests', () => {
 		it('Should create revision', async () => {
-			const testId = await getFirstIdTestByState('INSTITUTIONAL_REP_REVISION_REQUESTED');
+			const { id: testId } = await getFirstApplicationTestByState(
+				testApplicationService,
+				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+			);
 
 			const revisionResult = await testApplicationService.createRevisionRequest({
 				applicationId: testId,
