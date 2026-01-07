@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import assert from 'node:assert';
+
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { eq } from 'drizzle-orm';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
@@ -27,6 +29,8 @@ import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import BaseLogger from '@/logger.js';
+import { ApplicationService } from '@/service/types.ts';
+import { ApplicationListSummary, ApplicationStateValues } from '@pcgl-daco/data-model';
 import { applicationArray } from './mock/application-data.ts';
 
 const logger = BaseLogger.forModule('testUtils');
@@ -95,4 +99,26 @@ export const addPaginationDonors = async (db: PostgresDb) => {
 	for (let i = 0; i < 20; i++) {
 		await db.insert(applications).values(newApplication);
 	}
+};
+
+/**
+ * Function returns the first application based on the state provided if provided.
+ * @param state
+ * @returns ApplicationListSummary
+ */
+export const getFirstApplicationTestByState = async (
+	testApplicationRepo: ApplicationService,
+	applicationState?: ApplicationStateValues,
+): Promise<ApplicationListSummary> => {
+	const applicationRecordsResult = await testApplicationRepo.listApplications({
+		user_id: testUserId,
+		state: applicationState ? [applicationState] : undefined,
+	});
+
+	assert.ok(applicationRecordsResult.success);
+
+	const applicationRecords = applicationRecordsResult.data.applications;
+	assert.ok(applicationRecords[0]);
+
+	return applicationRecords[0];
 };
