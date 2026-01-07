@@ -20,6 +20,26 @@
 import { applications } from '@/db/schemas/applications.ts';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
+// Sample revision request data
+export const revisionRequestData = {
+	created_at: new Date(),
+	comments: 'Please provide additional documentation.',
+	applicant_notes: 'Needs more details',
+	applicant_approved: false,
+	institution_rep_approved: false,
+	institution_rep_notes: 'Incomplete information',
+	collaborators_approved: false,
+	collaborators_notes: 'Requires additional clarification',
+	project_approved: false,
+	project_notes: 'Not sufficient justification',
+	requested_studies_approved: false,
+	requested_studies_notes: 'Unclear scope',
+	ethics_approved: false,
+	agreements_approved: false,
+	appendices_approved: false,
+	sign_and_submit_approved: false,
+};
+
 export const applicationArray: (typeof applications.$inferInsert)[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',

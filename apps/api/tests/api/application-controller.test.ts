@@ -38,12 +38,13 @@ import {
 } from '@/controllers/applicationController.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type ApplicationService, type RevisionRequestModel } from '@/service/types.js';
+import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-import { ApplicationListSummary, ApplicationStateValues } from '@pcgl-daco/data-model';
+import { revisionRequestData } from '../utils/mock/application-data.ts';
 import {
 	addInitialApplications,
+	getFirstApplicationTestByState,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
@@ -52,27 +53,6 @@ import {
 	testUserName,
 	testUserId as user_id,
 } from '../utils/testUtils.ts';
-
-// Sample revision request data
-const revisionRequestData: RevisionRequestModel = {
-	application_id: testApplicationId,
-	created_at: new Date(),
-	comments: 'Please provide additional documentation.',
-	applicant_notes: 'Needs more details',
-	applicant_approved: false,
-	institution_rep_approved: false,
-	institution_rep_notes: 'Incomplete information',
-	collaborators_approved: false,
-	collaborators_notes: 'Requires additional clarification',
-	project_approved: false,
-	project_notes: 'Not sufficient justification',
-	requested_studies_approved: false,
-	requested_studies_notes: 'Unclear scope',
-	ethics_approved: false,
-	agreements_approved: false,
-	appendices_approved: false,
-	sign_and_submit_approved: false,
-};
 
 describe('Application API', () => {
 	let db: PostgresDb;
@@ -95,30 +75,9 @@ describe('Application API', () => {
 		testApplicationRepo = applicationSvc(db);
 	});
 
-	/**
-	 * Function returns the first application based on the state provided if provided.
-	 * @param state
-	 * @returns ApplicationListSummary
-	 */
-	const getFirstApplicationTestByState = async (
-		applicationState?: ApplicationStateValues,
-	): Promise<ApplicationListSummary> => {
-		const applicationRecordsResult = await testApplicationRepo.listApplications({
-			user_id,
-			state: applicationState ? [applicationState] : undefined,
-		});
-
-		assert.ok(applicationRecordsResult.success);
-
-		const applicationRecords = applicationRecordsResult.data.applications;
-		assert.ok(applicationRecords[0]);
-
-		return applicationRecords[0];
-	};
-
 	describe('Edit Application', () => {
 		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DRAFT);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
 
 			const update = { applicantFirstName: 'Test' };
 
@@ -134,7 +93,7 @@ describe('Application API', () => {
 		});
 
 		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DRAFT);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
 
 			assert.strictEqual(testApp.state, ApplicationStates.DRAFT);
 
@@ -165,7 +124,7 @@ describe('Application API', () => {
 		});
 
 		it('should error and return null when application state is not draft or review', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DRAFT);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
 
 			const stateUpdate = { state: ApplicationStates.CLOSED };
 			await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
@@ -225,7 +184,7 @@ describe('Application API', () => {
 
 	describe('Reject Application', () => {
 		it('should successfully reject an application in DAC_REVIEW state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DAC_REVIEW);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DAC_REVIEW);
 
 			const rejectionReason = 'Reject';
 
@@ -238,7 +197,7 @@ describe('Application API', () => {
 		});
 
 		it('should failed to reject an application in NOT in DAC_REVIEW state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.CLOSED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.CLOSED);
 
 			const result = await dacRejectApplication({
 				applicationId: testApp.id,
@@ -273,7 +232,7 @@ describe('Application API', () => {
 
 	describe('Revoke Application', () => {
 		it('should successfully revoke an application in APPROVED state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.APPROVED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.APPROVED);
 
 			const result = await revokeApplication(testApp.id, true, 'TEST-REVOKE-COMMENT', 'Test-User');
 
@@ -287,7 +246,7 @@ describe('Application API', () => {
 		});
 
 		it('should fail to revoke an application not in APPROVED state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.CLOSED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.CLOSED);
 
 			const result = await revokeApplication(testApp.id, true, 'TEST-REVOKE-COMMENT', 'Test-User');
 
@@ -309,7 +268,7 @@ describe('Application API', () => {
 
 	describe('Withdraw Application', () => {
 		it('should withdraw an application in DAC_REVIEW state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DAC_REVIEW);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DAC_REVIEW);
 
 			const result = await withdrawApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -318,7 +277,10 @@ describe('Application API', () => {
 		});
 
 		it('should withdraw an application in INSTITUTIONAL_REP_REVIEW state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+			const testApp = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+			);
 
 			const result = await withdrawApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -327,7 +289,7 @@ describe('Application API', () => {
 		});
 
 		it('should fail to withdraw an application in DRAFT state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DRAFT);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
 
 			const result = await withdrawApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -335,7 +297,7 @@ describe('Application API', () => {
 		});
 
 		it('should fail to withdraw an application in REJECTED state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.REJECTED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.REJECTED);
 
 			const result = await withdrawApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -343,7 +305,10 @@ describe('Application API', () => {
 		});
 
 		it('should fail to withdraw an application in INSTITUTIONAL_REP_REVISION_REQUESTED state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED);
+			const testApp = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+			);
 
 			const result = await withdrawApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -351,7 +316,10 @@ describe('Application API', () => {
 		});
 
 		it('should fail to withdraw an application in DAC_REVISIONS_REQUESTED state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DAC_REVISIONS_REQUESTED);
+			const testApp = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.DAC_REVISIONS_REQUESTED,
+			);
 
 			const result = await withdrawApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -359,7 +327,7 @@ describe('Application API', () => {
 		});
 
 		it('should fail to withdraw an application in APPROVED state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.APPROVED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.APPROVED);
 
 			const result = await withdrawApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -376,7 +344,7 @@ describe('Application API', () => {
 
 	describe('Close Application', () => {
 		it('should close an application in DRAFT state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DRAFT);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
 
 			const result = await closeApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -385,7 +353,10 @@ describe('Application API', () => {
 		});
 
 		it('should close an application in INSTITUTIONAL_REP_REVIEW state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+			const testApp = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+			);
 
 			const result = await closeApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -394,7 +365,7 @@ describe('Application API', () => {
 		});
 
 		it('should close an application in DAC_REVIEW state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DAC_REVIEW);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DAC_REVIEW);
 
 			const result = await closeApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -403,7 +374,7 @@ describe('Application API', () => {
 		});
 
 		it('should prevent closing an already CLOSED application', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.CLOSED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.CLOSED);
 
 			const result = await closeApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -412,7 +383,7 @@ describe('Application API', () => {
 		});
 
 		it('should prevent closing in APPROVED state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.APPROVED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.APPROVED);
 
 			const result = await closeApplication({ applicationId: testApp.id, userName: 'Test-User' });
 
@@ -430,11 +401,11 @@ describe('Application API', () => {
 
 	describe('Request DAC Revisions', () => {
 		it('should be able to create revisions DAC request when application is in DAC_REVIEW state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.DAC_REVIEW);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DAC_REVIEW);
 
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: testApp.id,
-				revisionData: revisionRequestData,
+				revisionData: { application_id: testApplicationId, ...revisionRequestData },
 				userName: testUserName,
 			});
 
@@ -442,11 +413,11 @@ describe('Application API', () => {
 		});
 
 		it('should fail revisions DAC request if application is not in the correct state', async () => {
-			const testApp = await getFirstApplicationTestByState(ApplicationStates.CLOSED);
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.CLOSED);
 
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: testApp.id,
-				revisionData: revisionRequestData,
+				revisionData: { application_id: testApplicationId, ...revisionRequestData },
 				userName: testUserName,
 			});
 
@@ -460,7 +431,7 @@ describe('Application API', () => {
 			// Act: Call the function
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: invalidApplicationId,
-				revisionData: revisionRequestData,
+				revisionData: { application_id: testApplicationId, ...revisionRequestData },
 				userName: testUserName,
 			});
 
