@@ -80,14 +80,34 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 		return result;
 	}
 
-	cron.schedule('0 0 */7 * *', () => {
-		// if still in draft after 7 days -> send email reminder
-		console.log('\nRunning Every 7th Day\n');
+	cron.schedule('0 0 */7 * *', async (context) => {
+		const applicationResult = await getApplicationById({ applicationId: result.data.id });
+
+		if (!applicationResult.success) {
+			return applicationResult;
+		}
+
+		if (result.data.state === ApplicationStates.DRAFT) {
+			// if still in draft after 7 days -> send email reminder
+			console.log('\nPlease review & submit your application with state DRAFT\n');
+		} else {
+			context.task?.destroy();
+		}
 	});
 
-	cron.schedule('0 0 */30 * *', () => {
-		// close after 30 days
-		console.log('\nClose after 30 days\n');
+	cron.schedule('0 0 */30 * *', async (context) => {
+		const application = await getApplicationById({ applicationId: result.data.id });
+
+		if (!application.success) {
+			return result;
+		}
+
+		if (result.data.state === ApplicationStates.DRAFT) {
+			// close after 30 days
+			console.log('\nClosing application after 30 days in DRAFT state\n');
+		} else {
+			context.task?.destroy();
+		}
 	});
 
 	const applicationDTO = convertToBasicApplicationRecord(result.data);

@@ -27,6 +27,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { type AddActionMethods, type ApplicationRecord } from '@/service/types.js';
 import { type AsyncResult, failure, type Result, success } from '@/utils/results.js';
 import BaseLogger from '../logger.js';
+import { getApplicationById } from './applicationController.ts';
 import { validateContent } from './validation.js';
 
 const logger = BaseLogger.forModule('stateManager');
@@ -181,9 +182,19 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onSubmitDraft() {
-		cron.schedule('0 0 */7 * *', () => {
-			// Moves to Rep Review, if still in review -> send email reminder
-			console.log('\nRunning Every 7th Day\n');
+		// Post Submit Draft, Application has moved to Rep Review, if still in review 7 days later -> send email reminder
+		cron.schedule('0 0 */7 * *', async (context) => {
+			const applicationResult = await getApplicationById({ applicationId: this._id });
+
+			if (!applicationResult.success) {
+				return applicationResult;
+			}
+
+			if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
+				console.log('\nPlease review & submit your application with state Rep Review\n');
+			} else {
+				context.task?.destroy();
+			}
 		});
 
 		return success(`Submit Draft email reminder set for application ${this._id}`);
@@ -260,10 +271,24 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onRepReviewRevision() {
-		cron.schedule('0 0 */7 * *', () => {
-			// if still waiting rep revision submission -> send email reminder
-			console.log('\nRunning Every 7th Day\n');
-		});
+		// Post Rep Revisions Requested, if still in review 7 days later -> send email reminder
+		cron.schedule(
+			'0 0 */7 * *',
+			async (context) => {
+				const applicationResult = await getApplicationById({ applicationId: this._id });
+
+				if (!applicationResult.success) {
+					return applicationResult;
+				}
+
+				if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+					console.log('\nPlease review & submit your application with state Rep Revision Requested\n');
+				} else {
+					context.task?.destroy();
+				}
+			},
+			{ noOverlap: true },
+		);
 
 		return success(`Submit Rep Review Revision email reminder set for application ${this._id}`);
 	}
@@ -278,10 +303,24 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onDacReviewRevision() {
-		cron.schedule('0 0 */7 * *', () => {
-			// if still waiting dac revision submission -> send email reminder
-			console.log('\nRunning Every 7th Day\n');
-		});
+		// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
+		cron.schedule(
+			'0 0 */7 * *',
+			async (context) => {
+				const applicationResult = await getApplicationById({ applicationId: this._id });
+
+				if (!applicationResult.success) {
+					return applicationResult;
+				}
+
+				if (applicationResult.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
+					console.log('\nPlease review & submit your application with state Dac Revision Requested\n');
+				} else {
+					context.task?.destroy();
+				}
+			},
+			{ noOverlap: true },
+		);
 
 		return success(`Submit DAC Review Revision email reminder set for application ${this._id}`);
 	}
@@ -337,9 +376,19 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onApproveRepReview() {
-		cron.schedule('0 0 */7 * *', () => {
-			// Moves to Dac review, if still in review -> send email reminder for approval
-			console.log('\nRunning Every 7th Day\n');
+		// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
+		cron.schedule('0 0 */7 * *', async (context) => {
+			const applicationResult = await getApplicationById({ applicationId: this._id });
+
+			if (!applicationResult.success) {
+				return applicationResult;
+			}
+
+			if (applicationResult.data.state === ApplicationStates.DAC_REVIEW) {
+				console.log('\nPlease review & submit your application with state Dac Review\n');
+			} else {
+				context.task?.destroy();
+			}
 		});
 
 		return success(`Submit Draft email reminder set for application ${this._id}`);
