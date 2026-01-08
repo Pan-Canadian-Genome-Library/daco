@@ -348,7 +348,7 @@ export const createApplicationPDF = async ({
 	if (
 		!aliasedApplicationContents.success ||
 		!aliasedSignatureContents.success ||
-		!aliasedFileContents.success ||
+		!aliasedCollaboratorsContents.success ||
 		!aliasedFileContents.success
 	) {
 		return failure('SYSTEM_ERROR', 'Error aliasing data records. Unknown keys.');
@@ -360,7 +360,7 @@ export const createApplicationPDF = async ({
 	const renderedPDF = await pdfRepo.renderPCGLApplicationPDF({
 		applicationContents: aliasedApplicationContents.data,
 		signatureContents: aliasedSignatureContents.data,
-		collaboratorsContents: aliasedCollaboratorsContents,
+		collaboratorsContents: aliasedCollaboratorsContents.data,
 		fileContents: aliasedFileContents.data,
 		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
 		trademark,

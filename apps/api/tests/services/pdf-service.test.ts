@@ -135,7 +135,7 @@ describe('File Service', () => {
 			assert.ok(aliasedSignatureData.success);
 
 			const aliasedCollabData = convertToCollaboratorRecords(collabContents.data);
-			assert.ok(Array.isArray(aliasedCollabData));
+			assert.ok(aliasedCollabData.success && Array.isArray(aliasedCollabData.data));
 
 			const aliasedFileData = convertToFileRecord(fileData.data);
 			assert.ok(aliasedFileData.success);
@@ -145,7 +145,7 @@ describe('File Service', () => {
 				applicationContents: aliasedAppData.data,
 				signatureContents: aliasedSignatureData.data,
 				fileContents: aliasedFileData.data,
-				collaboratorsContents: aliasedCollabData,
+				collaboratorsContents: aliasedCollabData.data,
 			});
 
 			assert.ok(pdfCreation.success);
@@ -195,7 +195,7 @@ describe('File Service', () => {
 			assert.ok(aliasedSignatureData.success);
 
 			const aliasedCollabData = convertToCollaboratorRecords(collabContents.data);
-			assert.ok(Array.isArray(aliasedCollabData));
+			assert.ok(aliasedCollabData.success && Array.isArray(aliasedCollabData.data));
 
 			const aliasedFileData = convertToFileRecord(fileData.data);
 			assert.ok(aliasedFileData.success);
@@ -208,7 +208,7 @@ describe('File Service', () => {
 				applicationContents: aliasedAppData.data,
 				signatureContents: aliasedSignatureData.data,
 				fileContents: aliasedFileData.data,
-				collaboratorsContents: aliasedCollabData,
+				collaboratorsContents: aliasedCollabData.data,
 			});
 
 			assert.ok(!pdfCreation.success);
