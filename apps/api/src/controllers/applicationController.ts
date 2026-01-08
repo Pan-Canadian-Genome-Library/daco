@@ -87,7 +87,7 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 
 	cron.schedule('0 0 */30 * *', () => {
 		// close after 30 days
-		console.log('\nRunning Every 7th Day\n');
+		console.log('\nClose after 30 days\n');
 	});
 
 	const applicationDTO = convertToBasicApplicationRecord(result.data);
