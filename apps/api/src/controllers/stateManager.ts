@@ -205,6 +205,31 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
+	private async _onSubmitRepRevision() {
+		// Post Rep Revisions Submitted, if still in review 7 days later -> send email reminder
+		cron.schedule(
+			'0 0 */7 * *',
+			async (context) => {
+				const applicationResult = await getApplicationById({ applicationId: this._id });
+
+				if (!applicationResult.success) {
+					return applicationResult;
+				}
+
+				if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
+					console.log(
+						`\nPlease review & submit your application with ID ${this._id} and state Rep Revision Requested\n`,
+					);
+				} else {
+					context.task?.destroy();
+				}
+			},
+			{ noOverlap: true },
+		);
+
+		return success(`Submit Rep Revision email reminder set for application ${this._id}`);
+	}
+
 	async submitDacRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_dac_revisions);
 		if (transitionResult.success) {
@@ -214,8 +239,29 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onSubmit() {
-		return success('post dispatch on submit');
+	private async _onSubmitDacRevision() {
+		// Post Dac Revisions Submitted, if still in review 7 days later -> send email reminder
+		cron.schedule(
+			'0 0 */7 * *',
+			async (context) => {
+				const applicationResult = await getApplicationById({ applicationId: this._id });
+
+				if (!applicationResult.success) {
+					return applicationResult;
+				}
+
+				if (applicationResult.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
+					console.log(
+						`\nPlease review & submit your application with ID ${this._id} and state Dac Revision Requested\n`,
+					);
+				} else {
+					context.task?.destroy();
+				}
+			},
+			{ noOverlap: true },
+		);
+
+		return success(`Submit Dac Revision email reminder set for application ${this._id}`);
 	}
 
 	// Edit
@@ -275,7 +321,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 				}
 
 				if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
-					console.log('\nPlease review & submit your application with state Rep Revision Requested\n');
+					console.log(
+						`\nPlease review & submit your application with ID ${this._id} and state Rep Revision Requested\n`,
+					);
 				} else {
 					context.task?.destroy();
 				}
@@ -283,7 +331,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			{ noOverlap: true },
 		);
 
-		return success(`Submit Rep Review Revision email reminder set for application ${this._id}`);
+		return success(`Submit Rep Revision email reminder set for application ${this._id}`);
 	}
 
 	async reviseDacReview(userName: string) {
@@ -307,7 +355,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 				}
 
 				if (applicationResult.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-					console.log('\nPlease review & submit your application with state Dac Revision Requested\n');
+					console.log(
+						`\nPlease review & submit your application with ID ${this._id} with state Dac Revision Requested\n`,
+					);
 				} else {
 					context.task?.destroy();
 				}
@@ -501,7 +551,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
 		submit_rep_revisions,
 		INSTITUTIONAL_REP_REVIEW,
-		this._onSubmit,
+		this._onSubmitRepRevision,
 	);
 
 	// DAC Review
@@ -522,7 +572,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVISIONS_REQUESTED,
 		submit_dac_revisions,
 		DAC_REVIEW,
-		this._onSubmit,
+		this._onSubmitDacRevision,
 	);
 
 	// Revoke Approval
