@@ -309,7 +309,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onRepRevision() {
+	private async _onRepRevisionRequest() {
 		// Post Rep Revisions Requested, if still in review 7 days later -> send email reminder
 		cron.schedule(
 			'0 0 */7 * *',
@@ -331,7 +331,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			{ noOverlap: true },
 		);
 
-		return success(`Submit Rep Revision email reminder set for application ${this._id}`);
+		return success(`Rep Revision Request email reminder set for application ${this._id}`);
 	}
 
 	async reviseDacReview(userName: string) {
@@ -343,7 +343,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onDacRevision() {
+	private async _onDacRevisionRequest() {
 		// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
 		cron.schedule(
 			'0 0 */7 * *',
@@ -365,7 +365,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			{ noOverlap: true },
 		);
 
-		return success(`Submit DAC Revision email reminder set for application ${this._id}`);
+		return success(`DAC Revision Request email reminder set for application ${this._id}`);
 	}
 
 	// Close
@@ -531,7 +531,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVIEW,
 		rep_revision_request,
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
-		this._onRepRevision,
+		this._onRepRevisionRequest,
 	);
 	private repReviewApproveTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
@@ -562,7 +562,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVIEW,
 		dac_revision_request,
 		DAC_REVISIONS_REQUESTED,
-		this._onDacRevision,
+		this._onDacRevisionRequest,
 	);
 	private dacReviewRejectTransition = transition(DAC_REVIEW, dac_reject, REJECTED, this._onReject);
 	private dacReviewWithdrawTransition = transition(DAC_REVIEW, dac_review_withdraw, DRAFT, this._onWithdrawal);
