@@ -136,9 +136,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 					return actionResult;
 				}
 
-				const { state_after } = actionResult.data;
-				// TODO: Drizzle pgEnum will not accept ApplicationStates as an argument
-				const state = state_after as ApplicationStateValues;
+				const { state_after: state } = actionResult.data;
 				const { id } = this._application;
 				const update = { state };
 				const applicationResult = await applicationRepo.findOneAndUpdate({
@@ -166,7 +164,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Handler Methods
 	// Submit
-	// TODO: Add Validation + Edit Content service methods
 	async submitDraft(userName: string) {
 		const transitionResult = this._canPerformAction(submit);
 		if (!transitionResult.success) {
@@ -185,7 +182,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		// Post Submit Draft, Application has moved to Rep Review, if still in review 7 days later -> send email reminder
 		cron.schedule('0 0 */7 * *', async (context) => {
 			const applicationResult = await getApplicationById({ applicationId: this._id });
-
 			if (!applicationResult.success) {
 				return applicationResult;
 			}
@@ -223,7 +219,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	// Edit
-	// TODO: Add Validation + Edit Content service methods
 	async editDraft() {
 		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
@@ -234,7 +229,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	// TODO: Add Validation + Edit Content service methods
 	async editRepReview() {
 		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
@@ -245,7 +239,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	// TODO: Add Validation + Edit Content service methods
 	async editDacReview() {
 		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
@@ -270,7 +263,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onRepReviewRevision() {
+	private async _onRepRevision() {
 		// Post Rep Revisions Requested, if still in review 7 days later -> send email reminder
 		cron.schedule(
 			'0 0 */7 * *',
@@ -302,7 +295,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onDacReviewRevision() {
+	private async _onDacRevision() {
 		// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
 		cron.schedule(
 			'0 0 */7 * *',
@@ -322,7 +315,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			{ noOverlap: true },
 		);
 
-		return success(`Submit DAC Review Revision email reminder set for application ${this._id}`);
+		return success(`Submit DAC Revision email reminder set for application ${this._id}`);
 	}
 
 	// Close
@@ -376,22 +369,22 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onApproveRepReview() {
-		// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
+		const applicationId = this._id;
 		cron.schedule('0 0 */7 * *', async (context) => {
-			const applicationResult = await getApplicationById({ applicationId: this._id });
-
+			// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
+			const applicationResult = await getApplicationById({ applicationId });
 			if (!applicationResult.success) {
 				return applicationResult;
 			}
 
 			if (applicationResult.data.state === ApplicationStates.DAC_REVIEW) {
-				console.log('\nPlease review & submit your application with state Dac Review\n');
+				console.log(`\nPlease review & submit your application with ID ${applicationId} in state Dac Review\n`);
 			} else {
 				context.task?.destroy();
 			}
 		});
 
-		return success(`Submit Draft email reminder set for application ${this._id}`);
+		return success(`Submit Draft email reminder set for application ${applicationId}`);
 	}
 
 	async approveDacReview(
@@ -488,7 +481,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVIEW,
 		rep_revision_request,
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
-		this._onRepReviewRevision,
+		this._onRepRevision,
 	);
 	private repReviewApproveTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
@@ -519,7 +512,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVIEW,
 		dac_revision_request,
 		DAC_REVISIONS_REQUESTED,
-		this._onDacReviewRevision,
+		this._onDacRevision,
 	);
 	private dacReviewRejectTransition = transition(DAC_REVIEW, dac_reject, REJECTED, this._onReject);
 	private dacReviewWithdrawTransition = transition(DAC_REVIEW, dac_review_withdraw, DRAFT, this._onWithdrawal);

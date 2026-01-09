@@ -80,8 +80,10 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 		return result;
 	}
 
+	const applicationId = result.data.id;
+
 	cron.schedule('0 0 */7 * *', async (context) => {
-		const applicationResult = await getApplicationById({ applicationId: result.data.id });
+		const applicationResult = await getApplicationById({ applicationId });
 
 		if (!applicationResult.success) {
 			return applicationResult;
@@ -89,14 +91,14 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 
 		if (result.data.state === ApplicationStates.DRAFT) {
 			// if still in draft after 7 days -> send email reminder
-			console.log('\nPlease review & submit your application with state DRAFT\n');
+			console.log(`\nPlease review & submit your application with ID ${applicationId} with state DRAFT\n`);
 		} else {
 			context.task?.destroy();
 		}
 	});
 
-	cron.schedule('0 0 */30 * *', async (context) => {
-		const application = await getApplicationById({ applicationId: result.data.id });
+	cron.schedule('0 0 */7 * *', async (context) => {
+		const application = await getApplicationById({ applicationId });
 
 		if (!application.success) {
 			return result;
@@ -104,7 +106,7 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 
 		if (result.data.state === ApplicationStates.DRAFT) {
 			// close after 30 days
-			console.log('\nClosing application after 30 days in DRAFT state\n');
+			console.log(`\nClosing application with ID ${applicationId} after 30 days in DRAFT state\n`);
 		} else {
 			context.task?.destroy();
 		}
