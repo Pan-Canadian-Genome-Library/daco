@@ -443,11 +443,12 @@ describe('Application API', () => {
 
 	describe('Get Revisions', () => {
 		it('DAC revisions request should fail if state is NOT in DAC_REVIEW', async () => {
-			// Find application that is not in DAC_REVIEW state
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id, state: ['APPROVED'] });
-			assert.ok(applicationRecordsResult.success);
-			const testAppId = applicationRecordsResult.data.applications[0]?.id;
-			assert.ok(testAppId);
+			const applicationRecordsResult = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.APPROVED,
+			);
+
+			const testAppId = applicationRecordsResult.id;
 
 			const result = await requestApplicationRevisionsByDac({
 				applicationId: testAppId,
@@ -475,9 +476,12 @@ describe('Application API', () => {
 
 		it('REP revisions request should fail if state is NOT in INSTITUTIONAL_REP_REVIEW', async () => {
 			// Find application that is not in INSTITUTIONAL_REP_REVIEW state
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id, state: ['APPROVED'] });
-			assert.ok(applicationRecordsResult.success);
-			const testAppId = applicationRecordsResult.data.applications[0]?.id;
+			const applicationRecordsResult = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.DAC_REVIEW,
+			);
+
+			const testAppId = applicationRecordsResult.id;
 			assert.ok(testAppId);
 
 			const result = await requestApplicationRevisionsByInstitutionalRep({
@@ -505,42 +509,32 @@ describe('Application API', () => {
 	});
 
 	describe('Submit Application', () => {
-		it('should successfully submit an application in DRAFT state', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+		it('should successfully submit an application in DRAFT', async () => {
+			const applicationRecordsResult = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.DRAFT,
 			);
 
-			const { id } = applicationRecordsResult.data.applications[0];
-			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DRAFT } });
+			const appTestId = applicationRecordsResult.id;
+			const result = await submitApplication({ applicationId: appTestId, userName: testUserName });
 
-			// Act
-			const result = await submitApplication({ applicationId: id, userName: testUserName });
-
-			// Assert
 			assert.ok(result.success);
-			assert.ok(result.data);
+			assert.strictEqual(result.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
 
 			// Verify state transition
-			const updatedApplication = await testApplicationRepo.getApplicationById({ id });
+			const updatedApplication = await testApplicationRepo.getApplicationById({ id: appTestId });
 			assert.ok(updatedApplication.success);
 		});
 
 		it('should fail to submit an application not in DRAFT state', async () => {
-			const applicationRecordsResult = await testApplicationRepo.listApplications({ user_id });
-			assert.ok(applicationRecordsResult.success);
-			assert.ok(
-				Array.isArray(applicationRecordsResult.data.applications) && applicationRecordsResult.data.applications[0],
+			const applicationRecordsResult = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.DAC_REVIEW,
 			);
 
-			const { id } = applicationRecordsResult.data.applications[0];
-			await testApplicationRepo.findOneAndUpdate({ id, update: { state: ApplicationStates.DAC_REVIEW } });
+			const appTestId = applicationRecordsResult.id;
+			const result = await submitApplication({ applicationId: appTestId, userName: testUserName });
 
-			// Act
-			const result = await submitApplication({ applicationId: id, userName: testUserName });
-
-			// Assert
 			assert.ok(!result.success);
 			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 		});
