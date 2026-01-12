@@ -70,6 +70,8 @@ export type FilesModel = typeof files.$inferInsert;
 export type FilesRecord = typeof files.$inferSelect;
 export type FilesUpdate = Partial<FilesRecord>;
 
+export type FilesRecordOptionalContents = Omit<FilesRecord, 'contents'> & { content?: Buffer<ArrayBufferLike> };
+
 export type FilesService = ReturnType<typeof filesSvc>;
 
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
