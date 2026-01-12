@@ -24,10 +24,10 @@ import {
 	type ApplicationRecord,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
-	type FilesRecord,
+	type FilesRecordOptionalContents,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { type SessionAccount, sessionAccount, sessionUser, type SessionUser } from '@/session/validation.ts';
+import { sessionAccount, sessionUser, type SessionAccount, type SessionUser } from '@/session/validation.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationHistoryResponseData,
@@ -188,7 +188,7 @@ export const convertToSignatureRecord = (data: ApplicationSignatureUpdate): Resu
  * @param data type `FileRecord` - File fields from the DB
  * @returns type `FileDTO` - camelCase variation of a Postgres success response.
  */
-export const convertToFileRecord = (data: FilesRecord): Result<FilesDTO, 'SYSTEM_ERROR'> => {
+export const convertToFileRecord = (data: FilesRecordOptionalContents): Result<FilesDTO, 'SYSTEM_ERROR'> => {
 	const camelCaseRecord = objectToCamel(data);
 	const validationResult = fileResponseSchema.safeParse(camelCaseRecord);
 	const result = validationResult.success
