@@ -97,11 +97,11 @@ describe('Application API', () => {
 
 			assert.strictEqual(testApp.state, ApplicationStates.DRAFT);
 
-			const stateUpdate = { state: ApplicationStates.INSTITUTIONAL_REP_REVIEW };
+			const stateUpdate = { state: ApplicationStates.DAC_REVIEW };
 			const reviewRecordResult = await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
 
 			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
-			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.DAC_REVIEW);
 
 			/**
 			 * Applications must be withdrawn before they can be edited.
