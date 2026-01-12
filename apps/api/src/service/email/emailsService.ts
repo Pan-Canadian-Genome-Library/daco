@@ -117,6 +117,50 @@ const emailSvc = () => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	// Periodic reminder Email for the Institutional Rep to Review Application
+	sendEmailInstitutionalRepReminder: async ({
+		id,
+		applicantName,
+		repName,
+		submittedDate,
+		to,
+	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
+				html: GenerateEmailInstitutionalRepReview({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+				text: GenerateEmailInstitutionalRepReviewPlain({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailInstitutionalRepForReview`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 	// Email to Applicant & Notify Institutional Rep Revisions
 	sendEmailApplicantRepRevisions: async ({
 		id,
@@ -198,6 +242,39 @@ const emailSvc = () => ({
 	},
 	// Email to notify DAC for review
 	sendEmailDacForReview: async ({
+		id,
+		applicantName,
+		submittedDate,
+		to,
+	}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
+				html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+				text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailDacForReview`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	// Periodic reminder email for DAC to review application
+	sendEmailDacReviewReminder: async ({
 		id,
 		applicantName,
 		submittedDate,

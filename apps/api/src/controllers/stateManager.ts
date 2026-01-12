@@ -187,7 +187,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 			}
 
 			if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-				console.log('\nPlease review & submit your application with state Rep Review\n');
+				console.log(`\nPlease review & submit your application with ID ${this._id} and state Rep Review\n`);
 			} else {
 				context.task?.destroy();
 			}
