@@ -49,7 +49,16 @@ async function retrieveFile(
 	if (user) {
 		const { fileId } = req.params;
 		const id = parseInt(fileId ? fileId : '');
-		const requestAuthResult = await canAccessRequest(user, id);
+
+		// Grab application id that fileId belongs
+		const fileResult = await getFile({ fileId: id, withBuffer: false });
+
+		if (!fileResult.success) {
+			res.status(404).send({ error: ErrorType.NOT_FOUND, message: `Cannot find file with id: ${id}` });
+			return;
+		}
+
+		const requestAuthResult = await canAccessRequest(user, fileResult.data.applicationId);
 		if (requestAuthResult.success) {
 			if (!isPositiveInteger(id)) {
 				res.status(400).send({ error: ErrorType.INVALID_REQUEST, message: 'Invalid fileId' });
