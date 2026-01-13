@@ -22,7 +22,26 @@ import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core
 
 import { applicationActions } from './applicationActions.ts';
 
-export const emailTypesEnum = pgEnum('email_types', ['SUBMISSION', 'REMINDER']);
+export const emailTypesEnum = pgEnum('email_types', [
+	'WITHDRAW',
+	'CLOSE',
+	'REVOKE',
+	'SUBMIT_FOR_REP_REVIEW',
+	'SUBMIT_FOR_REP_REMINDER',
+	'SUBMIT_REVISIONS_FOR_REP',
+	'SUBMIT_REVISIONS_FOR_REP_REMINDER',
+	'SUBMIT_FOR_DAC_REVIEW',
+	'SUBMIT_FOR_DAC_REMINDER',
+	'SUBMIT_REVISIONS_FOR_DAC',
+	'SUBMIT_REVISIONS_FOR_DAC_REMINDER',
+	'INSTITUTIONAL_REP_REVISION_REQUEST',
+	'INSTITUTIONAL_REP_REVISION_REMINDER',
+	'DAC_REVIEW_REVISION_REQUEST',
+	'DAC_REVIEW_REVISION_REMINDER',
+	'DAC_REVIEW_REJECTED',
+	'DAC_APPROVAL_NOTIFY_APPLICANT',
+	'DAC_APPROVAL_NOTIFY_COLLABORATORS',
+]);
 
 export const sentEmails = pgTable('emails', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
