@@ -125,7 +125,7 @@ describe('File Service', () => {
 
 			assert.ok(fileResponse.success);
 
-			const fileData = await testFileService.getFileById({ fileId: fileResponse.data.id });
+			const fileData = await testFileService.getFileById({ fileId: fileResponse.data.id, withBuffer: true });
 			assert.ok(fileData.success);
 
 			const aliasedAppData = convertToApplicationRecord(applicationContents.data);
@@ -185,7 +185,7 @@ describe('File Service', () => {
 
 			assert.ok(fileResponse.success);
 
-			const fileData = await testFileService.getFileById({ fileId: fileResponse.data.id });
+			const fileData = await testFileService.getFileById({ fileId: fileResponse.data.id, withBuffer: true });
 			assert.ok(fileData.success);
 
 			const aliasedAppData = convertToApplicationRecord(applicationContents.data);
