@@ -28,7 +28,7 @@ import {
 	type FilesService,
 } from '@/service/types.ts';
 import { convertToFileRecord } from '@/utils/aliases.ts';
-import { failure, success, type AsyncResult, type Result } from '@/utils/results.ts';
+import { failure, type AsyncResult, type Result } from '@/utils/results.ts';
 import { FilesDTO, FileTypes } from '@pcgl-daco/data-model';
 import formidable from 'formidable';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.ts';
@@ -133,7 +133,7 @@ export const getFile = async ({
 		const database = getDbInstance();
 		const filesService: FilesService = filesSvc(database);
 
-		const result = await filesService.getFileById({ fileId });
+		const result = await filesService.getFileById({ fileId, withBuffer });
 
 		if (!result.success) {
 			return failure('NOT_FOUND', `Unable to retrieve file with id: ${fileId}`);
@@ -143,11 +143,6 @@ export const getFile = async ({
 
 		if (!aliasedFileRecord.success) {
 			return aliasedFileRecord;
-		}
-
-		// Strip content
-		if (!withBuffer) {
-			return success({ ...aliasedFileRecord.data, content: null });
 		}
 
 		return aliasedFileRecord;

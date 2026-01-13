@@ -26,7 +26,13 @@ import { files } from '@/db/schemas/files.js';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { type FileType } from '@pcgl-daco/data-model';
-import { type FilesModel, type FilesRecord, type JoinedApplicationRecord, type PostgresTransaction } from './types.ts';
+import {
+	FilesRecordOptionalContents,
+	type FilesModel,
+	type FilesRecord,
+	type JoinedApplicationRecord,
+	type PostgresTransaction,
+} from './types.ts';
 
 const logger = BaseLogger.forModule('fileService');
 
@@ -37,11 +43,13 @@ const logger = BaseLogger.forModule('fileService');
 const filesSvc = (db: PostgresDb) => ({
 	getFileById: async ({
 		fileId,
+		withBuffer = false,
 		transaction,
 	}: {
 		fileId: number;
+		withBuffer?: boolean;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<FilesRecord, 'SYSTEM_ERROR'> => {
+	}): AsyncResult<FilesRecordOptionalContents, 'SYSTEM_ERROR'> => {
 		const dbTransaction = transaction ? transaction : db;
 
 		try {
@@ -54,7 +62,7 @@ const filesSvc = (db: PostgresDb) => ({
 						filename: files.filename,
 						submitter_user_id: files.submitter_user_id,
 						submitted_at: files.submitted_at,
-						content: files.content,
+						...(withBuffer ? { content: files.content } : {}),
 					})
 					.from(files)
 					.where(eq(files.id, fileId));

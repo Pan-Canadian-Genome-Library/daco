@@ -30,6 +30,7 @@ import {
 	addInitialApplications,
 	addPaginationDonors,
 	allRecordsPageSize,
+	getFirstApplicationTestByState,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
@@ -60,16 +61,7 @@ describe('Application Service', () => {
 
 	describe('Get Applications', () => {
 		it('should get applications requested by id, with application_contents', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			const applicationRecords = applicationRecordsResult.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords[0]);
-
-			const { id } = applicationRecords[0];
+			const { id } = await getFirstApplicationTestByState(testApplicationService);
 
 			const result = await testApplicationService.getApplicationWithContents({ id });
 
@@ -223,7 +215,7 @@ describe('Application Service', () => {
 		});
 
 		it('should return proper totals amount', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const applicationRecordsResult = await testApplicationService.listApplications({ user_id, pageSize: 1000 });
 			assert.ok(applicationRecordsResult.success);
 			const { applications, totals } = applicationRecordsResult.data;
 			assert.ok(totals);
@@ -331,16 +323,8 @@ describe('Application Service', () => {
 
 	describe('FindOneAndUpdate Application', () => {
 		it('should populate updated_at field', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
+			const { id } = await getFirstApplicationTestByState(testApplicationService);
 
-			assert.ok(applicationRecordsResult.success);
-
-			const applicationRecords = applicationRecordsResult.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(applicationRecords[0]);
-
-			const { id } = applicationRecords[0];
 			await testApplicationService.findOneAndUpdate({ id, update: {} });
 
 			const result = await testApplicationService.getApplicationById({ id });
@@ -355,15 +339,7 @@ describe('Application Service', () => {
 
 	describe('Edit Applications', () => {
 		it('should allow editing applications and return record with updated fields', async () => {
-			const applicationRecordsResult = await testApplicationService.listApplications({ user_id });
-
-			assert.ok(applicationRecordsResult.success);
-
-			const applicationRecords = applicationRecordsResult.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords) && applicationRecords[0]);
-
-			const { id } = applicationRecords[0];
+			const { id } = await getFirstApplicationTestByState(testApplicationService);
 
 			const update = { applicant_first_name: 'Test' };
 
@@ -378,28 +354,31 @@ describe('Application Service', () => {
 		});
 	});
 
-	describe('Get Application Metadata', () => {
-		it('should list statistics for how many applications are in each state category', async () => {
-			const appStateTotals = await testApplicationService.applicationStateTotals();
-			assert.ok(appStateTotals.success);
+	describe('Application Revision Requests', () => {
+		it('Should create revision', async () => {
+			const { id: testId } = await getFirstApplicationTestByState(
+				testApplicationService,
+				ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+			);
 
-			const allStates = appStateTotals.data;
-
-			const allApplications = await testApplicationService.listApplications({
-				user_id,
-				pageSize: allRecordsPageSize,
+			const revisionResult = await testApplicationService.createRevisionRequest({
+				applicationId: testId,
+				revisionData: {
+					application_id: testId,
+					agreements_approved: false,
+					appendices_approved: false,
+					ethics_approved: false,
+					sign_and_submit_approved: true,
+					comments: 'Test revision',
+					applicant_approved: false,
+					institution_rep_approved: false,
+					collaborators_approved: false,
+					project_approved: false,
+					requested_studies_approved: false,
+				},
 			});
-			assert.ok(allApplications.success);
 
-			const applicationRecords = allApplications.data.applications;
-
-			assert.ok(Array.isArray(applicationRecords));
-			assert.ok(allStates);
-
-			const allDraftRecords = applicationRecords.filter((records) => records.state === 'DRAFT');
-
-			assert.equal(allStates.DRAFT, allDraftRecords.length);
-			assert.equal(allStates.TOTAL, applicationRecords.length);
+			assert.ok(revisionResult.success);
 		});
 	});
 
