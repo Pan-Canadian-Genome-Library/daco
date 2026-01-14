@@ -27,12 +27,14 @@ import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
+import DacComments from '@/components/pages/application/collapse/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import { PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
@@ -42,9 +44,14 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions } = useOutletContext<ApplicationOutletContext>();
-	const canEdit = canEditSection({ revisions, section: 'institutional', isEditMode });
+	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const canEdit = canEditSection({
+		revisions,
+		section: 'institutional',
+		isEditMode,
+		userRole: state.applicationUserRole,
+	});
 	const { fields, formState } = state;
 
 	const form = useSectionForm({ section: 'institutional', sectionVisited: formState.sectionsVisited.institutional });
@@ -119,6 +126,10 @@ const Institutional = () => {
 					showLockIcon={!canEdit}
 					text={[translate('institutional-section.description1')]}
 				/>
+				<Row>
+					<DacComments sectionComments={dacComments} section="institutional" />
+					<RevisionsAlert sectionRevisions={revisions['institutional']} />
+				</Row>
 				<SectionContent title={translate('institutional-section.section1')}>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '25%' }}>

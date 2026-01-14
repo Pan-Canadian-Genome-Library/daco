@@ -10,6 +10,7 @@ const API_PROXY_PATH = '/api';
 export default ({ mode }: { mode: string }) => {
 	process.env = { ...process.env, ...loadEnv(mode, process.cwd(), ['VITE', 'API']) };
 	const apiHost = process.env.API_URL || 'http://localhost:3000';
+	const selfEnrolmentData = process.env.VITE_SELF_ENROLMENT_URL || 'VITE_SELF_ENROLMENT_URL';
 
 	// https://vitejs.dev/config/
 	return defineConfig({
@@ -32,6 +33,7 @@ export default ({ mode }: { mode: string }) => {
 		},
 		define: {
 			__API_PROXY_PATH__: JSON.stringify(API_PROXY_PATH),
+			__SELF_ENROLMENT_URL__: JSON.stringify(selfEnrolmentData),
 		},
 		resolve: {
 			alias: {

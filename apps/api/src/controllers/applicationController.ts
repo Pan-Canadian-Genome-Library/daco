@@ -17,10 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type {
+	ApplicationDTO,
+	ApplicationHistoryResponseData,
+	ApplicationResponseData,
+	ApproveApplication,
+	DacCommentRecord,
+	RevisionsDTO,
+} from '@pcgl-daco/data-model';
+import { ApplicationStates } from '@pcgl-daco/data-model';
+import type { SectionRoutesValues, UpdateEditApplicationRequest } from '@pcgl-daco/validation';
+
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
+import { applicationActionSvc } from '@/service/applicationActionService.ts';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
@@ -38,18 +50,15 @@ import {
 } from '@/service/types.js';
 import {
 	convertToApplicationContentsRecord,
+	convertToApplicationHistoryRecord,
 	convertToApplicationRecord,
 	convertToBasicApplicationRecord,
 	convertToCollaboratorRecords,
 	convertToFileRecord,
-	convertToRevisionsRecord,
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
-import { failure, success, type AsyncResult, type Result } from '@/utils/results.js';
+import { failure, type AsyncResult, type Result } from '@/utils/results.js';
 import { validateRevisedFields } from '@/utils/validation.ts';
-import type { ApplicationDTO, ApplicationResponseData, ApproveApplication, RevisionsDTO } from '@pcgl-daco/data-model';
-import { ApplicationStates } from '@pcgl-daco/data-model/src/main.ts';
-import type { UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
 const logger = BaseLogger.forModule('applicationController');
@@ -163,6 +172,8 @@ export const editApplication = async ({
  * @param page - page offset
  * @param pageSize - page limit
  * @param isDACMember - Boolean which represents if the user is a DAC Member (they can see all applications)
+ * @param isApplicantView - Boolean which represents if the user is an applicant (they can only see their own applications)
+ * @param search - text to search
  * @returns Success with list of Applications / Failure with Error
  */
 export const getAllApplications = async ({
@@ -171,13 +182,14 @@ export const getAllApplications = async ({
 	sort,
 	page,
 	pageSize,
-	isDACMember,
+	search,
+	isDAC,
 	isApplicantView,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	if (isDACMember) {
+	if (isDAC) {
 		//If we set UserID to undefined, it will not add in the where clause for limiting by userID.
 		userId = undefined;
 	}
@@ -188,6 +200,7 @@ export const getAllApplications = async ({
 		sort,
 		page,
 		pageSize,
+		search,
 		isApplicantView,
 	});
 
@@ -218,15 +231,24 @@ export const getApplicationById = async ({
 };
 
 /**
- * Gets the total of how many applications are in each state type, including a TOTAL count.
- * @param userId - The ID of the current user.
- * @returns Success with the details of the application / Failure with Error.
+ * Gets Action History for a corresponding application ID
+ * @param applicationId - The ID of the application within the database.
+ * @returns Success with the history of the application / Failure with Error.
  */
-export const getApplicationStateTotals = async () => {
+export const getApplicationHistory = async ({
+	applicationId,
+}: {
+	applicationId: number;
+}): AsyncResult<ApplicationHistoryResponseData, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	const database = getDbInstance();
-	const service: ApplicationService = applicationSvc(database);
+	const applicationActionRepo = applicationActionSvc(database);
 
-	return await service.applicationStateTotals();
+	const result = await applicationActionRepo.listActions({ application_id: applicationId });
+	if (!result.success) return result;
+
+	const aliasedResult = convertToApplicationHistoryRecord(result.data);
+
+	return aliasedResult;
 };
 
 /**
@@ -271,7 +293,7 @@ export const createApplicationPDF = async ({
 		return failure('SYSTEM_ERROR', 'No ethics approval or exemption file was found, unable to generate PDF.');
 	}
 
-	const fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
+	const fileContents = await fileService.getFileById({ fileId: ethicsLetterID, withBuffer: true });
 
 	if (!fileContents.success) {
 		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');
@@ -360,6 +382,7 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
+	userName,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -381,7 +404,7 @@ export const approveApplication = async ({
 			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
 		}
 
-		const approvalResult = await appStateManager.approveDacReview();
+		const approvalResult = await appStateManager.approveDacReview(userName);
 
 		if (!approvalResult.success) {
 			return failure('SYSTEM_ERROR', approvalResult.message);
@@ -450,9 +473,11 @@ export const approveApplication = async ({
 export const dacRejectApplication = async ({
 	applicationId,
 	rejectionReason,
+	userName,
 }: {
 	applicationId: number;
 	rejectionReason: string;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -469,7 +494,7 @@ export const dacRejectApplication = async ({
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		const rejectResult = await appStateManager.rejectDacReview();
+		const rejectResult = await appStateManager.rejectDacReview(userName);
 
 		if (!rejectResult.success) {
 			return failure('INVALID_STATE_TRANSITION', rejectResult.message || 'Failed to reject application.');
@@ -516,8 +541,10 @@ export const dacRejectApplication = async ({
 
 export const submitRevision = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName: string;
 }): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -543,9 +570,9 @@ export const submitRevision = async ({
 
 		let submittedRevision;
 		if (appStateManager.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-			submittedRevision = await appStateManager.submitDacRevision();
+			submittedRevision = await appStateManager.submitDacRevision(userName);
 		} else {
-			submittedRevision = await appStateManager.submitRepRevision();
+			submittedRevision = await appStateManager.submitRepRevision(userName);
 		}
 
 		if (!submittedRevision.success) {
@@ -601,6 +628,7 @@ export const revokeApplication = async (
 	applicationId: number,
 	isDACMember: boolean,
 	revokeReason: string,
+	userName: string,
 ): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -617,7 +645,7 @@ export const revokeApplication = async (
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		const revokeApplicationResult = await appStateManager.revokeApproval();
+		const revokeApplicationResult = await appStateManager.revokeApproval(userName);
 
 		if (!revokeApplicationResult.success) {
 			return revokeApplicationResult;
@@ -657,15 +685,17 @@ export const revokeApplication = async (
 export const requestApplicationRevisionsByDac = async ({
 	applicationId,
 	revisionData,
+	userName,
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const applicationService = applicationSvc(database);
 		const emailService = await emailSvc();
-		const result = await service.getApplicationById({ id: applicationId });
+		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -681,19 +711,28 @@ export const requestApplicationRevisionsByDac = async ({
 			);
 		}
 
-		const revisionResult = await appStateManager.reviseDacReview();
+		const actionResult = await appStateManager.reviseDacReview(userName);
 
-		if (!revisionResult.success) {
-			return revisionResult;
+		if (!actionResult.success) {
+			return actionResult;
 		}
 
-		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+		const revisionRequestResult = await applicationService.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
 			return revisionRequestResult;
 		}
 
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
+		const updateAction = await applicationService.updateApplicationActionRecordRevisionId({
+			actionId: actionResult.data.actionId,
+			revisionId: revisionRequestResult.data.id,
+		});
+
+		if (!updateAction.success) {
+			return updateAction;
+		}
+
+		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
@@ -706,7 +745,7 @@ export const requestApplicationRevisionsByDac = async ({
 		}
 
 		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
 			logger.error(
@@ -738,16 +777,18 @@ export const requestApplicationRevisionsByDac = async ({
 export const requestApplicationRevisionsByInstitutionalRep = async ({
 	applicationId,
 	revisionData,
+	userName,
 }: {
 	applicationId: number;
 	revisionData: RevisionRequestModel;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const applicationService = applicationSvc(database);
 		const emailService = await emailSvc();
 
-		const result = await service.getApplicationById({ id: applicationId });
+		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -763,26 +804,34 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			);
 		}
 
-		const revisionResult = await appStateManager.reviseRepReview();
-
-		if (!revisionResult.success) {
-			return revisionResult;
+		const actionResult = await appStateManager.reviseRepReview(userName);
+		if (!actionResult.success) {
+			return actionResult;
 		}
 
-		const revisionRequestResult = await service.createRevisionRequest({ applicationId, revisionData });
+		const revisionRequestResult = await applicationService.createRevisionRequest({ applicationId, revisionData });
 
 		if (!revisionRequestResult.success) {
 			return revisionRequestResult;
 		}
 
+		const updateAction = await applicationService.updateApplicationActionRecordRevisionId({
+			actionId: actionResult.data.actionId,
+			revisionId: revisionRequestResult.data.id,
+		});
+
+		if (!updateAction.success) {
+			return updateAction;
+		}
+
 		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success) {
 			return resultContents;
 		}
 
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
+		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
@@ -824,8 +873,10 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 
 export const submitApplication = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -848,11 +899,11 @@ export const submitApplication = async ({
 		let submissionResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
-			submissionResult = await appStateManager.submitDraft();
+			submissionResult = await appStateManager.submitDraft(userName);
 		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			submissionResult = await appStateManager.approveRepReview();
+			submissionResult = await appStateManager.approveRepReview(userName);
 		} else {
-			submissionResult = await appStateManager.submitRepRevision();
+			submissionResult = await appStateManager.submitRepRevision(userName);
 		}
 
 		if (!submissionResult.success) {
@@ -918,8 +969,10 @@ export const submitApplication = async ({
 
 export const closeApplication = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -942,13 +995,13 @@ export const closeApplication = async ({
 
 		switch (appStateManager.state) {
 			case ApplicationStates.DRAFT:
-				closeResult = await appStateManager.closeDraft();
+				closeResult = await appStateManager.closeDraft(userName);
 				break;
 			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-				closeResult = await appStateManager.closeRepReview();
+				closeResult = await appStateManager.closeRepReview(userName);
 				break;
 			case ApplicationStates.DAC_REVIEW:
-				closeResult = await appStateManager.closeDacReview();
+				closeResult = await appStateManager.closeDacReview(userName);
 				break;
 			default:
 				return failure('INVALID_STATE_TRANSITION', `Cannot close application in state ${appStateManager.state}.`);
@@ -971,8 +1024,10 @@ export const closeApplication = async ({
 
 export const withdrawApplication = async ({
 	applicationId,
+	userName,
 }: {
 	applicationId: number;
+	userName: string;
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -988,9 +1043,9 @@ export const withdrawApplication = async ({
 
 		let withdrawalRequest;
 		if (appStateManager.state === ApplicationStates.DAC_REVIEW) {
-			withdrawalRequest = await appStateManager.withdrawDacReview();
+			withdrawalRequest = await appStateManager.withdrawDacReview(userName);
 		} else if (appStateManager.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			withdrawalRequest = await appStateManager.withdrawRepReview();
+			withdrawalRequest = await appStateManager.withdrawRepReview(userName);
 		} else {
 			return failure(
 				'INVALID_STATE_TRANSITION',
@@ -1028,18 +1083,61 @@ export const getRevisions = async ({
 			return revisionsResult;
 		}
 
-		const aliasedRevs = revisionsResult.data.map((rev) => convertToRevisionsRecord(rev));
-
-		const filteredFailures = aliasedRevs.filter((results) => !results.success);
-		const filteredSuccesses = aliasedRevs.filter((results) => results.success).map((results) => results.data);
-
-		if (filteredFailures.length) {
-			throw new Error('Failed to alias Revisions Record');
-		} else {
-			return success(filteredSuccesses);
-		}
+		return revisionsResult;
 	} catch (error) {
 		const message = `Failed to fetch revisions for applicationId: ${applicationId}`;
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+export const submitDacComment = async ({
+	applicationId,
+	message,
+	userId,
+	userName,
+	section,
+	toDacChair,
+}: {
+	applicationId: number;
+	message: string;
+	userId: string;
+	userName: string;
+	section: SectionRoutesValues;
+	toDacChair: boolean;
+}): AsyncResult<DacCommentRecord, 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.createDacComment({ applicationId, message, userId, userName, section, toDacChair });
+
+		return result;
+	} catch (error) {
+		const message = `Failed to submit dac comment for applicationId: ${applicationId}`;
+		logger.error(message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+export const getDacComments = async ({
+	applicationId,
+	section,
+	isDac,
+}: {
+	applicationId: number;
+	section: string;
+	isDac: boolean;
+}): AsyncResult<DacCommentRecord[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const service: ApplicationService = applicationSvc(database);
+
+		const result = await service.getDacComment({ applicationId, section, isDac });
+
+		return result;
+	} catch (error) {
+		const message = `Failed to retrieve dac comments for applicationId: ${applicationId} on section: ${section}`;
 		logger.error(message, error);
 		return failure('SYSTEM_ERROR', message);
 	}

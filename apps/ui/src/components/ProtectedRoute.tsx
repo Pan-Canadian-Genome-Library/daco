@@ -30,8 +30,6 @@ type ProtectedRouteProps = PropsWithChildren<{
 	redirectTo?: To;
 }>;
 
-const AUTH_DISABLED = import.meta.env.VITE_DISABLE_AUTH === 'true';
-
 /**
  * Restrict a component from rendering if authorization rules are not met. Can be added to the
  * element of a Route to prevent access to that route.
@@ -54,10 +52,6 @@ const AUTH_DISABLED = import.meta.env.VITE_DISABLE_AUTH === 'true';
  */
 const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteProps) => {
 	const { isLoading, isLoggedIn, role } = useUserContext();
-
-	if (AUTH_DISABLED) {
-		return children;
-	}
 
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 

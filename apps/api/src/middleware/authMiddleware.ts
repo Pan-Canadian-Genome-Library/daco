@@ -17,11 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type Response } from 'express';
+import { RequestHandler, type Response } from 'express';
 
 import type { ErrorResponse, UserRole } from '@pcgl-daco/validation';
-import { RequestHandler } from 'express';
-import { getUserRole } from '../service/authService.js';
+
+import { getUserRole } from '@/service/authService.js';
 
 export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
 
@@ -64,12 +64,13 @@ export const authMiddleware =
 				error: 'UNAUTHORIZED',
 				message: 'This resource is protected and requires authorization.',
 			});
+
 			return;
 		}
 
 		if (requiredRoles) {
-			const role = getUserRole(request.session);
-			if (!requiredRoles.includes(role)) {
+			const userRole = getUserRole(user);
+			if (!requiredRoles.includes(userRole)) {
 				response.status(403).send({
 					error: 'FORBIDDEN',
 					message: 'You do not have the proper permissions to access or modify this resource.',

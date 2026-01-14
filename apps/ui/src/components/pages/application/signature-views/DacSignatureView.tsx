@@ -21,11 +21,15 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import SignatureViewer from '@/components/pages/application/SignatureViewer';
+import RevisionsAlert from '@/components/RevisionsAlert';
 import TextList from '@/components/TextList';
+import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { SignatureDTO } from '@pcgl-daco/data-model';
-import { Flex, Typography } from 'antd';
+import { Flex, Row, Typography } from 'antd';
 import { Trans, useTranslation } from 'react-i18next';
+import { useOutletContext } from 'react-router';
+import DacComments from '../collapse/DacComments';
 
 const { Text } = Typography;
 
@@ -40,6 +44,7 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 	const {
 		state: { fields },
 	} = useApplicationContext();
+	const { revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 
 	const { applicantFirstName, applicantLastName, institutionalRepFirstName, institutionalRepLastName } = fields;
 
@@ -58,6 +63,12 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 					<TextList data={PointArray} />
 				</Flex>
 			</SectionTitle>
+			<SectionContent showDivider={false}>
+				<Row>
+					<DacComments sectionComments={dacComments} section="sign" />
+					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />{' '}
+				</Row>
+			</SectionContent>
 			<SectionContent showDivider={false}>
 				<Flex vertical gap={'large'}>
 					{!signatureLoading ? (

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,27 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
+import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.ts';
+import { dacComments } from '@/db/schemas/dacComments.ts';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import BaseLogger from '@/logger.js';
-import { applicationsQuery } from '@/service/utils.js';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { RevisionsDTO, type ApplicationStateTotals, type DacCommentRecord } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
 	type ApplicationListResponse,
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
-import { collaborators } from '../db/schemas/collaborators.ts';
+import { type SectionRoutesValues } from '@pcgl-daco/validation';
 import {
+	type ApplicationActionRecord,
 	type ApplicationContentModel,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
 	type ApplicationsColumnName,
-	type ApplicationStateTotals,
 	type ApplicationUpdates,
 	type JoinedApplicationRecord,
 	type OrderBy,
@@ -45,6 +48,7 @@ import {
 	type RevisionRequestModel,
 	type RevisionRequestRecord,
 } from './types.js';
+import { applicationsQuery } from './utils.ts';
 
 const logger = BaseLogger.forModule('applicationService');
 
@@ -267,6 +271,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort = [],
 		page = 0,
 		pageSize = 20,
+		search,
 		isApplicantView = false,
 	}: {
 		user_id?: string;
@@ -274,18 +279,33 @@ const applicationSvc = (db: PostgresDb) => ({
 		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
+		search?: string;
 		isApplicantView?: boolean;
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
-			/**
-			 * Ensure that the page size or page somehow passed into here is not negative or not a number.
-			 * This should be handled at at the router layer, but just in-case.
-			 */
-			if (Number.isNaN(page) || Number.isNaN(pageSize)) {
-				throw Error('Page and/or page size must be a positive integer.');
-			} else if (page < 0 || pageSize < 0) {
-				throw Error('Page and/or page size must be non-negative values.');
-			}
+			const transformSearchIntoQuery = (searchText: string) => {
+				const sanitizedSearch = searchText
+					?.trim()
+					.replace(/[^a-zA-Z0-9\s@.\-]/g, '') // Remove special characters except @ . -
+					.trim() // apply trim again in-case user inputs a special characters as the first/last word
+					.replace(/\s+/g, ' | '); // add OR between phrases
+
+				const searchQuery = sql`(
+									setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
+									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
+								)
+     		 @@ to_tsquery('english', ${`%${sanitizedSearch}%` + ':*'})`;
+
+				return searchQuery;
+			};
+
+			const customCount = (state: ApplicationStateValues) => {
+				return sql<number>`COUNT(CASE WHEN ${applications.state} = ${state} THEN ${applications.state} END)`.mapWith(
+					Number,
+				);
+			};
 
 			const rawApplicationRecord = await db
 				.select({
@@ -308,6 +328,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					and(
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						state.length ? inArray(applications.state, state) : undefined,
+						search ? transformSearchIntoQuery(search) : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
@@ -315,13 +336,31 @@ const applicationSvc = (db: PostgresDb) => ({
 				.offset(page * pageSize)
 				.limit(pageSize);
 
-			const applicationRecordsCount = await db.$count(
-				applications,
-				and(
-					user_id ? eq(applications.user_id, String(user_id)) : undefined,
-					state.length ? inArray(applications.state, state) : undefined,
-				),
-			);
+			const countResult = await db
+				.select({
+					APPROVED: customCount(ApplicationStates.APPROVED),
+					CLOSED: customCount(ApplicationStates.CLOSED),
+					DAC_REVIEW: customCount(ApplicationStates.DAC_REVIEW),
+					DAC_REVISIONS_REQUESTED: customCount(ApplicationStates.DAC_REVISIONS_REQUESTED),
+					DRAFT: customCount(ApplicationStates.DRAFT),
+					INSTITUTIONAL_REP_REVIEW: customCount(ApplicationStates.INSTITUTIONAL_REP_REVIEW),
+					REJECTED: customCount(ApplicationStates.REJECTED),
+					INSTITUTIONAL_REP_REVISION_REQUESTED: customCount(ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED),
+					REVOKED: customCount(ApplicationStates.REVOKED),
+					TOTAL: count(),
+				})
+				.from(applications)
+				.where(
+					and(
+						user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						search ? transformSearchIntoQuery(search) : undefined,
+					),
+				)
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+
+			if (!countResult[0]) {
+				return failure('SYSTEM_ERROR', 'Failed to retrieve application totals');
+			}
 
 			let returnableApplications = rawApplicationRecord;
 
@@ -365,12 +404,14 @@ const applicationSvc = (db: PostgresDb) => ({
 				returnableApplications = [...reviewApplications, ...nonReviewApplications];
 			}
 
-			const applicationsList = {
+			const applicationsList: ApplicationListResponse = {
 				applications: returnableApplications,
 				pagingMetadata: {
-					totalRecords: applicationRecordsCount,
 					page: page,
 					pageSize: pageSize,
+				},
+				totals: {
+					...countResult[0],
 				},
 			};
 
@@ -423,7 +464,6 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to retrieve application counts.');
 		}
 	},
-
 	createRevisionRequest: async ({
 		applicationId,
 		revisionData,
@@ -450,23 +490,171 @@ const applicationSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-
-	getRevisions: async ({
-		applicationId,
-	}: {
-		applicationId: number;
-	}): AsyncResult<RevisionRequestModel[], 'SYSTEM_ERROR'> => {
+	getRevisions: async ({ applicationId }: { applicationId: number }): AsyncResult<RevisionsDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const results = await db
-				.select()
-				.from(revisionRequests)
-				.where(eq(revisionRequests.application_id, applicationId))
+				.select({
+					applicationsId: revisionRequests.application_id,
+					applicationActionId: applicationActions.id,
+					applicationAction: applicationActions.action,
+					comments: revisionRequests.comments,
+					applicantNotes: revisionRequests.applicant_notes,
+					applicantApproved: revisionRequests.applicant_approved,
+					institutionRepApproved: revisionRequests.institution_rep_approved,
+					institutionRepNotes: revisionRequests.institution_rep_notes,
+					collaboratorsApproved: revisionRequests.collaborators_approved,
+					collaboratorsNotes: revisionRequests.collaborators_notes,
+					projectApproved: revisionRequests.project_approved,
+					projectNotes: revisionRequests.project_notes,
+					requestedStudiesApproved: revisionRequests.requested_studies_approved,
+					requestedStudiesNotes: revisionRequests.requested_studies_notes,
+					ethicsApproved: revisionRequests.ethics_approved,
+					ethicsNotes: revisionRequests.ethics_notes,
+					agreementsApproved: revisionRequests.agreements_approved,
+					agreementsNotes: revisionRequests.agreements_notes,
+					appendicesApproved: revisionRequests.appendices_approved,
+					appendicesNotes: revisionRequests.appendices_notes,
+					signAndSubmitApproved: revisionRequests.sign_and_submit_approved,
+					signAndSubmitNotes: revisionRequests.sign_and_submit_notes,
+					createdAt: revisionRequests.created_at,
+				})
+				.from(applicationActions)
+				.where(
+					and(
+						eq(revisionRequests.application_id, applicationId),
+						or(
+							eq(applicationActions.action, 'DAC_REVIEW_REVISION_REQUEST'),
+							eq(applicationActions.action, 'INSTITUTIONAL_REP_REVISION_REQUEST'),
+						),
+					),
+				)
+				.innerJoin(revisionRequests, eq(revisionRequests.id, applicationActions.revisions_request_id))
 				.orderBy(desc(revisionRequests.created_at));
 
-			return success(results);
+			const transformResult: RevisionsDTO[] = results.map((revision) => {
+				return {
+					...revision,
+					isDacRequest: revision.applicationAction === 'DAC_REVIEW_REVISION_REQUEST',
+				};
+			});
+
+			return success(transformResult);
 		} catch (error) {
 			const message = `Error while fetching revisions for applicationId: ${applicationId}`;
 			logger.error(message, error);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	updateApplicationActionRecordRevisionId: async ({
+		actionId,
+		revisionId,
+	}: {
+		actionId: number;
+		revisionId: number;
+	}): AsyncResult<ApplicationActionRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const result = await db
+				.update(applicationActions)
+				.set({ revisions_request_id: revisionId })
+				.where(eq(applicationActions.id, actionId))
+				.returning();
+
+			return success(result);
+		} catch (err) {
+			const message = `Error at updateApplicationActionRecord with action id: ${actionId}`;
+			logger.error(message, err);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	createDacComment: async ({
+		applicationId,
+		message,
+		userId,
+		userName,
+		section,
+		toDacChair,
+		transaction,
+	}: {
+		applicationId: number;
+		message: string;
+		userId: string;
+		userName: string;
+		section: SectionRoutesValues;
+		toDacChair: boolean;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<DacCommentRecord, 'SYSTEM_ERROR'> => {
+		try {
+			const dbTransaction = transaction ? transaction : db;
+
+			const result = await dbTransaction.transaction(async (tx) => {
+				const commentRecord = await tx
+					.insert(dacComments)
+					.values({
+						application_id: applicationId,
+						user_id: userId,
+						message,
+						user_name: userName,
+						section: section.toUpperCase(),
+						dac_chair_only: toDacChair,
+					})
+					.returning({
+						id: dacComments.id,
+						applicationId: dacComments.application_id,
+						userId: dacComments.user_id,
+						message: dacComments.message,
+						userName: dacComments.user_name,
+						section: dacComments.section,
+						dacChairOnly: dacComments.dac_chair_only,
+						createdAt: dacComments.created_at,
+					});
+				if (!commentRecord[0]) throw new Error('Failed to insert dac comment');
+				// Returning the inserted comment
+				return commentRecord[0];
+			});
+
+			return success(result);
+		} catch (error) {
+			const message = `Error creating DAC comment for applicationId: ${applicationId}`;
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	getDacComment: async ({
+		applicationId,
+		section,
+		isDac,
+	}: {
+		applicationId: number;
+		section: string;
+		isDac: boolean;
+	}): AsyncResult<DacCommentRecord[], 'SYSTEM_ERROR'> => {
+		try {
+			const commentRecord = await db
+				.select({
+					id: dacComments.id,
+					applicationId: dacComments.application_id,
+					userId: dacComments.user_id,
+					message: dacComments.message,
+					userName: dacComments.user_name,
+					section: dacComments.section,
+					dacChairOnly: dacComments.dac_chair_only,
+					createdAt: dacComments.created_at,
+				})
+				.from(dacComments)
+				.where(
+					and(
+						eq(dacComments.application_id, applicationId), // Grab specific application id
+						eq(dacComments.section, section.toUpperCase()), // Grab specific section
+						isDac ? undefined : eq(dacComments.dac_chair_only, false), // if is dac, then we can return chair comments
+					),
+				);
+
+			return success(commentRecord);
+		} catch (error) {
+			const message = `Error retrieving DAC comments for applicationId: ${applicationId}`;
+			logger.error(message, error);
+
 			return failure('SYSTEM_ERROR', message);
 		}
 	},

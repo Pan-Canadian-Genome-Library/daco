@@ -42,6 +42,9 @@ export const pcglColours = {
 	grey: '#D9D9D9',
 	greyLight: '#FAFAFA',
 	darkGrey: 'rgba(0, 0, 0, 0.45)',
+	blue: '#2F54EB',
+	lighterBlue: '#1677FF',
+	geekBlue: '#F0F5FF',
 };
 
 // General Theme Configurations
@@ -83,6 +86,14 @@ const pcglTheme: ThemeConfig = {
 			fontWeight: 700,
 			defaultColor: pcglColours.black,
 			defaultBg: pcglColours.white,
+		},
+		Timeline: {
+			dotBorderWidth: 3,
+			dotBg: pcglColours.white,
+			itemPaddingBottom: 40,
+			paddingXXS: 0,
+			tailColor: pcglColours.primary,
+			tailWidth: 4,
 		},
 		Typography: {
 			fontSize: 16,

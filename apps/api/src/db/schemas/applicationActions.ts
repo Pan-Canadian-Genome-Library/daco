@@ -21,6 +21,7 @@ import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 import { applications } from './applications.ts';
+import { applicationStatesEnum } from './common.ts';
 import { revisionRequests } from './revisionRequests.ts';
 
 export const applicationActionTypesEnum = pgEnum('application_action_types', [
@@ -42,12 +43,12 @@ export const applicationActions = pgTable('application_actions', {
 	application_id: bigint({ mode: 'number' }).notNull(),
 	created_at: timestamp().notNull().defaultNow(),
 	user_id: varchar({ length: 100 }).notNull(),
+	user_name: varchar({ length: 100 }),
 	action: applicationActionTypesEnum().notNull(),
 	revisions_request_id: bigint({ mode: 'number' }),
-	state_before: varchar({ length: 255 }).notNull(),
-	state_after: varchar({ length: 255 }).notNull(),
+	state_before: applicationStatesEnum().notNull(),
+	state_after: applicationStatesEnum().notNull(),
 });
-// TODO: may need reference to a content diff
 
 export const applicationActionsRelations = relations(applicationActions, ({ one }) => ({
 	application_id: one(applications, {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,6 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import assert from 'node:assert';
+
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { eq } from 'drizzle-orm';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
@@ -27,10 +29,14 @@ import { type PostgresDb } from '@/db/index.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import BaseLogger from '@/logger.js';
+import { ApplicationService } from '@/service/types.ts';
+import { ApplicationListSummary, ApplicationStateValues } from '@pcgl-daco/data-model';
+import { applicationArray } from './mock/application-data.ts';
 
 const logger = BaseLogger.forModule('testUtils');
 
 export const testUserId = 'testUser@oicr.on.ca';
+export const testUserName = 'Test User';
 export const testApplicationId = 1;
 export const testActionId = 1;
 export const PG_DATABASE = 'testUser';
@@ -54,16 +60,16 @@ export const initTestMigration = async (db: PostgresDb) => {
 /** Sets Number of Db Records to Seed @ start of test run using addInitialApplications */
 export const numTestApplications = 20;
 /** Used to bypass pagination impacting test results */
-export const allRecordsPageSize = 5 * numTestApplications;
+export const allRecordsPageSize = 5 * applicationArray.length;
 
 export const addInitialApplications = async (db: PostgresDb) => {
-	const newApplication: typeof applications.$inferInsert = {
-		user_id: testUserId,
-		state: ApplicationStates.DRAFT,
-	};
+	for (let i = 0; i < applicationArray.length; i++) {
+		const newApplication = applicationArray[i];
 
-	/** Create 20 Initial Applications w/ Contents */
-	for (let i = 0; i < numTestApplications; i++) {
+		if (!newApplication) {
+			continue;
+		}
+
 		const newRecord = await db.insert(applications).values(newApplication).returning();
 		if (!newRecord[0]) throw new Error('Error creating test application records');
 
@@ -93,4 +99,26 @@ export const addPaginationDonors = async (db: PostgresDb) => {
 	for (let i = 0; i < 20; i++) {
 		await db.insert(applications).values(newApplication);
 	}
+};
+
+/**
+ * Function returns the first application based on the state provided if provided.
+ * @param state
+ * @returns ApplicationListSummary
+ */
+export const getFirstApplicationTestByState = async (
+	testApplicationRepo: ApplicationService,
+	applicationState?: ApplicationStateValues,
+): Promise<ApplicationListSummary> => {
+	const applicationRecordsResult = await testApplicationRepo.listApplications({
+		user_id: testUserId,
+		state: applicationState ? [applicationState] : undefined,
+	});
+
+	assert.ok(applicationRecordsResult.success);
+
+	const applicationRecords = applicationRecordsResult.data.applications;
+	assert.ok(applicationRecords[0]);
+
+	return applicationRecords[0];
 };

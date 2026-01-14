@@ -17,38 +17,48 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { SessionUser, userRoleSchema } from '@pcgl-daco/validation';
+
 import { authConfig } from '@/config/authConfig.js';
+import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
-import { UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
-import { userRoleSchema } from '@pcgl-daco/validation';
-import type { SessionData } from 'express-session';
+import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService } from './types.ts';
 
 /**
- * getUserRole will check if the user is APPLICANT or DAC_MEMBER
- * Since the INSTITUTIONAL_REP role is determined by its email comparisons between session and institutional_rep email from the application contents
+ * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
+ *
+ * Since the INSTITUTIONAL_REP role is determined by users email
+ * comparisons between session and institutional_rep email from the application contents, the logic
+ * is not included here but instead custom to endpoints that require specific rep functionality.
+ * As such reps will have an APPLICANT role.
+ *
  */
-export function getUserRole(session: Partial<SessionData>): UserRoleOmitRep {
-	const { user } = session;
-
+export function getUserRole(user: SessionUser | undefined): UserRoleOmitRep {
 	if (!user) {
 		return userRoleSchema.Values.ANONYMOUS;
 	}
 
-	const isDacMember = user?.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DACO);
+	const isDacReviewer = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_MEMBER);
+	const isDacChair = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_CHAIR);
 
-	return isDacMember ? userRoleSchema.Values.DAC_MEMBER : userRoleSchema.Values.APPLICANT;
+	if (isDacChair) {
+		return userRoleSchema.Values.DAC_CHAIR;
+	} else if (isDacReviewer) {
+		return userRoleSchema.Values.DAC_MEMBER;
+	}
+	return userRoleSchema.Values.APPLICANT;
 }
 
 /**
  * Based on user data stored in session data, determine the user's role & if the application is associated with them.
  */
-export async function isAssociatedRep(session: Partial<SessionData>, applicationId: number): Promise<Boolean> {
+export async function isAssociatedRep(user: SessionUser, applicationId: number): Promise<Boolean> {
 	const database = getDbInstance();
 	const applicationService: ApplicationService = applicationSvc(database);
-	const { user } = session;
 
 	const app = await applicationService.getApplicationWithContents({ id: applicationId });
 
@@ -64,4 +74,36 @@ export async function isAssociatedRep(session: Partial<SessionData>, application
 	}
 
 	return false;
+}
+
+/**
+ * Validate User is allowed access to this specific Application based on userRole or userId
+ * @param session Session data with user info used to confirm their role and id
+ * @param applicationId - The ID of the application to confirm User's association
+ * @returns boolean
+ */
+export async function canAccessRequest(
+	user: SessionUser,
+	applicationId: number,
+): AsyncResult<void, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
+	const userRole = getUserRole(user);
+
+	const hasSpecialAccess =
+		userRole === userRoleSchema.Values.DAC_MEMBER ||
+		userRole === userRoleSchema.Values.DAC_CHAIR ||
+		(await isAssociatedRep(user, applicationId));
+
+	const result = await getApplicationById({ applicationId });
+	if (result.success) {
+		const { data } = result;
+		const { userId } = user;
+		const canAccess = data.userId === userId || hasSpecialAccess;
+
+		if (!canAccess) {
+			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');
+		}
+	} else {
+		return result;
+	}
+	return success(undefined);
 }
