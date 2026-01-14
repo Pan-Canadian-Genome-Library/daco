@@ -1,6 +1,6 @@
 {
 	"name": "pcgl-daco",
-	"version": "0.0.1",
+	"version": "0.2.0",
 	"description": "Pan Canadian Genome Library DACO",
 	"main": "dist/index.js",
 	"type": "module",
