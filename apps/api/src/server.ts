@@ -34,6 +34,7 @@ import fileRouter from './routes/fileRouter.ts';
 import healthRouter from './routes/healthRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
 import swaggerRouter from './routes/swaggerRouter.ts';
+import scheduler from './scheduler.ts';
 import sessionMiddleware from './session/sessionMiddleware.js';
 
 const logger = BaseLogger.forModule('server');
@@ -45,6 +46,7 @@ const API_PATH_DOCS = `/api-docs`;
 
 const startServer = async () => {
 	const app = express();
+	scheduler();
 
 	app.use(ExpressLogger({ logger, excludeURLs: ['/auth/token'] }));
 

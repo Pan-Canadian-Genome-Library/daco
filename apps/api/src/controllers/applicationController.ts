@@ -17,8 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import cron from 'node-cron';
-
 import type {
 	ApplicationDTO,
 	ApplicationHistoryResponseData,
@@ -79,38 +77,6 @@ export const createApplication = async ({ user_id }: { user_id: string }): Async
 	if (!result.success) {
 		return result;
 	}
-
-	const applicationId = result.data.id;
-
-	cron.schedule('0 0 */7 * *', async (context) => {
-		const applicationResult = await getApplicationById({ applicationId });
-
-		if (!applicationResult.success) {
-			return applicationResult;
-		}
-
-		if (result.data.state === ApplicationStates.DRAFT) {
-			// if still in draft after 7 days -> send email reminder
-			console.log(`\nPlease review & submit your application with ID ${applicationId} with state DRAFT\n`);
-		} else {
-			context.task?.destroy();
-		}
-	});
-
-	cron.schedule('0 0 */7 * *', async (context) => {
-		const application = await getApplicationById({ applicationId });
-
-		if (!application.success) {
-			return result;
-		}
-
-		if (result.data.state === ApplicationStates.DRAFT) {
-			// close after 30 days
-			console.log(`\nClosing application with ID ${applicationId} after 30 days in DRAFT state\n`);
-		} else {
-			context.task?.destroy();
-		}
-	});
 
 	const applicationDTO = convertToBasicApplicationRecord(result.data);
 
