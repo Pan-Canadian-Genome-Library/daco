@@ -83,6 +83,8 @@ const dateConverter = (date: Date | string) => {
  */
 const emailSvc = (db: PostgresDb) => ({
 	/** @method createEmailRecord: Create record of Sent Email */
+	// TODO: Separate and integrate into other methods
+	// TODO: Supply action Ids -
 	createEmailRecord: async ({
 		application_action_id,
 		email_type,
@@ -100,6 +102,7 @@ const emailSvc = (db: PostgresDb) => ({
 		};
 
 		try {
+			// TODO: use get db instance
 			const sentEmail = await db.transaction(async (transaction) => {
 				// Create Application
 				const newEmailRecord = await transaction.insert(sentEmails).values(newEmail).returning();
@@ -132,6 +135,11 @@ const emailSvc = (db: PostgresDb) => ({
 			if (!to) {
 				throw new Error(`Error retrieving address to send email to user id: ${id} `);
 			}
+			// TODO:
+			// const actionResult = await applicationActionRepo.listActions({
+			// 	application_id: id,
+			// 	sort: [{ column: 'created_at', direction: 'desc' }],
+			// });
 
 			const response = await emailClient.sendMail({
 				from: fromAddress,
@@ -150,6 +158,8 @@ const emailSvc = (db: PostgresDb) => ({
 					submittedDate: dateConverter(submittedDate),
 				}),
 			});
+
+			// TODO: create Record
 
 			return success(response);
 		} catch (error) {

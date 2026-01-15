@@ -39,6 +39,8 @@ const dateDiffCheck = ({ created_at, interval = 7 }: { created_at: Date; interva
 const scheduler = async () => {
 	try {
 		cron.schedule('*/5 * * * *', async () => {
+			// TODO: separate job from scheduler in /jobs
+			// TODO: optimization, get all applications by state w/ application action & email tables joined
 			const allApplicationsResult = await getAllApplications({
 				state: [
 					ApplicationStates.DRAFT,
@@ -57,6 +59,7 @@ const scheduler = async () => {
 
 				for (const application of applications) {
 					const { id } = application;
+					// TODO: change to findOne / pageSize 1
 					const actionResult = await applicationActionRepo.listActions({
 						application_id: id,
 						sort: [{ column: 'created_at', direction: 'desc' }],
@@ -71,6 +74,7 @@ const scheduler = async () => {
 
 						const { created_at } = action;
 						const sendReminder = dateDiffCheck({ created_at });
+						// TODO: add check when last email was sent date w/ matching email type
 						if (sendReminder) {
 							sendEmailReminders({ application, action });
 						}
