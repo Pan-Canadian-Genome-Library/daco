@@ -47,7 +47,9 @@ export const emailTypesEnum = pgEnum('email_types', [
 
 export const sentEmails = pgTable('emails', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	application_action_id: bigint({ mode: 'number' }).notNull(),
+	application_action_id: bigint({ mode: 'number' })
+		.notNull()
+		.references(() => applicationActions.id),
 	created_at: timestamp().notNull(),
 	email_type: emailTypesEnum().notNull(),
 	recipient_emails: varchar({ length: 320 }).array().notNull(),

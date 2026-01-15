@@ -17,97 +17,155 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getApplicationById } from '@/controllers/applicationController.js';
-import { ApplicationStates } from '@pcgl-daco/data-model';
+import { getDbInstance } from '@/db/index.js';
+import { emailSvc } from '@/service/email/emailsService.ts';
+import { ApplicationActionRecord } from '@/service/types.ts';
+import { ApplicationListSummary, ApplicationStates, EmailTypes } from '@pcgl-daco/data-model';
 
-export const submitDraftReminder = async (applicationId: number) => {
-	const applicationResult = await getApplicationById({ applicationId });
-	if (!applicationResult.success) {
-		return applicationResult;
-	}
+export const sendEmailReminders = ({
+	application,
+	action,
+}: {
+	application: ApplicationListSummary;
+	action: ApplicationActionRecord;
+}) => {
+	const database = getDbInstance();
+	const emailService = emailSvc(database);
 
-	if (applicationResult.data.state === ApplicationStates.DRAFT) {
-		// if still in draft after 7 days -> send email reminder
-		console.log(`\nPlease review & submit your application with ID ${applicationId} with state DRAFT\n`);
-	}
-};
+	const { applicant, id: applicationId } = application;
+	const { id: application_action_id, created_at, user_name } = action;
 
-export const repReviewReminder = async (applicationId: number) => {
-	// Post Submit Draft, Application has moved to Rep Review, if still in review 7 days later -> send email reminder
-	const applicationResult = await getApplicationById({ applicationId });
-	if (!applicationResult.success) {
-		return applicationResult;
-	}
+	const applicantName = applicant?.firstName ?? 'Test User';
+	const applicantEmail = applicant?.email ?? 'testUser@email.com';
+	const repEmail = applicant?.email ?? 'testUser@email.com';
+	const dacEmail = applicant?.email ?? 'testUser@email.com';
 
-	if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-		console.log(`\nPlease review & submit your application with ID ${applicationId} and state Rep Review\n`);
-	}
-};
+	switch (application.state) {
+		case ApplicationStates.DRAFT:
+			// if still in draft after 7 days -> send email reminder
+			console.log(`\nPlease review & submit your application with ID ${applicationId} with state DRAFT\n`);
 
-export const repSubmitRevisionReminder = async (applicationId: number) => {
-	// Post Rep Revisions Submitted, if still in review 7 days later -> send email reminder
-	const applicationResult = await getApplicationById({ applicationId });
-	if (!applicationResult.success) {
-		return applicationResult;
-	}
-
-	if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
-		console.log(
-			`\nPlease review & submit your application with ID ${applicationId} and state Rep Revision Requested\n`,
-		);
-	}
-};
-
-export const repRevisionRequestReminder = async (applicationId: number) => {
-	// Post Rep Revisions Requested, if still in review 7 days later -> send email reminder
-	const applicationResult = await getApplicationById({ applicationId });
-	if (!applicationResult.success) {
-		return applicationResult;
-	}
-
-	if (applicationResult.data.state === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED) {
-		console.log(
-			`\nPlease review & submit your application with ID ${applicationId} and state Rep Revision Requested\n`,
-		);
-	}
-};
-
-export const dacSubmitRevisionReminder = async (applicationId: number) => {
-	// Post Dac Revisions Submitted, if still in review 7 days later -> send email reminder
-	const applicationResult = await getApplicationById({ applicationId });
-	if (!applicationResult.success) {
-		return applicationResult;
-	}
-
-	if (applicationResult.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-		console.log(
-			`\nPlease review & submit your application with ID ${applicationId} and state Dac Revision Requested\n`,
-		);
-	}
-};
-
-export const dacRevisionRequestReminder = async (applicationId: number) => {
-	// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
-	const applicationResult = await getApplicationById({ applicationId });
-	if (!applicationResult.success) {
-		return applicationResult;
-	}
-
-	if (applicationResult.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-		console.log(
-			`\nPlease review & submit your application with ID ${applicationId} with state Dac Revision Requested\n`,
-		);
-	}
-};
-
-export const dacReviewReminder = async (applicationId: number) => {
-	// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
-	const applicationResult = await getApplicationById({ applicationId });
-	if (!applicationResult.success) {
-		return applicationResult;
-	}
-
-	if (applicationResult.data.state === ApplicationStates.DAC_REVIEW) {
-		console.log(`\nPlease review & submit your application with ID ${applicationId} in state Dac Review\n`);
+			emailService.sendEmailSubmitDraftReminder({
+				id: applicationId,
+				applicantName,
+				submittedDate: created_at,
+				repName: 'The Rep',
+				to: applicantEmail,
+			});
+			emailService.createEmailRecord({
+				application_action_id,
+				email_type: EmailTypes.REMINDER_SUBMIT_DRAFT,
+				recipient_emails: [applicantEmail],
+			});
+			break;
+		case ApplicationStates.DAC_REVIEW:
+			// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
+			console.log(`\nPlease review & submit your application with ID ${applicationId} in state Dac Review\n`);
+			emailService.sendEmailDacReviewReminder({
+				id: applicationId,
+				applicantName,
+				submittedDate: created_at,
+				to: dacEmail,
+			});
+			emailService.createEmailRecord({
+				application_action_id,
+				email_type: EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
+				recipient_emails: [dacEmail],
+			});
+			break;
+		case ApplicationStates.DAC_REVISIONS_REQUESTED: {
+			if (user_name === 'APPLICANT') {
+				// Post Dac Revisions Submitted, if still not submitted 7 days later -> send email reminder
+				console.log(
+					`\nPlease review & submit your application with ID ${applicationId} and state Dac Revision Requested\n`,
+				);
+				emailService.sendEmailSubmitDacRevisionsReminder({
+					id: applicationId,
+					applicantName,
+					repName: 'Mr Rep',
+					submittedDate: created_at,
+					to: applicantEmail,
+				});
+				emailService.createEmailRecord({
+					application_action_id,
+					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
+					recipient_emails: [applicantEmail],
+				});
+			} else if (user_name === 'DAC_MEMBER') {
+				// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
+				console.log(
+					`\nPlease review & submit your application with ID ${applicationId} with state Dac Revision Requested\n`,
+				);
+				emailService.sendEmailDacRevisionsReminder({
+					id: applicationId,
+					applicantName,
+					submittedDate: created_at,
+					repName: 'Mr Rep',
+					to: applicantEmail,
+				});
+				emailService.createEmailRecord({
+					application_action_id,
+					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
+					recipient_emails: [dacEmail],
+				});
+			}
+			break;
+		}
+		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+			// Post Submit Draft, Application has moved to Rep Review, if still in review 7 days later -> send email reminder
+			console.log(`\nPlease review & submit your application with ID ${applicationId} and state Rep Review\n`);
+			emailService.sendEmailRepReviewReminder({
+				id: applicationId,
+				applicantName,
+				submittedDate: created_at,
+				repName: 'Mr Rep',
+				to: applicantEmail,
+			});
+			emailService.createEmailRecord({
+				application_action_id,
+				email_type: EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
+				recipient_emails: [applicantEmail],
+			});
+			break;
+		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
+			if (action.user_name === 'APPLICANT') {
+				// Post Rep Revisions Requested, if still in review 7 days later -> send email reminder
+				console.log(
+					`\nPlease review & submit your application with ID ${applicationId} and state Rep Revision Requested\n`,
+				);
+				emailService.sendEmailSubmitRepRevisionsReminder({
+					id: applicationId,
+					applicantName,
+					submittedDate: created_at,
+					repName: 'Mr Rep',
+					to: applicantEmail,
+				});
+				emailService.createEmailRecord({
+					application_action_id,
+					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
+					recipient_emails: [applicantEmail],
+				});
+			} else if (action.user_name === 'INSTITUTIONAL_REP') {
+				// Post Rep Revisions Submitted, if still in review 7 days later -> send email reminder
+				console.log(
+					`\nPlease review & submit your application with ID ${applicationId} and state Rep Revision Requested\n`,
+				);
+				emailService.sendEmailRepRevisionsReminder({
+					id: applicationId,
+					applicantName,
+					submittedDate: created_at,
+					repName: 'Mr Rep',
+					to: repEmail,
+				});
+				emailService.createEmailRecord({
+					application_action_id,
+					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
+					recipient_emails: [repEmail],
+				});
+			}
+			break;
+		}
+		default:
+			break;
 	}
 };

@@ -24,7 +24,7 @@ import { getAllApplications } from '@/controllers/applicationController.js';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { applicationActionSvc } from '@/service/applicationActionService.ts';
-import { emailSvc } from '@/service/email/emailsService.ts';
+import { sendEmailReminders } from './utils/emailReminders.ts';
 
 const logger = BaseLogger.forModule('Scheduler Error');
 
@@ -54,104 +54,25 @@ const scheduler = async () => {
 				const applications = allApplicationsResult.data.applications;
 				const database = getDbInstance();
 				const applicationActionRepo = applicationActionSvc(database);
-				const emailService = await emailSvc(database);
 
 				for (const application of applications) {
-					const { id, applicant } = application;
-					console.log('application', application);
+					const { id } = application;
 					const actionResult = await applicationActionRepo.listActions({
 						application_id: id,
 						sort: [{ column: 'created_at', direction: 'desc' }],
 					});
 
 					if (actionResult.success) {
-						const actionData = actionResult.data[0];
-						console.log('actionData', actionData);
-						if (!actionData) {
+						const action = actionResult.data[0];
+						if (!action) {
 							logger.error(`Error retrieving actions for application with ID ${application.id}`);
 							continue;
 						}
 
-						const { created_at, user_name } = actionData;
+						const { created_at } = action;
 						const sendReminder = dateDiffCheck({ created_at });
 						if (sendReminder) {
-							const applicantName = applicant?.firstName ?? 'Test User';
-							const applicantEmail = applicant?.email ?? 'testUser@email.com';
-							switch (application.state) {
-								case ApplicationStates.DRAFT:
-									console.log('DRAFT');
-									emailService.sendEmailSubmitDraftReminder({
-										id,
-										applicantName,
-										submittedDate: created_at,
-										repName: 'The Rep',
-										to: applicantEmail,
-									});
-									break;
-								case ApplicationStates.DAC_REVIEW:
-									console.log('DAC_REVIEW');
-									emailService.sendEmailDacReviewReminder({
-										id,
-										applicantName,
-										submittedDate: created_at,
-										to: applicantEmail,
-									});
-									break;
-								case ApplicationStates.DAC_REVISIONS_REQUESTED: {
-									console.log('DAC_REVISIONS_REQUESTED');
-									if (user_name === 'APPLICANT') {
-										emailService.sendEmailSubmitDacRevisionsReminder({
-											id,
-											applicantName,
-											repName: 'Mr Rep',
-											submittedDate: created_at,
-											to: applicantEmail,
-										});
-									} else if (user_name === 'DAC_MEMBER') {
-										emailService.sendEmailDacRevisionsReminder({
-											id,
-											applicantName,
-											submittedDate: created_at,
-											repName: 'Mr Rep',
-											to: applicantEmail,
-										});
-									}
-									break;
-								}
-								case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-									console.log('INSTITUTIONAL_REP_REVIEW');
-									emailService.sendEmailRepReviewReminder({
-										id,
-										applicantName,
-										submittedDate: created_at,
-										repName: 'Mr Rep',
-										to: applicantEmail,
-									});
-									break;
-								case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
-									console.log('INSTITUTIONAL_REP_REVISION_REQUESTED');
-									if (actionData.user_name === 'APPLICANT') {
-										emailService.sendEmailSubmitRepRevisionsReminder({
-											id,
-											applicantName,
-											submittedDate: created_at,
-											repName: 'Mr Rep',
-											to: applicantEmail,
-										});
-									} else if (actionData.user_name === 'INSTITUTIONAL_REP') {
-										emailService.sendEmailRepRevisionsReminder({
-											id,
-											applicantName,
-											submittedDate: created_at,
-											repName: 'Mr Rep',
-											to: applicantEmail,
-										});
-									}
-									break;
-								}
-								default:
-									break;
-							}
+							sendEmailReminders({ application, action });
 						}
 					} else {
 						logger.error(`Error retrieving actions for application with ID ${application.id}`, actionResult.message);
