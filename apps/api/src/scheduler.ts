@@ -24,27 +24,12 @@ import { getAllApplications } from '@/controllers/applicationController.js';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { applicationActionSvc } from '@/service/applicationActionService.ts';
-import { type ApplicationActionRecord } from '@/service/types.js';
-import {
-	dacReviewReminder,
-	dacRevisionRequestReminder,
-	dacSubmitRevisionReminder,
-	repReviewReminder,
-	repRevisionRequestReminder,
-	repSubmitRevisionReminder,
-	submitDraftReminder,
-} from '@/utils/emailReminders.ts';
+import { emailSvc } from '@/service/email/emailsService.ts';
 
 const logger = BaseLogger.forModule('Scheduler Error');
 
-const dateDiffCheck = ({
-	applicationAction,
-	interval = 7,
-}: {
-	applicationAction: ApplicationActionRecord;
-	interval?: number;
-}) => {
-	const actionDate = applicationAction.created_at.getDate();
+const dateDiffCheck = ({ created_at, interval = 7 }: { created_at: Date; interval?: number }) => {
+	const actionDate = created_at.getDate();
 	const currentDate = new Date().getDate();
 	const diff = currentDate - actionDate;
 
@@ -53,7 +38,7 @@ const dateDiffCheck = ({
 
 const scheduler = async () => {
 	try {
-		cron.schedule('5 * * * *', async () => {
+		cron.schedule('*/5 * * * *', async () => {
 			const allApplicationsResult = await getAllApplications({
 				state: [
 					ApplicationStates.DRAFT,
@@ -69,46 +54,98 @@ const scheduler = async () => {
 				const applications = allApplicationsResult.data.applications;
 				const database = getDbInstance();
 				const applicationActionRepo = applicationActionSvc(database);
+				const emailService = await emailSvc();
 
 				for (const application of applications) {
+					const { id, applicant } = application;
+					console.log('application', application);
 					const actionResult = await applicationActionRepo.listActions({
-						application_id: application.id,
+						application_id: id,
 						sort: [{ column: 'created_at', direction: 'desc' }],
 					});
 
 					if (actionResult.success) {
 						const actionData = actionResult.data[0];
+						console.log('actionData', actionData);
 						if (!actionData) {
 							logger.error(`Error retrieving actions for application with ID ${application.id}`);
 							continue;
 						}
 
-						const sendReminder = dateDiffCheck({ applicationAction: actionData });
-
+						const { created_at, user_name } = actionData;
+						const sendReminder = dateDiffCheck({ created_at });
 						if (sendReminder) {
+							const applicantName = applicant?.firstName ?? 'Test User';
+							const applicantEmail = applicant?.email ?? 'testUser@email.com';
 							switch (application.state) {
 								case ApplicationStates.DRAFT:
-									submitDraftReminder(application.id);
+									console.log('DRAFT');
+									emailService.sendEmailSubmitDraftReminder({
+										id,
+										applicantName,
+										submittedDate: created_at,
+										repName: 'The Rep',
+										to: applicantEmail,
+									});
 									break;
 								case ApplicationStates.DAC_REVIEW:
-									dacReviewReminder(application.id);
+									console.log('DAC_REVIEW');
+									emailService.sendEmailDacReviewReminder({
+										id,
+										applicantName,
+										submittedDate: created_at,
+										to: applicantEmail,
+									});
 									break;
 								case ApplicationStates.DAC_REVISIONS_REQUESTED: {
-									if (actionData.user_name === 'APPLICANT') {
-										dacRevisionRequestReminder(application.id);
-									} else if (actionData.user_name === 'INSTITUTIONAL_REP') {
-										dacSubmitRevisionReminder(application.id);
+									console.log('DAC_REVISIONS_REQUESTED');
+									if (user_name === 'APPLICANT') {
+										emailService.sendEmailSubmitDacRevisionsReminder({
+											id,
+											applicantName,
+											repName: 'Mr Rep',
+											submittedDate: created_at,
+											to: applicantEmail,
+										});
+									} else if (user_name === 'DAC_MEMBER') {
+										emailService.sendEmailDacRevisionsReminder({
+											id,
+											applicantName,
+											submittedDate: created_at,
+											repName: 'Mr Rep',
+											to: applicantEmail,
+										});
 									}
 									break;
 								}
 								case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-									repReviewReminder(application.id);
+									console.log('INSTITUTIONAL_REP_REVIEW');
+									emailService.sendEmailRepReviewReminder({
+										id,
+										applicantName,
+										submittedDate: created_at,
+										repName: 'Mr Rep',
+										to: applicantEmail,
+									});
 									break;
 								case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
+									console.log('INSTITUTIONAL_REP_REVISION_REQUESTED');
 									if (actionData.user_name === 'APPLICANT') {
-										repSubmitRevisionReminder(application.id);
+										emailService.sendEmailSubmitRepRevisionsReminder({
+											id,
+											applicantName,
+											submittedDate: created_at,
+											repName: 'Mr Rep',
+											to: applicantEmail,
+										});
 									} else if (actionData.user_name === 'INSTITUTIONAL_REP') {
-										repRevisionRequestReminder(application.id);
+										emailService.sendEmailRepRevisionsReminder({
+											id,
+											applicantName,
+											submittedDate: created_at,
+											repName: 'Mr Rep',
+											to: applicantEmail,
+										});
 									}
 									break;
 								}

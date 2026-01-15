@@ -73,6 +73,50 @@ const dateConverter = (date: Date | string) => {
 };
 
 const emailSvc = () => ({
+	// Periodic reminder Email for the Applicant to Submit Draft
+	sendEmailSubmitDraftReminder: async ({
+		id,
+		applicantName,
+		repName,
+		submittedDate,
+		to,
+	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.REMINDER_SUBMIT_DRAFT,
+				html: GenerateEmailInstitutionalRepReview({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+				text: GenerateEmailInstitutionalRepReviewPlain({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailInstitutionalRepReminder`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 	// Email to the Institutional Rep to Review Application
 	sendEmailInstitutionalRepForReview: async ({
 		id,
@@ -118,7 +162,7 @@ const emailSvc = () => ({
 		}
 	},
 	// Periodic reminder Email for the Institutional Rep to Review Application
-	sendEmailInstitutionalRepReminder: async ({
+	sendEmailRepReviewReminder: async ({
 		id,
 		applicantName,
 		repName,
@@ -202,6 +246,50 @@ const emailSvc = () => ({
 			return success(response);
 		} catch (error) {
 			const message = `Error sending email - sendEmailApplicantRepRevisions`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	// Periodic reminder Email for the Applicant to Submit Revisions
+	sendEmailSubmitRepRevisionsReminder: async ({
+		id,
+		applicantName,
+		repName,
+		submittedDate,
+		to,
+	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+				html: GenerateEmailInstitutionalRepReview({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+				text: GenerateEmailInstitutionalRepReviewPlain({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailRepRevisionsReminder`;
 
 			logger.error(message, error);
 
@@ -377,6 +465,50 @@ const emailSvc = () => ({
 			return success(response);
 		} catch (error) {
 			const message = `Error sending email - sendEmailApplicantDacRevisions`;
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	// Periodic reminder Email for the Applicant to Submit DAC Revisions
+	sendEmailSubmitDacRevisionsReminder: async ({
+		id,
+		applicantName,
+		repName,
+		submittedDate,
+		to,
+	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		try {
+			const {
+				email: { fromAddress },
+			} = getEmailConfig;
+
+			if (!to) {
+				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+			}
+
+			const response = await emailClient.sendMail({
+				from: fromAddress,
+				to,
+				subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+				html: GenerateEmailInstitutionalRepReview({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+				text: GenerateEmailInstitutionalRepReviewPlain({
+					id,
+					applicantName,
+					repName,
+					submittedDate: dateConverter(submittedDate),
+				}),
+			});
+
+			return success(response);
+		} catch (error) {
+			const message = `Error sending email - sendEmailDacRevisionsReminder`;
 
 			logger.error(message, error);
 
