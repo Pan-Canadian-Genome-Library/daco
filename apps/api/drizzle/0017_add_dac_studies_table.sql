@@ -29,7 +29,7 @@ CREATE TABLE "study" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp,
 	"category_id" integer,
-	"acceptingApplications" boolean DEFAULT false,
+	"accepting_applications" boolean DEFAULT false,
 	CONSTRAINT "study_category_id_unique" UNIQUE("category_id")
 );
 --> statement-breakpoint

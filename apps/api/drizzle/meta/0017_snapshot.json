@@ -1,5 +1,5 @@
 {
-	"id": "1b51f0ab-c6ff-4183-8c53-d8d0800fd18f",
+	"id": "60b69887-90b4-4672-9afd-81106ae01406",
 	"prevId": "096d67bd-277e-4db0-9fc0-43bee96db811",
 	"version": "7",
 	"dialect": "postgresql",
@@ -1054,8 +1054,8 @@
 					"primaryKey": false,
 					"notNull": false
 				},
-				"acceptingApplications": {
-					"name": "acceptingApplications",
+				"accepting_applications": {
+					"name": "accepting_applications",
 					"type": "boolean",
 					"primaryKey": false,
 					"notNull": false,
