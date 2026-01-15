@@ -17,10 +17,71 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationListSummary, ApplicationStates, EmailTypes } from '@pcgl-daco/data-model';
+
+import { getAllApplications } from '@/controllers/applicationController.js';
 import { getDbInstance } from '@/db/index.js';
+import BaseLogger from '@/logger.js';
+import { applicationActionSvc } from '@/service/applicationActionService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { ApplicationActionRecord } from '@/service/types.ts';
-import { ApplicationListSummary, ApplicationStates, EmailTypes } from '@pcgl-daco/data-model';
+
+const logger = BaseLogger.forModule('Scheduler Error');
+
+const dateDiffCheck = ({ created_at, interval = 7 }: { created_at: Date; interval?: number }) => {
+	const actionDate = created_at.getDate();
+	const currentDate = new Date().getDate();
+	const diff = currentDate - actionDate;
+	return diff > interval;
+};
+
+export const scheduleEmailReminders = async () => {
+	// TODO: optimization, get all applications by state w/ application action & email tables joined
+	const allApplicationsResult = await getAllApplications({
+		state: [
+			ApplicationStates.DRAFT,
+			ApplicationStates.DAC_REVIEW,
+			ApplicationStates.DAC_REVISIONS_REQUESTED,
+			ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+			ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+		],
+		isDAC: true,
+	});
+
+	if (allApplicationsResult.success) {
+		const applications = allApplicationsResult.data.applications;
+		const database = getDbInstance();
+		const applicationActionRepo = applicationActionSvc(database);
+
+		for (const application of applications) {
+			const { id } = application;
+			// TODO: change to findOne / pageSize 1
+			const actionResult = await applicationActionRepo.listActions({
+				application_id: id,
+				sort: [{ column: 'created_at', direction: 'desc' }],
+			});
+
+			if (actionResult.success) {
+				const action = actionResult.data[0];
+				if (!action) {
+					logger.error(`Error retrieving actions for application with ID ${application.id}`);
+					continue;
+				}
+
+				const { created_at } = action;
+				const sendReminder = dateDiffCheck({ created_at });
+				// TODO: add check when last email was sent date w/ matching email type
+				if (sendReminder) {
+					sendEmailReminders({ application, action });
+				}
+			} else {
+				logger.error(`Error retrieving actions for application with ID ${application.id}`, actionResult.message);
+			}
+		}
+	} else {
+		throw new Error('Error retrieving applications');
+	}
+};
 
 export const sendEmailReminders = ({
 	application,
@@ -44,7 +105,6 @@ export const sendEmailReminders = ({
 		case ApplicationStates.DRAFT:
 			// if still in draft after 7 days -> send email reminder
 			console.log(`\nPlease review & submit your application with ID ${applicationId} with state DRAFT\n`);
-
 			emailService.sendEmailSubmitDraftReminder({
 				id: applicationId,
 				applicantName,
