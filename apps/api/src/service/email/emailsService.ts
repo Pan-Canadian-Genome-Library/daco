@@ -17,12 +17,17 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getEmailConfig } from '@/config/emailConfig.ts';
-import BaseLogger from '@/logger.ts';
-import { AsyncResult, failure, success } from '@/utils/results.ts';
-import emailClient from './index.ts';
-
+import { EmailTypeValues } from '@pcgl-daco/data-model/src/types.js';
 import SMTPPool from 'nodemailer/lib/smtp-pool/index.js';
+
+import { getEmailConfig } from '@/config/emailConfig.ts';
+import { type PostgresDb } from '@/db/index.js';
+import { sentEmails } from '@/db/schemas/sentEmails.ts';
+import BaseLogger from '@/logger.ts';
+import { EmailModel, EmailRecord } from '@/service/types.ts';
+import { AsyncResult, failure, success } from '@/utils/results.ts';
+
+import emailClient from './index.ts';
 import {
 	GenerateEmailApplicantAppSubmitted,
 	GenerateEmailApplicantAppSubmittedPlain,
@@ -72,7 +77,45 @@ const dateConverter = (date: Date | string) => {
 	return formatter.format(new Date(date));
 };
 
-const emailSvc = () => ({
+/**
+ * EmailService provides methods for sending Emails and Creating Sent Email Records
+ * @param db - Drizzle Postgres DB Instance
+ */
+const emailSvc = (db: PostgresDb) => ({
+	/** @method createEmailRecord: Create record of Sent Email */
+	createEmailRecord: async ({
+		application_action_id,
+		email_type,
+		recipient_emails,
+	}: {
+		application_action_id: number;
+		email_type: EmailTypeValues;
+		recipient_emails: string[];
+	}): AsyncResult<EmailRecord, 'SYSTEM_ERROR'> => {
+		const newEmail: EmailModel = {
+			application_action_id,
+			created_at: new Date(),
+			email_type,
+			recipient_emails,
+		};
+
+		try {
+			const sentEmail = await db.transaction(async (transaction) => {
+				// Create Application
+				const newEmailRecord = await transaction.insert(sentEmails).values(newEmail).returning();
+				if (!newEmailRecord[0]) {
+					throw new Error('Application record is undefined');
+				}
+
+				return newEmailRecord[0];
+			});
+
+			return success(sentEmail);
+		} catch (err) {
+			logger.error(`Error at createEmailRecord with application_action_id: ${application_action_id}`);
+			return failure('SYSTEM_ERROR', 'An unexpected database failure occurred, email record was not created.');
+		}
+	},
 	// Periodic reminder Email for the Applicant to Submit Draft
 	sendEmailSubmitDraftReminder: async ({
 		id,

@@ -54,7 +54,7 @@ const scheduler = async () => {
 				const applications = allApplicationsResult.data.applications;
 				const database = getDbInstance();
 				const applicationActionRepo = applicationActionSvc(database);
-				const emailService = await emailSvc();
+				const emailService = await emailSvc(database);
 
 				for (const application of applications) {
 					const { id, applicant } = application;

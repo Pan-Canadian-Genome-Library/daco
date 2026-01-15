@@ -17,12 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { emailSvc } from '@/service/email/emailsService.ts';
-import { EmailService, RevisionRequestModel } from '@/service/types.ts';
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import assert from 'node:assert';
 import { before, describe, it } from 'node:test';
 
+import { connectToDb, type PostgresDb } from '@/db/index.js';
+import { emailSvc } from '@/service/email/emailsService.ts';
+import { EmailService, RevisionRequestModel } from '@/service/types.ts';
+
+import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
+
 describe('Email Service', () => {
+	let db: PostgresDb;
+	let container: StartedPostgreSqlContainer;
 	let testEmailService: EmailService;
 	// Sample revision request data
 	const revisionRequestData: RevisionRequestModel = {
@@ -50,7 +57,19 @@ describe('Email Service', () => {
 	};
 
 	before(async () => {
-		testEmailService = emailSvc();
+		container = await new PostgreSqlContainer()
+			.withUsername(PG_USER)
+			.withPassword(PG_PASSWORD)
+			.withDatabase(PG_DATABASE)
+			.start();
+
+		const connectionString = container.getConnectionUri();
+		db = connectToDb(connectionString);
+
+		await initTestMigration(db);
+		await addInitialApplications(db);
+
+		testEmailService = emailSvc(db);
 	});
 
 	describe('sendEmailInstitutionalRepForReview', () => {

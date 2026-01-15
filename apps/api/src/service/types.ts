@@ -27,8 +27,9 @@ import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
 import { files } from '@/db/schemas/index.js';
-
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
+import { sentEmails } from '@/db/schemas/sentEmails.js';
+
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
@@ -60,21 +61,8 @@ export type ApplicationSignatureUpdate = Pick<
 	| 'institutional_rep_signature'
 	| 'institutional_rep_signed_at'
 >;
-export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
-	contents: ApplicationContentUpdates | null;
-}
 
-export type PDFService = ReturnType<typeof pdfService>;
-
-export type FilesModel = typeof files.$inferInsert;
-export type FilesRecord = typeof files.$inferSelect;
-export type FilesUpdate = Partial<FilesRecord>;
-
-export type FilesService = ReturnType<typeof filesSvc>;
-
-export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
-	contents: ApplicationContentUpdates | null;
-}
+export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
@@ -84,9 +72,15 @@ export type CollaboratorModel = typeof collaborators.$inferInsert;
 export type CollaboratorRecord = typeof collaborators.$inferSelect;
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
-export type SignatureService = ReturnType<typeof signatureService>;
+export type EmailModel = typeof sentEmails.$inferInsert;
+export type EmailRecord = typeof sentEmails.$inferSelect;
+export type EmailService = ReturnType<typeof emailSvc>;
 
-export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
+export type FilesModel = typeof files.$inferInsert;
+export type FilesRecord = typeof files.$inferSelect;
+export type FilesUpdate = Partial<FilesRecord>;
+export type FilesService = ReturnType<typeof filesSvc>;
+
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }
@@ -96,6 +90,7 @@ export type OrderBy<Key extends SchemaKeys> = {
 	column: Key;
 };
 
+export type PDFService = ReturnType<typeof pdfService>;
 export type PostgresTransaction = PgTransaction<
 	NodePgQueryResultHKT,
 	typeof schema,
@@ -105,9 +100,8 @@ export type PostgresTransaction = PgTransaction<
 export type RevisionRequestModel = typeof revisionRequests.$inferInsert;
 export type RevisionRequestRecord = typeof revisionRequests.$inferSelect;
 
-export type EmailService = ReturnType<typeof emailSvc>;
-
 export type SessionType = Request['session'];
+export type SignatureService = ReturnType<typeof signatureService>;
 export interface UserSession extends SessionType {
 	user: SessionUser;
 }

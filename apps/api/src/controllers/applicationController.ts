@@ -388,9 +388,10 @@ export const approveApplication = async ({
 		// Fetch application
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
-		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 		const collaboratorsService = await collaboratorsSvc(database);
+
+		const result = await service.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -484,7 +485,7 @@ export const dacRejectApplication = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -551,7 +552,7 @@ export const submitRevision = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -635,7 +636,7 @@ export const revokeApplication = async (
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -694,7 +695,7 @@ export const requestApplicationRevisionsByDac = async ({
 	try {
 		const database = getDbInstance();
 		const applicationService = applicationSvc(database);
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -786,7 +787,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 	try {
 		const database = getDbInstance();
 		const applicationService = applicationSvc(database);
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		const result = await applicationService.getApplicationById({ id: applicationId });
 
@@ -881,7 +882,7 @@ export const submitApplication = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		// Fetch the application
 		const result = await service.getApplicationById({ id: applicationId });
