@@ -22,8 +22,8 @@ import { boolean, foreignKey, integer, pgEnum, pgTable, text, timestamp, varchar
 
 import { dac } from './dac.ts';
 
-export const studyStatus = pgEnum('study_status', ['ONGOING', 'COMPLETED']);
-export const studyContext = pgEnum('study_context', ['CLINICAL', 'RESEARCH']);
+export const studyStatus = pgEnum('study_status', ['Ongoing', 'Completed']);
+export const studyContext = pgEnum('study_context', ['Clinical', 'Research']);
 
 export const study = pgTable(
 	'study',

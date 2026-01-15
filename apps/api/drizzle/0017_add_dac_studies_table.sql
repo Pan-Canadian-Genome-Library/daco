@@ -1,5 +1,5 @@
-CREATE TYPE "public"."study_context" AS ENUM('CLINICAL', 'RESEARCH');--> statement-breakpoint
-CREATE TYPE "public"."study_status" AS ENUM('ONGOING', 'COMPLETED');--> statement-breakpoint
+CREATE TYPE "public"."study_context" AS ENUM('Clinical', 'Research');--> statement-breakpoint
+CREATE TYPE "public"."study_status" AS ENUM('Ongoing', 'Completed');--> statement-breakpoint
 CREATE TABLE "dac" (
 	"dac_id" text PRIMARY KEY NOT NULL,
 	"dac_name" varchar(255) NOT NULL,

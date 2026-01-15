@@ -1,5 +1,5 @@
 {
-	"id": "d949d43b-225d-4c5b-a725-2b10c8c7cfd9",
+	"id": "1b51f0ab-c6ff-4183-8c53-d8d0800fd18f",
 	"prevId": "096d67bd-277e-4db0-9fc0-43bee96db811",
 	"version": "7",
 	"dialect": "postgresql",
@@ -1144,12 +1144,12 @@
 		"public.study_context": {
 			"name": "study_context",
 			"schema": "public",
-			"values": ["CLINICAL", "RESEARCH"]
+			"values": ["Clinical", "Research"]
 		},
 		"public.study_status": {
 			"name": "study_status",
 			"schema": "public",
-			"values": ["ONGOING", "COMPLETED"]
+			"values": ["Ongoing", "Completed"]
 		}
 	},
 	"schemas": {},
