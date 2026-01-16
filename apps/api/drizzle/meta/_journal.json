@@ -120,6 +120,13 @@
 			"when": 1764886967791,
 			"tag": "0016_add_action_user_name",
 			"breakpoints": true
+		},
+		{
+			"idx": 17,
+			"version": "7",
+			"when": 1768510425584,
+			"tag": "0017_add_dac_studies_table",
+			"breakpoints": true
 		}
 	]
 }
