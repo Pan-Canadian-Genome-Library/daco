@@ -46,7 +46,7 @@ export const study = pgTable(
 		created_at: timestamp().notNull().defaultNow(),
 		updated_at: timestamp(),
 		category_id: integer().unique(),
-		acceptingApplications: boolean().default(false),
+		accepting_applications: boolean().default(false),
 	},
 	(table) => [
 		foreignKey({
