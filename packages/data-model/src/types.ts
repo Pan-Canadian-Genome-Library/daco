@@ -372,7 +372,7 @@ export interface FilesDTO {
 	type: FileType;
 	submitterUserId: string;
 	submittedAt: Date;
-	content: any;
+	content?: any;
 	filename: string | null;
 }
 

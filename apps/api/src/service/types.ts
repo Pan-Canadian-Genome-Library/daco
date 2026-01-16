@@ -64,6 +64,10 @@ export type ApplicationSignatureUpdate = Pick<
 
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 
+export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
+	contents: ApplicationContentUpdates | null;
+}
+
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
 export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
@@ -78,6 +82,7 @@ export type EmailService = ReturnType<typeof emailSvc>;
 
 export type FilesModel = typeof files.$inferInsert;
 export type FilesRecord = typeof files.$inferSelect;
+export type FilesRecordOptionalContents = Omit<FilesRecord, 'content'> & { content?: Buffer<ArrayBufferLike> };
 export type FilesUpdate = Partial<FilesRecord>;
 export type FilesService = ReturnType<typeof filesSvc>;
 

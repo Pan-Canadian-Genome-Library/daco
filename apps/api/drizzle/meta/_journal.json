@@ -124,6 +124,12 @@
 		{
 			"idx": 17,
 			"version": "7",
+			"when": 1768510425584,
+			"tag": "0017_add_dac_studies_table"
+		},
+		{
+			"idx": 18,
+			"version": "7",
 			"when": 1768406992899,
 			"tag": "0017_add_sent_emails_table",
 			"breakpoints": true
