@@ -22,7 +22,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
 import { type ApplicationService, type CollaboratorModel, type CollaboratorsService } from '@/service/types.js';
 import { convertToCollaboratorRecords } from '@/utils/aliases.ts';
-import { failure, success, type AsyncResult } from '@/utils/results.js';
+import { failure, type AsyncResult } from '@/utils/results.js';
 import {
 	type CollaboratorDTO,
 	type CollaboratorsResponseDTO,
@@ -94,7 +94,7 @@ export const createCollaborators = async ({
 
 	const result = convertToCollaboratorRecords(collaboratorsResult.data);
 
-	return success(result);
+	return result;
 };
 
 /**
@@ -140,7 +140,7 @@ export const deleteCollaborator = async ({
 		}
 		const result = convertToCollaboratorRecords(deleteResult.data);
 
-		return success(result);
+		return result;
 	} catch (error) {
 		return failure('SYSTEM_ERROR', 'Unexpected error.');
 	}
@@ -166,7 +166,7 @@ export const listCollaborators = async ({
 			return collaboratorsResult;
 		}
 
-		return success(convertToCollaboratorRecords(collaboratorsResult.data));
+		return convertToCollaboratorRecords(collaboratorsResult.data);
 	} catch (error) {
 		logger.error(`Unable to list collaborators for application with id: ${applicationId}`, error);
 		return failure('SYSTEM_ERROR', 'Unexpected error.');
@@ -249,5 +249,5 @@ export const updateCollaborator = async ({
 
 	const result = convertToCollaboratorRecords(updateResult.data);
 
-	return success(result);
+	return result;
 };

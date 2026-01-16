@@ -27,6 +27,10 @@ export const EmailSubjects = {
 	NOTIFY_REVISION: 'Revisions Requested on Your PCGL DACO Application',
 	NOTIFY_APPROVAL: 'Congratulations! Your DACO Application Has Been Approved',
 	DACO_APPLICATION_STATUS: 'DACO Application Status',
+	DACO_APPLICATION_STATUS_UPDATE: 'DACO Application Status Update',
+	REMINDER_SUBMIT_DRAFT: 'Please Complete Your DACO Application',
+	REMINDER_SUBMIT_REVIEW: 'Reminder: Pending Application Review Required',
+	REMINDER_SUBMIT_REVISIONS: 'Reminder: Action Required – Revisions Requested on Your Application',
 } as const;
 
 export type EmailSubjectsType = (typeof EmailSubjects)[keyof typeof EmailSubjects];

@@ -134,9 +134,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 					return actionResult;
 				}
 
-				const { state_after } = actionResult.data;
-				// TODO: Drizzle pgEnum will not accept ApplicationStates as an argument
-				const state = state_after as ApplicationStateValues;
+				const { state_after: state } = actionResult.data;
 				const { id } = this._application;
 				const update = { state };
 				const applicationResult = await applicationRepo.findOneAndUpdate({
@@ -164,7 +162,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 	// Handler Methods
 	// Submit
-	// TODO: Add Validation + Edit Content service methods
 	async submitDraft(userName: string) {
 		const transitionResult = this._canPerformAction(submit);
 		if (!transitionResult.success) {
@@ -179,6 +176,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
+	private async _onSubmitDraft() {
+		return success(`Submit Draft email reminder set for application ${this._id}`);
+	}
+
 	async submitRepRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_rep_revisions);
 		if (transitionResult.success) {
@@ -186,6 +187,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
+	}
+
+	private async _onSubmitRepRevision() {
+		return success(`Submit Rep Revision email reminder set for application ${this._id}`);
 	}
 
 	async submitDacRevision(userName: string) {
@@ -197,12 +202,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onSubmit() {
-		return success('post dispatch on submit');
+	private async _onSubmitDacRevision() {
+		return success(`Submit Dac Revision email reminder set for application ${this._id}`);
 	}
 
 	// Edit
-	// TODO: Add Validation + Edit Content service methods
 	async editDraft() {
 		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
@@ -213,7 +217,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	// TODO: Add Validation + Edit Content service methods
 	async editRepReview() {
 		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
@@ -224,7 +227,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	// TODO: Add Validation + Edit Content service methods
 	async editDacReview() {
 		const transitionResult = this._canPerformAction(edit);
 		if (transitionResult.success) {
@@ -249,6 +251,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
+	private async _onRepRevisionRequest() {
+		return success(`Rep Revision Request email reminder set for application ${this._id}`);
+	}
+
 	async reviseDacReview(userName: string) {
 		const transitionResult = this._canPerformAction(dac_revision_request);
 		if (transitionResult.success) {
@@ -258,8 +264,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onRevision() {
-		return success('post dispatch on revision');
+	private async _onDacRevisionRequest() {
+		return success(`DAC Revision Request email reminder set for application ${this._id}`);
 	}
 
 	// Close
@@ -310,6 +316,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
+	}
+
+	private async _onApproveRepReview() {
+		return success(`Submit Draft email reminder set for application ${this._id}`);
 	}
 
 	async approveDacReview(
@@ -390,7 +400,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	 * Transitions *
 	 * *********** */
 	// Draft
-	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
+	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmitDraft);
 	private draftEditTransition = transition(DRAFT, edit, DRAFT, this._onEdit);
 	private draftCloseTransition = transition(DRAFT, close, CLOSED, this._onClose);
 
@@ -406,13 +416,13 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVIEW,
 		rep_revision_request,
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
-		this._onRevision,
+		this._onRepRevisionRequest,
 	);
 	private repReviewApproveTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
 		rep_approve_review,
 		DAC_REVIEW,
-		this._onApproved,
+		this._onApproveRepReview,
 	);
 	private repReviewWithdrawTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
@@ -426,7 +436,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
 		submit_rep_revisions,
 		INSTITUTIONAL_REP_REVIEW,
-		this._onSubmit,
+		this._onSubmitRepRevision,
 	);
 
 	// DAC Review
@@ -437,7 +447,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVIEW,
 		dac_revision_request,
 		DAC_REVISIONS_REQUESTED,
-		this._onRevision,
+		this._onDacRevisionRequest,
 	);
 	private dacReviewRejectTransition = transition(DAC_REVIEW, dac_reject, REJECTED, this._onReject);
 	private dacReviewWithdrawTransition = transition(DAC_REVIEW, dac_review_withdraw, DRAFT, this._onWithdrawal);
@@ -447,7 +457,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVISIONS_REQUESTED,
 		submit_dac_revisions,
 		DAC_REVIEW,
-		this._onSubmit,
+		this._onSubmitDacRevision,
 	);
 
 	// Revoke Approval
