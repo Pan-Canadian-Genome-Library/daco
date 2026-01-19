@@ -1,2 +1,0 @@
-ALTER TABLE "applications" ADD COLUMN "dac_id" text NOT NULL;--> statement-breakpoint
-ALTER TABLE "applications" ADD CONSTRAINT "dac_id_fk" FOREIGN KEY ("dac_id") REFERENCES "public"."dac"("dac_id") ON DELETE no action ON UPDATE no action;
