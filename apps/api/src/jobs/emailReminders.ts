@@ -17,18 +17,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationListSummary, ApplicationStates, EmailTypes } from '@pcgl-daco/data-model';
+import { ApplicationStates, ApplicationStateValues, EmailTypes } from '@pcgl-daco/data-model';
 
-import { getAllApplications } from '@/controllers/applicationController.js';
 import { getDbInstance } from '@/db/index.js';
-import BaseLogger from '@/logger.js';
-import { applicationActionSvc } from '@/service/applicationActionService.ts';
+import BaseLogger from '@/logger.ts';
+import { applicationSvc } from '@/service/applicationService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
-import { ApplicationActionRecord } from '@/service/types.ts';
+import { type ApplicationActionRecord, type ApplicationContentRecord, type EmailRecord } from '@/service/types.ts';
 
-const logger = BaseLogger.forModule('Scheduler Error');
+const logger = BaseLogger.forModule('Email Reminders');
 
-const dateDiffCheck = ({ created_at, interval = 7 }: { created_at: Date; interval?: number }) => {
+const dateDiffCheck = ({
+	created_at,
+	interval = 7,
+	sentEmails = [],
+}: {
+	created_at: Date;
+	sentEmails: EmailRecord[] | null;
+	interval?: number;
+}) => {
 	const actionDate = created_at.getDate();
 	const currentDate = new Date().getDate();
 	const diff = currentDate - actionDate;
@@ -36,8 +43,9 @@ const dateDiffCheck = ({ created_at, interval = 7 }: { created_at: Date; interva
 };
 
 export const scheduleEmailReminders = async () => {
-	// TODO: optimization, get all applications by state w/ application action & email tables joined
-	const allApplicationsResult = await getAllApplications({
+	const database = getDbInstance();
+	const applicationService = applicationSvc(database);
+	const allApplicationsResult = await applicationService.getEmailActionDetails({
 		state: [
 			ApplicationStates.DRAFT,
 			ApplicationStates.DAC_REVIEW,
@@ -45,63 +53,60 @@ export const scheduleEmailReminders = async () => {
 			ApplicationStates.INSTITUTIONAL_REP_REVIEW,
 			ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
 		],
-		isDAC: true,
 	});
 
 	if (allApplicationsResult.success) {
-		const applications = allApplicationsResult.data.applications;
-		const database = getDbInstance();
-		const applicationActionRepo = applicationActionSvc(database);
-
+		const applications = allApplicationsResult.data;
 		for (const application of applications) {
-			const { id } = application;
 			// TODO: change to findOne / pageSize 1
-			const actionResult = await applicationActionRepo.listActions({
-				application_id: id,
-				sort: [{ column: 'created_at', direction: 'desc' }],
-			});
+			const {
+				application_id,
+				state,
+				application_actions: applicationActions,
+				application_contents: applicationContents,
+				sent_emails: sentEmails,
+			} = application;
 
-			if (actionResult.success) {
-				const action = actionResult.data[0];
-				if (!action) {
-					logger.error(`Error retrieving actions for application with ID ${application.id}`);
-					continue;
-				}
-
-				const { created_at } = action;
-				const sendReminder = dateDiffCheck({ created_at });
-				// TODO: add check when last email was sent date w/ matching email type
-				if (sendReminder) {
-					sendEmailReminders({ application, action });
-				}
-			} else {
-				logger.error(`Error retrieving actions for application with ID ${application.id}`, actionResult.message);
+			const action = applicationActions ? applicationActions[0] : null;
+			if (!action || !applicationContents) {
+				logger.error(`Error retrieving actions for application with ID ${application_id}`);
+				continue;
+			}
+			// TODO: add check when last email was sent date w/ matching email type
+			const { created_at } = action;
+			const sendReminder = dateDiffCheck({ created_at, sentEmails });
+			if (sendReminder) {
+				sendEmailReminders({ applicationId: application_id, applicationContents, action, state });
 			}
 		}
 	} else {
+		console.log(allApplicationsResult);
 		throw new Error('Error retrieving applications');
 	}
 };
 
 export const sendEmailReminders = ({
-	application,
+	applicationId,
+	state,
+	applicationContents,
 	action,
 }: {
-	application: ApplicationListSummary;
+	applicationId: number;
+	state: ApplicationStateValues;
+	applicationContents: ApplicationContentRecord;
 	action: ApplicationActionRecord;
 }) => {
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
 
-	const { applicant, id: applicationId } = application;
 	const { id: application_action_id, created_at, user_name } = action;
 
-	const applicantName = applicant?.firstName ?? 'Test User';
-	const applicantEmail = applicant?.email ?? 'testUser@email.com';
-	const repEmail = applicant?.email ?? 'testUser@email.com';
-	const dacEmail = applicant?.email ?? 'testUser@email.com';
+	const applicantName = applicationContents.applicant_first_name ?? 'Test User';
+	const applicantEmail = applicationContents.applicant_institutional_email ?? 'testUser@email.com';
+	const repEmail = applicationContents.institutional_rep_email ?? 'testUser@email.com';
+	const dacEmail = applicationContents.institutional_rep_email ?? 'testUser@email.com';
 
-	switch (application.state) {
+	switch (state) {
 		case ApplicationStates.DRAFT:
 			// if still in draft after 7 days -> send email reminder
 			console.log(`\nPlease review & submit your application with ID ${applicationId} with state DRAFT\n`);
@@ -113,6 +118,7 @@ export const sendEmailReminders = ({
 				to: applicantEmail,
 			});
 			emailService.createEmailRecord({
+				application_id: applicationId,
 				application_action_id,
 				email_type: EmailTypes.REMINDER_SUBMIT_DRAFT,
 				recipient_emails: [applicantEmail],
@@ -128,6 +134,7 @@ export const sendEmailReminders = ({
 				to: dacEmail,
 			});
 			emailService.createEmailRecord({
+				application_id: applicationId,
 				application_action_id,
 				email_type: EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
 				recipient_emails: [dacEmail],
@@ -147,6 +154,7 @@ export const sendEmailReminders = ({
 					to: applicantEmail,
 				});
 				emailService.createEmailRecord({
+					application_id: applicationId,
 					application_action_id,
 					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
 					recipient_emails: [applicantEmail],
@@ -164,6 +172,7 @@ export const sendEmailReminders = ({
 					to: applicantEmail,
 				});
 				emailService.createEmailRecord({
+					application_id: applicationId,
 					application_action_id,
 					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
 					recipient_emails: [dacEmail],
@@ -182,6 +191,7 @@ export const sendEmailReminders = ({
 				to: applicantEmail,
 			});
 			emailService.createEmailRecord({
+				application_id: applicationId,
 				application_action_id,
 				email_type: EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
 				recipient_emails: [applicantEmail],
@@ -201,6 +211,7 @@ export const sendEmailReminders = ({
 					to: applicantEmail,
 				});
 				emailService.createEmailRecord({
+					application_id: applicationId,
 					application_action_id,
 					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
 					recipient_emails: [applicantEmail],
@@ -218,6 +229,7 @@ export const sendEmailReminders = ({
 					to: repEmail,
 				});
 				emailService.createEmailRecord({
+					application_id: applicationId,
 					application_action_id,
 					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
 					recipient_emails: [repEmail],

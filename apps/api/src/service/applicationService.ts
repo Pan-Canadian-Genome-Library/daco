@@ -19,15 +19,6 @@
 
 import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
-import { type PostgresDb } from '@/db/index.js';
-import { applicationActions } from '@/db/schemas/applicationActions.ts';
-import { applicationContents } from '@/db/schemas/applicationContents.js';
-import { applications } from '@/db/schemas/applications.js';
-import { collaborators } from '@/db/schemas/collaborators.ts';
-import { dacComments } from '@/db/schemas/dacComments.ts';
-import { revisionRequests } from '@/db/schemas/revisionRequests.js';
-import BaseLogger from '@/logger.js';
-import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { RevisionsDTO, type ApplicationStateTotals, type DacCommentRecord } from '@pcgl-daco/data-model';
 import {
 	ApplicationStates,
@@ -35,6 +26,17 @@ import {
 	type ApplicationStateValues,
 } from '@pcgl-daco/data-model/src/types.js';
 import { type SectionRoutesValues } from '@pcgl-daco/validation';
+
+import { type PostgresDb } from '@/db/index.js';
+import { applicationActions } from '@/db/schemas/applicationActions.ts';
+import { applicationContents } from '@/db/schemas/applicationContents.js';
+import { applications } from '@/db/schemas/applications.js';
+import { collaborators } from '@/db/schemas/collaborators.ts';
+import { dacComments } from '@/db/schemas/dacComments.ts';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
+import { sentEmails } from '@/db/schemas/sentEmails.ts';
+import BaseLogger from '@/logger.js';
+import { failure, success, type AsyncResult } from '@/utils/results.js';
 import {
 	type ApplicationActionRecord,
 	type ApplicationContentModel,
@@ -42,6 +44,7 @@ import {
 	type ApplicationRecord,
 	type ApplicationsColumnName,
 	type ApplicationUpdates,
+	type JoinedApplicationEmailsActionsRecord,
 	type JoinedApplicationRecord,
 	type OrderBy,
 	type PostgresTransaction,
@@ -656,6 +659,67 @@ const applicationSvc = (db: PostgresDb) => ({
 			logger.error(message, error);
 
 			return failure('SYSTEM_ERROR', message);
+		}
+	},
+
+	/**
+	 * @method getEmailActionDetails: Find multiple Application records with Previous Action & Email data
+	 */
+	getEmailActionDetails: async ({
+		state = [],
+		sort = [],
+		page = 0,
+		pageSize = 20,
+	}: {
+		state: ApplicationStateValues[];
+		sort?: Array<OrderBy<ApplicationsColumnName>>;
+		page?: number;
+		pageSize?: number;
+	}): AsyncResult<JoinedApplicationEmailsActionsRecord[], 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
+		try {
+			// TODO: Optimize & Refactor using Drizzle Join or Query syntax
+			const applicationRecords = await db
+				.select()
+				.from(applications)
+				.where(and(state.length ? inArray(applications.state, state) : undefined))
+				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+
+			const formattedApplicationRecords = await Promise.all(
+				applicationRecords
+					.map((app) => ({
+						application_id: app.applications.id,
+						user_id: app.applications.user_id,
+						state: app.applications.state,
+						application_contents: app.application_contents,
+					}))
+					.map(async (applicationRecord) => {
+						const application_actions = await db
+							.select()
+							.from(applicationActions)
+							.where((action) => eq(action.application_id, applicationRecord.application_id));
+
+						const actionIds = application_actions.map((action) => action.id);
+						const sent_emails = await db
+							.select()
+							.from(sentEmails)
+							.where((email) =>
+								and(
+									eq(email.application_id, applicationRecord.application_id),
+									inArray(email.application_action_id, actionIds),
+								),
+							);
+
+						return { ...applicationRecord, application_actions, sent_emails };
+					}),
+			);
+
+			// .offset(page * pageSize)
+			// .limit(pageSize);
+
+			return success(formattedApplicationRecords);
+		} catch (err) {
+			logger.error(`Error at getEmailActionDetails`, err);
+			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to list applications.');
 		}
 	},
 });

@@ -86,15 +86,18 @@ const emailSvc = (db: PostgresDb) => ({
 	// TODO: Separate and integrate into other methods
 	// TODO: Supply action Ids -
 	createEmailRecord: async ({
+		application_id,
 		application_action_id,
 		email_type,
 		recipient_emails,
 	}: {
+		application_id: number;
 		application_action_id: number;
 		email_type: EmailTypeValues;
 		recipient_emails: string[];
 	}): AsyncResult<EmailRecord, 'SYSTEM_ERROR'> => {
 		const newEmail: EmailModel = {
+			application_id,
 			application_action_id,
 			created_at: new Date(),
 			email_type,

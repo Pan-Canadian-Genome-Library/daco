@@ -29,6 +29,7 @@ import * as schema from '@/db/schemas/index.js';
 import { files } from '@/db/schemas/index.js';
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { sentEmails } from '@/db/schemas/sentEmails.js';
+import { ApplicationStateValues } from '@pcgl-daco/data-model';
 
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -49,6 +50,7 @@ export type ApplicationUpdates = Partial<ApplicationModel>;
 export type ApplicationService = ReturnType<typeof applicationSvc>;
 
 export type ApplicationContentModel = typeof applicationContents.$inferInsert;
+export type ApplicationContentRecord = typeof applicationContents.$inferSelect;
 export type ApplicationContentUpdates = Omit<
 	Partial<ApplicationContentModel>,
 	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
@@ -88,6 +90,15 @@ export type FilesService = ReturnType<typeof filesSvc>;
 
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
+}
+
+export interface JoinedApplicationEmailsActionsRecord {
+	application_id: number;
+	user_id: string;
+	state: ApplicationStateValues;
+	application_contents: ApplicationContentRecord | null;
+	application_actions: ApplicationActionRecord[] | null;
+	sent_emails: EmailRecord[] | null;
 }
 
 export type OrderBy<Key extends SchemaKeys> = {

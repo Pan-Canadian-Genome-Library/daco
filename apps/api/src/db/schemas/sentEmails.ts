@@ -21,6 +21,7 @@ import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 import { applicationActions } from './applicationActions.ts';
+import { applications } from './applications.ts';
 
 export const emailTypesEnum = pgEnum('email_types', [
 	'NOTIFY_APPLICANT_WITHDRAW',
@@ -47,6 +48,9 @@ export const emailTypesEnum = pgEnum('email_types', [
 
 export const sentEmails = pgTable('emails', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+	application_id: bigint({ mode: 'number' })
+		.notNull()
+		.references(() => applications.id),
 	application_action_id: bigint({ mode: 'number' })
 		.notNull()
 		.references(() => applicationActions.id),
@@ -56,6 +60,10 @@ export const sentEmails = pgTable('emails', {
 });
 
 export const emailsRelations = relations(sentEmails, ({ one }) => ({
+	application_id: one(applications, {
+		fields: [sentEmails.application_id],
+		references: [applications.id],
+	}),
 	application_action_id: one(applicationActions, {
 		fields: [sentEmails.application_action_id],
 		references: [applicationActions.id],
