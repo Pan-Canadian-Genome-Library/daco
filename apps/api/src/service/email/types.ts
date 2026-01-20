@@ -43,6 +43,7 @@ export type BaseEmailType = {
 export type GenerateInstitutionalRepType = {
 	id: string | number;
 	repName: string;
+	actionId?: number;
 	applicantName: string;
 	submittedDate: Date | string;
 	// NOTE: sign up url for the institutional rep, subject to change
@@ -64,6 +65,8 @@ export type GenerateApproveType = {
 export type GenerateDacRevisionType = {
 	id: string | number;
 	applicantName: string;
+	repName?: string;
+	actionId?: number;
 	submittedDate: Date | string;
 } & BaseEmailType;
 
@@ -76,9 +79,11 @@ export type GenerateApplicantRevisionType = {
 export type GenerateApplicantRepRevisionType = {
 	id: string | number;
 	applicantName: string;
-	institutionalRepFirstName: string;
-	institutionalRepLastName: string;
-	comments: RevisionRequestModel;
+	actionId?: number;
+	institutionalRepFirstName?: string;
+	institutionalRepLastName?: string;
+	repName?: string;
+	comments?: RevisionRequestModel;
 } & BaseEmailType;
 
 export type GenerateRevokeType = {

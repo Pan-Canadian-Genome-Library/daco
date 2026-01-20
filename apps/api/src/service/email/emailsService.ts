@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { EmailTypeValues } from '@pcgl-daco/data-model/src/types.js';
+import { EmailTypeValues, EmailTypes } from '@pcgl-daco/data-model/src/types.js';
 import SMTPPool from 'nodemailer/lib/smtp-pool/index.js';
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
@@ -81,18 +81,15 @@ const dateConverter = (date: Date | string) => {
  * EmailService provides methods for sending Emails and Creating Sent Email Records
  * @param db - Drizzle Postgres DB Instance
  */
-const emailSvc = (db: PostgresDb) => ({
-	/** @method createEmailRecord: Create record of Sent Email */
-	// TODO: Separate and integrate into other methods
-	// TODO: Supply action Ids -
-	createEmailRecord: async ({
+const emailSvc = (db: PostgresDb) => {
+	const createEmailRecord = async ({
 		application_id,
 		application_action_id,
 		email_type,
 		recipient_emails,
 	}: {
 		application_id: number;
-		application_action_id: number;
+		application_action_id?: number;
 		email_type: EmailTypeValues;
 		recipient_emails: string[];
 	}): AsyncResult<EmailRecord, 'SYSTEM_ERROR'> => {
@@ -105,9 +102,7 @@ const emailSvc = (db: PostgresDb) => ({
 		};
 
 		try {
-			// TODO: use get db instance
 			const sentEmail = await db.transaction(async (transaction) => {
-				// Create Application
 				const newEmailRecord = await transaction.insert(sentEmails).values(newEmail).returning();
 				if (!newEmailRecord[0]) {
 					throw new Error('Application record is undefined');
@@ -118,672 +113,728 @@ const emailSvc = (db: PostgresDb) => ({
 
 			return success(sentEmail);
 		} catch (err) {
-			logger.error(`Error at createEmailRecord with application_action_id: ${application_action_id}`);
+			logger.error(`Error at createEmailRecord with application_id: ${application_id}`);
 			return failure('SYSTEM_ERROR', 'An unexpected database failure occurred, email record was not created.');
 		}
-	},
-	// Periodic reminder Email for the Applicant to Submit Draft
-	sendEmailSubmitDraftReminder: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+	};
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+	return {
+		// Periodic reminder Email for the Applicant to Submit Draft
+		sendEmailSubmitDraftReminder: async ({
+			id,
+			applicantName,
+			actionId,
+			repName,
+			submittedDate,
+			to,
+		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
+
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
+
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.REMINDER_SUBMIT_DRAFT,
+					html: GenerateEmailInstitutionalRepReview({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailInstitutionalRepReviewPlain({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REMINDER_SUBMIT_DRAFT,
+					recipient_emails: [to],
+				});
+
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailInstitutionalRepReminder`;
+
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
-			// TODO:
-			// const actionResult = await applicationActionRepo.listActions({
-			// 	application_id: id,
-			// 	sort: [{ column: 'created_at', direction: 'desc' }],
-			// });
+		},
+		// Email to the Institutional Rep to Review Application
+		sendEmailInstitutionalRepForReview: async ({
+			id,
+			applicantName,
+			repName,
+			submittedDate,
+			to,
+		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.REMINDER_SUBMIT_DRAFT,
-				html: GenerateEmailInstitutionalRepReview({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-				text: GenerateEmailInstitutionalRepReviewPlain({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			// TODO: create Record
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
+					html: GenerateEmailInstitutionalRepReview({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailInstitutionalRepReviewPlain({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailInstitutionalRepReminder`;
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailInstitutionalRepForReview`;
 
-			logger.error(message, error);
+				logger.error(message, error);
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to the Institutional Rep to Review Application
-	sendEmailInstitutionalRepForReview: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
-
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Periodic reminder Email for the Institutional Rep to Review Application
+		sendEmailRepReviewReminder: async ({
+			id,
+			applicantName,
+			actionId,
+			repName,
+			to,
+			comments,
+		}: GenerateApplicantRepRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
-				html: GenerateEmailInstitutionalRepReview({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-				text: GenerateEmailInstitutionalRepReviewPlain({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailInstitutionalRepForReview`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
+					html: GenerateEmailInstitutionalRepReview({
+						id,
+						applicantName,
+						repName: repName || 'Rep',
+						submittedDate: new Date(),
+					}),
+					text: GenerateEmailInstitutionalRepReviewPlain({
+						id,
+						applicantName,
+						repName: repName || 'Rep',
+						submittedDate: new Date(),
+					}),
+				});
 
-			logger.error(message, error);
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
+					recipient_emails: [to],
+				});
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Periodic reminder Email for the Institutional Rep to Review Application
-	sendEmailRepReviewReminder: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailInstitutionalRepReminder`;
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to Applicant & Notify Institutional Rep Revisions
+		sendEmailApplicantRepRevisions: async ({
+			id,
+			applicantName,
+			institutionalRepFirstName,
+			institutionalRepLastName,
+			comments,
+			to,
+		}: GenerateApplicantRepRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
-				html: GenerateEmailInstitutionalRepReview({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-				text: GenerateEmailInstitutionalRepReviewPlain({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailInstitutionalRepReminder`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_REVISION,
+					html: GenerateEmailApplicantRepRevision({
+						id,
+						applicantName,
+						institutionalRepFirstName,
+						institutionalRepLastName,
+						comments,
+					}),
+					text: GenerateEmailApplicantRepRevisionPlain({
+						id,
+						applicantName,
+						institutionalRepFirstName,
+						institutionalRepLastName,
+						comments,
+					}),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailApplicantRepRevisions`;
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to Applicant & Notify Institutional Rep Revisions
-	sendEmailApplicantRepRevisions: async ({
-		id,
-		applicantName,
-		institutionalRepFirstName,
-		institutionalRepLastName,
-		comments,
-		to,
-	}: GenerateApplicantRepRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				logger.error(message, error);
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Periodic reminder Email for the Applicant to Submit Revisions
+		sendEmailSubmitRepRevisionsReminder: async ({
+			id,
+			applicantName,
+			actionId,
+			repName,
+			submittedDate,
+			to,
+		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_REVISION,
-				html: GenerateEmailApplicantRepRevision({
-					id,
-					applicantName,
-					institutionalRepFirstName,
-					institutionalRepLastName,
-					comments,
-				}),
-				text: GenerateEmailApplicantRepRevisionPlain({
-					id,
-					applicantName,
-					institutionalRepFirstName,
-					institutionalRepLastName,
-					comments,
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailApplicantRepRevisions`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+					html: GenerateEmailInstitutionalRepReview({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailInstitutionalRepReviewPlain({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
 
-			logger.error(message, error);
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
+					recipient_emails: [to],
+				});
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Periodic reminder Email for the Applicant to Submit Revisions
-	sendEmailSubmitRepRevisionsReminder: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailRepRevisionsReminder`;
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Periodic reminder Email for the Institutional Rep to Review Revisions
+		sendEmailRepRevisionsReminder: async ({
+			id,
+			actionId,
+			applicantName,
+			repName,
+			submittedDate,
+			to,
+		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-				html: GenerateEmailInstitutionalRepReview({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-				text: GenerateEmailInstitutionalRepReviewPlain({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailRepRevisionsReminder`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+					html: GenerateEmailInstitutionalRepReview({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailInstitutionalRepReviewPlain({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
 
-			logger.error(message, error);
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
+					recipient_emails: [to],
+				});
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Periodic reminder Email for the Institutional Rep to Review Revisions
-	sendEmailRepRevisionsReminder: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailRepRevisionsReminder`;
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to notify Applicant that application is submitted by Rep for DAC review
+		sendEmailApplicantApplicationSubmitted: async ({
+			id,
+			name,
+			to,
+		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-				html: GenerateEmailInstitutionalRepReview({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-				text: GenerateEmailInstitutionalRepReviewPlain({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailRepRevisionsReminder`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW,
+					html: GenerateEmailApplicantAppSubmitted({ id, name }),
+					text: GenerateEmailApplicantAppSubmittedPlain({ id, name }),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailApplicantApplicationSubmitted`;
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to notify Applicant that application is submitted by Rep for DAC review
-	sendEmailApplicantApplicationSubmitted: async ({
-		id,
-		name,
-		to,
-	}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				logger.error(message, error);
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to notify DAC for review
+		sendEmailDacForReview: async ({
+			id,
+			applicantName,
+			submittedDate,
+			to,
+		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW,
-				html: GenerateEmailApplicantAppSubmitted({ id, name }),
-				text: GenerateEmailApplicantAppSubmittedPlain({ id, name }),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailApplicantApplicationSubmitted`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
+					html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+					text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailDacForReview`;
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to notify DAC for review
-	sendEmailDacForReview: async ({
-		id,
-		applicantName,
-		submittedDate,
-		to,
-	}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				logger.error(message, error);
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Periodic reminder email for DAC to review application
+		sendEmailDacReviewReminder: async ({
+			id,
+			applicantName,
+			actionId,
+			submittedDate,
+			to,
+		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
-				html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
-				text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacForReview`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
+					html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+					text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+				});
 
-			logger.error(message, error);
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
+					recipient_emails: [to],
+				});
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Periodic reminder email for DAC to review application
-	sendEmailDacReviewReminder: async ({
-		id,
-		applicantName,
-		submittedDate,
-		to,
-	}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailDacReviewReminder`;
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to Applicant about DAC Revisions
+		sendEmailApplicantDacRevisions: async ({
+			id,
+			applicantName,
+			comments,
+			to,
+		}: GenerateApplicantRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
-				html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
-				text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacReviewReminder`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_REVISION,
+					html: GenerateEmailApplicantRevision({ id, applicantName, comments }),
+					text: GenerateEmailApplicantRevisionPlain({ id, applicantName, comments }),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailApplicantDacRevisions`;
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to Applicant about DAC Revisions
-	sendEmailApplicantDacRevisions: async ({
-		id,
-		applicantName,
-		comments,
-		to,
-	}: GenerateApplicantRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				logger.error(message, error);
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Periodic reminder Email for the Applicant to Submit DAC Revisions
+		sendEmailSubmitDacRevisionsReminder: async ({
+			id,
+			actionId,
+			applicantName,
+			repName,
+			submittedDate,
+			to,
+		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_REVISION,
-				html: GenerateEmailApplicantRevision({ id, applicantName, comments }),
-				text: GenerateEmailApplicantRevisionPlain({ id, applicantName, comments }),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailApplicantDacRevisions`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+					html: GenerateEmailInstitutionalRepReview({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailInstitutionalRepReviewPlain({
+						id,
+						applicantName,
+						repName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
 
-			logger.error(message, error);
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
+					recipient_emails: [to],
+				});
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Periodic reminder Email for the Applicant to Submit DAC Revisions
-	sendEmailSubmitDacRevisionsReminder: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailDacRevisionsReminder`;
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to DAC about Submitted Revisions
+		sendEmailDacForSubmittedRevisions: async ({
+			id,
+			applicantName,
+			submittedDate,
+			to,
+		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-				html: GenerateEmailInstitutionalRepReview({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-				text: GenerateEmailInstitutionalRepReviewPlain({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacRevisionsReminder`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
+					html: GenerateEmailDacForSubmittedRevision({
+						id,
+						applicantName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailDacForSubmittedRevisionPlain({
+						id,
+						applicantName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailDacForSubmittedRevisions`;
+				logger.error(message, error);
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to DAC about Submitted Revisions
-	sendEmailDacForSubmittedRevisions: async ({
-		id,
-		applicantName,
-		submittedDate,
-		to,
-	}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
-
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Periodic reminder Email for the DAC to Review Revisions
+		sendEmailDacRevisionsReminder: async ({
+			id,
+			actionId,
+			applicantName,
+			repName,
+			submittedDate,
+			to,
+		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
-				html: GenerateEmailDacForSubmittedRevision({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
-				text: GenerateEmailDacForSubmittedRevisionPlain({
-					id,
-					applicantName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacForSubmittedRevisions`;
-			logger.error(message, error);
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+					html: GenerateEmailInstitutionalRepReview({
+						id,
+						applicantName,
+						repName: repName || 'Rep',
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailInstitutionalRepReviewPlain({
+						id,
+						applicantName,
+						repName: repName || 'Rep',
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Periodic reminder Email for the DAC to Review Revisions
-	sendEmailDacRevisionsReminder: async ({
-		id,
-		applicantName,
-		repName,
-		submittedDate,
-		to,
-	}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
+					recipient_emails: [to],
+				});
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailDacRevisionsReminder`;
+
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to Collaborators & Notify Approval
+		// Email to Applicant & Notify Approval
+		sendEmailApproval: async ({
+			id,
+			name,
+			to,
+		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-				html: GenerateEmailInstitutionalRepReview({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-				text: GenerateEmailInstitutionalRepReviewPlain({
-					id,
-					applicantName,
-					repName,
-					submittedDate: dateConverter(submittedDate),
-				}),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacRevisionsReminder`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_APPROVAL,
+					html: GenerateEmailApproval({ id, name }),
+					text: GenerateEmailApprovalPlain({ id, name }),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailApproval`;
+				logger.error(message, error);
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to Collaborators & Notify Approval
-	// Email to Applicant & Notify Approval
-	sendEmailApproval: async ({
-		id,
-		name,
-		to,
-	}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
-
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to Applicant & Notify Disapproval
+		sendEmailReject: async ({
+			id,
+			name,
+			to,
+			comment,
+		}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.NOTIFY_APPROVAL,
-				html: GenerateEmailApproval({ id, name }),
-				text: GenerateEmailApprovalPlain({ id, name }),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailApproval`;
-			logger.error(message, error);
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.DACO_APPLICATION_STATUS,
+					html: GenerateEmailRejection({ id, name, comment }),
+					text: GenerateEmailRejectionPlain({ name, comment }),
+				});
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to Applicant & Notify Disapproval
-	sendEmailReject: async ({
-		id,
-		name,
-		to,
-		comment,
-	}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailReject`;
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to Applicant that application has been revoked
+		sendEmailApplicantRevoke: async ({
+			id,
+			name,
+			to,
+			comment,
+			dacRevoked = false,
+		}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.DACO_APPLICATION_STATUS,
-				html: GenerateEmailRejection({ id, name, comment }),
-				text: GenerateEmailRejectionPlain({ name, comment }),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailReject`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.DACO_APPLICATION_STATUS,
+					html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
+					text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailDacRevoke`;
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to Applicant that application has been revoked
-	sendEmailApplicantRevoke: async ({
-		id,
-		name,
-		to,
-		comment,
-		dacRevoked = false,
-	}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				logger.error(message, error);
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
+		},
+		// Email to Applicant that application has been closed
+		sendEmailApplicantClose: async ({
+			id,
+			name,
+			to,
+			comment,
+			dacRevoked = false,
+		}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
 
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.DACO_APPLICATION_STATUS,
-				html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
-				text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
-			});
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
 
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailDacRevoke`;
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.DACO_APPLICATION_STATUS_UPDATE,
+					html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
+					text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
+				});
 
-			logger.error(message, error);
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailApplicantClose`;
 
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-	// Email to Applicant that application has been closed
-	sendEmailApplicantClose: async ({
-		id,
-		name,
-		to,
-		comment,
-		dacRevoked = false,
-	}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
-		try {
-			const {
-				email: { fromAddress },
-			} = getEmailConfig;
+				logger.error(message, error);
 
-			if (!to) {
-				throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				return failure('SYSTEM_ERROR', message);
 			}
-
-			const response = await emailClient.sendMail({
-				from: fromAddress,
-				to,
-				subject: EmailSubjects.DACO_APPLICATION_STATUS_UPDATE,
-				html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
-				text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
-			});
-
-			return success(response);
-		} catch (error) {
-			const message = `Error sending email - sendEmailApplicantClose`;
-
-			logger.error(message, error);
-
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
-});
+		},
+	};
+};
 
 export { emailSvc };

@@ -180,10 +180,11 @@ export const sendEmailReminders = ({
 	const emailService = emailSvc(database);
 
 	const { id: application_action_id, created_at: actionDate, user_name } = action || {};
-
+	// TODO: Correct these definitions
 	const applicantName = applicationContents?.applicant_first_name ?? 'Test User';
 	const applicantEmail = applicationContents?.applicant_institutional_email ?? 'testUser@email.com';
 	const repEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';
+	const repName = `${applicationContents?.institutional_rep_first_name} ${applicationContents?.institutional_rep_last_name}`;
 	const dacEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';
 	const submittedDate = actionDate || createdAt;
 
@@ -193,17 +194,13 @@ export const sendEmailReminders = ({
 			console.log(`\nPlease review & submit your application with ID ${applicationId} with state DRAFT\n`);
 			emailService.sendEmailSubmitDraftReminder({
 				id: applicationId,
+				actionId: application_action_id,
 				applicantName,
 				submittedDate,
-				repName: 'The Rep',
+				repName,
 				to: applicantEmail,
 			});
-			emailService.createEmailRecord({
-				application_id: applicationId,
-				application_action_id,
-				email_type: EmailTypes.REMINDER_SUBMIT_DRAFT,
-				recipient_emails: [applicantEmail],
-			});
+
 			break;
 		case ApplicationStates.DAC_REVIEW:
 			// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
@@ -211,15 +208,11 @@ export const sendEmailReminders = ({
 			emailService.sendEmailDacReviewReminder({
 				id: applicationId,
 				applicantName,
+				repName,
 				submittedDate,
 				to: dacEmail,
 			});
-			emailService.createEmailRecord({
-				application_id: applicationId,
-				application_action_id,
-				email_type: EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
-				recipient_emails: [dacEmail],
-			});
+
 			break;
 		case ApplicationStates.DAC_REVISIONS_REQUESTED: {
 			if (user_name === 'APPLICANT') {
@@ -234,12 +227,6 @@ export const sendEmailReminders = ({
 					submittedDate,
 					to: applicantEmail,
 				});
-				emailService.createEmailRecord({
-					application_id: applicationId,
-					application_action_id,
-					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
-					recipient_emails: [applicantEmail],
-				});
 			} else if (user_name === 'DAC_MEMBER') {
 				// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
 				console.log(
@@ -252,12 +239,6 @@ export const sendEmailReminders = ({
 					repName: 'Mr Rep',
 					to: applicantEmail,
 				});
-				emailService.createEmailRecord({
-					application_id: applicationId,
-					application_action_id,
-					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
-					recipient_emails: [dacEmail],
-				});
 			}
 			break;
 		}
@@ -267,15 +248,9 @@ export const sendEmailReminders = ({
 			emailService.sendEmailRepReviewReminder({
 				id: applicationId,
 				applicantName,
-				submittedDate,
-				repName: 'Mr Rep',
+				actionId: application_action_id,
+				repName,
 				to: applicantEmail,
-			});
-			emailService.createEmailRecord({
-				application_id: applicationId,
-				application_action_id,
-				email_type: EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
-				recipient_emails: [applicantEmail],
 			});
 			break;
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
@@ -291,12 +266,6 @@ export const sendEmailReminders = ({
 					repName: 'Mr Rep',
 					to: applicantEmail,
 				});
-				emailService.createEmailRecord({
-					application_id: applicationId,
-					application_action_id,
-					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
-					recipient_emails: [applicantEmail],
-				});
 			} else if (action?.user_name === 'INSTITUTIONAL_REP') {
 				// Post Rep Revisions Submitted, if still in review 7 days later -> send email reminder
 				console.log(
@@ -308,12 +277,6 @@ export const sendEmailReminders = ({
 					submittedDate,
 					repName: 'Mr Rep',
 					to: repEmail,
-				});
-				emailService.createEmailRecord({
-					application_id: applicationId,
-					application_action_id,
-					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
-					recipient_emails: [repEmail],
 				});
 			}
 			break;
