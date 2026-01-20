@@ -42,7 +42,7 @@ import { signatureService } from './signatureService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
-export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
+export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName | EmailRecordColumnName;
 
 export type ApplicationModel = typeof applications.$inferInsert;
 export type ApplicationRecord = typeof applications.$inferSelect;
@@ -66,10 +66,6 @@ export type ApplicationSignatureUpdate = Pick<
 
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 
-export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
-	contents: ApplicationContentUpdates | null;
-}
-
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
 export type ApplicationActionService = ReturnType<typeof applicationActionSvc>;
@@ -80,6 +76,7 @@ export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
 export type EmailModel = typeof sentEmails.$inferInsert;
 export type EmailRecord = typeof sentEmails.$inferSelect;
+export type EmailRecordColumnName = keyof typeof sentEmails.$inferSelect;
 export type EmailService = ReturnType<typeof emailSvc>;
 
 export type FilesModel = typeof files.$inferInsert;
@@ -95,6 +92,7 @@ export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'conten
 export interface JoinedApplicationEmailsActionsRecord {
 	application_id: number;
 	user_id: string;
+	created_at: Date;
 	state: ApplicationStateValues;
 	application_contents: ApplicationContentRecord | null;
 	application_actions: ApplicationActionRecord[] | null;

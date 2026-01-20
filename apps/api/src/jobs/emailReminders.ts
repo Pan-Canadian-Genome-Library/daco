@@ -17,7 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ApplicationStates, ApplicationStateValues, EmailTypes } from '@pcgl-daco/data-model';
+import {
+	ApplicationActions,
+	ApplicationActionValues,
+	ApplicationStates,
+	ApplicationStateValues,
+	EmailTypes,
+	EmailTypeValues,
+} from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
@@ -27,19 +34,70 @@ import { type ApplicationActionRecord, type ApplicationContentRecord, type Email
 
 const logger = BaseLogger.forModule('Email Reminders');
 
-const dateDiffCheck = ({
-	created_at,
-	interval = 7,
-	sentEmails = [],
-}: {
-	created_at: Date;
-	sentEmails: EmailRecord[] | null;
-	interval?: number;
-}) => {
-	const actionDate = created_at.getDate();
+const dateDiffCheck = ({ actionDate, interval = 7 }: { actionDate: Date | null; interval?: number }) => {
+	if (!actionDate) return false;
 	const currentDate = new Date().getDate();
-	const diff = currentDate - actionDate;
-	return diff > interval;
+	const comparisonDate = actionDate.getDate();
+	const diff = currentDate - comparisonDate;
+	return diff >= interval;
+};
+
+const getMostRecentEmail = ({
+	sentEmails,
+	state,
+}: {
+	sentEmails: EmailRecord[] | null;
+	state: ApplicationStateValues;
+}) => {
+	// Lookup most recent reminder email sent for current state, then confirm if it was sent >7 days ago
+	// If no reminder email was sent, see how long it has been in the current application state, and send a reminder if it has been in this state for >7 days
+	let targetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues }> = {
+		[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
+		[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
+		[ApplicationStates.DAC_REVIEW]: EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
+		[ApplicationStates.DAC_REVISIONS_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
+	};
+	const targetEmailType = targetEmailTypes[state];
+	const mostRecentEmail =
+		(sentEmails
+			? sentEmails.length > 1
+				? sentEmails.find((email) => email.email_type === targetEmailType)
+				: sentEmails[0]
+			: null) || null;
+	return mostRecentEmail;
+};
+
+const checkForEmailReminders = ({ mostRecentEmail }: { mostRecentEmail: EmailRecord | null }) => {
+	const mostRecentEmailDate = mostRecentEmail?.created_at || null;
+	return mostRecentEmailDate && dateDiffCheck({ actionDate: mostRecentEmailDate });
+};
+
+const getMostRecentAction = ({
+	applicationActions,
+	state,
+}: {
+	applicationActions: ApplicationActionRecord[] | null;
+	state: ApplicationStateValues;
+}) => {
+	let targetActionTypes: Partial<{ [k in ApplicationStateValues]: ApplicationActionValues }> = {
+		[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: ApplicationActions.SUBMIT_DRAFT,
+		[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
+		[ApplicationStates.DAC_REVIEW]: ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
+		[ApplicationStates.DAC_REVISIONS_REQUESTED]: ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
+	};
+	const targetActionType = targetActionTypes[state];
+	const mostRecentAction =
+		(applicationActions
+			? applicationActions.length > 1
+				? applicationActions.find((action) => action.action === targetActionType)
+				: applicationActions[0]
+			: null) || null;
+	return mostRecentAction;
+};
+
+const checkForActionReminders = ({ mostRecentAction }: { mostRecentAction: ApplicationActionRecord | null }) => {
+	const mostRecentActionDate = mostRecentAction?.created_at || null;
+	return mostRecentActionDate && dateDiffCheck({ actionDate: mostRecentActionDate });
 };
 
 export const scheduleEmailReminders = async () => {
@@ -60,23 +118,42 @@ export const scheduleEmailReminders = async () => {
 		for (const application of applications) {
 			// TODO: change to findOne / pageSize 1
 			const {
-				application_id,
+				application_id: applicationId,
 				state,
+				created_at: createdAt,
 				application_actions: applicationActions,
 				application_contents: applicationContents,
 				sent_emails: sentEmails,
 			} = application;
 
-			const action = applicationActions ? applicationActions[0] : null;
-			if (!action || !applicationContents) {
-				logger.error(`Error retrieving actions for application with ID ${application_id}`);
-				continue;
-			}
-			// TODO: add check when last email was sent date w/ matching email type
-			const { created_at } = action;
-			const sendReminder = dateDiffCheck({ created_at, sentEmails });
-			if (sendReminder) {
-				sendEmailReminders({ applicationId: application_id, applicationContents, action, state });
+			if (state === ApplicationStates.DRAFT) {
+				// If Application is still in DRAFT 7 days after creation, send a reminder email
+				const sendReminder = dateDiffCheck({ actionDate: createdAt });
+				if (sendReminder) {
+					sendEmailReminders({
+						applicationId,
+						applicationContents,
+						createdAt,
+						state,
+						action: null,
+					});
+				}
+			} else {
+				// For all other states, confirm if it has been >7 days since the last related reminder email or state change
+				const mostRecentEmail = getMostRecentEmail({ state, sentEmails });
+				const needsEmailReminder = checkForEmailReminders({ mostRecentEmail });
+				const mostRecentAction = getMostRecentAction({ state, applicationActions });
+				const needsStateReminder = checkForActionReminders({ mostRecentAction });
+				const sendReminder = needsEmailReminder || needsStateReminder;
+				if (sendReminder) {
+					sendEmailReminders({
+						applicationId,
+						state,
+						createdAt,
+						applicationContents,
+						action: mostRecentAction,
+					});
+				}
 			}
 		}
 	} else {
@@ -88,23 +165,27 @@ export const scheduleEmailReminders = async () => {
 export const sendEmailReminders = ({
 	applicationId,
 	state,
+	createdAt,
 	applicationContents,
 	action,
 }: {
 	applicationId: number;
+	createdAt: Date;
 	state: ApplicationStateValues;
-	applicationContents: ApplicationContentRecord;
-	action: ApplicationActionRecord;
+
+	applicationContents: ApplicationContentRecord | null;
+	action: ApplicationActionRecord | null;
 }) => {
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
 
-	const { id: application_action_id, created_at, user_name } = action;
+	const { id: application_action_id, created_at: actionDate, user_name } = action || {};
 
-	const applicantName = applicationContents.applicant_first_name ?? 'Test User';
-	const applicantEmail = applicationContents.applicant_institutional_email ?? 'testUser@email.com';
-	const repEmail = applicationContents.institutional_rep_email ?? 'testUser@email.com';
-	const dacEmail = applicationContents.institutional_rep_email ?? 'testUser@email.com';
+	const applicantName = applicationContents?.applicant_first_name ?? 'Test User';
+	const applicantEmail = applicationContents?.applicant_institutional_email ?? 'testUser@email.com';
+	const repEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';
+	const dacEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';
+	const submittedDate = actionDate || createdAt;
 
 	switch (state) {
 		case ApplicationStates.DRAFT:
@@ -113,7 +194,7 @@ export const sendEmailReminders = ({
 			emailService.sendEmailSubmitDraftReminder({
 				id: applicationId,
 				applicantName,
-				submittedDate: created_at,
+				submittedDate,
 				repName: 'The Rep',
 				to: applicantEmail,
 			});
@@ -130,7 +211,7 @@ export const sendEmailReminders = ({
 			emailService.sendEmailDacReviewReminder({
 				id: applicationId,
 				applicantName,
-				submittedDate: created_at,
+				submittedDate,
 				to: dacEmail,
 			});
 			emailService.createEmailRecord({
@@ -150,7 +231,7 @@ export const sendEmailReminders = ({
 					id: applicationId,
 					applicantName,
 					repName: 'Mr Rep',
-					submittedDate: created_at,
+					submittedDate,
 					to: applicantEmail,
 				});
 				emailService.createEmailRecord({
@@ -167,7 +248,7 @@ export const sendEmailReminders = ({
 				emailService.sendEmailDacRevisionsReminder({
 					id: applicationId,
 					applicantName,
-					submittedDate: created_at,
+					submittedDate,
 					repName: 'Mr Rep',
 					to: applicantEmail,
 				});
@@ -186,7 +267,7 @@ export const sendEmailReminders = ({
 			emailService.sendEmailRepReviewReminder({
 				id: applicationId,
 				applicantName,
-				submittedDate: created_at,
+				submittedDate,
 				repName: 'Mr Rep',
 				to: applicantEmail,
 			});
@@ -198,7 +279,7 @@ export const sendEmailReminders = ({
 			});
 			break;
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
-			if (action.user_name === 'APPLICANT') {
+			if (action?.user_name === 'APPLICANT') {
 				// Post Rep Revisions Requested, if still in review 7 days later -> send email reminder
 				console.log(
 					`\nPlease review & submit your application with ID ${applicationId} and state Rep Revision Requested\n`,
@@ -206,7 +287,7 @@ export const sendEmailReminders = ({
 				emailService.sendEmailSubmitRepRevisionsReminder({
 					id: applicationId,
 					applicantName,
-					submittedDate: created_at,
+					submittedDate,
 					repName: 'Mr Rep',
 					to: applicantEmail,
 				});
@@ -216,7 +297,7 @@ export const sendEmailReminders = ({
 					email_type: EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
 					recipient_emails: [applicantEmail],
 				});
-			} else if (action.user_name === 'INSTITUTIONAL_REP') {
+			} else if (action?.user_name === 'INSTITUTIONAL_REP') {
 				// Post Rep Revisions Submitted, if still in review 7 days later -> send email reminder
 				console.log(
 					`\nPlease review & submit your application with ID ${applicationId} and state Rep Revision Requested\n`,
@@ -224,7 +305,7 @@ export const sendEmailReminders = ({
 				emailService.sendEmailRepRevisionsReminder({
 					id: applicationId,
 					applicantName,
-					submittedDate: created_at,
+					submittedDate,
 					repName: 'Mr Rep',
 					to: repEmail,
 				});

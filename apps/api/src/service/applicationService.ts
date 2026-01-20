@@ -51,7 +51,7 @@ import {
 	type RevisionRequestModel,
 	type RevisionRequestRecord,
 } from './types.js';
-import { applicationsQuery } from './utils.ts';
+import { applicationActionsSortQuery, applicationsSortQuery, emailSortQuery } from './utils.ts';
 
 const logger = BaseLogger.forModule('applicationService');
 
@@ -335,7 +335,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
-				.orderBy(...applicationsQuery(sort))
+				.orderBy(...applicationsSortQuery(sort))
 				.offset(page * pageSize)
 				.limit(pageSize);
 
@@ -667,12 +667,10 @@ const applicationSvc = (db: PostgresDb) => ({
 	 */
 	getEmailActionDetails: async ({
 		state = [],
-		sort = [],
 		page = 0,
 		pageSize = 20,
 	}: {
 		state: ApplicationStateValues[];
-		sort?: Array<OrderBy<ApplicationsColumnName>>;
 		page?: number;
 		pageSize?: number;
 	}): AsyncResult<JoinedApplicationEmailsActionsRecord[], 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
@@ -688,6 +686,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				applicationRecords
 					.map((app) => ({
 						application_id: app.applications.id,
+						created_at: app.applications.created_at,
 						user_id: app.applications.user_id,
 						state: app.applications.state,
 						application_contents: app.application_contents,
@@ -696,7 +695,8 @@ const applicationSvc = (db: PostgresDb) => ({
 						const application_actions = await db
 							.select()
 							.from(applicationActions)
-							.where((action) => eq(action.application_id, applicationRecord.application_id));
+							.where((action) => eq(action.application_id, applicationRecord.application_id))
+							.orderBy(...applicationActionsSortQuery());
 
 						const actionIds = application_actions.map((action) => action.id);
 						const sent_emails = await db
@@ -707,14 +707,12 @@ const applicationSvc = (db: PostgresDb) => ({
 									eq(email.application_id, applicationRecord.application_id),
 									inArray(email.application_action_id, actionIds),
 								),
-							);
+							)
+							.orderBy(...emailSortQuery());
 
 						return { ...applicationRecord, application_actions, sent_emails };
 					}),
 			);
-
-			// .offset(page * pageSize)
-			// .limit(pageSize);
 
 			return success(formattedApplicationRecords);
 		} catch (err) {
