@@ -176,8 +176,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onSubmitDraft() {
-		return success(`Submit Draft email reminder set for application ${this._id}`);
+	private async _onSubmit() {
+		return success('post submit');
 	}
 
 	async submitRepRevision(userName: string) {
@@ -189,10 +189,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onSubmitRepRevision() {
-		return success(`Submit Rep Revision email reminder set for application ${this._id}`);
-	}
-
 	async submitDacRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_dac_revisions);
 		if (transitionResult.success) {
@@ -200,10 +196,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
-	}
-
-	private async _onSubmitDacRevision() {
-		return success(`Submit Dac Revision email reminder set for application ${this._id}`);
 	}
 
 	// Edit
@@ -251,8 +243,8 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onRepRevisionRequest() {
-		return success(`Rep Revision Request email reminder set for application ${this._id}`);
+	private async _onRevisionRequest() {
+		return success('post revision request');
 	}
 
 	async reviseDacReview(userName: string) {
@@ -262,10 +254,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
-	}
-
-	private async _onDacRevisionRequest() {
-		return success(`DAC Revision Request email reminder set for application ${this._id}`);
 	}
 
 	// Close
@@ -318,10 +306,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onApproveRepReview() {
-		return success(`Submit Draft email reminder set for application ${this._id}`);
-	}
-
 	async approveDacReview(
 		userName: string,
 	): AsyncResult<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
@@ -334,7 +318,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onApproved() {
-		return success('post dispatch on approve');
+		return success('post approval');
 	}
 
 	// Reject
@@ -400,7 +384,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	 * Transitions *
 	 * *********** */
 	// Draft
-	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmitDraft);
+	private draftSubmitTransition = transition(DRAFT, submit, INSTITUTIONAL_REP_REVIEW, this._onSubmit);
 	private draftEditTransition = transition(DRAFT, edit, DRAFT, this._onEdit);
 	private draftCloseTransition = transition(DRAFT, close, CLOSED, this._onClose);
 
@@ -416,13 +400,13 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVIEW,
 		rep_revision_request,
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
-		this._onRepRevisionRequest,
+		this._onRevisionRequest,
 	);
 	private repReviewApproveTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
 		rep_approve_review,
 		DAC_REVIEW,
-		this._onApproveRepReview,
+		this._onApproved,
 	);
 	private repReviewWithdrawTransition = transition(
 		INSTITUTIONAL_REP_REVIEW,
@@ -436,7 +420,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		INSTITUTIONAL_REP_REVISION_REQUESTED,
 		submit_rep_revisions,
 		INSTITUTIONAL_REP_REVIEW,
-		this._onSubmitRepRevision,
+		this._onSubmit,
 	);
 
 	// DAC Review
@@ -447,7 +431,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVIEW,
 		dac_revision_request,
 		DAC_REVISIONS_REQUESTED,
-		this._onDacRevisionRequest,
+		this._onRevisionRequest,
 	);
 	private dacReviewRejectTransition = transition(DAC_REVIEW, dac_reject, REJECTED, this._onReject);
 	private dacReviewWithdrawTransition = transition(DAC_REVIEW, dac_review_withdraw, DRAFT, this._onWithdrawal);
@@ -457,7 +441,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		DAC_REVISIONS_REQUESTED,
 		submit_dac_revisions,
 		DAC_REVIEW,
-		this._onSubmitDacRevision,
+		this._onSubmit,
 	);
 
 	// Revoke Approval
