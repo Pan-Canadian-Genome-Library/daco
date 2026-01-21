@@ -4,3 +4,4 @@ export * from './collaboratorsRoutes.js';
 export * from './common.js';
 export * from './fileRoutes.js';
 export * from './signatureRoutes.js';
+export * from './studyRoutes.js';
