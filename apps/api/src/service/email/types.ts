@@ -83,7 +83,17 @@ export type GenerateApplicantRepRevisionType = {
 	institutionalRepFirstName?: string;
 	institutionalRepLastName?: string;
 	repName?: string;
+	submittedDate?: Date | string;
 	comments?: RevisionRequestModel;
+} & BaseEmailType;
+
+export type GenerateClosedType = {
+	id: string | number;
+	applicantName: string;
+	userName: string;
+	submittedDate: Date | string;
+	status: string;
+	message: string;
 } & BaseEmailType;
 
 export type GenerateRevokeType = {

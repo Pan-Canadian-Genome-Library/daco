@@ -31,40 +31,38 @@ import emailClient from './index.ts';
 import {
 	GenerateEmailApplicantAppSubmitted,
 	GenerateEmailApplicantAppSubmittedPlain,
-} from './layouts/templates/EmailApplicantAppSubmitted.ts';
-import {
+	GenerateEmailApplicantClosed,
+	GenerateEmailApplicantClosedPlain,
 	GenerateEmailApplicantRepRevision,
 	GenerateEmailApplicantRepRevisionPlain,
-} from './layouts/templates/EmailApplicantRepRevision.ts';
-import {
 	GenerateEmailApplicantRevision,
 	GenerateEmailApplicantRevisionPlain,
-} from './layouts/templates/EmailApplicantRevision.ts';
-import {
 	GenerateEmailApplicantRevoke,
 	GenerateEmailApplicantRevokePlain,
-} from './layouts/templates/EmailApplicantRevoke.ts';
-import { GenerateEmailApproval, GenerateEmailApprovalPlain } from './layouts/templates/EmailApproval.ts';
-import { GenerateEmailDacForReview, GenerateEmailDacForReviewPlain } from './layouts/templates/EmailDacReview.ts';
-import {
+	GenerateEmailApproval,
+	GenerateEmailApprovalPlain,
+	GenerateEmailDacForReview,
+	GenerateEmailDacForReviewPlain,
 	GenerateEmailDacForSubmittedRevision,
 	GenerateEmailDacForSubmittedRevisionPlain,
-} from './layouts/templates/EmailDacRevision.ts';
-import {
 	GenerateEmailInstitutionalRepReview,
 	GenerateEmailInstitutionalRepReviewPlain,
-} from './layouts/templates/EmailInstitutionalRepReview.ts';
-import { GenerateEmailRejection, GenerateEmailRejectionPlain } from './layouts/templates/EmailRejection.ts';
-import {
+	GenerateEmailRejection,
+	GenerateEmailRejectionPlain,
+	GenerateEmailReminderDacReview,
+	GenerateEmailReminderDacReviewPlain,
 	GenerateEmailReminderRepReview,
 	GenerateEmailReminderRepReviewPlain,
-} from './layouts/templates/EmailReminderRepReview.ts';
-import {
+	GenerateEmailReminderSubmitDacRevisions,
+	GenerateEmailReminderSubmitDacRevisionsPlain,
 	GenerateEmailReminderSubmitDraft,
 	GenerateEmailReminderSubmitDraftPlain,
-} from './layouts/templates/EmailReminderSubmitDraft.ts';
+	GenerateEmailReminderSubmitRepRevisions,
+	GenerateEmailReminderSubmitRepRevisionsPlain,
+} from './layouts/templates/index.ts';
 import {
 	EmailSubjects,
+	GenerateClosedType,
 	type GenerateApplicantRepRevisionType,
 	type GenerateApplicantRevisionType,
 	type GenerateApproveType,
@@ -344,13 +342,13 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-					html: GenerateEmailInstitutionalRepReview({
+					html: GenerateEmailReminderSubmitRepRevisions({
 						id,
 						applicantName,
 						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
-					text: GenerateEmailInstitutionalRepReviewPlain({
+					text: GenerateEmailReminderSubmitRepRevisionsPlain({
 						id,
 						applicantName,
 						repName,
@@ -512,8 +510,16 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
-					html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
-					text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+					html: GenerateEmailReminderDacReview({
+						id,
+						applicantName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailReminderDacReviewPlain({
+						id,
+						applicantName,
+						submittedDate: dateConverter(submittedDate),
+					}),
 				});
 
 				await createEmailRecord({
@@ -587,13 +593,13 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-					html: GenerateEmailInstitutionalRepReview({
+					html: GenerateEmailReminderSubmitDacRevisions({
 						id,
 						applicantName,
 						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
-					text: GenerateEmailInstitutionalRepReviewPlain({
+					text: GenerateEmailReminderSubmitDacRevisionsPlain({
 						id,
 						applicantName,
 						repName,
@@ -679,13 +685,13 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-					html: GenerateEmailInstitutionalRepReview({
+					html: GenerateEmailReminderSubmitDacRevisions({
 						id,
 						applicantName,
 						repName: repName || 'Rep',
 						submittedDate: dateConverter(submittedDate),
 					}),
-					text: GenerateEmailInstitutionalRepReviewPlain({
+					text: GenerateEmailReminderSubmitDacRevisions({
 						id,
 						applicantName,
 						repName: repName || 'Rep',
@@ -811,11 +817,13 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to Applicant that application has been closed
 		sendEmailApplicantClose: async ({
 			id,
-			name,
+			userName,
+			applicantName,
+			message,
+			status,
+			submittedDate,
 			to,
-			comment,
-			dacRevoked = false,
-		}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateClosedType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -829,8 +837,8 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.DACO_APPLICATION_STATUS_UPDATE,
-					html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
-					text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
+					html: GenerateEmailApplicantClosed({ id, userName, applicantName, message, status, submittedDate }),
+					text: GenerateEmailApplicantClosedPlain({ id, userName, applicantName, message, status, submittedDate }),
 				});
 
 				return success(response);

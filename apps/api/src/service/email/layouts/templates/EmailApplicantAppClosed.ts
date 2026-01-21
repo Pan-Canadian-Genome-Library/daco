@@ -18,47 +18,51 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateInstitutionalRepType } from '@/service/email/types.ts';
+import { GenerateClosedType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailReminderSubmitDraft = ({
-	applicantName,
+export const GenerateEmailApplicantClosed = ({
 	id,
+	applicantName,
+	userName,
+	message,
+	status,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to'>) => {
+}: GenerateClosedType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
+
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${applicantName},
                 </mj-text>
                 <mj-text>
-                    We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
-                </mj-text>
-                <mj-text>
-                   To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
+                    We are writing to inform you that your application PCGL-${id} has been closed. 
                 </mj-text>
                 <mj-text>
                     <ul>
                         <li>
-                            Application ID: ${id} <br/>
+                            <b>Closed By:</b> ${userName} <br/>
                         </li>
                         <li>
-                            Last Modified: ${submittedDate} <br/>
+                            <b>Reason for Closure:</b> ${message} <br/>
+                        </li>
+                        <li>
+                            <b>Status Before Closure:</b> ${status} <br/>
+                        </li>
+                        <li>
+                            <b>Time of Closure:</b> ${submittedDate} <br/>
                         </li>
                     </ul>
                 </mj-text>
                 <mj-text>
-                    You can access your draft application here: ${ui}
+                    Please note that once an application is closed, it cannot be reopened and is no longer valid. 
                 </mj-text>
                 <mj-text>
-                    If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
-                </mj-text>
-                <mj-text>
-                    If you have any questions or need assistance, feel free to contact us!
+                    If you believe this application was closed by mistake or if you did not initiate the closure, please contact us as soon as possible.
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -70,25 +74,22 @@ export const GenerateEmailReminderSubmitDraft = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailReminderSubmitDraftPlain = ({
-	applicantName,
-	repName,
+export const GenerateEmailApplicantClosedPlain = ({
 	id,
+	applicantName,
+	userName,
+	message,
+	status,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to'>) => {
-	const {
-		express: { ui },
-	} = getEmailConfig;
-
-	return ` Dear ${applicantName},
-    \n We hope this message finds you well.
-    \n We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
-    \n To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
-    \n\n Application ID: ${id}
-    \n Last Modified: ${submittedDate}
-    \n\n You can access your draft application here: ${ui}
-    \n If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
-    \n If you have any questions or need assistance, feel free to contact us!
-    \n Best regards, \n The PCGL Data Access Compliance Office 
+}: GenerateClosedType) => {
+	return ` Dear ${applicantName},,
+    \n We are writing to inform you that your application PCGL-${id} has been closed. 
+    \n Closed By: ${userName}
+    \n Reason for Closure: ${message} 
+    \n Status Before Closure: ${status}
+    \n Time of Closure: ${submittedDate}
+    \n Please note that once an application is closed, it cannot be reopened and is no longer valid. 
+    \n If you believe this application was closed by mistake or if you did not initiate the closure, please contact us as soon as possible.
+    \n\n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };

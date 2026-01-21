@@ -22,43 +22,44 @@ import { GenerateInstitutionalRepType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailReminderSubmitDraft = ({
+export const GenerateEmailReminderDacReview = ({
 	applicantName,
 	id,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to'>) => {
+}: Omit<GenerateInstitutionalRepType, 'to' | 'repName'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
+
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear ${applicantName},
+                    Dear DAC Member,
                 </mj-text>
                 <mj-text>
-                    We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
+                    This is a friendly reminder that there is one or more applications assigned to you on the <u>PCGL Data Access Compliance Office portal</u> that have been <b>awaiting your review for over 7 days</b>.
                 </mj-text>
                 <mj-text>
-                   To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
+                   Timely review of applications helps us maintain efficient processing and meet compliance standards.
+                </mj-text>
+                <mj-text>
+                    <b>Pending Application(s):</b>
                 </mj-text>
                 <mj-text>
                     <ul>
                         <li>
-                            Application ID: ${id} <br/>
+                            <b>Application ID:</b> ${id} <br/>
                         </li>
                         <li>
-                            Last Modified: ${submittedDate} <br/>
+                            <b>Applicant:</b> ${applicantName} <br/>
+                        </li>
+                        <li>
+                            <b>Date Submitted:</b> ${submittedDate} <br/>
                         </li>
                     </ul>
                 </mj-text>
                 <mj-text>
-                    You can access your draft application here: ${ui}
-                </mj-text>
-                <mj-text>
-                    If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
-                </mj-text>
-                <mj-text>
-                    If you have any questions or need assistance, feel free to contact us!
+                    Please log in to the DACO portal to review: ${ui}
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -70,25 +71,24 @@ export const GenerateEmailReminderSubmitDraft = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailReminderSubmitDraftPlain = ({
+export const GenerateEmailReminderDacReviewPlain = ({
 	applicantName,
-	repName,
 	id,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to'>) => {
+}: Omit<GenerateInstitutionalRepType, 'to' | 'repName'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	return ` Dear ${applicantName},
+	return ` Dear DAC Member,
     \n We hope this message finds you well.
-    \n We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
-    \n To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
-    \n\n Application ID: ${id}
-    \n Last Modified: ${submittedDate}
-    \n\n You can access your draft application here: ${ui}
-    \n If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
-    \n If you have any questions or need assistance, feel free to contact us!
+    \n This is a friendly reminder that there is one or more applications assigned to you on the PCGL Data Access Compliance Office portal that have been awaiting your review for over 7 days.
+    \n Timely review of applications helps us maintain efficient processing and meet compliance standards.
+    \n Pending Application(s):
+    \n Application ID: ${id}
+    \n Applicant Name: ${applicantName}
+    \n Submission Date: ${submittedDate}
+    \n Please log in to the DACO portal to review: ${ui}
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };

@@ -22,43 +22,42 @@ import { GenerateInstitutionalRepType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailReminderSubmitDraft = ({
+export const GenerateEmailReminderSubmitDacRevisions = ({
 	applicantName,
+	repName,
 	id,
 	submittedDate,
 }: Omit<GenerateInstitutionalRepType, 'to'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
+
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${applicantName},
                 </mj-text>
                 <mj-text>
-                    We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
+                    This is a reminder that revisions were requested for your application on the <u>PCGL Data Access Compliance Office portal</u>, and we have not yet received a response.
                 </mj-text>
                 <mj-text>
-                   To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
+                   To proceed with the review process, please log in to review the comments and submit the required updates.
                 </mj-text>
                 <mj-text>
                     <ul>
                         <li>
-                            Application ID: ${id} <br/>
+                            <b>Application ID:</b> ${id} <br/>
                         </li>
                         <li>
-                            Last Modified: ${submittedDate} <br/>
+                            <b>Revision Requested By:</b> ${repName} <br/>
+                        </li>
+                        <li>
+                            <b>Date of Request:</b> ${submittedDate} <br/>
                         </li>
                     </ul>
                 </mj-text>
                 <mj-text>
-                    You can access your draft application here: ${ui}
-                </mj-text>
-                <mj-text>
-                    If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
-                </mj-text>
-                <mj-text>
-                    If you have any questions or need assistance, feel free to contact us!
+                    You can view and respond to the revision request here: ${ui}
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -70,7 +69,7 @@ export const GenerateEmailReminderSubmitDraft = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailReminderSubmitDraftPlain = ({
+export const GenerateEmailReminderSubmitDacRevisionsPlain = ({
 	applicantName,
 	repName,
 	id,
@@ -81,14 +80,12 @@ export const GenerateEmailReminderSubmitDraftPlain = ({
 	} = getEmailConfig;
 
 	return ` Dear ${applicantName},
-    \n We hope this message finds you well.
-    \n We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
-    \n To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
+    \n This is a reminder that revisions were requested for your application on the <u>PCGL Data Access Compliance Office portal</u>, and we have not yet received a response.
+    \n To proceed with the review process, please log in to review the comments and submit the required updates.
     \n\n Application ID: ${id}
-    \n Last Modified: ${submittedDate}
-    \n\n You can access your draft application here: ${ui}
-    \n If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
-    \n If you have any questions or need assistance, feel free to contact us!
+    \n Revision Requested By: ${repName}
+    \n Submission Date: ${submittedDate}
+    \n\n You can view and respond to the revision request here: ${ui}
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };
