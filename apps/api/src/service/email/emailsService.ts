@@ -56,6 +56,14 @@ import {
 } from './layouts/templates/EmailInstitutionalRepReview.ts';
 import { GenerateEmailRejection, GenerateEmailRejectionPlain } from './layouts/templates/EmailRejection.ts';
 import {
+	GenerateEmailReminderRepReview,
+	GenerateEmailReminderRepReviewPlain,
+} from './layouts/templates/EmailReminderRepReview.ts';
+import {
+	GenerateEmailReminderSubmitDraft,
+	GenerateEmailReminderSubmitDraftPlain,
+} from './layouts/templates/EmailReminderSubmitDraft.ts';
+import {
 	EmailSubjects,
 	type GenerateApplicantRepRevisionType,
 	type GenerateApplicantRevisionType,
@@ -113,7 +121,7 @@ const emailSvc = (db: PostgresDb) => {
 
 			return success(sentEmail);
 		} catch (err) {
-			logger.error(`Error at createEmailRecord with application_id: ${application_id}`);
+			logger.error(`Error at createEmailRecord with application_id: ${application_id}`, err);
 			return failure('SYSTEM_ERROR', 'An unexpected database failure occurred, email record was not created.');
 		}
 	};
@@ -141,13 +149,13 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_DRAFT,
-					html: GenerateEmailInstitutionalRepReview({
+					html: GenerateEmailReminderSubmitDraft({
 						id,
 						applicantName,
 						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
-					text: GenerateEmailInstitutionalRepReviewPlain({
+					text: GenerateEmailReminderSubmitDraftPlain({
 						id,
 						applicantName,
 						repName,
@@ -237,13 +245,13 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
-					html: GenerateEmailInstitutionalRepReview({
+					html: GenerateEmailReminderRepReview({
 						id,
 						applicantName,
 						repName: repName || 'Rep',
 						submittedDate: new Date(),
 					}),
-					text: GenerateEmailInstitutionalRepReviewPlain({
+					text: GenerateEmailReminderRepReviewPlain({
 						id,
 						applicantName,
 						repName: repName || 'Rep',

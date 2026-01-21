@@ -26,8 +26,8 @@ const logger = BaseLogger.forModule('Scheduler');
 
 const scheduler = async () => {
 	try {
-		// Scheduled to run at midnight
-		cron.schedule('0 0 * * *', async () => {
+		// Scheduled to run at midnight: '0 0 * * *'
+		cron.schedule('* * * * *', async () => {
 			scheduleEmailReminders();
 		});
 	} catch (error) {

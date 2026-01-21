@@ -182,7 +182,7 @@ export const sendEmailReminders = ({
 	const { id: application_action_id, created_at: actionDate, user_name } = action || {};
 	// TODO: Correct these definitions
 	const applicantName = applicationContents?.applicant_first_name ?? 'Test User';
-	const applicantEmail = applicationContents?.applicant_institutional_email ?? 'testUser@email.com';
+	const applicantEmail = applicationContents?.applicant_institutional_email ?? 'pcgl_email@yopmail.com';
 	const repEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';
 	const repName = `${applicationContents?.institutional_rep_first_name} ${applicationContents?.institutional_rep_last_name}`;
 	const dacEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';

@@ -133,6 +133,13 @@
 			"when": 1768841397238,
 			"tag": "0018_add_sent_emails_table",
 			"breakpoints": true
+		},
+		{
+			"idx": 19,
+			"version": "7",
+			"when": 1769015804458,
+			"tag": "0019_allow_null_action_id",
+			"breakpoints": true
 		}
 	]
 }
