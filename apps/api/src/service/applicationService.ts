@@ -667,12 +667,8 @@ const applicationSvc = (db: PostgresDb) => ({
 	 */
 	getEmailActionDetails: async ({
 		state = [],
-		page = 0,
-		pageSize = 20,
 	}: {
 		state: ApplicationStateValues[];
-		page?: number;
-		pageSize?: number;
 	}): AsyncResult<JoinedApplicationEmailsActionsRecord[], 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			// TODO: Optimize & Refactor using Drizzle Join or Query syntax
@@ -682,7 +678,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				.where(and(state.length ? inArray(applications.state, state) : undefined))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
-			const formattedApplicationRecords = await Promise.all(
+			const formattedRecords = await Promise.all(
 				applicationRecords
 					.map((app) => ({
 						application_id: app.applications.id,
@@ -714,7 +710,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					}),
 			);
 
-			return success(formattedApplicationRecords);
+			return success(formattedRecords);
 		} catch (err) {
 			logger.error(`Error at getEmailActionDetails`, err);
 			return failure('SYSTEM_ERROR', 'An unexpected error occurred attempting to list applications.');

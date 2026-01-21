@@ -176,10 +176,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onSubmit() {
-		return success('post submit');
-	}
-
 	async submitRepRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_rep_revisions);
 		if (transitionResult.success) {
@@ -187,6 +183,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
+	}
+
+	private async _onSubmit() {
+		return success('post dispatch on submit');
 	}
 
 	async submitDacRevision(userName: string) {
@@ -243,10 +243,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onRevisionRequest() {
-		return success('post revision request');
-	}
-
 	async reviseDacReview(userName: string) {
 		const transitionResult = this._canPerformAction(dac_revision_request);
 		if (transitionResult.success) {
@@ -254,6 +250,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
+	}
+
+	private async _onRevisionRequest() {
+		return success('post dispatch on revision request');
 	}
 
 	// Close
@@ -318,7 +318,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	}
 
 	private async _onApproved() {
-		return success('post approval');
+		return success('post dispatch on approval');
 	}
 
 	// Reject

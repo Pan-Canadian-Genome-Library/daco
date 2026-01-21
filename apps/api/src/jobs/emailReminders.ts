@@ -42,6 +42,13 @@ const dateDiffCheck = ({ actionDate, interval = 7 }: { actionDate: Date | null; 
 	return diff >= interval;
 };
 
+const targetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues }> = {
+	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
+	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
+	[ApplicationStates.DAC_REVIEW]: EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
+	[ApplicationStates.DAC_REVISIONS_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
+};
+
 const getMostRecentEmail = ({
 	sentEmails,
 	state,
@@ -49,14 +56,6 @@ const getMostRecentEmail = ({
 	sentEmails: EmailRecord[] | null;
 	state: ApplicationStateValues;
 }) => {
-	// Lookup most recent reminder email sent for current state, then confirm if it was sent >7 days ago
-	// If no reminder email was sent, see how long it has been in the current application state, and send a reminder if it has been in this state for >7 days
-	let targetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues }> = {
-		[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
-		[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
-		[ApplicationStates.DAC_REVIEW]: EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
-		[ApplicationStates.DAC_REVISIONS_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
-	};
 	const targetEmailType = targetEmailTypes[state];
 	const mostRecentEmail =
 		(sentEmails
@@ -72,6 +71,13 @@ const checkForEmailReminders = ({ mostRecentEmail }: { mostRecentEmail: EmailRec
 	return mostRecentEmailDate && dateDiffCheck({ actionDate: mostRecentEmailDate });
 };
 
+const targetActionTypes: Partial<{ [k in ApplicationStateValues]: ApplicationActionValues }> = {
+	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: ApplicationActions.SUBMIT_DRAFT,
+	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
+	[ApplicationStates.DAC_REVIEW]: ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
+	[ApplicationStates.DAC_REVISIONS_REQUESTED]: ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
+};
+
 const getMostRecentAction = ({
 	applicationActions,
 	state,
@@ -79,12 +85,6 @@ const getMostRecentAction = ({
 	applicationActions: ApplicationActionRecord[] | null;
 	state: ApplicationStateValues;
 }) => {
-	let targetActionTypes: Partial<{ [k in ApplicationStateValues]: ApplicationActionValues }> = {
-		[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: ApplicationActions.SUBMIT_DRAFT,
-		[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
-		[ApplicationStates.DAC_REVIEW]: ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
-		[ApplicationStates.DAC_REVISIONS_REQUESTED]: ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
-	};
 	const targetActionType = targetActionTypes[state];
 	const mostRecentAction =
 		(applicationActions
@@ -116,7 +116,6 @@ export const scheduleEmailReminders = async () => {
 	if (allApplicationsResult.success) {
 		const applications = allApplicationsResult.data;
 		for (const application of applications) {
-			// TODO: change to findOne / pageSize 1
 			const {
 				application_id: applicationId,
 				state,
@@ -172,7 +171,6 @@ export const sendEmailReminders = ({
 	applicationId: number;
 	createdAt: Date;
 	state: ApplicationStateValues;
-
 	applicationContents: ApplicationContentRecord | null;
 	action: ApplicationActionRecord | null;
 }) => {
@@ -218,7 +216,7 @@ export const sendEmailReminders = ({
 				emailService.sendEmailSubmitDacRevisionsReminder({
 					id: applicationId,
 					applicantName,
-					repName: 'Mr Rep',
+					repName,
 					submittedDate,
 					to: applicantEmail,
 				});
@@ -228,7 +226,7 @@ export const sendEmailReminders = ({
 					id: applicationId,
 					applicantName,
 					submittedDate,
-					repName: 'Mr Rep',
+					repName,
 					to: applicantEmail,
 				});
 			}
@@ -246,23 +244,21 @@ export const sendEmailReminders = ({
 			break;
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
 			if (action?.user_name === 'APPLICANT') {
-				console.log('applicant submit rep revision action', action);
 				// Post Rep Revisions Requested, if still in review 7 days later -> send Applicant email reminder
 				emailService.sendEmailSubmitRepRevisionsReminder({
 					id: applicationId,
 					applicantName,
 					submittedDate,
-					repName: 'Mr Rep',
+					repName,
 					to: applicantEmail,
 				});
 			} else if (action?.user_name === 'INSTITUTIONAL_REP') {
-				console.log('inst rep submit rep revision action', action);
 				// Post Rep Revisions Submitted, if still in review 7 days later -> send Institutional Rep email reminder
 				emailService.sendEmailRepRevisionsReminder({
 					id: applicationId,
 					applicantName,
 					submittedDate,
-					repName: 'Mr Rep',
+					repName,
 					to: repEmail,
 				});
 			}
