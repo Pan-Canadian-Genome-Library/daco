@@ -20,6 +20,7 @@
 import { eq } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
+import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
@@ -48,6 +49,7 @@ const studySvc = (db: PostgresDb) => ({
 					.select({
 						studyId: study.study_id,
 						dacId: study.dac_id,
+						dacName: dac.dac_name,
 						categoryId: study.category_id,
 						studyName: study.study_name,
 						studyDescription: study.study_description,
@@ -67,7 +69,8 @@ const studySvc = (db: PostgresDb) => ({
 						updatedAt: study.updated_at,
 					})
 					.from(study)
-					.where(eq(study.study_id, studyId));
+					.where(eq(study.study_id, studyId))
+					.innerJoin(dac, eq(dac.dac_id, study.dac_id));
 
 				if (!studyRecord[0]) {
 					throw new Error(`Study record ${studyId} is undefined.`);
