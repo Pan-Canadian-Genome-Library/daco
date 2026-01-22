@@ -62,13 +62,16 @@ import {
 } from './layouts/templates/index.ts';
 import {
 	EmailSubjects,
-	GenerateClosedType,
 	type GenerateApplicantRepRevisionType,
 	type GenerateApplicantRevisionType,
 	type GenerateApproveType,
+	type GenerateClosedType,
 	type GenerateDacRevisionType,
+	type GenerateDraftReminderEmailType,
 	type GenerateInstitutionalRepType,
 	type GenerateRejectType,
+	type GenerateReviewReminderEmailType,
+	type GenerateSubmitRevisionReminderEmailType,
 } from './types.ts';
 
 const logger = BaseLogger.forModule('emailService');
@@ -130,10 +133,9 @@ const emailSvc = (db: PostgresDb) => {
 			id,
 			applicantName,
 			actionId,
-			repName,
 			submittedDate,
 			to,
-		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateDraftReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -150,13 +152,11 @@ const emailSvc = (db: PostgresDb) => {
 					html: GenerateEmailReminderSubmitDraft({
 						id,
 						applicantName,
-						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
 					text: GenerateEmailReminderSubmitDraftPlain({
 						id,
 						applicantName,
-						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
 				});
@@ -228,8 +228,7 @@ const emailSvc = (db: PostgresDb) => {
 			actionId,
 			repName,
 			to,
-			comments,
-		}: GenerateApplicantRepRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -246,13 +245,13 @@ const emailSvc = (db: PostgresDb) => {
 					html: GenerateEmailReminderRepReview({
 						id,
 						applicantName,
-						repName: repName || 'Rep',
+						repName,
 						submittedDate: new Date(),
 					}),
 					text: GenerateEmailReminderRepReviewPlain({
 						id,
 						applicantName,
-						repName: repName || 'Rep',
+						repName,
 						submittedDate: new Date(),
 					}),
 				});
@@ -328,7 +327,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -493,10 +492,11 @@ const emailSvc = (db: PostgresDb) => {
 		sendEmailDacReviewReminder: async ({
 			id,
 			applicantName,
+			repName,
 			actionId,
 			submittedDate,
 			to,
-		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -513,11 +513,13 @@ const emailSvc = (db: PostgresDb) => {
 					html: GenerateEmailReminderDacReview({
 						id,
 						applicantName,
+						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
 					text: GenerateEmailReminderDacReviewPlain({
 						id,
 						applicantName,
+						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
 				});
@@ -579,7 +581,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -595,12 +597,14 @@ const emailSvc = (db: PostgresDb) => {
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
 					html: GenerateEmailReminderSubmitDacRevisions({
 						id,
+						actionId,
 						applicantName,
 						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
 					text: GenerateEmailReminderSubmitDacRevisionsPlain({
 						id,
+						actionId,
 						applicantName,
 						repName,
 						submittedDate: dateConverter(submittedDate),
@@ -671,7 +675,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -685,16 +689,16 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-					html: GenerateEmailReminderSubmitDacRevisions({
+					html: GenerateEmailReminderDacReview({
 						id,
 						applicantName,
-						repName: repName || 'Rep',
+						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
-					text: GenerateEmailReminderSubmitDacRevisions({
+					text: GenerateEmailReminderDacReview({
 						id,
 						applicantName,
-						repName: repName || 'Rep',
+						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
 				});

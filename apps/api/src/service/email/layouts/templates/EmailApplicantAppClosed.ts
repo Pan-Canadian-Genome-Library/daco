@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { getEmailConfig } from '@/config/emailConfig.ts';
 import { GenerateClosedType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
@@ -30,10 +29,6 @@ export const GenerateEmailApplicantClosed = ({
 	status,
 	submittedDate,
 }: GenerateClosedType) => {
-	const {
-		express: { ui },
-	} = getEmailConfig;
-
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>

@@ -18,15 +18,16 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateInstitutionalRepType } from '@/service/email/types.ts';
+import { GenerateReviewReminderEmailType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
 export const GenerateEmailReminderDacReview = ({
 	applicantName,
+	repName,
 	id,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to' | 'repName'>) => {
+}: Omit<GenerateReviewReminderEmailType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -34,7 +35,7 @@ export const GenerateEmailReminderDacReview = ({
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear DAC Member,
+                    Dear ${repName},
                 </mj-text>
                 <mj-text>
                     This is a friendly reminder that there is one or more applications assigned to you on the <u>PCGL Data Access Compliance Office portal</u> that have been <b>awaiting your review for over 7 days</b>.
@@ -73,14 +74,15 @@ export const GenerateEmailReminderDacReview = ({
 
 export const GenerateEmailReminderDacReviewPlain = ({
 	applicantName,
+	repName,
 	id,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to' | 'repName'>) => {
+}: Omit<GenerateReviewReminderEmailType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	return ` Dear DAC Member,
+	return ` Dear ${repName},
     \n We hope this message finds you well.
     \n This is a friendly reminder that there is one or more applications assigned to you on the PCGL Data Access Compliance Office portal that have been awaiting your review for over 7 days.
     \n Timely review of applications helps us maintain efficient processing and meet compliance standards.

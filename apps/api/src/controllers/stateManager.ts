@@ -185,10 +185,6 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		}
 	}
 
-	private async _onSubmit() {
-		return success('post dispatch on submit');
-	}
-
 	async submitDacRevision(userName: string) {
 		const transitionResult = this._canPerformAction(submit_dac_revisions);
 		if (transitionResult.success) {
@@ -196,6 +192,10 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		} else {
 			return transitionResult;
 		}
+	}
+
+	private async _onSubmit() {
+		return success('post dispatch on submit');
 	}
 
 	// Edit

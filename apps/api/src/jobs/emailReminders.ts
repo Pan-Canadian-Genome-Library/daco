@@ -30,7 +30,11 @@ import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
-import { type ApplicationActionRecord, type ApplicationContentRecord, type EmailRecord } from '@/service/types.ts';
+import {
+	type ApplicationActionRecord,
+	type EmailRecord,
+	type JoinedApplicationEmailsActionsRecord,
+} from '@/service/types.ts';
 
 const logger = BaseLogger.forModule('Email Reminders');
 
@@ -117,23 +121,19 @@ export const scheduleEmailReminders = async () => {
 		const applications = allApplicationsResult.data;
 		for (const application of applications) {
 			const {
-				application_id: applicationId,
 				state,
 				created_at: createdAt,
 				application_actions: applicationActions,
-				application_contents: applicationContents,
 				sent_emails: sentEmails,
 			} = application;
 
 			if (state === ApplicationStates.DRAFT) {
+				// TODO: Handle Withdrawn vs New Application
 				// If Application is still in DRAFT 7 days after creation, send a reminder email
 				const sendReminder = dateDiffCheck({ actionDate: createdAt });
 				if (sendReminder) {
 					sendEmailReminders({
-						applicationId,
-						applicationContents,
-						createdAt,
-						state,
+						application,
 						action: null,
 					});
 				}
@@ -146,10 +146,7 @@ export const scheduleEmailReminders = async () => {
 				const sendReminder = needsEmailReminder || needsStateReminder;
 				if (sendReminder) {
 					sendEmailReminders({
-						applicationId,
-						state,
-						createdAt,
-						applicationContents,
+						application,
 						action: mostRecentAction,
 					});
 				}
@@ -162,109 +159,133 @@ export const scheduleEmailReminders = async () => {
 };
 
 export const sendEmailReminders = ({
-	applicationId,
-	state,
-	createdAt,
-	applicationContents,
+	application,
 	action,
 }: {
-	applicationId: number;
-	createdAt: Date;
-	state: ApplicationStateValues;
-	applicationContents: ApplicationContentRecord | null;
+	application: JoinedApplicationEmailsActionsRecord;
 	action: ApplicationActionRecord | null;
 }) => {
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
+	const { application_id, state, created_at, application_contents } = application;
+	const { id: application_action_id, created_at: actionDate, user_name, user_id } = action || {};
 
-	const { id: application_action_id, created_at: actionDate, user_name } = action || {};
-	// TODO: Correct these definitions
-	const applicantName = applicationContents?.applicant_first_name ?? 'Test User';
-	const applicantEmail = applicationContents?.applicant_institutional_email ?? 'pcgl_email@yopmail.com';
-	const repEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';
-	const repName = `${applicationContents?.institutional_rep_first_name} ${applicationContents?.institutional_rep_last_name}`;
-	const dacEmail = applicationContents?.institutional_rep_email ?? 'testUser@email.com';
-	const submittedDate = actionDate || createdAt;
+	if (state === ApplicationStates.DRAFT) {
+		const { applicant_first_name, applicant_last_name, applicant_institutional_email } = application_contents || {};
 
-	switch (state) {
-		case ApplicationStates.DRAFT:
-			// if still in draft after 7 days -> send email reminder
-			emailService.sendEmailSubmitDraftReminder({
-				id: applicationId,
-				actionId: application_action_id,
-				applicantName,
-				submittedDate,
-				repName,
-				to: applicantEmail,
-			});
+		const applicantName = applicant_first_name
+			? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
+			: 'Applicant';
 
-			break;
-		case ApplicationStates.DAC_REVIEW:
-			// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
-			emailService.sendEmailDacReviewReminder({
-				id: applicationId,
-				applicantName,
-				repName,
-				submittedDate,
-				to: dacEmail,
-			});
+		// if still in draft after 7 days -> send email reminder
+		emailService.sendEmailSubmitDraftReminder({
+			id: application_id,
+			actionId: application_action_id,
+			applicantName,
+			submittedDate: actionDate || created_at,
+			to: applicant_institutional_email,
+		});
+	} else if (
+		application_contents !== null &&
+		action !== null &&
+		actionDate !== undefined &&
+		application_action_id !== undefined
+	) {
+		const {
+			applicant_first_name,
+			applicant_last_name,
+			applicant_institutional_email: applicantEmail,
+			institutional_rep_first_name,
+			institutional_rep_last_name,
+			institutional_rep_email: repEmail,
+		} = application_contents;
 
-			break;
-		case ApplicationStates.DAC_REVISIONS_REQUESTED: {
-			if (user_name === 'APPLICANT') {
-				// Post Dac Revisions Submitted, if still not submitted 7 days later -> send email reminder
-				emailService.sendEmailSubmitDacRevisionsReminder({
-					id: applicationId,
+		const applicantName = applicant_first_name
+			? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
+			: 'Applicant';
+		const repName = institutional_rep_first_name
+			? `${institutional_rep_first_name} ${institutional_rep_last_name || ''}`.trim()
+			: 'Representative';
+		// TODO: Need to Define Approach for Dac Member
+		const dacEmail = user_id ?? 'pcgl_email@yopmail.com';
+		const dacMemberName = user_name ? user_name : 'Dac Member';
+		const submittedDate = actionDate;
+
+		switch (state) {
+			case ApplicationStates.DAC_REVIEW:
+				// Post Submit Rep Review, Application has moved to Dac Review, if still in review 7 days later -> send email reminder
+				emailService.sendEmailDacReviewReminder({
+					id: application_id,
 					applicantName,
-					repName,
+					actionId: application_action_id,
+					repName: dacMemberName,
 					submittedDate,
-					to: applicantEmail,
+					to: dacEmail,
 				});
-			} else if (user_name === 'DAC_MEMBER') {
-				// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
-				emailService.sendEmailDacRevisionsReminder({
-					id: applicationId,
-					applicantName,
-					submittedDate,
-					repName,
-					to: applicantEmail,
-				});
+
+				break;
+			case ApplicationStates.DAC_REVISIONS_REQUESTED: {
+				// TODO: Check Action type
+				if (user_name === 'APPLICANT') {
+					// Post Dac Revisions Submitted, if still not submitted 7 days later -> send email reminder
+					emailService.sendEmailSubmitDacRevisionsReminder({
+						id: application_id,
+						actionId: application_action_id,
+						applicantName,
+						repName: dacMemberName,
+						submittedDate,
+						to: applicantEmail,
+					});
+				} else if (user_name === 'DAC_MEMBER') {
+					// Post Dac Revisions Requested, if still in review 7 days later -> send email reminder
+					emailService.sendEmailDacRevisionsReminder({
+						id: application_id,
+						actionId: application_action_id,
+						applicantName,
+						submittedDate,
+						repName: dacMemberName,
+						to: applicantEmail,
+					});
+				}
+				break;
 			}
-			break;
-		}
-		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-			// Post Submit Draft, Application has moved to Rep Review, if still in review 7 days later -> send email reminder
-			emailService.sendEmailRepReviewReminder({
-				id: applicationId,
-				applicantName,
-				actionId: application_action_id,
-				repName,
-				to: applicantEmail,
-			});
-			break;
-		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
-			if (action?.user_name === 'APPLICANT') {
-				// Post Rep Revisions Requested, if still in review 7 days later -> send Applicant email reminder
-				emailService.sendEmailSubmitRepRevisionsReminder({
-					id: applicationId,
+			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+				// Post Submit Draft, Application has moved to Rep Review, if still in review 7 days later -> send email reminder
+				emailService.sendEmailRepReviewReminder({
+					id: application_id,
 					applicantName,
-					submittedDate,
+					actionId: application_action_id,
 					repName,
+					submittedDate,
 					to: applicantEmail,
 				});
-			} else if (action?.user_name === 'INSTITUTIONAL_REP') {
-				// Post Rep Revisions Submitted, if still in review 7 days later -> send Institutional Rep email reminder
-				emailService.sendEmailRepRevisionsReminder({
-					id: applicationId,
-					applicantName,
-					submittedDate,
-					repName,
-					to: repEmail,
-				});
+				break;
+			case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED: {
+				// TODO: Check Action type
+				if (action.user_name === 'APPLICANT') {
+					// Post Rep Revisions Requested, if still in review 7 days later -> send Applicant email reminder
+					emailService.sendEmailSubmitRepRevisionsReminder({
+						id: application_id,
+						applicantName,
+						actionId: application_action_id,
+						submittedDate,
+						repName,
+						to: applicantEmail,
+					});
+				} else if (action.user_name === 'INSTITUTIONAL_REP') {
+					// Post Rep Revisions Submitted, if still in review 7 days later -> send Institutional Rep email reminder
+					emailService.sendEmailRepRevisionsReminder({
+						id: application_id,
+						applicantName,
+						submittedDate,
+						repName,
+						to: repEmail,
+					});
+				}
+				break;
 			}
-			break;
+			default:
+				break;
 		}
-		default:
-			break;
 	}
 };

@@ -65,8 +65,6 @@ export type GenerateApproveType = {
 export type GenerateDacRevisionType = {
 	id: string | number;
 	applicantName: string;
-	repName?: string;
-	actionId?: number;
 	submittedDate: Date | string;
 } & BaseEmailType;
 
@@ -79,12 +77,9 @@ export type GenerateApplicantRevisionType = {
 export type GenerateApplicantRepRevisionType = {
 	id: string | number;
 	applicantName: string;
-	actionId?: number;
-	institutionalRepFirstName?: string;
-	institutionalRepLastName?: string;
-	repName?: string;
-	submittedDate?: Date | string;
-	comments?: RevisionRequestModel;
+	institutionalRepFirstName: string;
+	institutionalRepLastName: string;
+	comments: RevisionRequestModel;
 } & BaseEmailType;
 
 export type GenerateClosedType = {
@@ -100,4 +95,34 @@ export type GenerateRevokeType = {
 	id: string | number;
 	name: string;
 	comment: string;
+} & BaseEmailType;
+
+export type GenerateDraftReminderEmailType = {
+	id: string | number;
+	actionId?: number;
+	applicantName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
+
+export type GenerateSubmitRevisionReminderEmailType = {
+	id: string | number;
+	applicantName: string;
+	actionId: number;
+	repName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
+
+export type GenerateRevisionReminderEmailType = {
+	id: string | number;
+	actionId: number;
+	repName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
+
+export type GenerateReviewReminderEmailType = {
+	id: string | number;
+	applicantName: string;
+	actionId: number;
+	repName: string;
+	submittedDate: Date | string;
 } & BaseEmailType;

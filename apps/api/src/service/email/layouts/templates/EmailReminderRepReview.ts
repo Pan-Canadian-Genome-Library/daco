@@ -18,7 +18,7 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateInstitutionalRepType } from '@/service/email/types.ts';
+import { GenerateReviewReminderEmailType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
@@ -27,7 +27,7 @@ export const GenerateEmailReminderRepReview = ({
 	repName,
 	id,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to'>) => {
+}: Omit<GenerateReviewReminderEmailType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -77,7 +77,7 @@ export const GenerateEmailReminderRepReviewPlain = ({
 	repName,
 	id,
 	submittedDate,
-}: Omit<GenerateInstitutionalRepType, 'to'>) => {
+}: Omit<GenerateReviewReminderEmailType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
