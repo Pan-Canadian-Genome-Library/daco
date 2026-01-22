@@ -22,7 +22,6 @@ import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import express from 'express';
 
 import { getStudyById } from '@/controllers/studyController.ts';
-import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
@@ -34,24 +33,28 @@ const studyRouter = express.Router();
  */
 studyRouter.get(
 	'/:studyId',
-	authMiddleware(),
 	withParamsSchemaValidation(
 		basicStudyParamSchema,
 		apiZodErrorMapping,
-		async (request, response: ResponseWithData<StudyDTO, ['NOT_FOUND', 'FORBIDDEN']>) => {
-			const { user } = request.session;
+		async (request, response: ResponseWithData<StudyDTO, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
 			const studyId = String(request.params.studyId);
 
-			if (user && user?.siteAdmin) {
-				const result = await getStudyById({ studyId });
+			const result = await getStudyById({ studyId });
 
-				if (result.success) {
-					response.status(200).json(result.data);
-					return;
+			if (!result.success) {
+				switch (result.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({ error: result.error, message: result.message });
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({ error: result.error, message: result.message });
+						break;
+					default:
+						response.status(500).json({ error: result.error, message: result.message });
 				}
+				return;
 			}
-
-			response.status(403).json({ error: 'FORBIDDEN', message: `User does not have permission to access this study.` });
+			response.status(200).json(result.data);
 			return;
 		},
 	),
