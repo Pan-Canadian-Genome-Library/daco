@@ -25,7 +25,6 @@ import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { StudyDTO } from '@pcgl-daco/data-model';
-import { type PostgresTransaction } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
 
@@ -34,51 +33,40 @@ const logger = BaseLogger.forModule('studyService');
  * @param db - Drizzle Postgres DB Instance
  */
 const studySvc = (db: PostgresDb) => ({
-	getStudyById: async ({
-		studyId,
-		transaction,
-	}: {
-		studyId: string;
-		transaction?: PostgresTransaction;
-	}): AsyncResult<StudyDTO, 'SYSTEM_ERROR'> => {
-		const dbTransaction = transaction ? transaction : db;
-
+	getStudyById: async ({ studyId }: { studyId: string }): AsyncResult<StudyDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
-			const result = await dbTransaction.transaction(async (transaction) => {
-				const studyRecord = await transaction
-					.select({
-						studyId: study.study_id,
-						dacId: study.dac_id,
-						dacName: dac.dac_name,
-						categoryId: study.category_id,
-						studyName: study.study_name,
-						studyDescription: study.study_description,
-						programName: study.program_name,
-						keywords: study.keywords,
-						status: study.status,
-						context: study.context,
-						domain: study.domain,
-						participantCriteria: study.participant_criteria,
-						principalInvestigators: study.principal_investigators,
-						leadOrganizations: study.lead_organizations,
-						collaborators: study.collaborators,
-						fundingSources: study.funding_sources,
-						publicationLinks: study.publication_links,
-						acceptingApplications: study.accepting_applications,
-						createdAt: study.created_at,
-						updatedAt: study.updated_at,
-					})
-					.from(study)
-					.where(eq(study.study_id, studyId))
-					.innerJoin(dac, eq(dac.dac_id, study.dac_id));
+			const studyRecord = await db
+				.select({
+					studyId: study.study_id,
+					dacId: study.dac_id,
+					dacName: dac.dac_name,
+					categoryId: study.category_id,
+					studyName: study.study_name,
+					studyDescription: study.study_description,
+					programName: study.program_name,
+					keywords: study.keywords,
+					status: study.status,
+					context: study.context,
+					domain: study.domain,
+					participantCriteria: study.participant_criteria,
+					principalInvestigators: study.principal_investigators,
+					leadOrganizations: study.lead_organizations,
+					collaborators: study.collaborators,
+					fundingSources: study.funding_sources,
+					publicationLinks: study.publication_links,
+					acceptingApplications: study.accepting_applications,
+					createdAt: study.created_at,
+					updatedAt: study.updated_at,
+				})
+				.from(study)
+				.where(eq(study.study_id, studyId))
+				.innerJoin(dac, eq(dac.dac_id, study.dac_id));
 
-				if (!studyRecord[0]) {
-					throw new Error(`Study record ${studyId} is undefined.`);
-				}
-				return studyRecord[0];
-			});
+			if (!studyRecord[0]) {
+				return failure('NOT_FOUND', `Uable to find study record ${studyId}.`);
+			}
 
-			return success(result);
+			return success(studyRecord[0]);
 		} catch (error) {
 			const message = 'Error at getStudyById';
 
