@@ -80,7 +80,7 @@ export const GenerateEmailReminderSubmitRepRevisionsPlain = ({
 	} = getEmailConfig;
 
 	return ` Dear ${applicantName},
-    \n This is a reminder that revisions were requested for your application on the <u>PCGL Data Access Compliance Office portal</u>, and we have not yet received a response.
+    \n This is a reminder that revisions were requested for your application on the PCGL Data Access Compliance Office portal, and we have not yet received a response.
     \n To proceed with the review process, please log in to review the comments and submit the required updates.
     \n\n Application ID: ${id}
     \n Revision Requested By: ${repName}

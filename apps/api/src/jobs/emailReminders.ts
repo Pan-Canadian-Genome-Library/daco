@@ -282,7 +282,7 @@ export const sendEmailReminders = ({
 						actionId: application_action_id,
 						repName,
 						submittedDate,
-						to: repEmail || 'pcgl_email@yopmail.com',
+						to: repEmail,
 					});
 				} else if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
 					// Post Rep Revisions Submitted, if still in review 7 days later -> send Institutional Rep email reminder

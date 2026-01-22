@@ -81,7 +81,7 @@ export const GenerateEmailReminderSubmitDraftPlain = ({
 
 	return ` Dear ${applicantName},
     \n We hope this message finds you well.
-    \n We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
+    \n We noticed that your application on the PCGL Data Access Compliance Office portal has been in draft status for over 7 days.
     \n To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
     \n\n Application ID: ${id}
     \n Last Modified: ${submittedDate}
