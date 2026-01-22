@@ -51,8 +51,12 @@ import {
 	GenerateEmailRejectionPlain,
 	GenerateEmailReminderDacReview,
 	GenerateEmailReminderDacReviewPlain,
+	GenerateEmailReminderDacReviewRevisions,
+	GenerateEmailReminderDacReviewRevisionsPlain,
 	GenerateEmailReminderRepReview,
 	GenerateEmailReminderRepReviewPlain,
+	GenerateEmailReminderRepReviewRevisions,
+	GenerateEmailReminderRepReviewRevisionsPlain,
 	GenerateEmailReminderSubmitDacRevisions,
 	GenerateEmailReminderSubmitDacRevisionsPlain,
 	GenerateEmailReminderSubmitDraft,
@@ -393,13 +397,13 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-					html: GenerateEmailInstitutionalRepReview({
+					html: GenerateEmailReminderRepReviewRevisions({
 						id,
 						applicantName,
 						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
-					text: GenerateEmailInstitutionalRepReviewPlain({
+					text: GenerateEmailReminderRepReviewRevisionsPlain({
 						id,
 						applicantName,
 						repName,
@@ -667,7 +671,7 @@ const emailSvc = (db: PostgresDb) => {
 				return failure('SYSTEM_ERROR', message);
 			}
 		},
-		// Periodic reminder Email for the DAC to Review Revisions
+		// Periodic reminder Email for the DAC to Review Submitted Revisions
 		sendEmailDacRevisionsReminder: async ({
 			id,
 			actionId,
@@ -689,13 +693,13 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
-					html: GenerateEmailReminderDacReview({
+					html: GenerateEmailReminderDacReviewRevisions({
 						id,
 						applicantName,
 						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
-					text: GenerateEmailReminderDacReview({
+					text: GenerateEmailReminderDacReviewRevisionsPlain({
 						id,
 						applicantName,
 						repName,

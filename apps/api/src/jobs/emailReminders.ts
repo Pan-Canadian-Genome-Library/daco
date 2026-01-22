@@ -147,8 +147,8 @@ export const scheduleEmailReminders = async () => {
 			const { state, created_at, application_actions: applicationActions, sent_emails: sentEmails } = application;
 
 			// Early Draft applications will not have any state transition Action records
-			// If Application is in DRAFT 7 days after creation (with no previous Actions), check created_at Date
-			// For all other states, confirm if it has been >7 days since the last related state change or reminder email
+			// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead
+			// For all other states & actions, confirm if it has been >7 days since the last related state change or reminder email
 			const mostRecentAction = getMostRecentAction({ state, applicationActions });
 			const actionDate = mostRecentAction
 				? mostRecentAction.created_at
@@ -189,7 +189,7 @@ export const sendEmailReminders = ({
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
 	const { application_id, state, created_at, application_contents } = application;
-	const { id: application_action_id, created_at: actionDate, user_name, user_id } = relatedAction || {};
+	const { id: application_action_id, created_at: actionDate } = relatedAction || {};
 
 	if (state === ApplicationStates.DRAFT) {
 		// If in State Draft for over 7 days, send a reminder email to Submit
@@ -229,13 +229,13 @@ export const sendEmailReminders = ({
 			? `${institutional_rep_first_name} ${institutional_rep_last_name || ''}`.trim()
 			: 'Representative';
 
-		// TODO: Need to Define Approach for Dac Member Names & Emails
-		const dacEmail = user_id ?? 'pcgl_email@yopmail.com';
-		const dacMemberName = user_name ? user_name : 'Dac Member';
 		const submittedDate = actionDate;
+		const dacMemberName = 'Dac Member';
 
 		switch (state) {
 			case ApplicationStates.DAC_REVIEW:
+				// TODO: Lookup contact email Dac table
+				const dacEmail = 'pcgl_email@yopmail.com';
 				if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
 					// Post Institutional Rep Submission, Application has moved to Dac Review
 					// If still in review 7 days later -> send email reminder to Dac Member
@@ -256,12 +256,12 @@ export const sendEmailReminders = ({
 						applicantName,
 						submittedDate,
 						repName: dacMemberName,
-						to: applicantEmail,
+						to: dacEmail,
 					});
 				}
 				break;
 			case ApplicationStates.DAC_REVISIONS_REQUESTED: {
-				// Post Dac Revisions Requested, if still not Subbmitted 7 days later -> send email reminder to Applicant
+				// Post Dac Revisions Requested, if still not Submitted 7 days later -> send email reminder to Applicant
 				emailService.sendEmailSubmitDacRevisionsReminder({
 					id: application_id,
 					actionId: application_action_id,
@@ -282,7 +282,7 @@ export const sendEmailReminders = ({
 						actionId: application_action_id,
 						repName,
 						submittedDate,
-						to: applicantEmail,
+						to: repEmail || 'pcgl_email@yopmail.com',
 					});
 				} else if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
 					// Post Rep Revisions Submitted, if still in review 7 days later -> send Institutional Rep email reminder
@@ -291,7 +291,7 @@ export const sendEmailReminders = ({
 						applicantName,
 						submittedDate,
 						repName,
-						to: repEmail,
+						to: repEmail || 'pcgl_email@yopmail.com',
 					});
 				}
 				break;

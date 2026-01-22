@@ -37,7 +37,15 @@ export {
 } from './EmailInstitutionalRepReview.ts';
 export { GenerateEmailRejection, GenerateEmailRejectionPlain } from './EmailRejection.ts';
 export { GenerateEmailReminderDacReview, GenerateEmailReminderDacReviewPlain } from './EmailReminderDacReview.ts';
+export {
+	GenerateEmailReminderDacReviewRevisions,
+	GenerateEmailReminderDacReviewRevisionsPlain,
+} from './EmailReminderDacReviewRevisions.ts';
 export { GenerateEmailReminderRepReview, GenerateEmailReminderRepReviewPlain } from './EmailReminderRepReview.ts';
+export {
+	GenerateEmailReminderRepReviewRevisions,
+	GenerateEmailReminderRepReviewRevisionsPlain,
+} from './EmailReminderRepReviewRevisions.ts';
 export {
 	GenerateEmailReminderSubmitDacRevisions,
 	GenerateEmailReminderSubmitDacRevisionsPlain,
