@@ -427,6 +427,7 @@ export type StudyStatusValues = (typeof StudyStatus)[keyof typeof StudyStatus];
 export type StudyDTO = {
 	studyId: string;
 	dacId: string;
+	dacName: string;
 	categoryId: number | null;
 	studyName: string;
 	studyDescription: string;
@@ -442,6 +443,16 @@ export type StudyDTO = {
 	fundingSources: string[];
 	publicationLinks: string[] | null;
 	acceptingApplications: boolean | null;
+	createdAt: Date | string;
+	updatedAt: Date | string | null;
+} & Pick<DacDTO, 'dacName'>;
+
+export type DacDTO = {
+	dacId: string;
+	dacName: string;
+	dacDescription: string;
+	contactName: string;
+	contactEmail: string;
 	createdAt: Date | string;
 	updatedAt: Date | string | null;
 };
