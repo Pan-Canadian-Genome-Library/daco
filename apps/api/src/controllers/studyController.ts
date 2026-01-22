@@ -38,10 +38,6 @@ export const getStudyById = async ({
 
 		const study = await studyService.getStudyById({ studyId });
 
-		if (!study) {
-			return failure('NOT_FOUND', `Study not found: ${studyId}`);
-		}
-
 		return study;
 	} catch (error) {
 		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
