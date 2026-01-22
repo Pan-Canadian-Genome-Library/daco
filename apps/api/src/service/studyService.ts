@@ -63,7 +63,7 @@ const studySvc = (db: PostgresDb) => ({
 				.innerJoin(dac, eq(dac.dac_id, study.dac_id));
 
 			if (!studyRecord[0]) {
-				return failure('NOT_FOUND', `Uable to find study record ${studyId}.`);
+				return failure('NOT_FOUND', `Unable to find study record ${studyId}.`);
 			}
 
 			return success(studyRecord[0]);
