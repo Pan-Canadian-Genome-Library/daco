@@ -21,7 +21,7 @@ import { dbConfig } from '@/config/dbConfig.ts';
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import { applications } from '@/db/schemas/applications.ts';
 import { dac } from '@/db/schemas/dac.ts';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, or } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
 const db = drizzle(dbConfig.connectionString);
@@ -55,7 +55,20 @@ try {
 			.set({
 				dac_id: `${dbConfig.PCGL_DACO_ID}`,
 			})
-			.where(and(isNull(applications.dac_id), eq(applications.state, 'APPROVED')));
+			.where(
+				and(
+					isNull(applications.dac_id),
+					or(
+						eq(applications.state, 'APPROVED'),
+						eq(applications.state, 'REVOKED'),
+						eq(applications.state, 'REJECTED'),
+						eq(applications.state, 'DAC_REVIEW'),
+						eq(applications.state, 'DAC_REVISIONS_REQUESTED'),
+						eq(applications.state, 'INSTITUTIONAL_REP_REVIEW'),
+						eq(applications.state, 'INSTITUTIONAL_REP_REVISION_REQUESTED'),
+					),
+				),
+			);
 	});
 
 	console.log('Successfully migrated dac_id with default DAC user');
