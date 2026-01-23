@@ -37,6 +37,7 @@ import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';
 import { pdfService } from './pdf/pdfService.ts';
 import { signatureService } from './signatureService.ts';
+import { studySvc } from './studyService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -116,3 +117,5 @@ export interface UserSession extends SessionType {
 export interface AuthorizedRequest extends Request {
 	session: UserSession;
 }
+
+export type StudyService = ReturnType<typeof studySvc>;
