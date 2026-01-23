@@ -10,7 +10,7 @@
 		"dev:server": "tsx watch --clear-screen=false --env-file=.env ./src/main.ts",
 		"dev:watch": "nx watch --projects=@pcgl-daco/api --includeDependentProjects -- nx run-many -t build \\$NX_PROJECT_NAME --exclude=@pcgl-daco/api",
 		"dbml": "tsx ./src/db/dbml.ts",
-		"migrate:db:dac-id": "tsx --env-file=.env src/scripts/dac-id-migration.ts",
+		"migrate:dac-id": "tsx --env-file=.env src/scripts/dac-id-migration.ts",
 		"setup": "pnpm setup:env && pnpm setup:db",
 		"setup:db": "pnpm migrate",
 		"setup:env": "cp -n .env.schema .env",

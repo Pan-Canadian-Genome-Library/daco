@@ -21,23 +21,33 @@ import { dbConfig } from '@/config/dbConfig.ts';
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import { applications } from '@/db/schemas/applications.ts';
 import { dac } from '@/db/schemas/dac.ts';
-import { isNull } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 
 const db = drizzle(dbConfig.connectionString);
-
 const { email } = getEmailConfig;
 
+/**
+ * Script to backfill existing applications field dac_id with default DAC user
+ */
 try {
 	await db.transaction(async (transaction) => {
-		// Add Default DAC user
-		await transaction.insert(dac).values({
-			dac_id: dbConfig.PCGL_DACO_ID,
-			dac_name: 'PCGL',
-			contact_name: 'PCGL',
-			contact_email: email.dacAddress,
-			dac_description: 'Default for PCGL',
-		});
+		// Get default dac user if exists
+		const defaultDacUser = await transaction.select().from(dac).where(eq(dac.dac_id, dbConfig.PCGL_DACO_ID));
+
+		// If it doesnt exist, insert default DAC user into dac table
+		if (defaultDacUser.length === 0) {
+			console.log('Adding default DAC user into dac table...');
+			await transaction.insert(dac).values({
+				dac_id: dbConfig.PCGL_DACO_ID,
+				dac_name: 'PCGL',
+				contact_name: 'PCGL',
+				contact_email: email.dacAddress,
+				dac_description: 'Default for PCGL',
+			});
+		} else {
+			console.log('Skipping default DAC user migration, user already exists');
+		}
 
 		// Apply backfill with PCGL_DACO_ID
 		await transaction
@@ -45,16 +55,12 @@ try {
 			.set({
 				dac_id: `${dbConfig.PCGL_DACO_ID}`,
 			})
-			.where(isNull(applications.dac_id));
-
-		// Alter dac_id column to be not nullable
-		await transaction.execute('ALTER TABLE applications ALTER COLUMN dac_id SET NOT NULL;');
+			.where(and(isNull(applications.dac_id), eq(applications.state, 'APPROVED')));
 	});
 
 	console.log('Successfully migrated dac_id with default DAC user');
 	process.exit(0);
 } catch (err) {
 	console.log(err);
-
 	process.exit(1);
 }
