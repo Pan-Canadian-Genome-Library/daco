@@ -54,11 +54,13 @@ const targetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues
 	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: [
 		EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
 		EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
+		EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 	],
 	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
 	[ApplicationStates.DAC_REVIEW]: [
 		EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
 		EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
+		EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 	],
 	[ApplicationStates.DAC_REVISIONS_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
 };
@@ -310,5 +312,9 @@ export const sendEmailReminders = ({
 			default:
 				break;
 		}
+	} else {
+		logger.error(
+			`Error at sendEmailReminders - Missing required application information for application with id ${application_id}`,
+		);
 	}
 };

@@ -22,7 +22,6 @@ import { GenerateReviewReminderEmailType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-// TODO: Update Templates
 export const GenerateEmailReminderRepReviewRevisions = ({
 	applicantName,
 	repName,
@@ -39,13 +38,10 @@ export const GenerateEmailReminderRepReviewRevisions = ({
                     Dear ${repName},
                 </mj-text>
                 <mj-text>
-                    This is a friendly reminder that there is one or more applications assigned to you on the <u>PCGL Data Access Compliance Office portal</u> that have been <b>awaiting your review for over 7 days</b>.
+                    This is a friendly reminder that one or more applications assigned to you in the <u>PCGL Data Access Compliance Office (DACO) portal</u> have been revised by the applicant and are awaiting your review for more than seven days.
                 </mj-text>
                 <mj-text>
-                   Timely review of applications helps us maintain efficient processing and meet compliance standards.
-                </mj-text>
-                <mj-text>
-                    <b>Pending Application(s):</b>
+                    <b>Revised Application(s):</b>
                 </mj-text>
                 <mj-text>
                     <ul>
@@ -61,7 +57,10 @@ export const GenerateEmailReminderRepReviewRevisions = ({
                     </ul>
                 </mj-text>
                 <mj-text>
-                    Please log in to the DACO portal to review: ${ui}
+                    Please log in to the DACO portal to review the submitted revisions: ${ui}
+                </mj-text>
+                <mj-text>
+                    Thank you for your attention and continued support.
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -84,14 +83,13 @@ export const GenerateEmailReminderRepReviewRevisionsPlain = ({
 	} = getEmailConfig;
 
 	return ` Dear ${repName},
-    \n We hope this message finds you well.
-    \n This is a friendly reminder that there is one or more applications assigned to you on the PCGL Data Access Compliance Office portal that have been awaiting your review for over 7 days.
-    \n Timely review of applications helps us maintain efficient processing and meet compliance standards.
+    \n This is a friendly reminder that one or more applications assigned to you in the PCGL Data Access Compliance Office (DACO) portal have been revised by the applicant and are awaiting your review for more than seven days.
     \n Pending Application(s):
     \n Application ID: ${id}
     \n Applicant Name: ${applicantName}
     \n Submission Date: ${submittedDate}
-    \n Please log in to the DACO portal to review: ${ui}
+    \n Please log in to the DACO portal to review the submitted revisions: ${ui}
+    \n Thank you for your attention and continued support.
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };

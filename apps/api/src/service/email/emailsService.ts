@@ -396,7 +396,7 @@ const emailSvc = (db: PostgresDb) => {
 				const response = await emailClient.sendMail({
 					from: fromAddress,
 					to,
-					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+					subject: EmailSubjects.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 					html: GenerateEmailReminderRepReviewRevisions({
 						id,
 						applicantName,
@@ -692,7 +692,7 @@ const emailSvc = (db: PostgresDb) => {
 				const response = await emailClient.sendMail({
 					from: fromAddress,
 					to,
-					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
+					subject: EmailSubjects.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 					html: GenerateEmailReminderDacReviewRevisions({
 						id,
 						applicantName,

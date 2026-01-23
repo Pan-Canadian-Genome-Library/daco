@@ -31,6 +31,7 @@ export const EmailSubjects = {
 	REMINDER_SUBMIT_DRAFT: 'Please Complete Your DACO Application',
 	REMINDER_SUBMIT_REVIEW: 'Reminder: Pending Application Review Required',
 	REMINDER_SUBMIT_REVISIONS: 'Reminder: Action Required – Revisions Requested on Your Application',
+	REMINDER_REVIEW_SUBMITTED_REVISIONS: 'Reminder: Revised Application Awaiting Your Review',
 } as const;
 
 export type EmailSubjectsType = (typeof EmailSubjects)[keyof typeof EmailSubjects];

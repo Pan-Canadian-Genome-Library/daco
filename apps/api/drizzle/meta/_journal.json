@@ -140,6 +140,13 @@
 			"when": 1769015804458,
 			"tag": "0019_allow_null_action_id",
 			"breakpoints": true
+		},
+		{
+			"idx": 20,
+			"version": "7",
+			"when": 1769188290554,
+			"tag": "0020_add_review_email_type",
+			"breakpoints": true
 		}
 	]
 }

@@ -1,0 +1,1298 @@
+{
+  "id": "7ac079bf-355c-4b4b-92c4-c36a066384f0",
+  "prevId": "d5eded0a-9556-41d7-981e-4aca9122e66f",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.application_actions": {
+      "name": "application_actions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "application_actions_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_name": {
+          "name": "user_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "application_action_types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revisions_request_id": {
+          "name": "revisions_request_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state_before": {
+          "name": "state_before",
+          "type": "application_states",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state_after": {
+          "name": "state_after",
+          "type": "application_states",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.application_contents": {
+      "name": "application_contents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "application_contents_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "applicant_first_name": {
+          "name": "applicant_first_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_middle_name": {
+          "name": "applicant_middle_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_last_name": {
+          "name": "applicant_last_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_title": {
+          "name": "applicant_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_suffix": {
+          "name": "applicant_suffix",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_position_title": {
+          "name": "applicant_position_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_primary_affiliation": {
+          "name": "applicant_primary_affiliation",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_institutional_email": {
+          "name": "applicant_institutional_email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_profile_url": {
+          "name": "applicant_profile_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_institution_country": {
+          "name": "applicant_institution_country",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_institution_state": {
+          "name": "applicant_institution_state",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_institution_city": {
+          "name": "applicant_institution_city",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_institution_street_address": {
+          "name": "applicant_institution_street_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_institution_postal_code": {
+          "name": "applicant_institution_postal_code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_institution_building": {
+          "name": "applicant_institution_building",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_title": {
+          "name": "institutional_rep_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_first_name": {
+          "name": "institutional_rep_first_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_middle_name": {
+          "name": "institutional_rep_middle_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_last_name": {
+          "name": "institutional_rep_last_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_suffix": {
+          "name": "institutional_rep_suffix",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_primary_affiliation": {
+          "name": "institutional_rep_primary_affiliation",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_email": {
+          "name": "institutional_rep_email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_profile_url": {
+          "name": "institutional_rep_profile_url",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_position_title": {
+          "name": "institutional_rep_position_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_country": {
+          "name": "institution_country",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_state": {
+          "name": "institution_state",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_city": {
+          "name": "institution_city",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_street_address": {
+          "name": "institution_street_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_postal_code": {
+          "name": "institution_postal_code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_building": {
+          "name": "institution_building",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_title": {
+          "name": "project_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_website": {
+          "name": "project_website",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_background": {
+          "name": "project_background",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_methodology": {
+          "name": "project_methodology",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_aims": {
+          "name": "project_aims",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_summary": {
+          "name": "project_summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_publication_urls": {
+          "name": "project_publication_urls",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_signature": {
+          "name": "applicant_signature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_signed_at": {
+          "name": "applicant_signed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_signature": {
+          "name": "institutional_rep_signature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_rep_signed_at": {
+          "name": "institutional_rep_signed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "accepted_agreements": {
+          "name": "accepted_agreements",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "accepted_appendices": {
+          "name": "accepted_appendices",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requested_studies": {
+          "name": "requested_studies",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ethics_review_required": {
+          "name": "ethics_review_required",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ethics_letter": {
+          "name": "ethics_letter",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "signed_pdf": {
+          "name": "signed_pdf",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "search_index": {
+          "name": "search_index",
+          "columns": [
+            {
+              "expression": "(\n\t\t\t\tsetweight(to_tsvector('english', \"application_id\"::text), 'A') ||\n\t\t\t\tsetweight(to_tsvector('english', \"applicant_first_name\" || ' ' || \"applicant_last_name\"), 'B') ||\n\t\t\t\tsetweight(to_tsvector('english', \"applicant_institutional_email\"), 'C') ||\n\t\t\t\tsetweight(to_tsvector('english', \"applicant_primary_affiliation\"), 'D') \n\t  \t\t)",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.applications": {
+      "name": "applications",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "applications_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "application_states",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "approved_at": {
+          "name": "approved_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contents": {
+          "name": "contents",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.collaborators": {
+      "name": "collaborators",
+      "schema": "",
+      "columns": {
+        "application_id": {
+          "name": "application_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "middle_name": {
+          "name": "middle_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "suffix": {
+          "name": "suffix",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "position_title": {
+          "name": "position_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institutional_email": {
+          "name": "institutional_email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "profile_url": {
+          "name": "profile_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "collaborator_type": {
+          "name": "collaborator_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "collaborators_application_id_institutional_email_pk": {
+          "name": "collaborators_application_id_institutional_email_pk",
+          "columns": [
+            "application_id",
+            "institutional_email"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dac": {
+      "name": "dac",
+      "schema": "",
+      "columns": {
+        "dac_id": {
+          "name": "dac_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dac_name": {
+          "name": "dac_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dac_description": {
+          "name": "dac_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_name": {
+          "name": "contact_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_email": {
+          "name": "contact_email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.comments": {
+      "name": "comments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "comments_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_name": {
+          "name": "user_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dac_chair_only": {
+          "name": "dac_chair_only",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "section": {
+          "name": "section",
+          "type": "sections",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.files": {
+      "name": "files",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "files_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "file_types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submitter_user_id": {
+          "name": "submitter_user_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submitted_at": {
+          "name": "submitted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "filename": {
+          "name": "filename",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.revision_requests": {
+      "name": "revision_requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "revision_requests_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "comments": {
+          "name": "comments",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_notes": {
+          "name": "applicant_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_approved": {
+          "name": "applicant_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "institution_rep_approved": {
+          "name": "institution_rep_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "institution_rep_notes": {
+          "name": "institution_rep_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "collaborators_approved": {
+          "name": "collaborators_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collaborators_notes": {
+          "name": "collaborators_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_approved": {
+          "name": "project_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "project_notes": {
+          "name": "project_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requested_studies_approved": {
+          "name": "requested_studies_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "requested_studies_notes": {
+          "name": "requested_studies_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ethics_approved": {
+          "name": "ethics_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ethics_notes": {
+          "name": "ethics_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "agreements_approved": {
+          "name": "agreements_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "agreements_notes": {
+          "name": "agreements_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "appendices_approved": {
+          "name": "appendices_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "appendices_notes": {
+          "name": "appendices_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sign_and_submit_approved": {
+          "name": "sign_and_submit_approved",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sign_and_submit_notes": {
+          "name": "sign_and_submit_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.emails": {
+      "name": "emails",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "emails_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "application_id": {
+          "name": "application_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "application_action_id": {
+          "name": "application_action_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_type": {
+          "name": "email_type",
+          "type": "email_types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recipient_emails": {
+          "name": "recipient_emails",
+          "type": "varchar(320)[]",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "emails_application_id_applications_id_fk": {
+          "name": "emails_application_id_applications_id_fk",
+          "tableFrom": "emails",
+          "tableTo": "applications",
+          "columnsFrom": [
+            "application_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "emails_application_action_id_application_actions_id_fk": {
+          "name": "emails_application_action_id_application_actions_id_fk",
+          "tableFrom": "emails",
+          "tableTo": "application_actions",
+          "columnsFrom": [
+            "application_action_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.study": {
+      "name": "study",
+      "schema": "",
+      "columns": {
+        "study_id": {
+          "name": "study_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dac_id": {
+          "name": "dac_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "study_name": {
+          "name": "study_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "study_description": {
+          "name": "study_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "program_name": {
+          "name": "program_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "keywords": {
+          "name": "keywords",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "study_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "context": {
+          "name": "context",
+          "type": "study_context",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participant_criteria": {
+          "name": "participant_criteria",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "principal_investigators": {
+          "name": "principal_investigators",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lead_organizations": {
+          "name": "lead_organizations",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collaborators": {
+          "name": "collaborators",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "funding_sources": {
+          "name": "funding_sources",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publication_links": {
+          "name": "publication_links",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "accepting_applications": {
+          "name": "accepting_applications",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "dac_id_fk": {
+          "name": "dac_id_fk",
+          "tableFrom": "study",
+          "tableTo": "dac",
+          "columnsFrom": [
+            "dac_id"
+          ],
+          "columnsTo": [
+            "dac_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "study_category_id_unique": {
+          "name": "study_category_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "category_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.application_action_types": {
+      "name": "application_action_types",
+      "schema": "public",
+      "values": [
+        "WITHDRAW",
+        "CLOSE",
+        "SUBMIT_DRAFT",
+        "INSTITUTIONAL_REP_REVISION_REQUEST",
+        "INSTITUTIONAL_REP_SUBMIT",
+        "INSTITUTIONAL_REP_APPROVED",
+        "DAC_REVIEW_REVISION_REQUEST",
+        "DAC_REVIEW_SUBMIT",
+        "DAC_REVIEW_APPROVED",
+        "DAC_REVIEW_REJECTED",
+        "REVOKE"
+      ]
+    },
+    "public.application_states": {
+      "name": "application_states",
+      "schema": "public",
+      "values": [
+        "DRAFT",
+        "INSTITUTIONAL_REP_REVIEW",
+        "INSTITUTIONAL_REP_REVISION_REQUESTED",
+        "DAC_REVIEW",
+        "DAC_REVISIONS_REQUESTED",
+        "REJECTED",
+        "APPROVED",
+        "CLOSED",
+        "REVOKED"
+      ]
+    },
+    "public.sections": {
+      "name": "sections",
+      "schema": "public",
+      "values": [
+        "INTRO",
+        "APPLICANT",
+        "INSTITUTIONAL",
+        "COLLABORATORS",
+        "PROJECT",
+        "STUDY",
+        "ETHICS",
+        "AGREEMENT",
+        "APPENDICES",
+        "SIGN"
+      ]
+    },
+    "public.file_types": {
+      "name": "file_types",
+      "schema": "public",
+      "values": [
+        "SIGNED_APPLICATION",
+        "ETHICS_LETTER"
+      ]
+    },
+    "public.email_types": {
+      "name": "email_types",
+      "schema": "public",
+      "values": [
+        "NOTIFY_APPLICANT_WITHDRAW",
+        "NOTIFY_APPLICANT_CLOSE",
+        "NOTIFY_APPLICANT_REVOKE",
+        "NOTIFY_APPLICANT_DAC_REVIEW_REJECTED",
+        "NOTIFY_APPLICANT_DAC_APPROVAL",
+        "NOTIFY_COLLABORATORS_DAC_APPROVAL",
+        "REMINDER_SUBMIT_DRAFT",
+        "REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW",
+        "REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP",
+        "REMINDER_SUBMIT_DAC_REVIEW",
+        "REMINDER_SUBMIT_REVISIONS_DAC_REVIEW",
+        "REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP",
+        "REMINDER_REQUEST_REVISIONS_DAC_REVIEW",
+        "REQUEST_REVISIONS_INSTITUTIONAL_REP",
+        "REQUEST_REVISIONS_DAC_REVIEW",
+        "REMINDER_REVIEW_SUBMITTED_REVISIONS",
+        "SUBMIT_DRAFT",
+        "SUBMIT_REVISIONS_INSTITUTIONAL_REP",
+        "SUBMIT_INSTITUTIONAL_REP_REVIEW",
+        "SUBMIT_REVISIONS_DAC_REVIEW",
+        "SUBMIT_DAC_REVIEW"
+      ]
+    },
+    "public.study_context": {
+      "name": "study_context",
+      "schema": "public",
+      "values": [
+        "Clinical",
+        "Research"
+      ]
+    },
+    "public.study_status": {
+      "name": "study_status",
+      "schema": "public",
+      "values": [
+        "Ongoing",
+        "Completed"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
