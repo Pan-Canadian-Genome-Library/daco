@@ -1,1 +1,0 @@
-ALTER TABLE "emails" ALTER COLUMN "application_action_id" DROP NOT NULL;
