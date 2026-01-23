@@ -24,9 +24,56 @@ enum application_states {
   REVOKED
 }
 
+enum email_types {
+  NOTIFY_APPLICANT_WITHDRAW
+  NOTIFY_APPLICANT_CLOSE
+  NOTIFY_APPLICANT_REVOKE
+  NOTIFY_APPLICANT_DAC_REVIEW_REJECTED
+  NOTIFY_APPLICANT_DAC_APPROVAL
+  NOTIFY_COLLABORATORS_DAC_APPROVAL
+  REMINDER_SUBMIT_DRAFT
+  REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW
+  REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP
+  REMINDER_SUBMIT_DAC_REVIEW
+  REMINDER_SUBMIT_REVISIONS_DAC_REVIEW
+  REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP
+  REMINDER_REQUEST_REVISIONS_DAC_REVIEW
+  REQUEST_REVISIONS_INSTITUTIONAL_REP
+  REQUEST_REVISIONS_DAC_REVIEW
+  REMINDER_REVIEW_SUBMITTED_REVISIONS
+  SUBMIT_DRAFT
+  SUBMIT_REVISIONS_INSTITUTIONAL_REP
+  SUBMIT_INSTITUTIONAL_REP_REVIEW
+  SUBMIT_REVISIONS_DAC_REVIEW
+  SUBMIT_DAC_REVIEW
+}
+
 enum file_types {
   SIGNED_APPLICATION
   ETHICS_LETTER
+}
+
+enum sections {
+  INTRO
+  APPLICANT
+  INSTITUTIONAL
+  COLLABORATORS
+  PROJECT
+  STUDY
+  ETHICS
+  AGREEMENT
+  APPENDICES
+  SIGN
+}
+
+enum study_context {
+  Clinical
+  Research
+}
+
+enum study_status {
+  Ongoing
+  Completed
 }
 
 table application_actions {
@@ -34,10 +81,11 @@ table application_actions {
   application_id bigint [not null]
   created_at timestamp [not null, default: `now()`]
   user_id varchar(100) [not null]
+  user_name varchar(100)
   action application_action_types [not null]
   revisions_request_id bigint
-  state_before varchar(255) [not null]
-  state_after varchar(255) [not null]
+  state_before application_states [not null]
+  state_after application_states [not null]
 }
 
 table application_contents {
@@ -92,6 +140,10 @@ table application_contents {
   ethics_review_required boolean
   ethics_letter bigint
   signed_pdf bigint
+
+  indexes {
+    (application_id, applicant_first_name, applicant_last_name, applicant_institutional_email, applicant_primary_affiliation) [name: 'search_index']
+  }
 }
 
 table applications {
@@ -106,7 +158,6 @@ table applications {
 }
 
 table collaborators {
-  id bigint [pk, not null]
   application_id bigint [not null]
   first_name varchar(255) [not null]
   middle_name varchar(255)
@@ -117,6 +168,31 @@ table collaborators {
   institutional_email varchar(320) [not null]
   profile_url text
   collaborator_type text
+
+  indexes {
+    (application_id, institutional_email) [pk]
+  }
+}
+
+table dac {
+  dac_id text [pk, not null]
+  dac_name varchar(255) [not null]
+  dac_description text [not null]
+  contact_name varchar(255) [not null]
+  contact_email varchar(255) [not null]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+}
+
+table comments {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  user_id varchar(255) [not null]
+  message text [not null]
+  user_name varchar(255) [not null]
+  dac_chair_only boolean [not null]
+  section sections [not null]
+  created_at timestamp [not null, default: `now()`]
 }
 
 table files {
@@ -154,6 +230,37 @@ table revision_requests {
   sign_and_submit_notes text
 }
 
+table emails {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  application_action_id bigint
+  created_at timestamp [not null]
+  email_type email_types [not null]
+  recipient_emails "varchar(320)[]" [not null]
+}
+
+table study {
+  study_id text [pk, not null]
+  dac_id text [not null]
+  study_name varchar(255) [not null]
+  study_description text [not null]
+  program_name varchar(255)
+  keywords text[]
+  status study_status [not null]
+  context study_context [not null]
+  domain text[] [not null]
+  participant_criteria text
+  principal_investigators text[] [not null]
+  lead_organizations text[] [not null]
+  collaborators text[]
+  funding_sources text[] [not null]
+  publication_links text[]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+  category_id integer [unique]
+  accepting_applications boolean [default: false]
+}
+
 ref: application_actions.application_id > applications.id
 
 ref: application_actions.revisions_request_id > revision_requests.id
@@ -164,6 +271,14 @@ ref: application_contents.signed_pdf - files.id
 
 ref: collaborators.application_id > application_contents.application_id
 
+ref: comments.application_id - applications.id
+
+ref: emails.application_id > applications.id
+
+ref: emails.application_action_id > application_actions.id
+
 ref: files.application_id - applications.id
 
 ref: revision_requests.application_id > application_contents.id
+
+ref: study.dac_id - dac.dac_id
