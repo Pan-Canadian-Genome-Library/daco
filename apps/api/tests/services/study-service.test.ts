@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -28,7 +28,7 @@ import { studySvc } from '@/service/studyService.ts';
 import { StudyService } from '@/service/types.ts';
 import { addStudyAndDacUsers, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
 
-describe('File API', () => {
+describe('Study API', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
 	let studyService: StudyService;
