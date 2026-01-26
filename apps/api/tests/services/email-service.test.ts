@@ -17,15 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { EmailTypes } from '@pcgl-daco/data-model/src/types.js';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
+import { and, eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { before, describe, it } from 'node:test';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
+import { sentEmails } from '@/db/schemas/sentEmails.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { EmailService, RevisionRequestModel } from '@/service/types.ts';
 
-import { addInitialApplications, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
+import {
+	addInitialActions,
+	addInitialApplications,
+	initTestMigration,
+	PG_DATABASE,
+	PG_PASSWORD,
+	PG_USER,
+	testUserId,
+} from '../utils/testUtils.ts';
 
 describe('Email Service', () => {
 	let db: PostgresDb;
@@ -68,6 +79,7 @@ describe('Email Service', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
+		await addInitialActions(db);
 
 		testEmailService = emailSvc(db);
 	});
@@ -187,6 +199,176 @@ describe('Email Service', () => {
 			});
 
 			assert.ok(!response.success);
+		});
+	});
+
+	describe('Email Reminders', () => {
+		it('sendEmailSubmitDraftReminder - Should create a Sent Email record', async () => {
+			const response = await testEmailService.sendEmailSubmitDraftReminder({
+				applicantName: 'Test User',
+				id: 1,
+				submittedDate: new Date(),
+				to: testUserId,
+			});
+
+			assert.ok(response.success);
+
+			const emailRecord = await db
+				.select()
+				.from(sentEmails)
+				.where(and(eq(sentEmails.application_id, 1), eq(sentEmails.email_type, EmailTypes.REMINDER_SUBMIT_DRAFT)));
+
+			assert.ok(emailRecord[0]);
+		});
+
+		it('sendEmailRepReviewReminder - Should create a Sent Email record', async () => {
+			const response = await testEmailService.sendEmailRepReviewReminder({
+				actionId: 1,
+				applicantName: 'Test User',
+				id: 1,
+				repName: 'Test Representative',
+				submittedDate: new Date(),
+				to: testUserId,
+			});
+
+			assert.ok(response.success);
+
+			const emailRecord = await db
+				.select()
+				.from(sentEmails)
+				.where(
+					and(
+						eq(sentEmails.application_action_id, 1),
+						eq(sentEmails.email_type, EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW),
+					),
+				);
+
+			assert.ok(emailRecord[0]);
+		});
+
+		it('sendEmailRepRevisionsReminder - Should create a Sent Email record', async () => {
+			const response = await testEmailService.sendEmailRepRevisionsReminder({
+				actionId: 2,
+				applicantName: 'Test User',
+				id: 1,
+				repName: 'Test Representative',
+				submittedDate: new Date(),
+				to: testUserId,
+			});
+
+			assert.ok(response.success);
+
+			const emailRecord = await db
+				.select()
+				.from(sentEmails)
+				.where(
+					and(
+						eq(sentEmails.application_action_id, 2),
+						eq(sentEmails.email_type, EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP),
+					),
+				);
+
+			assert.ok(emailRecord[0]);
+		});
+
+		it('sendEmailSubmitRepRevisionsReminder - Should create a Sent Email record', async () => {
+			const response = await testEmailService.sendEmailSubmitRepRevisionsReminder({
+				actionId: 3,
+				applicantName: 'Test User',
+				id: 1,
+				repName: 'Test Representative',
+				submittedDate: new Date(),
+				to: testUserId,
+			});
+
+			assert.ok(response.success);
+
+			const emailRecord = await db
+				.select()
+				.from(sentEmails)
+				.where(
+					and(
+						eq(sentEmails.application_action_id, 3),
+						eq(sentEmails.email_type, EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP),
+					),
+				);
+
+			assert.ok(emailRecord[0]);
+		});
+
+		it('sendEmailSubmitDacRevisionsReminder - Should create a Sent Email record', async () => {
+			const response = await testEmailService.sendEmailSubmitDacRevisionsReminder({
+				actionId: 4,
+				applicantName: 'Test User',
+				id: 1,
+				repName: 'Test Representative',
+				submittedDate: new Date(),
+				to: testUserId,
+			});
+
+			assert.ok(response.success);
+
+			const emailRecord = await db
+				.select()
+				.from(sentEmails)
+				.where(
+					and(
+						eq(sentEmails.application_action_id, 4),
+						eq(sentEmails.email_type, EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW),
+					),
+				);
+
+			assert.ok(emailRecord[0]);
+		});
+
+		it('sendEmailDacRevisionsReminder - Should create a Sent Email record', async () => {
+			const response = await testEmailService.sendEmailDacRevisionsReminder({
+				actionId: 5,
+				applicantName: 'Test User',
+				id: 1,
+				repName: 'Test Representative',
+				submittedDate: new Date(),
+				to: testUserId,
+			});
+
+			assert.ok(response.success);
+
+			const emailRecord = await db
+				.select()
+				.from(sentEmails)
+				.where(
+					and(
+						eq(sentEmails.application_action_id, 5),
+						eq(sentEmails.email_type, EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW),
+					),
+				);
+
+			assert.ok(emailRecord[0]);
+		});
+
+		it('sendEmailDacReviewReminder - Should create a Sent Email record', async () => {
+			const response = await testEmailService.sendEmailDacReviewReminder({
+				actionId: 6,
+				applicantName: 'Test User',
+				id: 1,
+				repName: 'Test Representative',
+				submittedDate: new Date(),
+				to: testUserId,
+			});
+
+			assert.ok(response.success);
+
+			const emailRecord = await db
+				.select()
+				.from(sentEmails)
+				.where(
+					and(
+						eq(sentEmails.application_action_id, 6),
+						eq(sentEmails.email_type, EmailTypes.REMINDER_SUBMIT_DAC_REVIEW),
+					),
+				);
+
+			assert.ok(emailRecord[0]);
 		});
 	});
 });
