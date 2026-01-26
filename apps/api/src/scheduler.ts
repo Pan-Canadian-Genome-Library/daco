@@ -22,13 +22,17 @@ import cron from 'node-cron';
 import { scheduleEmailReminders } from '@/jobs/emailReminders.ts';
 import BaseLogger from '@/logger.js';
 
+const { ENABLE_EMAIL_REMINDERS } = process.env;
+
 const logger = BaseLogger.forModule('Scheduler');
 
 const scheduler = async () => {
 	try {
 		// Scheduled to run at midnight:
 		cron.schedule('0 0 * * *', async () => {
-			scheduleEmailReminders();
+			if (ENABLE_EMAIL_REMINDERS === 'true') {
+				scheduleEmailReminders();
+			}
 		});
 	} catch (error) {
 		logger.error(error);
