@@ -3,7 +3,7 @@ CREATE TABLE "emails" (
 	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "emails_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
 	"application_id" bigint NOT NULL,
 	"application_action_id" bigint,
-	"created_at" timestamp NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
 	"email_type" "email_types" NOT NULL,
 	"recipient_emails" varchar(320)[] NOT NULL
 );

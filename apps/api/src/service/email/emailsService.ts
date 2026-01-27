@@ -368,7 +368,7 @@ const emailSvc = (db: PostgresDb) => {
 
 				return success(response);
 			} catch (error) {
-				const message = `Error sending email - sendEmailRepRevisionsReminder`;
+				const message = `Error sending email - sendEmailSubmitRepRevisionsReminder`;
 
 				logger.error(message, error);
 
@@ -624,7 +624,7 @@ const emailSvc = (db: PostgresDb) => {
 
 				return success(response);
 			} catch (error) {
-				const message = `Error sending email - sendEmailDacRevisionsReminder`;
+				const message = `Error sending email - sendEmailSubmitDacRevisionsReminder`;
 
 				logger.error(message, error);
 

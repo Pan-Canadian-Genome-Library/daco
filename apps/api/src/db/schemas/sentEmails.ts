@@ -53,7 +53,7 @@ export const sentEmails = pgTable('emails', {
 		.notNull()
 		.references(() => applications.id),
 	application_action_id: bigint({ mode: 'number' }).references(() => applicationActions.id),
-	created_at: timestamp().notNull(),
+	created_at: timestamp().notNull().defaultNow(),
 	email_type: emailTypesEnum().notNull(),
 	recipient_emails: varchar({ length: 320 }).array().notNull(),
 });
