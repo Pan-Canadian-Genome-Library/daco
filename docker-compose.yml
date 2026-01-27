@@ -66,8 +66,9 @@ services:
     container_name: dictionary-manager.service
     image: ghcr.io/pan-canadian-genome-library/dictionary-manager:edge
     ports:
-      - 3000:3000
+      - 3001:3001
     environment:
+      PORT: 3001
       MONGO_HOST: dictionary-manager-mongo
       MONGO_PORT: 27017
       MONGO_DB: dictionary-manager

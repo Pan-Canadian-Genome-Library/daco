@@ -27,7 +27,7 @@ const serverConfigSchema = z.object({
 	npm_package_version: z.string().optional().default('unknown'),
 
 	// Custom env variables
-	PORT: z.coerce.number().optional().default(3001),
+	PORT: z.coerce.number().optional().default(3000),
 	SESSION_KEYS: z.string(),
 	SESSION_MAX_AGE: z.coerce
 		.number()
