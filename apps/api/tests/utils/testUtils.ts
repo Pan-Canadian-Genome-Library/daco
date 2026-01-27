@@ -96,13 +96,8 @@ export const addInitialApplications = async (db: PostgresDb) => {
  * Create test data for study and dac users
  */
 export const addStudyAndDacUsers = async (db: PostgresDb) => {
-	testDacUsersData.forEach(async (user) => {
-		await db.insert(dac).values(user);
-	});
-
-	testStudyData.forEach(async (currentStudy) => {
-		await db.insert(study).values(currentStudy);
-	});
+	await Promise.all(testDacUsersData.map((user) => db.insert(dac).values(user)));
+	await Promise.all(testStudyData.map((currentStudy) => db.insert(study).values(currentStudy)));
 };
 
 /** Create additional 20 Applications to test paginated results */
