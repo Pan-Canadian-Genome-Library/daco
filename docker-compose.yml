@@ -63,7 +63,7 @@ services:
       MONGODB_DATABASE: dictionary-manager
       MONGODB_ROOT_PASSWORD: password123
   dictionary-manager:
-    container_name: dictionary-manager.service
+    container_name: dictionary-manager
     image: ghcr.io/pan-canadian-genome-library/dictionary-manager:edge
     ports:
       - 3001:3001
