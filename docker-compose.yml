@@ -40,7 +40,7 @@ services:
     volumes:
       - 'clinical-submission:/clinical-submission/data'
   clinical-postgres:
-    container_name: clinical.api.postgres
+    container_name: clinical.api.db
     image: postgres:15-alpine
     ports:
       - 5433:5432
