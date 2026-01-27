@@ -234,7 +234,7 @@ table emails {
   id bigint [pk, not null]
   application_id bigint [not null]
   application_action_id bigint
-  created_at timestamp [not null]
+  created_at timestamp [not null, default: `now()`]
   email_type email_types [not null]
   recipient_emails "varchar(320)[]" [not null]
 }
