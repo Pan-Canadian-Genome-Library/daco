@@ -27,6 +27,7 @@ import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
 import { files } from '@/db/schemas/index.js';
+import { study } from '@/db/schemas/studies.ts';
 
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
@@ -119,3 +120,5 @@ export interface AuthorizedRequest extends Request {
 }
 
 export type StudyService = ReturnType<typeof studySvc>;
+
+export type StudyModel = typeof study.$inferInsert;

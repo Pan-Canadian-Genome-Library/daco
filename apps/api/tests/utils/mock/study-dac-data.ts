@@ -18,9 +18,9 @@
  */
 
 import { dac } from '@/db/schemas/dac.ts';
-import { study } from '@/db/schemas/studies.ts';
+import { StudyModel } from '@/service/types.ts';
 
-export const testStudyData: (typeof study.$inferInsert)[] = [
+export const testStudyData: StudyModel[] = [
 	{
 		study_id: 'study1',
 		dac_id: 'dac1',
