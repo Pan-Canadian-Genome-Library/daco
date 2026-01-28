@@ -38,6 +38,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
+import { grantUserPermissions } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
@@ -373,6 +374,7 @@ export const createApplicationPDF = async ({
  * @async
  * @param {ApproveApplication} param0
  * @param {ApproveApplication} param0.applicationId
+ * @param {ApproveApplication} param1.approverAccessToken
  * @returns {Promise<{
  * 	success: boolean;
  * 	message?: string;
@@ -382,6 +384,7 @@ export const createApplicationPDF = async ({
  */
 export const approveApplication = async ({
 	applicationId,
+	approverAccessToken,
 	userName,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
@@ -437,13 +440,28 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
+		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
 
-		emailService.sendEmailApproval({
-			id: application.id,
-			to: applicant_institutional_email,
-			name: applicant_first_name || 'N/A',
-		});
+		if (applicant_institutional_email && requested_studies && requested_studies.length) {
+			const permissionAdded = await grantUserPermissions({
+				institutionalEmail: applicant_institutional_email,
+				approverAccessToken,
+				requestedStudies: requested_studies,
+			});
+
+			if (permissionAdded.success) {
+				// Notify Applicant of approval
+				emailService.sendEmailApproval({
+					id: application.id,
+					to: applicant_institutional_email,
+					name: applicant_first_name || 'N/A',
+				});
+			}
+
+			// TODO: Handle failure to grant permissions to applicant, currently we are ignoring
+			// any failures but we should capture the information in db and have a mechanism to retry
+			// granting permissions accordingly.
+		}
 
 		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
 
@@ -455,13 +473,28 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		collaboratorResponse.data.forEach((collab) => {
-			emailService.sendEmailApproval({
-				id: application.id,
-				to: collab.institutional_email,
-				name: collab.first_name || 'N/A',
-			});
-		});
+		for (const collab of collaboratorResponse.data) {
+			if (collab.institutional_email && requested_studies && requested_studies.length) {
+				const permissionAdded = await grantUserPermissions({
+					institutionalEmail: collab.institutional_email,
+					approverAccessToken,
+					requestedStudies: requested_studies,
+				});
+
+				if (permissionAdded.success) {
+					// Notify each collaborator of approval
+					emailService.sendEmailApproval({
+						id: application.id,
+						to: collab.institutional_email,
+						name: collab.first_name || 'N/A',
+					});
+				}
+
+				// TODO: Handle failure to grant permissions to applicant, currently we are ignoring
+				// any failures but we should capture the information in db and have a mechanism to retry
+				// granting permissions accordingly.
+			}
+		}
 
 		return dtoFriendlyData;
 	} catch (error) {
