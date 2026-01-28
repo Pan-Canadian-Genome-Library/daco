@@ -27,6 +27,11 @@ export const EmailSubjects = {
 	NOTIFY_REVISION: 'Revisions Requested on Your PCGL DACO Application',
 	NOTIFY_APPROVAL: 'Congratulations! Your DACO Application Has Been Approved',
 	DACO_APPLICATION_STATUS: 'DACO Application Status',
+	DACO_APPLICATION_STATUS_UPDATE: 'DACO Application Status Update',
+	REMINDER_SUBMIT_DRAFT: 'Please Complete Your DACO Application',
+	REMINDER_SUBMIT_REVIEW: 'Reminder: Pending Application Review Required',
+	REMINDER_SUBMIT_REVISIONS: 'Reminder: Action Required – Revisions Requested on Your Application',
+	REMINDER_REVIEW_SUBMITTED_REVISIONS: 'Reminder: Revised Application Awaiting Your Review',
 } as const;
 
 export type EmailSubjectsType = (typeof EmailSubjects)[keyof typeof EmailSubjects];
@@ -39,6 +44,7 @@ export type BaseEmailType = {
 export type GenerateInstitutionalRepType = {
 	id: string | number;
 	repName: string;
+	actionId?: number;
 	applicantName: string;
 	submittedDate: Date | string;
 	// NOTE: sign up url for the institutional rep, subject to change
@@ -47,38 +53,83 @@ export type GenerateInstitutionalRepType = {
 
 export type GenerateRejectType = {
 	id: string | number;
+	actionId: number;
 	name: string;
 	comment: string;
 } & BaseEmailType;
 
 export type GenerateApproveType = {
 	id: string | number;
+	actionId: number;
 	name: string;
 	lang?: string;
 } & BaseEmailType;
 
 export type GenerateDacRevisionType = {
 	id: string | number;
+	actionId: number;
 	applicantName: string;
 	submittedDate: Date | string;
 } & BaseEmailType;
 
 export type GenerateApplicantRevisionType = {
 	id: string | number;
+	actionId: number;
 	applicantName: string;
 	comments: RevisionRequestModel;
 } & BaseEmailType;
 
 export type GenerateApplicantRepRevisionType = {
 	id: string | number;
+	actionId: number;
 	applicantName: string;
 	institutionalRepFirstName: string;
 	institutionalRepLastName: string;
 	comments: RevisionRequestModel;
 } & BaseEmailType;
 
+export type GenerateClosedType = {
+	id: string | number;
+	actionId: number;
+	applicantName: string;
+	userName: string;
+	submittedDate: Date | string;
+	state: string;
+	message: string;
+} & BaseEmailType;
+
 export type GenerateRevokeType = {
 	id: string | number;
 	name: string;
 	comment: string;
+} & BaseEmailType;
+
+export type GenerateDraftReminderEmailType = {
+	id: string | number;
+	actionId?: number;
+	applicantName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
+
+export type GenerateSubmitRevisionReminderEmailType = {
+	id: string | number;
+	applicantName: string;
+	actionId: number;
+	repName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
+
+export type GenerateRevisionReminderEmailType = {
+	id: string | number;
+	actionId: number;
+	repName: string;
+	submittedDate: Date | string;
+} & BaseEmailType;
+
+export type GenerateReviewReminderEmailType = {
+	id: string | number;
+	applicantName: string;
+	actionId: number;
+	repName: string;
+	submittedDate: Date | string;
 } & BaseEmailType;

@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { applications } from '@/db/schemas/applications.ts';
+import { type ApplicationModel } from '@/service/types.ts';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
 // Sample revision request data
@@ -40,7 +40,7 @@ export const revisionRequestData = {
 	sign_and_submit_approved: false,
 };
 
-export const applicationArray: (typeof applications.$inferInsert)[] = [
+export const applicationArray: ApplicationModel[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',
 		state: ApplicationStates.DRAFT,

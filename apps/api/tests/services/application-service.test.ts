@@ -474,6 +474,22 @@ describe('Application Service', () => {
 			assert.ok(dacCommentResult.success);
 			assert.ok(Array.isArray(dacCommentResult.data) && dacCommentResult.data.length === 2);
 		});
+
+		describe('Get Email & Action Details', () => {
+			it('should retrieve a list of Joined Application/Emails/Action Records', async () => {
+				const result = await testApplicationService.getEmailActionDetails({
+					state: [ApplicationStates.DRAFT],
+				});
+
+				assert.ok(result.success);
+				assert.ok(Array.isArray(result.data) && result.data.length);
+
+				const joinedRecord = result.data[0];
+				assert.ok(joinedRecord && joinedRecord.hasOwnProperty('application_contents'));
+				assert.ok(joinedRecord && joinedRecord.hasOwnProperty('application_actions'));
+				assert.ok(joinedRecord && joinedRecord.hasOwnProperty('sent_emails'));
+			});
+		});
 	});
 
 	after(async () => {

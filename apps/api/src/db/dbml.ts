@@ -19,13 +19,16 @@
 
 import * as schema from '@/db/schemas/index.js';
 import BaseLogger from '@/logger.js';
-import { pgGenerate } from 'drizzle-dbml-generator'; // Using Postgres for this example
+import { pgGenerate } from 'drizzle-dbml-generator';
 
 const logger = BaseLogger.forModule('dbml');
 
-const out = './src/db/schema.dbml';
+const outApi = './src/db/schema.dbml';
+const outDocs = './../../docs/model/data-model.dbml';
 const relational = true;
 
-pgGenerate({ schema, out, relational });
+pgGenerate({ schema, out: outApi, relational });
+logger.info(`Schema DBML Generated at ${outApi}`);
 
-logger.info(`Schema DBML Generated at ${out}`);
+pgGenerate({ schema, out: outDocs, relational });
+logger.info(`Schema DBML Generated at ${outDocs}`);
