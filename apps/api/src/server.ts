@@ -33,6 +33,7 @@ import authRouter from './routes/authRouter.js';
 import fileRouter from './routes/fileRouter.ts';
 import healthRouter from './routes/healthRouter.ts';
 import signatureRouter from './routes/signatureRouter.ts';
+import studyRouter from './routes/studyRouter.ts';
 import swaggerRouter from './routes/swaggerRouter.ts';
 import sessionMiddleware from './session/sessionMiddleware.js';
 
@@ -59,6 +60,7 @@ const startServer = async () => {
 	app.use('/file', fileRouter);
 	app.use('/health', healthRouter);
 	app.use('/signature', signatureRouter);
+	app.use('/study', studyRouter);
 
 	app.get('/', async (req: Request, res: Response) => {
 		res.send();
