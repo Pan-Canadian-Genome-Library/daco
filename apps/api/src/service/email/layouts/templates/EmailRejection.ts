@@ -22,7 +22,7 @@ import { type GenerateRejectType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
+export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejectType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -51,7 +51,7 @@ export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejec
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailRejectionPlain = ({ name, comment }: Omit<GenerateRejectType, 'id' | 'to'>) => {
+export const GenerateEmailRejectionPlain = ({ name, comment }: Omit<GenerateRejectType, 'id' | 'to' | 'actionId'>) => {
 	return ` Dear ${name},
     \n Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
     \n This is the Data Access Committee's comment on your application: ${comment}

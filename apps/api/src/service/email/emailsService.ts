@@ -184,6 +184,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to the Institutional Rep to Review Application
 		sendEmailInstitutionalRepForReview: async ({
 			id,
+			actionId,
 			applicantName,
 			repName,
 			submittedDate,
@@ -214,6 +215,13 @@ const emailSvc = (db: PostgresDb) => {
 						repName,
 						submittedDate: dateConverter(submittedDate),
 					}),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.SUBMIT_INSTITUTIONAL_REP_REVIEW,
+					recipient_emails: [to],
 				});
 
 				return success(response);
@@ -279,6 +287,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to Applicant & Notify Institutional Rep Revisions
 		sendEmailApplicantRepRevisions: async ({
 			id,
+			actionId,
 			applicantName,
 			institutionalRepFirstName,
 			institutionalRepLastName,
@@ -312,6 +321,13 @@ const emailSvc = (db: PostgresDb) => {
 						institutionalRepLastName,
 						comments,
 					}),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_APPLICANT_REP_REVISIONS,
+					recipient_emails: [to],
 				});
 
 				return success(response);
@@ -430,6 +446,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to notify Applicant that application is submitted by Rep for DAC review
 		sendEmailApplicantApplicationSubmitted: async ({
 			id,
+			actionId,
 			name,
 			to,
 		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
@@ -450,6 +467,13 @@ const emailSvc = (db: PostgresDb) => {
 					text: GenerateEmailApplicantAppSubmittedPlain({ id, name }),
 				});
 
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.SUBMIT_INSTITUTIONAL_REP_REVIEW,
+					recipient_emails: [to],
+				});
+
 				return success(response);
 			} catch (error) {
 				const message = `Error sending email - sendEmailApplicantApplicationSubmitted`;
@@ -462,6 +486,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to notify DAC for review
 		sendEmailDacForReview: async ({
 			id,
+			actionId,
 			applicantName,
 			submittedDate,
 			to,
@@ -481,6 +506,13 @@ const emailSvc = (db: PostgresDb) => {
 					subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
 					html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
 					text: GenerateEmailDacForReviewPlain({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.REQUEST_REVISIONS_DAC_REVIEW,
+					recipient_emails: [to],
 				});
 
 				return success(response);
@@ -547,6 +579,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to Applicant about DAC Revisions
 		sendEmailApplicantDacRevisions: async ({
 			id,
+			actionId,
 			applicantName,
 			comments,
 			to,
@@ -566,6 +599,13 @@ const emailSvc = (db: PostgresDb) => {
 					subject: EmailSubjects.NOTIFY_REVISION,
 					html: GenerateEmailApplicantRevision({ id, applicantName, comments }),
 					text: GenerateEmailApplicantRevisionPlain({ id, applicantName, comments }),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_APPLICANT_DAC_REVISIONS,
+					recipient_emails: [to],
 				});
 
 				return success(response);
@@ -634,6 +674,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to DAC about Submitted Revisions
 		sendEmailDacForSubmittedRevisions: async ({
 			id,
+			actionId,
 			applicantName,
 			submittedDate,
 			to,
@@ -661,6 +702,13 @@ const emailSvc = (db: PostgresDb) => {
 						applicantName,
 						submittedDate: dateConverter(submittedDate),
 					}),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.SUBMIT_REVISIONS_DAC_REVIEW,
+					recipient_emails: [to],
 				});
 
 				return success(response);
@@ -707,7 +755,7 @@ const emailSvc = (db: PostgresDb) => {
 					}),
 				});
 
-				createEmailRecord({
+				await createEmailRecord({
 					application_id: Number(id),
 					application_action_id: actionId,
 					email_type: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
@@ -727,6 +775,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to Applicant & Notify Approval
 		sendEmailApproval: async ({
 			id,
+			actionId,
 			name,
 			to,
 		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
@@ -747,6 +796,13 @@ const emailSvc = (db: PostgresDb) => {
 					text: GenerateEmailApprovalPlain({ id, name }),
 				});
 
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_APPLICANT_DAC_APPROVAL,
+					recipient_emails: [to],
+				});
+
 				return success(response);
 			} catch (error) {
 				const message = `Error sending email - sendEmailApproval`;
@@ -758,6 +814,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to Applicant & Notify Disapproval
 		sendEmailReject: async ({
 			id,
+			actionId,
 			name,
 			to,
 			comment,
@@ -779,6 +836,13 @@ const emailSvc = (db: PostgresDb) => {
 					text: GenerateEmailRejectionPlain({ name, comment }),
 				});
 
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_APPLICANT_DAC_REVIEW_REJECTED,
+					recipient_emails: [to],
+				});
+
 				return success(response);
 			} catch (error) {
 				const message = `Error sending email - sendEmailReject`;
@@ -791,6 +855,7 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to Applicant that application has been revoked
 		sendEmailApplicantRevoke: async ({
 			id,
+			actionId,
 			name,
 			to,
 			comment,
@@ -813,6 +878,13 @@ const emailSvc = (db: PostgresDb) => {
 					text: GenerateEmailApplicantRevokePlain({ id, name, comment, dacRevoked }),
 				});
 
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_APPLICANT_REVOKE,
+					recipient_emails: [to],
+				});
+
 				return success(response);
 			} catch (error) {
 				const message = `Error sending email - sendEmailDacRevoke`;
@@ -825,10 +897,11 @@ const emailSvc = (db: PostgresDb) => {
 		// Email to Applicant that application has been closed
 		sendEmailApplicantClose: async ({
 			id,
+			actionId,
 			userName,
 			applicantName,
 			message,
-			status,
+			state,
 			submittedDate,
 			to,
 		}: GenerateClosedType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
@@ -845,8 +918,15 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.DACO_APPLICATION_STATUS_UPDATE,
-					html: GenerateEmailApplicantClosed({ id, userName, applicantName, message, status, submittedDate }),
-					text: GenerateEmailApplicantClosedPlain({ id, userName, applicantName, message, status, submittedDate }),
+					html: GenerateEmailApplicantClosed({ id, userName, applicantName, message, state, submittedDate }),
+					text: GenerateEmailApplicantClosedPlain({ id, userName, applicantName, message, state, submittedDate }),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_APPLICANT_CLOSE,
+					recipient_emails: [to],
 				});
 
 				return success(response);

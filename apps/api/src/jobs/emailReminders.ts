@@ -49,20 +49,26 @@ const dateDiffCheck = ({ actionDate, interval = 7 }: { actionDate: Date; interva
 
 // Dictionary matching Reminder Email subjects to the triggering Application State
 // Rep Review and Dac Review states can trigger multiple Reminder Email types depending on the previous action
-const targetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues | EmailTypeValues[] }> = {
-	[ApplicationStates.DRAFT]: EmailTypes.REMINDER_SUBMIT_DRAFT,
+const allTargetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues[] }> = {
+	[ApplicationStates.DRAFT]: [EmailTypes.REMINDER_SUBMIT_DRAFT],
 	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: [
 		EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
 		EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
 		EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 	],
-	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
+	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: [
+		EmailTypes.NOTIFY_APPLICANT_REP_REVISIONS,
+		EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
+	],
 	[ApplicationStates.DAC_REVIEW]: [
 		EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
 		EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
 		EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 	],
-	[ApplicationStates.DAC_REVISIONS_REQUESTED]: EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
+	[ApplicationStates.DAC_REVISIONS_REQUESTED]: [
+		EmailTypes.NOTIFY_APPLICANT_DAC_REVISIONS,
+		EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
+	],
 };
 
 // Find record for most recent relevant email created with target email_type value
@@ -73,14 +79,10 @@ const getMostRecentEmail = ({
 	sentEmails: EmailRecord[] | null;
 	state: ApplicationStateValues;
 }) => {
-	const targetEmailType = targetEmailTypes[state];
+	const targetEmailTypes = allTargetEmailTypes[state];
 	const mostRecentEmail =
-		sentEmails?.length && targetEmailType
-			? sentEmails.find((email) =>
-					typeof targetEmailType === 'string'
-						? email.email_type === targetEmailType
-						: targetEmailType.includes(email.email_type),
-				)
+		sentEmails?.length && targetEmailTypes
+			? sentEmails.find((email) => targetEmailTypes.includes(email.email_type))
 			: null;
 	return mostRecentEmail || null;
 };
@@ -93,16 +95,16 @@ const checkForEmailReminders = ({ emailDate }: { emailDate: Date | null }) => {
 // Dictionary matching Application State values to related triggering State Transition Action values
 // Rep Review and Dac Review states can be triggered by multiple potential State Transitions
 const targetActionTypes: Partial<{
-	[k in ApplicationStateValues]: ApplicationActionValues | ApplicationActionValues[];
+	[k in ApplicationStateValues]: ApplicationActionValues[];
 }> = {
-	[ApplicationStates.DRAFT]: ApplicationActions.WITHDRAW,
+	[ApplicationStates.DRAFT]: [ApplicationActions.WITHDRAW],
 	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: [
 		ApplicationActions.SUBMIT_DRAFT,
 		ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
 	],
-	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST,
+	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: [ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST],
 	[ApplicationStates.DAC_REVIEW]: [ApplicationActions.INSTITUTIONAL_REP_SUBMIT, ApplicationActions.DAC_REVIEW_SUBMIT],
-	[ApplicationStates.DAC_REVISIONS_REQUESTED]: ApplicationActions.DAC_REVIEW_REVISION_REQUEST,
+	[ApplicationStates.DAC_REVISIONS_REQUESTED]: [ApplicationActions.DAC_REVIEW_REVISION_REQUEST],
 };
 
 // Find record for most recent relevant Action created with target state transition Action value
@@ -116,11 +118,7 @@ const getMostRecentAction = ({
 	const targetActionType = targetActionTypes[state];
 	const mostRecentAction =
 		applicationActions?.length && targetActionType
-			? applicationActions.find((action) =>
-					typeof targetActionType === 'string'
-						? action.action === targetActionType
-						: targetActionType.includes(action.action),
-				)
+			? applicationActions.find((action) => targetActionType.includes(action.action))
 			: null;
 	return mostRecentAction || null;
 };

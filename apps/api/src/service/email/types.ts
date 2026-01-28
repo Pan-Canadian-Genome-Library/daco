@@ -53,30 +53,35 @@ export type GenerateInstitutionalRepType = {
 
 export type GenerateRejectType = {
 	id: string | number;
+	actionId: number;
 	name: string;
 	comment: string;
 } & BaseEmailType;
 
 export type GenerateApproveType = {
 	id: string | number;
+	actionId: number;
 	name: string;
 	lang?: string;
 } & BaseEmailType;
 
 export type GenerateDacRevisionType = {
 	id: string | number;
+	actionId: number;
 	applicantName: string;
 	submittedDate: Date | string;
 } & BaseEmailType;
 
 export type GenerateApplicantRevisionType = {
 	id: string | number;
+	actionId: number;
 	applicantName: string;
 	comments: RevisionRequestModel;
 } & BaseEmailType;
 
 export type GenerateApplicantRepRevisionType = {
 	id: string | number;
+	actionId: number;
 	applicantName: string;
 	institutionalRepFirstName: string;
 	institutionalRepLastName: string;
@@ -85,10 +90,11 @@ export type GenerateApplicantRepRevisionType = {
 
 export type GenerateClosedType = {
 	id: string | number;
+	actionId: number;
 	applicantName: string;
 	userName: string;
 	submittedDate: Date | string;
-	status: string;
+	state: string;
 	message: string;
 } & BaseEmailType;
 

@@ -22,7 +22,7 @@ import { GenerateApproveType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateApproveType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -50,7 +50,7 @@ export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateAp
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApplicantAppSubmittedPlain = ({ name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApplicantAppSubmittedPlain = ({ name }: Omit<GenerateApproveType, 'to' | 'actionId'>) => {
 	return ` Dear ${name},
     \n We are pleased to inform you that your DACO application has been successfully submitted for DAC review by the institutional representative. The review process is now underway, and you will be notified once any updates or decisions are made.
     \n If you have any questions or need further information during this time, please do not hesitate to contact us.

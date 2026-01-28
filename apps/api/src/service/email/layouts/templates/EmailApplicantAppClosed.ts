@@ -26,9 +26,9 @@ export const GenerateEmailApplicantClosed = ({
 	applicantName,
 	userName,
 	message,
-	status,
+	state,
 	submittedDate,
-}: GenerateClosedType) => {
+}: Omit<GenerateClosedType, 'actionId'>) => {
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
@@ -46,7 +46,7 @@ export const GenerateEmailApplicantClosed = ({
                             <b>Reason for Closure:</b> ${message} <br/>
                         </li>
                         <li>
-                            <b>Status Before Closure:</b> ${status} <br/>
+                            <b>Status Before Closure:</b> ${state} <br/>
                         </li>
                         <li>
                             <b>Time of Closure:</b> ${submittedDate} <br/>
@@ -74,14 +74,14 @@ export const GenerateEmailApplicantClosedPlain = ({
 	applicantName,
 	userName,
 	message,
-	status,
+	state,
 	submittedDate,
-}: GenerateClosedType) => {
+}: Omit<GenerateClosedType, 'actionId'>) => {
 	return ` Dear ${applicantName},,
     \n We are writing to inform you that your application PCGL-${id} has been closed. 
     \n Closed By: ${userName}
     \n Reason for Closure: ${message} 
-    \n Status Before Closure: ${status}
+    \n Status Before Closure: ${state}
     \n Time of Closure: ${submittedDate}
     \n Please note that once an application is closed, it cannot be reopened and is no longer valid. 
     \n If you believe this application was closed by mistake or if you did not initiate the closure, please contact us as soon as possible.

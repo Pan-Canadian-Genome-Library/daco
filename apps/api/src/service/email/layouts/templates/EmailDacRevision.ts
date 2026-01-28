@@ -26,7 +26,7 @@ export const GenerateEmailDacForSubmittedRevision = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -67,7 +67,7 @@ export const GenerateEmailDacForSubmittedRevisionPlain = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;

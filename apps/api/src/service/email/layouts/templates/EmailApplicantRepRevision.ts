@@ -28,7 +28,7 @@ export const GenerateEmailApplicantRepRevision = ({
 	institutionalRepFirstName,
 	institutionalRepLastName,
 	comments,
-}: Omit<GenerateApplicantRepRevisionType, 'to'>) => {
+}: Omit<GenerateApplicantRepRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -99,7 +99,7 @@ export const GenerateEmailApplicantRepRevisionPlain = ({
 	institutionalRepFirstName,
 	institutionalRepLastName,
 	comments,
-}: Omit<GenerateApplicantRepRevisionType, 'to'>) => {
+}: Omit<GenerateApplicantRepRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;

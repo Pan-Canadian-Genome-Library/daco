@@ -69,7 +69,7 @@ export const GenerateEmailDacForReviewPlain = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;

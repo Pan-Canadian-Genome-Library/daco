@@ -57,7 +57,7 @@ import {
 	convertToFileRecord,
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
-import { failure, type AsyncResult, type Result } from '@/utils/results.js';
+import { failure, type AsyncResult } from '@/utils/results.js';
 import { validateRevisedFields } from '@/utils/validation.ts';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
@@ -439,10 +439,12 @@ export const approveApplication = async ({
 		}
 
 		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
+		const { actionId } = approvalResult.data;
 
 		emailService.sendEmailApproval({
 			id: application.id,
 			to: applicant_institutional_email,
+			actionId,
 			name: applicant_first_name || 'N/A',
 		});
 
@@ -460,6 +462,7 @@ export const approveApplication = async ({
 			emailService.sendEmailApproval({
 				id: application.id,
 				to: collab.institutional_email,
+				actionId,
 				name: collab.first_name || 'N/A',
 			});
 		});
@@ -523,10 +526,12 @@ export const dacRejectApplication = async ({
 		}
 
 		const { applicant_institutional_email, applicant_first_name } = resultContents.data.contents;
+		const { actionId } = rejectResult.data;
 
 		emailService.sendEmailReject({
 			id: application.id,
 			to: applicant_institutional_email,
+			actionId,
 			name: applicant_first_name || 'N/A',
 			comment: rejectionReason,
 		});
@@ -559,7 +564,6 @@ export const submitRevision = async ({
 		}
 
 		const application = result.data;
-
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (
@@ -593,6 +597,7 @@ export const submitRevision = async ({
 
 		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
 			resultContents.data.contents;
+		const { actionId } = submittedRevision.data;
 
 		if (result.data.state === ApplicationStates.DAC_REVIEW) {
 			const {
@@ -604,6 +609,7 @@ export const submitRevision = async ({
 				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 		} else {
 			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
@@ -613,6 +619,7 @@ export const submitRevision = async ({
 				repName: institutional_rep_first_name || 'N/A',
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 		}
 
@@ -667,9 +674,11 @@ export const revokeApplication = async (
 			return applicationDTO;
 		}
 
+		const { actionId } = revokeApplicationResult.data;
 		emailService.sendEmailApplicantRevoke({
 			id: application.id,
 			to: applicationWithContents.data.contents?.applicant_institutional_email,
+			actionId,
 			name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
 			comment: revokeReason,
 			dacRevoked: isDACMember,
@@ -756,6 +765,7 @@ export const requestApplicationRevisionsByDac = async ({
 			return aliasResult;
 		}
 
+		const { actionId } = actionResult.data;
 		const { applicant_first_name } = resultContents.data.contents;
 		const {
 			email: { dacAddress },
@@ -764,6 +774,7 @@ export const requestApplicationRevisionsByDac = async ({
 		emailService.sendEmailApplicantDacRevisions({
 			id: application.id,
 			to: dacAddress,
+			actionId,
 			applicantName: applicant_first_name || 'N/A',
 			comments: revisionRequestResult.data,
 		});
@@ -854,10 +865,12 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 
 		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
 			resultContents.data.contents;
+		const { actionId } = actionResult.data;
 
 		emailService.sendEmailApplicantRepRevisions({
 			id: application.id,
 			to: institutional_rep_email,
+			actionId,
 			applicantName: applicant_first_name || 'N/A',
 			institutionalRepFirstName: institutional_rep_first_name || 'N/A',
 			institutionalRepLastName: institutional_rep_last_name || 'N/A',
@@ -897,7 +910,7 @@ export const submitApplication = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		// Transition application to the next state (e.g., under review)
-		let submissionResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
+		let submissionResult;
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
 			submissionResult = await appStateManager.submitDraft(userName);
@@ -921,6 +934,7 @@ export const submitApplication = async ({
 			return applicationDTO;
 		}
 
+		const { actionId } = submissionResult.data;
 		const {
 			applicant_first_name,
 			applicant_last_name,
@@ -938,6 +952,7 @@ export const submitApplication = async ({
 				applicantName: `${applicant_first_name} ${applicant_last_name}` || 'N/A',
 				repName: `${institutional_rep_first_name} ${institutional_rep_last_name}` || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
 			const {
@@ -950,6 +965,7 @@ export const submitApplication = async ({
 				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 
 			//  send email to applicant that application is submitted to DAC
@@ -957,6 +973,7 @@ export const submitApplication = async ({
 				id: application.id,
 				to: applicant_institutional_email,
 				name: applicant_first_name || 'N/A',
+				actionId,
 			});
 		}
 		return applicationDTO;
@@ -977,6 +994,7 @@ export const closeApplication = async ({
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
+		const emailService = await emailSvc(database);
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
@@ -992,7 +1010,7 @@ export const closeApplication = async ({
 			return failure('INVALID_STATE_TRANSITION', 'Application is already closed.');
 		}
 
-		let closeResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
+		let closeResult;
 
 		switch (appStateManager.state) {
 			case ApplicationStates.DRAFT:
@@ -1013,6 +1031,34 @@ export const closeApplication = async ({
 		}
 
 		const applicationDTO = convertToBasicApplicationRecord(closeResult.data);
+		const { id } = application;
+		const { actionId } = closeResult.data;
+		const contentsResult = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!contentsResult.success || !contentsResult.data.contents) {
+			logger.error(
+				`Unable to retrieve information to send closing email for application with ID: ${applicationId}`,
+				contentsResult,
+			);
+			return applicationDTO;
+		}
+
+		const { applicant_first_name, applicant_last_name, applicant_institutional_email } = contentsResult.data.contents;
+
+		const applicantName = `${applicant_first_name} ${applicant_last_name}` || 'Applicant';
+
+		// Send email to applicant that application is closed
+		await emailService.sendEmailApplicantClose({
+			id,
+			actionId,
+			userName,
+			applicantName,
+			// TODO: Need Definition for Closing Messages
+			message: '',
+			state: appStateManager.state,
+			submittedDate: new Date(),
+			to: applicant_institutional_email,
+		});
 
 		return applicationDTO;
 	} catch (error) {

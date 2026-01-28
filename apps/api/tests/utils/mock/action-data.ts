@@ -80,4 +80,14 @@ export const actionArray: Omit<ApplicationActionModel, 'id'>[] = [
 		state_before: 'DAC_REVISIONS_REQUESTED',
 		state_after: 'DAC_REVIEW',
 	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		application_id: 1,
+		created_at: new Date('2026-01-01T15:00:00Z'),
+		user_name: 'Test User',
+		action: 'CLOSE',
+		revisions_request_id: null,
+		state_before: 'DAC_REVIEW',
+		state_after: 'CLOSED',
+	},
 ];
