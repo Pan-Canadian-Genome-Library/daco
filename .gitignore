@@ -11,7 +11,7 @@ node_modules/
 .env*
 !.env.schema
 !.env.test
-!.env.clinical.schema
+!.env.docker.schema
 
 # Logs
 npm-debug.log*
