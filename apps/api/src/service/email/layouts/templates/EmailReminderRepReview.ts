@@ -44,7 +44,7 @@ export const GenerateEmailReminderRepReview = ({
                    Timely review of applications helps us maintain efficient processing and meet compliance standards.
                 </mj-text>
                 <mj-text>
-                    <b>Pending Application(s):</b>
+                    <b>Pending Application:</b>
                 </mj-text>
                 <mj-text>
                     <ul>
