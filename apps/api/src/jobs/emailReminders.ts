@@ -181,6 +181,7 @@ export const scheduleEmailReminders = async () => {
 export const sendEmailReminders = ({
 	application,
 	relatedAction,
+	relatedEmail,
 }: {
 	application: JoinedApplicationEmailsActionsRecord;
 	relatedAction?: ApplicationActionRecord | null;
@@ -189,7 +190,7 @@ export const sendEmailReminders = ({
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
 	const { application_id, state, created_at, application_contents } = application;
-	const { id: application_action_id, created_at: actionDate } = relatedAction || {};
+	const { id: application_action_id, created_at: actionDate, user_name, user_id } = relatedAction || {};
 
 	if (state === ApplicationStates.DRAFT) {
 		// If in State Draft for over 7 days, send a reminder email to Submit
@@ -230,12 +231,14 @@ export const sendEmailReminders = ({
 			: 'Representative';
 
 		const submittedDate = actionDate;
-		const dacMemberName = 'Dac Member';
+
+		// TODO: Lookup contact email Dac table
+		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/549
+		const dacMemberName = user_name || 'DAC Member';
+		const dacEmail = relatedEmail?.recipient_emails[0] || user_id;
 
 		switch (state) {
 			case ApplicationStates.DAC_REVIEW:
-				// TODO: Lookup contact email Dac table
-				const dacEmail = 'pcgl_email@yopmail.com';
 				if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
 					// Post Institutional Rep Submission, Application has moved to Dac Review
 					// If still in review 7 days later -> send email reminder to Dac Member

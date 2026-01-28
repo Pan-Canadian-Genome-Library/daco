@@ -1054,6 +1054,7 @@ export const closeApplication = async ({
 			userName,
 			applicantName,
 			// TODO: Need Definition for Closing Messages
+			// https://github.com/Pan-Canadian-Genome-Library/daco/issues/419
 			message: '',
 			state: appStateManager.state,
 			submittedDate: new Date(),
