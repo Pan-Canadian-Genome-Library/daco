@@ -13,7 +13,7 @@
 		"setup": "pnpm setup:env && pnpm setup:env-clinical && pnpm setup:db",
 		"setup:db": "pnpm migrate",
 		"setup:env": "cp -n .env.schema .env",
-		"setup:env-clinical": "cp -n .env.schema.clinical .env.clinical",
+		"setup:env-docker": "cp -n .env.docker.schema .env.docker",
 		"migrate": "pnpm drizzle-kit migrate",
 		"start:prod": "pnpm migrate && tsx ./src/main.js",
 		"test": "tsx --test --test-reporter=spec --experimental-test-coverage --env-file=./tests/utils/.env.test  ./tests/**/*.test.ts  ",
