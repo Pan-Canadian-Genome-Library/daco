@@ -29,11 +29,14 @@ import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
+import { dac } from '@/db/schemas/dac.ts';
+import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.js';
 import { ApplicationService } from '@/service/types.ts';
 import { ApplicationListSummary, ApplicationStateValues } from '@pcgl-daco/data-model';
 import { actionArray } from './mock/action-data.ts';
 import { applicationArray } from './mock/application-data.ts';
+import { testDacUsersData, testStudyData } from './mock/study-dac-data.ts';
 
 const logger = BaseLogger.forModule('testUtils');
 
@@ -102,6 +105,14 @@ export const addInitialActions = async (db: PostgresDb) => {
 		const newRecord = await db.insert(applicationActions).values(newAction).returning();
 		if (!newRecord[0]) throw new Error('Error creating test action records');
 	}
+};
+
+/**
+ * Create test data for study and dac users
+ */
+export const addStudyAndDacUsers = async (db: PostgresDb) => {
+	await Promise.all(testDacUsersData.map((user) => db.insert(dac).values(user)));
+	await Promise.all(testStudyData.map((currentStudy) => db.insert(study).values(currentStudy)));
 };
 
 /** Create additional 20 Applications to test paginated results */
