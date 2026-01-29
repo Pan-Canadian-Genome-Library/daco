@@ -27,6 +27,7 @@ import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
 import { files } from '@/db/schemas/index.js';
+import { study } from '@/db/schemas/studies.ts';
 
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
@@ -37,6 +38,7 @@ import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';
 import { pdfService } from './pdf/pdfService.ts';
 import { signatureService } from './signatureService.ts';
+import { studySvc } from './studyService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
@@ -116,3 +118,7 @@ export interface UserSession extends SessionType {
 export interface AuthorizedRequest extends Request {
 	session: UserSession;
 }
+
+export type StudyService = ReturnType<typeof studySvc>;
+
+export type StudyModel = typeof study.$inferInsert;

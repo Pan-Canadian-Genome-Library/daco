@@ -1,0 +1,109 @@
+# Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
+#
+# This program and the accompanying materials are made available under the terms of
+# the GNU Affero General Public License v3.0. You should have received a copy of the
+# GNU Affero General Public License along with this program.
+#  If not, see <http://www.gnu.org/licenses/>.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+# SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+components:
+  schemas:
+    StudyRecord:
+      type: object
+      description: Studies available to the user.
+      properties:
+        studyId:
+          type: string
+          description: The ID of the study.
+        dacId:
+          type: string
+          description: The DAC ID associated with the study.
+        dacName:
+          type: string
+          description: The name of the DAC member associated with the selected study.
+        categoryId:
+          type: integer
+          nullable: true
+          description: The category ID of the study.
+        studyName:
+          type: string
+          description: The name of the study.
+        studyDescription:
+          type: string
+          description: The description of the study.
+        programName:
+          type: string
+          nullable: true
+          description: The program name associated with the study.
+        keywords:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Keywords associated with the study.
+        status:
+          type: string
+          enum: ['Ongoing', 'Completed']
+          description: The status of the study.
+        context:
+          type: string
+          enum: ['Clinical', 'Research']
+          description: The context of the study.
+        domain:
+          type: array
+          items:
+            type: string
+          description: The domains of the study.
+        participantCriteria:
+          type: string
+          nullable: true
+          description: Criteria for participants.
+        principalInvestigators:
+          type: array
+          items:
+            type: string
+          description: List of principal investigators.
+        leadOrganizations:
+          type: array
+          items:
+            type: string
+          description: List of lead organizations.
+        collaborators:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: List of collaborators.
+        fundingSources:
+          type: array
+          items:
+            type: string
+          description: Sources of funding.
+        publicationLinks:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Links to publications.
+        acceptingApplications:
+          type: boolean
+          nullable: true
+          description: Whether the study is accepting applications.
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last update timestamp.
