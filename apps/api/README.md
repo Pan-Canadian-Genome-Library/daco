@@ -21,15 +21,13 @@ Follow these steps to prepare your local machine to run this application from so
 
 ## Environment Variables
 
-DACO requires multiple services to be running to be used like clinical-submission. Clinical-Submission requires their own set of environment variables, so we utilize two different env files.
+DACO requires multiple services to be running to be used, importantly the clinical-submission service. 
+Clinical-Submission requires environment variables to be set to function properly. Clinical-submission service environment variables are defined in two locations: `.env.docker` and the `docker-compose.yml` file itself. The purpose of the division of variable locations is to separate the environment variables that are sensitive from those that are not. Environment variables in the `docker-compose.yml` file are values that are not sensitive and can be shared with others, the values by default show automatically work without any additional configuration(unless needed for your specific use-case).
 
-Clinical submission environment variables live in two different locations for local development, the docker-compose file itself and `.env.docker`
-The difference being that `.env.docker` will contain environment variables that are sensitive. 
 
 The following sub-sections list the environment variables that can be set to configure the DACO API. If the property is listed as required, the app will fail to run without a value being provided to the server's runtime environment.
 
 ### Environment Variables DACO
-
 
 | Name                 | Description                                                                                                                                                                                                                                                                                                                                | Type      | Required                                  | Default    |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----------------------------------------- | ---------- |
