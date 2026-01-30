@@ -23,12 +23,8 @@ import { pgGenerate } from 'drizzle-dbml-generator';
 
 const logger = BaseLogger.forModule('dbml');
 
-const outApi = './src/db/schema.dbml';
-const outDocs = './../../docs/model/data-model.dbml';
+const outPath = './../../docs/model/data-model.dbml';
 const relational = true;
 
-pgGenerate({ schema, out: outApi, relational });
-logger.info(`Schema DBML Generated at ${outApi}`);
-
-pgGenerate({ schema, out: outDocs, relational });
-logger.info(`Schema DBML Generated at ${outDocs}`);
+pgGenerate({ schema, out: outPath, relational });
+logger.info(`Schema DBML Generated at ${outPath}`);
