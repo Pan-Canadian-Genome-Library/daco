@@ -21,12 +21,18 @@ import { asc, desc } from 'drizzle-orm';
 
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
+import { sentEmails } from '@/db/schemas/sentEmails.ts';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { type SessionUser } from '@/session/validation.ts';
 import { type Failure, failure } from '@/utils/results.ts';
-import { type ApplicationActionsColumnName, type ApplicationsColumnName, type OrderBy } from './types.js';
+import {
+	type ApplicationActionsColumnName,
+	type ApplicationsColumnName,
+	type EmailRecordColumnName,
+	type OrderBy,
+} from './types.js';
 
-export const applicationsQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
+export const applicationsSortQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>) => {
 	const orderByArguments =
 		sort && sort.length
 			? sort.map((sortBy) =>
@@ -37,12 +43,22 @@ export const applicationsQuery = (sort?: Array<OrderBy<ApplicationsColumnName>>)
 	return orderByArguments;
 };
 
-export const applicationActionsQuery = (sort?: Array<OrderBy<ApplicationActionsColumnName>>) => {
+export const applicationActionsSortQuery = (sort?: Array<OrderBy<ApplicationActionsColumnName>>) => {
 	const orderByArguments = sort
 		? sort.map((sortBy) =>
 				sortBy.direction === 'asc' ? asc(applicationActions[sortBy.column]) : desc(applicationActions[sortBy.column]),
 			)
 		: [asc(applicationActions.created_at)];
+
+	return orderByArguments;
+};
+
+export const emailSortQuery = (sort?: Array<OrderBy<EmailRecordColumnName>>) => {
+	const orderByArguments = sort
+		? sort.map((sortBy) =>
+				sortBy.direction === 'asc' ? asc(sentEmails[sortBy.column]) : desc(sentEmails[sortBy.column]),
+			)
+		: [asc(sentEmails.created_at)];
 
 	return orderByArguments;
 };

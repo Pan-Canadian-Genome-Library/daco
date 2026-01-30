@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,14 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './applicationActions.ts';
-export * from './applicationContents.ts';
-export * from './applications.ts';
-export * from './collaborators.ts';
-export * from './common.ts';
-export * from './dac.ts';
-export * from './dacComments.ts';
-export * from './files.ts';
-export * from './revisionRequests.ts';
-export * from './sentEmails.ts';
-export * from './studies.ts';
+import cron from 'node-cron';
+
+import { scheduleEmailReminders } from '@/jobs/emailReminders.ts';
+import BaseLogger from '@/logger.js';
+
+const { ENABLE_EMAIL_REMINDERS } = process.env;
+
+const logger = BaseLogger.forModule('Scheduler');
+
+const scheduler = async () => {
+	try {
+		// Scheduled to run at midnight:
+		cron.schedule('0 0 * * *', async () => {
+			if (ENABLE_EMAIL_REMINDERS === 'true') {
+				scheduleEmailReminders();
+			}
+		});
+	} catch (error) {
+		logger.error(error);
+	}
+};
+
+export default scheduler;

@@ -22,6 +22,7 @@ import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { applicationActions } from './applicationActions.ts';
 import { applicationContents } from './applicationContents.ts';
 import { applicationStatesEnum } from './common.ts';
+import { sentEmails } from './sentEmails.ts';
 
 export const applications = pgTable('applications', {
 	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
@@ -39,5 +40,6 @@ export const applicationsRelations = relations(applications, ({ one, many }) => 
 		fields: [applications.contents],
 		references: [applicationContents.id],
 	}),
-	actions: many(applicationActions),
+	application_actions: many(applicationActions),
+	sent_emails: many(sentEmails),
 }));

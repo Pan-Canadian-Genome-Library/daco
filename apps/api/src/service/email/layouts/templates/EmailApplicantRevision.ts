@@ -26,7 +26,7 @@ export const GenerateEmailApplicantRevision = ({
 	id,
 	applicantName,
 	comments,
-}: Omit<GenerateApplicantRevisionType, 'to'>) => {
+}: Omit<GenerateApplicantRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -95,7 +95,7 @@ export const GenerateEmailApplicantRevisionPlain = ({
 	id,
 	applicantName,
 	comments,
-}: Omit<GenerateApplicantRevisionType, 'to'>) => {
+}: Omit<GenerateApplicantRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
