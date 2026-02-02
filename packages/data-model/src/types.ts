@@ -442,7 +442,7 @@ export type StudyDTO = {
 	collaborators: string[] | null;
 	fundingSources: string[];
 	publicationLinks: string[] | null;
-	acceptingApplications: boolean | null;
+	acceptingApplications: booleanw;
 	createdAt: Date | string;
 	updatedAt: Date | string | null;
 } & Pick<DacDTO, 'dacName'>;
