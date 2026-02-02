@@ -61,7 +61,7 @@ export const setStudyAcceptingApplications = async ({
 		const database = getDbInstance();
 		const studyService = studySvc(database);
 
-		const study = await studyService.setStudyAcceptingApplications({ studyId, enabled });
+		const study = await studyService.updateStudyAcceptingApplication({ studyId, enabled });
 
 		return study;
 	} catch (error) {

@@ -75,7 +75,7 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	setStudyAcceptingApplications: async ({
+	updateStudyAcceptingApplication: async ({
 		studyId,
 		enabled,
 	}: {
