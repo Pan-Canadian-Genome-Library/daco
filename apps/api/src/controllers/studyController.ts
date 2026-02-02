@@ -19,6 +19,8 @@
 
 import { getDbInstance } from '@/db/index.js';
 import { studySvc } from '@/service/studyService.ts';
+import { type StudyRecord } from '@/service/types.ts';
+import { convertToStudyUpdateRecord } from '@/utils/aliases.ts';
 import { failure, type AsyncResult } from '@/utils/results.ts';
 import type { StudyDTO } from '@pcgl-daco/data-model';
 
@@ -41,5 +43,37 @@ export const getStudyById = async ({
 		return study;
 	} catch (error) {
 		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
+	}
+};
+
+/**
+ * Inserts & Updates Multiple Study Records
+ * @param studies - An array of Study DTO objects from the Submission Service
+ * @returns
+ */
+export const updateStudies = async ({
+	studies,
+}: {
+	studies: StudyDTO[];
+}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const studyService = studySvc(database);
+
+		const studyData = studies
+			.map((study) => {
+				const updatedRecordResult = convertToStudyUpdateRecord(study);
+				if (updatedRecordResult.success) {
+					return updatedRecordResult.data;
+				}
+				return null;
+			})
+			.filter((record) => !!record);
+
+		const updatedStudies = await studyService.updateStudies({ studyData });
+
+		return updatedStudies;
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching updating studies`);
 	}
 };

@@ -24,7 +24,8 @@ import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { StudyDTO } from '@pcgl-daco/data-model';
+import { type StudyDTO } from '@pcgl-daco/data-model';
+import { type StudyModel, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
 
@@ -67,6 +68,35 @@ const studySvc = (db: PostgresDb) => ({
 			}
 
 			return success(studyRecord[0]);
+		} catch (error) {
+			const message = 'Error at getStudyById';
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+
+	updateStudies: async ({
+		studyData,
+	}: {
+		studyData: StudyModel[];
+	}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const studyRecords = await db
+				.insert(study)
+				.values(studyData)
+				.onConflictDoUpdate({
+					target: study.study_id,
+					set: study,
+				})
+				.returning();
+
+			if (!studyRecords[0]) {
+				return failure('NOT_FOUND', `Unable to update study records.`);
+			}
+
+			return success(studyRecords);
 		} catch (error) {
 			const message = 'Error at getStudyById';
 

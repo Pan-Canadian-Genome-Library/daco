@@ -122,3 +122,4 @@ export interface AuthorizedRequest extends Request {
 export type StudyService = ReturnType<typeof studySvc>;
 
 export type StudyModel = typeof study.$inferInsert;
+export type StudyRecord = typeof study.$inferSelect;

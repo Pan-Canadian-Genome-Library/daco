@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
+import { type OIDCTokenResponse, type OIDCUserInfoResponse, type PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
 	type ApplicationContentUpdates,
@@ -26,6 +26,7 @@ import {
 	type CollaboratorRecord,
 	type FilesRecordOptionalContents,
 	type JoinedApplicationRecord,
+	type StudyModel,
 } from '@/service/types.js';
 import { sessionAccount, sessionUser, type SessionAccount, type SessionUser } from '@/session/validation.ts';
 import {
@@ -35,6 +36,7 @@ import {
 	type CollaboratorsResponseDTO,
 	type FilesDTO,
 	type SignatureDTO,
+	type StudyDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicationHistoryResponseSchema,
@@ -42,10 +44,11 @@ import {
 	basicApplicationResponseSchema,
 	fileResponseSchema,
 	signatureResponseSchema,
+	studyModelSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
-import { failure, Result, success } from './results.ts';
+import { failure, success, type Result } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
 
 export const convertToSessionAccount = (data: OIDCTokenResponse): Result<SessionAccount, 'SYSTEM_ERROR'> => {
@@ -224,4 +227,23 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
 	});
 
 	return formattedUpdate;
+};
+
+/** Converts retrieved Submission Service Study Data into database insert using snake_case model format
+ * @param data type StudyDTO study data in camelCase
+ * @returns  type StudyModel study data in snake_case
+ */
+export const convertToStudyUpdateRecord = (data: StudyDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
+	const createdDate = typeof data.createdAt === 'string' ? new Date(data.createdAt) : data.createdAt;
+	const updatedDate = typeof data.updatedAt === 'string' ? new Date(data.updatedAt) : data.updatedAt;
+	const studyModel = { ...data, createdAt: createdDate, updatedAt: updatedDate };
+	const snakeCaseRecord = objectToSnake(studyModel);
+	const validationResult = studyModelSchema.safeParse(snakeCaseRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToStudyUpdateRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
 };

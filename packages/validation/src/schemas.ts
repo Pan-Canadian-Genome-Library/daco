@@ -19,7 +19,7 @@
 
 import { z } from 'zod';
 
-import { ApplicationAgreements } from '@pcgl-daco/data-model';
+import { ApplicationAgreements, StudyContext, StudyStatus } from '@pcgl-daco/data-model';
 
 import {
 	Concise200WordCountString,
@@ -154,3 +154,27 @@ export const esignatureSchema = z.object({
 	signature: z.string().regex(BASE64_IMAGE).nullable(),
 });
 export type eSignatureSchemaType = z.infer<typeof esignatureSchema>;
+
+export const studyModelSchema = z.object({
+	study_id: z.string(),
+	dac_id: z.string(),
+	dac_name: z.string(),
+	category_id: z.number().nullable(),
+	study_name: z.string(),
+	study_description: z.string(),
+	program_name: z.string().nullable(),
+	keywords: z.array(z.string()),
+	status: z.nativeEnum(StudyStatus),
+	context: z.nativeEnum(StudyContext),
+	domain: z.array(z.string()),
+	participant_criteria: z.string().nullable(),
+	principal_investigators: z.array(z.string()),
+	lead_organizations: z.array(z.string()),
+	collaborators: z.array(z.string()),
+	funding_sources: z.array(z.string()),
+	publication_links: z.array(z.string()),
+	accepting_applications: z.boolean().nullable(),
+	created_at: z.union([z.date(), z.undefined()]),
+	updated_at: z.union([z.date(), z.undefined()]).nullable(),
+});
+export type studySchemaType = z.infer<typeof studyModelSchema>;
