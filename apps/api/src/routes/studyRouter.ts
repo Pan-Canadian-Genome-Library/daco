@@ -21,12 +21,29 @@ import type { StudyDTO } from '@pcgl-daco/data-model';
 import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import express from 'express';
 
+import { serverConfig } from '@/config/serverConfig.js';
 import { getStudyById } from '@/controllers/studyController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
 const studyRouter = express.Router();
+
+/**
+ * Import all studies from submission service
+ */
+studyRouter.get(
+	'/import',
+	async (request, response: ResponseWithData<{ studies: StudyDTO[] }, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+		const { CLINICAL_URL } = serverConfig;
+		const serviceResponse = await fetch(`${CLINICAL_URL}/study`);
+
+		const studyData = (await serviceResponse.json()) as StudyDTO[];
+
+		response.status(200).json({ studies: studyData });
+		return;
+	},
+);
 
 /**
  * Get the study by studyId
