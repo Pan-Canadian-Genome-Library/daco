@@ -68,6 +68,33 @@ describe('Study API', () => {
 			assert.ok(result.error, 'NOT_FOUND');
 		});
 	});
+
+	describe('setStudyAcceptingApplications', () => {
+		it('should set acceptingApplications to true', async () => {
+			const testRecordId = 'study1';
+			const result = await studyService.setStudyAcceptingApplications({ studyId: testRecordId, enabled: true });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.acceptingApplications, true);
+		});
+
+		it('should set acceptingApplications to false', async () => {
+			const testRecordId = 'study1';
+			const result = await studyService.setStudyAcceptingApplications({ studyId: testRecordId, enabled: false });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.acceptingApplications, false);
+		});
+
+		it('should fail to set acceptingApplications if study does not exist', async () => {
+			const testRecordId = 'MISSING-STUDY';
+			const result = await studyService.setStudyAcceptingApplications({ studyId: testRecordId, enabled: true });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'NOT_FOUND');
+		});
+	});
+
 	after(async () => {
 		await container.stop();
 		process.exit(0);

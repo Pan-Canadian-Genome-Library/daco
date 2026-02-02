@@ -25,7 +25,7 @@ import type { StudyDTO } from '@pcgl-daco/data-model';
 /**
  * Gets a study.
  * @param studyId - The study ID
- * @returns
+ * @returns {StudyDTO} - The study data
  */
 export const getStudyById = async ({
 	studyId,
@@ -45,10 +45,10 @@ export const getStudyById = async ({
 };
 
 /**
- * Toggles accepting applications for a study.
+ * Sets accepting applications for a study.
  * @param studyId - The study ID
  * @param enabled - Whether to enable or disable accepting applications
- * @returns
+ * @returns {acceptingApplications: boolean}
  */
 export const setStudyAcceptingApplications = async ({
 	studyId,
