@@ -18,11 +18,14 @@
  */
 
 import { getDbInstance } from '@/db/index.js';
+import BaseLogger from '@/logger.js';
 import { studySvc } from '@/service/studyService.ts';
 import { type StudyRecord } from '@/service/types.ts';
 import { convertToStudyUpdateRecord } from '@/utils/aliases.ts';
 import { failure, type AsyncResult } from '@/utils/results.ts';
 import type { StudyDTO } from '@pcgl-daco/data-model';
+
+const logger = BaseLogger.forModule('fileController');
 
 /**
  * Gets a study.
@@ -60,20 +63,24 @@ export const updateStudies = async ({
 		const database = getDbInstance();
 		const studyService = studySvc(database);
 
-		const studyData = studies
-			.map((study) => {
-				const updatedRecordResult = convertToStudyUpdateRecord(study);
-				if (updatedRecordResult.success) {
-					return updatedRecordResult.data;
-				}
-				return null;
-			})
-			.filter((record) => !!record);
+		const studyData = studies.map((study) => {
+			const createdDate = typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt;
+			const updatedDate = typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt;
+			const acceptingApplications =
+				typeof study.acceptingApplications === 'boolean' ? study.acceptingApplications : false;
+			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications };
+			const updatedRecordResult = convertToStudyUpdateRecord(studyModel);
+			if (updatedRecordResult.success) {
+				return updatedRecordResult.data;
+			}
+			throw new Error(updatedRecordResult.message);
+		});
 
 		const updatedStudies = await studyService.updateStudies({ studyData });
 
 		return updatedStudies;
 	} catch (error) {
-		return failure('SYSTEM_ERROR', `Unexpected error fetching updating studies`);
+		logger.error(error);
+		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);
 	}
 };

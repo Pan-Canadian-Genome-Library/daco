@@ -158,7 +158,7 @@ export type eSignatureSchemaType = z.infer<typeof esignatureSchema>;
 export const studyModelSchema = z.object({
 	study_id: z.string(),
 	dac_id: z.string(),
-	dac_name: z.string(),
+	dac_name: z.union([z.string(), z.undefined()]).nullable(),
 	category_id: z.number().nullable(),
 	study_name: z.string(),
 	study_description: z.string(),

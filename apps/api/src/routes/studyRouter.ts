@@ -22,7 +22,8 @@ import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import express from 'express';
 
 import { serverConfig } from '@/config/serverConfig.js';
-import { getStudyById } from '@/controllers/studyController.ts';
+import { getStudyById, updateStudies } from '@/controllers/studyController.ts';
+import { StudyModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
@@ -34,13 +35,29 @@ const studyRouter = express.Router();
  */
 studyRouter.get(
 	'/import',
-	async (request, response: ResponseWithData<{ studies: StudyDTO[] }, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+	async (request, response: ResponseWithData<{ studies: StudyModel[] }, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
 		const { CLINICAL_URL } = serverConfig;
 		const serviceResponse = await fetch(`${CLINICAL_URL}/study`);
 
 		const studyData = (await serviceResponse.json()) as StudyDTO[];
 
-		response.status(200).json({ studies: studyData });
+		const updatedStudiesResult = await updateStudies({ studies: studyData });
+
+		if (!updatedStudiesResult.success) {
+			switch (updatedStudiesResult.error) {
+				case 'NOT_FOUND':
+					response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+					break;
+				case 'SYSTEM_ERROR':
+					response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+					break;
+				default:
+					response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+			}
+			return;
+		}
+
+		response.status(200).json({ studies: updatedStudiesResult.data });
 		return;
 	},
 );

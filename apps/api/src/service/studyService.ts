@@ -98,7 +98,7 @@ const studySvc = (db: PostgresDb) => ({
 
 			return success(studyRecords);
 		} catch (error) {
-			const message = 'Error at getStudyById';
+			const message = 'Error at updateStudies';
 
 			logger.error(message, error);
 

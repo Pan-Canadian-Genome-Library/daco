@@ -234,10 +234,7 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
  * @returns  type StudyModel study data in snake_case
  */
 export const convertToStudyUpdateRecord = (data: StudyDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
-	const createdDate = typeof data.createdAt === 'string' ? new Date(data.createdAt) : data.createdAt;
-	const updatedDate = typeof data.updatedAt === 'string' ? new Date(data.updatedAt) : data.updatedAt;
-	const studyModel = { ...data, createdAt: createdDate, updatedAt: updatedDate };
-	const snakeCaseRecord = objectToSnake(studyModel);
+	const snakeCaseRecord = objectToSnake(data);
 	const validationResult = studyModelSchema.safeParse(snakeCaseRecord);
 	const result = validationResult.success
 		? success(validationResult.data)
