@@ -23,7 +23,7 @@ import express from 'express';
 
 import { getStudyById, setStudyAcceptingApplications } from '@/controllers/studyController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { activateParamSchema, basicStudyParamSchema } from '@pcgl-daco/validation';
+import { activateBodyParamSchema, basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
 const studyRouter = express.Router();
@@ -69,7 +69,7 @@ studyRouter.patch(
 		basicStudyParamSchema,
 		apiZodErrorMapping,
 		withBodySchemaValidation(
-			activateParamSchema,
+			activateBodyParamSchema,
 			apiZodErrorMapping,
 			async (request, response: ResponseWithData<boolean, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
 				const studyId = String(request.params.studyId);
