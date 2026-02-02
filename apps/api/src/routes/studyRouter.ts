@@ -18,12 +18,12 @@
  */
 
 import type { StudyDTO } from '@pcgl-daco/data-model';
-import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import express from 'express';
 
-import { getStudyById } from '@/controllers/studyController.ts';
+import { getStudyById, setStudyAcceptingApplications } from '@/controllers/studyController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { basicStudyParamSchema } from '@pcgl-daco/validation';
+import { activateParamSchema, basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
 const studyRouter = express.Router();
@@ -60,4 +60,40 @@ studyRouter.get(
 	),
 );
 
+/**
+ * Activate or Deactive study by Id
+ */
+studyRouter.patch(
+	'/:studyId/accepting-applications',
+	withParamsSchemaValidation(
+		basicStudyParamSchema,
+		apiZodErrorMapping,
+		withBodySchemaValidation(
+			activateParamSchema,
+			apiZodErrorMapping,
+			async (request, response: ResponseWithData<boolean, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+				const studyId = String(request.params.studyId);
+				const enabled = request.body.enabled;
+
+				const result = await setStudyAcceptingApplications({ studyId, enabled });
+
+				if (!result.success) {
+					switch (result.error) {
+						case 'NOT_FOUND':
+							response.status(404).json({ error: result.error, message: result.message });
+							break;
+						case 'SYSTEM_ERROR':
+							response.status(500).json({ error: result.error, message: result.message });
+							break;
+						default:
+							response.status(500).json({ error: result.error, message: result.message });
+					}
+					return;
+				}
+				response.status(200).json(result.data);
+				return;
+			},
+		),
+	),
+);
 export default studyRouter;

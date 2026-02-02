@@ -43,3 +43,28 @@ export const getStudyById = async ({
 		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
 	}
 };
+
+/**
+ * Toggles accepting applications for a study.
+ * @param studyId - The study ID
+ * @param enabled - Whether to enable or disable accepting applications
+ * @returns
+ */
+export const setStudyAcceptingApplications = async ({
+	studyId,
+	enabled,
+}: {
+	studyId: string;
+	enabled: boolean;
+}): AsyncResult<boolean, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const studyService = studySvc(database);
+
+		const study = await studyService.setStudyAcceptingApplications({ studyId, enabled });
+
+		return study;
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
+	}
+};

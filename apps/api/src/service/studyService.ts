@@ -75,6 +75,35 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	setStudyAcceptingApplications: async ({
+		studyId,
+		enabled,
+	}: {
+		studyId: string;
+		enabled: boolean;
+	}): AsyncResult<boolean, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const studyRecord = await db
+				.update(study)
+				.set({ accepting_applications: enabled })
+				.where(eq(study.study_id, studyId))
+				.returning({
+					acceptingApplications: study.accepting_applications,
+				});
+
+			if (!studyRecord) {
+				return failure('NOT_FOUND', `Unable to find study record ${studyId}.`);
+			}
+
+			return success(studyRecord[0]?.acceptingApplications || true);
+		} catch (error) {
+			const message = 'Error at setStudyAcceptingApplications';
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 });
 
 export { studySvc };
