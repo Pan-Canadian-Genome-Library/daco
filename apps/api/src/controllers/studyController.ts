@@ -56,7 +56,7 @@ export const setStudyAcceptingApplications = async ({
 }: {
 	studyId: string;
 	enabled: boolean;
-}): AsyncResult<boolean, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);

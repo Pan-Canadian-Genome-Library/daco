@@ -29,7 +29,7 @@ import type { ResponseWithData } from './types.ts';
 const studyRouter = express.Router();
 
 /**
- * Get the study by studyId
+ * Get study by studyId
  */
 studyRouter.get(
 	'/:studyId',
@@ -71,7 +71,10 @@ studyRouter.patch(
 		withBodySchemaValidation(
 			activateBodyParamSchema,
 			apiZodErrorMapping,
-			async (request, response: ResponseWithData<boolean, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+			async (
+				request,
+				response: ResponseWithData<Pick<StudyDTO, 'acceptingApplications'>, ['SYSTEM_ERROR', 'NOT_FOUND']>,
+			) => {
 				const studyId = String(request.params.studyId);
 				const enabled = request.body.enabled;
 

@@ -81,7 +81,7 @@ const studySvc = (db: PostgresDb) => ({
 	}: {
 		studyId: string;
 		enabled: boolean;
-	}): AsyncResult<boolean, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecord = await db
 				.update(study)
@@ -91,11 +91,11 @@ const studySvc = (db: PostgresDb) => ({
 					acceptingApplications: study.accepting_applications,
 				});
 
-			if (!studyRecord) {
-				return failure('NOT_FOUND', `Unable to find study record ${studyId}.`);
+			if (!studyRecord || studyRecord.length === 0 || studyRecord[0] === undefined) {
+				return failure('NOT_FOUND', `Unable to find study record to update ${studyId}.`);
 			}
 
-			return success(studyRecord[0]?.acceptingApplications || true);
+			return success(studyRecord[0]);
 		} catch (error) {
 			const message = 'Error at setStudyAcceptingApplications';
 
