@@ -19,64 +19,41 @@
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
-import { studySvc } from '@/service/studyService.ts';
-import { type StudyRecord } from '@/service/types.ts';
-import { convertToStudyUpdateRecord } from '@/utils/aliases.ts';
+import { dacSvc } from '@/service/dacService.ts';
+import { type DacRecord } from '@/service/types.ts';
+import { convertToDacUpdateRecord } from '@/utils/aliases.ts';
 import { failure, type AsyncResult } from '@/utils/results.ts';
-import type { StudyDTO } from '@pcgl-daco/data-model';
+import type { DacDTO } from '@pcgl-daco/data-model';
 
-const logger = BaseLogger.forModule('studyController');
-
-/**
- * Gets a study.
- * @param studyId - The study ID
- * @returns
- */
-export const getStudyById = async ({
-	studyId,
-}: {
-	studyId: string;
-}): AsyncResult<StudyDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
-	try {
-		const database = getDbInstance();
-		const studyService = studySvc(database);
-
-		const study = await studyService.getStudyById({ studyId });
-
-		return study;
-	} catch (error) {
-		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
-	}
-};
+const logger = BaseLogger.forModule('dacController');
 
 /**
  * Inserts & Updates Multiple Study Records
  * @param studies - An array of Study DTO objects from the Submission Service
  * @returns
  */
-export const updateStudies = async ({
-	studies,
+export const createDacRecords = async ({
+	dacData,
 }: {
-	studies: StudyDTO[];
-}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	dacData: DacDTO[];
+}): AsyncResult<DacRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
-		const studyService = studySvc(database);
+		const dacService = dacSvc(database);
 
-		const studyData = studies.map((study) => {
-			const createdDate = typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt;
-			const updatedDate = typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt;
-			const acceptingApplications =
-				typeof study.acceptingApplications === 'boolean' ? study.acceptingApplications : false;
-			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications };
-			const updatedRecordResult = convertToStudyUpdateRecord(studyModel);
+		const dacGroups = dacData.map((dacRecord) => {
+			const { createdAt, updatedAt } = dacRecord;
+			const createdDate = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+			const updatedDate = typeof updatedAt === 'string' ? new Date(updatedAt) : updatedAt;
+			const record = { ...dacRecord, createdAt: createdDate, updatedAt: updatedDate };
+			const updatedRecordResult = convertToDacUpdateRecord(record);
 			if (updatedRecordResult.success) {
 				return updatedRecordResult.data;
 			}
 			throw new Error(updatedRecordResult.message);
 		});
 
-		const updatedStudies = await studyService.updateStudies({ studyData });
+		const updatedStudies = await dacService.createDacRecords({ dacGroups });
 
 		return updatedStudies;
 	} catch (error) {

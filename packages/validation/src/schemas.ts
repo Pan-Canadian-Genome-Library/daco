@@ -178,3 +178,14 @@ export const studyModelSchema = z.object({
 	updated_at: z.union([z.date(), z.undefined()]).nullable(),
 });
 export type studySchemaType = z.infer<typeof studyModelSchema>;
+
+export const dacModelSchema = z.object({
+	dac_id: z.string(),
+	dac_name: z.string(),
+	dac_description: z.string(),
+	contact_name: z.string(),
+	contact_email: z.string(),
+	created_at: z.date(),
+	updated_at: z.union([z.date(), z.undefined()]).nullable(),
+});
+export type dacSchemaType = z.infer<typeof dacModelSchema>;

@@ -24,6 +24,7 @@ import {
 	type ApplicationRecord,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
+	type DacModel,
 	type FilesRecordOptionalContents,
 	type JoinedApplicationRecord,
 	type StudyModel,
@@ -34,6 +35,7 @@ import {
 	type ApplicationHistoryResponseData,
 	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
+	type DacDTO,
 	type FilesDTO,
 	type SignatureDTO,
 	type StudyDTO,
@@ -42,6 +44,7 @@ import {
 	applicationHistoryResponseSchema,
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
+	dacModelSchema,
 	fileResponseSchema,
 	signatureResponseSchema,
 	studyModelSchema,
@@ -241,6 +244,22 @@ export const convertToStudyUpdateRecord = (data: StudyDTO): Result<StudyModel, '
 		: failure(
 				'SYSTEM_ERROR',
 				`Validation Error while aliasing data at convertToStudyUpdateRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
+
+/** Converts retrieved Submission Service Dac Data into database insert using snake_case model format
+ * @param data type DacDTO study data in camelCase
+ * @returns  type DacModel study data in snake_case
+ */
+export const convertToDacUpdateRecord = (data: DacDTO): Result<DacModel, 'SYSTEM_ERROR'> => {
+	const snakeCaseRecord = objectToSnake(data);
+	const validationResult = dacModelSchema.safeParse(snakeCaseRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToDacUpdateRecord: \n${validationResult.error.issues[0]?.message || ''}`,
 			);
 	return result;
 };
