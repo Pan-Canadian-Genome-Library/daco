@@ -34,14 +34,14 @@ const CommentLabel = ({ label, numOfComments }: CommentLabelProps) => {
 			<CommentOutlined
 				style={{
 					backgroundColor: pcglColours.lighterBlue,
-					paddingInline: 5,
+					padding: 5,
 					borderRadius: 40,
 					color: 'white',
-					fontSize: '0.9rem',
+					fontSize: '0,9rem',
 				}}
 			/>
 			<Flex align="center">
-				<Text>{`${label} - (${numOfComments})`}</Text>
+				<Text style={{ fontSize: 14 }}>{`${label} - (${numOfComments})`}</Text>
 			</Flex>
 		</Flex>
 	);
