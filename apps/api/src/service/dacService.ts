@@ -26,7 +26,7 @@ import { type DacModel, type DacRecord } from './types.ts';
 const logger = BaseLogger.forModule('studyService');
 
 /**
- * Study service provides methods for study DB access
+ * DAC service provides methods for dac DB access
  * @param db - Drizzle Postgres DB Instance
  */
 const dacSvc = (db: PostgresDb) => ({
