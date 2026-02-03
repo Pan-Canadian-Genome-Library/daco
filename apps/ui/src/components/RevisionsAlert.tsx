@@ -102,8 +102,13 @@ const RevisionsAlert = ({ sectionRevisions, general }: RevisionsProps) => {
 								key,
 								label: (
 									<Flex gap={'middle'}>
-										<ExclamationCircleFilled style={{ color: pcglColours.primary, fontSize: '1.1rem' }} />
-										<>{value.isDacRequest ? `DAC Revisions - ${createdDate}` : `Rep Revisions - ${createdDate}`}</>
+										<ExclamationCircleFilled
+											style={{
+												color: pcglColours.primary,
+												fontSize: '24.5px', // Note: This should match antd CommentOutlined icon> CommentOutlined is not filled like this is, so needs a more specific tailored css to match sizing
+											}}
+										/>{' '}
+										/<>{value.isDacRequest ? `DAC Revisions - ${createdDate}` : `Rep Revisions - ${createdDate}`}</>
 									</Flex>
 								),
 								children: (
