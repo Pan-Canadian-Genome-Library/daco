@@ -27,15 +27,15 @@ const { ENABLE_EMAIL_REMINDERS } = process.env;
 const logger = BaseLogger.forModule('Scheduler');
 
 const scheduler = async () => {
-	try {
+	if (ENABLE_EMAIL_REMINDERS === 'true') {
 		// Scheduled to run at midnight:
 		cron.schedule('0 0 * * *', async () => {
-			if (ENABLE_EMAIL_REMINDERS === 'true') {
-				scheduleEmailReminders();
+			try {
+				await scheduleEmailReminders();
+			} catch (error) {
+				logger.error(error);
 			}
 		});
-	} catch (error) {
-		logger.error(error);
 	}
 };
 
