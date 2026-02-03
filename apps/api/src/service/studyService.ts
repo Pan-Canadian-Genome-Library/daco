@@ -75,6 +75,35 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	updateStudyAcceptingApplication: async ({
+		studyId,
+		enabled,
+	}: {
+		studyId: string;
+		enabled: boolean;
+	}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const studyRecord = await db
+				.update(study)
+				.set({ accepting_applications: enabled })
+				.where(eq(study.study_id, studyId))
+				.returning({
+					acceptingApplications: study.accepting_applications,
+				});
+
+			if (!studyRecord || studyRecord.length === 0 || studyRecord[0] === undefined) {
+				return failure('NOT_FOUND', `Unable to find study record to update ${studyId}.`);
+			}
+
+			return success(studyRecord[0]);
+		} catch (error) {
+			const message = 'Error at setStudyAcceptingApplications';
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 });
 
 export { studySvc };

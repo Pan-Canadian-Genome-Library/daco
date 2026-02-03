@@ -18,18 +18,18 @@
  */
 
 import type { StudyDTO } from '@pcgl-daco/data-model';
-import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import express from 'express';
 
-import { getStudyById } from '@/controllers/studyController.ts';
+import { getStudyById, setStudyAcceptingApplications } from '@/controllers/studyController.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { basicStudyParamSchema } from '@pcgl-daco/validation';
+import { activateBodyParamSchema, basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
 const studyRouter = express.Router();
 
 /**
- * Get the study by studyId
+ * Get study by studyId
  */
 studyRouter.get(
 	'/:studyId',
@@ -60,4 +60,44 @@ studyRouter.get(
 	),
 );
 
+/**
+ * Activate or Deactive study by Id
+ */
+studyRouter.patch(
+	'/:studyId/accepting-applications',
+	// authMiddleware(), // TODO: right now theres not ADMIN check, this should be locked to only admin users
+	withParamsSchemaValidation(
+		basicStudyParamSchema,
+		apiZodErrorMapping,
+		withBodySchemaValidation(
+			activateBodyParamSchema,
+			apiZodErrorMapping,
+			async (
+				request,
+				response: ResponseWithData<Pick<StudyDTO, 'acceptingApplications'>, ['SYSTEM_ERROR', 'NOT_FOUND']>,
+			) => {
+				const studyId = String(request.params.studyId);
+				const enabled = request.body.enabled;
+
+				const result = await setStudyAcceptingApplications({ studyId, enabled });
+
+				if (!result.success) {
+					switch (result.error) {
+						case 'NOT_FOUND':
+							response.status(404).json({ error: result.error, message: result.message });
+							break;
+						case 'SYSTEM_ERROR':
+							response.status(500).json({ error: result.error, message: result.message });
+							break;
+						default:
+							response.status(500).json({ error: result.error, message: result.message });
+					}
+					return;
+				}
+				response.status(204).json();
+				return;
+			},
+		),
+	),
+);
 export default studyRouter;
