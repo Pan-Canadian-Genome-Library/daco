@@ -108,7 +108,7 @@ const RevisionsAlert = ({ sectionRevisions, general }: RevisionsProps) => {
 												fontSize: '24.5px', // Note: This should match antd CommentOutlined icon> CommentOutlined is not filled like this is, so needs a more specific tailored css to match sizing
 											}}
 										/>{' '}
-										/<>{value.isDacRequest ? `DAC Revisions - ${createdDate}` : `Rep Revisions - ${createdDate}`}</>
+										<>{value.isDacRequest ? `DAC Revisions - ${createdDate}` : `Rep Revisions - ${createdDate}`}</>
 									</Flex>
 								),
 								children: (
