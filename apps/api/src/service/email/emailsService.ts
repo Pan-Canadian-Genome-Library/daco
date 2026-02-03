@@ -447,7 +447,7 @@ const emailSvc = (db: PostgresDb) => {
 		sendEmailApplicantApplicationSubmitted: async ({
 			id,
 			actionId,
-			name,
+			name: applicantName,
 			to,
 		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
@@ -463,8 +463,8 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW,
-					html: GenerateEmailApplicantAppSubmitted({ id, name }),
-					text: GenerateEmailApplicantAppSubmittedPlain({ id, name }),
+					html: GenerateEmailApplicantAppSubmitted({ id, applicantName }),
+					text: GenerateEmailApplicantAppSubmittedPlain({ id, applicantName }),
 				});
 
 				await createEmailRecord({

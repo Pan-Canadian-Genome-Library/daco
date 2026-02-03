@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type GenerateClosedType } from '../../types.ts';
+import { type EmailReminderTemplateType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
@@ -28,7 +28,7 @@ export const GenerateEmailApplicantClosed = ({
 	message,
 	state,
 	submittedDate,
-}: Omit<GenerateClosedType, 'actionId'>) => {
+}: EmailReminderTemplateType) => {
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
@@ -76,7 +76,7 @@ export const GenerateEmailApplicantClosedPlain = ({
 	message,
 	state,
 	submittedDate,
-}: Omit<GenerateClosedType, 'actionId'>) => {
+}: EmailReminderTemplateType) => {
 	return ` Dear ${applicantName},,
     \n We are writing to inform you that your application PCGL-${id} has been closed. 
     \n Closed By: ${userName}

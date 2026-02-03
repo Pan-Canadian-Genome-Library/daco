@@ -18,15 +18,11 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { type GenerateDraftReminderEmailType } from '@/service/email/types.ts';
+import { EmailReminderTemplateType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailReminderSubmitDraft = ({
-	applicantName,
-	id,
-	submittedDate,
-}: Omit<GenerateDraftReminderEmailType, 'to'>) => {
+export const GenerateEmailReminderSubmitDraft = ({ applicantName, id, submittedDate }: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -74,7 +70,7 @@ export const GenerateEmailReminderSubmitDraftPlain = ({
 	applicantName,
 	id,
 	submittedDate,
-}: Omit<GenerateDraftReminderEmailType, 'to'>) => {
+}: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;

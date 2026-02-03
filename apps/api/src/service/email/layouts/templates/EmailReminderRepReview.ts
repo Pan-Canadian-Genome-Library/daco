@@ -18,7 +18,7 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { type GenerateReviewReminderEmailType } from '@/service/email/types.ts';
+import { type EmailReminderTemplateType, type GenerateReviewReminderEmailType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
@@ -27,7 +27,7 @@ export const GenerateEmailReminderRepReview = ({
 	repName,
 	id,
 	submittedDate,
-}: Omit<GenerateReviewReminderEmailType, 'to' | 'actionId'>) => {
+}: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;

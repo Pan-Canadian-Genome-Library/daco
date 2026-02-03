@@ -41,6 +41,17 @@ export type BaseEmailType = {
 	lang?: string;
 };
 
+export type EmailReminderTemplateType = {
+	id: string | number;
+	actionId?: number;
+	applicantName?: string;
+	repName?: string;
+	userName?: string;
+	message?: string;
+	state?: string;
+	submittedDate?: Date | string;
+};
+
 export type GenerateInstitutionalRepType = {
 	id: string | number;
 	repName: string;

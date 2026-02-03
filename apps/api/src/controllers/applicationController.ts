@@ -387,11 +387,11 @@ export const approveApplication = async ({
 	try {
 		// Fetch application
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
+		const applicationService: ApplicationService = applicationSvc(database);
 		const emailService = await emailSvc(database);
 		const collaboratorsService = await collaboratorsSvc(database);
 
-		const result = await service.getApplicationById({ id: applicationId });
+		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -412,13 +412,13 @@ export const approveApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		const updatedResult = await applicationService.findOneAndUpdate({ id: applicationId, update });
 
 		if (!updatedResult.success) {
 			return updatedResult;
 		}
 
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
+		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
@@ -431,7 +431,7 @@ export const approveApplication = async ({
 		}
 
 		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
 			logger.error(`Unable to retrieve information to send approval email: ${applicationId}`, resultContents);
