@@ -38,17 +38,21 @@ import {
 
 const logger = BaseLogger.forModule('Email Reminders');
 
-// Compare a supplied email or action date (measured in Days) against an interval value
-// If days passed since action date is greater than the interval, return true, else return false
-const dateDiffCheck = ({ actionDate, interval = 7 }: { actionDate: Date; interval?: number }) => {
+/** 
+/* Check if the current date is more than interval days after a given action date
+/* If days passed since action date is greater than the interval, return true, else return false
+*/
+const dateDiffCheck = ({ actionDate, intervalDays = 7 }: { actionDate: Date; intervalDays?: number }) => {
 	const currentDate = new Date().getDate();
 	const comparisonDate = actionDate.getDate();
 	const diff = currentDate - comparisonDate;
-	return diff >= interval;
+	return diff >= intervalDays;
 };
 
-// Dictionary matching Reminder Email subjects to the triggering Application State
-// Rep Review and Dac Review states can trigger multiple Reminder Email types depending on the previous action
+/**
+ * Dictionary matching Reminder Email subjects to the triggering Application State
+ * Rep Review and Dac Review states can trigger multiple Reminder Email types depending on the previous action
+ */
 const allTargetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues[] }> = {
 	[ApplicationStates.DRAFT]: [EmailTypes.REMINDER_SUBMIT_DRAFT],
 	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: [
