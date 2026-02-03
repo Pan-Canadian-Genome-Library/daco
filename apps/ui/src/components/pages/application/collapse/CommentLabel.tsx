@@ -37,7 +37,6 @@ const CommentLabel = ({ label, numOfComments }: CommentLabelProps) => {
 					borderRadius: 20,
 					padding: 5,
 					color: 'white',
-					fontSize: '0.75rem',
 				}}
 			/>
 			<Flex align="center">
