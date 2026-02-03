@@ -65,6 +65,7 @@ studyRouter.get(
  */
 studyRouter.patch(
 	'/:studyId/accepting-applications',
+	// authMiddleware(), // TODO: right now theres not ADMIN check, this should be locked to only admin users
 	withParamsSchemaValidation(
 		basicStudyParamSchema,
 		apiZodErrorMapping,
@@ -93,7 +94,7 @@ studyRouter.patch(
 					}
 					return;
 				}
-				response.status(200).json(result.data);
+				response.status(204).json();
 				return;
 			},
 		),
