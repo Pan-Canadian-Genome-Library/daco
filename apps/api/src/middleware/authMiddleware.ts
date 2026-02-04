@@ -19,17 +19,16 @@
 
 import { RequestHandler, type Response } from 'express';
 
-import type { ErrorResponse, UserRole } from '@pcgl-daco/validation';
+import type { UserRole } from '@pcgl-daco/validation';
 
 import { getUserRole } from '@/service/authService.js';
+import { AuthenticationErrorResponse } from '@/utils/middleware.ts';
 
 export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
 
 export type AuthMiddlewareConfig = {
 	requiredRoles?: [UserRoleOmitRep, ...UserRoleOmitRep[]];
 };
-
-type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
 
 /**
  * Auth Middleware will check that the request is being made by an authenticated user.

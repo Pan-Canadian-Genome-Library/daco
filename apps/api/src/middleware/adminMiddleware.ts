@@ -19,10 +19,27 @@
 
 import { RequestHandler, type Response } from 'express';
 
-import type { ErrorResponse } from '@pcgl-daco/validation';
+import { AuthenticationErrorResponse } from '@/utils/middleware.ts';
 
-type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
-
+/**
+ * Middleware that ensures the request is initiated by an authenticated user with site administrator privileges.
+ *
+ * This middleware checks the session for a user object.
+ * - If no user is found, it sends a 401 Unauthorized response.
+ * - If a user is found but lacks the `siteAdmin` flag, it sends a 403 Forbidden response.
+ * - If the user is authenticated and is a site admin, control is passed to the next middleware or route handler.
+ *
+ * @returns {RequestHandler} An Express RequestHandler.
+ *
+ * @example
+ * router.get(
+ * 	'/admin/users',
+ * 	adminMiddleware(),
+ * 	(request, response) => {
+ * 		// Only site admins can access this route
+ * 	}
+ * )
+ */
 export const adminMiddleware =
 	(): RequestHandler => (request, response: Response<AuthenticationErrorResponse>, next) => {
 		const { user } = request.session;
