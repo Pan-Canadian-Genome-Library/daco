@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,14 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z as zod } from 'zod';
+import { Flex, Layout } from 'antd';
 
-export const userRoleSchema = zod.enum([
-	'DAC_CHAIR',
-	'DAC_MEMBER',
-	'INSTITUTIONAL_REP',
-	'APPLICANT',
-	'ANONYMOUS',
-	'ADMIN',
-]);
-export type UserRole = zod.infer<typeof userRoleSchema>;
+import ContentWrapper from '@/components/layouts/ContentWrapper';
+
+const { Content } = Layout;
+
+const AdminDashboardPage = () => {
+	return (
+		<>
+			<Content>
+				<Flex style={{ height: '100%' }} vertical>
+					<ContentWrapper style={{ padding: '40px 0 40px 0' }}>
+						<div>Admin</div>
+					</ContentWrapper>
+				</Flex>
+			</Content>
+		</>
+	);
+};
+
+export default AdminDashboardPage;
