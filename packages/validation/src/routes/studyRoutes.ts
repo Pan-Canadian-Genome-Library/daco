@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,13 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './applicationActions.ts';
-export * from './applicationContents.ts';
-export * from './applications.ts';
-export * from './collaborators.ts';
-export * from './common.ts';
-export * from './dac.ts';
-export * from './dacComments.ts';
-export * from './files.ts';
-export * from './revisionRequests.ts';
-export * from './studies.ts';
+import { z } from 'zod';
+import { NonEmptyString } from '../common/strings.js';
+
+export const basicStudyParamSchema = z.object({
+	studyId: NonEmptyString.nonempty(),
+});

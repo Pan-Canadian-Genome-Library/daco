@@ -294,7 +294,7 @@ export const createApplicationPDF = async ({
 		return failure('SYSTEM_ERROR', 'No ethics approval or exemption file was found, unable to generate PDF.');
 	}
 
-	const fileContents = await fileService.getFileById({ fileId: ethicsLetterID });
+	const fileContents = await fileService.getFileById({ fileId: ethicsLetterID, withBuffer: true });
 
 	if (!fileContents.success) {
 		return failure('NOT_FOUND', 'Unable to retrieve ethics approval or exemption file, unable to generate PDF.');

@@ -34,7 +34,7 @@ export const fileResponseSchema = z.object({
 	id: z.number(),
 	filename: z.string().nullable(),
 	applicationId: z.number(),
-	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)),
+	content: z.instanceof(ArrayBuffer).or(z.instanceof(Uint8Array)).nullable().optional(),
 	submittedAt: z.date(),
 	submitterUserId: z.string(),
 	type: z.literal('SIGNED_APPLICATION').or(z.literal('ETHICS_LETTER')),
