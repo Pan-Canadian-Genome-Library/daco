@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { serverConfig } from '@/config/serverConfig.js';
+import { authConfig } from '@/config/authConfig.ts';
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -30,7 +30,7 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
  * @returns
  */
 export async function fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
-	const { FETCH_RETRIES, FETCH_RETRY_DELAY_MS, FETCH_TIMEOUT_MS } = serverConfig;
+	const { AUTHZ_FETCH_RETRIES, AUTHZ_FETCH_RETRY_DELAY_MS, AUTHZ_FETCH_TIMEOUT_MS } = authConfig;
 
 	let attempt = 0;
 
@@ -38,19 +38,19 @@ export async function fetchWithRetry(url: string, init: RequestInit): Promise<Re
 		try {
 			const response = await fetch(url, init);
 
-			if (response.status >= 400 && attempt < FETCH_RETRIES) {
+			if (response.status >= 400 && attempt < AUTHZ_FETCH_RETRIES) {
 				attempt++;
-				await sleep(FETCH_RETRY_DELAY_MS);
+				await sleep(AUTHZ_FETCH_RETRY_DELAY_MS);
 				continue;
 			}
 
 			return response;
 		} catch (error) {
-			if (attempt >= FETCH_RETRIES) {
+			if (attempt >= AUTHZ_FETCH_RETRIES) {
 				throw error;
 			}
 			attempt++;
-			await sleep(FETCH_TIMEOUT_MS);
+			await sleep(AUTHZ_FETCH_TIMEOUT_MS);
 		}
 	}
 }

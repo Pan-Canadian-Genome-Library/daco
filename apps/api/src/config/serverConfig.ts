@@ -26,11 +26,6 @@ const serverConfigSchema = z.object({
 	NODE_ENV: z.string().optional().default('development'),
 	npm_package_version: z.string().optional().default('unknown'),
 
-	// Fetch configs
-	FETCH_RETRIES: z.coerce.number().optional().default(3),
-	FETCH_RETRY_DELAY_MS: z.coerce.number().optional().default(500),
-	FETCH_TIMEOUT_MS: z.coerce.number().optional().default(10000),
-
 	// Custom env variables
 	PORT: z.coerce.number().optional().default(3000),
 	SESSION_KEYS: z.string(),

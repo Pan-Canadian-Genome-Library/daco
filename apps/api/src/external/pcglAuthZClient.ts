@@ -18,7 +18,6 @@
  */
 
 import { authConfig } from '@/config/authConfig.ts';
-import { serverConfig } from '@/config/serverConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 import urlJoin from 'url-join';
@@ -91,13 +90,12 @@ export const refreshAuthZServiceToken = async () => {
  *
  */
 export const fetchAuthZResource = async (resource: string, token: string, options?: RequestInit) => {
+	const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_ID, AUTHZ_FETCH_RETRIES, AUTHZ_FETCH_RETRY_DELAY_MS } = authConfig;
 	/**
 	 * Internal function that does the work of fetching the resource from AuthZ.
 	 * We will need to retry this if this is rejected due to an expired serviceToken.
 	 */
 	async function _fetchFromAuthZ() {
-		const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_ID } = authConfig;
-
 		const url = urlJoin(AUTHZ_ENDPOINT, resource);
 		const headers = new Headers({
 			Authorization: `Bearer ${token}`,
@@ -120,31 +118,30 @@ export const fetchAuthZResource = async (resource: string, token: string, option
 	}
 
 	// Retry mechanism for authz requires to refresh service token before retying fetch call
-	const { FETCH_RETRIES, FETCH_RETRY_DELAY_MS } = serverConfig;
 	let attempt = 0;
 	while (true) {
 		try {
 			const response = await _fetchFromAuthZ();
 
-			if (!response.ok && attempt < FETCH_RETRIES) {
+			if (!response.ok && attempt < AUTHZ_FETCH_RETRIES) {
 				// Refresh Service token when Bearer is invalid
 				if (response.status === 401 || response.status === 403) {
 					await refreshAuthZServiceToken();
 				}
 
 				attempt++;
-				await sleep(FETCH_RETRY_DELAY_MS);
+				await sleep(AUTHZ_FETCH_RETRY_DELAY_MS);
 				continue;
 			}
 
 			return response;
 		} catch (error) {
-			if (attempt >= FETCH_RETRIES) {
+			if (attempt >= AUTHZ_FETCH_RETRIES) {
 				throw new Error(`Something went wrong fetching AuthZ service: ${String(error)}`);
 			}
 
 			attempt++;
-			await sleep(FETCH_RETRY_DELAY_MS);
+			await sleep(AUTHZ_FETCH_RETRY_DELAY_MS);
 		}
 	}
 };
