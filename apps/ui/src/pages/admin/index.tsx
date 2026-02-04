@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Layout } from 'antd';
+import { Button, Flex, Layout } from 'antd';
 
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 
@@ -29,7 +29,12 @@ const AdminDashboardPage = () => {
 			<Content>
 				<Flex style={{ height: '100%' }} vertical>
 					<ContentWrapper style={{ padding: '40px 0 40px 0' }}>
-						<div>Admin</div>
+						<Flex vertical>
+							<Flex>
+								<Button>Import Studies</Button>
+								<Button>Activate/Deactivate Studies</Button>
+							</Flex>
+						</Flex>
 					</ContentWrapper>
 				</Flex>
 			</Content>
