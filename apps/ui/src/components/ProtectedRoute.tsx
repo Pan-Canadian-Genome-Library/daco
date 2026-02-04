@@ -31,7 +31,6 @@ type ProtectedRouteProps = PropsWithChildren<{
 }>;
 
 /**
- *
  * Restrict a component from rendering if authorization rules are not met. Can be added to the
  * element of a Route to prevent access to that route.
  *
