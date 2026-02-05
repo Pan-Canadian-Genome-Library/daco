@@ -369,18 +369,15 @@ export const createApplicationPDF = async ({
 };
 
 /**
- * Approves the application by providing the applicationId
+ * This function moves the application status to `dacApproved`.
+ * It looks for the PCGLID of the applicant and each collaborator to grant access to the requested study.
+ * TODO: A refactor is required to better handling when the collaborator PCGLID is not found
  *
  * @async
- * @param {ApproveApplication} param0
- * @param {ApproveApplication} param0.applicationId
- * @param {ApproveApplication} param1.approverAccessToken
- * @returns {Promise<{
- * 	success: boolean;
- * 	message?: string;
- * 	errors?: string | Error;
- * 	data?: any;
- * }>}
+ * @param applicationId - ID of the application
+ * @param approverAccessToken - Bearer token with sufficient privileges to grant study access
+ * @param userName - Name of the user approving the application
+ * @returns The application on success, or a failure containing the error
  */
 export const approveApplication = async ({
 	applicationId,
