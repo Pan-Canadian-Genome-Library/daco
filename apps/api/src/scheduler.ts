@@ -23,9 +23,13 @@ import { scheduleEmailReminders } from '@/jobs/emailReminders.ts';
 import BaseLogger from '@/logger.js';
 
 const { ENABLE_EMAIL_REMINDERS } = process.env;
-
 const logger = BaseLogger.forModule('Scheduler');
 
+/*
+ * Scheduler for managing Cron jobs
+ * New cron tasks can be added to this file using the [cron syntax](https://nodecron.com/cron-syntax.html) to define new intervals as needed.
+ * Task logic should be stored in `/src/jobs`
+ */
 const scheduler = async () => {
 	if (ENABLE_EMAIL_REMINDERS === 'true') {
 		// Scheduled to run at midnight:

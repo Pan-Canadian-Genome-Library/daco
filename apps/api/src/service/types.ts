@@ -27,11 +27,11 @@ import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
 import * as schema from '@/db/schemas/index.js';
 import { files } from '@/db/schemas/index.js';
-import { study } from '@/db/schemas/studies.ts';
-
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
 import { sentEmails } from '@/db/schemas/sentEmails.js';
-import { ApplicationStateValues } from '@pcgl-daco/data-model';
+import { study } from '@/db/schemas/studies.ts';
+
+import { type ApplicationStateValues } from '@pcgl-daco/data-model';
 
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
@@ -127,5 +127,4 @@ export interface AuthorizedRequest extends Request {
 }
 
 export type StudyService = ReturnType<typeof studySvc>;
-
 export type StudyModel = typeof study.$inferInsert;

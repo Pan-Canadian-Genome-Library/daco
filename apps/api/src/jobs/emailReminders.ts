@@ -17,132 +17,140 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import {
-	ApplicationActions,
-	ApplicationActionValues,
-	ApplicationStates,
-	ApplicationStateValues,
-	EmailTypes,
-	EmailTypeValues,
-} from '@pcgl-daco/data-model';
+import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import {
+	type ReminderEmailTypes,
+	reminderEmailTypeValues,
+	reminderTargetActionTypes,
+	reminderTargetEmailTypes,
+} from '@/service/email/types.ts';
+import {
 	type ApplicationActionRecord,
 	type EmailRecord,
 	type JoinedApplicationEmailsActionsRecord,
 } from '@/service/types.ts';
+import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
+
+/**
+ * Conditions for sending Application Reminder Emails
+ *
+ * Applications in states DRAFT, DAC_REVIEW, DAC_REVISIONS_REQUESTED, INSTITUTIONAL_REP_REVIEW, & INSTITUTIONAL_REP_REVISION_REQUESTED
+ * are checked nightly at midnight to see if a follow up email needs to be sent, to prompt the next step in the Submission process.
+ * The nightly cron function is setup in `/src/scheduler.ts`.
+ *
+ * The logic compares application state, most recent relevant application action, and the most recent relevant email sent,
+ * to determine if an email reminder should be sent.
+ *
+ * - If the application is in one of the appropriate states requiring action,
+ * - And the related Application Action was created 7 days ago (or more),
+ * - Or the related Email was sent 7 days ago (or more),
+ * - then an Email Reminder should be sent.
+ *
+ *	Not all Application States, Actions or Email Types require follow up.
+ *  Some Application States have multiple associated types of emails or state transitions.
+ *
+ *	`reminderTargetEmailTypes` represents a map from type of Email Sent, to the relevant Application state(s)
+ *	For example, if application is in state INSTITUTIONAL_REP_REVIEW, the application will check for a SUBMIT_DRAFT email record
+ * 	If this email was last sent 7 days ago or more, (indicating the draft was submitted 7 days ago and now requires further action)
+ *  an additional Reminder email should be sent.
+ *
+ *  Creating new reminders requires reviewing & confirming the following:
+ *	- The relevant Application State is contained in reminderStates so that the application record is reviewed
+ *	- The relevant Action or Email Type exists, and is included in reminderTargetActionTypes and/or reminderTargetEmailTypes
+ *	- The dateDiffCheck is used with the correct interval definition for your use case
+ * 	- A new Email Service method is created to send an Email using the Email Client and create an Email record in the database
+ */
 
 const logger = BaseLogger.forModule('Email Reminders');
 
-/** 
-/* Check if the current date is more than interval days after a given action date
-/* If days passed since action date is greater than the interval, return true, else return false
-*/
+/**
+ * Check if the current date is more than interval days after a specific action date
+ * If days passed since action date is greater than the interval, return true, else return false
+ */
 const dateDiffCheck = ({ actionDate, intervalDays = 7 }: { actionDate: Date; intervalDays?: number }) => {
-	const currentDate = new Date().getDate();
-	const comparisonDate = actionDate.getDate();
-	const diff = currentDate - comparisonDate;
+	const currentDate = new Date();
+	const valueOfActionDate = actionDate.valueOf();
+	const valueOfCurrentDate = currentDate.valueOf();
+	const diff = Math.round((valueOfCurrentDate - valueOfActionDate) / (1000 * 60 * 60 * 24));
 	return diff >= intervalDays;
 };
 
-/**
- * Dictionary matching Reminder Email subjects to the triggering Application State
- * Rep Review and Dac Review states can trigger multiple Reminder Email types depending on the previous action
+/*
+ * Type guard to help separate records with targeted Reminder email types from other emails
  */
-const allTargetEmailTypes: Partial<{ [k in ApplicationStateValues]: EmailTypeValues[] }> = {
-	[ApplicationStates.DRAFT]: [EmailTypes.REMINDER_SUBMIT_DRAFT],
-	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: [
-		EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
-		EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
-		EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS,
-	],
-	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: [
-		EmailTypes.NOTIFY_APPLICANT_REP_REVISIONS,
-		EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
-	],
-	[ApplicationStates.DAC_REVIEW]: [
-		EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
-		EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
-		EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS,
-	],
-	[ApplicationStates.DAC_REVISIONS_REQUESTED]: [
-		EmailTypes.NOTIFY_APPLICANT_DAC_REVISIONS,
-		EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
-	],
-};
+function isReminderEmailType(emailType: EmailTypeValues): emailType is ReminderEmailTypes {
+	const testArray: string[] = [...reminderEmailTypeValues];
+	return testArray.includes(emailType);
+}
 
-// Find record for most recent relevant email created with target email_type value
-const getMostRecentEmail = ({
+/**
+ * Find record for email with target reminder email_type values
+ * Used to determine if an application needs a follow up email (not all emails require follow up)
+ * Records are pre-sorted by DB so the email should be the most recent
+ */
+const getRelevantReminderEmail = ({
 	sentEmails,
 	state,
 }: {
-	sentEmails: EmailRecord[] | null;
+	sentEmails: EmailRecord[];
 	state: ApplicationStateValues;
-}) => {
-	const targetEmailTypes = allTargetEmailTypes[state];
-	const mostRecentEmail =
-		sentEmails?.length && targetEmailTypes
-			? sentEmails.find((email) => targetEmailTypes.includes(email.email_type))
-			: null;
-	return mostRecentEmail || null;
+}): EmailRecord | undefined => {
+	const targetEmail = sentEmails?.find((email) => {
+		const emailType = email.email_type;
+		if (!isReminderEmailType(emailType)) {
+			return false;
+		}
+
+		const allowedStates = reminderTargetEmailTypes[emailType];
+		if (allowedStates?.includes(state)) {
+			return true;
+		}
+
+		return false;
+	});
+
+	return targetEmail;
 };
 
-// Return true if a relevant email record exists and was created
-const checkForEmailReminders = ({ emailDate }: { emailDate: Date | null }) => {
-	return !!emailDate && dateDiffCheck({ actionDate: emailDate });
-};
-
-// Dictionary matching Application State values to related triggering State Transition Action values
-// Rep Review and Dac Review states can be triggered by multiple potential State Transitions
-const targetActionTypes: Partial<{
-	[k in ApplicationStateValues]: ApplicationActionValues[];
-}> = {
-	[ApplicationStates.DRAFT]: [ApplicationActions.WITHDRAW],
-	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: [
-		ApplicationActions.SUBMIT_DRAFT,
-		ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
-	],
-	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: [ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST],
-	[ApplicationStates.DAC_REVIEW]: [ApplicationActions.INSTITUTIONAL_REP_SUBMIT, ApplicationActions.DAC_REVIEW_SUBMIT],
-	[ApplicationStates.DAC_REVISIONS_REQUESTED]: [ApplicationActions.DAC_REVIEW_REVISION_REQUEST],
-};
-
-// Find record for most recent relevant Action created with target state transition Action value
-const getMostRecentAction = ({
+/*
+ * Finds relevant record Action created with target state transition Action value
+ * Records are pre-sorted by DB so first result should be most recent
+ */
+const getRelevantReminderAction = ({
 	applicationActions,
 	state,
 }: {
-	applicationActions: ApplicationActionRecord[] | null;
+	applicationActions: ApplicationActionRecord[];
 	state: ApplicationStateValues;
 }) => {
-	const targetActionType = targetActionTypes[state];
+	const targetActionType = reminderTargetActionTypes[state];
 	const mostRecentAction =
 		applicationActions?.length && targetActionType
 			? applicationActions.find((action) => targetActionType.includes(action.action))
 			: null;
-	return mostRecentAction || null;
+	return mostRecentAction;
 };
 
-const checkForActionReminders = ({ actionDate }: { actionDate: Date | null }) => {
-	return !!actionDate && dateDiffCheck({ actionDate });
-};
+/* List of Application States requiring checks for reminder Emails */
+const reminderStates = [
+	ApplicationStates.DRAFT,
+	ApplicationStates.DAC_REVIEW,
+	ApplicationStates.DAC_REVISIONS_REQUESTED,
+	ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+	ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+];
 
-// Reviews Application, Action & Email details to determine if an Application needs a Reminder Email
+/* Reviews Application, Action & Email details to determine if an Application needs a Reminder Email */
 export const scheduleEmailReminders = async () => {
 	const database = getDbInstance();
 	const applicationService = applicationSvc(database);
 	const allApplicationsResult = await applicationService.getEmailActionDetails({
-		state: [
-			ApplicationStates.DRAFT,
-			ApplicationStates.DAC_REVIEW,
-			ApplicationStates.DAC_REVISIONS_REQUESTED,
-			ApplicationStates.INSTITUTIONAL_REP_REVIEW,
-			ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
-		],
+		state: reminderStates,
 	});
 
 	if (allApplicationsResult.success) {
@@ -153,19 +161,19 @@ export const scheduleEmailReminders = async () => {
 			// Early Draft applications will not have any state transition Action records
 			// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead
 			// For all other states & actions, confirm if it has been >7 days since the last related state change or reminder email
-			const mostRecentAction = getMostRecentAction({ state, applicationActions });
+			const mostRecentAction = applicationActions ? getRelevantReminderAction({ state, applicationActions }) : null;
 			const actionDate = mostRecentAction
 				? mostRecentAction.created_at
 				: state === ApplicationStates.DRAFT
 					? created_at
 					: null;
-			const needsStateReminder = checkForActionReminders({ actionDate });
+			const needsActionReminder = actionDate ? dateDiffCheck({ actionDate }) : false;
 
-			const mostRecentEmail = getMostRecentEmail({ state, sentEmails });
-			const emailDate = mostRecentEmail?.created_at || null;
-			const needsEmailReminder = checkForEmailReminders({ emailDate });
+			const mostRecentEmail = sentEmails ? getRelevantReminderEmail({ state, sentEmails }) : null;
+			const emailDate = mostRecentEmail?.created_at;
+			const needsEmailReminder = emailDate ? dateDiffCheck({ actionDate: emailDate }) : false;
 
-			const sendReminder = needsEmailReminder || needsStateReminder;
+			const sendReminder = needsEmailReminder || needsActionReminder;
 			if (sendReminder) {
 				sendEmailReminders({
 					application,

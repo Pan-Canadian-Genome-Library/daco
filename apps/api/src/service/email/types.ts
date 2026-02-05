@@ -17,7 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RevisionRequestModel } from '../types.ts';
+import {
+	ApplicationActions,
+	type ApplicationActionValues,
+	ApplicationStates,
+	type ApplicationStateValues,
+	EmailTypes,
+	type EmailTypeValues,
+} from '@pcgl-daco/data-model';
+import { type RevisionRequestModel } from '../types.ts';
 
 // TODO: Likely to be refactored once we add translations
 export const EmailSubjects = {
@@ -144,3 +152,107 @@ export type GenerateReviewReminderEmailType = {
 	repName: string;
 	submittedDate: Date | string;
 } & BaseEmailType;
+
+export type AllEmailsStateMapping = Record<EmailTypeValues, ApplicationStateValues[]>;
+
+export type ReminderEmailTypes = Extract<
+	EmailTypeValues,
+	| typeof EmailTypes.REMINDER_SUBMIT_DRAFT
+	| typeof EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW
+	| typeof EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP
+	| typeof EmailTypes.NOTIFY_APPLICANT_REP_REVISIONS
+	| typeof EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP
+	| typeof EmailTypes.REMINDER_SUBMIT_DAC_REVIEW
+	| typeof EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW
+	| typeof EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS
+	| typeof EmailTypes.NOTIFY_APPLICANT_DAC_REVISIONS
+	| typeof EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW
+	| typeof EmailTypes.SUBMIT_DRAFT
+	| typeof EmailTypes.REQUEST_REVISIONS_INSTITUTIONAL_REP
+	| typeof EmailTypes.REQUEST_REVISIONS_DAC_REVIEW
+	| typeof EmailTypes.SUBMIT_INSTITUTIONAL_REP_REVIEW
+	| typeof EmailTypes.SUBMIT_REVISIONS_INSTITUTIONAL_REP
+	| typeof EmailTypes.SUBMIT_REVISIONS_DAC_REVIEW
+>;
+
+export const reminderEmailTypeValues: ReminderEmailTypes[] = [
+	EmailTypes.REMINDER_SUBMIT_DRAFT,
+	EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW,
+	EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP,
+	EmailTypes.NOTIFY_APPLICANT_REP_REVISIONS,
+	EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP,
+	EmailTypes.REMINDER_SUBMIT_DAC_REVIEW,
+	EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW,
+	EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS,
+	EmailTypes.NOTIFY_APPLICANT_DAC_REVISIONS,
+	EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW,
+	EmailTypes.SUBMIT_DRAFT,
+	EmailTypes.REQUEST_REVISIONS_INSTITUTIONAL_REP,
+	EmailTypes.REQUEST_REVISIONS_DAC_REVIEW,
+	EmailTypes.SUBMIT_INSTITUTIONAL_REP_REVIEW,
+	EmailTypes.SUBMIT_REVISIONS_INSTITUTIONAL_REP,
+	EmailTypes.SUBMIT_REVISIONS_DAC_REVIEW,
+] as const;
+
+export type ReminderEmailStateMapping = Pick<AllEmailsStateMapping, ReminderEmailTypes>;
+export type AdditionalEmailStateMapping = Omit<AllEmailsStateMapping, ReminderEmailTypes>;
+
+/**
+ * Dictionary matching Reminder Email subjects to the triggering Application State
+ * reminderTargetEmailTypes collects only email types which require follow up emails sent
+ */
+export const reminderTargetEmailTypes: { [k in ReminderEmailTypes]: ApplicationStateValues[] } = {
+	[EmailTypes.REMINDER_SUBMIT_DRAFT]: [ApplicationStates.DRAFT],
+	[EmailTypes.REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW]: [ApplicationStates.INSTITUTIONAL_REP_REVIEW],
+	[EmailTypes.REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP]: [ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED],
+	[EmailTypes.NOTIFY_APPLICANT_REP_REVISIONS]: [ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED],
+	[EmailTypes.REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP]: [ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED],
+	[EmailTypes.REMINDER_SUBMIT_DAC_REVIEW]: [ApplicationStates.DAC_REVIEW],
+	[EmailTypes.REMINDER_SUBMIT_REVISIONS_DAC_REVIEW]: [ApplicationStates.DAC_REVISIONS_REQUESTED],
+	[EmailTypes.REMINDER_REVIEW_SUBMITTED_REVISIONS]: [
+		ApplicationStates.DAC_REVIEW,
+		ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+	],
+	[EmailTypes.NOTIFY_APPLICANT_DAC_REVISIONS]: [ApplicationStates.DAC_REVISIONS_REQUESTED],
+	[EmailTypes.REMINDER_REQUEST_REVISIONS_DAC_REVIEW]: [ApplicationStates.DAC_REVISIONS_REQUESTED],
+	[EmailTypes.SUBMIT_DRAFT]: [ApplicationStates.INSTITUTIONAL_REP_REVIEW],
+	[EmailTypes.REQUEST_REVISIONS_INSTITUTIONAL_REP]: [ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED],
+	[EmailTypes.REQUEST_REVISIONS_DAC_REVIEW]: [ApplicationStates.DAC_REVISIONS_REQUESTED],
+	[EmailTypes.SUBMIT_INSTITUTIONAL_REP_REVIEW]: [ApplicationStates.DAC_REVIEW],
+	[EmailTypes.SUBMIT_REVISIONS_INSTITUTIONAL_REP]: [ApplicationStates.INSTITUTIONAL_REP_REVIEW],
+	[EmailTypes.SUBMIT_REVISIONS_DAC_REVIEW]: [ApplicationStates.DAC_REVIEW],
+} as const;
+
+/**
+ * Dictionary matching Reminder Email subjects to the triggering Application State
+ * additionalEmailTypes collects only email types which do not require follow up
+ */
+export const additionalEmailTypes: AdditionalEmailStateMapping = {
+	[EmailTypes.NOTIFY_APPLICANT_WITHDRAW]: [ApplicationStates.DRAFT],
+	[EmailTypes.NOTIFY_APPLICANT_CLOSE]: [ApplicationStates.CLOSED],
+	[EmailTypes.NOTIFY_APPLICANT_REVOKE]: [ApplicationStates.REVOKED],
+	[EmailTypes.NOTIFY_APPLICANT_DAC_REVIEW_REJECTED]: [ApplicationStates.REJECTED],
+	[EmailTypes.NOTIFY_APPLICANT_DAC_APPROVAL]: [ApplicationStates.APPROVED],
+	[EmailTypes.NOTIFY_COLLABORATORS_DAC_APPROVAL]: [ApplicationStates.APPROVED],
+	[EmailTypes.SUBMIT_DAC_REVIEW]: [ApplicationStates.APPROVED],
+} as const;
+
+export const allTargetEmailTypes: Record<EmailTypeValues, ApplicationStateValues[]> = {
+	...reminderTargetEmailTypes,
+	...additionalEmailTypes,
+} as const;
+
+// Dictionary matching Application State values to related triggering State Transition Action values
+// Rep Review and Dac Review states can be triggered by multiple potential State Transitions
+export const reminderTargetActionTypes: Partial<{
+	[k in ApplicationStateValues]: ApplicationActionValues[];
+}> = {
+	[ApplicationStates.DRAFT]: [ApplicationActions.WITHDRAW],
+	[ApplicationStates.INSTITUTIONAL_REP_REVIEW]: [
+		ApplicationActions.SUBMIT_DRAFT,
+		ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
+	],
+	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: [ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST],
+	[ApplicationStates.DAC_REVIEW]: [ApplicationActions.INSTITUTIONAL_REP_SUBMIT, ApplicationActions.DAC_REVIEW_SUBMIT],
+	[ApplicationStates.DAC_REVISIONS_REQUESTED]: [ApplicationActions.DAC_REVIEW_REVISION_REQUEST],
+};
