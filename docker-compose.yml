@@ -1,31 +1,105 @@
-name: pcgl-daco-database
+name: daco-services
 
 services:
-  postgres:
+  daco-postgres:
+    container_name: daco.api.db
     image: postgres:15-alpine
-    container_name: pcgl-daco-postgres
     ports:
       - 5432:5432
     volumes:
       - daco-api-db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: mypassword
-  valkey:
+  daco-valkey:
+    container_name: daco.valkey
     image: valkey/valkey:8-alpine
     command: valkey-server --requirepass valkeypass
-    container_name: valkey
     ports:
       - '6379:6379'
     volumes:
       - 'valkey:/bitnami/valkey/data'
-  mailhog:
+  daco-mailhog:
+    container_name: daco.mailhog
     # Using this image over mailhog/mailhog due to incompatibility with apple silicon chips
     # This is the same image used in OHCRN
     image: docker.io/jcalonso/mailhog:latest
-    container_name: mailhog
     ports:
       - '1025:1025'
       - '8025:8025'
+  clinical-submission:
+    image: ghcr.io/pan-canadian-genome-library/clinical-submission:edge
+    container_name: clinical.submission
+    depends_on:
+      - clinical-postgres # ensure that the database is ready before starting the service
+      - dictionary-manager-mongo
+      - dictionary-manager
+    ports:
+      - '3030:3030'
+    env_file: # Contains environment variables that should not be exposed
+      - ./apps/api/.env.docker
+    environment:
+      AUTH_ENABLED: true # Docker runs clinical in NODE_ENV=production, so this must be enabled
+      AUTH_PROTECT_METHODS: GET,POST,PUT,DELETE
+      PORT: 3000
+      API_HOST: http://localhost:3030
+      SESSION_KEYS: newsecret,oldsecret
+      ALLOWED_ORIGINS: http://localhost:3030,http://localhost:3000,http://host.docker.internal:3000,http://host.docker.internal:3030
+      AUDIT_ENABLED: true
+      LECTERN_URL: http://host.docker.internal:3000
+      LOG_LEVEL: info
+      CORS_ALLOWED_ORIGINS: '*'
+      DB_HOST: host.docker.internal
+      DB_NAME: submission
+      DB_PASSWORD: secret
+      DB_PORT: 5433
+      DB_USER: postgres
+      DB_CLINICAL_PREFIX: pcgl
+      ID_CUSTOM_ALPHABET: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+      ID_CUSTOM_SIZE: 21
+      ID_USELOCAL: true
+      ID_MANAGER_CONFIG: '[]'
+      ID_MANAGER_SECRET: super-secret
+      SERVER_PORT: 3030
+      SERVER_UPLOAD_LIMIT: 4000
+      PLURALIZE_SCHEMAS_ENABLED:
+      VALIDATOR_CONFIG: '[]'
+    volumes:
+      - 'clinical-submission:/clinical-submission/data'
+  clinical-postgres:
+    container_name: clinical.api.db
+    image: postgres:15-alpine
+    ports:
+      - 5433:5432
+    volumes:
+      - submission_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=submission
+  dictionary-manager-mongo:
+    container_name: dictionary-manager.api.db
+    image: bitnami/mongodb:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/bitnami
+    environment:
+      MONGODB_USERNAME: admin
+      MONGODB_PASSWORD: password
+      MONGODB_DATABASE: dictionary-manager
+      MONGODB_ROOT_PASSWORD: password123
+  dictionary-manager:
+    container_name: dictionary-manager
+    image: ghcr.io/pan-canadian-genome-library/dictionary-manager:edge
+    ports:
+      - 3001:3001
+    environment:
+      PORT: 3001
+      MONGO_HOST: dictionary-manager-mongo
+      MONGO_PORT: 27017
+      MONGO_DB: dictionary-manager
+      MONGO_USER: admin
+      MONGO_PASS: password
 
 volumes:
   daco-api-db:
@@ -33,4 +107,13 @@ volumes:
     driver: local
   valkey:
     name: daco-api-valkey
+    driver: local
+  clinical-submission:
+    name: clinical-submission
+    driver: local
+  submission_data:
+    name: submission-postgres-data
+    driver: local
+  mongodb_data:
+    name: dictionary-manager-mongo-data
     driver: local
