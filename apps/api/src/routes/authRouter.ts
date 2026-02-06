@@ -188,13 +188,8 @@ authRouter.get('/token', async (request, response) => {
 			throw new Error(sessionUserAliasing.message);
 		}
 
-		const groups = sessionUserAliasing.data.groups;
-
 		request.session.account = userAccountAliasing.data;
-		request.session.user = {
-			...sessionUserAliasing.data,
-			dacoAdmin: groups ? groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN) : false,
-		};
+		request.session.user = sessionUserAliasing.data;
 
 		request.session.save();
 	} catch (error) {

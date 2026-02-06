@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { authConfig } from '@/config/authConfig.ts';
 import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
@@ -82,8 +83,11 @@ export const convertToSessionUser = (
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedPCGLResponse.groups,
+
 		// DACO generated values
-		dacoAdmin: false, // Default value for dacoAdmin,
+		dacoAdmin: aliasedPCGLResponse.groups
+			? aliasedPCGLResponse.groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN)
+			: false,
 	};
 
 	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
