@@ -72,7 +72,9 @@ const SubmitApplicationModal = ({ isOpen, setIsOpen }: SuccessModalProps) => {
 					{translate('sign-and-submit-section.modal.description', {
 						id: appId,
 						reviewer:
-							applicationUserRole === 'INSTITUTIONAL_REP' ? 'Data Access Committee' : 'Institutional Representative',
+							applicationUserRole === 'INSTITUTIONAL_REP' || applicationState === 'DAC_REVISIONS_REQUESTED'
+								? 'Data Access Committee'
+								: 'Institutional Representative',
 					})}
 				</Text>
 			</Flex>

@@ -20,8 +20,10 @@
 import { pcglColours } from '@/providers/ThemeProvider';
 import { CaretRightFilled, ExclamationCircleFilled } from '@ant-design/icons';
 import { GeneralType, RevisionType } from '@pcgl-daco/validation';
-import { Collapse, Flex, theme } from 'antd';
+import { Collapse, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
+
+const { Text } = Typography;
 
 interface RevisionsProps {
 	sectionRevisions: RevisionType;
@@ -63,7 +65,7 @@ const RevisionsAlert = ({ sectionRevisions, general }: RevisionsProps) => {
 							),
 							children: (
 								<Flex>
-									<p>{value.comment}</p>
+									<Text style={{ fontSize: 12 }}>{value.comment}</Text>
 								</Flex>
 							),
 							style: {
@@ -102,13 +104,20 @@ const RevisionsAlert = ({ sectionRevisions, general }: RevisionsProps) => {
 								key,
 								label: (
 									<Flex gap={'middle'}>
-										<ExclamationCircleFilled style={{ color: pcglColours.primary, fontSize: '1.1rem' }} />
-										<>{value.isDacRequest ? `DAC Revisions - ${createdDate}` : `Rep Revisions - ${createdDate}`}</>
+										<ExclamationCircleFilled
+											style={{
+												color: pcglColours.primary,
+												fontSize: '24.5px', // Note: This should match antd CommentOutlined icon> CommentOutlined is not filled like this is, so needs a more specific tailored css to match sizing
+											}}
+										/>
+										<Text style={{ fontSize: 14 }}>
+											{value.isDacRequest ? `DAC Revisions - ${createdDate}` : `Rep Revisions - ${createdDate}`}
+										</Text>
 									</Flex>
 								),
 								children: (
 									<Flex>
-										<p>{value.comment}</p>
+										<Text style={{ fontSize: 12 }}>{value.comment}</Text>
 									</Flex>
 								),
 								style: {
