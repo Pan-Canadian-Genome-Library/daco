@@ -193,7 +193,7 @@ authRouter.get('/token', async (request, response) => {
 		request.session.account = userAccountAliasing.data;
 		request.session.user = {
 			...sessionUserAliasing.data,
-			siteAdmin: groups ? groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN) : false,
+			dacoAdmin: groups ? groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN) : false,
 		};
 
 		request.session.save();

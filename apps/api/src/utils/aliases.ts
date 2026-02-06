@@ -27,7 +27,6 @@ import {
 	type FilesRecordOptionalContents,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { sessionAccount, sessionUser, type SessionAccount, type SessionUser } from '@/session/validation.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationHistoryResponseData,
@@ -41,6 +40,10 @@ import {
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
 	fileResponseSchema,
+	sessionAccount,
+	SessionAccount,
+	sessionUser,
+	type SessionUser,
 	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
@@ -79,6 +82,8 @@ export const convertToSessionUser = (
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedPCGLResponse.groups,
+		// DACO generated values
+		dacoAdmin: false, // Default value for dacoAdmin,
 	};
 
 	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
