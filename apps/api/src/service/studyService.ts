@@ -89,7 +89,6 @@ const studySvc = (db: PostgresDb) => ({
 				.onConflictDoUpdate({
 					target: study.study_id,
 					set: {
-						study_id: sql`EXCLUDED.study_id`,
 						dac_id: sql`EXCLUDED.dac_id`,
 						study_name: sql`EXCLUDED.study_name`,
 						study_description: sql`EXCLUDED.study_description`,
@@ -105,7 +104,6 @@ const studySvc = (db: PostgresDb) => ({
 						participant_criteria: sql`EXCLUDED.participant_criteria`,
 						collaborators: sql`EXCLUDED.collaborators`,
 						publication_links: sql`EXCLUDED.publication_links`,
-						created_at: sql`EXCLUDED.created_at`,
 						updated_at: sql`EXCLUDED.updated_at`,
 						category_id: sql`EXCLUDED.category_id`,
 						accepting_applications: sql`EXCLUDED.accepting_applications`,

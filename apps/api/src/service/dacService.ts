@@ -17,10 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { sql } from 'drizzle-orm';
+
 import { type PostgresDb } from '@/db/index.js';
 import { dac } from '@/db/schemas/dac.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
+
 import { type DacModel, type DacRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
@@ -41,7 +44,13 @@ const dacSvc = (db: PostgresDb) => ({
 				.values(dacGroups)
 				.onConflictDoUpdate({
 					target: dac.dac_id,
-					set: dac,
+					set: {
+						dac_name: sql`EXCLUDED.dac_name`,
+						dac_description: sql`EXCLUDED.dac_description`,
+						contact_name: sql`EXCLUDED.contact_name`,
+						contact_email: sql`EXCLUDED.contact_email`,
+						updated_at: sql`EXCLUDED.updated_at`,
+					},
 				})
 				.returning();
 

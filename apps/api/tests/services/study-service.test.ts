@@ -28,7 +28,7 @@ import { studySvc } from '@/service/studyService.ts';
 import { type StudyModel, type StudyService } from '@/service/types.ts';
 import { addStudyAndDacUsers, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
 
-describe('Study API', () => {
+describe('Study Service', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
 	let studyService: StudyService;
