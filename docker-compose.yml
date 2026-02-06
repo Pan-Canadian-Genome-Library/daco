@@ -1,4 +1,4 @@
-name: DACO-Services
+name: daco-services
 
 services:
   daco-postgres:
@@ -38,6 +38,8 @@ services:
     env_file: # Contains environment variables that should not be exposed
       - ./apps/api/.env.docker
     environment:
+      AUTH_ENABLED: true # Docker runs clinical in NODE_ENV=production, so this must be enabled
+      AUTH_PROTECT_METHODS: GET,POST,PUT,DELETE
       PORT: 3000
       API_HOST: http://localhost:3030
       SESSION_KEYS: newsecret,oldsecret
