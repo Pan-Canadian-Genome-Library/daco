@@ -1,4 +1,4 @@
-name: DACO-Services
+name: daco-services
 
 services:
   daco-postgres:
@@ -38,12 +38,14 @@ services:
     env_file: # Contains environment variables that should not be exposed
       - ./apps/api/.env.docker
     environment:
+      AUTH_ENABLED: true # Docker runs clinical in NODE_ENV=production, so this must be enabled
+      AUTH_PROTECT_METHODS: GET,POST,PUT,DELETE
       PORT: 3000
       API_HOST: http://localhost:3030
       SESSION_KEYS: newsecret,oldsecret
       ALLOWED_ORIGINS: http://localhost:3030,http://localhost:3000,http://host.docker.internal:3000,http://host.docker.internal:3030
       AUDIT_ENABLED: true
-      LECTERN_URL: http://host.docker.internal:3001
+      LECTERN_URL: http://host.docker.internal:3000
       LOG_LEVEL: info
       CORS_ALLOWED_ORIGINS: '*'
       DB_HOST: host.docker.internal
@@ -55,7 +57,7 @@ services:
       ID_CUSTOM_ALPHABET: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       ID_CUSTOM_SIZE: 21
       ID_USELOCAL: true
-      ID_MANAGER_CONFIG: '[{"entityName":"participant","fieldName":"submitter_participant_id","prefix":"PT","internalId":"pcgl_participant_id","paddingLength":8,"parentEntityName":"study","parentFieldName":"study_id","sequenceStart":1},{"entityName":"study","fieldName":"study_id","prefix":"ST","internalId":"pcgl_study_id","paddingLength":8,"sequenceStart":5},{"entityName":"treatment","fieldName":"submitter_treatment_id","prefix":"TREAT","internalId":"pcgl_treatment_id","paddingLength":8,"sequenceStart":4},{"entityName":"diagnosis","fieldName":"submitter_diagnosis_id","prefix":"DIAG","internalId":"pcgl_diagnosis_id","paddingLength":8,"sequenceStart":2}]'
+      ID_MANAGER_CONFIG: '[]'
       ID_MANAGER_SECRET: super-secret
       SERVER_PORT: 3030
       SERVER_UPLOAD_LIMIT: 4000
@@ -93,7 +95,7 @@ services:
       - 3001:3001
     environment:
       PORT: 3001
-      MONGO_HOST: host.docker.internal
+      MONGO_HOST: dictionary-manager-mongo
       MONGO_PORT: 27017
       MONGO_DB: dictionary-manager
       MONGO_USER: admin

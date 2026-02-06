@@ -87,7 +87,13 @@ export const authZUserInfo = z.object({
 });
 export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
 
-export const sessionUser = z.object({
+// Session values calculated in DACO services
+const dacoGeneratedSessionValues = z.object({
+	dacoAdmin: z.boolean().default(false),
+});
+
+// Session values retrieved from Authz and Auth services
+const authGeneratedSessionValues = z.object({
 	userId: z.string(),
 	sub: z.string(),
 	givenName: z.string().optional(),
@@ -114,7 +120,12 @@ export const sessionUser = z.object({
 	),
 	groups: authZUserInfo.pick({ groups: true }).shape.groups,
 });
+
+export const sessionUser = z.intersection(dacoGeneratedSessionValues, authGeneratedSessionValues);
+
 export type SessionUser = z.infer<typeof sessionUser>;
+
+// TODO: create SessionUserUI type based off SessionUser, once its determined what fields are to be returned to the UI
 
 export const sessionAccount = z.object({
 	idToken: z.string(),

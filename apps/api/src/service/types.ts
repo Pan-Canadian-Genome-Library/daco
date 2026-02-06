@@ -16,6 +16,7 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { type SessionUser } from '@pcgl-daco/validation';
 import { type ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
@@ -28,13 +29,12 @@ import { collaborators } from '@/db/schemas/collaborators.js';
 import { dac } from '@/db/schemas/dac.ts';
 import { files } from '@/db/schemas/files.js';
 import * as schema from '@/db/schemas/index.js';
-import { study } from '@/db/schemas/studies.ts';
-
 import { revisionRequests } from '@/db/schemas/revisionRequests.js';
+import { study } from '@/db/schemas/studies.ts';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
-import { type SessionUser } from '@/session/validation.ts';
+
 import { dacSvc } from './dacService.ts';
 import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';

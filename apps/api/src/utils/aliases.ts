@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { authConfig } from '@/config/authConfig.ts';
 import { type OIDCTokenResponse, type OIDCUserInfoResponse, type PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
@@ -29,7 +30,6 @@ import {
 	type JoinedApplicationRecord,
 	type StudyModel,
 } from '@/service/types.js';
-import { sessionAccount, sessionUser, type SessionAccount, type SessionUser } from '@/session/validation.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationHistoryResponseData,
@@ -46,12 +46,16 @@ import {
 	basicApplicationResponseSchema,
 	dacModelSchema,
 	fileResponseSchema,
+	sessionAccount,
+	type SessionAccount,
+	sessionUser,
+	type SessionUser,
 	signatureResponseSchema,
 	studyModelSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
-import { failure, success, type Result } from './results.ts';
+import { failure, type Result, success } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
 
 export const convertToSessionAccount = (data: OIDCTokenResponse): Result<SessionAccount, 'SYSTEM_ERROR'> => {
@@ -85,6 +89,11 @@ export const convertToSessionUser = (
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedPCGLResponse.groups,
+
+		// DACO generated values
+		dacoAdmin: aliasedPCGLResponse.groups
+			? aliasedPCGLResponse.groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN)
+			: false,
 	};
 
 	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
