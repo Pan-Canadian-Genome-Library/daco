@@ -88,12 +88,12 @@ export const authZUserInfo = z.object({
 export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
 
 // Session values calculated in DACO services
-export const dacoGeneratedSessionValues = z.object({
+const dacoGeneratedSessionValues = z.object({
 	dacoAdmin: z.boolean().default(false),
 });
 
 // Session values retrieved from Authz and Auth services
-export const authGeneratedSessionValues = z.object({
+const authGeneratedSessionValues = z.object({
 	userId: z.string(),
 	sub: z.string(),
 	givenName: z.string().optional(),
