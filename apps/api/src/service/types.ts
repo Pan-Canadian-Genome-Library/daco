@@ -36,7 +36,7 @@ import { type ApplicationStateValues } from '@pcgl-daco/data-model';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
-import { type SessionUser } from '@/session/validation.ts';
+import { type SessionUser } from '@pcgl-daco/validation';
 import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';
 import { pdfService } from './pdf/pdfService.ts';

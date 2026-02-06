@@ -19,11 +19,12 @@
 
 import { asc, desc } from 'drizzle-orm';
 
+import { type SessionUser } from '@pcgl-daco/validation';
+
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applications } from '@/db/schemas/applications.js';
 import { sentEmails } from '@/db/schemas/sentEmails.ts';
 import { type ResponseWithData } from '@/routes/types.ts';
-import { type SessionUser } from '@/session/validation.ts';
 import { type Failure, failure } from '@/utils/results.ts';
 import {
 	type ApplicationActionsColumnName,

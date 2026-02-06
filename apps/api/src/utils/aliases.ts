@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { authConfig } from '@/config/authConfig.ts';
 import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
@@ -27,7 +28,6 @@ import {
 	type FilesRecordOptionalContents,
 	type JoinedApplicationRecord,
 } from '@/service/types.js';
-import { sessionAccount, sessionUser, type SessionAccount, type SessionUser } from '@/session/validation.ts';
 import {
 	type ApplicationDTO,
 	type ApplicationHistoryResponseData,
@@ -41,6 +41,10 @@ import {
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
 	fileResponseSchema,
+	sessionAccount,
+	type SessionAccount,
+	sessionUser,
+	type SessionUser,
 	signatureResponseSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
@@ -79,6 +83,11 @@ export const convertToSessionUser = (
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedPCGLResponse.groups,
+
+		// DACO generated values
+		dacoAdmin: aliasedPCGLResponse.groups
+			? aliasedPCGLResponse.groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN)
+			: false,
 	};
 
 	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
