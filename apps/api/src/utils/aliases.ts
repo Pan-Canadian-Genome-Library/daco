@@ -41,7 +41,7 @@ import {
 	basicApplicationResponseSchema,
 	fileResponseSchema,
 	sessionAccount,
-	SessionAccount,
+	type SessionAccount,
 	sessionUser,
 	type SessionUser,
 	signatureResponseSchema,
