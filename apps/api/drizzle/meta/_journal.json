@@ -127,6 +127,13 @@
 			"when": 1768510425584,
 			"tag": "0017_add_dac_studies_table",
 			"breakpoints": true
+		},
+		{
+			"idx": 18,
+			"version": "7",
+			"when": 1770070135906,
+			"tag": "0018_add_dac_name_field",
+			"breakpoints": true
 		}
 	]
 }
