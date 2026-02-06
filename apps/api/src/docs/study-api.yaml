@@ -56,7 +56,7 @@ paths:
       summary: Import all studies from the submission service
       responses:
         '200':
-          description: Successfully retrieved study record.
+          description: Successfully imported study records.
           content:
             application/json:
               schema:
@@ -67,7 +67,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/StudyRecord'
         '404':
-          description: Application not found.
+          description: Unable to update studies - Studies not found.
           content:
             application/json:
               schema:
