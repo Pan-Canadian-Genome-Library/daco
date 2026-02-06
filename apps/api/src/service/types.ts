@@ -88,6 +88,17 @@ export type CollaboratorModel = typeof collaborators.$inferInsert;
 export type CollaboratorRecord = typeof collaborators.$inferSelect;
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
+export type GrantUserPermissionsParams = {
+	institutionalEmail: string;
+	approverAccessToken: string;
+	requestedStudies: string[];
+};
+
+export type GrantUserPermissionsResult = {
+	success: boolean;
+	failureMessages: string[];
+};
+
 export type SignatureService = ReturnType<typeof signatureService>;
 
 export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
