@@ -103,7 +103,8 @@
 		"pcglWebsite": "PCGL Website",
 		"dataPlatform": "Data Platform",
 		"myApplications": "My Applications",
-		"manageApplications": "Manage Applications"
+		"manageApplications": "Manage Applications",
+		"admin": "Admin Dashboard"
 	},
 	"button": {
 		"logout": "Logout",
