@@ -17,15 +17,50 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex } from 'antd';
+import { Button, Flex, Table, TableColumnsType } from 'antd';
 
+import useGetStudies from '@/api/queries/useGetStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
+import { StudyDTO } from '@pcgl-daco/data-model';
 
 const AdminStudiesPage = () => {
+	const { data, isLoading, isError } = useGetStudies();
+
+	const columns: TableColumnsType<StudyDTO> = [
+		{
+			key: 'names',
+			title: 'Study Name',
+			dataIndex: 'studyName',
+
+			colSpan: 1,
+		},
+		{
+			key: 'acceptingsStatus',
+			title: 'Accepting Status',
+			dataIndex: 'acceptingStatus',
+			width: '400px',
+			align: 'center',
+			render: (_, record) => {
+				const isAccepting = record.acceptingApplications;
+				return (
+					<Button
+						onClick={() => {}}
+						color={isAccepting ? 'green' : 'danger'}
+						variant="solid"
+						style={{ width: '150px' }}
+					>
+						{isAccepting ? 'Accepting' : 'Not Accepting'}
+					</Button>
+				);
+			},
+		},
+	];
+
+	if (isLoading || isError) return <>Loading</>;
 	return (
-		<ContentWrapper style={{ height: '100%', padding: '2em 0', gap: '3rem' }}>
-			<Flex vertical justify="center" align="center" gap={'large'}>
-				test
+		<ContentWrapper style={{ height: '100%', width: '100%', padding: '2em 0', gap: '3rem' }}>
+			<Flex flex={1} vertical justify="center" align="center" gap={'large'}>
+				<Table rowKey="studyId" style={{ width: '100%' }} dataSource={data} columns={columns} />;
 			</Flex>
 		</ContentWrapper>
 	);
