@@ -19,6 +19,7 @@
 		"migrate": "pnpm drizzle-kit migrate",
 		"\n==================  Scripts  ==================": "",
 		"migrate:scripts": "tsx src/scripts/start-up-script.ts",
+		"migrate:scripts:local": "tsx --env-file=.env src/scripts/start-up-script.ts",
 		"\n==================  Tests  ==================": "",
 		"test": "tsx --test --test-reporter=spec --experimental-test-coverage --env-file=./tests/utils/.env.test  ./tests/**/*.test.ts  ",
 		"test:local": "pnpm run test:api && pnpm run test:db && pnpm run test:services && pnpm run test:functions",
