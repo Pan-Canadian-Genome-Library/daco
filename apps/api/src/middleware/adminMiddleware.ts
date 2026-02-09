@@ -53,7 +53,7 @@ export const adminMiddleware =
 			return;
 		}
 
-		if (!user.siteAdmin) {
+		if (!user.dacoAdmin) {
 			response.status(403).send({
 				error: 'FORBIDDEN',
 				message: 'You do not have the proper permissions to access or modify this resource.',
