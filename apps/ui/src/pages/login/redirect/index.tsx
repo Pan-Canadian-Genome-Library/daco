@@ -42,7 +42,7 @@ const LoginRedirect = () => {
 			return;
 		}
 
-		if (user?.siteAdmin) {
+		if (user?.dacoAdmin) {
 			navigate('/admin', { replace: true });
 			return;
 		}
