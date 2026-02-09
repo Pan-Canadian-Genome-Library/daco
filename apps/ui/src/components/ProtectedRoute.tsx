@@ -63,7 +63,7 @@ const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteP
 	}
 
 	// Admin should have access to all routes
-	if (user?.siteAdmin) {
+	if (user?.dacoAdmin) {
 		return children;
 	}
 

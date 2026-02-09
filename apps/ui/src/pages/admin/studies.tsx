@@ -17,30 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Flex } from 'antd';
-import { useNavigate } from 'react-router';
+import { Flex } from 'antd';
 
-import useImportStudies from '@/api/mutations/useImportStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 
-const AdminDashboardPage = () => {
-	const { mutateAsync: syncStudies } = useImportStudies();
-	const navigate = useNavigate();
-
-	const handleSyncStudies = async () => {
-		await syncStudies();
-	};
-
+const AdminStudiesPage = () => {
 	return (
 		<ContentWrapper style={{ height: '100%', padding: '2em 0', gap: '3rem' }}>
 			<Flex vertical justify="center" align="center" gap={'large'}>
-				<Button onClick={handleSyncStudies} style={{ width: '100%' }}>
-					Import Studies
-				</Button>
-				<Button onClick={() => navigate('/admin/studies')}>Activate/Deactivate Studies</Button>
+				test
 			</Flex>
 		</ContentWrapper>
 	);
 };
 
-export default AdminDashboardPage;
+export default AdminStudiesPage;

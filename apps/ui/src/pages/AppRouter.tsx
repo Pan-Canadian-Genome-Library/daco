@@ -43,6 +43,7 @@ import NotFound from '@/pages/NotFound';
 import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
 import AdminDashboardPage from './admin';
+import AdminStudiesPage from './admin/studies';
 
 export interface ApplicationSectionRouteTypes {
 	route: SectionRoutesValues;
@@ -153,6 +154,14 @@ function AppRouter() {
 					element={
 						<ProtectedRoute requiredRoles={['ADMIN']} redirectTo={'/login/redirect/'}>
 							<AdminDashboardPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="admin/studies"
+					element={
+						<ProtectedRoute requiredRoles={['ADMIN']} redirectTo={'/login/redirect/'}>
+							<AdminStudiesPage />
 						</ProtectedRoute>
 					}
 				/>
