@@ -30,50 +30,54 @@ const { email } = getEmailConfig;
 /**
  * Script to backfill existing applications field dac_id with default DAC user
  */
-try {
-	await db.transaction(async (transaction) => {
-		// Get default dac user if exists
-		const defaultDacUser = await transaction.select().from(dac).where(eq(dac.dac_id, dbConfig.PCGL_DACO_ID));
+const dacIdMigration = async () => {
+	try {
+		await db.transaction(async (transaction) => {
+			// Get default dac user if exists
+			const defaultDacUser = await transaction.select().from(dac).where(eq(dac.dac_id, dbConfig.PCGL_DACO_ID));
 
-		// If it doesnt exist, insert default DAC user into dac table
-		if (defaultDacUser.length === 0) {
-			console.log('Adding default DAC user into dac table...');
-			await transaction.insert(dac).values({
-				dac_id: dbConfig.PCGL_DACO_ID,
-				dac_name: 'PCGL',
-				contact_name: 'PCGL',
-				contact_email: email.dacAddress,
-				dac_description: 'Default for PCGL',
-			});
-		} else {
-			console.log('Skipping default DAC user migration, user already exists');
-		}
+			// If it doesnt exist, insert default DAC user into dac table
+			if (defaultDacUser.length === 0) {
+				console.log('Adding default DAC user into dac table...');
+				await transaction.insert(dac).values({
+					dac_id: dbConfig.PCGL_DACO_ID,
+					dac_name: 'PCGL',
+					contact_name: 'PCGL',
+					contact_email: email.dacAddress,
+					dac_description: 'Default for PCGL',
+				});
+			} else {
+				console.log('Skipping default DAC user migration, user already exists');
+			}
 
-		// Apply backfill with PCGL_DACO_ID
-		await transaction
-			.update(applications)
-			.set({
-				dac_id: `${dbConfig.PCGL_DACO_ID}`,
-			})
-			.where(
-				and(
-					isNull(applications.dac_id),
-					or(
-						eq(applications.state, 'APPROVED'),
-						eq(applications.state, 'REVOKED'),
-						eq(applications.state, 'REJECTED'),
-						eq(applications.state, 'DAC_REVIEW'),
-						eq(applications.state, 'DAC_REVISIONS_REQUESTED'),
-						eq(applications.state, 'INSTITUTIONAL_REP_REVIEW'),
-						eq(applications.state, 'INSTITUTIONAL_REP_REVISION_REQUESTED'),
+			// Apply backfill with PCGL_DACO_ID
+			await transaction
+				.update(applications)
+				.set({
+					dac_id: `${dbConfig.PCGL_DACO_ID}`,
+				})
+				.where(
+					and(
+						isNull(applications.dac_id),
+						or(
+							eq(applications.state, 'APPROVED'),
+							eq(applications.state, 'REVOKED'),
+							eq(applications.state, 'REJECTED'),
+							eq(applications.state, 'DAC_REVIEW'),
+							eq(applications.state, 'DAC_REVISIONS_REQUESTED'),
+							eq(applications.state, 'INSTITUTIONAL_REP_REVIEW'),
+							eq(applications.state, 'INSTITUTIONAL_REP_REVISION_REQUESTED'),
+						),
 					),
-				),
-			);
-	});
+				);
+		});
 
-	console.log('Successfully migrated dac_id with default DAC user');
-	process.exit(0);
-} catch (err) {
-	console.log(err);
-	process.exit(1);
-}
+		console.log('Successfully migrated dac_id with default DAC user');
+		process.exit(0);
+	} catch (err) {
+		console.log(err);
+		process.exit(1);
+	}
+};
+
+export default dacIdMigration;
