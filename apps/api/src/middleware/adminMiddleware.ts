@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -19,43 +19,29 @@
 
 import { RequestHandler, type Response } from 'express';
 
-import type { UserRole } from '@pcgl-daco/validation';
-
-import { getUserRole } from '@/service/authService.js';
 import { AuthenticationErrorResponse } from '@/utils/middleware.ts';
 
-export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
-
-export type AuthMiddlewareConfig = {
-	requiredRoles?: [UserRoleOmitRep, ...UserRoleOmitRep[]];
-};
-
 /**
- * Auth Middleware will check that the request is being made by an authenticated user.
+ * Middleware that ensures the request is initiated by an authenticated user with site administrator privileges.
  *
- * This will check that the request session has authenticated user information.
+ * This middleware checks the session for a user object.
+ * - If no user is found, it sends a 401 Unauthorized response.
+ * - If a user is found but lacks the `siteAdmin` flag, it sends a 403 Forbidden response.
+ * - If the user is authenticated and is a site admin, control is passed to the next middleware or route handler.
  *
- * Optionally, you can provide a list of required roles. This will require that the user
- * has one of the required roles to access the endpoint. If this config is omitted, any role
- * other than 'ANONYMOUS' is accepted.
- *
- * If a request is rejected by this middleware it will return a response of:
- *   - http 401 (session has no authenticated user)
- *   - http 403 (missing required role)
+ * @returns {RequestHandler} An Express RequestHandler.
  *
  * @example
  * router.get(
- * 	'/path',
- * 	authMiddleware({requiredRoles: ['DAC_MEMBER']}),
+ * 	'/admin/users',
+ * 	adminMiddleware(),
  * 	(request, response) => {
- * 		// Only DAC_MEMBERS will get here.
+ * 		// Only site admins can access this route
  * 	}
  * )
  */
-export const authMiddleware =
-	(config: AuthMiddlewareConfig = {}): RequestHandler =>
-	(request, response: Response<AuthenticationErrorResponse>, next) => {
-		const { requiredRoles } = config;
+export const adminMiddleware =
+	(): RequestHandler => (request, response: Response<AuthenticationErrorResponse>, next) => {
 		const { user } = request.session;
 
 		if (!user) {
@@ -67,16 +53,12 @@ export const authMiddleware =
 			return;
 		}
 
-		if (requiredRoles) {
-			const userRole = getUserRole(user);
-			if (!requiredRoles.includes(userRole)) {
-				response.status(403).send({
-					error: 'FORBIDDEN',
-					message: 'You do not have the proper permissions to access or modify this resource.',
-				});
-				return;
-			}
+		if (!user.siteAdmin) {
+			response.status(403).send({
+				error: 'FORBIDDEN',
+				message: 'You do not have the proper permissions to access or modify this resource.',
+			});
+			return;
 		}
-
 		return next();
 	};
