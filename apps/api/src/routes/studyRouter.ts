@@ -22,6 +22,7 @@ import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco
 import express from 'express';
 
 import { getStudyById, setStudyAcceptingApplications } from '@/controllers/studyController.ts';
+import { adminMiddleware } from '@/middleware/adminMiddleware.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { activateBodyParamSchema, basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
@@ -65,7 +66,7 @@ studyRouter.get(
  */
 studyRouter.patch(
 	'/:studyId/accepting-applications',
-	// authMiddleware(), // TODO: right now theres not ADMIN check, this should be locked to only admin users
+	adminMiddleware(),
 	withParamsSchemaValidation(
 		basicStudyParamSchema,
 		apiZodErrorMapping,
