@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,34 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
+import { ErrorResponse } from '@pcgl-daco/validation';
 
-import EnvironmentConfigError from './EnvironmentConfigError.js';
-
-const serverConfigSchema = z.object({
-	// Node built in env variables
-	NODE_ENV: z.string().optional().default('development'),
-	npm_package_version: z.string().optional().default('unknown'),
-
-	// Custom env variables
-	PORT: z.coerce.number().optional().default(3000),
-	SESSION_KEYS: z.string(),
-	SESSION_MAX_AGE: z.coerce
-		.number()
-		.int()
-		.optional()
-		.default(1000 * 60 * 30), // default 30 minutes
-	UI_HOST: z.string().url(),
-	CLINICAL_URL: z.string().url(),
-});
-
-const parseResult = serverConfigSchema.safeParse(process.env);
-
-if (!parseResult.success) {
-	throw new EnvironmentConfigError(`server`, parseResult.error);
-}
-export const serverConfig = {
-	...parseResult.data,
-	isProduction: parseResult.data.NODE_ENV === 'production',
-	sessionKeys: parseResult.data.SESSION_KEYS.split(','),
-};
+export type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
