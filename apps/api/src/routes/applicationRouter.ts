@@ -524,7 +524,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/revoke',
-	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
+	authMiddleware({ requiredRoles: ['DAC_CHAIR', 'APPLICANT'] }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
