@@ -49,9 +49,20 @@ enum section {
   SIGN
 }
 
+enum study_context {
+  CLINICAL
+  RESEARCH
+}
+
+enum study_status {
+  ONGOING
+  COMPLETED
+}
+
 Table applications {
   id bigint [pk, increment, not null]
   user_id varchar(100) [not null] // User ID set to a string since we don't have details atm about how this will be communicated. This will either be email address or a unique token from the auth system
+  dac_id text [ref: - dac.dac_id]
   state application_states [not null]
   created_at timestamp [not null, default: `now()`]
   approved_at timestamp
@@ -104,9 +115,9 @@ Table application_contents {
   institutional_rep_profile_url varchar(255)
   institutional_rep_position_title varchar(255)
 
-  institution_country vachar(255)
-  institution_state vachar(255)
-  institution_city vachar(255)
+  institution_country varchar(255)
+  institution_state varchar(255)
+  institution_city varchar(255)
   institution_street_address text
   institution_postal_code varchar(255) // postal codes globally may be longer, might as well not constrain it
   institution_building varchar(255)
@@ -125,10 +136,10 @@ Table application_contents {
   institutional_rep_signed_at timestamp
 
   accepted_agreements text[] [Note: "Should only take in values in: [dac_agreement_software_updates, dac_agreement_non_disclosure, dac_agreement_monitor_individual_access, dac_agreement_destroy_data, dac_agreement_familiarize_restrictions, dac_agreement_provide_it_policy, dac_agreement_notify_unauthorized_access, dac_agreement_certify_application, dac_agreement_read_and_agreed]."]
-  accepted_appendices text[] [Note: "Should only take in values in: [appendix_1 appendix_2, appendix_3]."]
+  accepted_appendices text[] [Note: "Should only take in values in: [appendix_1, appendix_2, appendix_3]."]
 
-  //TODO: requested study information
-  requested_studies text
+  // TODO: requested study information
+  requested_studies text[]
 
   // TODO: need to store user agreement to terms
   ethics_review_required boolean
@@ -145,6 +156,7 @@ Table application_actions {
   action application_action_types [not null]
   state_before varchar(255) [not null]
   state_after varchar(255) [not null]
+
   revisions_request_id bigint [ref: > revision_requests.id]
   // TODO: may need reference to a content diff
 }
@@ -236,6 +248,6 @@ Table dac {
   dac_description text [not null]
   contact_name varchar(255) [not null]
   contact_email varchar(255) [not null]
-  created_at timestamp [not null, default: `not()`]
+  created_at timestamp [not null, default: `now()`]
   updated_at timestamp
 }

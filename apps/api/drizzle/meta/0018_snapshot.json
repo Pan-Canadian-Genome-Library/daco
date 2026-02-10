@@ -1,5 +1,5 @@
 {
-	"id": "19da8acf-e721-4def-8b44-388ca2f23f6e",
+	"id": "a1badfeb-cbe3-449c-aa85-8abeb35dd9e2",
 	"prevId": "60b69887-90b4-4672-9afd-81106ae01406",
 	"version": "7",
 	"dialect": "postgresql",
@@ -454,6 +454,12 @@
 						"cycle": false
 					}
 				},
+				"dac_id": {
+					"name": "dac_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
 				"user_id": {
 					"name": "user_id",
 					"type": "varchar(100)",
@@ -500,7 +506,17 @@
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
+			"foreignKeys": {
+				"dac_id_fk": {
+					"name": "dac_id_fk",
+					"tableFrom": "applications",
+					"tableTo": "dac",
+					"columnsFrom": ["dac_id"],
+					"columnsTo": ["dac_id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {},
 			"policies": {},
@@ -966,12 +982,6 @@
 					"type": "text",
 					"primaryKey": false,
 					"notNull": true
-				},
-				"dac_name": {
-					"name": "dac_name",
-					"type": "varchar(255)",
-					"primaryKey": false,
-					"notNull": false
 				},
 				"program_name": {
 					"name": "program_name",
