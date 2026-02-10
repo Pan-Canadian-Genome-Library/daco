@@ -31,6 +31,7 @@ if (serverConfig.isProduction && !enabled) {
 }
 
 const authConfigSchema = z.object({
+	APPROVED_PERMISSION_EXPIRES_IN_DAYS: z.coerce.number().int().optional().default(365),
 	AUTH_PROVIDER_HOST: z.string().url(),
 	AUTH_CLIENT_ID: z.string(),
 	AUTH_CLIENT_SECRET: z.string(),
@@ -40,6 +41,9 @@ const authConfigSchema = z.object({
 	AUTHZ_GROUP_DAC_CHAIR: z.string(),
 	AUTHZ_SERVICE_ID: z.string(),
 	AUTHZ_SERVICE_UUID: z.string(),
+	AUTHZ_FETCH_RETRIES: z.coerce.number().optional().default(3),
+	AUTHZ_FETCH_RETRY_DELAY_MS: z.coerce.number().optional().default(500),
+	AUTHZ_FETCH_TIMEOUT_MS: z.coerce.number().optional().default(10000),
 });
 
 const parseResult = authConfigSchema.safeParse(process.env);

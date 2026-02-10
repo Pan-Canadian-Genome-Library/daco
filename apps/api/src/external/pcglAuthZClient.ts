@@ -18,12 +18,33 @@
  */
 
 import { authConfig } from '@/config/authConfig.ts';
-import logger from '@/logger.ts';
+import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 import urlJoin from 'url-join';
-import { authZUserInfo, ServiceTokenResponse, type PCGLAuthZUserInfoResponse } from './types.ts';
+import { fetchWithRetry } from './fetchWithRetry.ts';
+import {
+	addUserToStudyPermissionResponse,
+	authZUserInfo,
+	lookupUserResponse,
+	ServiceTokenResponse,
+	type PCGLAddUserToStudyPermissionResponse,
+	type PCGLAuthzLookupUserResponse,
+	type PCGLAuthZUserInfoResponse,
+} from './types.ts';
+
+const logger = BaseLogger.forModule('authZClient');
 
 let serviceToken: string | undefined = undefined;
+
+const today = new Date().toISOString();
+
+const addDaysToDateString = (dateString: string, days: number) => {
+	const date = new Date(dateString);
+	date.setDate(date.getDate() + days);
+	return date.toISOString();
+};
+
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Function to fetch AuthZ serviceToken to append to header requirement X-Service-Token
@@ -34,7 +55,7 @@ export const refreshAuthZServiceToken = async () => {
 	try {
 		const url = urlJoin(AUTHZ_ENDPOINT, `/service/${AUTHZ_SERVICE_ID}/verify`);
 
-		const response = await fetch(url, {
+		const response = await fetchWithRetry(url, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -60,7 +81,8 @@ export const refreshAuthZServiceToken = async () => {
 };
 
 /**
- *  Function to perform fetch requests to AUTHZ service
+ * Function to perform fetch requests to AUTHZ service.
+ * It uses a retry mechanishm
  *
  * @param resource endpoint to query from authz
  * @param token authorization token
@@ -68,13 +90,12 @@ export const refreshAuthZServiceToken = async () => {
  *
  */
 export const fetchAuthZResource = async (resource: string, token: string, options?: RequestInit) => {
+	const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_ID, AUTHZ_FETCH_RETRIES, AUTHZ_FETCH_RETRY_DELAY_MS } = authConfig;
 	/**
 	 * Internal function that does the work of fetching the resource from AuthZ.
 	 * We will need to retry this if this is rejected due to an expired serviceToken.
 	 */
 	async function _fetchFromAuthZ() {
-		const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_ID } = authConfig;
-
 		const url = urlJoin(AUTHZ_ENDPOINT, resource);
 		const headers = new Headers({
 			Authorization: `Bearer ${token}`,
@@ -84,6 +105,7 @@ export const fetchAuthZResource = async (resource: string, token: string, option
 		});
 
 		try {
+			// We do not require to retry automatically the fetch here, since the request depends on refreshing the service token before retrying.
 			return await fetch(url, { headers, ...options });
 		} catch (error) {
 			throw new Error(`Something went wrong fetching authz service. ${error}`);
@@ -95,20 +117,33 @@ export const fetchAuthZResource = async (resource: string, token: string, option
 		await refreshAuthZServiceToken();
 	}
 
-	const firstResponse = await _fetchFromAuthZ();
+	// Retry mechanism for authz requires to refresh service token before retying fetch call
+	let attempt = 0;
+	while (true) {
+		try {
+			const response = await _fetchFromAuthZ();
 
-	// CASE-1: Bad bearer token
-	if (!firstResponse.ok && firstResponse.status === 401) {
-		throw new Error(`Bearer token is invalid`);
-	}
-	// CASE-2: Bad serviceToken
-	// Trigger refresh service token and recall with the new token
-	if (!firstResponse.ok && firstResponse.status === 403) {
-		await refreshAuthZServiceToken();
-		return await _fetchFromAuthZ();
-	}
+			if (!response.ok && attempt < AUTHZ_FETCH_RETRIES) {
+				// Refresh Service token when Bearer is invalid
+				if (response.status === 401 || response.status === 403) {
+					await refreshAuthZServiceToken();
+				}
 
-	return firstResponse;
+				attempt++;
+				await sleep(AUTHZ_FETCH_RETRY_DELAY_MS);
+				continue;
+			}
+
+			return response;
+		} catch (error) {
+			if (attempt >= AUTHZ_FETCH_RETRIES) {
+				throw new Error(`Something went wrong fetching AuthZ service: ${String(error)}`);
+			}
+
+			attempt++;
+			await sleep(AUTHZ_FETCH_RETRY_DELAY_MS);
+		}
+	}
 };
 
 export const getUserInformation = async (
@@ -135,5 +170,91 @@ export const getUserInformation = async (
 	} catch (error) {
 		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
 		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
+	}
+};
+
+/**
+ * Function to lookup a user by their email address in the AuthZ service
+ * @param emailAddress
+ * @param accessToken
+ * @returns a list of PCGL IDs that match the email provided
+ */
+export const lookupUserByEmail = async (
+	emailAddress: string,
+	accessToken: string,
+): AsyncResult<PCGLAuthzLookupUserResponse, 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
+	try {
+		const queryParams = new URLSearchParams();
+		queryParams.set('email', emailAddress);
+		const response = await fetchAuthZResource(`/user/lookup?${queryParams.toString()}`, accessToken);
+
+		if (response.status === 404) {
+			const message = `No user found with email ${emailAddress}.`;
+			logger.info('[AUTHZ]:', message);
+			return failure('NOT_FOUND', message);
+		}
+
+		const res = await response.json();
+
+		const resultLookUpUser = lookupUserResponse.safeParse(res);
+
+		if (!resultLookUpUser.success) {
+			const message = `AuthZ service returned unexpected data to find user with email ${emailAddress}`;
+			logger.error(`[AUTHZ]: ${message}`, resultLookUpUser.error);
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultLookUpUser.data);
+	} catch (error) {
+		const message = `Unexpected error while getting user with email ${emailAddress}`;
+		logger.error('[AUTHZ]:', message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+/**
+ * Function to Add user to study permission in the AuthZ service
+ * @param studyId
+ * @param userPcglId
+ * @param accessToken
+ * @returns a list of study permissions for the user, otherwise returns failure with SYSTEM_ERROR
+ */
+export const addUserToStudyPermission = async (
+	studyId: string,
+	userPcglId: string,
+	accessToken: string,
+): AsyncResult<PCGLAddUserToStudyPermissionResponse, 'SYSTEM_ERROR'> => {
+	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
+	try {
+		const response = await fetchAuthZResource(`/user/${userPcglId}`, accessToken, {
+			method: 'POST',
+			body: JSON.stringify({
+				study_id: studyId,
+				start_date: today,
+				end_date: addDaysToDateString(today, APPROVED_PERMISSION_EXPIRES_IN_DAYS),
+			}),
+		});
+
+		if (!response.ok) {
+			const message = `Failed to add user '${userPcglId}' to study '${studyId}'`;
+			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${await response.text()}`);
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		const res = await response.json();
+
+		const resultAddPermission = addUserToStudyPermissionResponse.safeParse(res);
+
+		if (!resultAddPermission.success) {
+			const message = `AuthZ service returned unexpected data to add user to study permission`;
+			logger.error(`[AUTHZ]: ${message}`, JSON.stringify(res));
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultAddPermission.data);
+	} catch (error) {
+		const message = `Unexpected error while adding ${userPcglId} to study ${studyId}`;
+		logger.error('[AUTHZ]:', message, error);
+		return failure('SYSTEM_ERROR', message);
 	}
 };

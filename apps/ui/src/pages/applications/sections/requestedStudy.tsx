@@ -44,17 +44,21 @@ const rule = createSchemaFieldRule(requestedStudiesSchema);
 
 interface RequestedStudy {
 	studyName: string;
-	studyID: number;
+	studyID: string;
 }
 
 const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 	{
-		studyName: 'OICR Study',
-		studyID: 1,
+		studyName: 'TEST-CA',
+		studyID: 'PCGLST0001',
 	},
 	{
-		studyName: 'Government of Canada Pan-Canadian Collaboration Study',
-		studyID: 2,
+		studyName: 'EXAMPLE-CA',
+		studyID: 'PCGLST0002',
+	},
+	{
+		studyName: 'TEST-C3G',
+		studyID: 'PCGLST0003',
 	},
 ];
 
@@ -132,7 +136,7 @@ const RequestedStudy = () => {
 								rule={rule}
 								mode="multiple"
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyName, label: study.studyName };
+									return { value: study.studyID, label: study.studyName };
 								})}
 								required
 								disabled={!canEdit}

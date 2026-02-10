@@ -134,6 +134,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 
 		buttons.push(
 			<Button
+				key={'history-btn'}
 				onClick={() => {
 					setShowHistoryModal(true);
 				}}
@@ -162,10 +163,18 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 			</ProtectedComponent>,
 			<ProtectedComponent key={'header-dac-controls'} requiredRoles={['DAC_CHAIR']} requiredStates={['DAC_REVIEW']}>
-				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
-				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
-				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
-				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
+				<Button key={'approve-application-btn'} onClick={() => setShowApprovalModal(true)}>
+					{translate('button.approveApplication')}
+				</Button>
+				<Button key={'request-revisions-btn'} onClick={() => setOpenRevisionsModal(true)}>
+					{translate('button.requestRevisions')}
+				</Button>
+				<Button key={'reject-application-btn'} onClick={() => setShowRejectModal(true)}>
+					{translate('button.rejectApplication')}
+				</Button>
+				<Button key={'close-app-btn'} onClick={() => setShowCloseApplicationModal(true)}>
+					{translate('button.closeApp')}
+				</Button>
 			</ProtectedComponent>,
 			<ProtectedComponent
 				key={'header-download'}
