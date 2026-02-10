@@ -25,7 +25,6 @@ const serverConfigSchema = z.object({
 	PG_PASSWORD: z.string(),
 	PG_HOST: z.string(),
 	PG_DATABASE: z.string(),
-	PCGL_DACO_ID: z.string(),
 });
 
 const parseResult = serverConfigSchema.safeParse(process.env);
