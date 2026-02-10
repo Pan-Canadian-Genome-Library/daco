@@ -150,13 +150,9 @@ Table application_contents {
 
 Table application_actions {
   id bigint [pk, increment]
-
   application_id bigint [not null, ref: <> applications.id]
-
   created_at timestamp [not null, default: `now()`]
-
   user_id varchar(100) [not null]
-
   action application_action_types [not null]
   state_before varchar(255) [not null]
   state_after varchar(255) [not null]
