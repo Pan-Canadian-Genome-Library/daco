@@ -26,9 +26,6 @@ import type { GrantUserPermissionsParams, GrantUserPermissionsResult } from './t
  * First, it looks for the associated PCGL user ID using the institutional email
  * Then, it grants the study permissions using the approver's access token
  * Returns the list of successfully granted study IDs and any failure messages
- *
- * @param param0
- * @returns
  */
 export const grantUserPermissions = async ({
 	institutionalEmail,

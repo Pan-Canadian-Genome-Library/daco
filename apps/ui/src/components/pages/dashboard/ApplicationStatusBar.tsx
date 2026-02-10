@@ -54,7 +54,7 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 						<Flex
 							style={{
 								padding: token.paddingLG,
-								backgroundColor: token.colorBgContainer,
+								backgroundColor: hasAccess ? token.colorSuccessBg : token.colorBgContainer,
 								borderRadius: token.borderRadius,
 								margin: isLowResDevice ? `${token.paddingMD}px 0` : 'none',
 							}}
@@ -64,7 +64,7 @@ const ApplicationStatusBar = ({ expiresAt }: ApplicationStatusBarProps) => {
 						>
 							{hasAccess ? (
 								<>
-									<CheckCircleFilled style={{ color: token.colorPrimary, fontSize: 30 }} />
+									<CheckCircleFilled style={{ color: token.colorSuccess, fontSize: 30 }} />
 									<Flex vertical>
 										<Text strong>{translate('dashboard.hasAccess')}</Text>
 									</Flex>

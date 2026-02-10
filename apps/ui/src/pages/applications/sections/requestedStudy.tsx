@@ -50,15 +50,15 @@ interface RequestedStudy {
 const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
 	{
 		studyName: 'TEST-CA',
-		studyID: 'TEST-CA',
+		studyID: 'PCGLST0001',
 	},
 	{
 		studyName: 'EXAMPLE-CA',
-		studyID: 'EXAMPLE-CA',
+		studyID: 'PCGLST0002',
 	},
 	{
 		studyName: 'TEST-C3G',
-		studyID: 'TEST-C3G',
+		studyID: 'PCGLST0003',
 	},
 ];
 
@@ -136,7 +136,7 @@ const RequestedStudy = () => {
 								rule={rule}
 								mode="multiple"
 								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyName, label: study.studyName };
+									return { value: study.studyID, label: study.studyName };
 								})}
 								required
 								disabled={!canEdit}

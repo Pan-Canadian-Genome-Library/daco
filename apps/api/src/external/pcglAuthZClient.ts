@@ -247,7 +247,7 @@ export const addUserToStudyPermission = async (
 
 		if (!resultAddPermission.success) {
 			const message = `AuthZ service returned unexpected data to add user to study permission`;
-			logger.error(`[AUTHZ]: ${message}`, resultAddPermission.error);
+			logger.error(`[AUTHZ]: ${message}`, JSON.stringify(res));
 			return failure('SYSTEM_ERROR', message);
 		}
 
