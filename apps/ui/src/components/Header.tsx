@@ -143,7 +143,10 @@ const HeaderComponent = () => {
 	};
 
 	const UserInfo = (
-		<Flex vertical style={{ padding: 5, width: '100%' }}>
+		<Flex
+			vertical
+			style={{ padding: 5, width: '100%', position: 'relative', top: isLogoutOpen && !isResponsiveMode ? 5 : 0 }}
+		>
 			{isResponsiveMode && (
 				<Divider style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10 }} />
 			)}
@@ -185,8 +188,8 @@ const HeaderComponent = () => {
 							left: 0,
 							minWidth: 100,
 							position: 'absolute',
-							top: displayEmail ? 60 : 42,
-							width: '100%',
+							top: displayEmail ? 65 : 42,
+							width: isResponsiveMode ? '100%' : 'calc(100% + 20px)',
 						}}
 					>
 						{translate(`button.logout`)}{' '}
@@ -224,7 +227,7 @@ const HeaderComponent = () => {
 				height: 'auto',
 				justifyContent: isResponsiveMode ? 'left' : 'center',
 				lineHeight: 0.5,
-				paddingLeft: isResponsiveMode ? 0 : 15,
+				padding: 0,
 				textAlign: 'left',
 			},
 		},
