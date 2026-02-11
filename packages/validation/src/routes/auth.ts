@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { z } from 'zod';
-import { userRoleSchema } from '../user.js';
 
 export const userResponseSchema = z.object({
 	user: z
@@ -27,7 +26,6 @@ export const userResponseSchema = z.object({
 			familyName: z.string().optional(),
 		})
 		.optional(),
-	role: userRoleSchema,
 });
 export type UserResponse = z.infer<typeof userResponseSchema>;
 
@@ -127,7 +125,10 @@ export const sessionUser = z.intersection(dacoGeneratedSessionValues, authGenera
 
 export type SessionUser = z.infer<typeof sessionUser>;
 
-// TODO: create SessionUserUI type based off SessionUser, once its determined what fields are to be returned to the UI
+export type SessionUserUI = Pick<
+	SessionUser,
+	'givenName' | 'emails' | 'familyName' | 'dacChair' | 'dacMember' | 'dacoAdmin' | 'userId'
+>;
 
 export const sessionAccount = z.object({
 	idToken: z.string(),

@@ -21,7 +21,7 @@ import axios, { AxiosError } from 'axios';
 import { Router } from 'express';
 import urlJoin from 'url-join';
 
-import { type UserResponse } from '@pcgl-daco/validation';
+import { SessionUserUI } from '@pcgl-daco/validation';
 
 import { authConfig } from '@/config/authConfig.js';
 import { serverConfig } from '@/config/serverConfig.js';
@@ -30,7 +30,6 @@ import * as oidcAuthClient from '@/external/oidcAuthNClient.ts';
 import * as pcglAuthZClient from '@/external/pcglAuthZClient.ts';
 import BaseLogger from '@/logger.js';
 import { type ResponseWithData } from '@/routes/types.ts';
-import { getUserRole } from '@/service/authService.ts';
 import { resetSession } from '@/session/index.js';
 import { convertToSessionAccount, convertToSessionUser } from '@/utils/aliases.ts';
 
@@ -216,20 +215,35 @@ authRouter.get('/token', async (request, response) => {
  * if a user is logged in and what type of user they are (which role they have). This will
  * let the UI determine which routes to allow to the user.
  */
-authRouter.get('/user', async (request, response: ResponseWithData<UserResponse, ['AUTH_DISABLED']>) => {
-	if (!authConfig.enabled) {
-		response.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
+authRouter.get(
+	'/user',
+	async (
+		request,
+		response: ResponseWithData<{ user: SessionUserUI | undefined }, ['AUTH_DISABLED', 'USER_NOT_FOUND']>,
+	) => {
+		if (!authConfig.enabled) {
+			response.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
+			return;
+		}
+
+		const { user } = request.session;
+
+		const output = {
+			user: user
+				? {
+						userId: user.userId,
+						givenName: user.givenName,
+						familyName: user.familyName,
+						emails: user.emails,
+						dacChair: user.dacChair,
+						dacMember: user.dacMember,
+						dacoAdmin: user.dacoAdmin,
+					}
+				: undefined,
+		};
+
+		response.json(output);
 		return;
-	}
-
-	const { user } = request.session;
-
-	const output: UserResponse = {
-		role: getUserRole(user),
-		user,
-	};
-
-	response.json(output);
-	return;
-});
+	},
+);
 export default authRouter;
