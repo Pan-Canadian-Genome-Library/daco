@@ -68,3 +68,19 @@ export const setStudyAcceptingApplications = async ({
 		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
 	}
 };
+
+/**
+ * Returns all studies.
+ * @returns {StudyDTO[]}
+ */
+export const getAllStudies = async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const studyService = studySvc(database);
+		const studies = await studyService.getAllStudies();
+
+		return studies;
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching studies`);
+	}
+};

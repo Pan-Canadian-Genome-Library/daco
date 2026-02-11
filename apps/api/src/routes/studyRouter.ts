@@ -21,7 +21,7 @@ import type { StudyDTO } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import express from 'express';
 
-import { getStudyById, setStudyAcceptingApplications } from '@/controllers/studyController.ts';
+import { getAllStudies, getStudyById, setStudyAcceptingApplications } from '@/controllers/studyController.ts';
 import { adminMiddleware } from '@/middleware/adminMiddleware.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { activateBodyParamSchema, basicStudyParamSchema } from '@pcgl-daco/validation';
@@ -101,4 +101,24 @@ studyRouter.patch(
 		),
 	),
 );
+/*
+ * Get all studies
+ */
+studyRouter.get('/', async (request, response: ResponseWithData<StudyDTO[], ['SYSTEM_ERROR']>) => {
+	const result = await getAllStudies();
+
+	if (!result.success) {
+		switch (result.error) {
+			case 'SYSTEM_ERROR':
+				response.status(500).json({ error: result.error, message: result.message });
+				break;
+			default:
+				response.status(500).json({ error: result.error, message: result.message });
+		}
+		return;
+	}
+	response.status(200).json(result.data);
+	return;
+});
+
 export default studyRouter;
