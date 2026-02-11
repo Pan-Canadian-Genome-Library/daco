@@ -51,7 +51,7 @@ describe('Study API', () => {
 		studyService = studySvc(db);
 	});
 
-	describe('Study', () => {
+	describe('getStudyById', () => {
 		it('should get study by id', async () => {
 			const testRecordId = 'study1';
 			const result = await studyService.getStudyById({ studyId: testRecordId });
@@ -66,6 +66,14 @@ describe('Study API', () => {
 
 			assert.ok(!result.success);
 			assert.ok(result.error, 'NOT_FOUND');
+		});
+	});
+
+	describe('getAllStudies', () => {
+		it('should get all studies', async () => {
+			const result = await studyService.getAllStudies();
+
+			assert.ok(result.success && result.data.length >= 0);
 		});
 	});
 
