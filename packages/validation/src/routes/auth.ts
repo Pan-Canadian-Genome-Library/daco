@@ -90,6 +90,8 @@ export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
 // Session values calculated in DACO services
 const dacoGeneratedSessionValues = z.object({
 	dacoAdmin: z.boolean().default(false),
+	dacChair: z.array(z.string()).default([]),
+	dacMember: z.array(z.string()).default([]),
 });
 
 // Session values retrieved from Authz and Auth services
