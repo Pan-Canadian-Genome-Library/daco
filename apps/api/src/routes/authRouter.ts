@@ -217,10 +217,7 @@ authRouter.get('/token', async (request, response) => {
  */
 authRouter.get(
 	'/user',
-	async (
-		request,
-		response: ResponseWithData<{ user: SessionUserUI | undefined }, ['AUTH_DISABLED', 'USER_NOT_FOUND']>,
-	) => {
+	async (request, response: ResponseWithData<{ user: SessionUserUI | undefined }, ['AUTH_DISABLED']>) => {
 		if (!authConfig.enabled) {
 			response.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
 			return;
