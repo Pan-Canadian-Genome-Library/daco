@@ -24,11 +24,13 @@ import express from 'express';
 import { serverConfig } from '@/config/serverConfig.js';
 import { createDacRecords } from '@/controllers/dacController.ts';
 import { getStudyById, updateStudies } from '@/controllers/studyController.ts';
+import BaseLogger from '@/logger.js';
 import { type StudyModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import { basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
+const logger = BaseLogger.forModule('studyRouter');
 const studyRouter = express.Router();
 
 /**
@@ -45,8 +47,12 @@ studyRouter.get(
 			Array.isArray(dacResponseData) &&
 			dacResponseData.map((dac) => dac as DacDTO);
 
-		if (dacData === false) {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC Group data' });
+		if (!dacData) {
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC data' });
+			return;
+		} else if (dacData.length === 0) {
+			logger.error('No DAC data retrieved from Clinical on Import Studies');
+			response.status(404).json({ error: 'NOT_FOUND', message: 'No DAC Study data retrieved from Clinical' });
 			return;
 		}
 
@@ -73,7 +79,12 @@ studyRouter.get(
 			Array.isArray(studyResponseData) &&
 			studyResponseData.map((study) => study as StudyDTO);
 		if (!studyData) {
-			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC Group data' });
+			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies');
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC Study data from Clinical' });
+			return;
+		} else if (studyData.length === 0) {
+			logger.error('No Study data retrieved from Clinical on Import Studies');
+			response.status(404).json({ error: 'NOT_FOUND', message: 'No Study data retrieved from Clinical' });
 			return;
 		}
 

@@ -174,6 +174,7 @@ export const editApplication = async ({
  * @param isDACMember - Boolean which represents if the user is a DAC Member (they can see all applications)
  * @param isApplicantView - Boolean which represents if the user is an applicant (they can only see their own applications)
  * @param search - text to search
+ * @param authorizedDacIds - Array of allowed DacId string values
  * @returns Success with list of Applications / Failure with Error
  */
 export const getAllApplications = async ({
@@ -185,6 +186,7 @@ export const getAllApplications = async ({
 	search,
 	isDAC,
 	isApplicantView,
+	authorizedDacIds,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
@@ -202,6 +204,7 @@ export const getAllApplications = async ({
 		pageSize,
 		search,
 		isApplicantView,
+		authorizedDacIds,
 	});
 
 	return result;
