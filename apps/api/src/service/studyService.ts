@@ -75,44 +75,6 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-
-	getAllStudies: async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
-		try {
-			const studyRecords = await db
-				.select({
-					studyId: study.study_id,
-					dacId: study.dac_id,
-					dacName: dac.dac_name,
-					categoryId: study.category_id,
-					studyName: study.study_name,
-					studyDescription: study.study_description,
-					programName: study.program_name,
-					keywords: study.keywords,
-					status: study.status,
-					context: study.context,
-					domain: study.domain,
-					participantCriteria: study.participant_criteria,
-					principalInvestigators: study.principal_investigators,
-					leadOrganizations: study.lead_organizations,
-					collaborators: study.collaborators,
-					fundingSources: study.funding_sources,
-					publicationLinks: study.publication_links,
-					acceptingApplications: study.accepting_applications,
-					createdAt: study.created_at,
-					updatedAt: study.updated_at,
-				})
-				.from(study)
-				.innerJoin(dac, eq(dac.dac_id, study.dac_id));
-
-			return success(studyRecords);
-		} catch (error) {
-			const message = 'Error at getAllStudies';
-
-			logger.error(message, error);
-
-			return failure('SYSTEM_ERROR', message);
-		}
-	},
 });
 
 export { studySvc };
