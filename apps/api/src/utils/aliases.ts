@@ -72,6 +72,8 @@ export const convertToSessionUser = (
 
 	const aliasedPCGLResponse = objectToCamel(pcglData);
 
+	let aliasedGroup = aliasedPCGLResponse.groups || [];
+
 	const finalizedUserObject: SessionUser = {
 		sub: aliasedOIDCResponse.sub,
 		userId: aliasedPCGLResponse.userinfo.pcglId,
@@ -82,12 +84,21 @@ export const convertToSessionUser = (
 		siteCurator: aliasedPCGLResponse.userinfo.siteCurator,
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
-		groups: aliasedPCGLResponse.groups,
+		groups: aliasedGroup,
 
 		// DACO generated values
-		dacoAdmin: aliasedPCGLResponse.groups
-			? aliasedPCGLResponse.groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN)
-			: false,
+		dacoAdmin:
+			aliasedGroup.length > 0 ? aliasedGroup.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN) : false,
+		dacChair: aliasedGroup
+			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_DAC_CHAIR))
+			.map((group) => {
+				return group.name.slice(authConfig.AUTHZ_GROUP_DAC_CHAIR.length);
+			}),
+		dacMember: aliasedGroup
+			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_DAC_MEMBER))
+			.map((group) => {
+				return group.name.slice(authConfig.AUTHZ_GROUP_DAC_MEMBER.length);
+			}),
 	};
 
 	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
