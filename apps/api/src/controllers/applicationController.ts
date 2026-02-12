@@ -186,7 +186,6 @@ export const getAllApplications = async ({
 	search,
 	isDAC,
 	isApplicantView,
-	authorizedDacIds,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
@@ -204,7 +203,6 @@ export const getAllApplications = async ({
 		pageSize,
 		search,
 		isApplicantView,
-		authorizedDacIds,
 	});
 
 	return result;

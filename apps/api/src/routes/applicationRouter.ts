@@ -40,7 +40,6 @@ import {
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 
-import { authConfig } from '@/config/authConfig.ts';
 import {
 	approveApplication,
 	closeApplication,
@@ -62,7 +61,7 @@ import {
 	withdrawApplication,
 } from '@/controllers/applicationController.js';
 import BaseLogger from '@/logger.js';
-import { authMiddleware, type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
+import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { canAccessRequest, getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { authErrorResponseHandler, authFailure, getUserName } from '@/service/utils.ts';
@@ -166,43 +165,10 @@ applicationRouter.get(
 	) => {
 		const { user } = request.session;
 		if (user) {
-			const { userId, dacoAdmin, dacAuthorizations, groups } = user;
+			const { userId } = user;
 
 			const userRole = getUserRole(user);
 			const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
-			console.log('user', user);
-			console.log('userRole', userRole);
-
-			/**
-			 * When called by a DAC member, filters by the DAC ID of the PCGL DAC (from Auth config)
-			 * When called by a DAC Chair, this needs to filter applications by the DAC ID(s) that they are the chair of
-			 * @param userRole
-			 * @param dacoAdmin
-			 * @param dacAuthorizations
-			 */
-			const getAuthorizedDacIds = ({
-				userRole,
-				dacoAdmin,
-				dacAuthorizations,
-			}: {
-				userRole: UserRoleOmitRep;
-				dacoAdmin: boolean;
-				dacAuthorizations: typeof user.dacAuthorizations;
-			}) => {
-				const { AUTHZ_GROUP_DAC_CHAIR } = authConfig;
-
-				if (userRole === userRoleSchema.Values.DAC_MEMBER && AUTHZ_GROUP_DAC_CHAIR) {
-					return [AUTHZ_GROUP_DAC_CHAIR];
-				} else if (userRole === userRoleSchema.Values.DAC_CHAIR && dacoAdmin) {
-					return dacAuthorizations.map((study) => study?.studyId).filter((studyId) => typeof studyId === 'string');
-				}
-			};
-
-			const authorizedDacIds = getAuthorizedDacIds({
-				userRole,
-				dacoAdmin,
-				dacAuthorizations,
-			});
 
 			const {
 				state: stateQuery,
@@ -256,7 +222,6 @@ applicationRouter.get(
 				search: searchResult,
 				isDAC,
 				isApplicantView,
-				authorizedDacIds,
 			});
 
 			if (result.success) {
