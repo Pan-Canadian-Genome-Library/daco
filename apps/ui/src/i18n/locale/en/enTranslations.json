@@ -211,6 +211,9 @@
 		"createDacComment": {
 			"successTitle": "DAC Comment Submitted",
 			"successMessage": "DAC comment submitted successfully"
+		},
+		"importStudies": {
+			"successMessage": "Studies imported successfully"
 		}
 	}
 }

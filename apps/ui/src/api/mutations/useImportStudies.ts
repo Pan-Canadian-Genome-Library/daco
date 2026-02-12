@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -21,14 +21,15 @@ import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 type ImportType = {
-	todo?: string;
+	todo?: string; // properly type this DTO
 };
 
 const useImportStudies = () => {
 	const notification = useNotificationContext();
-	// const { t: translate } = useTranslation();
+	const { t: translate } = useTranslation();
 
 	return useMutation<ImportType, ServerError>({
 		mutationFn: async () => {
@@ -41,13 +42,14 @@ const useImportStudies = () => {
 		onSuccess: () => {
 			notification.openNotification({
 				type: 'success',
-				message: 'Add success translation here',
+				message: translate('importStudies.successMessage'),
 			});
 		},
-		onError: () => {
+		onError: (error) => {
 			notification.openNotification({
 				type: 'error',
-				message: 'Add error translation here',
+				message: translate('errors.generic.title'),
+				description: error.message,
 			});
 		},
 	});
