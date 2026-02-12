@@ -273,7 +273,6 @@ const applicationSvc = (db: PostgresDb) => ({
 		pageSize = 20,
 		search,
 		isApplicantView = false,
-		authorizedDacIds,
 	}: {
 		user_id?: string;
 		state?: ApplicationStateValues[];
@@ -282,7 +281,6 @@ const applicationSvc = (db: PostgresDb) => ({
 		pageSize?: number;
 		search?: string;
 		isApplicantView?: boolean;
-		authorizedDacIds?: string[];
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			const transformSearchIntoQuery = (searchText: string) => {
@@ -331,7 +329,6 @@ const applicationSvc = (db: PostgresDb) => ({
 						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						state.length ? inArray(applications.state, state) : undefined,
 						search ? transformSearchIntoQuery(search) : undefined,
-						authorizedDacIds && authorizedDacIds.length ? inArray(applications.dac_id, authorizedDacIds) : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))

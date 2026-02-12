@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { DacDTO, StudyDTO } from '@pcgl-daco/data-model';
+import type { StudyDTO } from '@pcgl-daco/data-model';
 import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import express from 'express';
 
@@ -27,7 +27,7 @@ import { getStudyById, updateStudies } from '@/controllers/studyController.ts';
 import BaseLogger from '@/logger.js';
 import { type StudyModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { basicStudyParamSchema } from '@pcgl-daco/validation';
+import { basicStudyParamSchema, dacDTOResponseSchema, studyDTOResponseSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
 const logger = BaseLogger.forModule('studyRouter');
@@ -42,20 +42,19 @@ studyRouter.get(
 		const { CLINICAL_URL } = serverConfig;
 		const dacResponse = await fetch(`${CLINICAL_URL}/dac`);
 		const dacResponseData = await dacResponse.json();
-		const dacData =
-			typeof dacResponseData === 'object' &&
-			Array.isArray(dacResponseData) &&
-			dacResponseData.map((dac) => dac as DacDTO);
+		const parsedDacData = dacDTOResponseSchema.safeParse(dacResponseData);
 
-		if (!dacData) {
+		if (!parsedDacData.success) {
+			logger.error('Error retrieving DAC data', parsedDacData.error);
 			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC data' });
 			return;
-		} else if (dacData.length === 0) {
+		} else if (parsedDacData.data.length === 0) {
 			logger.error('No DAC data retrieved from Clinical on Import Studies');
 			response.status(404).json({ error: 'NOT_FOUND', message: 'No DAC Study data retrieved from Clinical' });
 			return;
 		}
 
+		const dacData = parsedDacData.data;
 		const updatedDacResult = await createDacRecords({ dacData });
 
 		if (!updatedDacResult.success) {
@@ -74,20 +73,18 @@ studyRouter.get(
 
 		const studyResponse = await fetch(`${CLINICAL_URL}/study`);
 		const studyResponseData = await studyResponse.json();
-		const studyData =
-			typeof studyResponseData === 'object' &&
-			Array.isArray(studyResponseData) &&
-			studyResponseData.map((study) => study as StudyDTO);
-		if (!studyData) {
-			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies');
+		const parsedStudyData = studyDTOResponseSchema.safeParse(studyResponseData);
+
+		if (!parsedStudyData.success) {
+			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies', parsedStudyData.error);
 			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC Study data from Clinical' });
 			return;
-		} else if (studyData.length === 0) {
+		} else if (parsedStudyData.data.length === 0) {
 			logger.error('No Study data retrieved from Clinical on Import Studies');
 			response.status(404).json({ error: 'NOT_FOUND', message: 'No Study data retrieved from Clinical' });
 			return;
 		}
-
+		const studyData = parsedStudyData.data;
 		const updatedStudiesResult = await updateStudies({ studies: studyData });
 
 		if (!updatedStudiesResult.success) {

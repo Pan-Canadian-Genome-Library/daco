@@ -179,6 +179,33 @@ export const studyModelSchema = z.object({
 });
 export type studySchemaType = z.infer<typeof studyModelSchema>;
 
+export const studyDTOSchema = z.object({
+	studyId: z.string(),
+	dacId: z.string(),
+	dacName: z.union([z.undefined(), z.string()]),
+	categoryId: z.number().nullable(),
+	studyName: z.string(),
+	studyDescription: z.string(),
+	programName: z.string().nullable(),
+	keywords: z.array(z.string()),
+	status: z.nativeEnum(StudyStatus),
+	context: z.nativeEnum(StudyContext),
+	domain: z.array(z.string()),
+	participantCriteria: z.string().nullable(),
+	principalInvestigators: z.array(z.string()),
+	leadOrganizations: z.array(z.string()),
+	collaborators: z.array(z.string()),
+	fundingSources: z.array(z.string()),
+	publicationLinks: z.array(z.string()),
+	acceptingApplications: z.union([z.boolean(), z.undefined()]).nullable(),
+	createdAt: z.union([z.date(), z.string()]),
+	updatedAt: z.union([z.date(), z.string()]).nullable(),
+});
+export const studyDTOResponseSchema = z.array(studyDTOSchema);
+
+export type studyDTOResponseType = z.infer<typeof studyDTOSchema>;
+export type studyDTOResponseSchemaType = z.infer<typeof studyDTOResponseSchema>;
+
 export const dacModelSchema = z.object({
 	dac_id: z.string(),
 	dac_name: z.string(),
@@ -189,3 +216,17 @@ export const dacModelSchema = z.object({
 	updated_at: z.union([z.date(), z.undefined()]).nullable(),
 });
 export type dacSchemaType = z.infer<typeof dacModelSchema>;
+
+export const dacDTOSchema = z.object({
+	dacId: z.string(),
+	dacName: z.string(),
+	dacDescription: z.string(),
+	contactName: z.string(),
+	contactEmail: z.string(),
+	createdAt: z.union([z.date(), z.string()]),
+	updatedAt: z.union([z.date(), z.string()]).nullable(),
+});
+export const dacDTOResponseSchema = z.array(dacDTOSchema);
+
+export type dacDTOSchemaType = z.infer<typeof dacDTOSchema>;
+export type dacDTOResponseSchemaType = z.infer<typeof dacDTOResponseSchema>;
