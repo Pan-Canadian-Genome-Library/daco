@@ -32,6 +32,7 @@ export const study = pgTable(
 		dac_id: text().notNull(),
 		study_name: varchar({ length: 255 }).notNull(),
 		study_description: text().notNull(), // Assuming the description is large
+		dac_name: varchar({ length: 255 }),
 		program_name: varchar({ length: 255 }),
 		keywords: text().array(),
 		status: studyStatus().notNull(),

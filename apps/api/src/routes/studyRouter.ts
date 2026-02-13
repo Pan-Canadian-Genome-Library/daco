@@ -19,14 +19,101 @@
 
 import type { StudyDTO } from '@pcgl-daco/data-model';
 import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { basicStudyParamSchema, dacDTOResponseSchema, studyDTOResponseSchema } from '@pcgl-daco/validation';
 import express from 'express';
 
-import { getStudyById } from '@/controllers/studyController.ts';
+import { serverConfig } from '@/config/serverConfig.js';
+import { createDacRecords } from '@/controllers/dacController.ts';
+import { getStudyById, updateStudies } from '@/controllers/studyController.ts';
+import { getDbInstance } from '@/db/index.js';
+import BaseLogger from '@/logger.js';
+import { type StudyModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
+const logger = BaseLogger.forModule('studyRouter');
 const studyRouter = express.Router();
+
+/**
+ * Import all studies from submission service
+ */
+studyRouter.get(
+	'/import',
+	async (request, response: ResponseWithData<{ studies: StudyModel[] }, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+		const { CLINICAL_URL } = serverConfig;
+		const dacResponse = await fetch(`${CLINICAL_URL}/dac`);
+		const dacResponseData = await dacResponse.json();
+		const parsedDacData = dacDTOResponseSchema.safeParse(dacResponseData);
+
+		if (!parsedDacData.success) {
+			logger.error('Error retrieving DAC data', parsedDacData.error);
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC data' });
+			return;
+		} else if (parsedDacData.data.length === 0) {
+			logger.error('No DAC data retrieved from Clinical on Import Studies');
+			response.status(404).json({ error: 'NOT_FOUND', message: 'No DAC Study data retrieved from Clinical' });
+			return;
+		}
+
+		const studyResponse = await fetch(`${CLINICAL_URL}/study`);
+		const studyResponseData = await studyResponse.json();
+		const parsedStudyData = studyDTOResponseSchema.safeParse(studyResponseData);
+
+		if (!parsedStudyData.success) {
+			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies', parsedStudyData.error);
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC Study data from Clinical' });
+			return;
+		} else if (parsedStudyData.data.length === 0) {
+			logger.error('No Study data retrieved from Clinical on Import Studies');
+			response.status(404).json({ error: 'NOT_FOUND', message: 'No Study data retrieved from Clinical' });
+			return;
+		}
+
+		const database = getDbInstance();
+		const txResult = await database.transaction(async (tx) => {
+			const dacData = parsedDacData.data;
+			const updatedDacResult = await createDacRecords({ dacData, transaction: tx });
+
+			if (!updatedDacResult.success) {
+				switch (updatedDacResult.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+						break;
+					default:
+						response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+				}
+				return;
+			}
+
+			const studyData = parsedStudyData.data;
+			const updatedStudiesResult = await updateStudies({ studies: studyData, transaction: tx });
+
+			if (!updatedStudiesResult.success) {
+				switch (updatedStudiesResult.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+						break;
+					default:
+						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+				}
+				return;
+			}
+
+			return updatedStudiesResult;
+		});
+
+		if (txResult) {
+			response.status(200).json({ studies: txResult.data });
+		}
+		return;
+	},
+);
 
 /**
  * Get the study by studyId

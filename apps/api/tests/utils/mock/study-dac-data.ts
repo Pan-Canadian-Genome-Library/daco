@@ -204,4 +204,14 @@ export const testDacUsersData: (typeof dac.$inferInsert)[] = [
 		created_at: new Date(),
 		updated_at: new Date(),
 	},
+
+	{
+		dac_id: 'dac7',
+		dac_name: 'Gastrointestinal DAC',
+		dac_description: 'DAC for stomach and gastric imaging data.',
+		contact_name: 'Chef Nonna',
+		contact_email: 'nonna@example.com',
+		created_at: new Date(),
+		updated_at: new Date(),
+	},
 ];

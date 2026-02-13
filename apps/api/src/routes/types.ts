@@ -32,6 +32,7 @@ export type ApplicationListRequest = {
 	search?: string;
 	isDAC?: boolean;
 	isApplicantView?: boolean;
+	authorizedDacIds?: string[];
 };
 
 /**
