@@ -121,14 +121,21 @@ const authGeneratedSessionValues = z.object({
 	groups: authZUserInfo.pick({ groups: true }).shape.groups,
 });
 
-export const sessionUser = z.intersection(dacoGeneratedSessionValues, authGeneratedSessionValues);
+export const sessionUser = authGeneratedSessionValues.merge(dacoGeneratedSessionValues);
 
 export type SessionUser = z.infer<typeof sessionUser>;
 
-export type SessionUserUI = Pick<
-	SessionUser,
-	'givenName' | 'emails' | 'familyName' | 'dacChair' | 'dacMember' | 'dacoAdmin' | 'userId'
->;
+export const SessionUserResponse = sessionUser.pick({
+	userId: true,
+	givenName: true,
+	familyName: true,
+	emails: true,
+	dacChair: true,
+	dacMember: true,
+	dacoAdmin: true,
+});
+
+export type SessionUserResponseType = z.infer<typeof SessionUserResponse>;
 
 export const sessionAccount = z.object({
 	idToken: z.string(),

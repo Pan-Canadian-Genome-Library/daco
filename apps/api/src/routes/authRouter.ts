@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -21,8 +21,6 @@ import axios, { AxiosError } from 'axios';
 import { Router } from 'express';
 import urlJoin from 'url-join';
 
-import { SessionUserUI } from '@pcgl-daco/validation';
-
 import { authConfig } from '@/config/authConfig.js';
 import { serverConfig } from '@/config/serverConfig.js';
 import ExternalAuthError from '@/external/AuthenticationError.ts';
@@ -32,6 +30,7 @@ import BaseLogger from '@/logger.js';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { resetSession } from '@/session/index.js';
 import { convertToSessionAccount, convertToSessionUser } from '@/utils/aliases.ts';
+import { SessionUserResponseType } from '@pcgl-daco/validation';
 
 const logger = BaseLogger.forModule(`authRouter`);
 
@@ -217,7 +216,7 @@ authRouter.get('/token', async (request, response) => {
  */
 authRouter.get(
 	'/user',
-	async (request, response: ResponseWithData<{ user: SessionUserUI | undefined }, ['AUTH_DISABLED']>) => {
+	async (request, response: ResponseWithData<{ user: SessionUserResponseType | undefined }, ['AUTH_DISABLED']>) => {
 		if (!authConfig.enabled) {
 			response.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
 			return;
