@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -18,24 +18,35 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, foreignKey, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { applicationActions } from './applicationActions.ts';
-import { applicationContents } from './applicationContents.ts';
-import { applicationStatesEnum } from './common.ts';
+import { boolean, foreignKey, integer, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+
 import { dac } from './dac.ts';
 
-export const applications = pgTable(
-	'applications',
+export const studyStatus = pgEnum('study_status', ['Ongoing', 'Completed']);
+export const studyContext = pgEnum('study_context', ['Clinical', 'Research']);
+
+export const study = pgTable(
+	'study',
 	{
-		id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-		dac_id: text(),
-		user_id: varchar({ length: 100 }).notNull(),
-		state: applicationStatesEnum().notNull(),
+		study_id: text().primaryKey().notNull(),
+		dac_id: text().notNull(),
+		study_name: varchar({ length: 255 }).notNull(),
+		study_description: text().notNull(), // Assuming the description is large
+		program_name: varchar({ length: 255 }),
+		keywords: text().array(),
+		status: studyStatus().notNull(),
+		context: studyContext().notNull(),
+		domain: text().array().notNull(),
+		participant_criteria: text(),
+		principal_investigators: text().array().notNull(),
+		lead_organizations: text().array().notNull(),
+		collaborators: text().array(),
+		funding_sources: text().array().notNull(),
+		publication_links: text().array(),
 		created_at: timestamp().notNull().defaultNow(),
-		approved_at: timestamp(),
 		updated_at: timestamp(),
-		expires_at: timestamp(),
-		contents: bigint({ mode: 'number' }),
+		category_id: integer().unique(),
+		accepting_applications: boolean().default(false),
 	},
 	(table) => [
 		foreignKey({
@@ -46,14 +57,9 @@ export const applications = pgTable(
 	],
 );
 
-export const applicationsRelations = relations(applications, ({ one, many }) => ({
-	application_contents: one(applicationContents, {
-		fields: [applications.contents],
-		references: [applicationContents.id],
-	}),
+export const studyRelations = relations(study, ({ one }) => ({
 	dac_id: one(dac, {
-		fields: [applications.dac_id],
+		fields: [study.dac_id],
 		references: [dac.dac_id],
 	}),
-	actions: many(applicationActions),
 }));
