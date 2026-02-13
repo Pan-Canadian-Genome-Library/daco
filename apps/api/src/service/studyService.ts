@@ -25,7 +25,7 @@ import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { type StudyDTO } from '@pcgl-daco/data-model';
-import { type StudyModel, type StudyRecord } from './types.ts';
+import { type PostgresTransaction, type StudyModel, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
 
@@ -79,11 +79,14 @@ const studySvc = (db: PostgresDb) => ({
 
 	updateStudies: async ({
 		studyData,
+		transaction,
 	}: {
 		studyData: StudyModel[];
+		transaction?: PostgresTransaction;
 	}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
-			const studyRecords = await db
+			const dbTransaction = transaction ? transaction : db;
+			const studyRecords = await dbTransaction
 				.insert(study)
 				.values(studyData)
 				.onConflictDoUpdate({

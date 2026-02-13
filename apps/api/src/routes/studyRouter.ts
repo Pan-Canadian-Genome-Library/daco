@@ -19,15 +19,16 @@
 
 import type { StudyDTO } from '@pcgl-daco/data-model';
 import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { basicStudyParamSchema, dacDTOResponseSchema, studyDTOResponseSchema } from '@pcgl-daco/validation';
 import express from 'express';
 
 import { serverConfig } from '@/config/serverConfig.js';
 import { createDacRecords } from '@/controllers/dacController.ts';
 import { getStudyById, updateStudies } from '@/controllers/studyController.ts';
+import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { type StudyModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { basicStudyParamSchema, dacDTOResponseSchema, studyDTOResponseSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
 const logger = BaseLogger.forModule('studyRouter');
@@ -54,23 +55,6 @@ studyRouter.get(
 			return;
 		}
 
-		const dacData = parsedDacData.data;
-		const updatedDacResult = await createDacRecords({ dacData });
-
-		if (!updatedDacResult.success) {
-			switch (updatedDacResult.error) {
-				case 'NOT_FOUND':
-					response.status(404).json({ error: updatedDacResult.error, message: updatedDacResult.message });
-					break;
-				case 'SYSTEM_ERROR':
-					response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
-					break;
-				default:
-					response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
-			}
-			return;
-		}
-
 		const studyResponse = await fetch(`${CLINICAL_URL}/study`);
 		const studyResponseData = await studyResponse.json();
 		const parsedStudyData = studyDTOResponseSchema.safeParse(studyResponseData);
@@ -84,24 +68,49 @@ studyRouter.get(
 			response.status(404).json({ error: 'NOT_FOUND', message: 'No Study data retrieved from Clinical' });
 			return;
 		}
-		const studyData = parsedStudyData.data;
-		const updatedStudiesResult = await updateStudies({ studies: studyData });
 
-		if (!updatedStudiesResult.success) {
-			switch (updatedStudiesResult.error) {
-				case 'NOT_FOUND':
-					response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
-					break;
-				case 'SYSTEM_ERROR':
-					response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
-					break;
-				default:
-					response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+		const database = getDbInstance();
+		const txResult = await database.transaction(async (tx) => {
+			const dacData = parsedDacData.data;
+			const updatedDacResult = await createDacRecords({ dacData, transaction: tx });
+
+			if (!updatedDacResult.success) {
+				switch (updatedDacResult.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+						break;
+					default:
+						response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+				}
+				return;
 			}
-			return;
-		}
 
-		response.status(200).json({ studies: updatedStudiesResult.data });
+			const studyData = parsedStudyData.data;
+			const updatedStudiesResult = await updateStudies({ studies: studyData, transaction: tx });
+
+			if (!updatedStudiesResult.success) {
+				switch (updatedStudiesResult.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+						break;
+					default:
+						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+				}
+				return;
+			}
+
+			return updatedStudiesResult;
+		});
+
+		if (txResult) {
+			response.status(200).json({ studies: txResult.data });
+		}
 		return;
 	},
 );

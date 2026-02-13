@@ -24,7 +24,7 @@ import { dac } from '@/db/schemas/dac.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 
-import { type DacModel, type DacRecord } from './types.ts';
+import { type DacModel, type DacRecord, type PostgresTransaction } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
 
@@ -35,11 +35,14 @@ const logger = BaseLogger.forModule('studyService');
 const dacSvc = (db: PostgresDb) => ({
 	createDacRecords: async ({
 		dacGroups,
+		transaction,
 	}: {
 		dacGroups: DacModel[];
+		transaction?: PostgresTransaction;
 	}): AsyncResult<DacRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
-			const studyRecords = await db
+			const dbTransaction = transaction ? transaction : db;
+			const studyRecords = await dbTransaction
 				.insert(dac)
 				.values(dacGroups)
 				.onConflictDoUpdate({

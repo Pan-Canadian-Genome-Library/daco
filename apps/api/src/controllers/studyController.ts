@@ -17,13 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { StudyDTO } from '@pcgl-daco/data-model';
+
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { studySvc } from '@/service/studyService.ts';
-import { type StudyRecord } from '@/service/types.ts';
+import { type PostgresTransaction, type StudyRecord } from '@/service/types.ts';
 import { convertToStudyUpdateRecord } from '@/utils/aliases.ts';
 import { failure, type AsyncResult } from '@/utils/results.ts';
-import type { StudyDTO } from '@pcgl-daco/data-model';
 
 const logger = BaseLogger.forModule('studyController');
 
@@ -56,8 +57,10 @@ export const getStudyById = async ({
  */
 export const updateStudies = async ({
 	studies,
+	transaction,
 }: {
 	studies: StudyDTO[];
+	transaction?: PostgresTransaction;
 }): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -76,7 +79,7 @@ export const updateStudies = async ({
 			throw new Error(updatedRecordResult.message);
 		});
 
-		const updatedStudies = await studyService.updateStudies({ studyData });
+		const updatedStudies = await studyService.updateStudies({ studyData, transaction });
 
 		return updatedStudies;
 	} catch (error) {
