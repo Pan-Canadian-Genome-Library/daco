@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,14 +17,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z as zod } from 'zod';
+import { Button, Flex } from 'antd';
+import { useNavigate } from 'react-router';
 
-export const userRoleSchema = zod.enum([
-	'DAC_CHAIR',
-	'DAC_MEMBER',
-	'INSTITUTIONAL_REP',
-	'APPLICANT',
-	'ANONYMOUS',
-	'ADMIN',
-]);
-export type UserRole = zod.infer<typeof userRoleSchema>;
+import useImportStudies from '@/api/mutations/useImportStudies';
+import ContentWrapper from '@/components/layouts/ContentWrapper';
+
+const AdminDashboardPage = () => {
+	const { mutateAsync: syncStudies } = useImportStudies();
+	const navigate = useNavigate();
+
+	const handleSyncStudies = async () => {
+		await syncStudies();
+	};
+
+	return (
+		<ContentWrapper style={{ height: '100%', padding: '2em 0', gap: '3rem' }}>
+			<Flex vertical justify="center" align="center" gap={'large'}>
+				<Button onClick={handleSyncStudies} style={{ width: '100%' }}>
+					Import Studies
+				</Button>
+				<Button onClick={() => navigate('/admin/studies')}>Activate/Deactivate Studies</Button>
+			</Flex>
+		</ContentWrapper>
+	);
+};
+
+export default AdminDashboardPage;

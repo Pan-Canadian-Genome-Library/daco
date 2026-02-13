@@ -111,6 +111,13 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
+		} else if (user?.dacoAdmin) {
+			return {
+				name: translate('links.admin'),
+				href: '/admin',
+				position: 'right',
+				target: '_self',
+			};
 		} else if (role === 'DAC_MEMBER' || role === 'DAC_CHAIR') {
 			return {
 				name: translate('links.manageApplications'),

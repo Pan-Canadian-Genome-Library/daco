@@ -26,7 +26,7 @@ import { useNavigate } from 'react-router';
 
 const LoginRedirect = () => {
 	const { t: translate } = useTranslation();
-	const { role, isLoading } = useUserContext();
+	const { role, isLoading, user } = useUserContext();
 	const navigate = useNavigate();
 
 	const redirectRep = () => {
@@ -39,6 +39,11 @@ const LoginRedirect = () => {
 
 	useEffect(() => {
 		if (isLoading) {
+			return;
+		}
+
+		if (user?.dacoAdmin) {
+			navigate('/admin', { replace: true });
 			return;
 		}
 

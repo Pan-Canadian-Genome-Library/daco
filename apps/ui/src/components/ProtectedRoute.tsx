@@ -51,7 +51,7 @@ type ProtectedRouteProps = PropsWithChildren<{
  *	</Routes>
  */
 const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteProps) => {
-	const { isLoading, isLoggedIn, role } = useUserContext();
+	const { isLoading, isLoggedIn, role, user } = useUserContext();
 
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 
@@ -60,6 +60,11 @@ const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteP
 	}
 	if (!isLoggedIn) {
 		return <Redirect />;
+	}
+
+	// Admin should have access to all routes
+	if (user?.dacoAdmin) {
+		return children;
 	}
 
 	if (requiredRoles) {
