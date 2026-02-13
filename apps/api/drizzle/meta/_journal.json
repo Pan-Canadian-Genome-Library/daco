@@ -138,7 +138,7 @@
 			"idx": 19,
 			"version": "7",
 			"when": 1769562585190,
-			"tag": "0018_sent_emails_table",
+			"tag": "0019_sent_emails_table",
 			"breakpoints": true
 		}
 	]
