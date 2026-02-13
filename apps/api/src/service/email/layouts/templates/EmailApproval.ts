@@ -22,7 +22,7 @@ import { GenerateApproveType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailApproval = ({ id, name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApproval = ({ id, name }: Omit<GenerateApproveType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -47,7 +47,7 @@ export const GenerateEmailApproval = ({ id, name }: Omit<GenerateApproveType, 't
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApprovalPlain = ({ name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApprovalPlain = ({ name }: Omit<GenerateApproveType, 'to' | 'actionId'>) => {
 	return ` Dear ${name},
     \n We are pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. 
     \n Should you have any questions or need assistance, feel free to reach out to us. 
