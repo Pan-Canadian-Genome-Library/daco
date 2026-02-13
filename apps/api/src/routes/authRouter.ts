@@ -30,7 +30,7 @@ import BaseLogger from '@/logger.js';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { resetSession } from '@/session/index.js';
 import { convertToSessionAccount, convertToSessionUser } from '@/utils/aliases.ts';
-import { SessionUserResponseType } from '@pcgl-daco/validation';
+import { type SessionUserResponse } from '@pcgl-daco/validation';
 
 const logger = BaseLogger.forModule(`authRouter`);
 
@@ -216,7 +216,7 @@ authRouter.get('/token', async (request, response) => {
  */
 authRouter.get(
 	'/user',
-	async (request, response: ResponseWithData<{ user: SessionUserResponseType | undefined }, ['AUTH_DISABLED']>) => {
+	async (request, response: ResponseWithData<{ user: SessionUserResponse | undefined }, ['AUTH_DISABLED']>) => {
 		if (!authConfig.enabled) {
 			response.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
 			return;

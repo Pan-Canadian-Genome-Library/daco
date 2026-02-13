@@ -125,7 +125,7 @@ export const sessionUser = authGeneratedSessionValues.merge(dacoGeneratedSession
 
 export type SessionUser = z.infer<typeof sessionUser>;
 
-export const SessionUserResponse = sessionUser.pick({
+export const sessionUserResponse = sessionUser.pick({
 	userId: true,
 	givenName: true,
 	familyName: true,
@@ -135,7 +135,7 @@ export const SessionUserResponse = sessionUser.pick({
 	dacoAdmin: true,
 });
 
-export type SessionUserResponseType = z.infer<typeof SessionUserResponse>;
+export type SessionUserResponse = z.infer<typeof sessionUserResponse>;
 
 export const sessionAccount = z.object({
 	idToken: z.string(),
