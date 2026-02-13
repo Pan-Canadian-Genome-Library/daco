@@ -90,14 +90,14 @@ export const convertToSessionUser = (
 		dacoAdmin:
 			aliasedGroup.length > 0 ? aliasedGroup.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN) : false,
 		dacChair: aliasedGroup
-			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_DAC_CHAIR))
+			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR))
 			.map((group) => {
-				return group.name.slice(authConfig.AUTHZ_GROUP_DAC_CHAIR.length);
+				return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR.length);
 			}),
 		dacMember: aliasedGroup
-			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_DAC_MEMBER))
+			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER))
 			.map((group) => {
-				return group.name.slice(authConfig.AUTHZ_GROUP_DAC_MEMBER.length);
+				return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER.length);
 			}),
 	};
 

@@ -42,8 +42,9 @@ export function getUserRole(user: SessionUser | undefined): UserRoleOmitRep {
 		return userRoleSchema.Values.ANONYMOUS;
 	}
 
-	const isDacReviewer = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_MEMBER);
-	const isDacChair = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_CHAIR);
+	// TODO: removing in the auth refactor
+	const isDacReviewer = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER);
+	const isDacChair = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR);
 
 	if (isDacChair) {
 		return userRoleSchema.Values.DAC_CHAIR;
