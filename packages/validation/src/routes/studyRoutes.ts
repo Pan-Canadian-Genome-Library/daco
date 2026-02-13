@@ -23,3 +23,7 @@ import { NonEmptyString } from '../common/strings.js';
 export const basicStudyParamSchema = z.object({
 	studyId: NonEmptyString.nonempty(),
 });
+
+export const activateBodyParamSchema = z.object({
+	enabled: z.boolean(),
+});

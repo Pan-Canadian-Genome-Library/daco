@@ -25,7 +25,7 @@ import type { StudyDTO } from '@pcgl-daco/data-model';
 /**
  * Gets a study.
  * @param studyId - The study ID
- * @returns
+ * @returns {StudyDTO} - The study data
  */
 export const getStudyById = async ({
 	studyId,
@@ -41,5 +41,46 @@ export const getStudyById = async ({
 		return study;
 	} catch (error) {
 		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
+	}
+};
+
+/**
+ * Sets accepting applications for a study.
+ * @param studyId - The study ID
+ * @param enabled - Whether to enable or disable accepting applications
+ * @returns {acceptingApplications: boolean}
+ */
+export const setStudyAcceptingApplications = async ({
+	studyId,
+	enabled,
+}: {
+	studyId: string;
+	enabled: boolean;
+}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const studyService = studySvc(database);
+
+		const study = await studyService.updateStudyAcceptingApplication({ studyId, enabled });
+
+		return study;
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
+	}
+};
+
+/**
+ * Returns all studies.
+ * @returns {StudyDTO[]}
+ */
+export const getAllStudies = async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const studyService = studySvc(database);
+		const studies = await studyService.getAllStudies();
+
+		return studies;
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching studies`);
 	}
 };
