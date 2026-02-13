@@ -150,6 +150,7 @@ table application_contents {
 
 table applications {
   id bigint [pk, not null]
+  dac_id text
   user_id varchar(100) [not null]
   state application_states [not null]
   created_at timestamp [not null, default: `now()`]
@@ -270,6 +271,8 @@ ref: application_actions.revisions_request_id > revision_requests.id
 ref: applications.contents - application_contents.id
 
 ref: application_contents.signed_pdf - files.id
+
+ref: applications.dac_id - dac.dac_id
 
 ref: collaborators.application_id > application_contents.application_id
 

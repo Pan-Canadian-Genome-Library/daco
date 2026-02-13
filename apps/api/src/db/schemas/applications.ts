@@ -18,22 +18,34 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { bigint, foreignKey, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { applicationActions } from './applicationActions.ts';
 import { applicationContents } from './applicationContents.ts';
 import { applicationStatesEnum } from './common.ts';
+import { dac } from './dac.ts';
 import { sentEmails } from './sentEmails.ts';
 
-export const applications = pgTable('applications', {
-	id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
-	user_id: varchar({ length: 100 }).notNull(),
-	state: applicationStatesEnum().notNull(),
-	created_at: timestamp().notNull().defaultNow(),
-	approved_at: timestamp(),
-	updated_at: timestamp(),
-	expires_at: timestamp(),
-	contents: bigint({ mode: 'number' }),
-});
+export const applications = pgTable(
+	'applications',
+	{
+		id: bigint({ mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+		dac_id: text(),
+		user_id: varchar({ length: 100 }).notNull(),
+		state: applicationStatesEnum().notNull(),
+		created_at: timestamp().notNull().defaultNow(),
+		approved_at: timestamp(),
+		updated_at: timestamp(),
+		expires_at: timestamp(),
+		contents: bigint({ mode: 'number' }),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.dac_id],
+			foreignColumns: [dac.dac_id],
+			name: 'dac_id_fk',
+		}),
+	],
+);
 
 export const applicationsRelations = relations(applications, ({ one, many }) => ({
 	application_contents: one(applicationContents, {
@@ -42,4 +54,8 @@ export const applicationsRelations = relations(applications, ({ one, many }) => 
 	}),
 	application_actions: many(applicationActions),
 	sent_emails: many(sentEmails),
+	dac_id: one(dac, {
+		fields: [applications.dac_id],
+		references: [dac.dac_id],
+	}),
 }));

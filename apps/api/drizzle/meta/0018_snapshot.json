@@ -1,5 +1,5 @@
 {
-	"id": "ff3142c6-269c-456e-b517-d6d6deb36970",
+	"id": "a1badfeb-cbe3-449c-aa85-8abeb35dd9e2",
 	"prevId": "60b69887-90b4-4672-9afd-81106ae01406",
 	"version": "7",
 	"dialect": "postgresql",
@@ -454,6 +454,12 @@
 						"cycle": false
 					}
 				},
+				"dac_id": {
+					"name": "dac_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
 				"user_id": {
 					"name": "user_id",
 					"type": "varchar(100)",
@@ -500,7 +506,17 @@
 				}
 			},
 			"indexes": {},
-			"foreignKeys": {},
+			"foreignKeys": {
+				"dac_id_fk": {
+					"name": "dac_id_fk",
+					"tableFrom": "applications",
+					"tableTo": "dac",
+					"columnsFrom": ["dac_id"],
+					"columnsTo": ["dac_id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {},
 			"policies": {},
@@ -939,87 +955,6 @@
 			"checkConstraints": {},
 			"isRLSEnabled": false
 		},
-		"public.emails": {
-			"name": "emails",
-			"schema": "",
-			"columns": {
-				"id": {
-					"name": "id",
-					"type": "bigint",
-					"primaryKey": true,
-					"notNull": true,
-					"identity": {
-						"type": "always",
-						"name": "emails_id_seq",
-						"schema": "public",
-						"increment": "1",
-						"startWith": "1",
-						"minValue": "1",
-						"maxValue": "9223372036854775807",
-						"cache": "1",
-						"cycle": false
-					}
-				},
-				"application_id": {
-					"name": "application_id",
-					"type": "bigint",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"application_action_id": {
-					"name": "application_action_id",
-					"type": "bigint",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"created_at": {
-					"name": "created_at",
-					"type": "timestamp",
-					"primaryKey": false,
-					"notNull": true,
-					"default": "now()"
-				},
-				"email_type": {
-					"name": "email_type",
-					"type": "email_types",
-					"typeSchema": "public",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"recipient_emails": {
-					"name": "recipient_emails",
-					"type": "varchar(320)[]",
-					"primaryKey": false,
-					"notNull": true
-				}
-			},
-			"indexes": {},
-			"foreignKeys": {
-				"emails_application_id_applications_id_fk": {
-					"name": "emails_application_id_applications_id_fk",
-					"tableFrom": "emails",
-					"tableTo": "applications",
-					"columnsFrom": ["application_id"],
-					"columnsTo": ["id"],
-					"onDelete": "no action",
-					"onUpdate": "no action"
-				},
-				"emails_application_action_id_application_actions_id_fk": {
-					"name": "emails_application_action_id_application_actions_id_fk",
-					"tableFrom": "emails",
-					"tableTo": "application_actions",
-					"columnsFrom": ["application_action_id"],
-					"columnsTo": ["id"],
-					"onDelete": "no action",
-					"onUpdate": "no action"
-				}
-			},
-			"compositePrimaryKeys": {},
-			"uniqueConstraints": {},
-			"policies": {},
-			"checkConstraints": {},
-			"isRLSEnabled": false
-		},
 		"public.study": {
 			"name": "study",
 			"schema": "",
@@ -1221,35 +1156,6 @@
 			"name": "file_types",
 			"schema": "public",
 			"values": ["SIGNED_APPLICATION", "ETHICS_LETTER"]
-		},
-		"public.email_types": {
-			"name": "email_types",
-			"schema": "public",
-			"values": [
-				"NOTIFY_APPLICANT_WITHDRAW",
-				"NOTIFY_APPLICANT_CLOSE",
-				"NOTIFY_APPLICANT_REVOKE",
-				"NOTIFY_APPLICANT_DAC_REVIEW_REJECTED",
-				"NOTIFY_APPLICANT_DAC_APPROVAL",
-				"NOTIFY_COLLABORATORS_DAC_APPROVAL",
-				"NOTIFY_APPLICANT_REP_REVISIONS",
-				"NOTIFY_APPLICANT_DAC_REVISIONS",
-				"REMINDER_SUBMIT_DRAFT",
-				"REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW",
-				"REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP",
-				"REMINDER_SUBMIT_DAC_REVIEW",
-				"REMINDER_SUBMIT_REVISIONS_DAC_REVIEW",
-				"REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP",
-				"REMINDER_REQUEST_REVISIONS_DAC_REVIEW",
-				"REQUEST_REVISIONS_INSTITUTIONAL_REP",
-				"REQUEST_REVISIONS_DAC_REVIEW",
-				"REMINDER_REVIEW_SUBMITTED_REVISIONS",
-				"SUBMIT_DRAFT",
-				"SUBMIT_REVISIONS_INSTITUTIONAL_REP",
-				"SUBMIT_INSTITUTIONAL_REP_REVIEW",
-				"SUBMIT_REVISIONS_DAC_REVIEW",
-				"SUBMIT_DAC_REVIEW"
-			]
 		},
 		"public.study_context": {
 			"name": "study_context",

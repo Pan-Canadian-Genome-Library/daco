@@ -130,6 +130,13 @@
 		{
 			"idx": 18,
 			"version": "7",
+			"when": 1768854017217,
+			"tag": "0018_add_dac_id_to_applications_table",
+			"breakpoints": true
+		},
+		{
+			"idx": 19,
+			"version": "7",
 			"when": 1769562585190,
 			"tag": "0018_sent_emails_table",
 			"breakpoints": true
