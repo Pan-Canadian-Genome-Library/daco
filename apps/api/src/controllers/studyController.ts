@@ -99,7 +99,7 @@ export const updateStudies = async ({
 	studies,
 	transaction,
 }: {
-	studies: StudyDTO[];
+	studies: Omit<StudyDTO, 'acceptingApplications'>[];
 	transaction?: PostgresTransaction;
 }): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
@@ -109,9 +109,8 @@ export const updateStudies = async ({
 		const studyData = studies.map((study) => {
 			const createdDate = typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt;
 			const updatedDate = typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt;
-			const acceptingApplications =
-				typeof study.acceptingApplications === 'boolean' ? study.acceptingApplications : false;
-			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications };
+
+			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications: false };
 			const updatedRecordResult = convertToStudyUpdateRecord(studyModel);
 			if (updatedRecordResult.success) {
 				return updatedRecordResult.data;

@@ -23,7 +23,7 @@ import {
 	activateBodyParamSchema,
 	basicStudyParamSchema,
 	dacDTOResponseSchema,
-	studyDTOResponseSchema,
+	studyClinicalDTOResponseSchema,
 } from '@pcgl-daco/validation';
 import express from 'express';
 
@@ -68,7 +68,7 @@ studyRouter.get(
 
 		const studyResponse = await fetch(`${CLINICAL_URL}/study`);
 		const studyResponseData = await studyResponse.json();
-		const parsedStudyData = studyDTOResponseSchema.safeParse(studyResponseData);
+		const parsedStudyData = studyClinicalDTOResponseSchema.safeParse(studyResponseData);
 
 		if (!parsedStudyData.success) {
 			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies', parsedStudyData.error);
