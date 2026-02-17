@@ -18,38 +18,44 @@
  */
 
 import { authConfig } from '@/config/authConfig.ts';
-import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
+import { type OIDCTokenResponse, type OIDCUserInfoResponse, type PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
+	type DacModel,
 	type FilesRecordOptionalContents,
 	type JoinedApplicationRecord,
+	type StudyModel,
 } from '@/service/types.js';
 import {
 	type ApplicationDTO,
 	type ApplicationHistoryResponseData,
 	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
+	type DacDTO,
 	type FilesDTO,
 	type SignatureDTO,
+	type StudyDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicationHistoryResponseSchema,
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
+	dacModelSchema,
 	fileResponseSchema,
 	sessionAccount,
 	type SessionAccount,
 	sessionUser,
 	type SessionUser,
 	signatureResponseSchema,
+	studyModelSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
-import { failure, Result, success } from './results.ts';
+import { failure, type Result, success } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
 
 export const convertToSessionAccount = (data: OIDCTokenResponse): Result<SessionAccount, 'SYSTEM_ERROR'> => {
@@ -244,4 +250,36 @@ export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): Collab
 	});
 
 	return formattedUpdate;
+};
+
+/** Converts retrieved Submission Service Study Data into database insert using snake_case model format
+ * @param data type StudyDTO study data in camelCase
+ * @returns  type StudyModel study data in snake_case
+ */
+export const convertToStudyUpdateRecord = (data: StudyDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
+	const snakeCaseRecord = objectToSnake(data);
+	const validationResult = studyModelSchema.safeParse(snakeCaseRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToStudyUpdateRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
+
+/** Converts retrieved Submission Service Dac Data into database insert using snake_case model format
+ * @param data type DacDTO study data in camelCase
+ * @returns  type DacModel study data in snake_case
+ */
+export const convertToDacUpdateRecord = (data: DacDTO): Result<DacModel, 'SYSTEM_ERROR'> => {
+	const snakeCaseRecord = objectToSnake(data);
+	const validationResult = dacModelSchema.safeParse(snakeCaseRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToDacUpdateRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
 };
