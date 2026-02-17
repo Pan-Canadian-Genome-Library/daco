@@ -17,6 +17,31 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { RequestHandler, type Response } from 'express';
+
 import { ErrorResponse } from '@pcgl-daco/validation';
 
 export type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
+
+/**
+ * Authentication middlware HOC. Wrap this around authoirization middlewares to check if the user is authenticated before any authorization steps are taken.
+ *
+ * @param handler
+ * @returns
+ */
+export const withAuthentication =
+	(handler: RequestHandler): RequestHandler =>
+	(request, response: Response<AuthenticationErrorResponse>, next) => {
+		const user = request.session.user;
+
+		if (!user) {
+			response.status(401).send({
+				error: 'UNAUTHORIZED',
+				message: 'This resource is protected and requires authorization.',
+			});
+
+			return;
+		}
+
+		return handler(request, response, next);
+	};

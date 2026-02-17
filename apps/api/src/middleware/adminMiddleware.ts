@@ -17,19 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RequestHandler, type Response } from 'express';
+import { type Response } from 'express';
 
-import { AuthenticationErrorResponse } from '@/utils/middleware.ts';
+import { AuthenticationErrorResponse, withAuthentication } from '@/utils/middleware.ts';
 
 /**
  * Middleware that ensures the request is initiated by an authenticated user with site administrator privileges.
- *
- * This middleware checks the session for a user object.
- * - If no user is found, it sends a 401 Unauthorized response.
- * - If a user is found but lacks the `siteAdmin` flag, it sends a 403 Forbidden response.
- * - If the user is authenticated and is a site admin, control is passed to the next middleware or route handler.
- *
- * @returns {RequestHandler} An Express RequestHandler.
  *
  * @example
  * router.get(
@@ -40,25 +33,17 @@ import { AuthenticationErrorResponse } from '@/utils/middleware.ts';
  * 	}
  * )
  */
-export const adminMiddleware =
-	(): RequestHandler => (request, response: Response<AuthenticationErrorResponse>, next) => {
-		const { user } = request.session;
+export const adminMiddleware = () =>
+	withAuthentication((request, response: Response<AuthenticationErrorResponse>, next) => {
+		const user = request.session.user;
 
-		if (!user) {
-			response.status(401).send({
-				error: 'UNAUTHORIZED',
-				message: 'This resource is protected and requires authorization.',
-			});
-
-			return;
-		}
-
-		if (!user.dacoAdmin) {
+		if (!user?.dacoAdmin) {
 			response.status(403).send({
 				error: 'FORBIDDEN',
 				message: 'You do not have the proper permissions to access or modify this resource.',
 			});
 			return;
 		}
+
 		return next();
-	};
+	});
