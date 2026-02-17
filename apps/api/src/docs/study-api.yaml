@@ -48,3 +48,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
+
+  /study/import:
+    get:
+      tags:
+        - Study
+      summary: Import all studies from the submission service
+      responses:
+        '200':
+          description: Successfully imported study records.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  studies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StudyRecord'
+        '404':
+          description: Unable to update studies - Studies not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ClientErrors'
+        '500':
+          description: Something went wrong while processing your request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ServerErrors'

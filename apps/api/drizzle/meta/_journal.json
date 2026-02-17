@@ -137,8 +137,14 @@
 		{
 			"idx": 19,
 			"version": "7",
+			"when": 1770827276289,
+			"tag": "0019_add_dac_name_field",
+			"breakpoints": true
+		},
+		{
+			"idx": 20,
 			"when": 1769562585190,
-			"tag": "0019_sent_emails_table",
+			"tag": "0020_sent_emails_table",
 			"breakpoints": true
 		}
 	]
