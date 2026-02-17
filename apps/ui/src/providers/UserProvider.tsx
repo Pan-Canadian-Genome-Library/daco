@@ -20,22 +20,26 @@
 /* eslint-disable react-refresh/only-export-components */
 
 import useGetUser from '@/api/queries/useGetUser';
-import { SessionUser, UserRole } from '@pcgl-daco/validation';
+import { SessionUser } from '@pcgl-daco/validation';
 import { createContext, useContext, type PropsWithChildren } from 'react';
 
 type UserState = {
 	isLoading: boolean;
 	isLoggedIn: boolean;
 	refresh: () => void;
-	role: UserRole;
 	user?: SessionUser;
+	isDacMember: boolean;
+	isDacChair: boolean;
+	isAdmin: boolean;
 };
 
 const UserContext = createContext<UserState>({
 	isLoading: true,
 	isLoggedIn: false,
 	refresh: () => {},
-	role: 'ANONYMOUS',
+	isDacMember: false,
+	isDacChair: false,
+	isAdmin: false,
 });
 
 export function UserProvider({ children }: PropsWithChildren) {
@@ -45,9 +49,11 @@ export function UserProvider({ children }: PropsWithChildren) {
 		refetch();
 	};
 
-	const userState: UserState & { role: UserRole } = {
+	const userState: UserState = {
 		user: data?.user,
-		role: data?.role ?? 'ANONYMOUS',
+		isDacMember: !isLoading && data?.user ? data.user.dacMember.length > 0 : false,
+		isDacChair: !isLoading && data?.user ? data.user.dacChair.length > 0 : false,
+		isAdmin: !isLoading && data?.user ? data.user.dacoAdmin : false,
 		isLoading,
 		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : true,
 		refresh,
