@@ -18,7 +18,6 @@
  */
 
 import FullscreenLoader from '@/components/FullscreenLoader';
-import { getExtraSessionInformation } from '@/global/localStorage';
 import { useUserContext } from '@/providers/UserProvider';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,37 +25,25 @@ import { useNavigate } from 'react-router';
 
 const LoginRedirect = () => {
 	const { t: translate } = useTranslation();
-	const { role, isLoading } = useUserContext();
+	const { isLoading, isDacChair, isDacMember, isAdmin } = useUserContext();
 	const navigate = useNavigate();
-
-	const redirectRep = () => {
-		const sessionInfo = getExtraSessionInformation();
-		if (sessionInfo && sessionInfo.role === 'INSTITUTIONAL_REP') {
-			return `/application/${sessionInfo.applicationId}/`;
-		}
-		return '/';
-	};
 
 	useEffect(() => {
 		if (isLoading) {
 			return;
 		}
 
-		switch (role) {
-			case 'APPLICANT':
-				navigate('/dashboard', { replace: true });
-				break;
-			case 'DAC_CHAIR':
-			case 'DAC_MEMBER':
-				navigate('/manage/applications', { replace: true });
-				break;
-			case 'INSTITUTIONAL_REP':
-				navigate(redirectRep(), { replace: true });
-				break;
-			default:
-				navigate('/', { replace: true });
+		if (isAdmin) {
+			navigate('/admin');
+			return;
+		} else if (isDacChair || isDacMember) {
+			navigate('/manage/applications', { replace: true });
+			return;
+		} else {
+			navigate('/', { replace: true });
+			return;
 		}
-	}, [isLoading, navigate, role]);
+	}, [isLoading, navigate]);
 
 	return <FullscreenLoader loadingText={translate('global.login.loggingIn')} />;
 };

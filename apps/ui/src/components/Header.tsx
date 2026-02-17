@@ -59,7 +59,7 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, role, user } = useUserContext();
+	const { isLoggedIn, user, isDacChair, isDacMember, isAdmin } = useUserContext();
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -111,22 +111,23 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
-		} else if (role === 'DAC_MEMBER' || role === 'DAC_CHAIR') {
+		} else if (isDacChair || isDacMember) {
 			return {
 				name: translate('links.manageApplications'),
 				href: '/manage/applications',
 				position: 'right',
 				target: '_self',
 			};
-		} else if (role === 'APPLICANT') {
+		} else if (isAdmin) {
+			// TODO: route to admin dashboar
+			return undefined;
+		} else {
 			return {
 				name: translate('links.myApplications'),
 				href: '/dashboard',
 				position: 'right',
 				target: '_self',
 			};
-		} else {
-			return undefined;
 		}
 	};
 

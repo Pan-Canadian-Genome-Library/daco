@@ -108,7 +108,6 @@ function AppRouter() {
 			<Route element={<PageLayout />}>
 				<Route path="login/redirect" element={<LoginRedirect />} />
 				<Route path="login/error/*" element={<LoginError />} />
-
 				<Route index element={<HomePage />} />
 				<Route
 					path="dashboard"

@@ -51,12 +51,12 @@ export function UserProvider({ children }: PropsWithChildren) {
 
 	const userState: UserState = {
 		user: data?.user,
+		isLoading,
+		refresh,
+		isLoggedIn: !isLoading && !!data?.user,
 		isDacMember: !isLoading && data?.user ? data.user.dacMember.length > 0 : false,
 		isDacChair: !isLoading && data?.user ? data.user.dacChair.length > 0 : false,
 		isAdmin: !isLoading && data?.user ? data.user.dacoAdmin : false,
-		isLoading,
-		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : true,
-		refresh,
 	};
 	return <UserContext.Provider value={userState}>{children}</UserContext.Provider>;
 }

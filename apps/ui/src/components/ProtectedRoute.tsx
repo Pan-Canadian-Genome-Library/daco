@@ -51,7 +51,7 @@ type ProtectedRouteProps = PropsWithChildren<{
  *	</Routes>
  */
 const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteProps) => {
-	const { isLoading, isLoggedIn, role } = useUserContext();
+	const { isLoading, isLoggedIn, isAdmin, isDacChair, isDacMember } = useUserContext();
 
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 
@@ -62,7 +62,7 @@ const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteP
 		return <Redirect />;
 	}
 
-	if (requiredRoles) {
+	if (isAdmin || isDacChair || isDacMember) {
 		if (!role) {
 			return <Redirect />;
 		}
