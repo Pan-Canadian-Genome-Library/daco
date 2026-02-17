@@ -173,7 +173,7 @@ export const studyModelSchema = z.object({
 	collaborators: z.array(z.string()),
 	funding_sources: z.array(z.string()),
 	publication_links: z.array(z.string()),
-	accepting_applications: z.boolean().nullable(),
+	accepting_applications: z.boolean(),
 	created_at: z.union([z.date(), z.undefined()]),
 	updated_at: z.union([z.date(), z.undefined()]).nullable(),
 });
@@ -197,7 +197,7 @@ export const studyDTOSchema = z.object({
 	collaborators: z.array(z.string()),
 	fundingSources: z.array(z.string()),
 	publicationLinks: z.array(z.string()),
-	acceptingApplications: z.union([z.boolean(), z.undefined()]).nullable(),
+	acceptingApplications: z.boolean(),
 	createdAt: z.union([z.date(), z.string()]),
 	updatedAt: z.union([z.date(), z.string()]).nullable(),
 });
