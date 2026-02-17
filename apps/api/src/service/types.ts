@@ -99,6 +99,7 @@ export interface JoinedApplicationEmailsActionsRecord {
 	application_id: number;
 	user_id: string;
 	created_at: Date;
+	dac_id: string | null;
 	state: ApplicationStateValues;
 	application_contents: ApplicationContentRecord | null;
 	application_actions: ApplicationActionRecord[] | null;

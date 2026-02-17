@@ -18,10 +18,12 @@
  */
 
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model';
+import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
+import { dacSvc } from '@/service/dacService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import {
 	type ReminderEmailTypes,
@@ -34,7 +36,7 @@ import {
 	type EmailRecord,
 	type JoinedApplicationEmailsActionsRecord,
 } from '@/service/types.ts';
-import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
+import { failure, success } from '@/utils/results.js';
 
 /**
  * Conditions for sending Application Reminder Emails
@@ -175,7 +177,7 @@ export const scheduleEmailReminders = async () => {
 
 			const sendReminder = needsEmailReminder || needsActionReminder;
 			if (sendReminder) {
-				sendEmailReminders({
+				await sendEmailReminders({
 					application,
 					relatedAction: mostRecentAction,
 					relatedEmail: mostRecentEmail,
@@ -189,8 +191,40 @@ export const scheduleEmailReminders = async () => {
 	}
 };
 
+// Populate Dac Member Info and return Success / Failure
+const getDacUserDataResult = async ({
+	dac_id,
+	relatedAction,
+	relatedEmail,
+}: {
+	dac_id: string | null;
+	relatedAction?: ApplicationActionRecord | null;
+	relatedEmail?: EmailRecord | null;
+}) => {
+	const database = getDbInstance();
+	const dacService = dacSvc(database);
+
+	const { user_name, user_id } = relatedAction || {};
+	const { recipient_emails } = relatedEmail || {};
+
+	let dacMemberName = user_name;
+	let dacEmail = (recipient_emails && recipient_emails[0]) || user_id;
+	if (dac_id) {
+		const dacRecordResult = await dacService.getDacById({ id: dac_id });
+		if (dacRecordResult.success) {
+			const { contact_name, contact_email } = dacRecordResult.data;
+			dacMemberName = contact_name;
+			dacEmail = contact_email;
+		}
+	}
+	if (dacMemberName && dacEmail) {
+		return success({ dacMemberName, dacEmail });
+	}
+	return failure('NOT_FOUND', `DAC contact info missing for id: ${dac_id}.`);
+};
+
 // Generates & Sends Reminder Emails based on Application State
-export const sendEmailReminders = ({
+export const sendEmailReminders = async ({
 	application,
 	relatedAction,
 	relatedEmail,
@@ -201,8 +235,8 @@ export const sendEmailReminders = ({
 }) => {
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
-	const { application_id, state, created_at, application_contents } = application;
-	const { id: application_action_id, created_at: actionDate, user_name, user_id } = relatedAction || {};
+	const { application_id, dac_id, state, created_at, application_contents } = application;
+	const { id: application_action_id, created_at: actionDate } = relatedAction || {};
 
 	if (state === ApplicationStates.DRAFT) {
 		// If in State Draft for over 7 days, send a reminder email to Submit
@@ -244,16 +278,18 @@ export const sendEmailReminders = ({
 
 		const submittedDate = actionDate;
 
-		// TODO: Lookup contact email Dac table
-		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/549
-		const dacMemberName = user_name || 'DAC Member';
-		const dacEmail = relatedEmail?.recipient_emails[0] || user_id;
-
 		switch (state) {
 			case ApplicationStates.DAC_REVIEW:
 				if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
 					// Post Institutional Rep Submission, Application has moved to Dac Review
 					// If still in review 7 days later -> send email reminder to Dac Member
+					const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+					if (!dacUserInfoResult.success) {
+						const { error, message } = dacUserInfoResult;
+						logger.error(message, error);
+						return dacUserInfoResult;
+					}
+					const { dacMemberName, dacEmail } = dacUserInfoResult.data;
 					emailService.sendEmailDacReviewReminder({
 						id: application_id,
 						applicantName,
@@ -265,6 +301,13 @@ export const sendEmailReminders = ({
 				} else if (relatedAction.action === ApplicationActions.DAC_REVIEW_SUBMIT) {
 					// Post Dac Revisions Submitted, Application has moved back to Dac Review
 					// If still in review 7 days later -> send email reminder to Dac Member
+					const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+					if (!dacUserInfoResult.success) {
+						const { error, message } = dacUserInfoResult;
+						logger.error(message, error);
+						return dacUserInfoResult;
+					}
+					const { dacMemberName, dacEmail } = dacUserInfoResult.data;
 					emailService.sendEmailDacRevisionsReminder({
 						id: application_id,
 						actionId: application_action_id,
@@ -277,6 +320,13 @@ export const sendEmailReminders = ({
 				break;
 			case ApplicationStates.DAC_REVISIONS_REQUESTED: {
 				// Post Dac Revisions Requested, if still not Submitted 7 days later -> send email reminder to Applicant
+				const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+				if (!dacUserInfoResult.success) {
+					const { error, message } = dacUserInfoResult;
+					logger.error(message, error);
+					return dacUserInfoResult;
+				}
+				const { dacMemberName } = dacUserInfoResult.data;
 				emailService.sendEmailSubmitDacRevisionsReminder({
 					id: application_id,
 					actionId: application_action_id,
@@ -320,7 +370,6 @@ export const sendEmailReminders = ({
 					repName,
 					to: applicantEmail,
 				});
-
 				break;
 			default:
 				break;
