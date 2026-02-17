@@ -70,6 +70,15 @@ import { failure, success } from '@/utils/results.js';
 
 const logger = BaseLogger.forModule('Email Reminders');
 
+/* List of Application States requiring checks for reminder Emails */
+const reminderStates = [
+	ApplicationStates.DRAFT,
+	ApplicationStates.DAC_REVIEW,
+	ApplicationStates.DAC_REVISIONS_REQUESTED,
+	ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+	ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+];
+
 /**
  * Check if the current date is more than interval days after a specific action date
  * If days passed since action date is greater than the interval, return true, else return false
@@ -138,14 +147,37 @@ const getRelevantReminderAction = ({
 	return mostRecentAction;
 };
 
-/* List of Application States requiring checks for reminder Emails */
-const reminderStates = [
-	ApplicationStates.DRAFT,
-	ApplicationStates.DAC_REVIEW,
-	ApplicationStates.DAC_REVISIONS_REQUESTED,
-	ApplicationStates.INSTITUTIONAL_REP_REVIEW,
-	ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
-];
+// Populate Dac Member Info and return Success / Failure
+const getDacUserDataResult = async ({
+	dac_id,
+	relatedAction,
+	relatedEmail,
+}: {
+	dac_id: string | null;
+	relatedAction?: ApplicationActionRecord | null;
+	relatedEmail?: EmailRecord | null;
+}) => {
+	const database = getDbInstance();
+	const dacService = dacSvc(database);
+
+	const { user_name, user_id } = relatedAction || {};
+	const { recipient_emails } = relatedEmail || {};
+
+	let dacMemberName = user_name;
+	let dacEmail = (recipient_emails && recipient_emails[0]) || user_id;
+	if (dac_id) {
+		const dacRecordResult = await dacService.getDacById({ id: dac_id });
+		if (dacRecordResult.success) {
+			const { contact_name, contact_email } = dacRecordResult.data;
+			dacMemberName = contact_name;
+			dacEmail = contact_email;
+		}
+	}
+	if (dacMemberName && dacEmail) {
+		return success({ dacMemberName, dacEmail });
+	}
+	return failure('NOT_FOUND', `DAC contact info missing for id: ${dac_id}.`);
+};
 
 /* Reviews Application, Action & Email details to determine if an Application needs a Reminder Email */
 export const scheduleEmailReminders = async () => {
@@ -189,38 +221,6 @@ export const scheduleEmailReminders = async () => {
 		logger.error(message, error);
 		throw new Error(message);
 	}
-};
-
-// Populate Dac Member Info and return Success / Failure
-const getDacUserDataResult = async ({
-	dac_id,
-	relatedAction,
-	relatedEmail,
-}: {
-	dac_id: string | null;
-	relatedAction?: ApplicationActionRecord | null;
-	relatedEmail?: EmailRecord | null;
-}) => {
-	const database = getDbInstance();
-	const dacService = dacSvc(database);
-
-	const { user_name, user_id } = relatedAction || {};
-	const { recipient_emails } = relatedEmail || {};
-
-	let dacMemberName = user_name;
-	let dacEmail = (recipient_emails && recipient_emails[0]) || user_id;
-	if (dac_id) {
-		const dacRecordResult = await dacService.getDacById({ id: dac_id });
-		if (dacRecordResult.success) {
-			const { contact_name, contact_email } = dacRecordResult.data;
-			dacMemberName = contact_name;
-			dacEmail = contact_email;
-		}
-	}
-	if (dacMemberName && dacEmail) {
-		return success({ dacMemberName, dacEmail });
-	}
-	return failure('NOT_FOUND', `DAC contact info missing for id: ${dac_id}.`);
 };
 
 // Generates & Sends Reminder Emails based on Application State
