@@ -134,13 +134,6 @@
 			"when": 1768854017217,
 			"tag": "0018_add_dac_id_to_applications_table",
 			"breakpoints": true
-		},
-		{
-			"idx": 19,
-			"version": "7",
-			"when": 1770835086970,
-			"tag": "0019_change_accepting_application_not_null",
-			"breakpoints": true
 		}
 	]
 }

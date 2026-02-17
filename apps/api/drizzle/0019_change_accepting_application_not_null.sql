@@ -1,1 +1,0 @@
-ALTER TABLE "study" ALTER COLUMN "accepting_applications" SET NOT NULL;
