@@ -17,14 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { StudyDTO } from '@pcgl-daco/data-model';
+import { type StudyDTO } from '@pcgl-daco/data-model';
+import { type PostgresTransaction, type StudyModel, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
 
@@ -134,7 +135,54 @@ const studySvc = (db: PostgresDb) => ({
 			const message = 'Error at getAllStudies';
 
 			logger.error(message, error);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	updateStudies: async ({
+		studyData,
+		transaction,
+	}: {
+		studyData: StudyModel[];
+		transaction?: PostgresTransaction;
+	}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const dbTransaction = transaction ? transaction : db;
+			const studyRecords = await dbTransaction
+				.insert(study)
+				.values(studyData)
+				.onConflictDoUpdate({
+					target: study.study_id,
+					set: {
+						dac_id: sql`EXCLUDED.dac_id`,
+						study_name: sql`EXCLUDED.study_name`,
+						study_description: sql`EXCLUDED.study_description`,
+						status: sql`EXCLUDED.status`,
+						context: sql`EXCLUDED.context`,
+						domain: sql`EXCLUDED.domain`,
+						principal_investigators: sql`EXCLUDED.principal_investigators`,
+						lead_organizations: sql`EXCLUDED.lead_organizations`,
+						funding_sources: sql`EXCLUDED.funding_sources`,
+						dac_name: sql`EXCLUDED.dac_name`,
+						program_name: sql`EXCLUDED.program_name`,
+						keywords: sql`EXCLUDED.keywords`,
+						participant_criteria: sql`EXCLUDED.participant_criteria`,
+						collaborators: sql`EXCLUDED.collaborators`,
+						publication_links: sql`EXCLUDED.publication_links`,
+						updated_at: sql`EXCLUDED.updated_at`,
+						category_id: sql`EXCLUDED.category_id`,
+						accepting_applications: sql`EXCLUDED.accepting_applications`,
+					},
+				})
+				.returning();
 
+			if (!studyRecords[0]) {
+				return failure('NOT_FOUND', `Unable to update study records.`);
+			}
+
+			return success(studyRecords);
+		} catch (error) {
+			const message = 'Error at updateStudies';
+			logger.error(message, error);
 			return failure('SYSTEM_ERROR', message);
 		}
 	},

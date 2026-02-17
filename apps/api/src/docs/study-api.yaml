@@ -93,6 +93,25 @@ paths:
           description: Successfully updated accepting applications status.
         '404':
           description: Study to update not found.
+  /study/import:
+    get:
+      tags:
+        - Study
+      summary: Import all studies from the submission service
+      responses:
+        '200':
+          description: Successfully imported study records.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  studies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StudyRecord'
+        '404':
+          description: Unable to update studies - Studies not found.
           content:
             application/json:
               schema:
