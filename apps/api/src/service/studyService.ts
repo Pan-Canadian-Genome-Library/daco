@@ -170,7 +170,6 @@ const studySvc = (db: PostgresDb) => ({
 						publication_links: sql`EXCLUDED.publication_links`,
 						updated_at: sql`EXCLUDED.updated_at`,
 						category_id: sql`EXCLUDED.category_id`,
-						accepting_applications: sql`EXCLUDED.accepting_applications`,
 					},
 				})
 				.returning();
