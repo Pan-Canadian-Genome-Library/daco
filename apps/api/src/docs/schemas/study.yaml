@@ -107,3 +107,13 @@ components:
           format: date-time
           nullable: true
           description: Last update timestamp.
+    StudyActivateDeactivate:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description:
+          nullable: false
+          example: true
+      required:
+        - enabled

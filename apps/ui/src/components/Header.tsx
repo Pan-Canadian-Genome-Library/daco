@@ -20,7 +20,7 @@
 import React, { useState, type PropsWithChildren } from 'react';
 
 import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
-import { Button, ButtonProps, ConfigProvider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
+import { Button, ButtonProps, ConfigProvider, Divider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '@/api/paths';
@@ -150,54 +150,64 @@ const HeaderComponent = () => {
 	};
 
 	const UserInfo = (
-		<Flex vertical>
-			<Typography style={{ fontSize: isResponsiveMode ? 10 : 14 }}>{displayName}</Typography>
-			{displayEmail && (
-				<Typography
-					style={{
-						color: pcglColours.primary,
-						fontSize: isResponsiveMode ? 10 : 14,
-						fontWeight: 400,
-						height: 20,
-						margin: 0,
-					}}
-				>
-					{displayEmail}
-				</Typography>
+		<Flex
+			vertical
+			style={{ padding: 5, width: '100%', position: 'relative', top: isLogoutOpen && !isResponsiveMode ? 5 : 0 }}
+		>
+			{isResponsiveMode && (
+				<Divider style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10 }} />
 			)}
-			{(isLogoutOpen || isResponsiveMode) && (
-				<Button
-					href={API_PATH_LOGOUT}
-					onClick={() => {
-						clearExtraSessionInformation();
-					}}
-					onMouseOver={() => {
-						setLogoutHover(true);
-					}}
-					onMouseOut={() => {
-						setLogoutHover(false);
-					}}
-					style={{
-						backgroundColor: isResponsiveMode ? pcglColours.tertiary : pcglColours.white,
-						boxShadow: '0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08)',
-						fontWeight: 'normal',
-						height: 45,
-						justifyContent: 'left',
-						left: 0,
-						minWidth: 100,
-						position: 'absolute',
-						top: displayEmail ? 40 : 22,
-						width: '100%',
-					}}
-				>
-					{translate(`button.logout`)}{' '}
-					<LogoutOutlined
+			<Flex vertical style={{ padding: 5, width: '100%' }}>
+				<Typography style={{ fontSize: 14 }}>{displayName}</Typography>
+				{displayEmail && (
+					<Typography
 						style={{
-							color: isLogoutHover ? pcglColours.primary : pcglColours.darkGrey,
-							marginLeft: 10,
+							color: pcglColours.primary,
+							fontSize: 14,
+							fontWeight: 400,
+							height: 20,
+							margin: 0,
 						}}
-					/>
-				</Button>
+					>
+						{displayEmail}
+					</Typography>
+				)}
+			</Flex>
+			{(isLogoutOpen || isResponsiveMode) && (
+				<Flex vertical style={{ padding: 5, width: '100%' }}>
+					<Button
+						href={API_PATH_LOGOUT}
+						onClick={() => {
+							clearExtraSessionInformation();
+						}}
+						onMouseOver={() => {
+							setLogoutHover(true);
+						}}
+						onMouseOut={() => {
+							setLogoutHover(false);
+						}}
+						style={{
+							backgroundColor: isResponsiveMode ? pcglColours.tertiary : pcglColours.white,
+							boxShadow: '0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08)',
+							fontWeight: 'normal',
+							height: 45,
+							justifyContent: 'left',
+							left: 0,
+							minWidth: 100,
+							position: 'absolute',
+							top: displayEmail ? 65 : 42,
+							width: isResponsiveMode ? '100%' : 'calc(100% + 20px)',
+						}}
+					>
+						{translate(`button.logout`)}{' '}
+						<LogoutOutlined
+							style={{
+								color: isLogoutHover ? pcglColours.primary : pcglColours.darkGrey,
+								marginLeft: 10,
+							}}
+						/>
+					</Button>
+				</Flex>
 			)}
 		</Flex>
 	);
@@ -224,7 +234,7 @@ const HeaderComponent = () => {
 				height: 'auto',
 				justifyContent: isResponsiveMode ? 'left' : 'center',
 				lineHeight: 0.5,
-				paddingLeft: isResponsiveMode ? 0 : 15,
+				padding: 0,
 				textAlign: 'left',
 			},
 		},

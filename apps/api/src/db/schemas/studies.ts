@@ -32,6 +32,7 @@ export const study = pgTable(
 		dac_id: text().notNull(),
 		study_name: varchar({ length: 255 }).notNull(),
 		study_description: text().notNull(), // Assuming the description is large
+		dac_name: varchar({ length: 255 }),
 		program_name: varchar({ length: 255 }),
 		keywords: text().array(),
 		status: studyStatus().notNull(),
@@ -46,7 +47,7 @@ export const study = pgTable(
 		created_at: timestamp().notNull().defaultNow(),
 		updated_at: timestamp(),
 		category_id: integer().unique(),
-		accepting_applications: boolean().default(false),
+		accepting_applications: boolean().notNull().default(false),
 	},
 	(table) => [
 		foreignKey({
