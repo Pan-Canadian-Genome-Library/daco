@@ -144,8 +144,16 @@
 		},
 		{
 			"idx": 20,
+			"version": "7",
+			"when": 1771432007256,
+			"tag": "0020_make_accepting_applications_not_null",
+			"breakpoints": true
+		},
+		{
+			"idx": 21,
+			"version": "7",
 			"when": 1769562585190,
-			"tag": "0020_sent_emails_table",
+			"tag": "0021_sent_emails_table",
 			"breakpoints": true
 		}
 	]

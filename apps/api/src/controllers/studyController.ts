@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { StudyDTO } from '@pcgl-daco/data-model';
+import type { StudyClinicalDTO, StudyDTO } from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
@@ -31,7 +31,7 @@ const logger = BaseLogger.forModule('studyController');
 /**
  * Gets a study.
  * @param studyId - The study ID
- * @returns
+ * @returns {StudyDTO} - The study data
  */
 export const getStudyById = async ({
 	studyId,
@@ -51,6 +51,46 @@ export const getStudyById = async ({
 };
 
 /**
+ * Sets accepting applications for a study.
+ * @param studyId - The study ID
+ * @param enabled - Whether to enable or disable accepting applications
+ * @returns {acceptingApplications: boolean}
+ */
+export const setStudyAcceptingApplications = async ({
+	studyId,
+	enabled,
+}: {
+	studyId: string;
+	enabled: boolean;
+}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const studyService = studySvc(database);
+
+		const study = await studyService.updateStudyAcceptingApplication({ studyId, enabled });
+
+		return study;
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching study: ${studyId}`);
+	}
+};
+
+/**
+ * Returns all studies.
+ * @returns {StudyDTO[]}
+ */
+export const getAllStudies = async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const studyService = studySvc(database);
+		const studies = await studyService.getAllStudies();
+
+		return studies;
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Unexpected error fetching studies`);
+	}
+};
+/*
  * Inserts & Updates Multiple Study Records
  * @param studies - An array of Study DTO objects from the Submission Service
  * @returns
@@ -59,7 +99,7 @@ export const updateStudies = async ({
 	studies,
 	transaction,
 }: {
-	studies: StudyDTO[];
+	studies: StudyClinicalDTO[];
 	transaction?: PostgresTransaction;
 }): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
@@ -69,9 +109,8 @@ export const updateStudies = async ({
 		const studyData = studies.map((study) => {
 			const createdDate = typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt;
 			const updatedDate = typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt;
-			const acceptingApplications =
-				typeof study.acceptingApplications === 'boolean' ? study.acceptingApplications : false;
-			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications };
+
+			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications: false };
 			const updatedRecordResult = convertToStudyUpdateRecord(studyModel);
 			if (updatedRecordResult.success) {
 				return updatedRecordResult.data;
