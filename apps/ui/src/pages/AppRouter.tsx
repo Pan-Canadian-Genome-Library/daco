@@ -42,6 +42,8 @@ import ManageApplicationsPage from '@/pages/manage/applications';
 import NotFound from '@/pages/NotFound';
 import InstitutionalRepLogin from '@/pages/review';
 import { ApplicationContextProvider } from '@/providers/context/application/ApplicationContextProvider';
+import AdminDashboardPage from './admin';
+import AdminStudiesPage from './admin/studies';
 
 export interface ApplicationSectionRouteTypes {
 	route: SectionRoutesValues;
@@ -106,10 +108,12 @@ function AppRouter() {
 	return (
 		<Routes>
 			<Route element={<PageLayout />}>
+				{/*REDIRECT*/}
 				<Route path="login/redirect" element={<LoginRedirect />} />
 				<Route path="login/error/*" element={<LoginError />} />
 
 				<Route index element={<HomePage />} />
+				{/*APPLICANT AND INSTITUTIONAL REP DASHBOARD*/}
 				<Route
 					path="dashboard"
 					element={
@@ -118,6 +122,7 @@ function AppRouter() {
 						</ProtectedRoute>
 					}
 				/>
+				{/* APPLICATION WIZARD */}
 				<Route
 					path="application/:id"
 					element={
@@ -134,6 +139,7 @@ function AppRouter() {
 						<Route key={item.route} path={item.path} element={item.element} />
 					))}
 				</Route>
+				{/*DAC CHAIR AND DAC MEMBER DASHBOARD*/}
 				<Route
 					path="manage/applications"
 					element={
@@ -142,8 +148,26 @@ function AppRouter() {
 						</ProtectedRoute>
 					}
 				/>
-				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
+				{/*ADMIN DASHBOARD*/}
+				<Route
+					path="admin"
+					element={
+						<ProtectedRoute requiredRoles={['ADMIN']} redirectTo={'/login/redirect/'}>
+							<AdminDashboardPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="admin/studies"
+					element={
+						<ProtectedRoute requiredRoles={['ADMIN']} redirectTo={'/login/redirect/'}>
+							<AdminStudiesPage />
+						</ProtectedRoute>
+					}
+				/>
 
+				<Route path="review/:applicationId" element={<InstitutionalRepLogin />} />
+				{/*NOT FOUND*/}
 				<Route path="*" element={<NotFound />} />
 			</Route>
 		</Routes>
