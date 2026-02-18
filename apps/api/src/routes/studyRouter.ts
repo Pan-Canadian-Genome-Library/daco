@@ -18,15 +18,26 @@
  */
 
 import type { StudyDTO } from '@pcgl-daco/data-model';
-import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
-import { basicStudyParamSchema, dacDTOResponseSchema, studyDTOResponseSchema } from '@pcgl-daco/validation';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import {
+	activateBodyParamSchema,
+	basicStudyParamSchema,
+	dacDTOResponseSchema,
+	studyClinicalDTOResponseSchema,
+} from '@pcgl-daco/validation';
 import express from 'express';
 
 import { serverConfig } from '@/config/serverConfig.js';
 import { createDacRecords } from '@/controllers/dacController.ts';
-import { getStudyById, updateStudies } from '@/controllers/studyController.ts';
+import {
+	getAllStudies,
+	getStudyById,
+	setStudyAcceptingApplications,
+	updateStudies,
+} from '@/controllers/studyController.ts';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
+import { adminMiddleware } from '@/middleware/adminMiddleware.ts';
 import { type StudyModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -57,7 +68,7 @@ studyRouter.get(
 
 		const studyResponse = await fetch(`${CLINICAL_URL}/study`);
 		const studyResponseData = await studyResponse.json();
-		const parsedStudyData = studyDTOResponseSchema.safeParse(studyResponseData);
+		const parsedStudyData = studyClinicalDTOResponseSchema.safeParse(studyResponseData);
 
 		if (!parsedStudyData.success) {
 			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies', parsedStudyData.error);
@@ -146,5 +157,65 @@ studyRouter.get(
 		},
 	),
 );
+
+/**
+ * Activate or Deactive study by Id
+ */
+studyRouter.patch(
+	'/:studyId/accepting-applications',
+	adminMiddleware(),
+	withParamsSchemaValidation(
+		basicStudyParamSchema,
+		apiZodErrorMapping,
+		withBodySchemaValidation(
+			activateBodyParamSchema,
+			apiZodErrorMapping,
+			async (
+				request,
+				response: ResponseWithData<Pick<StudyDTO, 'acceptingApplications'>, ['SYSTEM_ERROR', 'NOT_FOUND']>,
+			) => {
+				const studyId = String(request.params.studyId);
+				const enabled = request.body.enabled;
+
+				const result = await setStudyAcceptingApplications({ studyId, enabled });
+
+				if (!result.success) {
+					switch (result.error) {
+						case 'NOT_FOUND':
+							response.status(404).json({ error: result.error, message: result.message });
+							break;
+						case 'SYSTEM_ERROR':
+							response.status(500).json({ error: result.error, message: result.message });
+							break;
+						default:
+							response.status(500).json({ error: result.error, message: result.message });
+					}
+					return;
+				}
+				response.status(204).json();
+				return;
+			},
+		),
+	),
+);
+/*
+ * Get all studies
+ */
+studyRouter.get('/', async (request, response: ResponseWithData<StudyDTO[], ['SYSTEM_ERROR']>) => {
+	const result = await getAllStudies();
+
+	if (!result.success) {
+		switch (result.error) {
+			case 'SYSTEM_ERROR':
+				response.status(500).json({ error: result.error, message: result.message });
+				break;
+			default:
+				response.status(500).json({ error: result.error, message: result.message });
+		}
+		return;
+	}
+	response.status(200).json(result.data);
+	return;
+});
 
 export default studyRouter;
