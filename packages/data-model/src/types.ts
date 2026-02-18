@@ -447,6 +447,8 @@ export type StudyDTO = {
 	updatedAt: Date | string | null;
 } & Pick<DacDTO, 'dacName'>;
 
+export type StudyClinicalDTO = Omit<StudyDTO, 'acceptingApplications'>;
+
 export type DacDTO = {
 	dacId: string;
 	dacName?: string;

@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { StudyDTO } from '@pcgl-daco/data-model';
+import type { StudyClinicalDTO, StudyDTO } from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
@@ -99,7 +99,7 @@ export const updateStudies = async ({
 	studies,
 	transaction,
 }: {
-	studies: Omit<StudyDTO, 'acceptingApplications'>[];
+	studies: StudyClinicalDTO[];
 	transaction?: PostgresTransaction;
 }): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
