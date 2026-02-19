@@ -53,7 +53,7 @@ export const emailActionArray: Omit<ApplicationActionModel, 'id'>[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',
 		application_id: 5,
-		created_at: new Date('2026-01-01T14:00:00Z'),
+		created_at: new Date('2025-01-01T14:00:00Z'),
 		user_name: 'Test User',
 		action: 'INSTITUTIONAL_REP_APPROVED',
 		revisions_request_id: null,
@@ -83,11 +83,11 @@ export const emailActionArray: Omit<ApplicationActionModel, 'id'>[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',
 		application_id: 8,
-		created_at: new Date('2026-01-01T15:00:00Z'),
+		created_at: new Date('2025-01-01T15:00:00Z'),
 		user_name: 'Test User',
-		action: 'CLOSE',
-		revisions_request_id: null,
+		action: 'WITHDRAW',
+		revisions_request_id: 3,
 		state_before: 'DAC_REVIEW',
-		state_after: 'CLOSED',
+		state_after: 'DRAFT',
 	},
 ];

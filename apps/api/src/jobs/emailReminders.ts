@@ -104,7 +104,7 @@ function isReminderEmailType(emailType: EmailTypeValues): emailType is ReminderE
  * Used to determine if an application needs a follow up email (not all emails require follow up)
  * Records are pre-sorted by DB so the email should be the most recent
  */
-const getRelevantReminderEmail = ({
+export const getRelevantReminderEmail = ({
 	sentEmails,
 	state,
 }: {
@@ -132,7 +132,7 @@ const getRelevantReminderEmail = ({
  * Finds relevant record Action created with target state transition Action value
  * Records are pre-sorted by DB so first result should be most recent
  */
-const getRelevantReminderAction = ({
+export const getRelevantReminderAction = ({
 	applicationActions,
 	state,
 }: {
