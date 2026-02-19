@@ -31,7 +31,7 @@ const logger = BaseLogger.forModule('dacController');
 /**
  * Inserts & Updates Multiple DAC Group records
  * @param studies - An array of DAC DTO objects from the Submission Service
- * @returns
+ * @returns Result with array of created DacRecords
  */
 export const createDacRecords = async ({
 	dacData,
@@ -68,7 +68,7 @@ export const createDacRecords = async ({
 /**
  * Lookup a DAC record using the records' id
  * @param dac - A DAC record from the database
- * @returns
+ * @returns Result with DacRecord
  */
 export const getDacById = async ({ id }: { id: string }): AsyncResult<DacRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {

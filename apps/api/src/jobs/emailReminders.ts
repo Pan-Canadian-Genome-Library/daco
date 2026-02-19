@@ -71,7 +71,7 @@ import { failure, success } from '@/utils/results.js';
 const logger = BaseLogger.forModule('Email Reminders');
 
 /* List of Application States requiring checks for reminder Emails */
-const reminderStates = [
+export const reminderStates = [
 	ApplicationStates.DRAFT,
 	ApplicationStates.DAC_REVIEW,
 	ApplicationStates.DAC_REVISIONS_REQUESTED,
@@ -147,7 +147,13 @@ const getRelevantReminderAction = ({
 	return mostRecentAction;
 };
 
-// Populate Dac Member Info and return Success / Failure
+/**
+ * Collect Dac Member User Info and return Result with user info or error if info was not found
+ * @param dac_id - ID of Dac Group associated with application, or null
+ * @param relatedAction - Relevant ApplicationAction record or null
+ * @param relatedEmail - Relevant SentEmail record or null
+ * @returns Result with Dac Member Name & Email
+ */
 const getDacUserDataResult = async ({
 	dac_id,
 	relatedAction,
@@ -179,6 +185,36 @@ const getDacUserDataResult = async ({
 	return failure('NOT_FOUND', `DAC contact info missing for id: ${dac_id}.`);
 };
 
+export const checkApplicationNeedsReminder = ({
+	state,
+	mostRecentAction,
+	mostRecentEmail,
+	created_at,
+	intervalDays,
+}: {
+	state: ApplicationStateValues;
+	created_at: Date | null;
+	mostRecentAction?: ApplicationActionRecord | null;
+	mostRecentEmail?: EmailRecord | null;
+	intervalDays?: number;
+}): boolean => {
+	// Early Draft applications will not have any state transition Action records
+	// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead
+	// For all other states & actions, confirm if it has been >7 days (or chosen interval value) since the last related state change or reminder email
+	const actionDate = mostRecentAction
+		? mostRecentAction.created_at
+		: state === ApplicationStates.DRAFT
+			? created_at
+			: null;
+	const needsActionReminder = actionDate ? dateDiffCheck({ actionDate, intervalDays }) : false;
+
+	const emailDate = mostRecentEmail?.created_at;
+	const needsEmailReminder = emailDate ? dateDiffCheck({ actionDate: emailDate, intervalDays }) : false;
+
+	const sendReminder = needsEmailReminder || needsActionReminder;
+	return sendReminder;
+};
+
 /* Reviews Application, Action & Email details to determine if an Application needs a Reminder Email */
 export const scheduleEmailReminders = async () => {
 	const database = getDbInstance();
@@ -191,23 +227,9 @@ export const scheduleEmailReminders = async () => {
 		const applications = allApplicationsResult.data;
 		for (const application of applications) {
 			const { state, created_at, application_actions: applicationActions, sent_emails: sentEmails } = application;
-
-			// Early Draft applications will not have any state transition Action records
-			// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead
-			// For all other states & actions, confirm if it has been >7 days since the last related state change or reminder email
 			const mostRecentAction = applicationActions ? getRelevantReminderAction({ state, applicationActions }) : null;
-			const actionDate = mostRecentAction
-				? mostRecentAction.created_at
-				: state === ApplicationStates.DRAFT
-					? created_at
-					: null;
-			const needsActionReminder = actionDate ? dateDiffCheck({ actionDate }) : false;
-
 			const mostRecentEmail = sentEmails ? getRelevantReminderEmail({ state, sentEmails }) : null;
-			const emailDate = mostRecentEmail?.created_at;
-			const needsEmailReminder = emailDate ? dateDiffCheck({ actionDate: emailDate }) : false;
-
-			const sendReminder = needsEmailReminder || needsActionReminder;
+			const sendReminder = checkApplicationNeedsReminder({ state, created_at, mostRecentAction, mostRecentEmail });
 			if (sendReminder) {
 				await sendEmailReminders({
 					application,
@@ -356,7 +378,7 @@ export const sendEmailReminders = async ({
 						applicantName,
 						submittedDate,
 						repName,
-						to: repEmail || 'pcgl_email@yopmail.com',
+						to: repEmail,
 					});
 				}
 				break;
