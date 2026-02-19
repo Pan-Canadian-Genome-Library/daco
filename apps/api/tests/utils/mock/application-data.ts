@@ -173,6 +173,7 @@ export const reminderApplicationArray: ApplicationModel[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',
 		state: ApplicationStates.DRAFT,
+		dac_id: 'dac1',
 		created_at: new Date('2025-01-01T11:00:00Z'),
 		updated_at: new Date('2025-01-01T11:30:00Z'),
 	},

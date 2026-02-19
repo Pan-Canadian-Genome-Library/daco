@@ -23,9 +23,15 @@ import { after, before, describe, it } from 'node:test';
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { connectToDb, type PostgresDb } from '@/db/index.js';
-import { checkApplicationNeedsReminder, getRelevantReminderAction, reminderStates } from '@/jobs/emailReminders.ts';
+import {
+	checkApplicationNeedsReminder,
+	getDacUserDataResult,
+	getRelevantReminderAction,
+	reminderStates,
+} from '@/jobs/emailReminders.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
 import { type ApplicationService, type JoinedApplicationEmailsActionsRecord } from '@/service/types.ts';
+import { testDacUsersData } from '../utils/mock/study-dac-data.ts';
 import {
 	addEmailReminderActions,
 	addReminderApplications,
@@ -36,7 +42,7 @@ import {
 	PG_USER,
 } from '../utils/testUtils.ts';
 
-describe('Email Reminder Jobs', () => {
+describe('Email Reminders', () => {
 	let db: PostgresDb;
 	let container: StartedPostgreSqlContainer;
 	let appService: ApplicationService;
@@ -53,9 +59,9 @@ describe('Email Reminder Jobs', () => {
 		db = connectToDb(connectionString);
 
 		await initTestMigration(db);
+		await addStudyAndDacUsers(db);
 		await addReminderApplications(db);
 		await addEmailReminderActions(db);
-		await addStudyAndDacUsers(db);
 
 		appService = applicationSvc(db);
 		const testApplicationResult = await appService.getEmailActionDetails({
@@ -68,7 +74,7 @@ describe('Email Reminder Jobs', () => {
 		}
 	});
 
-	describe('EmailReminders', () => {
+	describe('checkApplicationNeedsReminder', () => {
 		it('checkApplicationNeedsReminder - Draft', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 1);
 			assert.ok(testApplicationRecord);
@@ -161,6 +167,39 @@ describe('Email Reminder Jobs', () => {
 			assert.ok(mostRecentAction && mostRecentAction.action === 'WITHDRAW');
 			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
 			assert.ok(reminderResult);
+		});
+	});
+
+	describe('getDacUserDataResult', () => {
+		it('should successfully retrieve Dac User Name & Email info', async () => {
+			const testApplicationRecord = testApplications.find((app) => app.application_id === 1);
+			assert.ok(testApplicationRecord);
+			const { dac_id } = testApplicationRecord;
+			const userDataResult = await getDacUserDataResult({ dac_id });
+			assert.ok(userDataResult.success && userDataResult.data);
+			const userData = userDataResult.data;
+			const dacData = testDacUsersData.find((dac) => dac.dac_id === dac_id);
+			assert.ok(dacData);
+			assert.ok(userData.dacEmail === dacData.contact_email);
+			assert.ok(userData.dacMemberName === dacData.contact_name);
+		});
+
+		it('should successfully retrieve User Name & Email from Actions when dacId is null', async () => {
+			const testApplicationRecord = testApplications.find((app) => app.application_id === 2);
+			assert.ok(testApplicationRecord);
+			const { dac_id, state, application_actions: applicationActions } = testApplicationRecord;
+			assert.ok(!dac_id);
+			assert.ok(state === 'INSTITUTIONAL_REP_REVIEW');
+			assert.ok(applicationActions?.length && applicationActions?.length > 0);
+			const relatedAction = getRelevantReminderAction({ applicationActions, state });
+			assert.ok(relatedAction);
+			const userDataResult = await getDacUserDataResult({ dac_id, relatedAction });
+			assert.ok(userDataResult.success && userDataResult.data);
+			const userData = userDataResult.data;
+			const actionName = relatedAction.user_name;
+			const actionEmail = relatedAction.user_id;
+			assert.ok(userData.dacEmail === actionEmail);
+			assert.ok(userData.dacMemberName === actionName);
 		});
 	});
 

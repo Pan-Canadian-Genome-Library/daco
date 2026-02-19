@@ -154,7 +154,7 @@ export const getRelevantReminderAction = ({
  * @param relatedEmail - Relevant SentEmail record or null
  * @returns Result with Dac Member Name & Email
  */
-const getDacUserDataResult = async ({
+export const getDacUserDataResult = async ({
 	dac_id,
 	relatedAction,
 	relatedEmail,
