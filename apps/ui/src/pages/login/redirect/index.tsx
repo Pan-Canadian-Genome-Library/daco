@@ -23,9 +23,10 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+// TODO: REP FLOW
 const LoginRedirect = () => {
 	const { t: translate } = useTranslation();
-	const { isLoading, isDacChair, isDacMember, isAdmin } = useUserContext();
+	const { isLoading, isDacChair, isDacMember, isAdmin, isLoggedIn } = useUserContext();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -33,14 +34,17 @@ const LoginRedirect = () => {
 			return;
 		}
 
-		if (isAdmin) {
+		if (!isLoggedIn) {
+			navigate('/', { replace: true });
+			return;
+		} else if (isAdmin) {
 			navigate('/admin');
 			return;
 		} else if (isDacChair || isDacMember) {
 			navigate('/manage/applications', { replace: true });
 			return;
 		} else {
-			navigate('/', { replace: true });
+			navigate('/dashboard', { replace: true });
 			return;
 		}
 	}, [isLoading, navigate]);

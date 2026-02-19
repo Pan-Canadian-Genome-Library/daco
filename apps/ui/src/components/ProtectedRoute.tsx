@@ -19,14 +19,14 @@
 
 import { Navigate, type To } from 'react-router';
 
-import { UserRole } from '@pcgl-daco/validation';
-
 import FullscreenLoader from '@/components/FullscreenLoader';
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
 
+type Membership = 'DAC' | 'ADMIN';
+
 type ProtectedRouteProps = PropsWithChildren<{
-	requiredRoles?: [UserRole, ...UserRole[]];
+	requiredMembership?: [Membership, ...Membership[]];
 	redirectTo?: To;
 }>;
 
@@ -50,8 +50,8 @@ type ProtectedRouteProps = PropsWithChildren<{
  *		</Route>
  *	</Routes>
  */
-const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteProps) => {
-	const { isLoading, isLoggedIn, isAdmin, isDacChair, isDacMember } = useUserContext();
+const ProtectedRoute = ({ requiredMembership, redirectTo, children }: ProtectedRouteProps) => {
+	const { isLoading, isLoggedIn, isDacChair, isDacMember, isAdmin } = useUserContext();
 
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 
@@ -62,11 +62,12 @@ const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteP
 		return <Redirect />;
 	}
 
-	if (isAdmin || isDacChair || isDacMember) {
-		if (!role) {
+	if (requiredMembership) {
+		if (requiredMembership.includes('ADMIN') && !isAdmin) {
 			return <Redirect />;
 		}
-		if (!requiredRoles.includes(role)) {
+
+		if (requiredMembership.includes('DAC') && !(isDacChair || isDacMember)) {
 			return <Redirect />;
 		}
 	}
