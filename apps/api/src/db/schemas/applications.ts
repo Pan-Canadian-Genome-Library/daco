@@ -23,6 +23,7 @@ import { applicationActions } from './applicationActions.ts';
 import { applicationContents } from './applicationContents.ts';
 import { applicationStatesEnum } from './common.ts';
 import { dac } from './dac.ts';
+import { sentEmails } from './sentEmails.ts';
 
 export const applications = pgTable(
 	'applications',
@@ -51,9 +52,10 @@ export const applicationsRelations = relations(applications, ({ one, many }) => 
 		fields: [applications.contents],
 		references: [applicationContents.id],
 	}),
+	application_actions: many(applicationActions),
+	sent_emails: many(sentEmails),
 	dac_id: one(dac, {
 		fields: [applications.dac_id],
 		references: [dac.dac_id],
 	}),
-	actions: many(applicationActions),
 }));

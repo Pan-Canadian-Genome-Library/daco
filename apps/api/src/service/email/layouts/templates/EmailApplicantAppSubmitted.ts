@@ -18,11 +18,11 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateApproveType } from '../../types.ts';
+import { EmailReminderTemplateType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApplicantAppSubmitted = ({ id, applicantName }: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -30,7 +30,7 @@ export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateAp
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear ${name},
+                    Dear ${applicantName},
                 </mj-text>
                 <mj-text>
                     We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully submitted for DAC review by the institutional representative. The review process is now underway, and you will be notified once any updates or decisions are made.<br /> <br />
@@ -50,8 +50,8 @@ export const GenerateEmailApplicantAppSubmitted = ({ id, name }: Omit<GenerateAp
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApplicantAppSubmittedPlain = ({ name }: Omit<GenerateApproveType, 'to'>) => {
-	return ` Dear ${name},
+export const GenerateEmailApplicantAppSubmittedPlain = ({ applicantName }: EmailReminderTemplateType) => {
+	return ` Dear ${applicantName},
     \n We are pleased to inform you that your DACO application has been successfully submitted for DAC review by the institutional representative. The review process is now underway, and you will be notified once any updates or decisions are made.
     \n If you have any questions or need further information during this time, please do not hesitate to contact us.
     \n Thank you for your continued patience and cooperation. 

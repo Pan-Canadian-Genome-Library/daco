@@ -27,7 +27,7 @@ export const GenerateEmailApplicantRevoke = ({
 	name,
 	comment,
 	dacRevoked,
-}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
+}: Omit<GenerateRejectType, 'to' | 'actionId'> & { dacRevoked: boolean }) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -64,7 +64,7 @@ export const GenerateEmailApplicantRevokePlain = ({
 	name,
 	comment,
 	dacRevoked,
-}: Omit<GenerateRejectType, 'to'> & { dacRevoked: boolean }) => {
+}: Omit<GenerateRejectType, 'to' | 'actionId'> & { dacRevoked: boolean }) => {
 	return ` Dear ${name},
     \n ${dacRevoked ? `We are writing to inform you that your PCGL-${id} has been revoked by the PCGL Data Access Committee` : `We are writing to inform you that you have revoked PCGL-${id}.`} This is the message you left on the revoked application: 
     \n ${comment}

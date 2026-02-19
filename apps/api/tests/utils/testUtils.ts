@@ -26,6 +26,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 import { type PostgresDb } from '@/db/index.js';
+import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { dac } from '@/db/schemas/dac.ts';
@@ -33,6 +34,7 @@ import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.js';
 import { ApplicationService } from '@/service/types.ts';
 import { ApplicationListSummary, ApplicationStateValues } from '@pcgl-daco/data-model';
+import { actionArray } from './mock/action-data.ts';
 import { applicationArray } from './mock/application-data.ts';
 import { testDacUsersData, testStudyData } from './mock/study-dac-data.ts';
 
@@ -89,6 +91,19 @@ export const addInitialApplications = async (db: PostgresDb) => {
 		const { id: contentsId } = newAppContentsRecord[0];
 
 		await db.update(applications).set({ contents: contentsId }).where(eq(applications.id, id));
+	}
+};
+
+export const addInitialActions = async (db: PostgresDb) => {
+	for (let i = 0; i < actionArray.length; i++) {
+		const newAction = actionArray[i];
+
+		if (!newAction) {
+			continue;
+		}
+
+		const newRecord = await db.insert(applicationActions).values(newAction).returning();
+		if (!newRecord[0]) throw new Error('Error creating test action records');
 	}
 };
 

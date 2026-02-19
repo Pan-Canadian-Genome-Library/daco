@@ -23,6 +23,7 @@ import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core
 import { applications } from './applications.ts';
 import { applicationStatesEnum } from './common.ts';
 import { revisionRequests } from './revisionRequests.ts';
+import { sentEmails } from './sentEmails.ts';
 
 export const applicationActionTypesEnum = pgEnum('application_action_types', [
 	'WITHDRAW',
@@ -50,7 +51,7 @@ export const applicationActions = pgTable('application_actions', {
 	state_after: applicationStatesEnum().notNull(),
 });
 
-export const applicationActionsRelations = relations(applicationActions, ({ one }) => ({
+export const applicationActionsRelations = relations(applicationActions, ({ one, many }) => ({
 	application_id: one(applications, {
 		fields: [applicationActions.application_id],
 		references: [applications.id],
@@ -59,4 +60,5 @@ export const applicationActionsRelations = relations(applicationActions, ({ one 
 		fields: [applicationActions.revisions_request_id],
 		references: [revisionRequests.id],
 	}),
+	sent_emails: many(sentEmails),
 }));
