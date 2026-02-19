@@ -22,10 +22,10 @@ import { useQuery } from '@tanstack/react-query';
 import { withErrorResponseHandler } from '@/api/apiUtils';
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import type { SessionUser, UserRole } from '@pcgl-daco/validation';
+import type { SessionUser } from '@pcgl-daco/validation';
 
 const useGetUser = () => {
-	return useQuery<{ user: SessionUser; role: UserRole }, ServerError>({
+	return useQuery<{ user: SessionUser }, ServerError>({
 		queryKey: ['user'],
 		queryFn: async () => {
 			const response = await fetch(`/auth/user`).then(withErrorResponseHandler);

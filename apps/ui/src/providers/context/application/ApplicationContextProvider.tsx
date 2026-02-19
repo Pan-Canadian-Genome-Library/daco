@@ -22,11 +22,14 @@ import { createContext, useReducer } from 'react';
 import ApplicationReducer from '@/providers/context/application/ApplicationReducer';
 import { type ApplicationContextType, type ApplicationFormState } from '@/providers/context/application/types';
 import { ApplicationStates } from '@pcgl-daco/data-model';
-import { userRoleSchema } from '@pcgl-daco/validation';
 
 const initialState: ApplicationFormState = {
 	applicationState: ApplicationStates.DRAFT,
-	applicationUserRole: userRoleSchema.Values.ANONYMOUS,
+	applicationUserPermissions: {
+		isInstitutionalRep: false,
+		isDacChair: false,
+		isDacMember: false,
+	},
 	fields: {},
 	formState: {
 		isFormCompleted: false,

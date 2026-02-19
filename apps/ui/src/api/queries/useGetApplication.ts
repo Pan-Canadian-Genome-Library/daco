@@ -27,11 +27,10 @@ import { ServerError } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useUserContext } from '@/providers/UserProvider';
 import { type ApplicationContentsResponse, type ApplicationResponseData } from '@pcgl-daco/data-model';
-import { userRoleSchema } from '@pcgl-daco/validation';
 
 const useGetApplication = (id?: string | number) => {
 	const { state, dispatch } = useApplicationContext();
-	const { role, user } = useUserContext();
+	const { user } = useUserContext();
 
 	return useQuery<ApplicationResponseData, ServerError>({
 		queryKey: [`application-${id}`],
@@ -54,12 +53,12 @@ const useGetApplication = (id?: string | number) => {
 						type: 'UPDATE_APPLICATION',
 						payload: {
 							...state,
-							// INSTITUTIONAL_REP role is specific to Application page only,
-							// since reps are determined by email comparison, we can check it here
-							applicationUserRole: isRepUser(fields.institutionalRepEmail, user)
-								? userRoleSchema.Values.INSTITUTIONAL_REP
-								: role,
 							applicationState: data.state,
+							applicationUserPermissions: {
+								isInstitutionalRep: isRepUser(fields.institutionalRepEmail, user),
+								isDacChair: user ? user.dacChair.some((dacId) => dacId === data.dacId) : false,
+								isDacMember: user ? user.dacMember.some((dacId) => dacId === data.dacId) : false,
+							},
 							fields,
 						},
 					});
