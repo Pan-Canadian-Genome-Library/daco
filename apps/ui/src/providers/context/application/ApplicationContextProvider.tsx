@@ -26,6 +26,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 const initialState: ApplicationFormState = {
 	applicationState: ApplicationStates.DRAFT,
 	applicationUserPermissions: {
+		isApplicant: false,
 		isInstitutionalRep: false,
 		isDacChair: false,
 		isDacMember: false,

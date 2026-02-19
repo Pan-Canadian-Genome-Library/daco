@@ -17,16 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { UserRole } from '@pcgl-daco/validation';
-
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useUserContext } from '@/providers/UserProvider';
 import { ApplicationStateValues } from '@pcgl-daco/data-model';
 import { Skeleton } from 'antd';
 import type { PropsWithChildren } from 'react';
+import { Membership } from './ProtectedRoute';
 
 type ProtectedComponentProps = PropsWithChildren<{
-	requiredRoles: [UserRole, ...UserRole[]];
+	requiredMembership?: [Membership, ...Membership[]];
 	requiredStates?: [ApplicationStateValues, ...ApplicationStateValues[]];
 }>;
 
@@ -39,10 +38,10 @@ type ProtectedComponentProps = PropsWithChildren<{
  *
  * To restrict a component to only users of a specific role, you can add the `requiredRoles` prop. If you do,
  * only users with one of the required roles will be able to access that component.
- * 
- * To restrict a component to only show when in a certain state, you can add the `requiredStates` prop. If you do, 
+ *
+ * To restrict a component to only show when in a certain state, you can add the `requiredStates` prop. If you do,
  * a component will only be visible if the app is in a certain state.
- 
+
  * @example
  * <div>
  *  <ProtectedComponent requiredRoles={['DAC_MEMBER']} requiredStates={['DRAFT']}>
@@ -50,11 +49,14 @@ type ProtectedComponentProps = PropsWithChildren<{
  * </ProtectedComponent>
  * </div>
  */
-const ProtectedComponent = ({ requiredRoles, requiredStates, children }: ProtectedComponentProps) => {
+const ProtectedComponent = ({ requiredMembership, requiredStates, children }: ProtectedComponentProps) => {
 	const { isLoading, isLoggedIn } = useUserContext();
+
 	const {
-		state: { applicationState, applicationUserRole: role },
+		state: { applicationState, applicationUserPermissions },
 	} = useApplicationContext();
+
+	const { isApplicant, isDacChair, isDacMember, isInstitutionalRep } = applicationUserPermissions;
 
 	if (isLoading) {
 		return <Skeleton />;
@@ -63,17 +65,20 @@ const ProtectedComponent = ({ requiredRoles, requiredStates, children }: Protect
 		return null;
 	}
 
-	if (requiredRoles) {
-		if (!role) {
-			return null;
-		}
-		if (!requiredRoles.includes(role)) {
+	if (requiredStates) {
+		if (!requiredStates.includes(applicationState)) {
 			return null;
 		}
 	}
 
-	if (requiredStates) {
-		if (!requiredStates.includes(applicationState)) {
+	if (requiredMembership) {
+		if (requiredMembership.includes('DAC') && (isDacChair || isDacMember)) {
+			return children;
+		} else if (requiredMembership.includes('INSTITUTIONAL_REP') && isInstitutionalRep) {
+			return children;
+		} else if (isApplicant) {
+			return children;
+		} else {
 			return null;
 		}
 	}

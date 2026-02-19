@@ -34,6 +34,7 @@ export type SectionsVisited<T extends string> = {
 export interface ApplicationFormState {
 	applicationState: ApplicationStateValues;
 	applicationUserPermissions: {
+		isApplicant: boolean;
 		isInstitutionalRep: boolean;
 		isDacChair: boolean;
 		isDacMember: boolean;
