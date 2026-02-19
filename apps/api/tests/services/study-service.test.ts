@@ -51,7 +51,7 @@ describe('Study Service', () => {
 		studyService = studySvc(db);
 	});
 
-	describe('Study', () => {
+	describe('getStudyById', () => {
 		it('should get study by id', async () => {
 			const testRecordId = 'study1';
 			const result = await studyService.getStudyById({ studyId: testRecordId });
@@ -122,6 +122,41 @@ describe('Study Service', () => {
 			assert.deepStrictEqual(result.data[0].funding_sources, testRecords[0]?.funding_sources);
 		});
 	});
+
+	describe('getAllStudies', () => {
+		it('should get all studies', async () => {
+			const result = await studyService.getAllStudies();
+
+			assert.ok(result.success && result.data.length >= 0);
+		});
+	});
+
+	describe('updateStudyAcceptingApplication', () => {
+		it('should set acceptingApplications to true', async () => {
+			const testRecordId = 'study1';
+			const result = await studyService.updateStudyAcceptingApplication({ studyId: testRecordId, enabled: true });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.acceptingApplications, true);
+		});
+
+		it('should set acceptingApplications to false', async () => {
+			const testRecordId = 'study1';
+			const result = await studyService.updateStudyAcceptingApplication({ studyId: testRecordId, enabled: false });
+
+			assert.ok(result.success);
+			assert.strictEqual(result.data.acceptingApplications, false);
+		});
+
+		it('should fail to set acceptingApplications if study does not exist', async () => {
+			const testRecordId = 'MISSING-STUDY';
+			const result = await studyService.updateStudyAcceptingApplication({ studyId: testRecordId, enabled: true });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'NOT_FOUND');
+		});
+	});
+
 	after(async () => {
 		await container.stop();
 		process.exit(0);

@@ -470,10 +470,12 @@ export type StudyDTO = {
 	collaborators: string[] | null;
 	fundingSources: string[];
 	publicationLinks: string[] | null;
-	acceptingApplications?: boolean | null;
+	acceptingApplications: boolean;
 	createdAt: Date | string;
 	updatedAt: Date | string | null;
 } & Pick<DacDTO, 'dacName'>;
+
+export type StudyClinicalDTO = Omit<StudyDTO, 'acceptingApplications'>;
 
 export type DacDTO = {
 	dacId: string;

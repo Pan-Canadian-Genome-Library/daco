@@ -76,7 +76,68 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
+	updateStudyAcceptingApplication: async ({
+		studyId,
+		enabled,
+	}: {
+		studyId: string;
+		enabled: boolean;
+	}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const studyRecord = await db
+				.update(study)
+				.set({ accepting_applications: enabled })
+				.where(eq(study.study_id, studyId))
+				.returning({
+					acceptingApplications: study.accepting_applications,
+				});
 
+			if (!studyRecord || studyRecord.length === 0 || studyRecord[0] === undefined) {
+				return failure('NOT_FOUND', `Unable to find study record to update ${studyId}.`);
+			}
+
+			return success(studyRecord[0]);
+		} catch (error) {
+			const message = 'Error at setStudyAcceptingApplications';
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	getAllStudies: async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+		try {
+			const studyRecords = await db
+				.select({
+					studyId: study.study_id,
+					dacId: study.dac_id,
+					dacName: dac.dac_name,
+					categoryId: study.category_id,
+					studyName: study.study_name,
+					studyDescription: study.study_description,
+					programName: study.program_name,
+					keywords: study.keywords,
+					status: study.status,
+					context: study.context,
+					domain: study.domain,
+					participantCriteria: study.participant_criteria,
+					principalInvestigators: study.principal_investigators,
+					leadOrganizations: study.lead_organizations,
+					collaborators: study.collaborators,
+					fundingSources: study.funding_sources,
+					publicationLinks: study.publication_links,
+					acceptingApplications: study.accepting_applications,
+					createdAt: study.created_at,
+					updatedAt: study.updated_at,
+				})
+				.from(study)
+				.innerJoin(dac, eq(dac.dac_id, study.dac_id));
+
+			return success(studyRecords);
+		} catch (error) {
+			const message = 'Error at getAllStudies';
+
+			logger.error(message, error);
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
 	updateStudies: async ({
 		studyData,
 		transaction,
@@ -109,7 +170,6 @@ const studySvc = (db: PostgresDb) => ({
 						publication_links: sql`EXCLUDED.publication_links`,
 						updated_at: sql`EXCLUDED.updated_at`,
 						category_id: sql`EXCLUDED.category_id`,
-						accepting_applications: sql`EXCLUDED.accepting_applications`,
 					},
 				})
 				.returning();
