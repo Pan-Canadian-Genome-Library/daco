@@ -18,10 +18,12 @@
  */
 
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model';
+import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
+import { dacSvc } from '@/service/dacService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import {
 	type ReminderEmailTypes,
@@ -34,7 +36,7 @@ import {
 	type EmailRecord,
 	type JoinedApplicationEmailsActionsRecord,
 } from '@/service/types.ts';
-import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
+import { failure, success } from '@/utils/results.js';
 
 /**
  * Conditions for sending Application Reminder Emails
@@ -68,6 +70,15 @@ import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
 
 const logger = BaseLogger.forModule('Email Reminders');
 
+/* List of Application States requiring checks for reminder Emails */
+export const reminderStates = [
+	ApplicationStates.DRAFT,
+	ApplicationStates.DAC_REVIEW,
+	ApplicationStates.DAC_REVISIONS_REQUESTED,
+	ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+	ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+];
+
 /**
  * Check if the current date is more than interval days after a specific action date
  * If days passed since action date is greater than the interval, return true, else return false
@@ -91,28 +102,29 @@ function isReminderEmailType(emailType: EmailTypeValues): emailType is ReminderE
 /**
  * Find record for email with target reminder email_type values
  * Used to determine if an application needs a follow up email (not all emails require follow up)
- * Records are pre-sorted by DB so the email should be the most recent
  */
-const getRelevantReminderEmail = ({
+export const getRelevantReminderEmail = ({
 	sentEmails,
 	state,
 }: {
 	sentEmails: EmailRecord[];
 	state: ApplicationStateValues;
 }): EmailRecord | undefined => {
-	const targetEmail = sentEmails?.find((email) => {
-		const emailType = email.email_type;
-		if (!isReminderEmailType(emailType)) {
+	const targetEmail = sentEmails
+		?.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf())
+		.find((email) => {
+			const emailType = email.email_type;
+			if (!isReminderEmailType(emailType)) {
+				return false;
+			}
+
+			const allowedStates = reminderTargetEmailTypes[emailType];
+			if (allowedStates?.includes(state)) {
+				return true;
+			}
+
 			return false;
-		}
-
-		const allowedStates = reminderTargetEmailTypes[emailType];
-		if (allowedStates?.includes(state)) {
-			return true;
-		}
-
-		return false;
-	});
+		});
 
 	return targetEmail;
 };
@@ -121,29 +133,100 @@ const getRelevantReminderEmail = ({
  * Finds relevant record Action created with target state transition Action value
  * Records are pre-sorted by DB so first result should be most recent
  */
-const getRelevantReminderAction = ({
+export const getRelevantReminderAction = ({
 	applicationActions,
 	state,
 }: {
 	applicationActions: ApplicationActionRecord[];
 	state: ApplicationStateValues;
 }) => {
-	const targetActionType = reminderTargetActionTypes[state];
+	const targetActionTypes = reminderTargetActionTypes[state];
 	const mostRecentAction =
-		applicationActions?.length && targetActionType
-			? applicationActions.find((action) => targetActionType.includes(action.action))
+		applicationActions?.length && targetActionTypes
+			? applicationActions
+					.filter((action) => targetActionTypes.includes(action.action))
+					.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf())[0]
 			: null;
 	return mostRecentAction;
 };
 
-/* List of Application States requiring checks for reminder Emails */
-const reminderStates = [
-	ApplicationStates.DRAFT,
-	ApplicationStates.DAC_REVIEW,
-	ApplicationStates.DAC_REVISIONS_REQUESTED,
-	ApplicationStates.INSTITUTIONAL_REP_REVIEW,
-	ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
-];
+/**
+ * Collect Dac Member User Info and return Result with user info or error if info was not found
+ * @param dac_id - ID of Dac Group associated with application, or null
+ * @param relatedAction - Relevant ApplicationAction record or null
+ * @param relatedEmail - Relevant SentEmail record or null
+ * @returns Result with Dac Member Name & Email
+ */
+export const getDacUserDataResult = async ({
+	dac_id,
+	relatedAction,
+	relatedEmail,
+}: {
+	dac_id: string | null;
+	relatedAction?: ApplicationActionRecord | null;
+	relatedEmail?: EmailRecord | null;
+}) => {
+	const database = getDbInstance();
+	const dacService = dacSvc(database);
+
+	const { user_name, user_id } = relatedAction || {};
+	const { recipient_emails } = relatedEmail || {};
+
+	let dacMemberName = user_name;
+	let dacEmail = (recipient_emails && recipient_emails[0]) || user_id;
+	if (dac_id) {
+		const dacRecordResult = await dacService.getDacById({ id: dac_id });
+		if (dacRecordResult.success) {
+			const { contact_name, contact_email } = dacRecordResult.data;
+			dacMemberName = contact_name;
+			dacEmail = contact_email;
+		}
+	}
+	if (dacMemberName && dacEmail) {
+		return success({ dacMemberName, dacEmail });
+	}
+	return failure('NOT_FOUND', `DAC contact info missing for id: ${dac_id}.`);
+};
+
+/**
+ * For an Application with given state, compare date of most recent state transition and / or sent email date
+ * Compare this date to see if # intervalDays have passed since that time, returns true / false
+ * @param created_at Application creation date
+ * @param state Application State Value
+ * @param mostRecentAction Latest Application Action record
+ * @param mostRecentEmail Most current email sent related to application
+ * @param intervalDays Number of days to compare
+ * @returns boolean
+ */
+export const checkApplicationNeedsReminder = ({
+	created_at,
+	state,
+	mostRecentAction,
+	mostRecentEmail,
+	intervalDays,
+}: {
+	created_at: Date | null;
+	state: ApplicationStateValues;
+	mostRecentAction?: ApplicationActionRecord | null;
+	mostRecentEmail?: EmailRecord | null;
+	intervalDays?: number;
+}): boolean => {
+	// Early Draft applications will not have any state transition Action records
+	// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead
+	// For all other states & actions, confirm if it has been >7 days (or chosen interval value) since the last related state change or reminder email
+	const actionDate = mostRecentAction
+		? mostRecentAction.created_at
+		: state === ApplicationStates.DRAFT
+			? created_at
+			: null;
+	const needsActionReminder = actionDate ? dateDiffCheck({ actionDate, intervalDays }) : false;
+
+	const emailDate = mostRecentEmail?.created_at;
+	const needsEmailReminder = emailDate ? dateDiffCheck({ actionDate: emailDate, intervalDays }) : false;
+
+	const sendReminder = needsEmailReminder || needsActionReminder;
+	return sendReminder;
+};
 
 /* Reviews Application, Action & Email details to determine if an Application needs a Reminder Email */
 export const scheduleEmailReminders = async () => {
@@ -157,25 +240,11 @@ export const scheduleEmailReminders = async () => {
 		const applications = allApplicationsResult.data;
 		for (const application of applications) {
 			const { state, created_at, application_actions: applicationActions, sent_emails: sentEmails } = application;
-
-			// Early Draft applications will not have any state transition Action records
-			// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead
-			// For all other states & actions, confirm if it has been >7 days since the last related state change or reminder email
 			const mostRecentAction = applicationActions ? getRelevantReminderAction({ state, applicationActions }) : null;
-			const actionDate = mostRecentAction
-				? mostRecentAction.created_at
-				: state === ApplicationStates.DRAFT
-					? created_at
-					: null;
-			const needsActionReminder = actionDate ? dateDiffCheck({ actionDate }) : false;
-
 			const mostRecentEmail = sentEmails ? getRelevantReminderEmail({ state, sentEmails }) : null;
-			const emailDate = mostRecentEmail?.created_at;
-			const needsEmailReminder = emailDate ? dateDiffCheck({ actionDate: emailDate }) : false;
-
-			const sendReminder = needsEmailReminder || needsActionReminder;
+			const sendReminder = checkApplicationNeedsReminder({ state, created_at, mostRecentAction, mostRecentEmail });
 			if (sendReminder) {
-				sendEmailReminders({
+				await sendEmailReminders({
 					application,
 					relatedAction: mostRecentAction,
 					relatedEmail: mostRecentEmail,
@@ -190,7 +259,7 @@ export const scheduleEmailReminders = async () => {
 };
 
 // Generates & Sends Reminder Emails based on Application State
-export const sendEmailReminders = ({
+export const sendEmailReminders = async ({
 	application,
 	relatedAction,
 	relatedEmail,
@@ -201,8 +270,8 @@ export const sendEmailReminders = ({
 }) => {
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
-	const { application_id, state, created_at, application_contents } = application;
-	const { id: application_action_id, created_at: actionDate, user_name, user_id } = relatedAction || {};
+	const { application_id, dac_id, state, created_at, application_contents } = application;
+	const { id: application_action_id, created_at: actionDate } = relatedAction || {};
 
 	if (state === ApplicationStates.DRAFT) {
 		// If in State Draft for over 7 days, send a reminder email to Submit
@@ -244,16 +313,18 @@ export const sendEmailReminders = ({
 
 		const submittedDate = actionDate;
 
-		// TODO: Lookup contact email Dac table
-		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/549
-		const dacMemberName = user_name || 'DAC Member';
-		const dacEmail = relatedEmail?.recipient_emails[0] || user_id;
-
 		switch (state) {
 			case ApplicationStates.DAC_REVIEW:
 				if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
 					// Post Institutional Rep Submission, Application has moved to Dac Review
 					// If still in review 7 days later -> send email reminder to Dac Member
+					const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+					if (!dacUserInfoResult.success) {
+						const { error, message } = dacUserInfoResult;
+						logger.error(message, error);
+						return dacUserInfoResult;
+					}
+					const { dacMemberName, dacEmail } = dacUserInfoResult.data;
 					emailService.sendEmailDacReviewReminder({
 						id: application_id,
 						applicantName,
@@ -265,6 +336,13 @@ export const sendEmailReminders = ({
 				} else if (relatedAction.action === ApplicationActions.DAC_REVIEW_SUBMIT) {
 					// Post Dac Revisions Submitted, Application has moved back to Dac Review
 					// If still in review 7 days later -> send email reminder to Dac Member
+					const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+					if (!dacUserInfoResult.success) {
+						const { error, message } = dacUserInfoResult;
+						logger.error(message, error);
+						return dacUserInfoResult;
+					}
+					const { dacMemberName, dacEmail } = dacUserInfoResult.data;
 					emailService.sendEmailDacRevisionsReminder({
 						id: application_id,
 						actionId: application_action_id,
@@ -277,6 +355,13 @@ export const sendEmailReminders = ({
 				break;
 			case ApplicationStates.DAC_REVISIONS_REQUESTED: {
 				// Post Dac Revisions Requested, if still not Submitted 7 days later -> send email reminder to Applicant
+				const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+				if (!dacUserInfoResult.success) {
+					const { error, message } = dacUserInfoResult;
+					logger.error(message, error);
+					return dacUserInfoResult;
+				}
+				const { dacMemberName } = dacUserInfoResult.data;
 				emailService.sendEmailSubmitDacRevisionsReminder({
 					id: application_id,
 					actionId: application_action_id,
@@ -306,7 +391,7 @@ export const sendEmailReminders = ({
 						applicantName,
 						submittedDate,
 						repName,
-						to: repEmail || 'pcgl_email@yopmail.com',
+						to: repEmail,
 					});
 				}
 				break;
@@ -320,7 +405,6 @@ export const sendEmailReminders = ({
 					repName,
 					to: applicantEmail,
 				});
-
 				break;
 			default:
 				break;

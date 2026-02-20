@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { dac } from '@/db/schemas/dac.ts';
@@ -58,12 +58,30 @@ const dacSvc = (db: PostgresDb) => ({
 				.returning();
 
 			if (!studyRecords[0]) {
-				return failure('NOT_FOUND', `Unable to update study records.`);
+				return failure('NOT_FOUND', `Unable to create DAC records.`);
 			}
 
 			return success(studyRecords);
 		} catch (error) {
-			const message = 'Error at updateStudies';
+			const message = 'Error at createDacRecords';
+
+			logger.error(message, error);
+
+			return failure('SYSTEM_ERROR', message);
+		}
+	},
+
+	getDacById: async ({ id }: { id: string }): AsyncResult<DacRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const dacRecords = await db.select().from(dac).where(eq(dac.dac_id, id));
+
+			if (!dacRecords[0]) {
+				return failure('NOT_FOUND', `No DAC records found with id: ${id}.`);
+			}
+
+			return success(dacRecords[0]);
+		} catch (error) {
+			const message = 'Error at getDacById';
 
 			logger.error(message, error);
 
