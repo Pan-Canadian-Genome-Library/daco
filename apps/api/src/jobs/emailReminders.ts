@@ -102,7 +102,6 @@ function isReminderEmailType(emailType: EmailTypeValues): emailType is ReminderE
 /**
  * Find record for email with target reminder email_type values
  * Used to determine if an application needs a follow up email (not all emails require follow up)
- * Records are pre-sorted by DB so the email should be the most recent
  */
 export const getRelevantReminderEmail = ({
 	sentEmails,
@@ -111,19 +110,21 @@ export const getRelevantReminderEmail = ({
 	sentEmails: EmailRecord[];
 	state: ApplicationStateValues;
 }): EmailRecord | undefined => {
-	const targetEmail = sentEmails?.find((email) => {
-		const emailType = email.email_type;
-		if (!isReminderEmailType(emailType)) {
+	const targetEmail = sentEmails
+		?.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf())
+		.find((email) => {
+			const emailType = email.email_type;
+			if (!isReminderEmailType(emailType)) {
+				return false;
+			}
+
+			const allowedStates = reminderTargetEmailTypes[emailType];
+			if (allowedStates?.includes(state)) {
+				return true;
+			}
+
 			return false;
-		}
-
-		const allowedStates = reminderTargetEmailTypes[emailType];
-		if (allowedStates?.includes(state)) {
-			return true;
-		}
-
-		return false;
-	});
+		});
 
 	return targetEmail;
 };
@@ -139,10 +140,12 @@ export const getRelevantReminderAction = ({
 	applicationActions: ApplicationActionRecord[];
 	state: ApplicationStateValues;
 }) => {
-	const targetActionType = reminderTargetActionTypes[state];
+	const targetActionTypes = reminderTargetActionTypes[state];
 	const mostRecentAction =
-		applicationActions?.length && targetActionType
-			? applicationActions.find((action) => targetActionType.includes(action.action))
+		applicationActions?.length && targetActionTypes
+			? applicationActions
+					.filter((action) => targetActionTypes.includes(action.action))
+					.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf())[0]
 			: null;
 	return mostRecentAction;
 };
@@ -185,15 +188,25 @@ export const getDacUserDataResult = async ({
 	return failure('NOT_FOUND', `DAC contact info missing for id: ${dac_id}.`);
 };
 
+/**
+ * For an Application with given state, compare date of most recent state transition and / or sent email date
+ * Compare this date to see if # intervalDays have passed since that time, returns true / false
+ * @param created_at Application creation date
+ * @param state Application State Value
+ * @param mostRecentAction Latest Application Action record
+ * @param mostRecentEmail Most current email sent related to application
+ * @param intervalDays Number of days to compare
+ * @returns boolean
+ */
 export const checkApplicationNeedsReminder = ({
+	created_at,
 	state,
 	mostRecentAction,
 	mostRecentEmail,
-	created_at,
 	intervalDays,
 }: {
-	state: ApplicationStateValues;
 	created_at: Date | null;
+	state: ApplicationStateValues;
 	mostRecentAction?: ApplicationActionRecord | null;
 	mostRecentEmail?: EmailRecord | null;
 	intervalDays?: number;
