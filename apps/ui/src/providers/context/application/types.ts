@@ -31,14 +31,16 @@ export type SectionsVisited<T extends string> = {
 	[section in T]: boolean;
 };
 
+export interface ApplicationUserPermission {
+	isApplicant: boolean;
+	isInstitutionalRep: boolean;
+	isDacChair: boolean;
+	isDacMember: boolean;
+}
+
 export interface ApplicationFormState {
 	applicationState: ApplicationStateValues;
-	applicationUserPermissions: {
-		isApplicant: boolean;
-		isInstitutionalRep: boolean;
-		isDacChair: boolean;
-		isDacMember: boolean;
-	};
+	applicationUserPermissions: ApplicationUserPermission;
 	fields: Partial<ApplicationContentsResponse>;
 	formState: FormState;
 }
