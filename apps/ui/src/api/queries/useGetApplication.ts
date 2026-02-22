@@ -55,9 +55,11 @@ const useGetApplication = (id?: string | number) => {
 							...state,
 							applicationState: data.state,
 							applicationUserPermissions: {
+								isApplicant: user ? user.userId === data.userId : false,
 								isInstitutionalRep: isRepUser(fields.institutionalRepEmail, user),
 								isDacChair: user ? user.dacChair.some((dacId) => dacId === data.dacId) : false,
 								isDacMember: user ? user.dacMember.some((dacId) => dacId === data.dacId) : false,
+								// TODO: is collaborator
 							},
 							fields,
 						},
