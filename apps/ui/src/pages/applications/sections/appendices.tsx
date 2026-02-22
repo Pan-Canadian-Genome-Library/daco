@@ -45,7 +45,6 @@ const Appendices = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'appendices', isEditMode, userRole: state.applicationUserRole });
 	const {
 		control,
 		getValues,
@@ -55,6 +54,12 @@ const Appendices = () => {
 			acceptedAppendices: state.fields.acceptedAppendices,
 		},
 		resolver: zodResolver(appendicesSchema),
+	});
+	const canEdit = canEditSection({
+		revisions,
+		section: 'appendices',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
 	});
 	const form = useSectionForm({ section: 'appendices', sectionVisited: state.formState.sectionsVisited.appendices });
 

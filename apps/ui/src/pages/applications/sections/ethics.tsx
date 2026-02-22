@@ -57,7 +57,13 @@ const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'ethics', isEditMode, userRole: state.applicationUserRole });
+
+	const canEdit = canEditSection({
+		revisions,
+		section: 'ethics',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
+	});
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const { mutateAsync: editApplication } = useEditApplication();
 
