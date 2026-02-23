@@ -142,7 +142,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			</Button>,
 			<ProtectedComponent
 				key={'header-revoke'}
-				requiredMembership={['DAC', 'INSTITUTIONAL_REP']}
+				requiredMembership={['DAC_CHAIR', 'INSTITUTIONAL_REP', 'APPLICANT']}
 				requiredStates={['APPROVED']}
 			>
 				<Button onClick={() => setShowRevokeModal(true)}>{translate('button.revoke')}</Button>
@@ -154,10 +154,18 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			>
 				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 			</ProtectedComponent>,
-			<ProtectedComponent key={'header-close'} requiredStates={['DRAFT', 'INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW']}>
+			<ProtectedComponent
+				key={'header-close'}
+				requiredMembership={['APPLICANT']}
+				requiredStates={['DRAFT', 'INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW']}
+			>
 				<Button onClick={() => setShowCloseApplicationModal(true)}>{translate('button.closeApp')}</Button>
 			</ProtectedComponent>,
-			<ProtectedComponent key={'header-dac-controls'} requiredMembership={['DAC']} requiredStates={['DAC_REVIEW']}>
+			<ProtectedComponent
+				key={'header-dac-controls'}
+				requiredMembership={['DAC_CHAIR']}
+				requiredStates={['DAC_REVIEW']}
+			>
 				<Button onClick={() => setShowApprovalModal(true)}>{translate('button.approveApplication')}</Button>
 				<Button onClick={() => setOpenRevisionsModal(true)}>{translate('button.requestRevisions')}</Button>
 				<Button onClick={() => setShowRejectModal(true)}>{translate('button.rejectApplication')}</Button>
@@ -165,7 +173,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 			</ProtectedComponent>,
 			<ProtectedComponent
 				key={'header-download'}
-				requiredMembership={['DAC', 'INSTITUTIONAL_REP']}
+				requiredMembership={['DAC_CHAIR', 'APPLICANT', 'DAC_MEMBER', 'INSTITUTIONAL_REP']}
 				requiredStates={['INSTITUTIONAL_REP_REVIEW', 'DAC_REVIEW', 'APPROVED', 'REJECTED', 'CLOSED', 'REVOKED']}
 			>
 				<Button onClick={() => onPDFDownload()}>{translate('sign-and-submit-section.section.buttons.download')}</Button>

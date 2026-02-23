@@ -23,7 +23,7 @@ import FullscreenLoader from '@/components/FullscreenLoader';
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
 
-export type Membership = 'DAC' | 'ADMIN' | 'INSTITUTIONAL_REP' | 'APPLICANT';
+export type Membership = 'DAC_MEMBER' | 'DAC_CHAIR' | 'ADMIN' | 'INSTITUTIONAL_REP' | 'APPLICANT';
 
 type ProtectedRouteProps = PropsWithChildren<{
 	requiredMembership?: [Membership, ...Membership[]];
@@ -67,7 +67,10 @@ const ProtectedRoute = ({ requiredMembership, redirectTo, children }: ProtectedR
 			return <Redirect />;
 		}
 
-		if (requiredMembership.includes('DAC') && !(isDacChair || isDacMember)) {
+		if (
+			requiredMembership.some((role) => role === 'DAC_CHAIR' || role === 'DAC_MEMBER') &&
+			!(isDacChair || isDacMember)
+		) {
 			return <Redirect />;
 		}
 	}
