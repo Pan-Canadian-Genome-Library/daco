@@ -43,7 +43,7 @@ const logger = BaseLogger.forModule('applicationController');
  * IMPORTANT Must be used for middlewares providing params or a body containing the id of the application to check access for.
  * @params :applicationId
  * @body :id - from `POST /applications/edit` TODO change this to applicationId
- * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit`
+ * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit` and `POST /sign`
  */
 export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
 	withAuthentication(async (request, response: Response<AuthenticationErrorResponse>, next) => {
@@ -80,7 +80,6 @@ export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
 		}
 
 		const requestAuthResult = await canAccessRequest(user, applicationId, accessConfig);
-		console.log('hai', requestAuthResult);
 
 		if (!requestAuthResult.success) {
 			authErrorResponseHandler(response, requestAuthResult);
