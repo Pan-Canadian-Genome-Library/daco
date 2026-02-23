@@ -173,13 +173,13 @@ export const studyModelSchema = z.object({
 	collaborators: z.array(z.string()),
 	funding_sources: z.array(z.string()),
 	publication_links: z.array(z.string()),
-	accepting_applications: z.boolean().nullable(),
+	accepting_applications: z.boolean(),
 	created_at: z.union([z.date(), z.undefined()]),
 	updated_at: z.union([z.date(), z.undefined()]).nullable(),
 });
 export type studySchemaType = z.infer<typeof studyModelSchema>;
 
-export const studyDTOSchema = z.object({
+export const studyClinicalDTOSchema = z.object({
 	studyId: z.string(),
 	dacId: z.string(),
 	dacName: z.union([z.undefined(), z.string()]),
@@ -197,14 +197,13 @@ export const studyDTOSchema = z.object({
 	collaborators: z.array(z.string()),
 	fundingSources: z.array(z.string()),
 	publicationLinks: z.array(z.string()),
-	acceptingApplications: z.union([z.boolean(), z.undefined()]).nullable(),
 	createdAt: z.union([z.date(), z.string()]),
 	updatedAt: z.union([z.date(), z.string()]).nullable(),
 });
-export const studyDTOResponseSchema = z.array(studyDTOSchema);
+export const studyClinicalDTOResponseSchema = z.array(studyClinicalDTOSchema);
 
-export type studyDTOResponseType = z.infer<typeof studyDTOSchema>;
-export type studyDTOResponseSchemaType = z.infer<typeof studyDTOResponseSchema>;
+export type studyClinicalDTOResponseType = z.infer<typeof studyClinicalDTOResponseSchema>;
+export type studyClinicalDTOResponseSchemaType = z.infer<typeof studyClinicalDTOResponseSchema>;
 
 export const dacModelSchema = z.object({
 	dac_id: z.string(),
