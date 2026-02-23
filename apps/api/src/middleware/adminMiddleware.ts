@@ -19,7 +19,7 @@
 
 import { type Response } from 'express';
 
-import { AuthenticationErrorResponse, withAuthentication } from '@/utils/middleware.ts';
+import { AuthenticationErrorResponse, withAuthentication } from '@/middleware/utils/middleware.ts';
 
 /**
  * Middleware that ensures the request is initiated by an authenticated user with site administrator privileges.

@@ -21,8 +21,8 @@ import { RequestHandler, type Response } from 'express';
 
 import type { UserRole } from '@pcgl-daco/validation';
 
+import { AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
 import { getUserRole } from '@/service/authService.js';
-import { AuthenticationErrorResponse } from '@/utils/middleware.ts';
 
 export type UserRoleOmitRep = Exclude<UserRole, 'INSTITUTIONAL_REP'>;
 
