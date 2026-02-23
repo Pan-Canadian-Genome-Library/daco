@@ -34,7 +34,10 @@ interface SuccessModalProps {
 const SubmitApplicationModal = ({ isOpen, setIsOpen }: SuccessModalProps) => {
 	const { t: translate } = useTranslation();
 	const {
-		state: { applicationState, applicationUserRole },
+		state: {
+			applicationState,
+			applicationUserPermissions: { isInstitutionalRep },
+		},
 	} = useApplicationContext();
 	const { appId } = useOutletContext<ApplicationOutletContext>();
 	const { mutateAsync: submitApplication, isPending: isSubmitting } = useSubmitApplication();
@@ -72,7 +75,7 @@ const SubmitApplicationModal = ({ isOpen, setIsOpen }: SuccessModalProps) => {
 					{translate('sign-and-submit-section.modal.description', {
 						id: appId,
 						reviewer:
-							applicationUserRole === 'INSTITUTIONAL_REP' || applicationState === 'DAC_REVISIONS_REQUESTED'
+							isInstitutionalRep || applicationState === 'DAC_REVISIONS_REQUESTED'
 								? 'Data Access Committee'
 								: 'Institutional Representative',
 					})}
