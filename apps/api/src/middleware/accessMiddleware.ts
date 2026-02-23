@@ -40,9 +40,10 @@ const logger = BaseLogger.forModule('applicationController');
 /**
  * Access middleware for API routes to check if the user has access to the requested resource.
  *
- * !IMPORTANT Must be used for middlewares providing params or a body containing the id of the application to check access for.
- * @params :applicationId - The ID of the application to check access for.
- * @body :id - The ID of the application to check access for.
+ * IMPORTANT Must be used for middlewares providing params or a body containing the id of the application to check access for.
+ * @params :applicationId
+ * @body :id - from `POST /applications/edit` TODO change this to applicationId
+ * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit`
  */
 export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
 	withAuthentication(async (request, response: Response<AuthenticationErrorResponse>, next) => {
@@ -51,14 +52,19 @@ export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
 		/**
 		 * Check if the middleware is retrieving proper header params :applicationId  or body params of :id
 		 */
-		if (request.params.applicationId === undefined && request.body.id === undefined) {
-			logger.error(`Invalid applicationId, accessMiddleware failed to retrieve the required applicationId`);
+		if (
+			request.params.applicationId === undefined &&
+			request.body.id === undefined &&
+			request.body.applicationId === undefined
+		) {
+			logger.error(`accessMiddleware failed to retrieve the required applicationId`);
 			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Something went wrong retrieving this resource' });
 			return;
 		}
 
 		// The applicationId can be retrieved from the body or the params
-		const applicationId = Number(request.params.applicationId) || Number(request.body.id);
+		const applicationId =
+			Number(request.params.applicationId) || Number(request.body.id) || Number(request.body.applicationId);
 
 		if (!isPositiveInteger(applicationId)) {
 			response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application id is not valid' });

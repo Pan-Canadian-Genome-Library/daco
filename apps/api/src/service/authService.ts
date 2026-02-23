@@ -128,10 +128,10 @@ export async function canAccessRequest(
 	return success(undefined);
 }
 
-export function isUserDacMember(user: SessionUser, applicationDac: string): boolean {
+export function isUserDacMember(user: SessionUser, applicationDac: string | null): boolean {
 	return user.dacMember.some((dacId) => dacId === applicationDac);
 }
-export function isUserDacChair(user: SessionUser, applicationDac: string): boolean {
+export function isUserDacChair(user: SessionUser, applicationDac: string | null): boolean {
 	return user.dacChair.some((dacId) => dacId === applicationDac);
 }
 export function isUserApplicant(user: SessionUser, applicationUserId: string): boolean {
