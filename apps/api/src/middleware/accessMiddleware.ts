@@ -19,27 +19,62 @@
 
 import { type Response } from 'express';
 
+import BaseLogger from '@/logger.js';
+import { AuthenticationErrorResponse, withAuthentication } from '@/middleware/utils/middleware.ts';
 import { canAccessRequest } from '@/service/authService.ts';
 import { authErrorResponseHandler } from '@/service/utils.ts';
-import { AuthenticationErrorResponse, withAuthentication } from '@/utils/middleware.ts';
 import { isPositiveInteger } from '@pcgl-daco/validation';
 
-export const accessMiddleware = () =>
+export type AccessConfig = {
+	accessConfig?: {
+		applicant?: boolean;
+		dacChair?: boolean;
+		dacMember?: boolean;
+		dacoAdmin?: boolean;
+		institutionalRep?: boolean;
+	};
+};
+
+const logger = BaseLogger.forModule('applicationController');
+
+/**
+ * Access middleware for API routes to check if the user has access to the requested resource.
+ *
+ * !IMPORTANT Must be used for middlewares providing params or a body containing the id of the application to check access for.
+ * @params :applicationId - The ID of the application to check access for.
+ * @body :id - The ID of the application to check access for.
+ */
+export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
 	withAuthentication(async (request, response: Response<AuthenticationErrorResponse>, next) => {
 		const user = request.session.user;
+
+		/**
+		 * Check if the middleware is retrieving proper header params :applicationId  or body params of :id
+		 */
+		if (request.params.applicationId === undefined && request.body.id === undefined) {
+			logger.error(`Invalid applicationId, accessMiddleware failed to retrieve the required applicationId`);
+			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Something went wrong retrieving this resource' });
+			return;
+		}
 
 		// The applicationId can be retrieved from the body or the params
 		const applicationId = Number(request.params.applicationId) || Number(request.body.id);
 
 		if (!isPositiveInteger(applicationId)) {
-			response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+			response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application id is not valid' });
 			return;
 		}
 
 		if (!user) {
+			response.status(401).send({
+				error: 'UNAUTHORIZED',
+				message: 'This resource is protected and requires authorization.',
+			});
 			return;
 		}
-		const requestAuthResult = await canAccessRequest(user, applicationId);
+
+		const requestAuthResult = await canAccessRequest(user, applicationId, accessConfig);
+		console.log('hai', requestAuthResult);
 
 		if (!requestAuthResult.success) {
 			authErrorResponseHandler(response, requestAuthResult);

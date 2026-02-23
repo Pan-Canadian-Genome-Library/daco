@@ -23,6 +23,7 @@ import { authConfig } from '@/config/authConfig.js';
 import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
+import { AccessConfig } from '@/middleware/accessMiddleware.ts';
 import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
@@ -86,19 +87,37 @@ export async function isAssociatedRep(user: SessionUser, applicationId: number):
 export async function canAccessRequest(
 	user: SessionUser,
 	applicationId: number,
+	config: AccessConfig,
 ): AsyncResult<void, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
 	const result = await getApplicationById({ applicationId });
 	if (result.success) {
 		const { data } = result;
-		const { userId, dacChair, dacMember, dacoAdmin } = user;
+		const { dacoAdmin } = user;
 
-		const hasSpecialAccess =
-			dacoAdmin ||
-			dacChair.some((dacId) => dacId === result.data.dacId) ||
-			dacMember.some((dacId) => dacId === result.data.dacId) ||
-			(await isAssociatedRep(user, applicationId));
+		const ownsApplication = isUserApplicant(user, data.userId);
+		const dacChairOfApplication = isUserDacChair(user, data.dacId);
+		const dacMemberOfApplication = isUserDacMember(user, data.dacId);
+		const representativeOfApplication = await isAssociatedRep(user, applicationId);
 
-		const canAccess = data.userId === userId || hasSpecialAccess;
+		// If accessConfig exists, this means we are stricter with who can access this resource.
+		if (config?.accessConfig) {
+			const { accessConfig } = config;
+			if (accessConfig.applicant && ownsApplication) {
+				return success(undefined);
+			} else if (accessConfig.dacChair && dacChairOfApplication) {
+				return success(undefined);
+			} else if (accessConfig.dacMember && dacMemberOfApplication) {
+				return success(undefined);
+			} else if (accessConfig.dacoAdmin && dacoAdmin) {
+				return success(undefined);
+			} else if (accessConfig.institutionalRep && representativeOfApplication) {
+				return success(undefined);
+			}
+			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');
+		}
+
+		// At least one needs to be authorizied
+		const canAccess = ownsApplication || dacChairOfApplication || dacMemberOfApplication || representativeOfApplication;
 
 		if (!canAccess) {
 			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');
@@ -107,4 +126,14 @@ export async function canAccessRequest(
 		return result;
 	}
 	return success(undefined);
+}
+
+export function isUserDacMember(user: SessionUser, applicationDac: string): boolean {
+	return user.dacMember.some((dacId) => dacId === applicationDac);
+}
+export function isUserDacChair(user: SessionUser, applicationDac: string): boolean {
+	return user.dacChair.some((dacId) => dacId === applicationDac);
+}
+export function isUserApplicant(user: SessionUser, applicationUserId: string): boolean {
+	return user.userId === applicationUserId;
 }
