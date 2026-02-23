@@ -126,7 +126,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 
 		if (canShowEdit) {
 			buttons.push(
-				<ProtectedComponent key={'header-edit'}>
+				<ProtectedComponent key={'header-edit'} requiredMembership={['APPLICANT']}>
 					<Button onClick={() => onEditButtonClick()}>{translate('button.edit')}</Button>
 				</ProtectedComponent>,
 			);

@@ -70,13 +70,14 @@ const ProtectedComponent = ({ requiredMembership, requiredStates, children }: Pr
 			return null;
 		}
 	}
+	console.log(isApplicant, requiredMembership);
 
 	if (requiredMembership) {
-		if (requiredMembership.includes('DAC') && (isDacChair || isDacMember)) {
+		if (requiredMembership.includes('APPLICANT') && isApplicant) {
+			return children;
+		} else if (requiredMembership.includes('DAC') && (isDacChair || isDacMember)) {
 			return children;
 		} else if (requiredMembership.includes('INSTITUTIONAL_REP') && isInstitutionalRep) {
-			return children;
-		} else if (isApplicant) {
 			return children;
 		} else {
 			return null;

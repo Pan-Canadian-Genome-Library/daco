@@ -23,7 +23,7 @@ import FullscreenLoader from '@/components/FullscreenLoader';
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
 
-export type Membership = 'DAC' | 'ADMIN' | 'INSTITUTIONAL_REP';
+export type Membership = 'DAC' | 'ADMIN' | 'INSTITUTIONAL_REP' | 'APPLICANT';
 
 type ProtectedRouteProps = PropsWithChildren<{
 	requiredMembership?: [Membership, ...Membership[]];
