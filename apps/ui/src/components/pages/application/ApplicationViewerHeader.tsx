@@ -134,6 +134,7 @@ const ApplicationViewerHeader = ({ id, appState, currentSection, isEditMode }: A
 
 		buttons.push(
 			<Button
+				key={'header-history'}
 				onClick={() => {
 					setShowHistoryModal(true);
 				}}
