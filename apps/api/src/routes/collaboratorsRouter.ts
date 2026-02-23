@@ -34,8 +34,7 @@ import {
 	listCollaborators,
 	updateCollaborator,
 } from '@/controllers/collaboratorsController.js';
-import { authMiddleware } from '@/middleware/authMiddleware.ts';
-import { canAccessRequest } from '@/service/authService.ts';
+import { accessMiddleware } from '@/middleware/accessMiddleware.ts';
 import { authErrorResponseHandler, authFailure } from '@/service/utils.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -47,7 +46,7 @@ const collaboratorsRouter = express.Router();
  */
 collaboratorsRouter.post(
 	'/create',
-	authMiddleware(),
+	accessMiddleware(),
 	withBodySchemaValidation(
 		collaboratorsCreateRequestSchema,
 		apiZodErrorMapping,
@@ -112,7 +111,7 @@ collaboratorsRouter.post(
  */
 collaboratorsRouter.get(
 	'/:applicationId',
-	authMiddleware(),
+	accessMiddleware(),
 	async (
 		request: Request,
 		response: ResponseWithData<
@@ -123,34 +122,29 @@ collaboratorsRouter.get(
 		const { user } = request.session;
 		if (user) {
 			const applicationId = Number(request.params.applicationId);
-			const requestAuthResult = await canAccessRequest(user, applicationId);
-			if (requestAuthResult.success) {
-				try {
-					if (!isPositiveInteger(applicationId)) {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
-						return;
-					}
 
-					const result = await listCollaborators({
-						applicationId,
-					});
-
-					if (result.success) {
-						response.status(201).json(result.data);
-						return;
-					}
-					switch (result.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
-					}
-				} catch (error) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+			try {
+				if (!isPositiveInteger(applicationId)) {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 					return;
 				}
-			} else {
-				authErrorResponseHandler(response, requestAuthResult);
+
+				const result = await listCollaborators({
+					applicationId,
+				});
+
+				if (result.success) {
+					response.status(201).json(result.data);
+					return;
+				}
+				switch (result.error) {
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 				return;
 			}
 		} else {
@@ -165,7 +159,7 @@ collaboratorsRouter.get(
  */
 collaboratorsRouter.delete(
 	'/:applicationId/:collaboratorEmail',
-	authMiddleware(),
+	accessMiddleware(),
 	withParamsSchemaValidation(
 		collaboratorsDeleteParamsSchema,
 		apiZodErrorMapping,
@@ -177,60 +171,53 @@ collaboratorsRouter.delete(
 			>,
 		) => {
 			const { user } = request.session;
-			if (user) {
-				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(user, applicationId);
-				if (requestAuthResult.success) {
-					try {
-						const collaboratorEmail = request.params.collaboratorEmail;
-
-						if (!collaboratorEmail) {
-							response
-								.status(400)
-								.json({ error: 'INVALID_REQUEST', message: 'Collaborator Email must be included in delete request.' });
-							return;
-						}
-
-						const applicationId = Number(request.params.applicationId);
-
-						if (!isPositiveInteger(applicationId)) {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
-							return;
-						}
-
-						const result = await deleteCollaborator({
-							application_id: applicationId,
-							collaborator_email: collaboratorEmail,
-						});
-
-						if (result.success) {
-							response.status(201).json(result.data);
-							return;
-						}
-						switch (result.error) {
-							case 'INVALID_STATE_TRANSITION': {
-								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-								return;
-							}
-							case 'NOT_FOUND': {
-								response.status(404).json({ error: result.error, message: result.message });
-								return;
-							}
-							case 'SYSTEM_ERROR': {
-								response.status(500).json({ error: result.error, message: result.message });
-								return;
-							}
-						}
-					} catch (error) {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
-					}
-				} else {
-					authErrorResponseHandler(response, requestAuthResult);
-					return;
-				}
-			} else {
+			if (!user) {
 				authErrorResponseHandler(response, authFailure);
 				return;
+			}
+
+			try {
+				const collaboratorEmail = request.params.collaboratorEmail;
+
+				if (!collaboratorEmail) {
+					response
+						.status(400)
+						.json({ error: 'INVALID_REQUEST', message: 'Collaborator Email must be included in delete request.' });
+					return;
+				}
+
+				const applicationId = Number(request.params.applicationId);
+
+				if (!isPositiveInteger(applicationId)) {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+					return;
+				}
+
+				const result = await deleteCollaborator({
+					application_id: applicationId,
+					collaborator_email: collaboratorEmail,
+				});
+
+				if (result.success) {
+					response.status(201).json(result.data);
+					return;
+				}
+				switch (result.error) {
+					case 'INVALID_STATE_TRANSITION': {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+						return;
+					}
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 			}
 		},
 	),
@@ -241,6 +228,7 @@ collaboratorsRouter.delete(
  */
 collaboratorsRouter.post(
 	'/update',
+	accessMiddleware(),
 	withBodySchemaValidation(
 		collaboratorsUpdateRequestSchema,
 		apiZodErrorMapping,
