@@ -17,44 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SessionUser, userRoleSchema } from '@pcgl-daco/validation';
+import { SessionUser } from '@pcgl-daco/validation';
 
-import { authConfig } from '@/config/authConfig.js';
 import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
 import { AccessConfig } from '@/middleware/accessMiddleware.ts';
-import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService } from './types.ts';
-
-/**
- * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
- *
- * Since the INSTITUTIONAL_REP role is determined by users email
- * comparisons between session and institutional_rep email from the application contents, the logic
- * is not included here but instead custom to endpoints that require specific rep functionality.
- * As such reps will have an APPLICANT role.
- *
- */
-export function getUserRole(user: SessionUser | undefined): UserRoleOmitRep {
-	if (!user) {
-		return userRoleSchema.Values.ANONYMOUS;
-	}
-
-	// TODO: removing in the auth refactor
-	const isDacReviewer = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER);
-	const isDacChair = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR);
-
-	if (isDacChair) {
-		return userRoleSchema.Values.DAC_CHAIR;
-	} else if (isDacReviewer) {
-		return userRoleSchema.Values.DAC_MEMBER;
-	}
-	return userRoleSchema.Values.APPLICANT;
-}
-
 /**
  * Based on user data stored in session data, determine the user's role & if the application is associated with them.
  */
