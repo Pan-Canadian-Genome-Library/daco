@@ -17,33 +17,33 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { RequestHandler, type Response } from 'express';
+import { type Response } from 'express';
 
-import { ErrorResponse } from '@pcgl-daco/validation';
+import { canAccessRequest } from '@/service/authService.ts';
+import { authErrorResponseHandler } from '@/service/utils.ts';
+import { AuthenticationErrorResponse, withAuthentication } from '@/utils/middleware.ts';
+import { isPositiveInteger } from '@pcgl-daco/validation';
 
-export type AuthenticationErrorResponse = ErrorResponse<
-	['FORBIDDEN', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST']
->;
-
-/**
- * Authentication middlware HOC. Wrap this around authoirization middlewares to check if the user is authenticated before any authorization steps are taken.
- *
- * @param handler
- * @returns
- */
-export const withAuthentication =
-	(handler: RequestHandler): RequestHandler =>
-	(request, response: Response<AuthenticationErrorResponse>, next) => {
+export const accessMiddleware = () =>
+	withAuthentication(async (request, response: Response<AuthenticationErrorResponse>, next) => {
 		const user = request.session.user;
 
-		if (!user) {
-			response.status(401).send({
-				error: 'UNAUTHORIZED',
-				message: 'This resource is protected and requires authorization.',
-			});
+		// The applicationId can be retrieved from the body or the params
+		const applicationId = Number(request.params.applicationId) || Number(request.body.id);
 
+		if (!isPositiveInteger(applicationId)) {
+			response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
 			return;
 		}
 
-		return handler(request, response, next);
-	};
+		if (!user) {
+			return;
+		}
+		const requestAuthResult = await canAccessRequest(user, applicationId);
+
+		if (!requestAuthResult.success) {
+			authErrorResponseHandler(response, requestAuthResult);
+			return;
+		}
+		return next();
+	});

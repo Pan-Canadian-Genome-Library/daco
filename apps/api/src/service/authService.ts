@@ -87,17 +87,17 @@ export async function canAccessRequest(
 	user: SessionUser,
 	applicationId: number,
 ): AsyncResult<void, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
-	const userRole = getUserRole(user);
-
-	const hasSpecialAccess =
-		userRole === userRoleSchema.Values.DAC_MEMBER ||
-		userRole === userRoleSchema.Values.DAC_CHAIR ||
-		(await isAssociatedRep(user, applicationId));
-
 	const result = await getApplicationById({ applicationId });
 	if (result.success) {
 		const { data } = result;
-		const { userId } = user;
+		const { userId, dacChair, dacMember, dacoAdmin } = user;
+
+		const hasSpecialAccess =
+			dacoAdmin ||
+			dacChair.some((dacId) => dacId === result.data.dacId) ||
+			dacMember.some((dacId) => dacId === result.data.dacId) ||
+			(await isAssociatedRep(user, applicationId));
+
 		const canAccess = data.userId === userId || hasSpecialAccess;
 
 		if (!canAccess) {
