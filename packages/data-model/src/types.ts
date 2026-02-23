@@ -183,7 +183,7 @@ export type ApplicationDTO = {
 	userId: string;
 	state: ApplicationStateValues;
 	createdAt: Date;
-	dacId: string;
+	dacId: string | null;
 	approvedAt?: Date | null;
 	updatedAt?: Date | null;
 	expiresAt?: Date | null;
