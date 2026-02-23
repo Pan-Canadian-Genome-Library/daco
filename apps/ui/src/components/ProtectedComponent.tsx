@@ -70,7 +70,6 @@ const ProtectedComponent = ({ requiredMembership, requiredStates, children }: Pr
 			return null;
 		}
 	}
-	console.log(isApplicant, requiredMembership);
 
 	if (requiredMembership) {
 		if (requiredMembership.includes('APPLICANT') && isApplicant) {
