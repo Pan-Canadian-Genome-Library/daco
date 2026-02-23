@@ -50,7 +50,7 @@ export async function isAssociatedRep(user: SessionUser, applicationId: number):
 }
 
 /**
- * Validate User is allowed access to this specific Application based on userRole or userId
+ * Validate User is allowed access to this specific Application based on user groups or userId
  * @param session Session data with user info used to confirm their role and id
  * @param applicationId - The ID of the application to confirm User's association
  * @returns boolean
