@@ -39,6 +39,9 @@ export type AccessConfig = {
  * Access middleware for file API routes. To determine if a user has access to a file,
  * we also need to check if the user has accessto the application that the file belongs to.
  * @params :fileId
+ *
+ * @prop {AccessConfig} - accessConfig - Configuration object for access control. Target the specific roles that the user must have to access the resource.
+ *                                       If not provided, the middleware will allow access users with at least one of roles are true.
  */
 export const fileAccessMiddleware =
 	(accessConfig: AccessConfig = {}): RequestHandler =>
