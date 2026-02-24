@@ -20,20 +20,10 @@
 import { RequestHandler, type Response } from 'express';
 
 import { getFile } from '@/controllers/fileController.ts';
-import { AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
+import type { AccessConfig, AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
 import { canAccessRequest } from '@/service/authService.ts';
 import { authErrorResponseHandler } from '@/service/utils.ts';
 import { ErrorType } from '@pcgl-daco/request-utils';
-
-export type AccessConfig = {
-	accessConfig?: {
-		applicant?: boolean;
-		dacChair?: boolean;
-		dacMember?: boolean;
-		dacoAdmin?: boolean;
-		institutionalRep?: boolean;
-	};
-};
 
 /**
  * Access middleware for file API routes. To determine if a user has access to a file,
