@@ -22,3 +22,13 @@ import { ErrorResponse } from '@pcgl-daco/validation';
 export type AuthenticationErrorResponse = ErrorResponse<
 	['FORBIDDEN', 'UNAUTHORIZED', 'NOT_FOUND', 'SYSTEM_ERROR', 'INVALID_REQUEST']
 >;
+
+export type AccessConfig = {
+	accessConfig?: {
+		applicant?: boolean;
+		dacChair?: boolean;
+		dacMember?: boolean;
+		dacoAdmin?: boolean;
+		institutionalRep?: boolean;
+	};
+};

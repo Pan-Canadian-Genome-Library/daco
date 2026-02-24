@@ -20,20 +20,10 @@
 import { RequestHandler, type Response } from 'express';
 
 import BaseLogger from '@/logger.js';
-import { AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
+import { AccessConfig, AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
 import { canAccessRequest } from '@/service/authService.ts';
 import { authErrorResponseHandler } from '@/service/utils.ts';
 import { isPositiveInteger } from '@pcgl-daco/validation';
-
-export type AccessConfig = {
-	accessConfig?: {
-		applicant?: boolean;
-		dacChair?: boolean;
-		dacMember?: boolean;
-		dacoAdmin?: boolean;
-		institutionalRep?: boolean;
-	};
-};
 
 const logger = BaseLogger.forModule('applicationController');
 
@@ -46,7 +36,7 @@ const logger = BaseLogger.forModule('applicationController');
  * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit` and `POST /sign`
  *
  * @prop {AccessConfig} - accessConfig - Configuration object for access control. Target the specific roles that the user must have to access the resource.
- *                                       If not provided, the middleware will allow access users with at least one of those true.
+ *                                       If not provided, the middleware will allow access users with at least one of roles are true.
  */
 export const accessMiddleware =
 	(accessConfig: AccessConfig = {}): RequestHandler =>
