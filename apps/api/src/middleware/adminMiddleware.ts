@@ -17,9 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type Response } from 'express';
+import { RequestHandler, type Response } from 'express';
 
-import { AuthenticationErrorResponse, withAuthentication } from '@/middleware/utils/middleware.ts';
+import { AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
 
 /**
  * Middleware that ensures the request is initiated by an authenticated user with site administrator privileges.
@@ -33,8 +33,8 @@ import { AuthenticationErrorResponse, withAuthentication } from '@/middleware/ut
  * 	}
  * )
  */
-export const adminMiddleware = () =>
-	withAuthentication((request, response: Response<AuthenticationErrorResponse>, next) => {
+export const adminMiddleware =
+	(): RequestHandler => (request, response: Response<AuthenticationErrorResponse>, next) => {
 		const user = request.session.user;
 
 		if (!user?.dacoAdmin) {
@@ -46,4 +46,4 @@ export const adminMiddleware = () =>
 		}
 
 		return next();
-	});
+	};

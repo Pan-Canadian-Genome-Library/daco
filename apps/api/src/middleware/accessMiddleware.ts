@@ -17,10 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { type Response } from 'express';
+import { RequestHandler, type Response } from 'express';
 
 import BaseLogger from '@/logger.js';
-import { AuthenticationErrorResponse, withAuthentication } from '@/middleware/utils/middleware.ts';
+import { AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
 import { canAccessRequest } from '@/service/authService.ts';
 import { authErrorResponseHandler } from '@/service/utils.ts';
 import { isPositiveInteger } from '@pcgl-daco/validation';
@@ -45,9 +45,18 @@ const logger = BaseLogger.forModule('applicationController');
  * @body :id - from `POST /applications/edit` TODO change this to applicationId
  * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit` and `POST /sign`
  */
-export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
-	withAuthentication(async (request, response: Response<AuthenticationErrorResponse>, next) => {
+export const accessMiddleware =
+	(accessConfig: AccessConfig = {}): RequestHandler =>
+	async (request, response: Response<AuthenticationErrorResponse>, next) => {
 		const user = request.session.user;
+
+		if (!user) {
+			response.status(401).send({
+				error: 'UNAUTHORIZED',
+				message: 'This resource is protected and requires authorization.',
+			});
+			return;
+		}
 
 		/**
 		 * Check if the middleware is retrieving proper header params :applicationId  or body params of :id
@@ -71,14 +80,6 @@ export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
 			return;
 		}
 
-		if (!user) {
-			response.status(401).send({
-				error: 'UNAUTHORIZED',
-				message: 'This resource is protected and requires authorization.',
-			});
-			return;
-		}
-
 		const requestAuthResult = await canAccessRequest(user, applicationId, accessConfig);
 
 		if (!requestAuthResult.success) {
@@ -86,4 +87,4 @@ export const accessMiddleware = (accessConfig: AccessConfig = {}) =>
 			return;
 		}
 		return next();
-	});
+	};
