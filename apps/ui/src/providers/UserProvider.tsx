@@ -28,18 +28,12 @@ type UserState = {
 	isLoggedIn: boolean;
 	refresh: () => void;
 	user?: SessionUser;
-	isDacMember: boolean;
-	isDacChair: boolean;
-	isAdmin: boolean;
 };
 
 const UserContext = createContext<UserState>({
 	isLoading: true,
 	isLoggedIn: false,
 	refresh: () => {},
-	isDacMember: false,
-	isDacChair: false,
-	isAdmin: false,
 });
 
 export function UserProvider({ children }: PropsWithChildren) {
@@ -54,9 +48,6 @@ export function UserProvider({ children }: PropsWithChildren) {
 		isLoading,
 		refresh,
 		isLoggedIn: !isLoading && !!data?.user,
-		isDacMember: !isLoading && data?.user ? data.user.dacMember.length > 0 : false,
-		isDacChair: !isLoading && data?.user ? data.user.dacChair.length > 0 : false,
-		isAdmin: !isLoading && data?.user ? data.user.dacoAdmin : false,
 	};
 	return <UserContext.Provider value={userState}>{children}</UserContext.Provider>;
 }

@@ -59,7 +59,7 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, user, isDacChair, isDacMember, isAdmin } = useUserContext();
+	const { isLoggedIn, user } = useUserContext();
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -111,14 +111,14 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
-		} else if (isDacChair || isDacMember) {
+		} else if (user && (user.dacChair.length > 0 || user.dacMember.length > 0)) {
 			return {
 				name: translate('links.manageApplications'),
 				href: '/manage/applications',
 				position: 'right',
 				target: '_self',
 			};
-		} else if (isAdmin) {
+		} else if (user?.dacoAdmin) {
 			// TODO: route to admin dashboar
 			return undefined;
 		} else {

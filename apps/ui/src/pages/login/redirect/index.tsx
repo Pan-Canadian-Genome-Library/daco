@@ -25,8 +25,10 @@ import { useNavigate } from 'react-router';
 
 const LoginRedirect = () => {
 	const { t: translate } = useTranslation();
-	const { isLoading, isDacChair, isDacMember, isAdmin, isLoggedIn } = useUserContext();
+	const { isLoading, user, isLoggedIn } = useUserContext();
 	const navigate = useNavigate();
+	const isDacChair = user && user.dacChair.length > 0;
+	const isDacMember = user && user.dacMember.length > 0;
 
 	useEffect(() => {
 		if (isLoading) {
@@ -36,7 +38,7 @@ const LoginRedirect = () => {
 		if (!isLoggedIn) {
 			navigate('/', { replace: true });
 			return;
-		} else if (isAdmin) {
+		} else if (user?.dacoAdmin) {
 			navigate('/admin');
 			return;
 		} else if (isDacChair || isDacMember) {

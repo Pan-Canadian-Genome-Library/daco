@@ -47,7 +47,10 @@ type ProtectedRouteProps = PropsWithChildren<{
  *	</Routes>
  */
 const ProtectedRoute = ({ requiredMembership, redirectTo, children }: ProtectedRouteProps) => {
-	const { isLoading, isLoggedIn, isDacChair, isDacMember, isAdmin } = useUserContext();
+	const { isLoading, isLoggedIn, user } = useUserContext();
+
+	const isDacChair = user && user.dacChair.length > 0;
+	const isDacMember = user && user.dacMember.length > 0;
 
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 
@@ -59,7 +62,7 @@ const ProtectedRoute = ({ requiredMembership, redirectTo, children }: ProtectedR
 	}
 
 	if (requiredMembership) {
-		if (requiredMembership.includes('ADMIN') && !isAdmin) {
+		if (requiredMembership.includes('ADMIN') && !user?.dacoAdmin) {
 			return <Redirect />;
 		}
 
