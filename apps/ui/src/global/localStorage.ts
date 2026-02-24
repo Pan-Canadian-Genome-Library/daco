@@ -47,7 +47,6 @@ export function getExtraSessionInformation(): ExtraSessionInformation | undefine
 
 export function setExtraSessionInformation(sessionInfo: ExtraSessionInformation): boolean {
 	const validSessionInfo = ExtraSessionInformationSchema.safeParse(sessionInfo);
-	console.log(validSessionInfo);
 
 	if (validSessionInfo.success) {
 		localStorage.setItem(SESSION_INFO_KEY, JSON.stringify(sessionInfo));
