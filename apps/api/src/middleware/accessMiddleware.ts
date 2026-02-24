@@ -44,6 +44,9 @@ const logger = BaseLogger.forModule('applicationController');
  * @params :applicationId
  * @body :id - from `POST /applications/edit` TODO change this to applicationId
  * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit` and `POST /sign`
+ *
+ * @prop {AccessConfig} - accessConfig - Configuration object for access control. Target the specific roles that the user must have to access the resource.
+ *                                       If not provided, the middleware will allow access users with at least one of those true.
  */
 export const accessMiddleware =
 	(accessConfig: AccessConfig = {}): RequestHandler =>
