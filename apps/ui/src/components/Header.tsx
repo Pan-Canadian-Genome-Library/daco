@@ -149,7 +149,9 @@ const HeaderComponent = () => {
 			style={{ padding: 5, width: '100%', position: 'relative', top: isLogoutOpen && !isResponsiveMode ? 5 : 0 }}
 		>
 			{isResponsiveMode && (
-				<Divider style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10 }} />
+				<Divider
+					style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10, alignSelf: 'center' }}
+				/>
 			)}
 			<Flex vertical style={{ padding: 5, width: '100%' }}>
 				<Typography style={{ fontSize: 14 }}>{displayName}</Typography>
