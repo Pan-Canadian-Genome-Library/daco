@@ -31,23 +31,11 @@ type ProtectedComponentProps = PropsWithChildren<{
 
 /**
  * Restrict a component from rendering if authorization rules are not met. Can be added
- * around any component to prevent the component from rendering if the user roles are not
+ * around any component to prevent the component from rendering if the user membership are not
  * correct.
  *
- * By default, users must be logged in to see the component.
+ * Since accounts membership is determined on a per-application basis, this component will only work in routes `/applications/*` and will check the user's membership for the current application.
  *
- * To restrict a component to only users of a specific role, you can add the `requiredRoles` prop. If you do,
- * only users with one of the required roles will be able to access that component.
- *
- * To restrict a component to only show when in a certain state, you can add the `requiredStates` prop. If you do,
- * a component will only be visible if the app is in a certain state.
-
- * @example
- * <div>
- *  <ProtectedComponent requiredRoles={['DAC_MEMBER']} requiredStates={['DRAFT']}>
- *      <Button>Button for DACs only<Button/>
- * </ProtectedComponent>
- * </div>
  */
 const ProtectedComponent = ({ requiredMembership, requiredStates, children }: ProtectedComponentProps) => {
 	const { isLoading, isLoggedIn } = useUserContext();

@@ -36,11 +36,7 @@ type ProtectedRouteProps = PropsWithChildren<{
  *
  * By default, users must be logged in to access the route.
  *
- * To restrict a route to only users of a specific role, you can add the `requiredRoles` prop. If you do,
- * only users with one of the required roles will be able to access that route.
- *
- * By default, unauthorized users will be redirected to the home page. To rediret to a different location,
- * provide a `redirectTo` prop
+ * Routes also check if a user has ANY dac chair, dac member membership to any application and admin flag, then will redirect accordingly
  *
  * @example
  * <Routes>
