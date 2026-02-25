@@ -75,7 +75,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 	{
 		title: 'DAC',
 		dataIndex: 'dacId',
-		render: (_, record) => `${record.dacId}`,
+		render: (_, record) => `${record.dacId || '-'}`,
 	},
 	{
 		title: 'Institution',
