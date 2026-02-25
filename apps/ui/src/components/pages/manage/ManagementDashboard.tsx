@@ -160,7 +160,7 @@ const ManagementDashboard = ({
 			</Flex>
 			<Flex style={{ width: '100%', height: '100%', margin: '.5rem 0' }} vertical>
 				<ConfigProvider theme={pcglTableTheme}>
-					<Table<ApplicationListSummary>
+					<Table
 						locale={{
 							emptyText: (
 								<Flex justify="center" align="center" style={{ height: '10rem' }}>
