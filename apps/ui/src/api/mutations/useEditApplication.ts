@@ -47,10 +47,9 @@ const useEditApplication = () => {
 				fields = parseRevisedFields(state.fields, revisions);
 			}
 
-			const response = await fetch('/applications/edit', {
+			const response = await fetch(`/applications/${applicationId}/edit`, {
 				method: 'POST',
 				body: JSON.stringify({
-					applicationId,
 					update: {
 						...fields,
 						...update,

@@ -93,55 +93,61 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/edit',
+	'/:applicationId/edit',
 	accessMiddleware({ accessConfig: { applicant: true } }),
-	withBodySchemaValidation(
-		editApplicationRequestSchema,
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
 		apiZodErrorMapping,
-		async (
-			request: Request,
-			response: ResponseWithData<
-				ApplicationResponseData,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
-			>,
-		) => {
-			const { user } = request.session;
-			if (user) {
-				const data = request.body;
-				const { applicationId, update } = data;
-				try {
-					const result = await editApplication({ id: applicationId, update });
-					if (result.success) {
-						response.status(200).json(result.data);
+		withBodySchemaValidation(
+			editApplicationRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request: Request,
+				response: ResponseWithData<
+					ApplicationResponseData,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				>,
+			) => {
+				const { user } = request.session;
+				const applicationId = Number(request.params.applicationId);
+
+				if (user) {
+					const data = request.body;
+					const { update } = data;
+					try {
+						const result = await editApplication({ id: applicationId, update });
+						if (result.success) {
+							response.status(200).json(result.data);
+							return;
+						}
+						switch (result.error) {
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'INVALID_STATE_TRANSITION': {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							default: {
+								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+								return;
+							}
+						}
+					} catch (error) {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 						return;
 					}
-					switch (result.error) {
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'INVALID_STATE_TRANSITION': {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: result.error, message: result.message });
-							return;
-						}
-						default: {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-							return;
-						}
-					}
-				} catch (error) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				} else {
+					authErrorResponseHandler(response, authFailure);
 					return;
 				}
-			} else {
-				authErrorResponseHandler(response, authFailure);
-				return;
-			}
-		},
+			},
+		),
 	),
 );
 
