@@ -103,6 +103,7 @@ export const applicationResponseSchema = z.object({
 	id: z.number(),
 	userId: z.string(),
 	state: z.nativeEnum(ApplicationStates),
+	dacId: z.string().nullable(),
 	createdAt: z.date(),
 	approvedAt: z.date().nullable(),
 	updatedAt: z.date().nullable(),

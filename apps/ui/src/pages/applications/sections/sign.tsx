@@ -28,7 +28,6 @@ import ApplicantSignatureView from '@/components/pages/application/signature-vie
 import DacSignatureView from '@/components/pages/application/signature-views/DacSignatureView';
 import RepSignatureView from '@/components/pages/application/signature-views/RepSignatureView';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
-import ProtectedComponent from '@/components/ProtectedComponent';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { ApplicationStates } from '@pcgl-daco/data-model';
@@ -36,8 +35,9 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 const SignAndSubmit = () => {
 	const [openModal, setOpenModal] = useState(false);
 	const {
-		state: { fields, applicationState },
+		state: { fields, applicationState, applicationUserPermissions },
 	} = useApplicationContext();
+	const { isApplicant, isDacChair, isDacMember, isInstitutionalRep } = applicationUserPermissions;
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const navigation = useNavigate();
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
@@ -53,15 +53,15 @@ const SignAndSubmit = () => {
 		<>
 			<SectionWrapper>
 				<Form layout="vertical" onFinish={() => setOpenModal(true)}>
-					<ProtectedComponent requiredRoles={['APPLICANT']}>
+					{isApplicant && (
 						<ApplicantSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
-					</ProtectedComponent>
-					<ProtectedComponent requiredRoles={['INSTITUTIONAL_REP']}>
+					)}
+					{isInstitutionalRep && (
 						<RepSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
-					</ProtectedComponent>
-					<ProtectedComponent requiredRoles={['DAC_CHAIR', 'DAC_MEMBER']}>
+					)}
+					{(isDacChair || isDacMember) && (
 						<DacSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
-					</ProtectedComponent>
+					)}
 				</Form>
 			</SectionWrapper>
 			<SubmitApplicationModal isOpen={openModal} setIsOpen={setOpenModal} />

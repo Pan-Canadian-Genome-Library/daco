@@ -50,12 +50,14 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 	const [dacCommentChairOnly, setDacCommentChairOnly] = useState('');
 
 	const {
-		state: { applicationUserRole },
+		state: {
+			applicationUserPermissions: { isDacChair, isDacMember },
+		},
 	} = useApplicationContext();
 	const { t: translate } = useTranslation();
 	const { mutate: createComment } = useCreateDacComments({ applicationId: appId, section });
 
-	const shouldShowDacComments = applicationUserRole === 'DAC_CHAIR' || applicationUserRole === 'DAC_MEMBER';
+	const shouldShowDacComments = isDacChair || isDacMember;
 
 	const dacComments = sectionComments.filter((comment) => !comment.dacChairOnly);
 	const chairOnlyComments = sectionComments.filter((comment) => comment.dacChairOnly);
