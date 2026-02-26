@@ -30,9 +30,8 @@ const logger = BaseLogger.forModule('applicationController');
 /**
  * Access middleware for API routes to check if the user has access to the requested resource.
  *
- * IMPORTANT Must be used for middlewares providing params or a body containing the id of the application to check access for.
+ * IMPORTANT Must be used for middlewares providing params applicationId
  * @params :applicationId
- * @body :applicationId -`POST /sign`
  *
  * @prop {AccessConfig} - accessConfig - Configuration object for access control. Target the specific roles that the user must have to access the resource.
  *                                       If not provided, the middleware will allow access users with at least one of roles are true.
@@ -50,12 +49,10 @@ export const accessMiddleware =
 			return;
 		}
 
-		console.log('fak---', request.params.applicationId);
-
 		/**
-		 * Check if the middleware is retrieving proper header params :applicationId  or body params of :applicationId
+		 * Check if the middleware is retrieving proper header params :applicationId
 		 */
-		if (request.params.applicationId === undefined && request.body.applicationId === undefined) {
+		if (request.params.applicationId === undefined) {
 			logger.error(`accessMiddleware failed to retrieve the required applicationId`);
 			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Something went wrong retrieving this resource' });
 			return;
