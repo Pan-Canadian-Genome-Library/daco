@@ -121,55 +121,60 @@ signatureRouter.get(
  * To sign an application, the user must be the author of the application, or be the institutional rep assigned to the application.
  */
 signatureRouter.post(
-	'/sign',
+	'/:applicationId/sign',
 	accessMiddleware(),
-	withBodySchemaValidation(
-		editSignatureRequestSchema,
+	withParamsSchemaValidation(
+		deleteSignatureParamsSchema,
 		apiZodErrorMapping,
-		async (
-			request,
-			response: ResponseWithData<
-				EditSignatureResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
-			>,
-		) => {
-			const { user } = request.session;
-			if (!user) {
-				authErrorResponseHandler(response, authFailure);
-				return;
-			}
-			const data = request.body;
-			const { applicationId, signature } = data;
-
-			try {
-				const isRep = await isAssociatedRep(user, applicationId);
-
-				const result = await updateApplicationSignature({
-					applicationId,
-					signature,
-					signee: isRep ? 'INSTITUTIONAL_REP' : 'APPLICANT',
-				});
-
-				if (result.success) {
-					response.json(result.data);
+		withBodySchemaValidation(
+			editSignatureRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request,
+				response: ResponseWithData<
+					EditSignatureResponse,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				>,
+			) => {
+				const { user } = request.session;
+				if (!user) {
+					authErrorResponseHandler(response, authFailure);
 					return;
 				}
+				const data = request.body;
+				const { signature } = data;
+				const applicationId = Number(request.params.applicationId);
 
-				switch (result.error) {
-					case 'NOT_FOUND': {
-						response.status(404).json({ error: result.error, message: result.message });
+				try {
+					const isRep = await isAssociatedRep(user, applicationId);
+
+					const result = await updateApplicationSignature({
+						applicationId,
+						signature,
+						signee: isRep ? 'INSTITUTIONAL_REP' : 'APPLICANT',
+					});
+
+					if (result.success) {
+						response.json(result.data);
 						return;
 					}
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
+
+					switch (result.error) {
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
 					}
+				} catch (error) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+					return;
 				}
-			} catch (error) {
-				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
-				return;
-			}
-		},
+			},
+		),
 	),
 );
 
