@@ -32,7 +32,7 @@ const logger = BaseLogger.forModule('applicationController');
  *
  * IMPORTANT Must be used for middlewares providing params or a body containing the id of the application to check access for.
  * @params :applicationId
- * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit` and `POST /sign`
+ * @body :applicationId -`POST /sign`
  *
  * @prop {AccessConfig} - accessConfig - Configuration object for access control. Target the specific roles that the user must have to access the resource.
  *                                       If not provided, the middleware will allow access users with at least one of roles are true.
@@ -49,6 +49,8 @@ export const accessMiddleware =
 			});
 			return;
 		}
+
+		console.log('fak---', request.params.applicationId);
 
 		/**
 		 * Check if the middleware is retrieving proper header params :applicationId  or body params of :applicationId

@@ -22,6 +22,7 @@ import express, { Request } from 'express';
 import type { ListCollaboratorResponse } from '@pcgl-daco/data-model/src/types.ts';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
+	basicApplicationParamSchema,
 	collaboratorsCreateRequestSchema,
 	collaboratorsDeleteParamsSchema,
 	collaboratorsUpdateRequestSchema,
@@ -45,64 +46,69 @@ const collaboratorsRouter = express.Router();
  * Add Collaborator
  */
 collaboratorsRouter.post(
-	'/create',
+	'/:applicationId/create',
 	accessMiddleware(),
-	withBodySchemaValidation(
-		collaboratorsCreateRequestSchema,
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
 		apiZodErrorMapping,
-		async (
-			request,
-			response: ResponseWithData<
-				ListCollaboratorResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
-			>,
-		) => {
-			const { user } = request.session;
-			if (user) {
-				const { userId } = user;
-				try {
-					const { applicationId: application_id, collaborators } = request.body;
+		withBodySchemaValidation(
+			collaboratorsCreateRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request,
+				response: ResponseWithData<
+					ListCollaboratorResponse,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
+				>,
+			) => {
+				const { user } = request.session;
+				if (user) {
+					const { userId } = user;
+					try {
+						const { collaborators } = request.body;
+						const applicationId = Number(request.params.applicationId);
 
-					const result = await createCollaborators({
-						application_id,
-						user_id: userId,
-						collaborators,
-					});
+						const result = await createCollaborators({
+							application_id: applicationId,
+							user_id: userId,
+							collaborators,
+						});
 
-					if (result.success) {
-						response.status(201).json(result.data);
-						return;
+						if (result.success) {
+							response.status(201).json(result.data);
+							return;
+						}
+						switch (result.error) {
+							case 'DUPLICATE_RECORD': {
+								response.status(409).json({ error: 'CONFLICT', message: result.message });
+								return;
+							}
+							case 'INVALID_STATE_TRANSITION': {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'UNAUTHORIZED': {
+								response.status(403).json({ error: 'FORBIDDEN', message: result.message });
+								return;
+							}
+						}
+					} catch (error) {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 					}
-					switch (result.error) {
-						case 'DUPLICATE_RECORD': {
-							response.status(409).json({ error: 'CONFLICT', message: result.message });
-							return;
-						}
-						case 'INVALID_STATE_TRANSITION': {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'UNAUTHORIZED': {
-							response.status(403).json({ error: 'FORBIDDEN', message: result.message });
-							return;
-						}
-					}
-				} catch (error) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				} else {
+					authErrorResponseHandler(response, authFailure);
+					return;
 				}
-			} else {
-				authErrorResponseHandler(response, authFailure);
-				return;
-			}
-		},
+			},
+		),
 	),
 );
 
@@ -227,66 +233,71 @@ collaboratorsRouter.delete(
  * Update Collaborator
  */
 collaboratorsRouter.post(
-	'/update',
+	'/:applicationId/update',
 	accessMiddleware(),
-	withBodySchemaValidation(
-		collaboratorsUpdateRequestSchema,
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
 		apiZodErrorMapping,
-		async (
-			request,
-			response: ResponseWithData<
-				ListCollaboratorResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
-			>,
-		) => {
-			const { user } = request.session;
-			if (user) {
-				try {
-					const { applicationId: application_id, collaboratorEmail, collaboratorUpdates } = request.body;
-					const { userId } = user;
+		withBodySchemaValidation(
+			collaboratorsUpdateRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request,
+				response: ResponseWithData<
+					ListCollaboratorResponse,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST', 'CONFLICT']
+				>,
+			) => {
+				const { user } = request.session;
+				if (user) {
+					try {
+						const { collaboratorEmail, collaboratorUpdates } = request.body;
+						const { userId } = user;
+						const applicationId = Number(request.params.applicationId);
 
-					const result = await updateCollaborator({
-						application_id,
-						institutional_email: collaboratorEmail,
-						user_id: userId,
-						collaboratorUpdates,
-					});
+						const result = await updateCollaborator({
+							application_id: applicationId,
+							institutional_email: collaboratorEmail,
+							user_id: userId,
+							collaboratorUpdates,
+						});
 
-					if (result.success) {
-						response.status(201).json(result.data);
+						if (result.success) {
+							response.status(201).json(result.data);
+							return;
+						}
+						switch (result.error) {
+							case 'INVALID_STATE_TRANSITION': {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+								return;
+							}
+							case 'NOT_FOUND': {
+								response.status(404).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'SYSTEM_ERROR': {
+								response.status(500).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'FORBIDDEN': {
+								response.status(403).json({ error: result.error, message: result.message });
+								return;
+							}
+							case 'DUPLICATE_RECORD': {
+								response.status(409).json({ error: 'CONFLICT', message: result.message });
+								return;
+							}
+						}
+					} catch (error) {
+						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 						return;
 					}
-					switch (result.error) {
-						case 'INVALID_STATE_TRANSITION': {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-							return;
-						}
-						case 'NOT_FOUND': {
-							response.status(404).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'SYSTEM_ERROR': {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'FORBIDDEN': {
-							response.status(403).json({ error: result.error, message: result.message });
-							return;
-						}
-						case 'DUPLICATE_RECORD': {
-							response.status(409).json({ error: 'CONFLICT', message: result.message });
-							return;
-						}
-					}
-				} catch (error) {
-					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+				} else {
+					authErrorResponseHandler(response, authFailure);
 					return;
 				}
-			} else {
-				authErrorResponseHandler(response, authFailure);
-				return;
-			}
-		},
+			},
+		),
 	),
 );
 
