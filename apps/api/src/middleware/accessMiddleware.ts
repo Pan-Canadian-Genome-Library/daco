@@ -32,7 +32,6 @@ const logger = BaseLogger.forModule('applicationController');
  *
  * IMPORTANT Must be used for middlewares providing params or a body containing the id of the application to check access for.
  * @params :applicationId
- * @body :id - from `POST /applications/edit` TODO change this to applicationId
  * @body :applicationId - from `POST /collaborator/create` and `POST /collaborator/edit` and `POST /sign`
  *
  * @prop {AccessConfig} - accessConfig - Configuration object for access control. Target the specific roles that the user must have to access the resource.
@@ -52,13 +51,9 @@ export const accessMiddleware =
 		}
 
 		/**
-		 * Check if the middleware is retrieving proper header params :applicationId  or body params of :id
+		 * Check if the middleware is retrieving proper header params :applicationId  or body params of :applicationId
 		 */
-		if (
-			request.params.applicationId === undefined &&
-			request.body.id === undefined &&
-			request.body.applicationId === undefined
-		) {
+		if (request.params.applicationId === undefined && request.body.applicationId === undefined) {
 			logger.error(`accessMiddleware failed to retrieve the required applicationId`);
 			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Something went wrong retrieving this resource' });
 			return;

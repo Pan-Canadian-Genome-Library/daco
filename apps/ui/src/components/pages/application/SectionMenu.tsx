@@ -49,7 +49,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		if (formState.isDirty) {
-			editApplication({ id: appId, revisions });
+			editApplication({ applicationId: appId, revisions });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};

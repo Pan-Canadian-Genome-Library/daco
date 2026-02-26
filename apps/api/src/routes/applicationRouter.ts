@@ -108,9 +108,9 @@ applicationRouter.post(
 			const { user } = request.session;
 			if (user) {
 				const data = request.body;
-				const { id, update } = data;
+				const { applicationId, update } = data;
 				try {
-					const result = await editApplication({ id, update });
+					const result = await editApplication({ id: applicationId, update });
 					if (result.success) {
 						response.status(200).json(result.data);
 						return;

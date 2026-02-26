@@ -93,7 +93,7 @@ export const applicationContentsResponseSchema = applicationContentsSchema
 	.partial();
 
 export const editApplicationRequestSchema = z.object({
-	id: z.number().nonnegative(),
+	applicationId: z.number().nonnegative(),
 	update: updateEditApplicationRequestSchema.strict().refine((updateObj) => Object.keys(updateObj).length !== 0, {
 		params: { violation: 'noEmptyObject' },
 	}),

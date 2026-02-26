@@ -180,7 +180,7 @@ const Ethics = () => {
 
 							// This page should edit the backend immediately
 							editApplication({
-								id: appId,
+								applicationId: appId,
 								update: {
 									ethicsReviewRequired: ethicsReviewReq,
 								},
