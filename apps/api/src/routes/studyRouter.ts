@@ -18,16 +18,28 @@
  */
 
 import type { DacDTO, StudyDTO } from '@pcgl-daco/data-model';
-import { withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
+import {
+	activateBodyParamSchema,
+	basicStudyParamSchema,
+	dacDTOResponseSchema,
+	studyClinicalDTOResponseSchema,
+} from '@pcgl-daco/validation';
 import express from 'express';
 
 import { serverConfig } from '@/config/serverConfig.js';
 import { createDacRecords } from '@/controllers/dacController.ts';
-import { getStudyById, updateStudies } from '@/controllers/studyController.ts';
+import {
+	getAllStudies,
+	getStudyById,
+	setStudyAcceptingApplications,
+	updateStudies,
+} from '@/controllers/studyController.ts';
+import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
+import { adminMiddleware } from '@/middleware/adminMiddleware.ts';
 import { type StudyModel } from '@/service/types.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
-import { basicStudyParamSchema } from '@pcgl-daco/validation';
 import type { ResponseWithData } from './types.ts';
 
 const logger = BaseLogger.forModule('studyRouter');
@@ -42,69 +54,74 @@ studyRouter.get(
 		const { CLINICAL_URL } = serverConfig;
 		const dacResponse = await fetch(`${CLINICAL_URL}/dac`);
 		const dacResponseData = await dacResponse.json();
-		const dacData =
-			typeof dacResponseData === 'object' &&
-			Array.isArray(dacResponseData) &&
-			dacResponseData.map((dac) => dac as DacDTO);
+		const parsedDacData = dacDTOResponseSchema.safeParse(dacResponseData);
 
-		if (!dacData) {
+		if (!parsedDacData.success) {
+			logger.error('Error retrieving DAC data', parsedDacData.error);
 			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC data' });
 			return;
-		} else if (dacData.length === 0) {
+		} else if (parsedDacData.data.length === 0) {
 			logger.error('No DAC data retrieved from Clinical on Import Studies');
 			response.status(404).json({ error: 'NOT_FOUND', message: 'No DAC Study data retrieved from Clinical' });
 			return;
 		}
 
-		const updatedDacResult = await createDacRecords({ dacData });
-
-		if (!updatedDacResult.success) {
-			switch (updatedDacResult.error) {
-				case 'NOT_FOUND':
-					response.status(404).json({ error: updatedDacResult.error, message: updatedDacResult.message });
-					break;
-				case 'SYSTEM_ERROR':
-					response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
-					break;
-				default:
-					response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
-			}
-			return;
-		}
-
 		const studyResponse = await fetch(`${CLINICAL_URL}/study`);
 		const studyResponseData = await studyResponse.json();
-		const studyData =
-			typeof studyResponseData === 'object' &&
-			Array.isArray(studyResponseData) &&
-			studyResponseData.map((study) => study as StudyDTO);
-		if (!studyData) {
-			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies');
+		const parsedStudyData = studyClinicalDTOResponseSchema.safeParse(studyResponseData);
+
+		if (!parsedStudyData.success) {
+			logger.error('Error retrieving DAC Study data retrieved from Clinical on Import Studies', parsedStudyData.error);
 			response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Error retrieving DAC Study data from Clinical' });
 			return;
-		} else if (studyData.length === 0) {
+		} else if (parsedStudyData.data.length === 0) {
 			logger.error('No Study data retrieved from Clinical on Import Studies');
 			response.status(404).json({ error: 'NOT_FOUND', message: 'No Study data retrieved from Clinical' });
 			return;
 		}
 
-		const updatedStudiesResult = await updateStudies({ studies: studyData });
+		const database = getDbInstance();
+		const txResult = await database.transaction(async (tx) => {
+			const dacData = parsedDacData.data;
+			const updatedDacResult = await createDacRecords({ dacData, transaction: tx });
 
-		if (!updatedStudiesResult.success) {
-			switch (updatedStudiesResult.error) {
-				case 'NOT_FOUND':
-					response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
-					break;
-				case 'SYSTEM_ERROR':
-					response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
-					break;
-				default:
-					response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+			if (!updatedDacResult.success) {
+				switch (updatedDacResult.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+						break;
+					default:
+						response.status(500).json({ error: updatedDacResult.error, message: updatedDacResult.message });
+				}
+				return;
 			}
-			return;
-		}
 
-		response.status(200).json({ studies: updatedStudiesResult.data });
+			const studyData = parsedStudyData.data;
+			const updatedStudiesResult = await updateStudies({ studies: studyData, transaction: tx });
+
+			if (!updatedStudiesResult.success) {
+				switch (updatedStudiesResult.error) {
+					case 'NOT_FOUND':
+						response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+						break;
+					case 'SYSTEM_ERROR':
+						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+						break;
+					default:
+						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
+				}
+				return;
+			}
+
+			return updatedStudiesResult;
+		});
+
+		if (txResult) {
+			response.status(200).json({ studies: txResult.data });
+		}
 		return;
 	},
 );
@@ -140,5 +157,65 @@ studyRouter.get(
 		},
 	),
 );
+
+/**
+ * Activate or Deactive study by Id
+ */
+studyRouter.patch(
+	'/:studyId/accepting-applications',
+	adminMiddleware(),
+	withParamsSchemaValidation(
+		basicStudyParamSchema,
+		apiZodErrorMapping,
+		withBodySchemaValidation(
+			activateBodyParamSchema,
+			apiZodErrorMapping,
+			async (
+				request,
+				response: ResponseWithData<Pick<StudyDTO, 'acceptingApplications'>, ['SYSTEM_ERROR', 'NOT_FOUND']>,
+			) => {
+				const studyId = String(request.params.studyId);
+				const enabled = request.body.enabled;
+
+				const result = await setStudyAcceptingApplications({ studyId, enabled });
+
+				if (!result.success) {
+					switch (result.error) {
+						case 'NOT_FOUND':
+							response.status(404).json({ error: result.error, message: result.message });
+							break;
+						case 'SYSTEM_ERROR':
+							response.status(500).json({ error: result.error, message: result.message });
+							break;
+						default:
+							response.status(500).json({ error: result.error, message: result.message });
+					}
+					return;
+				}
+				response.status(204).json();
+				return;
+			},
+		),
+	),
+);
+/*
+ * Get all studies
+ */
+studyRouter.get('/', async (request, response: ResponseWithData<StudyDTO[], ['SYSTEM_ERROR']>) => {
+	const result = await getAllStudies();
+
+	if (!result.success) {
+		switch (result.error) {
+			case 'SYSTEM_ERROR':
+				response.status(500).json({ error: result.error, message: result.message });
+				break;
+			default:
+				response.status(500).json({ error: result.error, message: result.message });
+		}
+		return;
+	}
+	response.status(200).json(result.data);
+	return;
+});
 
 export default studyRouter;

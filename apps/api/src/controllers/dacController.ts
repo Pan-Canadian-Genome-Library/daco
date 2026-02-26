@@ -17,25 +17,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { DacDTO } from '@pcgl-daco/data-model';
+
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { dacSvc } from '@/service/dacService.ts';
-import { type DacRecord } from '@/service/types.ts';
+import { type DacRecord, type PostgresTransaction } from '@/service/types.ts';
 import { convertToDacUpdateRecord } from '@/utils/aliases.ts';
 import { failure, type AsyncResult } from '@/utils/results.ts';
-import type { DacDTO } from '@pcgl-daco/data-model';
 
 const logger = BaseLogger.forModule('dacController');
 
 /**
- * Inserts & Updates Multiple Study Records
- * @param studies - An array of Study DTO objects from the Submission Service
+ * Inserts & Updates Multiple DAC Group records
+ * @param studies - An array of DAC DTO objects from the Submission Service
  * @returns
  */
 export const createDacRecords = async ({
 	dacData,
+	transaction,
 }: {
 	dacData: DacDTO[];
+	transaction?: PostgresTransaction;
 }): AsyncResult<DacRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
@@ -53,7 +56,7 @@ export const createDacRecords = async ({
 			throw new Error(updatedRecordResult.message);
 		});
 
-		const updatedStudies = await dacService.createDacRecords({ dacGroups });
+		const updatedStudies = await dacService.createDacRecords({ dacGroups, transaction });
 
 		return updatedStudies;
 	} catch (error) {
