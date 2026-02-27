@@ -40,7 +40,6 @@ import {
 	userRoleSchema,
 } from '@pcgl-daco/validation';
 
-import { authConfig } from '@/config/authConfig.ts';
 import {
 	approveApplication,
 	closeApplication,
@@ -62,7 +61,7 @@ import {
 	withdrawApplication,
 } from '@/controllers/applicationController.js';
 import BaseLogger from '@/logger.js';
-import { authMiddleware, type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
+import { authMiddleware } from '@/middleware/authMiddleware.ts';
 import { canAccessRequest, getUserRole, isAssociatedRep } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { authErrorResponseHandler, authFailure, getUserName } from '@/service/utils.ts';
