@@ -428,6 +428,19 @@ export const sendEmailReminders = async ({
 				to: applicantEmail,
 			});
 			break;
+		case ApplicationStates.DRAFT:
+			if (relatedAction.action === ApplicationActions.WITHDRAW) {
+				// Withdrawing moves Application back to Draft
+				// If still in review 7 days later -> send email reminder to Applicant
+				emailService.sendEmailSubmitDraftReminder({
+					id: application_id,
+					applicantName,
+					actionId: application_action_id,
+					submittedDate,
+					to: applicantEmail,
+				});
+			}
+			break;
 		default:
 			break;
 	}
