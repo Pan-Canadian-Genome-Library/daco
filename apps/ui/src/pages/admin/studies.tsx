@@ -41,7 +41,6 @@ const AdminStudiesPage = () => {
 			key: 'names',
 			title: 'Study Name',
 			dataIndex: 'studyName',
-			sorter: (a, b) => a.studyName.localeCompare(b.studyName),
 			render: (name: string) => <Text strong>{name}</Text>,
 		},
 		{
@@ -50,11 +49,6 @@ const AdminStudiesPage = () => {
 			dataIndex: 'acceptingApplications',
 			width: 180,
 			align: 'center',
-			filters: [
-				{ text: 'Accepting', value: true },
-				{ text: 'Not Accepting', value: false },
-			],
-			onFilter: (value, record) => record.acceptingApplications === value,
 			render: (_, record) => {
 				const isAccepting = record.acceptingApplications;
 				return (
