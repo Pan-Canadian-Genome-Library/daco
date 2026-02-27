@@ -17,54 +17,131 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Flex, Table, TableColumnsType } from 'antd';
+import { ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { Button, Card, Divider, Flex, Result, Table, TableColumnsType, Tag, Typography } from 'antd';
+import { useNavigate } from 'react-router';
 
 import useToggleAccptingStudies from '@/api/mutations/useToggleAcceptingStudies';
 import useGetStudies from '@/api/queries/useGetStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { StudyDTO } from '@pcgl-daco/data-model';
+import { useTranslation } from 'react-i18next';
+
+const { Title, Paragraph, Text } = Typography;
 
 const AdminStudiesPage = () => {
 	const { data, isLoading, isError } = useGetStudies();
 	const { mutate: toggleStudy } = useToggleAccptingStudies();
+	const navigate = useNavigate();
+	const { t: translate } = useTranslation();
 
 	const columns: TableColumnsType<StudyDTO> = [
 		{
 			key: 'names',
 			title: 'Study Name',
 			dataIndex: 'studyName',
-
-			colSpan: 1,
+			sorter: (a, b) => a.studyName.localeCompare(b.studyName),
+			render: (name: string) => <Text strong>{name}</Text>,
+		},
+		{
+			key: 'status',
+			title: 'Status',
+			dataIndex: 'acceptingApplications',
+			width: 180,
+			align: 'center',
+			filters: [
+				{ text: 'Accepting', value: true },
+				{ text: 'Not Accepting', value: false },
+			],
+			onFilter: (value, record) => record.acceptingApplications === value,
+			render: (_, record) => {
+				const isAccepting = record.acceptingApplications;
+				return (
+					<Tag
+						icon={isAccepting ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+						color={isAccepting ? 'success' : 'error'}
+						style={{ fontSize: 13, padding: '3px 10px' }}
+					>
+						{isAccepting ? 'Accepting' : 'Not Accepting'}
+					</Tag>
+				);
+			},
 		},
 		{
 			key: 'acceptingsStatus',
-			title: 'Accepting Status',
+			title: 'Toggle',
 			dataIndex: 'acceptingStatus',
-			width: '400px',
+			width: 200,
 			align: 'center',
 			render: (_, record) => {
 				const isAccepting = record.acceptingApplications;
 				return (
 					<Button
-						onClick={async () => {
+						onClick={() => {
 							toggleStudy({ studyId: record.studyId, enabled: !record.acceptingApplications });
 						}}
-						color={isAccepting ? 'green' : 'danger'}
-						variant="solid"
+						color={isAccepting ? 'danger' : 'green'}
+						variant="outlined"
 						style={{ width: '150px' }}
 					>
-						{isAccepting ? 'Accepting' : 'Not Accepting'}
+						{isAccepting ? 'Deactivate' : 'Activate'}
 					</Button>
 				);
 			},
 		},
 	];
 
-	if (isLoading || isError) return <>Loading</>;
 	return (
-		<ContentWrapper style={{ height: '100%', width: '100%', padding: '2em 0', gap: '3rem' }}>
-			<Flex flex={1} vertical justify="center" align="center" gap={'large'}>
-				<Table rowKey="studyId" style={{ width: '100%' }} dataSource={data} columns={columns} />;
+		<ContentWrapper style={{ height: '100%', width: '100%', padding: '3rem 0' }}>
+			<Flex vertical gap={32} style={{ width: '100%' }}>
+				{/* Page Header */}
+				<Flex vertical gap={4}>
+					<Button
+						type="text"
+						icon={<ArrowLeftOutlined />}
+						onClick={() => navigate('/admin')}
+						style={{
+							alignSelf: 'flex-start',
+							color: pcglColours.darkGrey,
+							padding: '0 4px',
+							marginBottom: 4,
+						}}
+					>
+						{translate('admin.activate.backToDashboard')}
+					</Button>
+
+					<Flex align="center" gap={12}>
+						<ExperimentOutlined style={{ fontSize: 28, color: pcglColours.primary }} />
+						<Title level={2} style={{ margin: 0, color: pcglColours.secondary }}>
+							{translate('admin.activate.pageTitle')}
+						</Title>
+					</Flex>
+					<Paragraph style={{ margin: 0, color: pcglColours.darkGrey, fontSize: 15, paddingLeft: 40 }}>
+						{translate('admin.activate.pageDescription')}
+					</Paragraph>
+				</Flex>
+
+				<Divider style={{ margin: 0 }} />
+
+				{isError ? (
+					<Result
+						status="error"
+						title="Failed to load studies"
+						subTitle="There was a problem fetching the study list."
+					/>
+				) : (
+					<Card
+						style={{
+							borderRadius: 8,
+							boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+							borderTop: `4px solid ${pcglColours.primary}`,
+						}}
+						styles={{ body: { padding: 0 } }}
+					>
+						<Table rowKey="studyId" style={{ width: '100%' }} dataSource={data} columns={columns} loading={isLoading} />
+					</Card>
+				)}
 			</Flex>
 		</ContentWrapper>
 	);

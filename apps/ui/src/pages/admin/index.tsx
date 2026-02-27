@@ -48,19 +48,19 @@ const AdminDashboardPage = () => {
 	const adminActions = [
 		{
 			key: 'import',
-			title: translate('admin.card.import.title'),
-			description: translate('admin.card.import.description'),
+			title: translate('admin.dashboard.card.import.title'),
+			description: translate('admin.dashboard.card.import.description'),
 			action: handleSyncStudies,
-			buttonLabel: translate('admin.card.import.button'),
+			buttonLabel: translate('admin.dashboard.card.import.button'),
 			buttonDisabled: isPending,
 			buttonIcon: isPending ? <Spin size="small" /> : undefined,
 		},
 		{
 			key: 'studies',
-			title: translate('admin.card.activateStudies.title'),
-			description: translate('admin.card.activateStudies.description'),
+			title: translate('admin.dashboard.card.activateStudies.title'),
+			description: translate('admin.dashboard.card.activateStudies.description'),
 			action: () => navigate('/admin/studies'),
-			buttonLabel: translate('admin.card.activateStudies.button'),
+			buttonLabel: translate('admin.dashboard.card.activateStudies.button'),
 			buttonDisabled: false,
 			buttonIcon: undefined,
 		},
@@ -73,11 +73,11 @@ const AdminDashboardPage = () => {
 					<Flex align="center" gap={12}>
 						<DashboardOutlined style={{ fontSize: 28, color: pcglColours.primary }} />
 						<Title level={2} style={{ margin: 0, color: pcglColours.secondary }}>
-							{translate('admin.pageTitle')}
+							{translate('admin.dashboard.pageTitle')}
 						</Title>
 					</Flex>
 					<Paragraph style={{ margin: 0, color: pcglColours.darkGrey, fontSize: 15, paddingLeft: 40 }}>
-						{translate('admin.pageDescription')}
+						{translate('admin.dashboard.pageDescription')}
 					</Paragraph>
 				</Flex>
 				<Divider style={{ margin: 0 }} />
@@ -86,7 +86,7 @@ const AdminDashboardPage = () => {
 						strong
 						style={{ fontSize: 13, letterSpacing: '0.06em', color: pcglColours.darkGrey, textTransform: 'uppercase' }}
 					>
-						{translate('admin.quickActions')}
+						{translate('admin.dashboard.quickActions')}
 					</Text>
 					<Row gutter={[24, 24]}>
 						{adminActions.map(({ key, title, description, action, buttonLabel, buttonDisabled, buttonIcon }) => (
