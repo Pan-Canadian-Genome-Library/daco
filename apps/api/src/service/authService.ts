@@ -22,7 +22,7 @@ import { SessionUser } from '@pcgl-daco/validation';
 import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
-import type { AccessConfig } from '@/middleware/utils/middleware.ts';
+import type { AccessConfig } from '@/middleware/utils/types.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService } from './types.ts';

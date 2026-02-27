@@ -20,7 +20,7 @@
 import { RequestHandler, type Response } from 'express';
 
 import { getFile } from '@/controllers/fileController.ts';
-import type { AccessConfig, AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
+import type { AccessConfig, AuthenticationErrorResponse } from '@/middleware/utils/types.ts';
 import { canAccessRequest } from '@/service/authService.ts';
 import { authErrorResponseHandler } from '@/service/utils.ts';
 import { ErrorType } from '@pcgl-daco/request-utils';

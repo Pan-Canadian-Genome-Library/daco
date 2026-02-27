@@ -20,7 +20,7 @@
 import { RequestHandler, type Response } from 'express';
 
 import BaseLogger from '@/logger.js';
-import { AccessConfig, AuthenticationErrorResponse } from '@/middleware/utils/middleware.ts';
+import { AccessConfig, AuthenticationErrorResponse } from '@/middleware/utils/types.ts';
 import { canAccessRequest } from '@/service/authService.ts';
 import { authErrorResponseHandler } from '@/service/utils.ts';
 import { isPositiveInteger } from '@pcgl-daco/validation';
