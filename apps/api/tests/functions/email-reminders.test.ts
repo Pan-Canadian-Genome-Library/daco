@@ -75,7 +75,7 @@ describe('Email Reminders', () => {
 		}
 	});
 
-	describe('checkDraftApplicationNeedsReminder', ()=>{
+	describe('checkDraftApplicationNeedsReminder', () => {
 		it('checkDraftApplicationNeedsReminder', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 1);
 			assert.ok(testApplicationRecord);
@@ -85,7 +85,7 @@ describe('Email Reminders', () => {
 			const reminderResult = checkDraftApplicationNeedsReminder({ state, created_at });
 			assert.ok(reminderResult);
 		});
-	}) 
+	});
 
 	describe('checkApplicationNeedsReminder', () => {
 		it('checkApplicationNeedsReminder - Institutional Rep Review', async () => {

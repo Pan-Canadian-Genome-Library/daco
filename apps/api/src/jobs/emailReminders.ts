@@ -192,24 +192,29 @@ export const getDacUserDataResult = async ({
 
 /**
  * Checks if early application in Draft requires email followup
-* @param state: ApplicationStateValues
-* @param created_at: Date
-* @param mostRecentEmail: EmailRecord | undefined
+ * @param state: ApplicationStateValues
+ * @param created_at: Date
+ * @param mostRecentEmail: EmailRecord | undefined
  * @returns boolean
  */
-export const checkDraftApplicationNeedsReminder = ({ state, created_at, mostRecentEmail }: {
-	state: ApplicationStateValues; 
-	created_at: Date; 
+export const checkDraftApplicationNeedsReminder = ({
+	state,
+	created_at,
+	mostRecentEmail,
+}: {
+	state: ApplicationStateValues;
+	created_at: Date;
 	mostRecentEmail?: EmailRecord;
 }) => {
 	// Early Draft applications will not have any state transition Action records
 	// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead of Action date
 	if (state === ApplicationStates.DRAFT && dateDiffCheck({ actionDate: created_at })) {
 		// Reminders should be sent if no reminder has been sent yet, or if a reminder email was sent #{interval} days ago
-		if(!mostRecentEmail || dateDiffCheck({ actionDate: mostRecentEmail.created_at })) {
+		if (!mostRecentEmail || dateDiffCheck({ actionDate: mostRecentEmail.created_at })) {
 			return true;
 		}
-}}
+	}
+};
 
 /**
  * Checks if post-Draft status application requires email follow up
@@ -217,7 +222,10 @@ export const checkDraftApplicationNeedsReminder = ({ state, created_at, mostRece
  * @param mostRecentEmail: EmailRecord | undefined
  * @returns boolean
  */
-export const checkApplicationNeedsReminder = ({ mostRecentAction, mostRecentEmail }: {
+export const checkApplicationNeedsReminder = ({
+	mostRecentAction,
+	mostRecentEmail,
+}: {
 	mostRecentAction: ApplicationActionRecord;
 	mostRecentEmail?: EmailRecord;
 }) => {
@@ -228,11 +236,10 @@ export const checkApplicationNeedsReminder = ({ mostRecentAction, mostRecentEmai
 		// Reminders should be sent if no reminder has been sent yet, or if a reminder email was sent #{interval} days ago
 		const noReminderSent = !mostRecentEmail;
 		const reminderTimeElapsed = mostRecentEmail && dateDiffCheck({ actionDate: mostRecentEmail.created_at });
-		return (noReminderSent || reminderTimeElapsed);
+		return noReminderSent || reminderTimeElapsed;
 	}
 	return false;
 };
-
 
 /* Reviews Application, Action & Email details to determine if an Application needs a Reminder Email */
 export const scheduleEmailReminders = async () => {
@@ -250,37 +257,42 @@ export const scheduleEmailReminders = async () => {
 			const mostRecentEmail = getRelevantReminderEmail({ state, sentEmails });
 
 			if (state === ApplicationStates.DRAFT && !mostRecentAction) {
-				if(checkDraftApplicationNeedsReminder({state, created_at, mostRecentEmail})) {
+				if (checkDraftApplicationNeedsReminder({ state, created_at, mostRecentEmail })) {
 					sendDraftEmailReminder({ application });
 				}
 			} else if (mostRecentAction) {
 				// Compare date of most recent state transition see if # intervalDays have passed since that time
-				const needsReminder = checkApplicationNeedsReminder({ mostRecentAction, mostRecentEmail});
-				if(needsReminder) {
+				const needsReminder = checkApplicationNeedsReminder({ mostRecentAction, mostRecentEmail });
+				if (needsReminder) {
 					await sendEmailReminders({
 						application,
 						relatedAction: mostRecentAction,
 						relatedEmail: mostRecentEmail,
 					});
 				}
+			}
 		}
-	}} else {
+	} else {
 		const { error, message } = allApplicationsResult;
 		logger.error(message, error);
 		throw new Error(message);
 	}
 };
 
-export const sendDraftEmailReminder = async({application}:{application: JoinedApplicationEmailsActionsRecord}) => {
+export const sendDraftEmailReminder = async ({
+	application,
+}: {
+	application: JoinedApplicationEmailsActionsRecord;
+}) => {
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
-	const { application_id, created_at, application_contents } = application;		
+	const { application_id, created_at, application_contents } = application;
 	const { applicant_first_name, applicant_last_name, applicant_institutional_email } = application_contents || {};
-	
+
 	const applicantName = applicant_first_name
-	? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
-	: 'Applicant';
-	
+		? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
+		: 'Applicant';
+
 	// If in State Draft for over 7 days, send a reminder email to Submit
 	emailService.sendEmailSubmitDraftReminder({
 		id: application_id,
@@ -288,7 +300,7 @@ export const sendDraftEmailReminder = async({application}:{application: JoinedAp
 		submittedDate: created_at,
 		to: applicant_institutional_email,
 	});
-}
+};
 
 // Generates & Sends Reminder Emails based on Application State
 export const sendEmailReminders = async ({
@@ -418,5 +430,5 @@ export const sendEmailReminders = async ({
 			break;
 		default:
 			break;
-	};
-}
+	}
+};
