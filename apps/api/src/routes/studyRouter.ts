@@ -50,7 +50,8 @@ const studyRouter = express.Router();
  */
 studyRouter.get(
 	'/import',
-	async (request, response: ResponseWithData<{ studies: StudyModel[] }, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+	adminMiddleware(),
+	async (_, response: ResponseWithData<{ studies: StudyModel[] }, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
 		const { CLINICAL_URL } = serverConfig;
 		const dacResponse = await fetch(`${CLINICAL_URL}/dac`);
 		const dacResponseData = await dacResponse.json();
@@ -201,7 +202,7 @@ studyRouter.patch(
 /*
  * Get all studies
  */
-studyRouter.get('/', async (request, response: ResponseWithData<StudyDTO[], ['SYSTEM_ERROR']>) => {
+studyRouter.get('/', async (_, response: ResponseWithData<StudyDTO[], ['SYSTEM_ERROR']>) => {
 	const result = await getAllStudies();
 
 	if (!result.success) {

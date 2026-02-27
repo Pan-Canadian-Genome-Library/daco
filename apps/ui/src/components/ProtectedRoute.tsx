@@ -19,14 +19,14 @@
 
 import { Navigate, type To } from 'react-router';
 
-import { UserRole } from '@pcgl-daco/validation';
-
 import FullscreenLoader from '@/components/FullscreenLoader';
 import { useUserContext } from '@/providers/UserProvider';
 import type { PropsWithChildren } from 'react';
 
+export type Membership = 'DAC_MEMBER' | 'DAC_CHAIR' | 'ADMIN' | 'INSTITUTIONAL_REP' | 'APPLICANT';
+
 type ProtectedRouteProps = PropsWithChildren<{
-	requiredRoles?: [UserRole, ...UserRole[]];
+	requiredMembership?: [Membership, ...Membership[]];
 	redirectTo?: To;
 }>;
 
@@ -36,11 +36,7 @@ type ProtectedRouteProps = PropsWithChildren<{
  *
  * By default, users must be logged in to access the route.
  *
- * To restrict a route to only users of a specific role, you can add the `requiredRoles` prop. If you do,
- * only users with one of the required roles will be able to access that route.
- *
- * By default, unauthorized users will be redirected to the home page. To rediret to a different location,
- * provide a `redirectTo` prop
+ * Routes also check if a user has ANY dac chair, dac member membership to any application and admin flag, then will redirect accordingly
  *
  * @example
  * <Routes>
@@ -50,8 +46,11 @@ type ProtectedRouteProps = PropsWithChildren<{
  *		</Route>
  *	</Routes>
  */
-const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteProps) => {
-	const { isLoading, isLoggedIn, role, user } = useUserContext();
+const ProtectedRoute = ({ requiredMembership, redirectTo, children }: ProtectedRouteProps) => {
+	const { isLoading, isLoggedIn, user } = useUserContext();
+
+	const isDacChair = user && user.dacChair.length > 0;
+	const isDacMember = user && user.dacMember.length > 0;
 
 	const Redirect = () => <Navigate replace to={redirectTo || '/'} />;
 
@@ -62,16 +61,15 @@ const ProtectedRoute = ({ requiredRoles, redirectTo, children }: ProtectedRouteP
 		return <Redirect />;
 	}
 
-	// Admin should have access to all routes
-	if (user?.dacoAdmin) {
-		return children;
-	}
-
-	if (requiredRoles) {
-		if (!role) {
+	if (requiredMembership) {
+		if (requiredMembership.includes('ADMIN') && !user?.dacoAdmin) {
 			return <Redirect />;
 		}
-		if (!requiredRoles.includes(role)) {
+
+		if (
+			requiredMembership.some((role) => role === 'DAC_CHAIR' || role === 'DAC_MEMBER') &&
+			!(isDacChair || isDacMember)
+		) {
 			return <Redirect />;
 		}
 	}

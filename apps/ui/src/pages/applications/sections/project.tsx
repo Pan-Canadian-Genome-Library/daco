@@ -45,7 +45,12 @@ const Project = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'project', isEditMode, userRole: state.applicationUserRole });
+	const canEdit = canEditSection({
+		revisions,
+		section: 'project',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
+	});
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 
 	const { control, getValues } = useForm<Nullable<ProjectInformationSchemaType>>({

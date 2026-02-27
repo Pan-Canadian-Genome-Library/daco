@@ -46,7 +46,12 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode, userRole: state.applicationUserRole });
+	const canEdit = canEditSection({
+		revisions,
+		section: 'applicant',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
+	});
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 
 	const {

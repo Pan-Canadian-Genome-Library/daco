@@ -26,42 +26,34 @@ import { useNavigate } from 'react-router';
 
 const LoginRedirect = () => {
 	const { t: translate } = useTranslation();
-	const { role, isLoading, user } = useUserContext();
+	const { isLoading, user, isLoggedIn } = useUserContext();
 	const navigate = useNavigate();
-
-	const redirectRep = () => {
-		const sessionInfo = getExtraSessionInformation();
-		if (sessionInfo && sessionInfo.role === 'INSTITUTIONAL_REP') {
-			return `/application/${sessionInfo.applicationId}/`;
-		}
-		return '/';
-	};
+	const isDacChair = user && user.dacChair.length > 0;
+	const isDacMember = user && user.dacMember.length > 0;
+	const existingSessionInfo = getExtraSessionInformation();
 
 	useEffect(() => {
 		if (isLoading) {
 			return;
 		}
 
-		if (user?.dacoAdmin) {
-			navigate('/admin', { replace: true });
+		if (!isLoggedIn) {
+			navigate('/', { replace: true });
+			return;
+		} else if (existingSessionInfo !== undefined) {
+			navigate(`/application/${existingSessionInfo.applicationId}`);
+			return;
+		} else if (user?.dacoAdmin) {
+			navigate('/admin');
+			return;
+		} else if (isDacChair || isDacMember) {
+			navigate('/manage/applications', { replace: true });
+			return;
+		} else {
+			navigate('/dashboard', { replace: true });
 			return;
 		}
-
-		switch (role) {
-			case 'APPLICANT':
-				navigate('/dashboard', { replace: true });
-				break;
-			case 'DAC_CHAIR':
-			case 'DAC_MEMBER':
-				navigate('/manage/applications', { replace: true });
-				break;
-			case 'INSTITUTIONAL_REP':
-				navigate(redirectRep(), { replace: true });
-				break;
-			default:
-				navigate('/', { replace: true });
-		}
-	}, [isLoading, navigate, role]);
+	}, [isLoading, navigate]);
 
 	return <FullscreenLoader loadingText={translate('global.login.loggingIn')} />;
 };

@@ -111,13 +111,13 @@ function AppRouter() {
 				{/*REDIRECT*/}
 				<Route path="login/redirect" element={<LoginRedirect />} />
 				<Route path="login/error/*" element={<LoginError />} />
-
 				<Route index element={<HomePage />} />
 				{/*APPLICANT AND INSTITUTIONAL REP DASHBOARD*/}
 				<Route
 					path="dashboard"
 					element={
-						<ProtectedRoute requiredRoles={['APPLICANT']} redirectTo={'/login/redirect/'}>
+						// Applicant
+						<ProtectedRoute redirectTo={'/login/redirect/'}>
 							<DashboardPage />
 						</ProtectedRoute>
 					}
@@ -143,7 +143,8 @@ function AppRouter() {
 				<Route
 					path="manage/applications"
 					element={
-						<ProtectedRoute requiredRoles={['DAC_MEMBER', 'DAC_CHAIR']} redirectTo={'/login/redirect/'}>
+						// DAC
+						<ProtectedRoute requiredMembership={['DAC_CHAIR', 'DAC_MEMBER']} redirectTo={'/login/redirect/'}>
 							<ManageApplicationsPage />
 						</ProtectedRoute>
 					}
