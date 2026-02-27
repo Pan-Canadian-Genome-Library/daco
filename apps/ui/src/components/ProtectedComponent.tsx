@@ -60,13 +60,12 @@ const ProtectedComponent = ({ requiredMembership, requiredStates, children }: Pr
 	}
 
 	if (requiredMembership) {
-		if (requiredMembership.includes('APPLICANT') && isApplicant) {
-			return children;
-		} else if (requiredMembership.includes('DAC_MEMBER') && isDacMember) {
-			return children;
-		} else if (requiredMembership.includes('DAC_CHAIR') && isDacChair) {
-			return children;
-		} else if (requiredMembership.includes('INSTITUTIONAL_REP') && isInstitutionalRep) {
+		if (
+			(requiredMembership.includes('APPLICANT') && isApplicant) ||
+			(requiredMembership.includes('DAC_MEMBER') && isDacMember) ||
+			(requiredMembership.includes('DAC_CHAIR') && isDacChair) ||
+			(requiredMembership.includes('INSTITUTIONAL_REP') && isInstitutionalRep)
+		) {
 			return children;
 		} else {
 			return null;
