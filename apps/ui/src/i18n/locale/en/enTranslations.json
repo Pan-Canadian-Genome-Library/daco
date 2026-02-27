@@ -229,6 +229,7 @@
 		"dashboard": {
 			"pageTitle": "Admin Dashboard",
 			"pageDescription": "Manage studies, data access committees, and platform-wide configurations.",
+			"quickActions": "Quick Actions",
 			"card": {
 				"import": {
 					"title": "Import DAC & Studies",
@@ -237,7 +238,7 @@
 				},
 				"activateStudies": {
 					"title": "Manage Studies",
-					"description": "Manage studies on the platform. Create new studies, edit existing ones, and manage their status.",
+					"description": "Manage studies on the platform. Manage their status, allowing applicants to apply for access.",
 					"button": "Manage Studies"
 				}
 			}
