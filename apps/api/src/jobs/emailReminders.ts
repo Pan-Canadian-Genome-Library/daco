@@ -102,12 +102,13 @@ function isReminderEmailType(emailType: EmailTypeValues): emailType is ReminderE
 /**
  * Find record for email with target reminder email_type values
  * Used to determine if an application needs a follow up email (not all emails require follow up)
+ * Records are sorted by created_at date to find most recent sent email
  */
 export const getRelevantReminderEmail = ({
 	sentEmails,
 	state,
 }: {
-	sentEmails: EmailRecord[];
+	sentEmails: EmailRecord[] | null;
 	state: ApplicationStateValues;
 }): EmailRecord | undefined => {
 	const targetEmail = sentEmails
@@ -131,23 +132,24 @@ export const getRelevantReminderEmail = ({
 
 /*
  * Finds relevant record Action created with target state transition Action value
- * Records are pre-sorted by DB so first result should be most recent
+ * Records are sorted by created_at date to insure most recent action is returned
  */
 export const getRelevantReminderAction = ({
 	applicationActions,
 	state,
 }: {
-	applicationActions: ApplicationActionRecord[];
+	applicationActions: ApplicationActionRecord[] | null;
 	state: ApplicationStateValues;
 }) => {
 	const targetActionTypes = reminderTargetActionTypes[state];
-	const mostRecentAction =
-		applicationActions?.length && targetActionTypes
-			? applicationActions
-					.filter((action) => targetActionTypes.includes(action.action))
-					.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf())[0]
-			: null;
-	return mostRecentAction;
+	if (Array.isArray(targetActionTypes) && Array.isArray(applicationActions) && applicationActions.length > 0) {
+		const filteredActions = applicationActions
+			.filter((action) => targetActionTypes.includes(action.action))
+			.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf());
+		const mostRecentAction = filteredActions[0] || null;
+		return mostRecentAction;
+	}
+	return null
 };
 
 /**
@@ -240,8 +242,8 @@ export const scheduleEmailReminders = async () => {
 		const applications = allApplicationsResult.data;
 		for (const application of applications) {
 			const { state, created_at, application_actions: applicationActions, sent_emails: sentEmails } = application;
-			const mostRecentAction = applicationActions ? getRelevantReminderAction({ state, applicationActions }) : null;
-			const mostRecentEmail = sentEmails ? getRelevantReminderEmail({ state, sentEmails }) : null;
+			const mostRecentAction = getRelevantReminderAction({ state, applicationActions });
+			const mostRecentEmail = getRelevantReminderEmail({ state, sentEmails });
 			const sendReminder = checkApplicationNeedsReminder({ state, created_at, mostRecentAction, mostRecentEmail });
 			if (sendReminder) {
 				await sendEmailReminders({
