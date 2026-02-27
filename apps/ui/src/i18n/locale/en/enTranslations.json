@@ -213,7 +213,11 @@
 			"successMessage": "DAC comment submitted successfully"
 		},
 		"importStudies": {
-			"successMessage": "Studies imported successfully"
+			"successMessage": "Studies imported successfully",
+			"successDescription": "DAC and studies have successfully been imported."
+		},
+		"toggleAcceptingStudies": {
+			"successMessage": "Accepting status of study:{{studyId}} updated successfully"
 		}
 	}
 }

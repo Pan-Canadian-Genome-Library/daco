@@ -450,6 +450,11 @@ export type StudyDTO = {
 
 export type StudyClinicalDTO = Omit<StudyDTO, 'acceptingApplications'>;
 
+export type AcceptingApplicationsResponse = {
+	studyId: string;
+	acceptingApplications: boolean;
+};
+
 export type DacDTO = {
 	dacId: string;
 	dacName?: string;

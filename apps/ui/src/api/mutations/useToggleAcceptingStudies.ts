@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -16,38 +16,55 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { withErrorResponseHandler } from '@/api/apiUtils';
+
+import type { AcceptingApplicationsResponse, StudyDTO } from '@pcgl-daco/data-model';
+
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
+import { queryClient } from '@/providers/Providers';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { withErrorResponseHandler } from '../apiUtils';
 
-const useImportStudies = () => {
-	const notification = useNotificationContext();
+type ToggleStudyPayload = {
+	studyId: string;
+	enabled: boolean;
+};
+
+const useToggleAccptingStudies = () => {
 	const { t: translate } = useTranslation();
+	const notification = useNotificationContext();
 
-	return useMutation<unknown, ServerError>({
-		mutationFn: async () => {
-			return await fetch(`/study/import`, {
-				method: 'GET',
+	return useMutation<AcceptingApplicationsResponse, ServerError, ToggleStudyPayload>({
+		mutationFn: async ({ studyId, enabled }) => {
+			const response = await fetch(`/study/${studyId}/accepting-applications`, {
+				method: 'PATCH',
+				body: JSON.stringify({
+					enabled,
+				}),
 			}).then(withErrorResponseHandler);
+
+			return await response.json();
 		},
-		onSuccess: () => {
+		onSuccess: (data) => {
+			const currentStudies = queryClient.getQueryData<StudyDTO[]>([`all-studies`]);
+
+			if (currentStudies) {
+				queryClient.setQueryData<StudyDTO[]>(
+					['all-studies'],
+					currentStudies.map((study) =>
+						study.studyId === data.studyId ? { ...study, acceptingApplications: data.acceptingApplications } : study,
+					),
+				);
+			}
+
 			notification.openNotification({
 				type: 'success',
-				message: translate('notifications.importStudies.successMessage'),
-				description: translate('notifications.importStudies.successDescription'),
-			});
-		},
-		onError: (error) => {
-			notification.openNotification({
-				type: 'error',
-				message: translate('errors.generic.title'),
-				description: error.message,
+				message: translate('notifications.toggleAcceptingStudies.successMessage', { studyId: data.studyId }),
 			});
 		},
 	});
 };
 
-export default useImportStudies;
+export default useToggleAccptingStudies;

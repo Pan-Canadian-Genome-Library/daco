@@ -19,12 +19,14 @@
 
 import { Button, Flex, Table, TableColumnsType } from 'antd';
 
+import useToggleAccptingStudies from '@/api/mutations/useToggleAcceptingStudies';
 import useGetStudies from '@/api/queries/useGetStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import { StudyDTO } from '@pcgl-daco/data-model';
 
 const AdminStudiesPage = () => {
 	const { data, isLoading, isError } = useGetStudies();
+	const { mutate: toggleStudy } = useToggleAccptingStudies();
 
 	const columns: TableColumnsType<StudyDTO> = [
 		{
@@ -44,7 +46,9 @@ const AdminStudiesPage = () => {
 				const isAccepting = record.acceptingApplications;
 				return (
 					<Button
-						onClick={() => {}}
+						onClick={async () => {
+							toggleStudy({ studyId: record.studyId, enabled: !record.acceptingApplications });
+						}}
 						color={isAccepting ? 'green' : 'danger'}
 						variant="solid"
 						style={{ width: '150px' }}

@@ -34,10 +34,12 @@ const AdminDashboardPage = () => {
 	return (
 		<ContentWrapper style={{ height: '100%', padding: '2em 0', gap: '3rem' }}>
 			<Flex vertical justify="center" align="center" gap={'large'}>
-				<Button onClick={handleSyncStudies} style={{ width: '100%' }}>
-					Import Studies
+				<Button type="primary" onClick={handleSyncStudies} style={{ width: '300px' }}>
+					Import DAC and Studies from Clinical
 				</Button>
-				<Button onClick={() => navigate('/admin/studies')}>Activate/Deactivate Studies</Button>
+				<Button type="primary" onClick={() => navigate('/admin/studies')} style={{ width: '300px' }}>
+					Activate Studies
+				</Button>
 			</Flex>
 		</ContentWrapper>
 	);
