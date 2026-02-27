@@ -33,9 +33,9 @@ const useEditApplication = () => {
 	return useMutation<
 		ApplicationResponseData,
 		ServerError,
-		{ id: number | string; update?: Partial<ApplicationContentsResponse>; revisions: SectionRevision }
+		{ applicationId: number | string; update?: Partial<ApplicationContentsResponse>; revisions: SectionRevision }
 	>({
-		mutationFn: async ({ id, update, revisions }) => {
+		mutationFn: async ({ applicationId, update, revisions }) => {
 			let fields = state.fields;
 
 			// If applications state is in revisions, then send only relevant fields in each sections
@@ -47,10 +47,9 @@ const useEditApplication = () => {
 				fields = parseRevisedFields(state.fields, revisions);
 			}
 
-			const response = await fetch('/applications/edit', {
+			const response = await fetch(`/applications/${applicationId}/edit`, {
 				method: 'POST',
 				body: JSON.stringify({
-					id,
 					update: {
 						...fields,
 						...update,

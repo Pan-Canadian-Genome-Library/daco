@@ -30,10 +30,9 @@ const useCreateSignature = () => {
 
 	return useMutation<EditSignatureResponse, ServerError, { applicationId: number | string; signature: string }>({
 		mutationFn: async ({ applicationId, signature }) => {
-			const response = await fetch('/signature/sign', {
+			const response = await fetch(`/signature/${applicationId}/sign`, {
 				method: 'POST',
 				body: JSON.stringify({
-					applicationId,
 					signature,
 				}),
 			}).then(withErrorResponseHandler);

@@ -62,7 +62,7 @@ export const updateApplicationSignature = async ({
 	applicationId,
 	signature,
 	signee,
-}: EditSignatureRequest & { signee: SignatureType }): AsyncResult<
+}: EditSignatureRequest & { applicationId: number; signee: SignatureType }): AsyncResult<
 	ApplicationSignatureDTO,
 	'NOT_FOUND' | 'SYSTEM_ERROR'
 > => {

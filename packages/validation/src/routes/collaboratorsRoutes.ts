@@ -38,7 +38,7 @@ export const baseCollaboratorsRequestSchema = z.object({
 	applicationId: z.number(),
 });
 
-export const collaboratorsCreateRequestSchema = baseCollaboratorsRequestSchema.extend({
+export const collaboratorsCreateRequestSchema = z.object({
 	collaborators: z.array(collaboratorsSchema).nonempty(),
 });
 
@@ -46,7 +46,7 @@ export const collaboratorsDeleteRequestSchema = baseCollaboratorsRequestSchema.e
 	collaboratorId: z.number(),
 });
 
-export const collaboratorsUpdateRequestSchema = baseCollaboratorsRequestSchema.extend({
+export const collaboratorsUpdateRequestSchema = z.object({
 	collaboratorEmail: z.string().nonempty().email(),
 	collaboratorUpdates: collaboratorsSchema,
 });

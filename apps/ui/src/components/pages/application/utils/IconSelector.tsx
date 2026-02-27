@@ -19,7 +19,7 @@
 
 import { CheckCircleOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
 import { ApplicationStates } from '@pcgl-daco/data-model';
-import { SectionRoutes, userRoleSchema } from '@pcgl-daco/validation';
+import { SectionRoutes } from '@pcgl-daco/validation';
 import { SectionMenuItemProps } from '../SectionMenuItem';
 
 /**
@@ -83,11 +83,11 @@ const DraftLogic = ({
 };
 
 // This is the logic for the application state when revisions are requested for both INSTITUTIONAL REP and DAC MEMBERS
-const RevisionsRequested = ({ label, isLocked, role }: Omit<SectionMenuItemProps, 'appState'>) => {
+const RevisionsRequested = ({ label, isLocked, isApplicant }: Omit<SectionMenuItemProps, 'appState'>) => {
 	if (label === SectionRoutes.INTRO) {
 		// do not display intro icon
 		return <LockOutlined />;
-	} else if (!isLocked && role === userRoleSchema.Values.APPLICANT) {
+	} else if (!isLocked && isApplicant) {
 		// Do not display icon on sections with revisions AND if the user is APPLICANT.
 		return;
 	} else if (label === SectionRoutes.SIGN) {

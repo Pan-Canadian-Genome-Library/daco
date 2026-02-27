@@ -36,7 +36,7 @@ const useAddCollaborator = () => {
 		{ applicationId: number | string; collaborators: CollaboratorsSchemaType[]; userId?: number | string }
 	>({
 		mutationFn: async ({ applicationId, collaborators }) => {
-			const response = await fetch('/collaborators/create', {
+			const response = await fetch(`/collaborators/${applicationId}/create`, {
 				method: 'POST',
 				body: JSON.stringify({
 					applicationId,
