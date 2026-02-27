@@ -170,6 +170,7 @@ describe('Application API', () => {
 			assert.equal(result.error, 'NOT_FOUND');
 		});
 	});
+
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
 			const result = await createApplication({ user_id });

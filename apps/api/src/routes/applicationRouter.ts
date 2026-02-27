@@ -166,42 +166,30 @@ applicationRouter.get(
 	) => {
 		const { user } = request.session;
 		if (user) {
-			const { userId, dacoAdmin, dacAuthorizations, groups } = user;
+			const { userId, dacChair, dacMember } = user;
 
 			const userRole = getUserRole(user);
 			const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
-			console.log('user', user);
-			console.log('userRole', userRole);
 
 			/**
 			 * When called by a DAC member, filters by the DAC ID of the PCGL DAC (from Auth config)
 			 * When called by a DAC Chair, this needs to filter applications by the DAC ID(s) that they are the chair of
-			 * @param userRole
-			 * @param dacoAdmin
-			 * @param dacAuthorizations
+			 * @param dacChair
+			 * @param dacMember
 			 */
 			const getAuthorizedDacIds = ({
-				userRole,
-				dacoAdmin,
-				dacAuthorizations,
+				dacChair,
+				dacMember,
 			}: {
-				userRole: UserRoleOmitRep;
-				dacoAdmin: boolean;
-				dacAuthorizations: typeof user.dacAuthorizations;
+				dacChair: typeof user.dacChair;
+				dacMember: typeof user.dacMember;
 			}) => {
-				const { AUTHZ_GROUP_DAC_CHAIR } = authConfig;
-
-				if (userRole === userRoleSchema.Values.DAC_MEMBER && AUTHZ_GROUP_DAC_CHAIR) {
-					return [AUTHZ_GROUP_DAC_CHAIR];
-				} else if (userRole === userRoleSchema.Values.DAC_CHAIR && dacoAdmin) {
-					return dacAuthorizations.map((study) => study?.studyId).filter((studyId) => typeof studyId === 'string');
-				}
+				return [...dacChair, ...dacMember];
 			};
 
 			const authorizedDacIds = getAuthorizedDacIds({
-				userRole,
-				dacoAdmin,
-				dacAuthorizations,
+				dacChair,
+				dacMember,
 			});
 
 			const {
