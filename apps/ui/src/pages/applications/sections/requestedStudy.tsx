@@ -62,7 +62,12 @@ const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'study', isEditMode, userRole: state.applicationUserRole });
+	const canEdit = canEditSection({
+		revisions,
+		section: 'study',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
+	});
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
 	const {

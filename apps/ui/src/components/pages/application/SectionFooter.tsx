@@ -66,14 +66,14 @@ const SectionFooter = ({ currentRoute, isEditMode, signSubmitHandler, submitDisa
 
 	const goBack = () => {
 		if (state?.formState?.isDirty) {
-			editApplication({ id: appId, revisions });
+			editApplication({ applicationId: appId, revisions });
 		}
 		navigate(`/application/${id}/${previousRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
 
 	const nextSection = () => {
 		if (state?.formState?.isDirty) {
-			editApplication({ id: appId, revisions });
+			editApplication({ applicationId: appId, revisions });
 		}
 		navigate(`/application/${id}/${nextRoute}/${shouldNavigateToEditMode ? 'edit' : ''}`, { replace: true });
 	};
