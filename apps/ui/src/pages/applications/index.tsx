@@ -40,6 +40,7 @@ const ApplicationViewer = () => {
 	const {
 		state: { applicationUserPermissions },
 	} = useApplicationContext();
+
 	// grab current route and its relevant information
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
@@ -59,14 +60,10 @@ const ApplicationViewer = () => {
 		isLoading: revisionsLoading,
 	} = useGetApplicationFeedback(params.id, applicationData?.state);
 
-	const {
-		data: dacCommentsData,
-		isLoading: dacCommentsIsLoading,
-		isError: dacCommentsIsErrored,
-		error: dacCommentsError,
-	} = useGetDacComments({
+	const { data: dacCommentsData } = useGetDacComments({
 		applicationId: params.id,
 		section: currentSection,
+		isApplicationLoading: applicationIsLoading,
 	});
 
 	useEffect(() => {
@@ -98,16 +95,9 @@ const ApplicationViewer = () => {
 		applicationIsErrored ||
 		applicationIsLoading ||
 		revisionsLoading ||
-		revisionsIsErrored ||
-		dacCommentsIsLoading ||
-		dacCommentsIsErrored
+		revisionsIsErrored
 	)
-		return (
-			<ErrorPage
-				loading={applicationIsLoading || revisionsLoading || dacCommentsIsLoading}
-				error={applicationError || revisionsError || dacCommentsError}
-			/>
-		);
+		return <ErrorPage loading={applicationIsLoading || revisionsLoading} error={applicationError || revisionsError} />;
 
 	return (
 		<Content>
@@ -140,7 +130,7 @@ const ApplicationViewer = () => {
 											appId: applicationData.id,
 											isEditMode,
 											revisions: revisionsData,
-											dacComments: dacCommentsData,
+											dacComments: dacCommentsData ? dacCommentsData : [],
 										}}
 									/>
 								</Col>

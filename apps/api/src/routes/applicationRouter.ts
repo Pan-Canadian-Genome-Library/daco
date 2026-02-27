@@ -1040,7 +1040,7 @@ applicationRouter.post(
  */
 applicationRouter.get(
 	'/:applicationId/dac/comments/:section',
-	accessMiddleware({ accessConfig: { dacChair: true, dacMember: true, applicant: true, institutionalRep: true } }),
+	accessMiddleware({ accessConfig: { dacChair: true, dacMember: true } }),
 	withParamsSchemaValidation(
 		dacCommentsGetParamSchema,
 		apiZodErrorMapping,
