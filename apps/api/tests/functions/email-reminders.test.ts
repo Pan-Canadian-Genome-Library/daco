@@ -25,6 +25,7 @@ import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import {
 	checkApplicationNeedsReminder,
+	checkDraftApplicationNeedsReminder,
 	getDacUserDataResult,
 	getRelevantReminderAction,
 	reminderStates,
@@ -74,108 +75,113 @@ describe('Email Reminders', () => {
 		}
 	});
 
-	describe('checkApplicationNeedsReminder', () => {
-		it('checkApplicationNeedsReminder - Draft', async () => {
+	describe('checkDraftApplicationNeedsReminder', ()=>{
+		it('checkDraftApplicationNeedsReminder', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 1);
 			assert.ok(testApplicationRecord);
 			const { state, created_at, sent_emails, application_actions } = testApplicationRecord;
 			assert.ok(sent_emails?.length === 0);
 			assert.ok(application_actions?.length === 0);
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at });
+			const reminderResult = checkDraftApplicationNeedsReminder({ state, created_at });
 			assert.ok(reminderResult);
 		});
+	}) 
 
+	describe('checkApplicationNeedsReminder', () => {
 		it('checkApplicationNeedsReminder - Institutional Rep Review', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 2);
 			assert.ok(testApplicationRecord);
-			const { state, created_at, application_actions: applicationActions } = testApplicationRecord;
+			const { state, application_actions: applicationActions } = testApplicationRecord;
 			assert.ok(state === 'INSTITUTIONAL_REP_REVIEW');
 			assert.ok(applicationActions?.length && applicationActions?.length > 0);
 			const mostRecentAction = getRelevantReminderAction({ applicationActions, state });
 			assert.ok(mostRecentAction && mostRecentAction.action === 'SUBMIT_DRAFT');
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
+			const reminderResult = checkApplicationNeedsReminder({ mostRecentAction });
 			assert.ok(reminderResult);
 		});
 
 		it('checkApplicationNeedsReminder - Institutional Rep Revision Requested', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 3);
 			assert.ok(testApplicationRecord);
-			const { state, created_at, application_actions: applicationActions } = testApplicationRecord;
+			const { state, application_actions: applicationActions } = testApplicationRecord;
 			assert.ok(state === 'INSTITUTIONAL_REP_REVISION_REQUESTED');
 			assert.ok(applicationActions?.length && applicationActions?.length > 0);
 			const mostRecentAction = getRelevantReminderAction({ applicationActions, state });
 			assert.ok(mostRecentAction && mostRecentAction.action === 'INSTITUTIONAL_REP_REVISION_REQUEST');
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
+			const reminderResult = checkApplicationNeedsReminder({ mostRecentAction });
 			assert.ok(reminderResult);
 		});
 
 		it('checkApplicationNeedsReminder - Post Rep Revision requested', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 4);
 			assert.ok(testApplicationRecord);
-			const { state, created_at, application_actions: applicationActions } = testApplicationRecord;
+			const { state, application_actions: applicationActions } = testApplicationRecord;
 			assert.ok(state === 'INSTITUTIONAL_REP_REVIEW');
 			assert.ok(applicationActions?.length && applicationActions?.length > 0);
 			const mostRecentAction = getRelevantReminderAction({ applicationActions, state });
 			assert.ok(mostRecentAction && mostRecentAction.action === 'INSTITUTIONAL_REP_SUBMIT');
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
+			const reminderResult = checkApplicationNeedsReminder({ mostRecentAction });
 			assert.ok(reminderResult);
 		});
 
 		it('checkApplicationNeedsReminder - Dac Review', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 5);
 			assert.ok(testApplicationRecord);
-			const { state, created_at, application_actions: applicationActions } = testApplicationRecord;
+			const { state, application_actions: applicationActions } = testApplicationRecord;
 			assert.ok(state === 'DAC_REVIEW');
 			assert.ok(applicationActions?.length && applicationActions?.length > 0);
 			const mostRecentAction = getRelevantReminderAction({ applicationActions, state });
 			assert.ok(mostRecentAction && mostRecentAction.action === 'INSTITUTIONAL_REP_APPROVED');
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
+			const reminderResult = checkApplicationNeedsReminder({ mostRecentAction });
 			assert.ok(reminderResult);
 		});
 
 		it('checkApplicationNeedsReminder - Dac Revisions Requested', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 6);
 			assert.ok(testApplicationRecord);
-			const { state, created_at, application_actions: applicationActions } = testApplicationRecord;
+			const { state, application_actions: applicationActions } = testApplicationRecord;
 			assert.ok(state === 'DAC_REVISIONS_REQUESTED');
 			assert.ok(applicationActions?.length && applicationActions?.length > 0);
 			const mostRecentAction = getRelevantReminderAction({ applicationActions, state });
 			assert.ok(mostRecentAction && mostRecentAction.action === 'DAC_REVIEW_REVISION_REQUEST');
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
+			const reminderResult = checkApplicationNeedsReminder({ mostRecentAction });
 			assert.ok(reminderResult);
 		});
 
 		it('checkApplicationNeedsReminder - Post Dac Revisions Requested', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 7);
 			assert.ok(testApplicationRecord);
-			const { state, created_at, application_actions: applicationActions } = testApplicationRecord;
+			const { state, application_actions: applicationActions } = testApplicationRecord;
 			assert.ok(state === 'DAC_REVIEW');
 			assert.ok(applicationActions?.length && applicationActions?.length > 0);
 			const mostRecentAction = getRelevantReminderAction({ applicationActions, state });
 			assert.ok(mostRecentAction && mostRecentAction.action === 'DAC_REVIEW_SUBMIT');
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
+			const reminderResult = checkApplicationNeedsReminder({ mostRecentAction });
 			assert.ok(reminderResult);
 		});
 
 		it('checkApplicationNeedsReminder - Application Withdrawn', async () => {
 			const testApplicationRecord = testApplications.find((app) => app.application_id === 8);
 			assert.ok(testApplicationRecord);
-			const { state, created_at, application_actions: applicationActions } = testApplicationRecord;
+			const { state, application_actions: applicationActions } = testApplicationRecord;
 			assert.ok(state === 'DRAFT');
 			assert.ok(applicationActions?.length && applicationActions?.length > 0);
 			const mostRecentAction = getRelevantReminderAction({ applicationActions, state });
 			assert.ok(mostRecentAction && mostRecentAction.action === 'WITHDRAW');
-			const reminderResult = await checkApplicationNeedsReminder({ state, created_at, mostRecentAction });
+			const reminderResult = checkApplicationNeedsReminder({ mostRecentAction });
 			assert.ok(reminderResult);
 		});
 	});
 
 	describe('getDacUserDataResult', () => {
 		it('should successfully retrieve Dac User Name & Email info', async () => {
-			const testApplicationRecord = testApplications.find((app) => app.application_id === 1);
+			const testApplicationRecord = testApplications.find((app) => app.application_id === 6);
 			assert.ok(testApplicationRecord);
-			const { dac_id } = testApplicationRecord;
-			const userDataResult = await getDacUserDataResult({ dac_id });
+			const { dac_id, application_actions: applicationActions, state } = testApplicationRecord;
+			assert.ok(applicationActions?.length && applicationActions?.length > 0);
+			const relatedAction = getRelevantReminderAction({ applicationActions, state });
+			assert.ok(relatedAction);
+			const userDataResult = await getDacUserDataResult({ dac_id, relatedAction });
 			assert.ok(userDataResult.success && userDataResult.data);
 			const userData = userDataResult.data;
 			const dacData = testDacUsersData.find((dac) => dac.dac_id === dac_id);

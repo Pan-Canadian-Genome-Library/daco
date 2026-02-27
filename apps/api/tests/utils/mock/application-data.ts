@@ -203,12 +203,14 @@ export const reminderApplicationArray: ApplicationModel[] = [
 	},
 	{
 		user_id: 'testUser@oicr.on.ca',
+		dac_id: 'dac6',
 		state: ApplicationStates.DAC_REVISIONS_REQUESTED,
 		created_at: new Date('2025-01-01T15:00:00Z'),
 		updated_at: new Date('2025-01-01T15:45:00Z'),
 	},
 	{
 		user_id: 'testUser@oicr.on.ca',
+		dac_id: 'dac7',
 		state: ApplicationStates.DAC_REVIEW,
 		created_at: new Date('2025-01-01T15:00:00Z'),
 		updated_at: new Date('2025-01-01T15:45:00Z'),
