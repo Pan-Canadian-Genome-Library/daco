@@ -58,9 +58,7 @@ export const accessMiddleware =
 			return;
 		}
 
-		// The applicationId can be retrieved from the body or the params
-		const applicationId =
-			Number(request.params.applicationId) || Number(request.body.id) || Number(request.body.applicationId);
+		const applicationId = Number(request.params.applicationId);
 
 		if (!isPositiveInteger(applicationId)) {
 			response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application id is not valid' });
