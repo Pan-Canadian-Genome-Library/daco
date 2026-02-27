@@ -127,6 +127,27 @@
 			"when": 1768510425584,
 			"tag": "0017_add_dac_studies_table",
 			"breakpoints": true
+		},
+		{
+			"idx": 18,
+			"version": "7",
+			"when": 1768854017217,
+			"tag": "0018_add_dac_id_to_applications_table",
+			"breakpoints": true
+		},
+		{
+			"idx": 19,
+			"version": "7",
+			"when": 1770827276289,
+			"tag": "0019_add_dac_name_field",
+			"breakpoints": true
+		},
+		{
+			"idx": 20,
+			"version": "7",
+			"when": 1771432007256,
+			"tag": "0020_make_accepting_applications_not_null",
+			"breakpoints": true
 		}
 	]
 }
