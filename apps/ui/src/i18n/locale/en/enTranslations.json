@@ -219,5 +219,22 @@
 		"toggleAcceptingStudies": {
 			"successMessage": "Accepting status of study:{{studyId}} updated successfully"
 		}
+	},
+	"admin": {
+		"pageTitle": "Admin Dashboard",
+		"pageDescription": "Manage studies, data access committees, and platform-wide configurations.",
+		"quickActions": "Quick Actions",
+		"card": {
+			"import": {
+				"title": "Import DAC & Studies",
+				"description": "Synchronize Data Access Committees and Studies from the Clinical platform. Run this to pull in the latest study configurations and DAC assignments.",
+				"button": "Import from Clinical"
+			},
+			"activateStudies": {
+				"title": "Manage Studies",
+				"description": "Manage studies on the platform. Create new studies, edit existing ones, and manage their status.",
+				"button": "Manage Studies"
+			}
+		}
 	}
 }

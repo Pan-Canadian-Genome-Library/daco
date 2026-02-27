@@ -17,29 +17,107 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Flex } from 'antd';
+import { DashboardOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Divider, Flex, Row, Spin, Typography } from 'antd';
 import { useNavigate } from 'react-router';
 
 import useImportStudies from '@/api/mutations/useImportStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
+import { pcglColours } from '@/providers/ThemeProvider';
+import { useTranslation } from 'react-i18next';
+
+const { Title, Paragraph, Text } = Typography;
+
+const cardStyle: React.CSSProperties = {
+	borderTop: `4px solid ${pcglColours.primary}`,
+	borderRadius: 8,
+	boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+	height: '100%',
+	minWidth: 320,
+};
 
 const AdminDashboardPage = () => {
-	const { mutateAsync: syncStudies } = useImportStudies();
+	const { mutateAsync: syncStudies, isPending } = useImportStudies();
 	const navigate = useNavigate();
+	const { t: translate } = useTranslation();
 
 	const handleSyncStudies = async () => {
 		await syncStudies();
 	};
 
+	const adminActions = [
+		{
+			key: 'import',
+			title: translate('admin.card.import.title'),
+			description: translate('admin.card.import.description'),
+			action: handleSyncStudies,
+			buttonLabel: translate('admin.card.import.button'),
+			buttonDisabled: isPending,
+			buttonIcon: isPending ? <Spin size="small" /> : undefined,
+		},
+		{
+			key: 'studies',
+			title: translate('admin.card.activateStudies.title'),
+			description: translate('admin.card.activateStudies.description'),
+			action: () => navigate('/admin/studies'),
+			buttonLabel: translate('admin.card.activateStudies.button'),
+			buttonDisabled: false,
+			buttonIcon: undefined,
+		},
+	];
+
 	return (
-		<ContentWrapper style={{ height: '100%', padding: '2em 0', gap: '3rem' }}>
-			<Flex vertical justify="center" align="center" gap={'large'}>
-				<Button type="primary" onClick={handleSyncStudies} style={{ width: '300px' }}>
-					Import DAC and Studies from Clinical
-				</Button>
-				<Button type="primary" onClick={() => navigate('/admin/studies')} style={{ width: '300px' }}>
-					Activate Studies
-				</Button>
+		<ContentWrapper style={{ padding: '3rem 0', height: '100%' }}>
+			<Flex vertical gap={32} style={{ width: '100%' }}>
+				<Flex vertical gap={4}>
+					<Flex align="center" gap={12}>
+						<DashboardOutlined style={{ fontSize: 28, color: pcglColours.primary }} />
+						<Title level={2} style={{ margin: 0, color: pcglColours.secondary }}>
+							{translate('admin.pageTitle')}
+						</Title>
+					</Flex>
+					<Paragraph style={{ margin: 0, color: pcglColours.darkGrey, fontSize: 15, paddingLeft: 40 }}>
+						{translate('admin.pageDescription')}
+					</Paragraph>
+				</Flex>
+				<Divider style={{ margin: 0 }} />
+				<Flex vertical gap={16}>
+					<Text
+						strong
+						style={{ fontSize: 13, letterSpacing: '0.06em', color: pcglColours.darkGrey, textTransform: 'uppercase' }}
+					>
+						{translate('admin.quickActions')}
+					</Text>
+					<Row gutter={[24, 24]}>
+						{adminActions.map(({ key, title, description, action, buttonLabel, buttonDisabled, buttonIcon }) => (
+							<Col key={key} xs={24} sm={24} md={12} lg={10} xl={8}>
+								<Card
+									style={cardStyle}
+									styles={{ body: { height: '100%', display: 'flex', flexDirection: 'column', gap: 16 } }}
+								>
+									<Flex vertical gap={8} flex={1}>
+										<Title level={4} style={{ margin: 0, color: pcglColours.secondary }}>
+											{title}
+										</Title>
+										<Paragraph style={{ margin: 0, color: pcglColours.darkGrey, fontSize: 14, lineHeight: 1.6 }}>
+											{description}
+										</Paragraph>
+									</Flex>
+									<Button
+										type="primary"
+										size="large"
+										icon={buttonIcon}
+										disabled={buttonDisabled}
+										onClick={action}
+										style={{ alignSelf: 'flex-start', marginTop: 8 }}
+									>
+										{buttonLabel}
+									</Button>
+								</Card>
+							</Col>
+						))}
+					</Row>
+				</Flex>
 			</Flex>
 		</ContentWrapper>
 	);
