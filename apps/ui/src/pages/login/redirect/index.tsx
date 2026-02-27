@@ -18,6 +18,7 @@
  */
 
 import FullscreenLoader from '@/components/FullscreenLoader';
+import { getExtraSessionInformation } from '@/global/localStorage';
 import { useUserContext } from '@/providers/UserProvider';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,7 @@ const LoginRedirect = () => {
 	const navigate = useNavigate();
 	const isDacChair = user && user.dacChair.length > 0;
 	const isDacMember = user && user.dacMember.length > 0;
+	const existingSessionInfo = getExtraSessionInformation();
 
 	useEffect(() => {
 		if (isLoading) {
@@ -37,6 +39,9 @@ const LoginRedirect = () => {
 
 		if (!isLoggedIn) {
 			navigate('/', { replace: true });
+			return;
+		} else if (existingSessionInfo !== undefined) {
+			navigate(`/application/${existingSessionInfo.applicationId}`);
 			return;
 		} else if (user?.dacoAdmin) {
 			navigate('/admin');
