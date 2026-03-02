@@ -91,14 +91,14 @@ export type CollaboratorRecord = typeof collaborators.$inferSelect;
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
 export type GrantUserPermissionsParams = {
-	institutionalEmail: string;
+	userEmails: string[];
 	approverAccessToken: string;
-	requestedStudies: string[];
+	studyIds: string[];
 };
 
 export type GrantUserPermissionsResult = {
-	success: boolean;
-	failureMessages: string[];
+	successfulUserEmails: string[];
+	errorMessages: string[];
 };
 
 export type SignatureService = ReturnType<typeof signatureService>;

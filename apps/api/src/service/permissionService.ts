@@ -17,36 +17,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { addUserToStudyPermission, lookupUserByEmail } from '@/external/pcglAuthZClient.ts';
+import { addUsersToStudyPermission } from '@/external/pcglAuthZClient.ts';
 
 import type { GrantUserPermissionsParams, GrantUserPermissionsResult } from './types.ts';
 
 /**
- * This function grants a user access to the requested studies
- * First, it looks for the associated PCGL user ID using the institutional email
- * Then, it grants the study permissions using the approver's access token
- * Returns the list of successfully granted study IDs and any failure messages
+ * This function grants user access to the requested studies
+ * For each study, the AuthZ service is called using the approver's access token
+ * to assign permissions to the provided list of user email addresses.
+ * Returns the list of successfully granted user emails and any failure messages
  */
 export const grantUserPermissions = async ({
-	institutionalEmail,
+	userEmails,
 	approverAccessToken,
-	requestedStudies,
+	studyIds,
 }: GrantUserPermissionsParams): Promise<GrantUserPermissionsResult> => {
-	const lookup = await lookupUserByEmail(institutionalEmail, approverAccessToken);
-
-	if (!lookup.success) {
-		return { success: false, failureMessages: [lookup.message] };
-	}
-
-	const failureMessages = [];
-	for (const studyId of requestedStudies ?? []) {
-		for (const userPcglId of lookup.data) {
-			const result = await addUserToStudyPermission(studyId, userPcglId, approverAccessToken);
-			if (!result.success) {
-				failureMessages.push(result.message);
+	const failureMessages: string[] = [];
+	const successfulUserEmails = new Set<string>();
+	for (const studyId of studyIds) {
+		const result = await addUsersToStudyPermission(studyId, userEmails, approverAccessToken);
+		if (!result.success) {
+			failureMessages.push(result.message);
+		} else {
+			result.data.success.forEach((email) => successfulUserEmails.add(email));
+			if (Array.isArray(result.data.error)) {
+				result.data.error.forEach((error) => failureMessages.push(error));
+			} else if (result.data.error) {
+				failureMessages.push(result.data.error);
 			}
 		}
 	}
 
-	return { success: failureMessages.length === 0, failureMessages };
+	return { successfulUserEmails: Array.from(successfulUserEmails), errorMessages: failureMessages };
 };

@@ -25,10 +25,8 @@ import { fetchWithRetry } from './fetchWithRetry.ts';
 import {
 	addUserToStudyPermissionResponse,
 	authZUserInfo,
-	lookupUserResponse,
 	ServiceTokenResponse,
 	type PCGLAddUserToStudyPermissionResponse,
-	type PCGLAuthzLookupUserResponse,
 	type PCGLAuthZUserInfoResponse,
 } from './types.ts';
 
@@ -174,70 +172,32 @@ export const getUserInformation = async (
 };
 
 /**
- * Function to lookup a user by their email address in the AuthZ service
- * @param emailAddress
- * @param accessToken
- * @returns a list of PCGL IDs that match the email provided
- */
-export const lookupUserByEmail = async (
-	emailAddress: string,
-	accessToken: string,
-): AsyncResult<PCGLAuthzLookupUserResponse, 'SYSTEM_ERROR' | 'NOT_FOUND'> => {
-	try {
-		const queryParams = new URLSearchParams();
-		queryParams.set('email', emailAddress);
-		const response = await fetchAuthZResource(`/user/lookup?${queryParams.toString()}`, accessToken);
-
-		if (response.status === 404) {
-			const message = `No user found with email ${emailAddress}.`;
-			logger.info('[AUTHZ]:', message);
-			return failure('NOT_FOUND', message);
-		}
-
-		const res = await response.json();
-
-		const resultLookUpUser = lookupUserResponse.safeParse(res);
-
-		if (!resultLookUpUser.success) {
-			const message = `AuthZ service returned unexpected data to find user with email ${emailAddress}`;
-			logger.error(`[AUTHZ]: ${message}`, resultLookUpUser.error);
-			return failure('SYSTEM_ERROR', message);
-		}
-
-		return success(resultLookUpUser.data);
-	} catch (error) {
-		const message = `Unexpected error while getting user with email ${emailAddress}`;
-		logger.error('[AUTHZ]:', message, error);
-		return failure('SYSTEM_ERROR', message);
-	}
-};
-
-/**
  * Function to Add user to study permission in the AuthZ service
  * @param studyId
- * @param userPcglId
+ * @param userEmails
  * @param accessToken
  * @returns a list of study permissions for the user, otherwise returns failure with SYSTEM_ERROR
  */
-export const addUserToStudyPermission = async (
+export const addUsersToStudyPermission = async (
 	studyId: string,
-	userPcglId: string,
+	userEmails: string[],
 	accessToken: string,
 ): AsyncResult<PCGLAddUserToStudyPermissionResponse, 'SYSTEM_ERROR'> => {
 	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
 	try {
-		const response = await fetchAuthZResource(`/user/${userPcglId}`, accessToken, {
+		const response = await fetchAuthZResource(`/study/${studyId}`, accessToken, {
 			method: 'POST',
 			body: JSON.stringify({
-				study_id: studyId,
+				user_emails: userEmails,
 				start_date: today,
 				end_date: addDaysToDateString(today, APPROVED_PERMISSION_EXPIRES_IN_DAYS),
 			}),
 		});
 
 		if (!response.ok) {
-			const message = `Failed to add user '${userPcglId}' to study '${studyId}'`;
-			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${await response.text()}`);
+			const responseText = await response.text();
+			const message = `Failed to add users '${userEmails.join(', ')}' to study '${studyId}'`;
+			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${responseText}`);
 			return failure('SYSTEM_ERROR', message);
 		}
 
@@ -253,7 +213,7 @@ export const addUserToStudyPermission = async (
 
 		return success(resultAddPermission.data);
 	} catch (error) {
-		const message = `Unexpected error while adding ${userPcglId} to study ${studyId}`;
+		const message = `Unexpected error while adding ${userEmails.join(', ')} to study ${studyId}`;
 		logger.error('[AUTHZ]:', message, error);
 		return failure('SYSTEM_ERROR', message);
 	}
