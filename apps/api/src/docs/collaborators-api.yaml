@@ -16,11 +16,18 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 paths:
-  /collaborators/create:
+  /collaborators/{applicationId}/create:
     post:
       tags:
         - Collaborators
       summary: Create new Collaborators for an application.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         description: The body containing information about the requesting user.
         required: true
@@ -29,9 +36,6 @@ paths:
             schema:
               type: object
               properties:
-                applicationId:
-                  type: number
-                  description: ID of the related Application record that new Collaborators are associated with
                 collaborators:
                   $ref: '#/components/requests/CreateCollaborators'
       responses:
@@ -112,11 +116,18 @@ paths:
               schema:
                 $ref: '#/components/responses/ClientErrors'
 
-  /collaborators/update:
+  /collaborators/{applicationId}/update:
     post:
       tags:
         - Collaborators
       summary: Edit existing Collaborator records
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         description: The body containing information about the requesting user.
         required: true
@@ -125,9 +136,6 @@ paths:
             schema:
               type: object
               properties:
-                applicationId:
-                  type: number
-                  description: ID of the related Application record that Collaborator records are associated with
                 collaboratorEmail:
                   type: string
                   format: email

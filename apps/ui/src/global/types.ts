@@ -19,7 +19,7 @@
 
 import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { SectionRevision, UserRole } from '@pcgl-daco/validation';
+import { SectionRevision } from '@pcgl-daco/validation';
 import { RuleRender } from 'antd/es/form';
 import { ReactNode } from 'react';
 
@@ -60,7 +60,6 @@ export interface ApplicationOutletContext {
 	appId: string | number;
 	isEditMode: boolean;
 	revisions: SectionRevision;
-	userRole: UserRole;
 	dacComments: DacCommentRecord[];
 }
 

@@ -314,6 +314,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					id: applications.id,
 					userId: applications.user_id,
 					state: applications.state,
+					dacId: applications.dac_id,
 					createdAt: applications.created_at,
 					updatedAt: applications.updated_at,
 					applicant: {

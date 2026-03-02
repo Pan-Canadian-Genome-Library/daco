@@ -38,8 +38,11 @@ export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 	const signatureRef = useRef<SignatureCanvas>(null);
 	const { mutateAsync: createSignature } = useCreateSignature();
 	const {
-		state: { applicationUserRole: role, applicationState },
+		state: { applicationState, applicationUserPermissions },
 	} = useApplicationContext();
+
+	const { isApplicant, isInstitutionalRep } = applicationUserPermissions;
+
 	const { isEditMode, appId, revisions } = useOutletContext<ApplicationOutletContext>();
 	const form = useForm<eSignatureSchemaType>({
 		resolver: zodResolver(esignatureSchema),
@@ -49,26 +52,21 @@ export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 	const { disableSignature, disableSubmit } = canSignSection({
 		revisions,
 		isEditMode,
-		role,
+		userPermissions: applicationUserPermissions,
 		state: applicationState,
 		signatures: signatureData,
 	});
 
 	// Load the proper signature based off type of user
 	useEffect(() => {
-		if (signatureData && signatureData.applicantSignature && signatureRef.current && role === 'APPLICANT') {
+		if (signatureData && signatureData.applicantSignature && signatureRef.current && isApplicant) {
 			signatureRef.current.fromDataURL(signatureData.applicantSignature, {
 				ratio: 1,
 				width: signatureRef.current?.getCanvas().offsetWidth,
 				height: signatureRef.current?.getCanvas().offsetHeight,
 			});
 			form.setValue('signature', signatureData.applicantSignature);
-		} else if (
-			signatureData &&
-			signatureData.institutionalRepSignature &&
-			signatureRef.current &&
-			role === 'INSTITUTIONAL_REP'
-		) {
+		} else if (signatureData && signatureData.institutionalRepSignature && signatureRef.current && isInstitutionalRep) {
 			signatureRef.current.fromDataURL(signatureData.institutionalRepSignature, {
 				ratio: 1,
 				width: signatureRef.current?.getCanvas().offsetWidth,
@@ -76,7 +74,7 @@ export const useSignatureForm = ({ signatureData }: SignatureProps) => {
 			});
 			form.setValue('signature', signatureData.institutionalRepSignature);
 		}
-	}, [signatureData, role, form.setValue, form]);
+	}, [signatureData, form.setValue, form]);
 
 	// Save signature
 	const onSaveClicked = async () => {

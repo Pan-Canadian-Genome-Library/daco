@@ -42,14 +42,14 @@ type SectionMenuProps = {
 const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const {
-		state: { fields, formState, applicationUserRole },
+		state: { fields, formState, applicationUserPermissions },
 	} = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetCollaborators(appId);
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		if (formState.isDirty) {
-			editApplication({ id: appId, revisions });
+			editApplication({ applicationId: appId, revisions });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};
@@ -113,7 +113,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 										isLocked={determineIfLocked(route)}
 										hasCollaborators={data && data.length > 0}
 										appState={appState}
-										role={applicationUserRole}
+										isApplicant={applicationUserPermissions.isApplicant}
 									/>
 								),
 								disabled: route === SectionRoutes.SIGN && !ValidateAllSections(fields),
