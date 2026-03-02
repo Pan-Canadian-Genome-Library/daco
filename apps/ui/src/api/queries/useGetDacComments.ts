@@ -19,6 +19,7 @@
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { DacCommentRecord } from '@pcgl-daco/data-model';
 import { SectionRoutesValues } from '@pcgl-daco/validation';
 import { useQuery } from '@tanstack/react-query';
@@ -27,20 +28,26 @@ import { withErrorResponseHandler } from '../apiUtils';
 const useGetDacComments = ({
 	applicationId,
 	section,
+	isApplicationLoading,
 }: {
 	applicationId?: string | number;
 	section?: SectionRoutesValues | string;
+	isApplicationLoading: boolean;
 }) => {
-	// Do not fetch if its intro section
-	const preventSection = section !== 'intro';
+	const {
+		state: { applicationUserPermissions },
+	} = useApplicationContext();
+
+	const { isApplicant } = applicationUserPermissions;
+
+	// Fetch when not intro and not applicant
+	const allowSection = section !== 'intro' && !isApplicant;
 
 	return useQuery<DacCommentRecord[], ServerError>({
 		queryKey: [`comments-${applicationId}-${section}`],
-		enabled: preventSection,
+		enabled: !isApplicationLoading ? allowSection : false,
+		retry: 0,
 		queryFn: async () => {
-			if (!preventSection) {
-				return [];
-			}
 			const response = await fetch(`/applications/${applicationId}/dac/comments/${section}`, {
 				method: 'GET',
 			}).then(withErrorResponseHandler);
