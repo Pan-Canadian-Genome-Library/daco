@@ -214,6 +214,7 @@ export const checkDraftApplicationNeedsReminder = ({
 			return true;
 		}
 	}
+	return false;
 };
 
 /**

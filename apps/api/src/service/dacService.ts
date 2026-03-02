@@ -70,7 +70,6 @@ const dacSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-
 	getDacById: async ({ id }: { id: string }): AsyncResult<DacRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const dacRecords = await db.select().from(dac).where(eq(dac.dac_id, id));
