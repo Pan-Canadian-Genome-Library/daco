@@ -19,15 +19,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { requestedStudiesSchema, type RequestedStudiesSchemaType } from '@pcgl-daco/validation';
-import { Col, Form, Row, Typography } from 'antd';
+import { Col, Dropdown, Flex, Form, Input, MenuProps, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
-import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -39,26 +39,23 @@ import { useApplicationContext } from '@/providers/context/application/Applicati
 import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
+const { Item } = Form;
 
 const rule = createSchemaFieldRule(requestedStudiesSchema);
 
-interface RequestedStudy {
-	studyName: string;
-	studyID: number;
-}
-
-const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
+const REQUESTED_STUDY_TEMP_DATA: MenuProps['items'] = [
 	{
-		studyName: 'OICR Study',
-		studyID: 1,
+		key: 1,
+		label: 'OICR Study',
 	},
 	{
-		studyName: 'Government of Canada Pan-Canadian Collaboration Study',
-		studyID: 2,
+		key: 2,
+		label: 'Government of Canada Pan-Canadian Collaboration Study',
 	},
 ];
 
 const RequestedStudy = () => {
+	const [dropdownOpen, setDropdownOpen] = useState(false); // Prevent dropdown from closing
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
@@ -72,7 +69,6 @@ const RequestedStudy = () => {
 
 	const {
 		formState: { isDirty },
-		control,
 		getValues,
 	} = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
@@ -127,21 +123,29 @@ const RequestedStudy = () => {
 				</Row>
 				<SectionContent showDivider={false}>
 					<Row>
-						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<SelectBox
-								label={translate('requested-study.section1.form.studyName')}
-								sublabel={translate('requested-study.section1.form.studyLabel')}
-								name="requestedStudies"
-								placeholder="Select"
-								control={control}
-								rule={rule}
-								mode="multiple"
-								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyName, label: study.studyName };
-								})}
-								required
-								disabled={!canEdit}
-							/>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '75%' }}>
+							<Item
+								label={`${translate('requested-study.section1.form.studyName')}`}
+								name={`requestedStudies`}
+								rules={[rule]}
+								required={true}
+							>
+								<Text style={{ fontSize: '0.75rem' }}>{translate('requested-study.section1.form.studyLabel')}</Text>
+								<Flex vertical style={{ width: '100%' }} gap={'middle'}>
+									<Dropdown
+										arrow={false}
+										menu={{ items: REQUESTED_STUDY_TEMP_DATA }}
+										open={dropdownOpen}
+										onOpenChange={(nextOpen, info) => {
+											if (info.source === 'trigger' || nextOpen) {
+												setDropdownOpen(nextOpen);
+											}
+										}}
+									>
+										<Input.Search placeholder="Filled" />
+									</Dropdown>
+								</Flex>
+							</Item>
 						</Col>
 					</Row>
 				</SectionContent>
