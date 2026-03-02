@@ -18,7 +18,7 @@
  */
 
 import { ApplicationContentsResponse, ApplicationStateValues } from '@pcgl-daco/data-model';
-import { SectionRoutesValues, UserRole } from '@pcgl-daco/validation';
+import { SectionRoutesValues } from '@pcgl-daco/validation';
 import { Dispatch } from 'react';
 
 export interface FormState {
@@ -31,9 +31,16 @@ export type SectionsVisited<T extends string> = {
 	[section in T]: boolean;
 };
 
+export interface ApplicationUserPermission {
+	isApplicant: boolean;
+	isInstitutionalRep: boolean;
+	isDacChair: boolean;
+	isDacMember: boolean;
+}
+
 export interface ApplicationFormState {
 	applicationState: ApplicationStateValues;
-	applicationUserRole: UserRole;
+	applicationUserPermissions: ApplicationUserPermission;
 	fields: Partial<ApplicationContentsResponse>;
 	formState: FormState;
 }

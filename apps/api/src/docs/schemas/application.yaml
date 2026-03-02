@@ -277,9 +277,6 @@ components:
         - id
         - update
       properties:
-        id:
-          type: number
-          description: The id of the Application
         update:
           description: Changes to make to the application
           type: object
