@@ -28,7 +28,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
 	addInitialApplications,
-	addPaginationDonors,
+	addPaginationApplications,
 	allRecordsPageSize,
 	getFirstApplicationTestByState,
 	initTestMigration,
@@ -281,7 +281,7 @@ describe('Application Service', () => {
 		});
 
 		it('should allow record pagination', async () => {
-			await addPaginationDonors(db); // Add extra pagination values
+			await addPaginationApplications(db); // Add extra pagination values
 
 			const paginationResult = await testApplicationService.listApplications({ user_id, page: 2, pageSize: 10 });
 

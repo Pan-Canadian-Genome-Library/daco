@@ -683,6 +683,7 @@ const applicationSvc = (db: PostgresDb) => ({
 					.map((app) => ({
 						application_id: app.applications.id,
 						created_at: app.applications.created_at,
+						dac_id: app.applications.dac_id,
 						user_id: app.applications.user_id,
 						state: app.applications.state,
 						application_contents: app.application_contents,

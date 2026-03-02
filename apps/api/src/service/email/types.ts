@@ -253,6 +253,6 @@ export const reminderTargetActionTypes: Partial<{
 		ApplicationActions.INSTITUTIONAL_REP_SUBMIT,
 	],
 	[ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED]: [ApplicationActions.INSTITUTIONAL_REP_REVISION_REQUEST],
-	[ApplicationStates.DAC_REVIEW]: [ApplicationActions.INSTITUTIONAL_REP_SUBMIT, ApplicationActions.DAC_REVIEW_SUBMIT],
+	[ApplicationStates.DAC_REVIEW]: [ApplicationActions.INSTITUTIONAL_REP_APPROVED, ApplicationActions.DAC_REVIEW_SUBMIT],
 	[ApplicationStates.DAC_REVISIONS_REQUESTED]: [ApplicationActions.DAC_REVIEW_REVISION_REQUEST],
 };

@@ -18,10 +18,12 @@
  */
 
 import { ApplicationActions, ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model';
+import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.ts';
 import { applicationSvc } from '@/service/applicationService.ts';
+import { dacSvc } from '@/service/dacService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import {
 	type ReminderEmailTypes,
@@ -34,7 +36,7 @@ import {
 	type EmailRecord,
 	type JoinedApplicationEmailsActionsRecord,
 } from '@/service/types.ts';
-import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
+import { failure, success } from '@/utils/results.js';
 
 /**
  * Conditions for sending Application Reminder Emails
@@ -68,6 +70,15 @@ import { type EmailTypeValues } from '@pcgl-daco/data-model/src/types.ts';
 
 const logger = BaseLogger.forModule('Email Reminders');
 
+/* List of Application States requiring checks for reminder Emails */
+export const reminderStates = [
+	ApplicationStates.DRAFT,
+	ApplicationStates.DAC_REVIEW,
+	ApplicationStates.DAC_REVISIONS_REQUESTED,
+	ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+	ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+];
+
 /**
  * Check if the current date is more than interval days after a specific action date
  * If days passed since action date is greater than the interval, return true, else return false
@@ -91,59 +102,145 @@ function isReminderEmailType(emailType: EmailTypeValues): emailType is ReminderE
 /**
  * Find record for email with target reminder email_type values
  * Used to determine if an application needs a follow up email (not all emails require follow up)
- * Records are pre-sorted by DB so the email should be the most recent
+ * Records are sorted by created_at date to find most recent sent email
  */
-const getRelevantReminderEmail = ({
+export const getRelevantReminderEmail = ({
 	sentEmails,
 	state,
 }: {
-	sentEmails: EmailRecord[];
+	sentEmails: EmailRecord[] | null;
 	state: ApplicationStateValues;
 }): EmailRecord | undefined => {
-	const targetEmail = sentEmails?.find((email) => {
-		const emailType = email.email_type;
-		if (!isReminderEmailType(emailType)) {
+	const targetEmail = sentEmails
+		?.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf())
+		.find((email) => {
+			const emailType = email.email_type;
+			if (!isReminderEmailType(emailType)) {
+				return false;
+			}
+
+			const allowedStates = reminderTargetEmailTypes[emailType];
+			if (allowedStates?.includes(state)) {
+				return true;
+			}
+
 			return false;
-		}
-
-		const allowedStates = reminderTargetEmailTypes[emailType];
-		if (allowedStates?.includes(state)) {
-			return true;
-		}
-
-		return false;
-	});
+		});
 
 	return targetEmail;
 };
 
 /*
  * Finds relevant record Action created with target state transition Action value
- * Records are pre-sorted by DB so first result should be most recent
+ * Records are sorted by created_at date to insure most recent action is returned
  */
-const getRelevantReminderAction = ({
+export const getRelevantReminderAction = ({
 	applicationActions,
 	state,
 }: {
-	applicationActions: ApplicationActionRecord[];
+	applicationActions: ApplicationActionRecord[] | null;
 	state: ApplicationStateValues;
 }) => {
-	const targetActionType = reminderTargetActionTypes[state];
-	const mostRecentAction =
-		applicationActions?.length && targetActionType
-			? applicationActions.find((action) => targetActionType.includes(action.action))
-			: null;
-	return mostRecentAction;
+	const targetActionTypes = reminderTargetActionTypes[state];
+	if (Array.isArray(targetActionTypes) && Array.isArray(applicationActions) && applicationActions.length > 0) {
+		const filteredActions = applicationActions
+			.filter((action) => targetActionTypes.includes(action.action))
+			.sort((actionA, actionB) => actionB.created_at.valueOf() - actionA.created_at.valueOf());
+		const mostRecentAction = filteredActions[0] || null;
+		return mostRecentAction;
+	}
+	return null;
 };
 
-/* List of Application States requiring checks for reminder Emails */
-const reminderStates = [
-	ApplicationStates.DRAFT,
-	ApplicationStates.DAC_REVIEW,
-	ApplicationStates.DAC_REVISIONS_REQUESTED,
-	ApplicationStates.INSTITUTIONAL_REP_REVIEW,
-	ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
-];
+/**
+ * Collect Dac Member User Info and return Result with user info or error if info was not found
+ * @param relatedAction - Relevant ApplicationAction record, required
+ * @param dac_id - ID of Dac Group associated with application, or null
+ * @param relatedEmail - Relevant SentEmail record or undefined
+ * @returns Result with Dac Member Name & Email
+ */
+export const getDacUserDataResult = async ({
+	dac_id,
+	relatedAction,
+	relatedEmail,
+}: {
+	relatedAction: ApplicationActionRecord;
+	dac_id: string | null;
+	relatedEmail?: EmailRecord;
+}) => {
+	const database = getDbInstance();
+	const dacService = dacSvc(database);
+
+	const { user_name, user_id } = relatedAction;
+	const { recipient_emails } = relatedEmail || {};
+
+	let dacMemberName = user_name;
+	let dacEmail = (recipient_emails && recipient_emails[0]) || user_id;
+	if (dac_id) {
+		const dacRecordResult = await dacService.getDacById({ id: dac_id });
+		if (dacRecordResult.success) {
+			const { contact_name, contact_email } = dacRecordResult.data;
+			dacMemberName = contact_name;
+			dacEmail = contact_email;
+		}
+	}
+	if (dacMemberName && dacEmail) {
+		return success({ dacMemberName, dacEmail });
+	}
+	return failure('NOT_FOUND', `DAC contact info missing for id: ${dac_id}.`);
+};
+
+/**
+ * Checks if early application in Draft requires email followup
+ * @param state: ApplicationStateValues
+ * @param created_at: Date
+ * @param mostRecentEmail: EmailRecord | undefined
+ * @returns boolean
+ */
+export const checkDraftApplicationNeedsReminder = ({
+	state,
+	created_at,
+	mostRecentEmail,
+}: {
+	state: ApplicationStateValues;
+	created_at: Date;
+	mostRecentEmail?: EmailRecord;
+}) => {
+	// Early Draft applications will not have any state transition Action records
+	// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead of Action date
+	if (state === ApplicationStates.DRAFT && dateDiffCheck({ actionDate: created_at })) {
+		// Reminders should be sent if no reminder has been sent yet, or if a reminder email was sent #{interval} days ago
+		if (!mostRecentEmail || dateDiffCheck({ actionDate: mostRecentEmail.created_at })) {
+			return true;
+		}
+	}
+	return false;
+};
+
+/**
+ * Checks if post-Draft status application requires email follow up
+ * @param mostRecentAction: ApplicationActionRecord
+ * @param mostRecentEmail: EmailRecord | undefined
+ * @returns boolean
+ */
+export const checkApplicationNeedsReminder = ({
+	mostRecentAction,
+	mostRecentEmail,
+}: {
+	mostRecentAction: ApplicationActionRecord;
+	mostRecentEmail?: EmailRecord;
+}) => {
+	// Compare date of most recent state transition to see if # intervalDays have passed since that time
+	const needsActionReminder = dateDiffCheck({ actionDate: mostRecentAction.created_at });
+
+	if (needsActionReminder) {
+		// Reminders should be sent if no reminder has been sent yet, or if a reminder email was sent #{interval} days ago
+		const noReminderSent = !mostRecentEmail;
+		const reminderTimeElapsed = mostRecentEmail && dateDiffCheck({ actionDate: mostRecentEmail.created_at });
+		return noReminderSent || reminderTimeElapsed;
+	}
+	return false;
+};
 
 /* Reviews Application, Action & Email details to determine if an Application needs a Reminder Email */
 export const scheduleEmailReminders = async () => {
@@ -157,29 +254,23 @@ export const scheduleEmailReminders = async () => {
 		const applications = allApplicationsResult.data;
 		for (const application of applications) {
 			const { state, created_at, application_actions: applicationActions, sent_emails: sentEmails } = application;
+			const mostRecentAction = getRelevantReminderAction({ state, applicationActions });
+			const mostRecentEmail = getRelevantReminderEmail({ state, sentEmails });
 
-			// Early Draft applications will not have any state transition Action records
-			// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead
-			// For all other states & actions, confirm if it has been >7 days since the last related state change or reminder email
-			const mostRecentAction = applicationActions ? getRelevantReminderAction({ state, applicationActions }) : null;
-			const actionDate = mostRecentAction
-				? mostRecentAction.created_at
-				: state === ApplicationStates.DRAFT
-					? created_at
-					: null;
-			const needsActionReminder = actionDate ? dateDiffCheck({ actionDate }) : false;
-
-			const mostRecentEmail = sentEmails ? getRelevantReminderEmail({ state, sentEmails }) : null;
-			const emailDate = mostRecentEmail?.created_at;
-			const needsEmailReminder = emailDate ? dateDiffCheck({ actionDate: emailDate }) : false;
-
-			const sendReminder = needsEmailReminder || needsActionReminder;
-			if (sendReminder) {
-				sendEmailReminders({
-					application,
-					relatedAction: mostRecentAction,
-					relatedEmail: mostRecentEmail,
-				});
+			if (state === ApplicationStates.DRAFT && !mostRecentAction) {
+				if (checkDraftApplicationNeedsReminder({ state, created_at, mostRecentEmail })) {
+					sendDraftEmailReminder({ application });
+				}
+			} else if (mostRecentAction) {
+				// Compare date of most recent state transition see if # intervalDays have passed since that time
+				const needsReminder = checkApplicationNeedsReminder({ mostRecentAction, mostRecentEmail });
+				if (needsReminder) {
+					await sendEmailReminders({
+						application,
+						relatedAction: mostRecentAction,
+						relatedEmail: mostRecentEmail,
+					});
+				}
 			}
 		}
 	} else {
@@ -189,145 +280,169 @@ export const scheduleEmailReminders = async () => {
 	}
 };
 
+export const sendDraftEmailReminder = async ({
+	application,
+}: {
+	application: JoinedApplicationEmailsActionsRecord;
+}) => {
+	const database = getDbInstance();
+	const emailService = emailSvc(database);
+	const { application_id, created_at, application_contents } = application;
+	const { applicant_first_name, applicant_last_name, applicant_institutional_email } = application_contents || {};
+
+	const applicantName = applicant_first_name
+		? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
+		: 'Applicant';
+
+	// If in State Draft for over 7 days, send a reminder email to Submit
+	emailService.sendEmailSubmitDraftReminder({
+		id: application_id,
+		applicantName,
+		submittedDate: created_at,
+		to: applicant_institutional_email,
+	});
+};
+
 // Generates & Sends Reminder Emails based on Application State
-export const sendEmailReminders = ({
+export const sendEmailReminders = async ({
 	application,
 	relatedAction,
 	relatedEmail,
 }: {
 	application: JoinedApplicationEmailsActionsRecord;
-	relatedAction?: ApplicationActionRecord | null;
-	relatedEmail?: EmailRecord | null;
+	relatedAction: ApplicationActionRecord;
+	relatedEmail?: EmailRecord;
 }) => {
+	// All post-Draft Applications should have Application Contents and at least one Action record
 	const database = getDbInstance();
 	const emailService = emailSvc(database);
-	const { application_id, state, created_at, application_contents } = application;
-	const { id: application_action_id, created_at: actionDate, user_name, user_id } = relatedAction || {};
+	const { application_id, dac_id, state, application_contents } = application;
+	const { id: application_action_id, created_at: actionDate } = relatedAction || {};
+	const {
+		applicant_first_name,
+		applicant_last_name,
+		applicant_institutional_email: applicantEmail,
+		institutional_rep_first_name,
+		institutional_rep_last_name,
+		institutional_rep_email: repEmail,
+	} = application_contents || {};
 
-	if (state === ApplicationStates.DRAFT) {
-		// If in State Draft for over 7 days, send a reminder email to Submit
-		const { applicant_first_name, applicant_last_name, applicant_institutional_email } = application_contents || {};
+	const applicantName = applicant_first_name
+		? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
+		: 'Applicant';
+	const repName = institutional_rep_first_name
+		? `${institutional_rep_first_name} ${institutional_rep_last_name || ''}`.trim()
+		: 'Representative';
 
-		const applicantName = applicant_first_name
-			? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
-			: 'Applicant';
+	const submittedDate = actionDate;
 
-		emailService.sendEmailSubmitDraftReminder({
-			id: application_id,
-			actionId: application_action_id,
-			applicantName,
-			submittedDate: actionDate || created_at,
-			to: applicant_institutional_email,
-		});
-	} else if (
-		// All post-Draft Applications should have Application Contents and at least one Action record
-		!!application_contents &&
-		!!relatedAction &&
-		actionDate !== undefined &&
-		application_action_id !== undefined
-	) {
-		const {
-			applicant_first_name,
-			applicant_last_name,
-			applicant_institutional_email: applicantEmail,
-			institutional_rep_first_name,
-			institutional_rep_last_name,
-			institutional_rep_email: repEmail,
-		} = application_contents;
-
-		const applicantName = applicant_first_name
-			? `${applicant_first_name} ${applicant_last_name || ''}`.trim()
-			: 'Applicant';
-		const repName = institutional_rep_first_name
-			? `${institutional_rep_first_name} ${institutional_rep_last_name || ''}`.trim()
-			: 'Representative';
-
-		const submittedDate = actionDate;
-
-		// TODO: Lookup contact email Dac table
-		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/549
-		const dacMemberName = user_name || 'DAC Member';
-		const dacEmail = relatedEmail?.recipient_emails[0] || user_id;
-
-		switch (state) {
-			case ApplicationStates.DAC_REVIEW:
-				if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
-					// Post Institutional Rep Submission, Application has moved to Dac Review
-					// If still in review 7 days later -> send email reminder to Dac Member
-					emailService.sendEmailDacReviewReminder({
-						id: application_id,
-						applicantName,
-						actionId: application_action_id,
-						repName: dacMemberName,
-						submittedDate,
-						to: dacEmail,
-					});
-				} else if (relatedAction.action === ApplicationActions.DAC_REVIEW_SUBMIT) {
-					// Post Dac Revisions Submitted, Application has moved back to Dac Review
-					// If still in review 7 days later -> send email reminder to Dac Member
-					emailService.sendEmailDacRevisionsReminder({
-						id: application_id,
-						actionId: application_action_id,
-						applicantName,
-						submittedDate,
-						repName: dacMemberName,
-						to: dacEmail,
-					});
+	switch (state) {
+		case ApplicationStates.DAC_REVIEW:
+			if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
+				// Post Institutional Rep Submission, Application has moved to Dac Review
+				// If still in review 7 days later -> send email reminder to Dac Member
+				const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+				if (!dacUserInfoResult.success) {
+					const { error, message } = dacUserInfoResult;
+					logger.error(message, error);
+					return dacUserInfoResult;
 				}
-				break;
-			case ApplicationStates.DAC_REVISIONS_REQUESTED: {
-				// Post Dac Revisions Requested, if still not Submitted 7 days later -> send email reminder to Applicant
-				emailService.sendEmailSubmitDacRevisionsReminder({
+				const { dacMemberName, dacEmail } = dacUserInfoResult.data;
+				emailService.sendEmailDacReviewReminder({
 					id: application_id,
-					actionId: application_action_id,
 					applicantName,
+					actionId: application_action_id,
 					repName: dacMemberName,
 					submittedDate,
-					to: applicantEmail,
+					to: dacEmail,
 				});
-				break;
-			}
-			case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
-				if (relatedAction.action === ApplicationActions.SUBMIT_DRAFT) {
-					// Post Submit Draft, Application has moved to Rep Review
-					// If still in review 7 days later -> send email reminder to Institutional Rep
-					emailService.sendEmailRepReviewReminder({
-						id: application_id,
-						applicantName,
-						actionId: application_action_id,
-						repName,
-						submittedDate,
-						to: repEmail,
-					});
-				} else if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
-					// Post Rep Revisions Submitted, if still in review 7 days later -> send Institutional Rep email reminder
-					emailService.sendEmailRepRevisionsReminder({
-						id: application_id,
-						applicantName,
-						submittedDate,
-						repName,
-						to: repEmail || 'pcgl_email@yopmail.com',
-					});
+			} else if (relatedAction.action === ApplicationActions.DAC_REVIEW_SUBMIT) {
+				// Post Dac Revisions Submitted, Application has moved back to Dac Review
+				// If still in review 7 days later -> send email reminder to Dac Member
+				const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+				if (!dacUserInfoResult.success) {
+					const { error, message } = dacUserInfoResult;
+					logger.error(message, error);
+					return dacUserInfoResult;
 				}
-				break;
-			case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
-				// Post Rep Revisions Requested, if still in review 7 days later -> send Applicant email reminder
-				emailService.sendEmailSubmitRepRevisionsReminder({
+				const { dacMemberName, dacEmail } = dacUserInfoResult.data;
+				emailService.sendEmailDacRevisionsReminder({
+					id: application_id,
+					actionId: application_action_id,
+					applicantName,
+					submittedDate,
+					repName: dacMemberName,
+					to: dacEmail,
+				});
+			}
+			break;
+		case ApplicationStates.DAC_REVISIONS_REQUESTED: {
+			// Post Dac Revisions Requested, if still not Submitted 7 days later -> send email reminder to Applicant
+			const dacUserInfoResult = await getDacUserDataResult({ dac_id, relatedAction, relatedEmail });
+			if (!dacUserInfoResult.success) {
+				const { error, message } = dacUserInfoResult;
+				logger.error(message, error);
+				return dacUserInfoResult;
+			}
+			const { dacMemberName } = dacUserInfoResult.data;
+			emailService.sendEmailSubmitDacRevisionsReminder({
+				id: application_id,
+				actionId: application_action_id,
+				applicantName,
+				repName: dacMemberName,
+				submittedDate,
+				to: applicantEmail,
+			});
+			break;
+		}
+		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
+			if (relatedAction.action === ApplicationActions.SUBMIT_DRAFT) {
+				// Post Submit Draft, Application has moved to Rep Review
+				// If still in review 7 days later -> send email reminder to Institutional Rep
+				emailService.sendEmailRepReviewReminder({
+					id: application_id,
+					applicantName,
+					actionId: application_action_id,
+					repName,
+					submittedDate,
+					to: repEmail,
+				});
+			} else if (relatedAction.action === ApplicationActions.INSTITUTIONAL_REP_SUBMIT) {
+				// Post Rep Revisions Submitted, if still in review 7 days later -> send Institutional Rep email reminder
+				emailService.sendEmailRepRevisionsReminder({
+					id: application_id,
+					applicantName,
+					submittedDate,
+					repName,
+					to: repEmail,
+				});
+			}
+			break;
+		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
+			// Post Rep Revisions Requested, if still in review 7 days later -> send Applicant email reminder
+			emailService.sendEmailSubmitRepRevisionsReminder({
+				id: application_id,
+				applicantName,
+				actionId: application_action_id,
+				submittedDate,
+				repName,
+				to: applicantEmail,
+			});
+			break;
+		case ApplicationStates.DRAFT:
+			if (relatedAction.action === ApplicationActions.WITHDRAW) {
+				// Withdrawing moves Application back to Draft
+				// If still in review 7 days later -> send email reminder to Applicant
+				emailService.sendEmailSubmitDraftReminder({
 					id: application_id,
 					applicantName,
 					actionId: application_action_id,
 					submittedDate,
-					repName,
 					to: applicantEmail,
 				});
-
-				break;
-			default:
-				break;
-		}
-	} else {
-		logger.error(
-			`Error at sendEmailReminders - Missing required application information for application with id ${application_id}`,
-		);
+			}
+			break;
+		default:
+			break;
 	}
 };
