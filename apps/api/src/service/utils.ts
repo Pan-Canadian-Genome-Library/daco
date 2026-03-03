@@ -94,7 +94,6 @@ export const authErrorResponseHandler = (
 	});
 };
 
-
 /**
  * When called by a DAC member, filters by the DAC ID of the PCGL DAC (from Auth config)
  * When called by a DAC Chair, this needs to filter applications by the DAC ID(s) that they are the chair of

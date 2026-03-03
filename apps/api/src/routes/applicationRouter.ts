@@ -63,7 +63,7 @@ import BaseLogger from '@/logger.js';
 import { accessMiddleware } from '@/middleware/accessMiddleware.ts';
 import { isAssociatedRep, isUserDacChair, isUserDacMember } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { authErrorResponseHandler, authFailure, getUserName, getAuthorizedDacIds } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure, getAuthorizedDacIds, getUserName } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -226,7 +226,7 @@ applicationRouter.get(
 			search: searchResult,
 			isDAC,
 			isApplicantView,
-			authorizedDacIds
+			authorizedDacIds,
 		});
 
 		if (result.success) {
