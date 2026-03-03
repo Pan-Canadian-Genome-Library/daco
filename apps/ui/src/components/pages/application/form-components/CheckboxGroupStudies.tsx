@@ -56,27 +56,25 @@ const CheckboxGroupStudies = <T extends FieldValues>(props: UseControllerProps<T
 						validateTrigger="onChange"
 						initialValue={field.value}
 						style={{ margin: 0 }}
-          >
- 									<Flex style={{ boxShadow: token.boxShadowSecondary, border: token.borderRadiusLG, padding: '5px' }}>
-
-						<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
-							{props.options.map((checkbox) => (
-								<Row
-									key={`checkbox-${checkbox.value}`}
-									style={{
-										borderRadius: token.borderRadius,
-										width: '100%',
-										minWidth: '100%',
-									}}
-								>
-									<Checkbox value={checkbox.value} disabled={props.disabled}>
-										{checkbox.label}
-									</Checkbox>
-								</Row>
-							))}
-              </Checkbox.Group>
- 									</Flex>
-
+					>
+						<Flex style={{ boxShadow: token.boxShadowSecondary, border: token.borderRadiusLG, padding: '5px' }}>
+							<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
+								{props.options.map((checkbox) => (
+									<Row
+										key={`checkbox-${checkbox.value}`}
+										style={{
+											borderRadius: token.borderRadius,
+											width: '100%',
+											minWidth: '100%',
+										}}
+									>
+										<Checkbox value={checkbox.value} disabled={props.disabled}>
+											{checkbox.label}
+										</Checkbox>
+									</Row>
+								))}
+							</Checkbox.Group>
+						</Flex>
 					</Item>
 				);
 			}}
