@@ -26,11 +26,12 @@ interface SectionContentProps extends PropsWithChildren {
 	title?: string;
 	showDivider?: boolean;
 	text?: string;
+	onClick?: () => void;
 }
 
-const SectionContent = ({ title, showDivider = true, text, children }: SectionContentProps) => {
+const SectionContent = ({ title, showDivider = true, onClick, text, children }: SectionContentProps) => {
 	return (
-		<Flex vertical>
+		<Flex vertical onClick={onClick}>
 			<Title level={4}>{title}</Title>
 			{text ? <Text style={{ margin: 'auto 0 1.5rem 0' }}>{text}</Text> : null}
 			{children}

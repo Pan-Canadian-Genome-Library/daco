@@ -19,15 +19,19 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { requestedStudiesSchema, type RequestedStudiesSchemaType } from '@pcgl-daco/validation';
-import { Col, Form, Row, Typography } from 'antd';
+import { Col, Flex, Form, Input, Row, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useGetStudies from '@/api/queries/useGetStudies';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
-import SelectBox from '@/components/pages/application/form-components/SelectBox';
+import CheckboxGroupStudies, {
+	CheckboxGroupOptionsStudy,
+} from '@/components/pages/application/form-components/CheckboxGroupStudies';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -42,26 +46,29 @@ const { Text } = Typography;
 
 const rule = createSchemaFieldRule(requestedStudiesSchema);
 
-interface RequestedStudy {
-	studyName: string;
-	studyID: number;
-}
+/**
+ * Checks whether the selected studies span more than one DAC.
+ * @param requestedStudies - Array of selected studyId strings from the form.
+ * @param studies - Full list of StudyDTOs fetched from the server.
+ * @returns `true` if two or more distinct dacIds are found, `false` otherwise.
+ */
+// const getDacIds = (requestedStudies: string[] | null | undefined, studies: StudyDTO[]) => {
+// 	if (!requestedStudies || requestedStudies.length === 0) return [];
 
-const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
-	{
-		studyName: 'OICR Study',
-		studyID: 1,
-	},
-	{
-		studyName: 'Government of Canada Pan-Canadian Collaboration Study',
-		studyID: 2,
-	},
-];
+// 	const dacIds = requestedStudies.map((studyId) => studies.find((study) => study.studyId === studyId)?.dacId);
+
+// 	return dacIds;
+// };
 
 const RequestedStudy = () => {
+	const [searchText, setSearchText] = useState<string | undefined>(); // Prevent dropdown from closing
+	const [isSearchFocused, setIsSearchFocused] = useState(false);
+	const isPanelMouseDownRef = useRef(false);
+	const [studyArray, setStudyArray] = useState<CheckboxGroupOptionsStudy[]>([]);
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const { data, isPending } = useGetStudies();
 	const canEdit = canEditSection({
 		revisions,
 		section: 'study',
@@ -71,8 +78,8 @@ const RequestedStudy = () => {
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
 	const {
-		formState: { isDirty },
 		control,
+		formState: { isDirty },
 		getValues,
 	} = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
@@ -80,6 +87,34 @@ const RequestedStudy = () => {
 		},
 		resolver: zodResolver(requestedStudiesSchema),
 	});
+
+	useEffect(() => {
+		if (data) {
+			let newArray: CheckboxGroupOptionsStudy[] = data.map((study) => ({
+				id: study.studyId,
+				name: study.studyName,
+				displayName: (
+					<>
+						<Text style={{ fontSize: '0.75rem' }} strong>
+							{study.studyName}
+						</Text>
+						, {study.studyId}
+					</>
+				),
+				value: study.studyId.toString(),
+				disabled: !canEdit,
+			}));
+
+			if (searchText) {
+				newArray = newArray.filter(
+					(study) =>
+						study.value.toLowerCase().includes(searchText.toLowerCase()) ||
+						study.name.toLowerCase().includes(searchText.toLowerCase()),
+				);
+			}
+			setStudyArray(newArray);
+		}
+	}, [data, canEdit, searchText]);
 
 	const onSubmit = () => {
 		const requestedStudies = getValues('requestedStudies');
@@ -127,21 +162,44 @@ const RequestedStudy = () => {
 				</Row>
 				<SectionContent showDivider={false}>
 					<Row>
-						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<SelectBox
-								label={translate('requested-study.section1.form.studyName')}
-								sublabel={translate('requested-study.section1.form.studyLabel')}
-								name="requestedStudies"
-								placeholder="Select"
-								control={control}
-								rule={rule}
-								mode="multiple"
-								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyName, label: study.studyName };
-								})}
-								required
-								disabled={!canEdit}
-							/>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '75%' }}>
+							<Flex vertical gap={'middle'}>
+								<Flex vertical>
+									<Text style={{ fontSize: '0.9rem' }}>{translate('requested-study.section1.form.studyName')}</Text>
+									<Text style={{ fontSize: '0.75rem' }}>{translate('requested-study.section1.form.studyLabel')}</Text>
+								</Flex>
+								<Input.Search
+									placeholder="Search study name..."
+									onFocus={() => setIsSearchFocused(true)}
+									onBlur={() => {
+										if (isPanelMouseDownRef.current) {
+											isPanelMouseDownRef.current = false;
+											return;
+										}
+										setIsSearchFocused(false);
+									}}
+									onChange={(e) => {
+										e.stopPropagation();
+										setSearchText(e.target.value);
+									}}
+									onSearch={(value) => setSearchText(value)}
+								/>
+								{isSearchFocused && !isPending && data ? (
+									<div
+										onMouseDown={() => {
+											isPanelMouseDownRef.current = true;
+										}}
+									>
+										<CheckboxGroupStudies
+											control={control}
+											rule={rule}
+											name="requestedStudies"
+											disabled={false}
+											options={studyArray}
+										/>
+									</div>
+								) : null}
+							</Flex>
 						</Col>
 					</Row>
 				</SectionContent>
