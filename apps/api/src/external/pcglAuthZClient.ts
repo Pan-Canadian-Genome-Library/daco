@@ -34,8 +34,6 @@ const logger = BaseLogger.forModule('authZClient');
 
 let serviceToken: string | undefined = undefined;
 
-const today = new Date().toISOString();
-
 const addDaysToDateString = (dateString: string, days: number) => {
 	const date = new Date(dateString);
 	date.setDate(date.getDate() + days);
@@ -184,6 +182,9 @@ export const addUsersToStudyPermission = async (
 	accessToken: string,
 ): AsyncResult<PCGLAddUserToStudyPermissionResponse, 'SYSTEM_ERROR'> => {
 	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
+
+	const today = new Date().toISOString();
+
 	try {
 		const response = await fetchAuthZResource(`/study/${studyId}`, accessToken, {
 			method: 'POST',
