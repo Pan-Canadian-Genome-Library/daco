@@ -95,8 +95,8 @@ export const authErrorResponseHandler = (
 };
 
 /**
- * When called by a DAC member, filters by the DAC ID of the PCGL DAC (from Auth config)
- * When called by a DAC Chair, this needs to filter applications by the DAC ID(s) that they are the chair of
+ * Creates an array of DAC IDs which User is authorized to access
+ * Combines User.dacChair & User.dacMember values (User can be both a Member and a Chair for multiple groups)
  * @param dacChair
  * @param dacMember
  */
