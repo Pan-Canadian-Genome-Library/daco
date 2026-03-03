@@ -371,8 +371,7 @@ export const createApplicationPDF = async ({
 
 /**
  * This function moves the application status to `dacApproved`.
- * It looks for the PCGLID of the applicant and each collaborator to grant access to the requested study.
- * TODO: A refactor is required to better handling when the collaborator PCGLID is not found
+ * It grants the applicant and all the collaborators permission to the requested study.
  *
  * @async
  * @param applicationId - ID of the application
