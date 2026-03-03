@@ -91,7 +91,7 @@ const HistoryModal = ({ id, isOpen, closeModal }: HistoryModalProps) => {
 	return (
 		<Modal
 			closeIcon={true}
-			destroyOnClose
+			destroyOnHidden
 			footer={[]}
 			loading={isLoading}
 			onCancel={closeModal}

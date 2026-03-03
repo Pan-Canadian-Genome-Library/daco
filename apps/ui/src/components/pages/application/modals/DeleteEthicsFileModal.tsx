@@ -65,7 +65,7 @@ const DeleteEthicsFileModal = ({ filename, isOpen, setIsOpen }: DeleteEthicsFile
 			open={isOpen}
 			onOk={onSubmit}
 			onCancel={() => setIsOpen(false)}
-			destroyOnClose
+			destroyOnHidden
 		></Modal>
 	);
 };

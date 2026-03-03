@@ -131,7 +131,7 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 			open={isOpen}
 			onCancel={(prev) => setIsOpen(!prev)}
 			footer={[]}
-			destroyOnClose
+			destroyOnHidden
 		>
 			<Flex style={{ height: '10%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('modals.requestRevisions.description')}</Text>

@@ -51,7 +51,7 @@ const DeleteCollaboratorModal = ({ appId, rowData, isOpen, setIsOpen }: DeleteCo
 			open={isOpen}
 			onOk={onSubmit}
 			onCancel={() => setIsOpen({ isOpen: false })}
-			destroyOnClose
+			destroyOnHidden
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>

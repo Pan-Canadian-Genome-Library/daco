@@ -71,7 +71,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 			open={isOpen}
 			onCancel={() => setIsOpen({ isOpen: false })}
 			footer={[]}
-			destroyOnClose
+			destroyOnHidden
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('collab-section.addModalDescription')}</Text>

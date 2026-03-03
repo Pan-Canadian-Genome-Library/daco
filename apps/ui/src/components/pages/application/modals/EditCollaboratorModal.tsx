@@ -93,7 +93,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 			open={isOpen}
 			onCancel={(prev) => setIsOpen({ ...prev, isOpen: false })}
 			footer={[]}
-			destroyOnClose
+			destroyOnHidden
 		>
 			<Flex style={{ height: '100%', marginTop: 20 }} vertical gap={'middle'}>
 				<Text>{translate('collab-section.editModalDescription')}</Text>
