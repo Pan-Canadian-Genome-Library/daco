@@ -60,7 +60,10 @@ const CheckboxGroupStudies = <T extends FieldValues>(props: UseControllerProps<T
 						initialValue={field.value}
 						style={{ margin: 0 }}
 					>
-						<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
+						<Checkbox.Group
+							{...field}
+							style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM, marginBottom: '20px' }}
+						>
 							<Flex
 								vertical
 								style={{

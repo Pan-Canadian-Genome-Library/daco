@@ -74,7 +74,7 @@ const RequestedStudy = () => {
 
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
-	const { control, watch, getValues } = useForm<Nullable<RequestedStudiesSchemaType>>({
+	const { control, watch, getValues, setValue } = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
 			requestedStudies: state.fields.requestedStudies,
 		},
@@ -124,10 +124,34 @@ const RequestedStudy = () => {
 			}
 			setStudyArray(newArray);
 		}
-	}, [data, canEdit, searchText, requestedStudies]);
+	}, [data, canEdit, searchText, requestedStudies, notification]);
 
 	const onSubmit = () => {
 		const requestedStudies = getValues('requestedStudies');
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				...state,
+				fields: {
+					...state.fields,
+					requestedStudies,
+				},
+				formState: {
+					...state.formState,
+					isDirty: true,
+				},
+			},
+		});
+	};
+
+	const removeTag = (value: string) => {
+		const requestedStudies = getValues('requestedStudies');
+		const filteredStudies = requestedStudies?.filter((study) => study !== value) || null;
+
+		form.setFieldValue('requestedStudies', filteredStudies);
+		form.validateFields();
+		setValue('requestedStudies', filteredStudies);
 
 		dispatch({
 			type: 'UPDATE_APPLICATION',
@@ -193,7 +217,11 @@ const RequestedStudy = () => {
 								<Flex wrap style={{ minHeight: '23px' }} gap={'small'}>
 									{requestedStudies
 										? requestedStudies.map((study) => {
-												return <Tag key={study}>{study}</Tag>;
+												return (
+													<Tag key={study} closable onClose={() => removeTag(study)}>
+														{study}
+													</Tag>
+												);
 											})
 										: null}
 								</Flex>
