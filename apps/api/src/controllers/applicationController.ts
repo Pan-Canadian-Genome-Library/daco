@@ -39,6 +39,7 @@ import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
+import { studySvc } from '@/service/studyService.ts';
 import {
 	type ApplicationRecord,
 	type ApplicationService,
@@ -96,9 +97,13 @@ export const editApplication = async ({
 }: {
 	id: number;
 	update: UpdateEditApplicationRequest;
-}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<
+	ApplicationResponseData,
+	'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_REQUEST'
+> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
+	const studyService = await studySvc(database);
 
 	const result = await applicationRepo.getApplicationById({ id });
 
@@ -144,6 +149,27 @@ export const editApplication = async ({
 			const message = `Upload data contains illegal fields`;
 
 			return failure('SYSTEM_ERROR', message);
+		}
+	}
+
+	// Need to check if the update contains valid study names before converting to record
+	if (update.requestedStudies && update.requestedStudies.length > 1) {
+		const allStudies = await studyService.getAllStudies();
+
+		if (!allStudies.success) {
+			logger.error('Failed to retrieve studies to validate users requested studies', allStudies.message);
+			return failure('SYSTEM_ERROR', 'Something went wrong. We cannot verify your requested studies.');
+		}
+
+		const dacIds = new Set(
+			update.requestedStudies.map((studyName) => allStudies.data.find((study) => study.studyName === studyName)?.dacId),
+		);
+
+		if (dacIds.size > 1) {
+			return failure(
+				'INVALID_REQUEST',
+				'Multiple DACs found for requested studies, only one DAC per study is allowed.',
+			);
 		}
 	}
 
