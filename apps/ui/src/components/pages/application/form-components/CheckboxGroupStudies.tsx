@@ -89,7 +89,7 @@ const CheckboxGroupStudies = <T extends FieldValues>(props: UseControllerProps<T
 												<Text disabled={checkbox.disabled} style={{ fontSize: '0.75rem' }}>
 													{checkbox.displayName}
 												</Text>
-												<Checkbox value={checkbox.value} disabled={checkbox.disabled} />
+												<Checkbox value={checkbox.value} />
 											</Flex>
 										</label>
 									);

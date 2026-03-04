@@ -76,12 +76,7 @@ const RequestedStudy = () => {
 	});
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
-	const {
-		control,
-		formState: { isDirty },
-		watch,
-		getValues,
-	} = useForm<Nullable<RequestedStudiesSchemaType>>({
+	const { control, watch, getValues } = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
 			requestedStudies: state.fields.requestedStudies,
 		},
@@ -139,7 +134,7 @@ const RequestedStudy = () => {
 				},
 				formState: {
 					...state.formState,
-					isDirty,
+					isDirty: true,
 				},
 			},
 		});
