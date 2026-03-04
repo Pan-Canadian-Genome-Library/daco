@@ -168,7 +168,7 @@ export const editApplication = async ({
 		if (dacIds.size > 1) {
 			return failure(
 				'INVALID_REQUEST',
-				'Multiple DACs found for requested studies, only one DAC per study is allowed.',
+				"Multiple DACs's found for requested studies. All selected studies in a single application must belong to the same DAC.",
 			);
 		}
 	}
