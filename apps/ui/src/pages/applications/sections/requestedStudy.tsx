@@ -19,9 +19,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { requestedStudiesSchema, type RequestedStudiesSchemaType } from '@pcgl-daco/validation';
-import { Col, Flex, Form, Input, Row, Typography } from 'antd';
+import { Col, Flex, Form, Input, Row, Tag, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -40,6 +40,7 @@ import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { StudyDTO } from '@pcgl-daco/data-model/src/types';
 import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
@@ -52,18 +53,16 @@ const rule = createSchemaFieldRule(requestedStudiesSchema);
  * @param studies - Full list of StudyDTOs fetched from the server.
  * @returns `true` if two or more distinct dacIds are found, `false` otherwise.
  */
-// const getDacIds = (requestedStudies: string[] | null | undefined, studies: StudyDTO[]) => {
-// 	if (!requestedStudies || requestedStudies.length === 0) return [];
+const getDacIds = (requestedStudies: string[] | null | undefined, studies: StudyDTO[]) => {
+	if (!requestedStudies || requestedStudies.length === 0) return [];
 
-// 	const dacIds = requestedStudies.map((studyId) => studies.find((study) => study.studyId === studyId)?.dacId);
+	const dacIds = requestedStudies.map((studyName) => studies.find((study) => study.studyName === studyName)?.dacId);
 
-// 	return dacIds;
-// };
+	return dacIds;
+};
 
 const RequestedStudy = () => {
 	const [searchText, setSearchText] = useState<string | undefined>(); // Prevent dropdown from closing
-	const [isSearchFocused, setIsSearchFocused] = useState(false);
-	const isPanelMouseDownRef = useRef(false);
 	const [studyArray, setStudyArray] = useState<CheckboxGroupOptionsStudy[]>([]);
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
@@ -80,6 +79,7 @@ const RequestedStudy = () => {
 	const {
 		control,
 		formState: { isDirty },
+		watch,
 		getValues,
 	} = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
@@ -87,34 +87,44 @@ const RequestedStudy = () => {
 		},
 		resolver: zodResolver(requestedStudiesSchema),
 	});
+	const requestedStudies = watch('requestedStudies');
 
 	useEffect(() => {
 		if (data) {
-			let newArray: CheckboxGroupOptionsStudy[] = data.map((study) => ({
-				id: study.studyId,
-				name: study.studyName,
-				displayName: (
-					<>
-						<Text style={{ fontSize: '0.75rem' }} strong>
-							{study.studyName}
-						</Text>
-						, {study.studyId}
-					</>
-				),
-				value: study.studyId.toString(),
-				disabled: !canEdit,
-			}));
+			const dacId = getDacIds(requestedStudies, data);
+			const dacSet = new Set(dacId);
+
+			const shouldDisbableAll = dacSet.size > 1;
+
+			let newArray: CheckboxGroupOptionsStudy[] = data.map((study) => {
+				const shouldDisable = dacId.length !== 0 && study.dacId !== dacId[0];
+				return {
+					id: study.studyId,
+					name: study.studyName,
+					displayName: (
+						<>
+							<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
+								{study.studyName}
+							</Text>
+							, {study.dacId}
+						</>
+					),
+					dacId: study.dacId,
+					value: study.studyName,
+					disabled: shouldDisable || shouldDisbableAll,
+				};
+			});
 
 			if (searchText) {
 				newArray = newArray.filter(
 					(study) =>
 						study.value.toLowerCase().includes(searchText.toLowerCase()) ||
-						study.name.toLowerCase().includes(searchText.toLowerCase()),
+						study.dacId.toLowerCase().includes(searchText.toLowerCase()),
 				);
 			}
 			setStudyArray(newArray);
 		}
-	}, [data, canEdit, searchText]);
+	}, [data, canEdit, searchText, requestedStudies]);
 
 	const onSubmit = () => {
 		const requestedStudies = getValues('requestedStudies');
@@ -140,7 +150,12 @@ const RequestedStudy = () => {
 			<Form
 				form={form}
 				layout="vertical"
-				onBlur={() => {
+				onKeyDown={(e) => {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+					}
+				}}
+				onChange={() => {
 					if (canEdit) {
 						onSubmit();
 					}
@@ -168,33 +183,30 @@ const RequestedStudy = () => {
 									<Text style={{ fontSize: '0.9rem' }}>{translate('requested-study.section1.form.studyName')}</Text>
 									<Text style={{ fontSize: '0.75rem' }}>{translate('requested-study.section1.form.studyLabel')}</Text>
 								</Flex>
+								<Flex style={{ height: '23px' }}>
+									{requestedStudies
+										? requestedStudies.map((study) => {
+												return <Tag key={study}>{study}</Tag>;
+											})
+										: null}
+								</Flex>
 								<Input.Search
 									placeholder="Search study name..."
-									onFocus={() => setIsSearchFocused(true)}
-									onBlur={() => {
-										if (isPanelMouseDownRef.current) {
-											isPanelMouseDownRef.current = false;
-											return;
-										}
-										setIsSearchFocused(false);
-									}}
+									allowClear
 									onChange={(e) => {
 										e.stopPropagation();
 										setSearchText(e.target.value);
 									}}
+									disabled={!canEdit}
 									onSearch={(value) => setSearchText(value)}
 								/>
-								{isSearchFocused && !isPending && data ? (
-									<div
-										onMouseDown={() => {
-											isPanelMouseDownRef.current = true;
-										}}
-									>
+								{!isPending && data ? (
+									<div>
 										<CheckboxGroupStudies
 											control={control}
 											rule={rule}
 											name="requestedStudies"
-											disabled={false}
+											disabled={!canEdit}
 											options={studyArray}
 										/>
 									</div>

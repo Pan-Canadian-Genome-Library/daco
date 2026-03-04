@@ -17,11 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Checkbox, Form, Row, theme, Typography } from 'antd';
+import { Checkbox, Flex, Form, theme, Typography } from 'antd';
 import { ReactNode } from 'react';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
+import { pcglColours } from '@/providers/ThemeProvider';
 
 const { Item } = Form;
 const { useToken } = theme;
@@ -30,6 +31,7 @@ const { Text } = Typography;
 export interface CheckboxGroupOptionsStudy {
 	displayName: string | ReactNode;
 	name: string;
+	dacId: string;
 	id: string;
 	value: string;
 	disabled?: boolean;
@@ -46,6 +48,7 @@ const CheckboxGroupStudies = <T extends FieldValues>(props: UseControllerProps<T
 		<Controller
 			name={props.name}
 			control={props.control}
+			disabled={props.disabled}
 			render={({ field }) => {
 				return (
 					<Item
@@ -57,24 +60,42 @@ const CheckboxGroupStudies = <T extends FieldValues>(props: UseControllerProps<T
 						initialValue={field.value}
 						style={{ margin: 0 }}
 					>
-						<Flex style={{ boxShadow: token.boxShadowSecondary, border: token.borderRadiusLG, padding: '5px' }}>
-							<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
-								{props.options.map((checkbox) => (
-									<Row
-										key={`checkbox-${checkbox.value}`}
-										style={{
-											borderRadius: token.borderRadius,
-											width: '100%',
-											minWidth: '100%',
-										}}
-									>
-										<Checkbox value={checkbox.value} disabled={props.disabled}>
-											{checkbox.label}
-										</Checkbox>
-									</Row>
-								))}
-							</Checkbox.Group>
-						</Flex>
+						<Checkbox.Group {...field} style={{ width: '100%', gap: props.gap ? `${props.gap}px` : token.marginSM }}>
+							<Flex
+								vertical
+								style={{
+									width: '100%',
+									boxShadow: token.boxShadowSecondary,
+									borderRadius: token.borderRadiusLG,
+									padding: '5px',
+								}}
+								gap={'small'}
+							>
+								{props.options.map((checkbox) => {
+									const isChecked = field.value?.includes(checkbox.value);
+
+									return (
+										<label
+											key={checkbox.id}
+											style={{
+												cursor: checkbox.disabled ? 'not-allowed' : 'pointer',
+												width: '100%',
+												padding: '5px 12px 5px 12px',
+												backgroundColor: isChecked ? pcglColours.tertiary : undefined,
+												borderRadius: token.borderRadiusLG,
+											}}
+										>
+											<Flex justify="space-between" align="center" style={{ width: '100%' }}>
+												<Text disabled={checkbox.disabled} style={{ fontSize: '0.75rem' }}>
+													{checkbox.displayName}
+												</Text>
+												<Checkbox value={checkbox.value} disabled={checkbox.disabled} />
+											</Flex>
+										</label>
+									);
+								})}
+							</Flex>
+						</Checkbox.Group>
 					</Item>
 				);
 			}}
