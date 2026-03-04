@@ -46,6 +46,7 @@ import Link from 'antd/es/typography/Link';
 const { Text } = Typography;
 
 const rule = createSchemaFieldRule(requestedStudiesSchema);
+const { Item } = Form;
 
 /**
  * Checks whether the selected studies span more than one DAC.
@@ -175,8 +176,15 @@ const RequestedStudy = () => {
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '75%' }}>
 							<Flex vertical gap={'middle'}>
 								<Flex vertical>
-									<Text style={{ fontSize: '0.9rem' }}>{translate('requested-study.section1.form.studyName')}</Text>
-									<Text style={{ fontSize: '0.75rem' }}>{translate('requested-study.section1.form.studyLabel')}</Text>
+									<Item
+										label={translate('requested-study.section1.form.studyName')}
+										required={true}
+										style={{ margin: 0 }}
+									>
+										<Text style={{ fontSize: '0.65rem', height: '10px' }}>
+											{translate('requested-study.section1.form.studyLabel')}
+										</Text>
+									</Item>
 								</Flex>
 								<Flex style={{ height: '23px' }}>
 									{requestedStudies
