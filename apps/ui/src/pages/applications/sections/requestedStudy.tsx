@@ -40,6 +40,7 @@ import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { StudyDTO } from '@pcgl-daco/data-model/src/types';
 import Link from 'antd/es/typography/Link';
 
@@ -48,11 +49,6 @@ const { Text } = Typography;
 const rule = createSchemaFieldRule(requestedStudiesSchema);
 const { Item } = Form;
 
-/**
- * Checks whether the selected studies span more than one DAC.
- * @param requestedStudies - Array of selected studyId strings from the form.
- * @param studies - Full list of StudyDTOs fetched from the server.
- */
 const getDacIds = (requestedStudies: string[] | null | undefined, studies: StudyDTO[]) => {
 	if (!requestedStudies || requestedStudies.length === 0) return [];
 
@@ -62,7 +58,7 @@ const getDacIds = (requestedStudies: string[] | null | undefined, studies: Study
 };
 
 const RequestedStudy = () => {
-	const [searchText, setSearchText] = useState<string | undefined>(); // Prevent dropdown from closing
+	const [searchText, setSearchText] = useState<string | undefined>();
 	const [studyArray, setStudyArray] = useState<CheckboxGroupOptionsStudy[]>([]);
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
@@ -74,6 +70,8 @@ const RequestedStudy = () => {
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
 	});
+	const notification = useNotificationContext();
+
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
 	const { control, watch, getValues } = useForm<Nullable<RequestedStudiesSchemaType>>({
@@ -86,13 +84,20 @@ const RequestedStudy = () => {
 
 	useEffect(() => {
 		if (data) {
-			const dacId = getDacIds(requestedStudies, data);
-			const dacSet = new Set(dacId);
+			const dacSet = new Set(getDacIds(requestedStudies, data));
 
 			const shouldDisbableAll = dacSet.size > 1;
 
+			if (shouldDisbableAll) {
+				notification.openNotification({
+					type: 'error',
+					message: 'Error: Multiple DACs Selected',
+					description: 'Please only select studies within the same DAC to continue.',
+				});
+			}
+
 			let newArray: CheckboxGroupOptionsStudy[] = data.map((study) => {
-				const shouldDisable = dacId.length !== 0 && study.dacId !== dacId[0];
+				const shouldDisable = dacSet.size !== 0 && study.dacId !== dacSet.values().next().value;
 				return {
 					id: study.studyId,
 					name: study.studyName,
@@ -173,7 +178,7 @@ const RequestedStudy = () => {
 				<SectionContent showDivider={false}>
 					<Row>
 						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '75%' }}>
-							<Flex vertical gap={'middle'}>
+							<Flex vertical gap={'small'}>
 								<Flex vertical>
 									<Item
 										label={translate('requested-study.section1.form.studyName')}

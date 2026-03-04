@@ -29,6 +29,7 @@ export const pcglColours = {
 
 	errorPrimary: '#FF4D4F',
 	errorSecondary: '#FFCCC7',
+	errorBanner: '#FFF2F0',
 
 	warningPrimary: '#F5DC4D',
 	warningSecondary: '#FFFFB8',
