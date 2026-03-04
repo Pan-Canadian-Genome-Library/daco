@@ -52,7 +52,6 @@ const { Item } = Form;
  * Checks whether the selected studies span more than one DAC.
  * @param requestedStudies - Array of selected studyId strings from the form.
  * @param studies - Full list of StudyDTOs fetched from the server.
- * @returns `true` if two or more distinct dacIds are found, `false` otherwise.
  */
 const getDacIds = (requestedStudies: string[] | null | undefined, studies: StudyDTO[]) => {
 	if (!requestedStudies || requestedStudies.length === 0) return [];
@@ -186,7 +185,7 @@ const RequestedStudy = () => {
 										</Text>
 									</Item>
 								</Flex>
-								<Flex style={{ height: '23px' }}>
+								<Flex wrap style={{ minHeight: '23px' }} gap={'small'}>
 									{requestedStudies
 										? requestedStudies.map((study) => {
 												return <Tag key={study}>{study}</Tag>;
