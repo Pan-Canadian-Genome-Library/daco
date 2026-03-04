@@ -41,7 +41,7 @@ const authConfigSchema = z.object({
 	AUTHZ_GROUP_PREFIX_DAC_CHAIR: z.string(),
 	AUTHZ_SERVICE_ID: z.string(),
 	AUTHZ_SERVICE_UUID: z.string(),
-	AUTHZ_FETCH_RETRIES: z.coerce.number().optional().default(3),
+	AUTHZ_FETCH_RETRIES: z.coerce.number().optional().default(2),
 	AUTHZ_FETCH_RETRY_DELAY_MS: z.coerce.number().optional().default(500),
 	AUTHZ_FETCH_TIMEOUT_MS: z.coerce.number().optional().default(10000),
 });
