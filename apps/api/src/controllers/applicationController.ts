@@ -152,7 +152,7 @@ export const editApplication = async ({
 		}
 	}
 
-	// Need to check if the update contains valid study names before converting to record
+	// Need to check if the update contains valid studies with only one dac id before returning record
 	if (update.requestedStudies && update.requestedStudies.length > 1) {
 		const allStudies = await studyService.getAllStudies();
 

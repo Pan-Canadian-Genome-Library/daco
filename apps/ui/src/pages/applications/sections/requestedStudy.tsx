@@ -89,8 +89,8 @@ const RequestedStudy = () => {
 		if (shouldDisableAll) {
 			notification.openNotification({
 				type: 'error',
-				message: 'Error: Multiple DACs Selected',
-				description: 'Please only select studies within the same DAC to continue.',
+				message: translate('notifications.requestedStudies.errorTitle'),
+				description: translate('notifications.requestedStudies.errorMessage'),
 			});
 		}
 
@@ -115,7 +115,6 @@ const RequestedStudy = () => {
 	const onSubmit = handleSubmit(() => {
 		const requestedStudies = getValues('requestedStudies');
 
-		setValue('requestedStudies', requestedStudies);
 		form.setFieldValue('requestedStudies', requestedStudies);
 		form.validateFields();
 

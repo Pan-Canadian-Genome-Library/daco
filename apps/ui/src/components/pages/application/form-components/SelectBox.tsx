@@ -62,9 +62,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
 							<Select
 								{...field}
-								onSelect={props.onSelect}
 								mode={props.mode}
-								onBlur={() => {}}
 								disabled={props.disabled}
 								options={props.options}
 								placeholder={props.placeholder}
@@ -77,6 +75,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 								removeIcon={props.removeIcon}
 								allowClear={props.allowClear}
 								showSearch={props.showSearch}
+								onSelect={props.onSelect}
 							/>
 						</Flex>
 					</Item>

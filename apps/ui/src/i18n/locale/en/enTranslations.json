@@ -210,6 +210,10 @@
 		"createDacComment": {
 			"successTitle": "DAC Comment Submitted",
 			"successMessage": "DAC comment submitted successfully"
+		},
+		"requestedStudies": {
+			"errorTitle": "Error: Multiple DACs Selected",
+			"errorMessage": "Please only select studies within the same DAC to continue."
 		}
 	}
 }
