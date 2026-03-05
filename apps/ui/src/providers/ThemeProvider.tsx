@@ -127,7 +127,9 @@ const pcglTheme: ThemeConfig = {
 			colorBgContainer: pcglColours.white,
 			multipleItemBg: pcglColours.greyLight,
 			controlItemBgActive: pcglColours.white,
-			colorPrimary: pcglColours.darkGrey, // Checkmark icon color
+			colorPrimary: pcglColours.primary, // Checkmark icon color
+			optionActiveBg: pcglColours.tertiary,
+			optionSelectedBg: pcglColours.tertiary,
 		},
 		Input: {
 			colorBgContainer: pcglColours.white,

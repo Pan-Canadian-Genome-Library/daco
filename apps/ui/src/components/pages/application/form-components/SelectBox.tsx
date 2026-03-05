@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Form, Select, Typography } from 'antd';
+import { Flex, Form, Select, type SelectProps, Typography } from 'antd';
 import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
@@ -29,13 +29,18 @@ const { Text } = Typography;
 
 interface SelectBoxProps extends BasicFormFieldProps {
 	options: {
-		label: string;
+		label: string | ReactNode;
 		value: string | number;
 	}[];
 	initialValue?: object | string | null;
 	placeholder?: string;
 	mode?: 'multiple' | 'tags';
 	sublabel?: string | ReactNode;
+	showSearch?: boolean;
+	allowClear?: boolean;
+	tagRender?: SelectProps['tagRender'];
+	removeIcon?: SelectProps['removeIcon'];
+	onSelect?: SelectProps['onSelect'];
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
@@ -50,13 +55,16 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 						name={`${props.name}`}
 						rules={[props.rule]}
 						required={props.required}
+						validateTrigger="onChange"
 						initialValue={props.initialValue ?? field.value}
 					>
 						<Flex vertical>
 							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
 							<Select
 								{...field}
+								onSelect={props.onSelect}
 								mode={props.mode}
+								onBlur={() => {}}
 								disabled={props.disabled}
 								options={props.options}
 								placeholder={props.placeholder}
@@ -65,8 +73,10 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 										<CheckCircleFilled />
 									</Flex>
 								}
-								removeIcon
-								showSearch={false}
+								tagRender={props.tagRender}
+								removeIcon={props.removeIcon}
+								allowClear={props.allowClear}
+								showSearch={props.showSearch}
 							/>
 						</Flex>
 					</Item>

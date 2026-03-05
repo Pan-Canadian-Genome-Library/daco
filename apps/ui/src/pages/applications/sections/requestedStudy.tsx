@@ -19,9 +19,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { requestedStudiesSchema, type RequestedStudiesSchemaType } from '@pcgl-daco/validation';
-import { Col, Flex, Form, Input, Row, Tag, Typography } from 'antd';
+import { Col, Flex, Form, Row, Tag, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
@@ -29,9 +28,7 @@ import { useOutletContext } from 'react-router';
 import useGetStudies from '@/api/queries/useGetStudies';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
-import CheckboxGroupStudies, {
-	CheckboxGroupOptionsStudy,
-} from '@/components/pages/application/form-components/CheckboxGroupStudies';
+import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
@@ -58,12 +55,11 @@ const getDacIds = (requestedStudies: string[] | null | undefined, studies: Study
 };
 
 const RequestedStudy = () => {
-	const [searchText, setSearchText] = useState<string | undefined>();
-	const [studyArray, setStudyArray] = useState<CheckboxGroupOptionsStudy[]>([]);
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { data, isPending } = useGetStudies();
+
 	const canEdit = canEditSection({
 		revisions,
 		section: 'study',
@@ -80,51 +76,40 @@ const RequestedStudy = () => {
 		},
 		resolver: zodResolver(requestedStudiesSchema),
 	});
-	const requestedStudies = watch('requestedStudies');
 
-	useEffect(() => {
-		if (data) {
-			const dacSet = new Set(getDacIds(requestedStudies, data));
+	const alterData = () => {
+		const requestedStudies = getValues('requestedStudies');
 
-			const shouldDisbableAll = dacSet.size > 1;
+		if (!data) return [];
+		const dacSet = new Set(getDacIds(requestedStudies, data));
 
-			if (shouldDisbableAll) {
-				notification.openNotification({
-					type: 'error',
-					message: 'Error: Multiple DACs Selected',
-					description: 'Please only select studies within the same DAC to continue.',
-				});
-			}
+		const shouldDisableAll = dacSet.size > 1;
 
-			let newArray: CheckboxGroupOptionsStudy[] = data.map((study) => {
-				const shouldDisable = dacSet.size !== 0 && study.dacId !== dacSet.values().next().value;
-				return {
-					id: study.studyId,
-					name: study.studyName,
-					displayName: (
-						<>
-							<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
-								{study.studyName}
-							</Text>
-							, {study.dacId}
-						</>
-					),
-					dacId: study.dacId,
-					value: study.studyName,
-					disabled: shouldDisable || shouldDisbableAll,
-				};
+		if (shouldDisableAll) {
+			notification.openNotification({
+				type: 'error',
+				message: 'Error: Multiple DACs Selected',
+				description: 'Please only select studies within the same DAC to continue.',
 			});
-
-			if (searchText) {
-				newArray = newArray.filter(
-					(study) =>
-						study.value.toLowerCase().includes(searchText.toLowerCase()) ||
-						study.dacId.toLowerCase().includes(searchText.toLowerCase()),
-				);
-			}
-			setStudyArray(newArray);
 		}
-	}, [data, canEdit, searchText, requestedStudies, notification]);
+
+		return data.map((study) => {
+			const shouldDisable = dacSet.size !== 0 && study.dacId !== dacSet.values().next().value;
+			return {
+				label: (
+					<>
+						<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
+							{study.studyName}
+						</Text>
+						, {study.dacId}
+					</>
+				),
+				dacId: study.dacId,
+				value: study.studyName,
+				disabled: shouldDisable || shouldDisableAll,
+			};
+		});
+	};
 
 	const onSubmit = () => {
 		const requestedStudies = getValues('requestedStudies');
@@ -149,9 +134,9 @@ const RequestedStudy = () => {
 		const requestedStudies = getValues('requestedStudies');
 		const filteredStudies = requestedStudies?.filter((study) => study !== value) || null;
 
+		setValue('requestedStudies', filteredStudies);
 		form.setFieldValue('requestedStudies', filteredStudies);
 		form.validateFields();
-		setValue('requestedStudies', filteredStudies);
 
 		dispatch({
 			type: 'UPDATE_APPLICATION',
@@ -159,7 +144,7 @@ const RequestedStudy = () => {
 				...state,
 				fields: {
 					...state.fields,
-					requestedStudies,
+					requestedStudies: filteredStudies,
 				},
 				formState: {
 					...state.formState,
@@ -169,6 +154,8 @@ const RequestedStudy = () => {
 		});
 	};
 
+	const studies = watch('requestedStudies');
+
 	return (
 		<SectionWrapper>
 			<Form
@@ -177,6 +164,11 @@ const RequestedStudy = () => {
 				onKeyDown={(e) => {
 					if (e.key === 'Enter') {
 						e.preventDefault();
+					}
+				}}
+				onBlur={() => {
+					if (canEdit) {
+						onSubmit();
 					}
 				}}
 				onChange={() => {
@@ -215,36 +207,30 @@ const RequestedStudy = () => {
 									</Item>
 								</Flex>
 								<Flex wrap style={{ minHeight: '23px' }} gap={'small'}>
-									{requestedStudies
-										? requestedStudies.map((study) => {
+									{studies
+										? studies.map((study) => {
 												return (
-													<Tag key={study} closable onClose={() => removeTag(study)}>
+													<Tag key={study} closable={canEdit} onClose={() => removeTag(study)}>
 														{study}
 													</Tag>
 												);
 											})
 										: null}
 								</Flex>
-								<Input.Search
-									placeholder="Search study name..."
-									allowClear
-									onChange={(e) => {
-										e.stopPropagation();
-										setSearchText(e.target.value);
-									}}
-									disabled={!canEdit}
-									onSearch={(value) => setSearchText(value)}
-								/>
+
 								{!isPending && data ? (
-									<div>
-										<CheckboxGroupStudies
-											control={control}
-											rule={rule}
-											name="requestedStudies"
-											disabled={!canEdit}
-											options={studyArray}
-										/>
-									</div>
+									<SelectBox
+										name="requestedStudies"
+										mode="multiple"
+										showSearch={true}
+										allowClear={false}
+										control={control}
+										rule={rule}
+										placeholder="Search study name..."
+										tagRender={() => <></>}
+										disabled={!canEdit}
+										options={alterData()}
+									/>
 								) : null}
 							</Flex>
 						</Col>
