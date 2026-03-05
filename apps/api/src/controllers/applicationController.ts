@@ -99,11 +99,11 @@ export const editApplication = async ({
 	update: UpdateEditApplicationRequest;
 }): AsyncResult<
 	ApplicationResponseData,
-	'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR' | 'INVALID_REQUEST'
+	'INVALID_REQUEST' | 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'
 > => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
-	const studyService = await studySvc(database);
+	const studyService = studySvc(database);
 
 	const result = await applicationRepo.getApplicationById({ id });
 
