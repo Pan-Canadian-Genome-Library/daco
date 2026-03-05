@@ -96,7 +96,8 @@ export const authErrorResponseHandler = (
 
 /**
  * Creates an array of DAC IDs which User is authorized to access
- * Combines User.dacChair & User.dacMember values (User can be both a Member and a Chair for multiple groups)
+ * Combines User.dacChair & User.dacMember values
+ * (User can be both a Member and a Chair for multiple groups)
  * @param dacChair
  * @param dacMember
  */

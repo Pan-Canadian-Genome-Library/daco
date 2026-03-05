@@ -27,6 +27,7 @@ import {
 	createApplication,
 	dacRejectApplication,
 	editApplication,
+	getAllApplications,
 	getApplicationById,
 	getApplicationHistory,
 	requestApplicationRevisionsByDac,
@@ -133,6 +134,24 @@ describe('Application API', () => {
 			const result = await editApplication({ id: testApp.id, update: contentUpdate });
 
 			assert.ok(!result.success);
+		});
+	});
+
+	describe('Get All Applications', () => {
+		it('should retrieve applications with submitted user_id and no DAC IDs', async () => {
+			const testResult = await getAllApplications({ userId: user_id });
+
+			assert.ok(testResult.success && testResult.data);
+			assert.ok(testResult.data.applications.every((record) => record.userId === user_id));
+			assert.ok(testResult.data.applications.every((record) => record.dacId === null));
+		});
+
+		it('should retrieve applications with submitted user_id & DAC IDs', async () => {
+			const testResult = await getAllApplications({ userId: user_id, authorizedDacIds: ['dac1', 'dac2'] });
+
+			assert.ok(testResult.success && testResult.data);
+			assert.ok(testResult.data.applications.some((record) => record.dacId === 'dac1'));
+			assert.ok(testResult.data.applications.some((record) => record.dacId === 'dac2'));
 		});
 	});
 
