@@ -25,7 +25,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
-import useGetStudies from '@/api/queries/useGetStudies';
+import useGetAllStudies from '@/api/queries/useGetAllStudies';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
@@ -61,7 +61,7 @@ const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const { data, isPending } = useGetStudies();
+	const { data: allStudies, isPending: isAllStudiesPending } = useGetAllStudies();
 
 	const canEdit = canEditSection({
 		revisions,
@@ -80,11 +80,11 @@ const RequestedStudy = () => {
 		resolver: zodResolver(requestedStudiesSchema),
 	});
 
-	const alterData = () => {
+	const alterAllStudiesData = () => {
 		const requestedStudies = getValues('requestedStudies');
 
-		if (!data) return [];
-		const dacSet = new Set(getDacIds(requestedStudies, data));
+		if (!allStudies) return [];
+		const dacSet = new Set(getDacIds(requestedStudies, allStudies));
 
 		const shouldDisableAll = dacSet.size > 1;
 
@@ -96,7 +96,7 @@ const RequestedStudy = () => {
 			});
 		}
 
-		return data.map((study) => {
+		return allStudies.map((study) => {
 			const shouldDisable = dacSet.size !== 0 && study.dacId !== dacSet.values().next().value;
 			return {
 				label: (
@@ -223,8 +223,7 @@ const RequestedStudy = () => {
 											})
 										: null}
 								</Flex>
-
-								{!isPending && data ? (
+								{!isAllStudiesPending && allStudies ? (
 									<SelectBox
 										name="requestedStudies"
 										mode="multiple"
@@ -235,7 +234,7 @@ const RequestedStudy = () => {
 										placeholder="Search study name..."
 										tagRender={() => <></>}
 										disabled={!canEdit}
-										options={alterData()}
+										options={alterAllStudiesData()}
 									/>
 								) : null}
 							</Flex>

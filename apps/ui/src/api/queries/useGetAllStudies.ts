@@ -24,7 +24,7 @@ import { ServerError } from '@/global/types';
 import { type StudyDTO } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
-const useGetStudies = () => {
+const useGetAllStudies = () => {
 	return useQuery<StudyDTO[], ServerError>({
 		queryKey: [`all-studies`],
 		queryFn: async () => {
@@ -35,4 +35,4 @@ const useGetStudies = () => {
 	});
 };
 
-export default useGetStudies;
+export default useGetAllStudies;
