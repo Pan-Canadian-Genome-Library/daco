@@ -331,6 +331,8 @@ const applicationSvc = (db: PostgresDb) => ({
 					and(
 						state.length ? inArray(applications.state, state) : undefined,
 						search ? transformSearchIntoQuery(search) : undefined,
+						// Retrieves Applications where the current User is the Applicant,
+						// and Applications where the User is a DAC Member or Chair
 						or(
 							user_id ? eq(applications.user_id, String(user_id)) : undefined,
 							authorizedDacIds?.length ? inArray(applications.dac_id, authorizedDacIds) : undefined,
@@ -359,6 +361,8 @@ const applicationSvc = (db: PostgresDb) => ({
 				.where(
 					and(
 						search ? transformSearchIntoQuery(search) : undefined,
+						// Retrieves Applications where the current User is the Applicant,
+						// and Applications where the User is a DAC Member or Chair
 						or(
 							user_id ? eq(applications.user_id, String(user_id)) : undefined,
 							authorizedDacIds?.length ? or(inArray(applications.dac_id, authorizedDacIds)) : undefined,
