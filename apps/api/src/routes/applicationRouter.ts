@@ -166,13 +166,8 @@ applicationRouter.get(
 			return;
 		}
 
-		const { userId, dacChair, dacMember } = user;
+		const { userId, dacChair = [], dacMember = [] } = user;
 		const isDAC = dacChair.length > 0 || dacMember.length > 0;
-
-		const authorizedDacIds = getAuthorizedDacIds({
-			dacChair,
-			dacMember,
-		});
 
 		const {
 			state: stateQuery,
@@ -217,6 +212,11 @@ applicationRouter.get(
 			return;
 		}
 
+		const authorizedDacIds = isDAC ? getAuthorizedDacIds({
+			dacChair,
+			dacMember,
+		}) : [];
+
 		const result = await getAllApplications({
 			userId,
 			state,
@@ -224,7 +224,6 @@ applicationRouter.get(
 			page: pageRequested,
 			pageSize: pageSizeRequested,
 			search: searchResult,
-			isDAC,
 			isApplicantView,
 			authorizedDacIds,
 		});

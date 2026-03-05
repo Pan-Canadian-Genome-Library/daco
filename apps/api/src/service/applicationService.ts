@@ -293,11 +293,11 @@ const applicationSvc = (db: PostgresDb) => ({
 					.replace(/\s+/g, ' | '); // add OR between phrases
 
 				const searchQuery = sql`(
-									setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
-									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
-									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
-									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
-								)
+					setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
+				)
      		 @@ to_tsquery('english', ${`%${sanitizedSearch}%` + ':*'})`;
 
 				return searchQuery;
@@ -309,7 +309,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				);
 			};
 
-			const rawApplicationRecord = await db
+			const rawApplicationRecords = await db
 				.select({
 					id: applications.id,
 					userId: applications.user_id,
@@ -329,17 +329,17 @@ const applicationSvc = (db: PostgresDb) => ({
 				.from(applications)
 				.where(
 					and(
-						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						state.length ? inArray(applications.state, state) : undefined,
 						search ? transformSearchIntoQuery(search) : undefined,
-						authorizedDacIds && authorizedDacIds.length ? inArray(applications.dac_id, authorizedDacIds) : undefined,
-					),
-				)
+						or(
+							user_id ? eq(applications.user_id, String(user_id)) : undefined,
+							authorizedDacIds?.length ? inArray(applications.dac_id, authorizedDacIds) : undefined),
+				))
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...applicationsQuery(sort))
 				.offset(page * pageSize)
 				.limit(pageSize);
-
+				
 			const countResult = await db
 				.select({
 					APPROVED: customCount(ApplicationStates.APPROVED),
@@ -356,17 +356,18 @@ const applicationSvc = (db: PostgresDb) => ({
 				.from(applications)
 				.where(
 					and(
-						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						search ? transformSearchIntoQuery(search) : undefined,
-					),
+						or(
+							user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						authorizedDacIds?.length ? or(inArray(applications.dac_id, authorizedDacIds)) : undefined
+					))
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
-
 			if (!countResult[0]) {
 				return failure('SYSTEM_ERROR', 'Failed to retrieve application totals');
 			}
 
-			let returnableApplications = rawApplicationRecord;
+			let returnableApplications = rawApplicationRecords;
 
 			/**
 			 *
