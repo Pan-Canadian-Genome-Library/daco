@@ -38,6 +38,7 @@ import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { StudyDTO } from '@pcgl-daco/data-model/src/types';
 import Link from 'antd/es/typography/Link';
 
@@ -70,7 +71,7 @@ const RequestedStudy = () => {
 
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
-	const { control, watch, getValues, setValue } = useForm<Nullable<RequestedStudiesSchemaType>>({
+	const { control, watch, getValues, setValue, handleSubmit } = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
 			requestedStudies: state.fields.requestedStudies,
 		},
@@ -111,8 +112,12 @@ const RequestedStudy = () => {
 		});
 	};
 
-	const onSubmit = () => {
+	const onSubmit = handleSubmit(() => {
 		const requestedStudies = getValues('requestedStudies');
+
+		setValue('requestedStudies', requestedStudies);
+		form.setFieldValue('requestedStudies', requestedStudies);
+		form.validateFields();
 
 		dispatch({
 			type: 'UPDATE_APPLICATION',
@@ -128,7 +133,7 @@ const RequestedStudy = () => {
 				},
 			},
 		});
-	};
+	});
 
 	const removeTag = (value: string) => {
 		const requestedStudies = getValues('requestedStudies');
@@ -171,11 +176,6 @@ const RequestedStudy = () => {
 						onSubmit();
 					}
 				}}
-				onChange={() => {
-					if (canEdit) {
-						onSubmit();
-					}
-				}}
 			>
 				<SectionTitle
 					title={translate('requested-study.title')}
@@ -210,7 +210,12 @@ const RequestedStudy = () => {
 									{studies
 										? studies.map((study) => {
 												return (
-													<Tag key={study} closable={canEdit} onClose={() => removeTag(study)}>
+													<Tag
+														key={study}
+														style={{ color: !canEdit ? pcglColours.darkGrey : undefined }}
+														closable={canEdit}
+														onClose={() => removeTag(study)}
+													>
 														{study}
 													</Tag>
 												);
