@@ -48,7 +48,9 @@ const rule = createSchemaFieldRule(requestedStudiesSchema);
 const { Item } = Form;
 
 const getDacIds = (requestedStudies: string[] | null, studies: StudyDTO[]): string[] => {
-	if (!requestedStudies || requestedStudies.length === 0) return [];
+	if (!requestedStudies?.length) {
+		return [];
+	}
 
 	const dacIds = requestedStudies
 		.map((studyName) => studies.find((study) => study.studyName === studyName)?.dacId)
