@@ -333,13 +333,15 @@ const applicationSvc = (db: PostgresDb) => ({
 						search ? transformSearchIntoQuery(search) : undefined,
 						or(
 							user_id ? eq(applications.user_id, String(user_id)) : undefined,
-							authorizedDacIds?.length ? inArray(applications.dac_id, authorizedDacIds) : undefined),
-				))
+							authorizedDacIds?.length ? inArray(applications.dac_id, authorizedDacIds) : undefined,
+						),
+					),
+				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...applicationsQuery(sort))
 				.offset(page * pageSize)
 				.limit(pageSize);
-				
+
 			const countResult = await db
 				.select({
 					APPROVED: customCount(ApplicationStates.APPROVED),
@@ -359,8 +361,9 @@ const applicationSvc = (db: PostgresDb) => ({
 						search ? transformSearchIntoQuery(search) : undefined,
 						or(
 							user_id ? eq(applications.user_id, String(user_id)) : undefined,
-						authorizedDacIds?.length ? or(inArray(applications.dac_id, authorizedDacIds)) : undefined
-					))
+							authorizedDacIds?.length ? or(inArray(applications.dac_id, authorizedDacIds)) : undefined,
+						),
+					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 			if (!countResult[0]) {

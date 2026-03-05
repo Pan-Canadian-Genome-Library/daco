@@ -212,10 +212,12 @@ applicationRouter.get(
 			return;
 		}
 
-		const authorizedDacIds = isDAC ? getAuthorizedDacIds({
-			dacChair,
-			dacMember,
-		}) : [];
+		const authorizedDacIds = isDAC
+			? getAuthorizedDacIds({
+					dacChair,
+					dacMember,
+				})
+			: [];
 
 		const result = await getAllApplications({
 			userId,
