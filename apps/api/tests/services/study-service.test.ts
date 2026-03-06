@@ -125,7 +125,7 @@ describe('Study Service', () => {
 
 	describe('getAllStudies', () => {
 		it('should get all studies', async () => {
-			const result = await studyService.getAllStudies();
+			const result = await studyService.getAllStudies({});
 
 			assert.ok(result.success && result.data.length >= 0);
 		});

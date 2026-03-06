@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { dac } from '@/db/schemas/dac.ts';
@@ -102,7 +102,7 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	getAllStudies: async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+	getAllStudies: async ({ studyIds }: { studyIds?: string[] }): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecords = await db
 				.select({
@@ -128,7 +128,8 @@ const studySvc = (db: PostgresDb) => ({
 					updatedAt: study.updated_at,
 				})
 				.from(study)
-				.innerJoin(dac, eq(dac.dac_id, study.dac_id));
+				.innerJoin(dac, eq(dac.dac_id, study.dac_id))
+				.where(studyIds ? inArray(study.study_id, studyIds) : undefined);
 
 			return success(studyRecords);
 		} catch (error) {
