@@ -53,7 +53,7 @@ const getDacIds = (requestedStudies: string[] | null, studies: StudyDTO[]): stri
 	}
 
 	const dacIds = requestedStudies
-		.map((studyName) => studies.find((study) => study.studyName === studyName)?.dacId)
+		.map((studyId) => studies.find((study) => study.studyId === studyId)?.dacId)
 		.filter((study) => study !== undefined);
 
 	return dacIds;
@@ -110,7 +110,7 @@ const RequestedStudy = () => {
 					</>
 				),
 				dacId: study.dacId,
-				value: study.studyName,
+				value: study.studyId,
 				disabled: shouldDisable || shouldDisableAll,
 			};
 		});
