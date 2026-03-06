@@ -166,7 +166,7 @@ applicationRouter.get(
 			return;
 		}
 
-		const { userId, dacChair = [], dacMember = [] } = user;
+		const { userId } = user;
 
 		const {
 			state: stateQuery,
@@ -211,10 +211,7 @@ applicationRouter.get(
 			return;
 		}
 
-		const authorizedDacIds = getAuthorizedDacIds({
-			dacChair,
-			dacMember,
-		});
+		const authorizedDacIds = getAuthorizedDacIds(user);
 
 		const result = await getAllApplications({
 			userId,
