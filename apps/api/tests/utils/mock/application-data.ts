@@ -141,14 +141,14 @@ export const applicationArray: (typeof applications.$inferInsert)[] = [
 		updated_at: new Date('2025-01-02T16:45:00Z'),
 	},
 	{
-		user_id: 'testUser@oicr.on.ca',
+		user_id: 'nextTestUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVIEW,
 		dac_id: 'dac2',
 		created_at: new Date('2025-01-02T17:00:00Z'),
 		updated_at: new Date('2025-01-02T17:30:00Z'),
 	},
 	{
-		user_id: 'testUser@oicr.on.ca',
+		user_id: 'nextTestUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVISIONS_REQUESTED,
 		dac_id: 'dac2',
 		created_at: new Date('2025-01-02T18:00:00Z'),
@@ -167,9 +167,9 @@ export const applicationArray: (typeof applications.$inferInsert)[] = [
 		updated_at: new Date('2025-01-02T20:30:00Z'),
 	},
 	{
-		user_id: 'testUser@oicr.on.ca',
+		user_id: 'nextTestUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVIEW,
-		dac_id: 'dac2',
+		dac_id: 'dac3',
 		created_at: new Date('2025-01-02T20:00:00Z'),
 		updated_at: new Date('2025-01-02T20:30:00Z'),
 	},

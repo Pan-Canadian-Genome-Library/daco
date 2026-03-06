@@ -42,7 +42,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-import { revisionRequestData } from '../utils/mock/application-data.ts';
+import { applicationArray, revisionRequestData } from '../utils/mock/application-data.ts';
 import {
 	addInitialApplications,
 	getFirstApplicationTestByState,
@@ -138,20 +138,32 @@ describe('Application API', () => {
 	});
 
 	describe('Get All Applications', () => {
-		it('should retrieve applications with submitted user_id and no DAC IDs', async () => {
+		it('should retrieve applications with submitted user_id', async () => {
 			const testResult = await getAllApplications({ userId: user_id });
 
 			assert.ok(testResult.success && testResult.data);
+
+			const expectedTestRecords = applicationArray.filter(
+				(record) => record.dac_id === 'dac1' || record.dac_id === 'dac2',
+			);
 			assert.ok(testResult.data.applications.every((record) => record.userId === user_id));
-			assert.ok(testResult.data.applications.every((record) => record.dacId === null));
+			assert.ok(testResult.data.applications.length === expectedTestRecords.length);
 		});
 
 		it('should retrieve applications with submitted user_id & DAC IDs', async () => {
 			const testResult = await getAllApplications({ userId: user_id, authorizedDacIds: ['dac1', 'dac2'] });
 
 			assert.ok(testResult.success && testResult.data);
-			assert.ok(testResult.data.applications.some((record) => record.dacId === 'dac1'));
-			assert.ok(testResult.data.applications.some((record) => record.dacId === 'dac2'));
+
+			const resultRecords = testResult.data.applications.filter(
+				(record) => record.dacId === 'dac1' || record.dacId === 'dac2',
+			);
+			const expectedTestRecords = applicationArray.filter(
+				(record) => record.dac_id === 'dac1' || record.dac_id === 'dac2',
+			);
+
+			assert.ok(resultRecords.length === expectedTestRecords.length);
+			assert.ok(!testResult.data.applications.find((record) => record.dacId === 'dac3'));
 		});
 	});
 
