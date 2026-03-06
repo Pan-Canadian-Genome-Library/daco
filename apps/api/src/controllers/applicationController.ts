@@ -992,6 +992,7 @@ export const submitApplication = async ({
 				return failure('SYSTEM_ERROR', `Something went wrong processing your request.`);
 			}
 
+			// Update application with DAC ID
 			const updatedResult = await service.findOneAndUpdate({
 				id: applicationId,
 				update: { dac_id: studyResult.data.dacId },
