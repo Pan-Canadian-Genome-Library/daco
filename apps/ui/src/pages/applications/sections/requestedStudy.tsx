@@ -39,7 +39,7 @@ import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { pcglColours } from '@/providers/ThemeProvider';
-import { type StudyDTO } from '@pcgl-daco/data-model';
+import { ApplicationStates, type StudyDTO } from '@pcgl-daco/data-model';
 import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
@@ -71,6 +71,12 @@ const RequestedStudy = () => {
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
 	});
+
+	// Should be able to change the requested studies while in DRAFT or INSTITUTIONAL_REP_REVISION_REQUESTED states, once past this, the user should not be able to change them
+	const editableState =
+		state.applicationState === ApplicationStates.DRAFT ||
+		state.applicationState === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED;
+
 	const notification = useNotificationContext();
 
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
@@ -103,7 +109,7 @@ const RequestedStudy = () => {
 			return {
 				label: (
 					<>
-						<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
+						<Text disabled={shouldDisable || !canEdit || !editableState} style={{ fontSize: '0.75rem' }} strong>
 							{study.studyName}
 						</Text>
 						, {study.dacId}
@@ -175,14 +181,14 @@ const RequestedStudy = () => {
 					}
 				}}
 				onBlur={() => {
-					if (canEdit) {
+					if (canEdit || editableState) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					title={translate('requested-study.title')}
-					showLockIcon={!canEdit}
+					showLockIcon={!canEdit && !editableState}
 					text={
 						<Col>
 							<Text>{translate('requested-study.description1') + ' '}</Text>
@@ -210,16 +216,19 @@ const RequestedStudy = () => {
 									</Item>
 								</Flex>
 								<Flex wrap style={{ minHeight: '23px' }} gap={'small'}>
-									{studies
-										? studies.map((study) => {
+									{studies && allStudies
+										? studies.map((studyId) => {
+												const study = allStudies.find((s) => s.studyId === studyId);
+												if (!study) return null;
+
 												return (
 													<Tag
-														key={study}
-														style={{ color: !canEdit ? pcglColours.darkGrey : undefined }}
-														closable={canEdit}
-														onClose={() => removeTag(study)}
+														key={study.studyId}
+														style={{ color: !canEdit && !editableState ? pcglColours.darkGrey : undefined }}
+														closable={canEdit && editableState}
+														onClose={() => removeTag(study.studyId)}
 													>
-														{study}
+														{study.studyName}
 													</Tag>
 												);
 											})
@@ -235,7 +244,7 @@ const RequestedStudy = () => {
 										rule={rule}
 										placeholder="Search study name..."
 										tagRender={() => <></>}
-										disabled={!canEdit}
+										disabled={!canEdit || !editableState}
 										options={alterAllStudiesData()}
 									/>
 								) : null}
@@ -243,7 +252,7 @@ const RequestedStudy = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="study" isEditMode={canEdit} />
+				<SectionFooter currentRoute="study" isEditMode={canEdit || editableState} />
 			</Form>
 		</SectionWrapper>
 	);
