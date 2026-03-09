@@ -234,6 +234,7 @@ authRouter.get(
 						dacChair: user.dacChair,
 						dacMember: user.dacMember,
 						dacoAdmin: user.dacoAdmin,
+						dacAuthorizations: user.dacAuthorizations,
 					}
 				: undefined,
 		};

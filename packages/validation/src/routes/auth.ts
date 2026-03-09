@@ -133,6 +133,7 @@ export const sessionUserResponse = sessionUser.pick({
 	dacChair: true,
 	dacMember: true,
 	dacoAdmin: true,
+	dacAuthorizations: true,
 });
 
 export type SessionUserResponse = z.infer<typeof sessionUserResponse>;
