@@ -27,7 +27,7 @@ import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { ApplicationStateValues } from '@pcgl-daco/data-model';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model';
 import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 import { ValidateAllSections } from './utils/validatorFunctions';
 
@@ -42,7 +42,7 @@ type SectionMenuProps = {
 const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const {
-		state: { fields, formState, applicationUserPermissions },
+		state: { applicationState, fields, formState, applicationUserPermissions },
 	} = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetCollaborators(appId);
@@ -75,6 +75,11 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 	 */
 	const determineIfLocked = (route: SectionRoutesValues) => {
 		const currentRevision = revisions[route][0];
+
+		// Study section is always locked when not in draft state
+		if (route === SectionRoutes.STUDY && applicationState !== ApplicationStates.DRAFT) {
+			return true;
+		}
 
 		if (!currentRevision) {
 			return false;
