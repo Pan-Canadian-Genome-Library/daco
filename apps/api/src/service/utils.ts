@@ -100,6 +100,6 @@ export const authErrorResponseHandler = (
  * (User can be both a Member and a Chair for multiple groups)
  * @param SessionUser
  */
-export const getAuthorizedDacIds = ({ dacChair, dacMember }: Pick<SessionUser, 'dacChair' | 'dacMember'>) => {
+export const getAuthorizedDacIds = ({ dacChair, dacMember }: Pick<SessionUser, 'dacChair' | 'dacMember'>): string[] => {
 	return [...dacChair, ...dacMember];
 };
