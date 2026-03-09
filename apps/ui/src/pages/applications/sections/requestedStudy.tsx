@@ -179,7 +179,7 @@ const RequestedStudy = () => {
 					}
 				}}
 				onBlur={() => {
-					if (canEdit || editableState) {
+					if (canEdit && editableState) {
 						onSubmit();
 					}
 				}}
