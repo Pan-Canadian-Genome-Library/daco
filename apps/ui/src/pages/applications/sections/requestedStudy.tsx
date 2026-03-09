@@ -72,10 +72,8 @@ const RequestedStudy = () => {
 		userPermissions: state.applicationUserPermissions,
 	});
 
-	// Should be able to change the requested studies while in DRAFT or INSTITUTIONAL_REP_REVISION_REQUESTED states, once past this, the user should not be able to change them
-	const editableState =
-		state.applicationState === ApplicationStates.DRAFT ||
-		state.applicationState === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED;
+	// Should be able to change the requested studies while in DRAFT, once past this, the user should not be able to change them
+	const editableState = state.applicationState === ApplicationStates.DRAFT;
 
 	const notification = useNotificationContext();
 
