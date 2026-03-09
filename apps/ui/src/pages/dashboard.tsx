@@ -28,9 +28,13 @@ import ApplicationCard from '@/components/pages/dashboard/cards/ApplicationCard'
 import LoadingApplicationCard from '@/components/pages/dashboard/cards/LoadingApplicationCard';
 import NewApplicationCard from '@/components/pages/dashboard/cards/NewApplicationCard';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { useUserContext } from '@/providers/UserProvider';
 import { type ApplicationDTO } from '@pcgl-daco/data-model';
+import { useEffect, useState } from 'react';
 
 const { Content } = Layout;
+
+const todayDate = new Date();
 
 const DashboardPage = () => {
 	const { useToken } = theme;
@@ -38,6 +42,8 @@ const DashboardPage = () => {
 
 	const { token } = useToken();
 	const minWidth = useMinWidth();
+	const { user } = useUserContext();
+	const [expiresAt, setExpiresAt] = useState<Date | undefined>(undefined);
 	const showDeviceRestriction = minWidth <= 1024;
 
 	const { data: applicationData, error } = useGetApplicationList({
@@ -50,6 +56,22 @@ const DashboardPage = () => {
 		pageSize: 100,
 		isApplicantView: true,
 	});
+
+	useEffect(() => {
+		// Determine any expiration date from the user's DAC authorizations
+		const anyDacPermission = user?.dacAuthorizations.find(
+			(auth) =>
+				auth?.startDate &&
+				new Date(auth.startDate) <= todayDate &&
+				auth?.endDate &&
+				new Date(auth.endDate) >= todayDate,
+		)?.endDate;
+
+		if (anyDacPermission) {
+			setExpiresAt(new Date(anyDacPermission));
+			return;
+		}
+	}, [user]);
 
 	return (
 		<>
@@ -73,7 +95,7 @@ const DashboardPage = () => {
 			) : null}
 			<Content>
 				<Flex style={{ height: '100%' }} vertical>
-					<ApplicationStatusBar />
+					<ApplicationStatusBar expiresAt={expiresAt} />
 					<ContentWrapper style={{ padding: '40px 0 40px 0' }}>
 						<div
 							style={{

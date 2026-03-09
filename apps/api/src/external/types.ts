@@ -75,6 +75,12 @@ export const authZUserInfo = z.object({
 });
 export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
 
+export const addUserToStudyPermissionResponse = z.object({
+	success: z.array(z.string()),
+	error: z.string().or(z.array(z.string())),
+});
+export type PCGLAddUserToStudyPermissionResponse = z.infer<typeof addUserToStudyPermissionResponse>;
+
 export const ServiceTokenResponse = z.object({
 	token: z.string(),
 });
