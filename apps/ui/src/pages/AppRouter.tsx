@@ -153,7 +153,7 @@ function AppRouter() {
 				<Route
 					path="admin"
 					element={
-						<ProtectedRoute requiredRoles={['ADMIN']} redirectTo={'/login/redirect/'}>
+						<ProtectedRoute requiredMembership={['ADMIN']} redirectTo={'/login/redirect/'}>
 							<AdminDashboardPage />
 						</ProtectedRoute>
 					}
@@ -161,7 +161,7 @@ function AppRouter() {
 				<Route
 					path="admin/studies"
 					element={
-						<ProtectedRoute requiredRoles={['ADMIN']} redirectTo={'/login/redirect/'}>
+						<ProtectedRoute requiredMembership={['ADMIN']} redirectTo={'/login/redirect/'}>
 							<AdminStudiesPage />
 						</ProtectedRoute>
 					}
