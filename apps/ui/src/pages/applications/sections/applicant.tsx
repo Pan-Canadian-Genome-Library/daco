@@ -60,7 +60,7 @@ const Applicant = () => {
 		control,
 	} = useForm<Nullable<ApplicantInformationSchemaType>>({
 		defaultValues: {
-			applicantInstitutionCountry: 'CAN',
+			applicantInstitutionCountry: state.fields.applicantInstitutionCountry ?? 'CAN',
 			applicantTitle: state.fields.applicantTitle,
 			applicantFirstName: state.fields.applicantFirstName,
 			applicantMiddleName: state.fields.applicantMiddleName,
