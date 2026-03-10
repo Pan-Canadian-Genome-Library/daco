@@ -280,6 +280,7 @@ const HeaderComponent = () => {
 						<Button
 							key={`menuItem-${key}`}
 							{...(menuItem.buttonProps ?? null)}
+							role="menuitem"
 							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
 							onClick={clickAction ? () => onMenuButtonClick(clickAction) : undefined}
 						>
@@ -288,7 +289,7 @@ const HeaderComponent = () => {
 					);
 				} else {
 					return (
-						<Link key={`menuItem-${key}`} style={linkStyle} href={menuItem.href ?? '#'}>
+						<Link key={`menuItem-${key}`} style={linkStyle} href={menuItem.href ?? '#'} role="menuitem">
 							{menuItem.name}
 						</Link>
 					);
@@ -323,8 +324,8 @@ const HeaderComponent = () => {
 				>
 					<Flex flex={1}>
 						<Flex justify="space-around" align="center" gap={40}>
-							<Link href="/">
-								<Image width={200} src={PCGL} preview={false} alt="PCGL DACO Home" />
+							<Link href="/" role="menuitem">
+								<Image width={200} src={PCGL} preview={false} alt="PCGL DACO Home" role="presentation" />
 							</Link>
 							{!isResponsiveMode ? <>{displayMenuItems(menuItems, 'left')}</> : null}
 						</Flex>
@@ -333,7 +334,12 @@ const HeaderComponent = () => {
 						{!isResponsiveMode ? (
 							<>{displayMenuItems(menuItems, 'right')}</>
 						) : !responsiveMenuOpen ? (
-							<Button type="text" aria-label="Open Menu" onClick={() => setResponsiveMenuOpen(true)}>
+							<Button
+								type="text"
+								role="menuitem"
+								aria-label="Open Menu ..."
+								onClick={() => setResponsiveMenuOpen(true)}
+							>
 								<MenuOutlined aria-hidden />
 							</Button>
 						) : (
