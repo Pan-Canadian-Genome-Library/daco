@@ -36,8 +36,9 @@ interface SelectBoxProps extends BasicFormFieldProps {
 	placeholder?: string;
 	mode?: 'multiple' | 'tags';
 	sublabel?: string | ReactNode;
-	showSearch?: boolean;
-	allowClear?: boolean;
+	filterOption?: SelectProps['filterOption'];
+	showSearch?: SelectProps['showSearch'];
+	allowClear?: SelectProps['allowClear'];
 	tagRender?: SelectProps['tagRender'];
 	removeIcon?: SelectProps['removeIcon'];
 	onSelect?: SelectProps['onSelect'];
@@ -76,6 +77,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 								allowClear={props.allowClear}
 								showSearch={props.showSearch}
 								onSelect={props.onSelect}
+								filterOption={props.filterOption}
 							/>
 						</Flex>
 					</Item>

@@ -115,6 +115,7 @@ const RequestedStudy = () => {
 				dacId: study.dacId,
 				value: study.studyId,
 				disabled: shouldDisable || shouldDisableAll,
+				searchValue: study.studyName,
 			};
 		});
 	};
@@ -234,6 +235,9 @@ const RequestedStudy = () => {
 									<SelectBox
 										name="requestedStudies"
 										mode="multiple"
+										filterOption={(input, option) => {
+											return (option?.searchValue ?? '').toLowerCase().includes(input.toLowerCase());
+										}}
 										showSearch={true}
 										allowClear={false}
 										control={control}
