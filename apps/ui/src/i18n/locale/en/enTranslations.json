@@ -103,7 +103,8 @@
 		"pcglWebsite": "PCGL Website",
 		"dataPlatform": "Data Platform",
 		"myApplications": "My Applications",
-		"manageApplications": "Manage Applications"
+		"manageApplications": "Manage Applications",
+		"admin": "Admin Dashboard"
 	},
 	"button": {
 		"logout": "Logout",
@@ -210,6 +211,37 @@
 		"createDacComment": {
 			"successTitle": "DAC Comment Submitted",
 			"successMessage": "DAC comment submitted successfully"
+		},
+		"importStudies": {
+			"successMessage": "Studies imported successfully",
+			"successDescription": "DAC and studies have successfully been imported."
+		},
+		"toggleAcceptingStudies": {
+			"successMessage": "Accepting status of study:{{studyId}} updated successfully"
+		}
+	},
+	"admin": {
+		"activate": {
+			"pageTitle": "Activate Studies",
+			"pageDescription": "Review and toggle the accepting-applications status for each study below.",
+			"backToDashboard": "Back to Dashboard"
+		},
+		"dashboard": {
+			"pageTitle": "Admin Dashboard",
+			"pageDescription": "Manage studies, data access committees, and platform-wide configurations.",
+			"quickActions": "Quick Actions",
+			"card": {
+				"import": {
+					"title": "Import DAC & Studies",
+					"description": "Synchronize Data Access Committees and Studies from the Clinical platform. Run this to pull in the latest study configurations and DAC assignments.",
+					"button": "Import from Clinical"
+				},
+				"activateStudies": {
+					"title": "Manage Studies",
+					"description": "Manage studies on the platform. Manage their status, allowing applicants to apply for access.",
+					"button": "Manage Studies"
+				}
+			}
 		}
 	}
 }
