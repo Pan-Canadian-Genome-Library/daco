@@ -51,6 +51,7 @@ import {
 	PG_PASSWORD,
 	PG_USER,
 	testApplicationId,
+	testUserId,
 	testUserName,
 	testUserId as user_id,
 } from '../utils/testUtils.ts';
@@ -75,67 +76,6 @@ describe('Application API', () => {
 		await addStudyAndDacUsers(db);
 
 		testApplicationRepo = applicationSvc(db);
-	});
-
-	describe('Edit Application', () => {
-		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
-			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
-
-			const update = { applicantFirstName: 'Test' };
-
-			const result = await editApplication({ id: testApp.id, update });
-
-			assert.ok(result.success);
-
-			const editedApplication = result.data;
-			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
-
-			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicantFirstName, update.applicantFirstName);
-		});
-
-		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
-			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
-
-			assert.strictEqual(testApp.state, ApplicationStates.DRAFT);
-
-			const stateUpdate = { state: ApplicationStates.DAC_REVIEW };
-			const reviewRecordResult = await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
-
-			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
-			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.DAC_REVIEW);
-
-			/**
-			 * Applications must be withdrawn before they can be edited.
-			 */
-			const withdrawResult = await withdrawApplication({ applicationId: testApp.id, userName: testUserName });
-
-			assert.ok(withdrawResult.success);
-
-			const contentUpdate = { applicantLastName: 'User' };
-			const result = await editApplication({ id: testApp.id, update: contentUpdate });
-
-			assert.ok(result.success);
-
-			const editedApplication = result.data;
-			assert.strictEqual(editedApplication.id, testApp.id);
-			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
-
-			assert.ok(editedApplication.contents);
-			assert.strictEqual(editedApplication.contents.applicantLastName, contentUpdate.applicantLastName);
-		});
-
-		it('should error and return null when application state is not draft or review', async () => {
-			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
-
-			const stateUpdate = { state: ApplicationStates.CLOSED };
-			await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
-
-			const contentUpdate = { applicantTitle: 'Dr.' };
-			const result = await editApplication({ id: testApp.id, update: contentUpdate });
-
-			assert.ok(!result.success);
-		});
 	});
 
 	describe('Get Application by ID', () => {
@@ -510,15 +450,22 @@ describe('Application API', () => {
 
 	describe('Submit Application', () => {
 		it('should successfully submit an application in DRAFT', async () => {
-			const applicationRecordsResult = await getFirstApplicationTestByState(
-				testApplicationRepo,
-				ApplicationStates.DRAFT,
-			);
+			const createResult = await createApplication({ user_id: testUserId });
 
-			const appTestId = applicationRecordsResult.id;
+			assert.ok(createResult.success);
+
+			const appTestId = createResult.data.id;
+
+			const editResult = await editApplication({
+				id: appTestId,
+				update: {
+					requestedStudies: ['study1'],
+				},
+			});
+
+			assert.ok(editResult.success);
+
 			const result = await submitApplication({ applicationId: appTestId, userName: testUserName });
-
-			console.log(result, applicationRecordsResult);
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);
@@ -540,6 +487,64 @@ describe('Application API', () => {
 			assert.ok(!result.success);
 			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 		});
+
+		it('should assign dacId to application during submission', async () => {
+			const createApplicationResult = await createApplication({ user_id: testUserId });
+
+			assert.ok(createApplicationResult.success);
+
+			const appTestId = createApplicationResult.data.id;
+			const editResult = await editApplication({
+				id: appTestId,
+				update: {
+					requestedStudies: ['study1', 'study2'],
+				},
+			});
+
+			assert.ok(editResult.success);
+
+			const result = await submitApplication({ applicationId: appTestId, userName: testUserName });
+
+			assert.ok(result.success);
+
+			const getApplicationResult = await getApplicationById({ applicationId: result.data.id });
+			assert.ok(getApplicationResult.success);
+			assert.strictEqual(getApplicationResult.data.dacId, 'dac1');
+		});
+
+		it('should fail to submit application if there is no requested studies', async () => {
+			const createApplicationResult = await createApplication({ user_id: testUserId });
+
+			assert.ok(createApplicationResult.success);
+
+			const appTestId = createApplicationResult.data.id;
+
+			const result = await submitApplication({ applicationId: appTestId, userName: testUserName });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'SYSTEM_ERROR');
+		});
+
+		it("should fail to submit application if the requested study doesn't exist in the database", async () => {
+			const createApplicationResult = await createApplication({ user_id: testUserId });
+
+			assert.ok(createApplicationResult.success);
+
+			const appTestId = createApplicationResult.data.id;
+			const editResult = await editApplication({
+				id: appTestId,
+				update: {
+					requestedStudies: ['study932093'],
+				},
+			});
+
+			assert.ok(editResult.success);
+
+			const result = await submitApplication({ applicationId: appTestId, userName: testUserName });
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'SYSTEM_ERROR');
+		});
 	});
 
 	describe('Application History', () => {
@@ -555,6 +560,152 @@ describe('Application API', () => {
 
 			assert.ok(!applicationHistoryResult.success);
 			assert.strictEqual(applicationHistoryResult.error, 'NOT_FOUND');
+		});
+	});
+
+	describe('Edit Application', () => {
+		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
+
+			const update = { applicantFirstName: 'Test' };
+
+			const result = await editApplication({ id: testApp.id, update });
+
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.contents.applicantFirstName, update.applicantFirstName);
+		});
+
+		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
+
+			assert.strictEqual(testApp.state, ApplicationStates.DRAFT);
+
+			const stateUpdate = { state: ApplicationStates.DAC_REVIEW };
+			const reviewRecordResult = await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
+
+			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
+			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.DAC_REVIEW);
+
+			/**
+			 * Applications must be withdrawn before they can be edited.
+			 */
+			const withdrawResult = await withdrawApplication({ applicationId: testApp.id, userName: testUserName });
+
+			assert.ok(withdrawResult.success);
+
+			const contentUpdate = { applicantLastName: 'User' };
+			const result = await editApplication({ id: testApp.id, update: contentUpdate });
+
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.id, testApp.id);
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.contents.applicantLastName, contentUpdate.applicantLastName);
+		});
+
+		it('should error and return null when application state is not draft or review', async () => {
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
+
+			const stateUpdate = { state: ApplicationStates.CLOSED };
+			await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
+
+			const contentUpdate = { applicantTitle: 'Dr.' };
+			const result = await editApplication({ id: testApp.id, update: contentUpdate });
+
+			assert.ok(!result.success);
+		});
+
+		it('should fail to edit application if requested studies contain studyIds belonging to multiple DACs', async () => {
+			const createApplicationResult = await createApplication({ user_id: testUserId });
+
+			assert.ok(createApplicationResult.success);
+
+			const appTestId = createApplicationResult.data.id;
+			const result = await editApplication({
+				id: appTestId,
+				update: {
+					requestedStudies: ['study1', 'study3'],
+				},
+			});
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'INVALID_REQUEST');
+		});
+
+		it('should fail to edit application if requested studies has been changed from INSTITUTIONAL_REP_REVISION_REQUESTED', async () => {
+			const applicationRecordsResult = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+			);
+
+			// Change to INSTITUTIONAL_REP_REVISION_REQUESTED state
+			const revisionRequestResult = await requestApplicationRevisionsByInstitutionalRep({
+				applicationId: applicationRecordsResult.id,
+				revisionData: { ...revisionRequestData, application_id: applicationRecordsResult.id },
+				userName: testUserName,
+			});
+
+			assert.ok(revisionRequestResult.success);
+
+			const result = await editApplication({
+				id: applicationRecordsResult.id,
+				update: {
+					requestedStudies: ['study2'],
+				},
+			});
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'SYSTEM_ERROR');
+		});
+
+		it('should fail to edit application if requested studies has been changed from DAC_REVISIONS_REQUESTED', async () => {
+			const applicationRecordsResult = await getFirstApplicationTestByState(
+				testApplicationRepo,
+				ApplicationStates.DAC_REVIEW,
+			);
+
+			// Change to DAC_REVISIONS_REQUESTED state
+			const revisionRequestResult = await requestApplicationRevisionsByDac({
+				applicationId: applicationRecordsResult.id,
+				revisionData: { ...revisionRequestData, application_id: applicationRecordsResult.id },
+				userName: testUserName,
+			});
+
+			assert.ok(revisionRequestResult.success);
+
+			const result = await editApplication({
+				id: applicationRecordsResult.id,
+				update: {
+					requestedStudies: ['study2'],
+				},
+			});
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'SYSTEM_ERROR');
+		});
+
+		it('should allow to edit application if requested studies contain studyIds belonging to a singlular DAC', async () => {
+			const createApplicationResult = await createApplication({ user_id: testUserId });
+
+			assert.ok(createApplicationResult.success);
+
+			const appTestId = createApplicationResult.data.id;
+			const result = await editApplication({
+				id: appTestId,
+				update: {
+					requestedStudies: ['study1', 'study2'],
+				},
+			});
+
+			assert.ok(result.success);
 		});
 	});
 
