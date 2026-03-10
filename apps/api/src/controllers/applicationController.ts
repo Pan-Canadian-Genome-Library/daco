@@ -117,9 +117,6 @@ export const editApplication = async ({
 	const application = result.data;
 	const { edit } = ApplicationStateEvents;
 
-	/**
-	 * FIXME: This does not prevent editing of fields that have already been approved. This needs to be added.
-	 */
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
 	if (!canEditResult.success) {
@@ -153,26 +150,39 @@ export const editApplication = async ({
 
 			return failure('SYSTEM_ERROR', message);
 		}
-	}
 
-	// Need to check if the update contains valid studies with only one dac id before returning record
-	if (update.requestedStudies && update.requestedStudies.length > 1) {
-		const allStudies = await studyService.getAllStudies({});
-
-		if (!allStudies.success) {
-			logger.error('Failed to retrieve studies to validate users requested studies', allStudies.message);
-			return failure('SYSTEM_ERROR', 'Something went wrong. We cannot verify your requested studies.');
-		}
-
-		const dacIds = new Set(
-			update.requestedStudies.map((studyName) => allStudies.data.find((study) => study.studyName === studyName)?.dacId),
-		);
-
-		if (dacIds.size > 1) {
+		// requestedStudies are not allowed to be updated after the application has been submitted
+		if (update.requestedStudies !== undefined) {
 			return failure(
 				'INVALID_REQUEST',
-				"Multiple DACs's found for requested studies. All selected studies in a single application must belong to the same DAC.",
+				'requestedStudies are not allowed to be updated after the application has been submitted',
 			);
+		}
+	}
+
+	/**
+	 * Validates if the update contains valid studies with only one dac id before returning record.
+	 */
+	if (application.state === ApplicationStates.DRAFT) {
+		// Need to check if the update contains valid studies with only one dac id before returning record
+		if (update.requestedStudies && update.requestedStudies.length > 1) {
+			const allStudies = await studyService.getAllStudies({});
+
+			if (!allStudies.success) {
+				logger.error('Failed to retrieve studies to validate users requested studies', allStudies.message);
+				return failure('SYSTEM_ERROR', 'Something went wrong. We cannot verify your requested studies.');
+			}
+
+			const dacIds = new Set(
+				update.requestedStudies.map((studyID) => allStudies.data.find((study) => study.studyId === studyID)?.dacId),
+			);
+
+			if (dacIds.size > 1) {
+				return failure(
+					'INVALID_REQUEST',
+					"Multiple DACs's found for requested studies. All selected studies in a single application must belong to the same DAC.",
+				);
+			}
 		}
 	}
 
