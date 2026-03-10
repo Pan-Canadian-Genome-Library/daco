@@ -150,14 +150,6 @@ export const editApplication = async ({
 
 			return failure('SYSTEM_ERROR', message);
 		}
-
-		// requestedStudies are not allowed to be updated after the application has been submitted
-		if (update.requestedStudies !== undefined) {
-			return failure(
-				'INVALID_REQUEST',
-				'requestedStudies are not allowed to be updated after the application has been submitted',
-			);
-		}
 	}
 
 	/**
