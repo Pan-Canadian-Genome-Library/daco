@@ -33,7 +33,6 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
-import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -196,7 +195,6 @@ const RequestedStudy = () => {
 				/>
 				<Row>
 					<DacComments sectionComments={dacComments} section="study" />
-					<RevisionsAlert sectionRevisions={revisions['study']} />
 				</Row>
 				<SectionContent showDivider={false}>
 					<Row>
