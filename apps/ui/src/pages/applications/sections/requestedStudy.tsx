@@ -64,7 +64,7 @@ const RequestedStudy = () => {
 	const { state, dispatch } = useApplicationContext();
 	const { data: allStudies, isPending: isAllStudiesPending } = useGetAllStudies();
 
-	const canEdit = canEditSection({
+	const canEditFromPermissions = canEditSection({
 		revisions,
 		section: 'study',
 		isEditMode,
@@ -72,7 +72,7 @@ const RequestedStudy = () => {
 	});
 
 	// Should be able to change the requested studies while in DRAFT, once past this, the user should not be able to change them
-	const editableState = state.applicationState === ApplicationStates.DRAFT;
+	const canEdit = canEditFromPermissions && state.applicationState === ApplicationStates.DRAFT;
 
 	const notification = useNotificationContext();
 
@@ -106,7 +106,7 @@ const RequestedStudy = () => {
 			return {
 				label: (
 					<>
-						<Text disabled={shouldDisable || !canEdit || !editableState} style={{ fontSize: '0.75rem' }} strong>
+						<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
 							{study.studyName}
 						</Text>
 						, {study.dacId}
@@ -178,14 +178,14 @@ const RequestedStudy = () => {
 					}
 				}}
 				onBlur={() => {
-					if (canEdit && editableState) {
+					if (canEdit) {
 						onSubmit();
 					}
 				}}
 			>
 				<SectionTitle
 					title={translate('requested-study.title')}
-					showLockIcon={!canEdit && !editableState}
+					showLockIcon={!canEdit}
 					text={
 						<Col>
 							<Text>{translate('requested-study.description1') + ' '}</Text>
@@ -220,8 +220,8 @@ const RequestedStudy = () => {
 												return (
 													<Tag
 														key={study.studyId}
-														style={{ color: !canEdit && !editableState ? pcglColours.darkGrey : undefined }}
-														closable={canEdit && editableState}
+														style={{ color: !canEdit ? pcglColours.darkGrey : undefined }}
+														closable={canEdit}
 														onClose={() => removeTag(study.studyId)}
 													>
 														{study.studyName}
@@ -240,7 +240,7 @@ const RequestedStudy = () => {
 										rule={rule}
 										placeholder="Search study name..."
 										tagRender={() => <></>}
-										disabled={!canEdit || !editableState}
+										disabled={!canEdit}
 										options={alterAllStudiesData()}
 									/>
 								) : null}
@@ -248,7 +248,7 @@ const RequestedStudy = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<SectionFooter currentRoute="study" isEditMode={canEdit || editableState} />
+				<SectionFooter currentRoute="study" isEditMode={canEdit} />
 			</Form>
 		</SectionWrapper>
 	);

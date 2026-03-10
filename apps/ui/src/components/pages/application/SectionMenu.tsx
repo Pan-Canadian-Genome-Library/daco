@@ -74,22 +74,20 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 	 * @returns a `boolean` weather a route should be locked or not.
 	 */
 	const determineIfLocked = (route: SectionRoutesValues) => {
-		const currentRevision = revisions[route][0];
-
-		// Study section is always locked when not in draft state
-		if (route === SectionRoutes.STUDY && applicationState !== ApplicationStates.DRAFT) {
-			return true;
-		}
-
-		if (!currentRevision) {
-			return false;
-		} else if (route === 'intro' && isEditMode === false) {
-			return true;
-		} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === true) {
-			return true;
-		} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === false) {
-			return false;
-		} else if (currentRevision.isApproved === undefined && isEditMode === false) {
+		if (route !== SectionRoutes.STUDY) {
+			const currentRevision = revisions[route][0];
+			if (!currentRevision) {
+				return false;
+			} else if (route === 'intro' && isEditMode === false) {
+				return true;
+			} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === true) {
+				return true;
+			} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === false) {
+				return false;
+			} else if (currentRevision.isApproved === undefined && isEditMode === false) {
+				return true;
+			}
+		} else if (route === SectionRoutes.STUDY && applicationState !== ApplicationStates.DRAFT) {
 			return true;
 		}
 
