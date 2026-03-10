@@ -44,6 +44,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 import { revisionRequestData } from '../utils/mock/application-data.ts';
 import {
 	addInitialApplications,
+	addStudyAndDacUsers,
 	getFirstApplicationTestByState,
 	initTestMigration,
 	PG_DATABASE,
@@ -71,6 +72,7 @@ describe('Application API', () => {
 
 		await initTestMigration(db);
 		await addInitialApplications(db);
+		await addStudyAndDacUsers(db);
 
 		testApplicationRepo = applicationSvc(db);
 	});
@@ -463,7 +465,6 @@ describe('Application API', () => {
 					institution_rep_approved: false,
 					collaborators_approved: false,
 					project_approved: false,
-					requested_studies_approved: false,
 					created_at: new Date(),
 					agreements_notes: '',
 				},
@@ -497,7 +498,6 @@ describe('Application API', () => {
 					institution_rep_approved: false,
 					collaborators_approved: false,
 					project_approved: false,
-					requested_studies_approved: false,
 					created_at: new Date(),
 				},
 				userName: 'Test-User',
@@ -517,6 +517,8 @@ describe('Application API', () => {
 
 			const appTestId = applicationRecordsResult.id;
 			const result = await submitApplication({ applicationId: appTestId, userName: testUserName });
+
+			console.log(result, applicationRecordsResult);
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.INSTITUTIONAL_REP_REVIEW);

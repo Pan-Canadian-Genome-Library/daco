@@ -80,6 +80,7 @@ export const addInitialApplications = async (db: PostgresDb) => {
 
 		const newAppContents: typeof applicationContents.$inferInsert = {
 			application_id: id,
+			requested_studies: ['study1'],
 			created_at: new Date(),
 			updated_at: new Date(),
 		};
