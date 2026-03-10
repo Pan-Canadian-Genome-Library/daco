@@ -36,6 +36,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 	placeholder?: string;
 	mode?: 'multiple' | 'tags';
 	sublabel?: string | ReactNode;
+	label: string;
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
@@ -56,6 +57,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
 							<Select
 								{...field}
+								aria-label={props.label}
 								mode={props.mode}
 								disabled={props.disabled}
 								options={props.options}
