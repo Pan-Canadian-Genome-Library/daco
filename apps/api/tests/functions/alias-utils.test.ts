@@ -29,7 +29,6 @@ describe('Alias Utils', () => {
 	it('Alias snake_case to camelCase', () => {
 		const testData: JoinedApplicationRecord = {
 			id: 1,
-			dac_id: 'dac1',
 			user_id: testUserId,
 			state: ApplicationStates.DRAFT,
 			dac_id: 'PCGLD0001',
@@ -65,7 +64,6 @@ describe('Alias Utils', () => {
 		const testData: JoinedApplicationRecord = {
 			id: 1,
 			user_id: testUserId,
-			dac_id: 'dac1',
 			state: ApplicationStates.DRAFT,
 			dac_id: 'PCGLD0001',
 			created_at: new Date(),

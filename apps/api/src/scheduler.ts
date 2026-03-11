@@ -34,6 +34,7 @@ const scheduler = async () => {
 	if (ENABLE_EMAIL_REMINDERS === 'true') {
 		// Scheduled to run at midnight:
 		cron.schedule('0 0 * * *', async () => {
+			logger.info('Scheduled Email Reminders run at:', new Date().toString());
 			try {
 				await scheduleEmailReminders();
 			} catch (error) {
