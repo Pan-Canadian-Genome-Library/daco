@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { StudyDTO } from '@pcgl-daco/data-model';
+import type { AcceptingApplicationsResponse, StudyDTO } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	activateBodyParamSchema,
@@ -121,7 +121,7 @@ studyRouter.get(
 		});
 
 		if (txResult) {
-			response.status(200).json({ studies: txResult.data });
+			response.status(204).send();
 		}
 		return;
 	},
@@ -171,10 +171,7 @@ studyRouter.patch(
 		withBodySchemaValidation(
 			activateBodyParamSchema,
 			apiZodErrorMapping,
-			async (
-				request,
-				response: ResponseWithData<Pick<StudyDTO, 'acceptingApplications'>, ['SYSTEM_ERROR', 'NOT_FOUND']>,
-			) => {
+			async (request, response: ResponseWithData<AcceptingApplicationsResponse, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
 				const studyId = String(request.params.studyId);
 				const enabled = request.body.enabled;
 
@@ -193,7 +190,8 @@ studyRouter.patch(
 					}
 					return;
 				}
-				response.status(204).json();
+
+				response.status(201).json({ studyId, acceptingApplications: result.data.acceptingApplications });
 				return;
 			},
 		),

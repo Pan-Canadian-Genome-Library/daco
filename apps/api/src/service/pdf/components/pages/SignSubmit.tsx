@@ -27,7 +27,8 @@ import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
 
 interface SignSubmitProps
-	extends Omit<SignatureDTO, 'applicationId'>,
+	extends
+		Omit<SignatureDTO, 'applicationId'>,
 		Pick<
 			ApplicantDTO,
 			| 'applicantFirstName'

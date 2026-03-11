@@ -90,6 +90,16 @@ export type FilesRecord = typeof files.$inferSelect;
 export type FilesRecordOptionalContents = Omit<FilesRecord, 'content'> & { content?: Buffer<ArrayBufferLike> };
 export type FilesUpdate = Partial<FilesRecord>;
 export type FilesService = ReturnType<typeof filesSvc>;
+export type GrantUserPermissionsParams = {
+	userEmails: string[];
+	approverAccessToken: string;
+	studyIds: string[];
+};
+
+export type GrantUserPermissionsResult = {
+	successfulUserEmails: string[];
+	errorMessages: string[];
+};
 
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;

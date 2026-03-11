@@ -38,10 +38,12 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
+import { grantUserPermissions } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import {
 	type ApplicationRecord,
 	type ApplicationService,
+	type CollaboratorRecord,
 	type CollaboratorsService,
 	type FilesService,
 	type PDFService,
@@ -368,20 +370,18 @@ export const createApplicationPDF = async ({
 };
 
 /**
- * Approves the application by providing the applicationId
+ * This function moves the application status to `dacApproved`.
+ * It grants the applicant and all the collaborators permission to the requested study.
  *
  * @async
- * @param {ApproveApplication} param0
- * @param {ApproveApplication} param0.applicationId
- * @returns {Promise<{
- * 	success: boolean;
- * 	message?: string;
- * 	errors?: string | Error;
- * 	data?: any;
- * }>}
+ * @param applicationId - ID of the application
+ * @param approverAccessToken - Bearer token with sufficient privileges to grant study access
+ * @param userName - Name of the user approving the application
+ * @returns The application on success, or a failure containing the error
  */
 export const approveApplication = async ({
 	applicationId,
+	approverAccessToken,
 	userName,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
@@ -438,15 +438,33 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
-		const { actionId } = approvalResult.data;
+		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
 
-		emailService.sendEmailApproval({
-			id: application.id,
-			to: applicant_institutional_email,
-			actionId,
-			name: applicant_first_name || 'N/A',
+		if (!requested_studies || !requested_studies.length) {
+			logger.error(`No studies were requested for application: ${applicationId}`);
+			return dtoFriendlyData;
+		}
+
+		if (!applicant_institutional_email) {
+			logger.warn(`Applicant does not have an institutional email for application: ${applicationId}`);
+			return dtoFriendlyData;
+		}
+
+		const permissionAdded = await grantUserPermissions({
+			userEmails: [applicant_institutional_email],
+			approverAccessToken,
+			studyIds: requested_studies,
 		});
+
+		if (permissionAdded.successfulUserEmails.length === 1) {
+			// Notify Applicant of approval
+			emailService.sendEmailApproval({
+				id: application.id,
+				to: applicant_institutional_email,
+				actionId: approvalResult.data.actionId,
+				name: applicant_first_name || 'N/A',
+			});
+		}
 
 		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
 
@@ -458,14 +476,19 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		collaboratorResponse.data.forEach((collab) => {
-			emailService.sendEmailApproval({
-				id: application.id,
-				to: collab.institutional_email,
-				actionId,
-				name: collab.first_name || 'N/A',
-			});
+		const collaboratorsByEmail: Record<string, CollaboratorRecord> = {};
+		for (const collaborator of collaboratorResponse.data) {
+			collaboratorsByEmail[collaborator.institutional_email] = collaborator;
+		}
+
+		await grantUserPermissions({
+			userEmails: Object.keys(collaboratorsByEmail),
+			approverAccessToken,
+			studyIds: requested_studies,
 		});
+
+		// TODO: Notify each collaborator of approval.
+		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/579
 
 		return dtoFriendlyData;
 	} catch (error) {
