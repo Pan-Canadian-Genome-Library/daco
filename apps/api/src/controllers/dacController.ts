@@ -64,23 +64,3 @@ export const createDacRecords = async ({
 		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);
 	}
 };
-
-/**
- * Lookup a DAC record using the records' id
- * @param dac - A DAC record from the database
- * @returns Result with DacRecord
- */
-export const getDacById = async ({ id }: { id: string }): AsyncResult<DacRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
-	try {
-		const database = getDbInstance();
-		const dacService = dacSvc(database);
-
-		const dacResult = await dacService.getDacById({ id });
-
-		return dacResult;
-	} catch (error) {
-		const message = `Failed to retrieve DAC record with id: ${id}`;
-		logger.error(message, error);
-		return failure('SYSTEM_ERROR', message);
-	}
-};
