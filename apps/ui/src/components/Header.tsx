@@ -111,6 +111,13 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
+		} else if (user?.dacoAdmin) {
+			return {
+				name: translate('links.admin'),
+				href: '/admin',
+				position: 'right',
+				target: '_self',
+			};
 		} else if (user && (user.dacChair.length > 0 || user.dacMember.length > 0)) {
 			return {
 				name: translate('links.manageApplications'),
@@ -118,9 +125,6 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
-		} else if (user?.dacoAdmin) {
-			// TODO: route to admin dashboar
-			return undefined;
 		} else {
 			return {
 				name: translate('links.myApplications'),
