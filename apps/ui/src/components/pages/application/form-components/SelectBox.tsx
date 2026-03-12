@@ -17,12 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Flex, Form, Select, Typography } from 'antd';
-import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
-
 import { BasicFormFieldProps } from '@/global/types';
 import { CheckCircleFilled } from '@ant-design/icons';
+import { Flex, Form, Select, Typography } from 'antd';
 import { ReactNode } from 'react';
+import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
+
+import { RequiredLabel } from './labels/RequiredLabel';
 
 const { Item } = Form;
 const { Text } = Typography;
@@ -32,36 +33,34 @@ interface SelectBoxProps extends BasicFormFieldProps {
 		label: string;
 		value: string | number;
 	}[];
+	label: string;
 	initialValue?: object | string | null;
 	placeholder?: string;
 	mode?: 'multiple' | 'tags';
 	sublabel?: string | ReactNode;
-	label: string;
+	required?: boolean;
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
+	const { required, label, name, rule, control, initialValue, sublabel, mode, disabled, options } = props;
+	const fieldLabel = props.required ? RequiredLabel(label) : label;
 	return (
 		<Controller
-			name={props.name}
-			control={props.control}
+			name={name}
+			control={control}
 			render={({ field }) => {
 				return (
-					<Item
-						label={props.label}
-						name={`${props.name}`}
-						rules={[props.rule]}
-						required={props.required}
-						initialValue={props.initialValue ?? field.value}
-					>
+					<Item label={fieldLabel} name={`${name}`} rules={[rule]} initialValue={initialValue ?? field.value}>
 						<Flex vertical>
-							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
+							{sublabel ? <Text style={{ fontSize: '0.75rem' }}>{sublabel}</Text> : null}
 							<Select
 								{...field}
-								aria-label={props.label}
-								mode={props.mode}
-								disabled={props.disabled}
-								options={props.options}
+								aria-label={label}
+								mode={mode}
+								disabled={disabled}
+								options={options}
 								placeholder={props.placeholder}
+								required={required}
 								menuItemSelectedIcon={
 									<Flex style={{ marginLeft: '10px' }}>
 										<CheckCircleFilled />
