@@ -29,6 +29,7 @@ export const pcglColours = {
 
 	errorPrimary: '#FF4D4F',
 	errorSecondary: '#FFCCC7',
+	errorBanner: '#FFF2F0',
 
 	warningPrimary: '#F5DC4D',
 	warningSecondary: '#FFFFB8',
@@ -126,7 +127,9 @@ const pcglTheme: ThemeConfig = {
 			colorBgContainer: pcglColours.white,
 			multipleItemBg: pcglColours.greyLight,
 			controlItemBgActive: pcglColours.white,
-			colorPrimary: pcglColours.darkGrey, // Checkmark icon color
+			colorPrimary: pcglColours.primary, // Checkmark icon color
+			optionActiveBg: pcglColours.tertiary,
+			optionSelectedBg: pcglColours.tertiary,
 		},
 		Input: {
 			colorBgContainer: pcglColours.white,

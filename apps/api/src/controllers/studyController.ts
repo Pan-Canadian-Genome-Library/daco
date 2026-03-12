@@ -83,7 +83,7 @@ export const getAllStudies = async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> =
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
-		const studies = await studyService.getAllStudies();
+		const studies = await studyService.getAllStudies({});
 
 		return studies;
 	} catch (error) {

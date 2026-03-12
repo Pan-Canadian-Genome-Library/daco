@@ -159,8 +159,8 @@
 		"description-link": "PCGL Research Portal - Studies.",
 		"section1": {
 			"form": {
-				"studyName": "Study Name:",
-				"studyLabel": "Multiple selection available."
+				"studyName": "Choose Study for List:",
+				"studyLabel": "Choose one or multiple studies. Studies must be from the same DAC."
 			}
 		}
 	},

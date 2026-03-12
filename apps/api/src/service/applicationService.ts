@@ -507,8 +507,6 @@ const applicationSvc = (db: PostgresDb) => ({
 					collaboratorsNotes: revisionRequests.collaborators_notes,
 					projectApproved: revisionRequests.project_approved,
 					projectNotes: revisionRequests.project_notes,
-					requestedStudiesApproved: revisionRequests.requested_studies_approved,
-					requestedStudiesNotes: revisionRequests.requested_studies_notes,
 					ethicsApproved: revisionRequests.ethics_approved,
 					ethicsNotes: revisionRequests.ethics_notes,
 					agreementsApproved: revisionRequests.agreements_approved,
