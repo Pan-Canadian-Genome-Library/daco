@@ -101,23 +101,26 @@ const RequestedStudy = () => {
 			});
 		}
 
-		return allStudies.map((study) => {
-			const shouldDisable = dacSet.size !== 0 && study.dacId !== dacSet.values().next().value;
-			return {
-				label: (
-					<>
-						<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
-							{study.studyName}
-						</Text>
-						, {study.dacId}
-					</>
-				),
-				dacId: study.dacId,
-				value: study.studyId,
-				disabled: shouldDisable || shouldDisableAll,
-				searchValue: study.studyName,
-			};
-		});
+		return allStudies
+			.filter((study) => study.acceptingApplications)
+			.map((study) => {
+				const shouldDisable = dacSet.size !== 0 && study.dacId !== dacSet.values().next().value;
+
+				return {
+					label: (
+						<>
+							<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
+								{study.studyName}
+							</Text>
+							, {study.dacId}
+						</>
+					),
+					dacId: study.dacId,
+					value: study.studyId,
+					disabled: shouldDisable || shouldDisableAll,
+					searchValue: study.studyName,
+				};
+			});
 	};
 
 	const onSubmit = handleSubmit(() => {

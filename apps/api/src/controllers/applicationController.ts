@@ -165,6 +165,16 @@ export const editApplication = async ({
 				return failure('SYSTEM_ERROR', 'Something went wrong. We cannot verify your requested studies.');
 			}
 
+			const requestedStudiesData = allStudies.data.filter((study) => update.requestedStudies?.includes(study.studyId));
+			const closedStudies = new Set(requestedStudiesData.filter((study) => !study.acceptingApplications));
+
+			if (closedStudies.size > 0) {
+				const names = Array.from(closedStudies)
+					.map((study) => study.studyName)
+					.join(', ');
+				return failure('INVALID_REQUEST', `The following studies are not accepting applications: ${names}.`);
+			}
+
 			const dacIds = new Set(
 				update.requestedStudies.map((studyID) => allStudies.data.find((study) => study.studyId === studyID)?.dacId),
 			);
