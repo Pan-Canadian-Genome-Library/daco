@@ -153,10 +153,9 @@ export const editApplication = async ({
 	}
 
 	/**
-	 * Validates if the update contains valid studies with only one dac id before returning record.
+	 * Validates if the update contains valid studies with only one dac id before returning record or contains studies that are not accepting applications
 	 */
 	if (application.state === ApplicationStates.DRAFT) {
-		// Need to check if the update contains valid studies with only one dac id before returning record
 		if (update.requestedStudies && update.requestedStudies.length >= 1) {
 			const allStudies = await studyService.getAllStudies({});
 
@@ -166,9 +165,9 @@ export const editApplication = async ({
 			}
 
 			const requestedStudiesData = allStudies.data.filter((study) => update.requestedStudies?.includes(study.studyId));
-			const closedStudies = new Set(requestedStudiesData.filter((study) => !study.acceptingApplications));
+			const closedStudies = requestedStudiesData.filter((study) => !study.acceptingApplications);
 
-			if (closedStudies.size > 0) {
+			if (closedStudies.length > 0) {
 				const names = Array.from(closedStudies)
 					.map((study) => study.studyName)
 					.join(', ');
