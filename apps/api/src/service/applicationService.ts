@@ -672,7 +672,6 @@ const applicationSvc = (db: PostgresDb) => ({
 		state: ApplicationStateValues[];
 	}): AsyncResult<JoinedApplicationEmailsActionsRecord[], 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
-			// TODO: Optimize & Refactor using Drizzle Join or Query syntax
 			const applicationRecords = await db
 				.select()
 				.from(applications)
