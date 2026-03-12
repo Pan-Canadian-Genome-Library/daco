@@ -20,7 +20,7 @@
 import { relations } from 'drizzle-orm';
 import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 
-import { EmailTypes } from '@pcgl-daco/data-model/';
+import { EmailTypes } from '@pcgl-daco/data-model/src/types.js';
 
 import { applicationActions } from './applicationActions.ts';
 import { applications } from './applications.ts';
