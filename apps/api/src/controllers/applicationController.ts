@@ -157,7 +157,7 @@ export const editApplication = async ({
 	 */
 	if (application.state === ApplicationStates.DRAFT) {
 		// Need to check if the update contains valid studies with only one dac id before returning record
-		if (update.requestedStudies && update.requestedStudies.length > 1) {
+		if (update.requestedStudies && update.requestedStudies.length >= 1) {
 			const allStudies = await studyService.getAllStudies({});
 
 			if (!allStudies.success) {
