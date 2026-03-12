@@ -459,7 +459,7 @@ describe('Application API', () => {
 			const editResult = await editApplication({
 				id: appTestId,
 				update: {
-					requestedStudies: ['study1'],
+					requestedStudies: ['study2'],
 				},
 			});
 
@@ -497,7 +497,7 @@ describe('Application API', () => {
 			const editResult = await editApplication({
 				id: appTestId,
 				update: {
-					requestedStudies: ['study1', 'study2'],
+					requestedStudies: ['study2', 'study3'],
 				},
 			});
 
@@ -632,7 +632,7 @@ describe('Application API', () => {
 			const result = await editApplication({
 				id: appTestId,
 				update: {
-					requestedStudies: ['study1', 'study3'],
+					requestedStudies: ['study1', 'study2'],
 				},
 			});
 
@@ -701,11 +701,28 @@ describe('Application API', () => {
 			const result = await editApplication({
 				id: appTestId,
 				update: {
-					requestedStudies: ['study1', 'study2'],
+					requestedStudies: ['study2', 'study3'],
 				},
 			});
 
 			assert.ok(result.success);
+		});
+
+		it('should fail to edit application if requested studies contain studyIds that are not accepting applications', async () => {
+			const createApplicationResult = await createApplication({ user_id: testUserId });
+
+			assert.ok(createApplicationResult.success);
+
+			const appTestId = createApplicationResult.data.id;
+			const result = await editApplication({
+				id: appTestId,
+				update: {
+					requestedStudies: ['study2', 'study4'],
+				},
+			});
+
+			assert.ok(!result.success);
+			assert.strictEqual(result.error, 'INVALID_REQUEST');
 		});
 	});
 
