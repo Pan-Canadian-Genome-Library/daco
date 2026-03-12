@@ -65,7 +65,7 @@ export const testStudyData: StudyModel[] = [
 	},
 	{
 		study_id: 'study3',
-		dac_id: 'dac2',
+		dac_id: 'dac1',
 		study_name: 'Rare Disease Cohort',
 		context: 'Clinical',
 		domain: ['RARE_DISEASE'],
