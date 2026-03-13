@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -48,6 +48,7 @@ export interface ModalState {
 
 export interface ModalStateProps extends ModalState {
 	setIsOpen: (props: ModalState) => void;
+	canEdit: boolean;
 }
 
 const Collaborators = () => {
@@ -98,14 +99,14 @@ const Collaborators = () => {
 					<Space size="middle">
 						<Button
 							onClick={() => setEditModalState({ rowData: value, isOpen: true })}
-							disabled={!isEditMode}
+							disabled={!canEdit}
 							style={{ fontWeight: 400 }}
 						>
 							{translate('button.edit')}
 						</Button>
 						<Button
 							onClick={() => setDeleteModalState({ rowData: value, isOpen: true })}
-							disabled={!isEditMode}
+							disabled={!canEdit}
 							style={{ fontWeight: 400 }}
 						>
 							{translate('button.delete')}
@@ -161,17 +162,21 @@ const Collaborators = () => {
 						</Col>
 					</Row>
 				</SectionContent>
-				<AddCollaboratorModal isOpen={addModalState.isOpen} setIsOpen={setAddModalState} />
+
+				{/*MODALS*/}
+				<AddCollaboratorModal isOpen={addModalState.isOpen} setIsOpen={setAddModalState} canEdit />
 				<DeleteCollaboratorModal
 					appId={appId}
 					isOpen={deleteModalState.isOpen}
 					rowData={deleteModalState.rowData}
 					setIsOpen={setDeleteModalState}
+					canEdit
 				/>
 				<EditCollaboratorModal
 					rowData={editModalState.rowData}
 					setIsOpen={setEditModalState}
 					isOpen={editModalState.isOpen}
+					canEdit
 				/>
 				<SectionFooter currentRoute="collaborators" isEditMode={canEdit} />
 			</>

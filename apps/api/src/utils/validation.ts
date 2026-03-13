@@ -25,7 +25,6 @@ import {
 	isEthicsKey,
 	isInstitutionalKey,
 	isProjectKey,
-	isRequestedStudies,
 } from '@pcgl-daco/validation';
 import { z } from 'zod';
 
@@ -71,9 +70,8 @@ const validateRevisedFields = (fields: ApplicationContentsResponse, revisions: R
 			return true;
 		} else if (!revisions.appendicesApproved && isAppendicesKey(key)) {
 			return true;
-		} else if (!revisions.requestedStudiesApproved && isRequestedStudies(key)) {
-			return true;
 		}
+
 		return false;
 	});
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,38 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const SectionRoutes = {
-	INTRO: 'intro',
-	APPLICANT: 'applicant',
-	INSTITUTIONAL: 'institutional',
-	COLLABORATORS: 'collaborators',
-	PROJECT: 'project',
-	STUDY: 'study',
-	ETHICS: 'ethics',
-	AGREEMENT: 'agreement',
-	APPENDICES: 'appendices',
-	SIGN: 'sign',
-} as const;
+import { useQuery } from '@tanstack/react-query';
 
-export type SectionRoutesValues = (typeof SectionRoutes)[keyof typeof SectionRoutes];
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { type StudyDTO } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
 
-export type RevisionType = {
-	isApproved: boolean | undefined;
-	comment: string | null;
-	isDacRequest: boolean;
-	createdAt?: Date;
-}[];
+const useGetAllStudies = () => {
+	return useQuery<StudyDTO[], ServerError>({
+		queryKey: [`all-studies`],
+		queryFn: async () => {
+			const response = await fetch(`/study`).then(withErrorResponseHandler);
 
-export type GeneralType = {
-	comment: string | null;
-	isDacRequest: boolean;
-	createdAt?: Date;
-}[];
-
-export type VerifySectionRevisionType<T extends string> = {
-	[section in T]: RevisionType;
+			return await response.json();
+		},
+	});
 };
 
-export type SectionRevision = VerifySectionRevisionType<Exclude<SectionRoutesValues, 'study'>> & {
-	general: GeneralType;
-};
+export default useGetAllStudies;

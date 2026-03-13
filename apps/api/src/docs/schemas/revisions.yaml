@@ -44,15 +44,6 @@ components:
           description: Notes specific to the project information section.
           nullable: true
           example: 'Project methodology needs more detail.'
-        requestedStudiesApproved:
-          type: boolean
-          description: Indicates whether the requested studies section is approved.
-          example: true
-        requestedStudiesNotes:
-          type: string
-          description: Notes specific to the requested studies section.
-          nullable: true
-          example: 'Studies align with project goals.'
         ethicsApproved:
           type: boolean
           description: Indicates whether the ethics section is approved.
@@ -97,7 +88,6 @@ components:
         - institutionRepApproved
         - collaboratorsApproved
         - projectApproved
-        - requestedStudiesApproved
         - ethicsApproved
         - agreementsApproved
         - appendicesApproved

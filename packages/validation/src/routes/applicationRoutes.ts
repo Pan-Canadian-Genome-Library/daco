@@ -140,8 +140,6 @@ export const revisionDataSchema = z
 		collaboratorsNotes: z.string().nullish(),
 		projectApproved: z.boolean(),
 		projectNotes: z.string().nullish(),
-		requestedStudiesApproved: z.boolean(),
-		requestedStudiesNotes: z.string().nullish(),
 		ethicsApproved: z.boolean(),
 		ethicsNotes: z.string().nullish(),
 		agreementsApproved: z.boolean(),

@@ -32,8 +32,6 @@ export const revisionRequestData = {
 	collaborators_notes: 'Requires additional clarification',
 	project_approved: false,
 	project_notes: 'Not sufficient justification',
-	requested_studies_approved: false,
-	requested_studies_notes: 'Unclear scope',
 	ethics_approved: false,
 	agreements_approved: false,
 	appendices_approved: false,
