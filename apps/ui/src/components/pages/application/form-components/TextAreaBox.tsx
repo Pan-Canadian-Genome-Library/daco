@@ -24,6 +24,8 @@ import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProp
 import { BasicFormFieldProps } from '@/global/types';
 import { WORDS } from '@pcgl-daco/validation';
 
+import { RequiredLabel } from './labels/RequiredLabel';
+
 const { Item } = Form;
 
 interface TextAreaProps extends BasicFormFieldProps {
@@ -38,6 +40,23 @@ interface TextAreaProps extends BasicFormFieldProps {
 }
 
 const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextAreaProps) => {
+	const {
+		required,
+		label,
+		labelAlign,
+		labelCol,
+		style,
+		rows,
+		showCount,
+		maxWordCount,
+		disabled,
+		placeHolder,
+		name,
+		control,
+		subLabel,
+		rule,
+	} = props;
+	const fieldLabel = required ? RequiredLabel(label) : label;
 	/**
 	 * Renders the TextArea component, helps reduce redefining (and making mistakes with)
 	 * the Input control.
@@ -49,47 +68,47 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 		return (
 			<Input.TextArea
 				style={
-					props.style ?? {
+					style ?? {
 						height: 'auto',
 					}
 				}
 				{...field}
-				rows={props.rows ?? 10}
+				rows={rows ?? 10}
 				count={{
-					show: props.showCount,
+					show: showCount,
 					strategy: (text) =>
 						text.length === 0 ? text.trim().split(WORDS).length - 1 : text.trim().split(WORDS).length,
-					max: props.maxWordCount,
+					max: maxWordCount,
 				}}
-				disabled={props.disabled}
-				placeholder={props.placeHolder}
+				disabled={disabled}
+				placeholder={placeHolder}
+				required={fieldLabel}
 			/>
 		);
 	};
 
 	return (
 		<Controller
-			name={props.name}
-			control={props.control}
+			name={name}
+			control={control}
 			render={({ field }) => {
 				return (
 					<Item
-						label={props.label}
-						required={props.required}
-						name={`${props.name}`}
-						rules={!props.subLabel ? [props.rule] : undefined}
-						labelAlign={props.labelAlign}
-						labelCol={props.labelCol}
-						initialValue={!props.subLabel ? field.value : undefined}
+						label={label}
+						name={`${name}`}
+						rules={!subLabel ? [rule] : undefined}
+						labelAlign={labelAlign}
+						labelCol={labelCol}
+						initialValue={!subLabel ? field.value : undefined}
 						validateTrigger="onBlur"
 					>
 						{props.subLabel ? (
 							<Item
-								label={props.subLabel}
-								name={`${props.name}`}
-								rules={[props.rule]}
-								labelAlign={props.labelAlign}
-								labelCol={props.labelCol}
+								label={subLabel}
+								name={`${name}`}
+								rules={[rule]}
+								labelAlign={labelAlign}
+								labelCol={labelCol}
 								initialValue={field.value}
 								validateTrigger="onBlur"
 							>

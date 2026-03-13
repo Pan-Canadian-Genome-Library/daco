@@ -55,7 +55,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 	 */
 	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
 		return (
-			<Radio.Group {...field} disabled={props.disabled}>
+			<Radio.Group required={props.required} {...field} disabled={props.disabled}>
 				<Row justify="start" gutter={[0, 10]}>
 					{props.options.map((item) => {
 						return (
@@ -84,7 +84,6 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 				return (
 					<Item
 						label={props.label}
-						required={props.required}
 						name={`${props.name}`}
 						labelAlign={props.labelAlign}
 						rules={!props.subLabel ? [props.rule] : undefined}
