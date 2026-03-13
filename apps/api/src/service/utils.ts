@@ -93,3 +93,13 @@ export const authErrorResponseHandler = (
 		message,
 	});
 };
+
+/**
+ * Creates an array of DAC IDs which User is authorized to access
+ * Combines SessionUser['dacChair'] & ['dacMember'] values
+ * (User can be both a Member and a Chair for multiple groups)
+ * @param SessionUser
+ */
+export const getAuthorizedDacIds = ({ dacChair, dacMember }: Pick<SessionUser, 'dacChair' | 'dacMember'>): string[] => {
+	return [...dacChair, ...dacMember];
+};

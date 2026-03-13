@@ -27,6 +27,7 @@ import {
 	createApplication,
 	dacRejectApplication,
 	editApplication,
+	getAllApplications,
 	getApplicationById,
 	getApplicationHistory,
 	requestApplicationRevisionsByDac,
@@ -41,7 +42,7 @@ import { applicationSvc } from '@/service/applicationService.js';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
-import { revisionRequestData } from '../utils/mock/application-data.ts';
+import { applicationArray, revisionRequestData } from '../utils/mock/application-data.ts';
 import {
 	addInitialApplications,
 	addStudyAndDacUsers,
@@ -78,6 +79,97 @@ describe('Application API', () => {
 		testApplicationRepo = applicationSvc(db);
 	});
 
+	describe('Edit Application', () => {
+		it('should allow editing applications with status DRAFT and submitted user_id', async () => {
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
+
+			const update = { applicantFirstName: 'Test' };
+
+			const result = await editApplication({ id: testApp.id, update });
+
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.contents.applicantFirstName, update.applicantFirstName);
+		});
+
+		it('should allow editing applications with state DAC_REVIEW, and revert state to DRAFT', async () => {
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
+
+			assert.strictEqual(testApp.state, ApplicationStates.DRAFT);
+
+			const stateUpdate = { state: ApplicationStates.DAC_REVIEW };
+			const reviewRecordResult = await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
+
+			assert.ok(reviewRecordResult.success && reviewRecordResult.data);
+			assert.strictEqual(reviewRecordResult.data.state, ApplicationStates.DAC_REVIEW);
+
+			/**
+			 * Applications must be withdrawn before they can be edited.
+			 */
+			const withdrawResult = await withdrawApplication({ applicationId: testApp.id, userName: testUserName });
+
+			assert.ok(withdrawResult.success);
+
+			const contentUpdate = { applicantLastName: 'User' };
+			const result = await editApplication({ id: testApp.id, update: contentUpdate });
+
+			assert.ok(result.success);
+
+			const editedApplication = result.data;
+			assert.strictEqual(editedApplication.id, testApp.id);
+			assert.strictEqual(editedApplication.state, ApplicationStates.DRAFT);
+
+			assert.ok(editedApplication.contents);
+			assert.strictEqual(editedApplication.contents.applicantLastName, contentUpdate.applicantLastName);
+		});
+
+		it('should error and return null when application state is not draft or review', async () => {
+			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DRAFT);
+
+			const stateUpdate = { state: ApplicationStates.CLOSED };
+			await testApplicationRepo.findOneAndUpdate({ id: testApp.id, update: stateUpdate });
+
+			const contentUpdate = { applicantTitle: 'Dr.' };
+			const result = await editApplication({ id: testApp.id, update: contentUpdate });
+
+			assert.ok(!result.success);
+		});
+	});
+
+	describe('Get All Applications', () => {
+		it('should retrieve applications with submitted user_id', async () => {
+			const testResult = await getAllApplications({ userId: user_id });
+
+			assert.ok(testResult.success && testResult.data);
+
+			const expectedTestRecords = applicationArray.filter(
+				(record) => record.dac_id === 'dac1' || record.dac_id === 'dac2',
+			);
+			assert.ok(testResult.data.applications.every((record) => record.userId === user_id));
+			assert.ok(testResult.data.applications.length === expectedTestRecords.length);
+		});
+
+		it('should retrieve applications with submitted user_id & DAC IDs', async () => {
+			const testResult = await getAllApplications({ userId: user_id, authorizedDacIds: ['dac1', 'dac2'] });
+
+			assert.ok(testResult.success && testResult.data);
+
+			const resultRecords = testResult.data.applications.filter(
+				(record) => record.dacId === 'dac1' || record.dacId === 'dac2',
+			);
+			const expectedTestRecords = applicationArray.filter(
+				(record) => record.dac_id === 'dac1' || record.dac_id === 'dac2',
+			);
+
+			assert.ok(resultRecords.length === expectedTestRecords.length);
+			assert.ok(!testResult.data.applications.find((record) => record.dacId === 'dac3'));
+		});
+	});
+
 	describe('Get Application by ID', () => {
 		it('should successfully be able to find an application with an ID', async () => {
 			const result = await getApplicationById({ applicationId: testApplicationId });
@@ -112,6 +204,7 @@ describe('Application API', () => {
 			assert.equal(result.error, 'NOT_FOUND');
 		});
 	});
+
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
 			const result = await createApplication({ user_id });

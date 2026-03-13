@@ -374,7 +374,6 @@ describe('Application Service', () => {
 					institution_rep_approved: false,
 					collaborators_approved: false,
 					project_approved: false,
-					requested_studies_approved: false,
 				},
 			});
 

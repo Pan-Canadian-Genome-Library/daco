@@ -63,7 +63,7 @@ import BaseLogger from '@/logger.js';
 import { accessMiddleware } from '@/middleware/accessMiddleware.ts';
 import { isAssociatedRep, isUserDacChair, isUserDacMember } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { authErrorResponseHandler, authFailure, getUserName } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure, getAuthorizedDacIds, getUserName } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -167,7 +167,6 @@ applicationRouter.get(
 		}
 
 		const { userId } = user;
-		const isDAC = user.dacChair.length > 0 || user.dacMember.length > 0;
 
 		const {
 			state: stateQuery,
@@ -212,6 +211,8 @@ applicationRouter.get(
 			return;
 		}
 
+		const authorizedDacIds = getAuthorizedDacIds(user);
+
 		const result = await getAllApplications({
 			userId,
 			state,
@@ -219,8 +220,8 @@ applicationRouter.get(
 			page: pageRequested,
 			pageSize: pageSizeRequested,
 			search: searchResult,
-			isDAC,
 			isApplicantView,
+			authorizedDacIds,
 		});
 
 		if (result.success) {
