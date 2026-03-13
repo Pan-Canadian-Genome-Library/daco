@@ -159,8 +159,9 @@
 		{
 			"idx": 22,
 			"version": "7",
-			"when": 1769562585190,
-			"tag": "0022_sent_emails_table"
+			"when": 1773418247663,
+			"tag": "0022_sent_emails_table",
+			"breakpoints": true
 		}
 	]
 }
