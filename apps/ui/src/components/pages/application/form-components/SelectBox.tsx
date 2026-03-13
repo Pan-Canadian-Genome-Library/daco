@@ -24,6 +24,8 @@ import { BasicFormFieldProps } from '@/global/types';
 import { CheckCircleFilled } from '@ant-design/icons';
 import { ReactNode } from 'react';
 
+import { RequiredLabel } from './labels/RequiredLabel';
+
 const { Item } = Form;
 const { Text } = Typography;
 
@@ -32,10 +34,12 @@ interface SelectBoxProps extends BasicFormFieldProps {
 		label: string | ReactNode;
 		value: string | number;
 	}[];
+	label: string;
 	initialValue?: object | string | null;
 	placeholder?: string;
 	mode?: 'multiple' | 'tags';
 	sublabel?: string | ReactNode;
+	required?: boolean;
 	filterOption?: SelectProps['filterOption'];
 	showSearch?: SelectProps['showSearch'];
 	allowClear?: SelectProps['allowClear'];
@@ -45,39 +49,60 @@ interface SelectBoxProps extends BasicFormFieldProps {
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
+	const {
+		required,
+		label,
+		name,
+		rule,
+		control,
+		initialValue,
+		sublabel,
+		mode,
+		disabled,
+		options,
+		placeholder,
+		tagRender,
+		removeIcon,
+		allowClear,
+		showSearch,
+		onSelect,
+		filterOption,
+	} = props;
+	const fieldLabel = props.required ? RequiredLabel(label) : label;
 	return (
 		<Controller
-			name={props.name}
-			control={props.control}
+			name={name}
+			control={control}
 			render={({ field }) => {
 				return (
 					<Item
-						label={props.label}
-						name={`${props.name}`}
-						rules={[props.rule]}
-						required={props.required}
+						label={fieldLabel}
+						name={`${name}`}
+						rules={[rule]}
 						validateTrigger="onChange"
-						initialValue={props.initialValue ?? field.value}
+						initialValue={initialValue ?? field.value}
 					>
 						<Flex vertical>
-							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
+							{sublabel ? <Text style={{ fontSize: '0.75rem' }}>{sublabel}</Text> : null}
 							<Select
 								{...field}
-								mode={props.mode}
-								disabled={props.disabled}
-								options={props.options}
-								placeholder={props.placeholder}
+								aria-label={label}
+								mode={mode}
+								disabled={disabled}
+								options={options}
+								placeholder={placeholder}
+								required={required}
 								menuItemSelectedIcon={
 									<Flex style={{ marginLeft: '10px' }}>
 										<CheckCircleFilled />
 									</Flex>
 								}
-								tagRender={props.tagRender}
-								removeIcon={props.removeIcon}
-								allowClear={props.allowClear}
-								showSearch={props.showSearch}
-								onSelect={props.onSelect}
-								filterOption={props.filterOption}
+								tagRender={tagRender}
+								removeIcon={removeIcon}
+								allowClear={allowClear}
+								showSearch={showSearch}
+								onSelect={onSelect}
+								filterOption={filterOption}
 							/>
 						</Flex>
 					</Item>
