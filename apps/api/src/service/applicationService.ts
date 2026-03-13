@@ -276,6 +276,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		pageSize = 20,
 		search,
 		isApplicantView = false,
+		authorizedDacIds,
 	}: {
 		user_id?: string;
 		state?: ApplicationStateValues[];
@@ -284,6 +285,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		pageSize?: number;
 		search?: string;
 		isApplicantView?: boolean;
+		authorizedDacIds?: string[];
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
 			const transformSearchIntoQuery = (searchText: string) => {
@@ -294,11 +296,11 @@ const applicationSvc = (db: PostgresDb) => ({
 					.replace(/\s+/g, ' | '); // add OR between phrases
 
 				const searchQuery = sql`(
-									setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
-									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
-									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
-									setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
-								)
+					setweight(to_tsvector('english', ${applicationContents.application_id}::text), 'A') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_first_name}, '') || ' ' || COALESCE(${applicationContents.applicant_last_name}, '')), 'B') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_institutional_email}, '')), 'C') ||
+					setweight(to_tsvector('english', COALESCE(${applicationContents.applicant_primary_affiliation}, '')), 'D')
+				)
      		 @@ to_tsquery('english', ${`%${sanitizedSearch}%` + ':*'})`;
 
 				return searchQuery;
@@ -310,7 +312,7 @@ const applicationSvc = (db: PostgresDb) => ({
 				);
 			};
 
-			const rawApplicationRecord = await db
+			const rawApplicationRecords = await db
 				.select({
 					id: applications.id,
 					userId: applications.user_id,
@@ -330,9 +332,10 @@ const applicationSvc = (db: PostgresDb) => ({
 				.from(applications)
 				.where(
 					and(
-						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						state.length ? inArray(applications.state, state) : undefined,
 						search ? transformSearchIntoQuery(search) : undefined,
+						isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						authorizedDacIds?.length && !isApplicantView ? inArray(applications.dac_id, authorizedDacIds) : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
@@ -356,17 +359,17 @@ const applicationSvc = (db: PostgresDb) => ({
 				.from(applications)
 				.where(
 					and(
-						user_id ? eq(applications.user_id, String(user_id)) : undefined,
 						search ? transformSearchIntoQuery(search) : undefined,
+						isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						authorizedDacIds?.length && !isApplicantView ? inArray(applications.dac_id, authorizedDacIds) : undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
-
 			if (!countResult[0]) {
 				return failure('SYSTEM_ERROR', 'Failed to retrieve application totals');
 			}
 
-			let returnableApplications = rawApplicationRecord;
+			let returnableApplications = rawApplicationRecords;
 
 			/**
 			 *
