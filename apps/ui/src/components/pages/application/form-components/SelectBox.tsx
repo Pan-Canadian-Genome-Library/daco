@@ -17,11 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { Flex, Form, Select, type SelectProps, Typography } from 'antd';
+import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
+
 import { BasicFormFieldProps } from '@/global/types';
 import { CheckCircleFilled } from '@ant-design/icons';
-import { Flex, Form, Select, Typography } from 'antd';
 import { ReactNode } from 'react';
-import { Controller, FieldValues, UseControllerProps } from 'react-hook-form';
 
 import { RequiredLabel } from './labels/RequiredLabel';
 
@@ -30,7 +31,7 @@ const { Text } = Typography;
 
 interface SelectBoxProps extends BasicFormFieldProps {
 	options: {
-		label: string;
+		label: string | ReactNode;
 		value: string | number;
 	}[];
 	label: string;
@@ -39,10 +40,34 @@ interface SelectBoxProps extends BasicFormFieldProps {
 	mode?: 'multiple' | 'tags';
 	sublabel?: string | ReactNode;
 	required?: boolean;
+	filterOption?: SelectProps['filterOption'];
+	showSearch?: SelectProps['showSearch'];
+	allowClear?: SelectProps['allowClear'];
+	tagRender?: SelectProps['tagRender'];
+	removeIcon?: SelectProps['removeIcon'];
+	onSelect?: SelectProps['onSelect'];
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
-	const { required, label, name, rule, control, initialValue, sublabel, mode, disabled, options } = props;
+	const {
+		required,
+		label,
+		name,
+		rule,
+		control,
+		initialValue,
+		sublabel,
+		mode,
+		disabled,
+		options,
+		placeholder,
+		tagRender,
+		removeIcon,
+		allowClear,
+		showSearch,
+		onSelect,
+		filterOption,
+	} = props;
 	const fieldLabel = props.required ? RequiredLabel(label) : label;
 	return (
 		<Controller
@@ -50,7 +75,13 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 			control={control}
 			render={({ field }) => {
 				return (
-					<Item label={fieldLabel} name={`${name}`} rules={[rule]} initialValue={initialValue ?? field.value}>
+					<Item
+						label={fieldLabel}
+						name={`${name}`}
+						rules={[rule]}
+						validateTrigger="onChange"
+						initialValue={initialValue ?? field.value}
+					>
 						<Flex vertical>
 							{sublabel ? <Text style={{ fontSize: '0.75rem' }}>{sublabel}</Text> : null}
 							<Select
@@ -59,15 +90,19 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 								mode={mode}
 								disabled={disabled}
 								options={options}
-								placeholder={props.placeholder}
+								placeholder={placeholder}
 								required={required}
 								menuItemSelectedIcon={
 									<Flex style={{ marginLeft: '10px' }}>
 										<CheckCircleFilled />
 									</Flex>
 								}
-								removeIcon
-								showSearch={false}
+								tagRender={tagRender}
+								removeIcon={removeIcon}
+								allowClear={allowClear}
+								showSearch={showSearch}
+								onSelect={onSelect}
+								filterOption={filterOption}
 							/>
 						</Flex>
 					</Item>

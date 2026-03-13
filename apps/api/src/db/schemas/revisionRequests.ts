@@ -40,9 +40,6 @@ export const revisionRequests = pgTable('revision_requests', {
 	project_approved: boolean().notNull(),
 	project_notes: text(),
 
-	requested_studies_approved: boolean().notNull(),
-	requested_studies_notes: text(),
-
 	ethics_approved: boolean().notNull(),
 	ethics_notes: text(),
 

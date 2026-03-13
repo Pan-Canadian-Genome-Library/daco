@@ -64,7 +64,6 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 			institutionalRep: '',
 			collaborators: '',
 			projectInformation: '',
-			requestedStudy: '',
 			ethics: '',
 			agreements: '',
 			appendices: '',
@@ -184,19 +183,6 @@ const RequestRevisionsModal = memo(({ isOpen, setIsOpen, id, setSuccessModalOpen
 									rows={2}
 									label={translate('modals.requestRevisions.projectInformation')}
 									name="projectInformation"
-									control={control}
-									rule={rule}
-								/>
-							</Col>
-						</Row>
-						<Row>
-							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
-								<TextAreaBox
-									showCount
-									maxWordCount={300}
-									rows={2}
-									label={translate('modals.requestRevisions.requestedStudy')}
-									name="requestedStudy"
 									control={control}
 									rule={rule}
 								/>

@@ -24,7 +24,19 @@ const { Text } = Typography;
 
 export const RequiredLabel = (children: string | ReactNode) => (
 	<Flex>
-		<Text style={{ color: 'red' }}>* </Text>
+		<Text
+			style={{
+				alignContent: 'center',
+				color: '#ff4d4f',
+				display: 'inline-block',
+				fontFamily: 'SimSun, sans-serif',
+				fontSize: '14px',
+				lineHeight: '1',
+				marginInlineEnd: '4px',
+			}}
+		>
+			*{' '}
+		</Text>
 		{children}
 	</Flex>
 );
