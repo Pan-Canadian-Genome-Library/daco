@@ -35,9 +35,9 @@ const { Text } = Typography;
 
 const rule = createSchemaFieldRule(collaboratorsSchema);
 
-const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
+const AddCollaboratorModal = memo(({ isOpen, setIsOpen, canEdit }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
+	const { appId } = useOutletContext<ApplicationOutletContext>();
 	const { mutateAsync: addCollaborator } = useAddCollaborator();
 
 	const { handleSubmit, control, reset, setFocus } = useForm<CollaboratorsSchemaType>({
@@ -85,7 +85,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -94,7 +94,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									label={translate('form.middleName')}
 									control={control}
 									rule={rule}
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>
@@ -106,7 +106,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -115,7 +115,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									name="collaboratorSuffix"
 									control={control}
 									rule={rule}
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>
@@ -128,7 +128,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -138,7 +138,7 @@ const AddCollaboratorModal = memo(({ isOpen, setIsOpen }: ModalStateProps) => {
 									style={{ marginTop: '27px' }} // accounting for sublabel extra size from primaryEmail
 									control={control}
 									rule={rule}
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>

@@ -18,7 +18,7 @@
  */
 
 import { Menu, MenuProps } from 'antd';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/mutations/useEditApplication';
@@ -73,26 +73,29 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 	 * @param route The `SectionRoutesValues` representing what route we're at
 	 * @returns a `boolean` weather a route should be locked or not.
 	 */
-	const determineIfLocked = (route: SectionRoutesValues) => {
-		if (route !== SectionRoutes.STUDY) {
-			const currentRevision = revisions[route][0];
-			if (!currentRevision) {
-				return false;
-			} else if (route === 'intro' && isEditMode === false) {
-				return true;
-			} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === true) {
-				return true;
-			} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === false) {
-				return false;
-			} else if (currentRevision.isApproved === undefined && isEditMode === false) {
+	const determineIfLocked = useCallback(
+		(route: SectionRoutesValues) => {
+			if (route !== SectionRoutes.STUDY) {
+				const currentRevision = revisions[route][0];
+				if (!currentRevision) {
+					return false;
+				} else if (route === 'intro' && isEditMode === false) {
+					return true;
+				} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === true) {
+					return true;
+				} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === false) {
+					return false;
+				} else if (currentRevision.isApproved === undefined && isEditMode === false) {
+					return true;
+				}
+			} else if (route === SectionRoutes.STUDY && applicationState !== ApplicationStates.DRAFT) {
 				return true;
 			}
-		} else if (route === SectionRoutes.STUDY && applicationState !== ApplicationStates.DRAFT) {
-			return true;
-		}
 
-		return false;
-	};
+			return false;
+		},
+		[revisions, isEditMode, applicationState],
+	);
 
 	return (
 		<Menu
