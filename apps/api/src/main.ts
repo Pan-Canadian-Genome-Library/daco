@@ -19,7 +19,9 @@
 
 import { dbConfig } from '@/config/dbConfig.js';
 import { connectToDb } from '@/db/index.js';
+import scheduler from '@/scheduler.ts';
 import startServer from '@/server.js';
 
 connectToDb(dbConfig.connectionString);
 startServer();
+scheduler();

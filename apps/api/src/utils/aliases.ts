@@ -231,25 +231,31 @@ export const convertToFileRecord = (data: FilesRecordOptionalContents): Result<F
  * @param data type CollaboratorRecord in snake_case
  * @returns  type GetCollaboratorsResponse in camelCase w/ Collaborator added
  */
-export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): CollaboratorsResponseDTO[] => {
-	const formattedUpdate: CollaboratorsResponseDTO[] = [];
+export const convertToCollaboratorRecords = (
+	data: CollaboratorRecord[],
+): Result<CollaboratorsResponseDTO[], 'SYSTEM_ERROR'> => {
+	try {
+		const formattedUpdate: CollaboratorsResponseDTO[] = [];
 
-	data.forEach((value) => {
-		formattedUpdate.push({
-			applicationId: value.application_id,
-			collaboratorFirstName: value.first_name,
-			collaboratorMiddleName: value.middle_name,
-			collaboratorLastName: value.last_name,
-			collaboratorInstitutionalEmail: value.institutional_email,
-			collaboratorPositionTitle: value.position_title,
-			collaboratorPrimaryAffiliation: value.title,
-			collaboratorResearcherProfileURL: value.profile_url,
-			collaboratorSuffix: value.suffix,
-			collaboratorType: value.collaborator_type,
+		data.forEach((value) => {
+			formattedUpdate.push({
+				applicationId: value.application_id,
+				collaboratorFirstName: value.first_name,
+				collaboratorMiddleName: value.middle_name,
+				collaboratorLastName: value.last_name,
+				collaboratorInstitutionalEmail: value.institutional_email,
+				collaboratorPositionTitle: value.position_title,
+				collaboratorPrimaryAffiliation: value.title,
+				collaboratorResearcherProfileURL: value.profile_url,
+				collaboratorSuffix: value.suffix,
+				collaboratorType: value.collaborator_type,
+			});
 		});
-	});
 
-	return formattedUpdate;
+		return success(formattedUpdate);
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Validation Error while aliasing data at convertToCollaboratorRecords: \n${error}`);
+	}
 };
 
 /** Converts retrieved Submission Service Study Data into database insert using snake_case model format

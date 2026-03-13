@@ -28,7 +28,7 @@ import { and, eq } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { applicationActions } from '@/db/schemas/applicationActions.js';
 import BaseLogger from '@/logger.js';
-import { applicationActionsQuery } from '@/service/utils.js';
+import { applicationActionsSortQuery } from '@/service/utils.js';
 import { type AsyncResult, failure, success } from '@/utils/results.js';
 import {
 	type ApplicationActionRecord,
@@ -219,7 +219,7 @@ const applicationActionSvc = (db: PostgresDb) => {
 							application_id ? eq(applicationActions.application_id, application_id) : undefined,
 						),
 					)
-					.orderBy(...applicationActionsQuery(sort))
+					.orderBy(...applicationActionsSortQuery(sort))
 					.offset(page * pageSize)
 					.limit(pageSize);
 

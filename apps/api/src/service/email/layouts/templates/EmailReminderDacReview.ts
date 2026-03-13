@@ -18,15 +18,16 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateDacRevisionType } from '../../types.ts';
+import { type EmailReminderTemplateType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailDacForReview = ({
-	id,
+export const GenerateEmailReminderDacReview = ({
 	applicantName,
+	repName,
+	id,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'actionId' | 'to'>) => {
+}: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -34,26 +35,32 @@ export const GenerateEmailDacForReview = ({
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear DAC Members,
+                    Dear ${repName},
                 </mj-text>
-                <mj-text>                    
-                    We are writing to inform you that a <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience. <br/> <br/>
                 <mj-text>
-                    Here are the application details:
+                    This is a friendly reminder that there is one or more applications assigned to you on the <u>PCGL Data Access Compliance Office portal</u> that have been <b>awaiting your review for over 7 days</b>.
+                </mj-text>
+                <mj-text>
+                   Timely review of applications helps us maintain efficient processing and meet compliance standards.
+                </mj-text>
+                <mj-text>
+                    <b>Pending Application:</b>
                 </mj-text>
                 <mj-text>
                     <ul>
-                        <li>Applicant Name: ${applicantName}</li>
-                        <li>Application ID: ${id}</li>
-                        <li> Submission Date: ${submittedDate}</li>
-                        <li>Link to the application: <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Application-${id}</a> </li>
+                        <li>
+                            <b>Application ID:</b> ${id} <br/>
+                        </li>
+                        <li>
+                            <b>Applicant:</b> ${applicantName} <br/>
+                        </li>
+                        <li>
+                            <b>Date Submitted:</b> ${submittedDate} <br/>
+                        </li>
                     </ul>
                 </mj-text>
                 <mj-text>
-                    Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
-                </mj-text>
-                <mj-text>
-                    Thank you for your time and attention to this matter.<br /><br />
+                    Please log in to the DACO portal to review: ${ui}
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -65,25 +72,25 @@ export const GenerateEmailDacForReview = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailDacForReviewPlain = ({
-	id,
+export const GenerateEmailReminderDacReviewPlain = ({
 	applicantName,
+	repName,
+	id,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
+}: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	return ` Dear DAC Members,
-    \n We are writing to inform you that a PCGL DACO application is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience.
-    \n\n Here are the application details:
-    \n Applicant Name: ${applicantName}
+	return ` Dear ${repName},
+    \n We hope this message finds you well.
+    \n This is a friendly reminder that there is one or more applications assigned to you on the PCGL Data Access Compliance Office portal that have been awaiting your review for over 7 days.
+    \n Timely review of applications helps us maintain efficient processing and meet compliance standards.
+    \n Pending Application(s):
     \n Application ID: ${id}
+    \n Applicant Name: ${applicantName}
     \n Submission Date: ${submittedDate}
-    \n Link to the application: ${ui}/application/${id}
-    \n
-    \n Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
-    \n Thank you for your time and attention to this matter.
+    \n Please log in to the DACO portal to review: ${ui}
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };

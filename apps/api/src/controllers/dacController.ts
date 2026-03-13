@@ -31,7 +31,7 @@ const logger = BaseLogger.forModule('dacController');
 /**
  * Inserts & Updates Multiple DAC Group records
  * @param studies - An array of DAC DTO objects from the Submission Service
- * @returns
+ * @returns Result with array of created DacRecords
  */
 export const createDacRecords = async ({
 	dacData,
