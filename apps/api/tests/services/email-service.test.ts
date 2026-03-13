@@ -56,8 +56,6 @@ describe('Email Service', () => {
 		collaborators_notes: 'Requires additional clarification',
 		project_approved: false,
 		project_notes: 'Not sufficient justification',
-		requested_studies_approved: false,
-		requested_studies_notes: 'Unclear scope',
 		agreements_approved: false,
 		agreements_notes: 'N/A',
 		appendices_approved: false,

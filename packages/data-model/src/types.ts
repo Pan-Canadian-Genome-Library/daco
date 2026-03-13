@@ -415,8 +415,6 @@ export interface RevisionsDTO {
 	collaboratorsNotes?: string | null;
 	projectApproved: boolean;
 	projectNotes?: string | null;
-	requestedStudiesApproved: boolean;
-	requestedStudiesNotes?: string | null;
 	ethicsApproved: boolean;
 	ethicsNotes?: string | null;
 	agreementsApproved: boolean;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -19,12 +19,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { requestedStudiesSchema, type RequestedStudiesSchemaType } from '@pcgl-daco/validation';
-import { Col, Form, Row, Typography } from 'antd';
+import { Col, Flex, Form, Row, Tag, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import useGetAllStudies from '@/api/queries/useGetAllStudies';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
 import SelectBox from '@/components/pages/application/form-components/SelectBox';
@@ -32,61 +33,101 @@ import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
 import { useSectionForm } from '@/components/pages/application/utils/useSectionForm';
-import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
+import { pcglColours } from '@/providers/ThemeProvider';
+import { ApplicationStates, type StudyDTO } from '@pcgl-daco/data-model';
 import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
 
 const rule = createSchemaFieldRule(requestedStudiesSchema);
+const { Item } = Form;
 
-interface RequestedStudy {
-	studyName: string;
-	studyID: string;
-}
+const getDacIds = (requestedStudies: string[] | null, studies: StudyDTO[]): string[] => {
+	if (!requestedStudies?.length) {
+		return [];
+	}
 
-const REQUESTED_STUDY_TEMP_DATA: RequestedStudy[] = [
-	{
-		studyName: 'TEST-CA',
-		studyID: 'PCGLST0001',
-	},
-	{
-		studyName: 'EXAMPLE-CA',
-		studyID: 'PCGLST0002',
-	},
-	{
-		studyName: 'TEST-C3G',
-		studyID: 'PCGLST0003',
-	},
-];
+	const dacIds = requestedStudies
+		.map((studyId) => studies.find((study) => study.studyId === studyId)?.dacId)
+		.filter((study) => study !== undefined);
+
+	return dacIds;
+};
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({
+	const { data: allStudies, isPending: isAllStudiesPending } = useGetAllStudies();
+
+	const canEditFromPermissions = canEditSection({
 		revisions,
 		section: 'study',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
 	});
+
+	// Should be able to change the requested studies while in DRAFT, once past this, the user should not be able to change them
+	const canEdit = canEditFromPermissions && state.applicationState === ApplicationStates.DRAFT;
+
+	const notification = useNotificationContext();
+
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
 
-	const {
-		formState: { isDirty },
-		control,
-		getValues,
-	} = useForm<Nullable<RequestedStudiesSchemaType>>({
+	const { control, watch, getValues, setValue, handleSubmit } = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
 			requestedStudies: state.fields.requestedStudies,
 		},
 		resolver: zodResolver(requestedStudiesSchema),
 	});
 
-	const onSubmit = () => {
+	const alterAllStudiesData = () => {
 		const requestedStudies = getValues('requestedStudies');
+
+		if (!allStudies) return [];
+		const dacSet = new Set(getDacIds(requestedStudies, allStudies));
+
+		const shouldDisableAll = dacSet.size > 1;
+
+		if (shouldDisableAll) {
+			notification.openNotification({
+				type: 'error',
+				message: translate('notifications.requestedStudies.errorTitle'),
+				description: translate('notifications.requestedStudies.errorMessage'),
+			});
+		}
+
+		return allStudies
+			.filter((study) => study.acceptingApplications)
+			.map((study) => {
+				const shouldDisable = dacSet.size !== 0 && study.dacId !== dacSet.values().next().value;
+
+				return {
+					label: (
+						<>
+							<Text disabled={shouldDisable || !canEdit} style={{ fontSize: '0.75rem' }} strong>
+								{study.studyName}
+							</Text>
+							, {study.dacId}
+						</>
+					),
+					dacId: study.dacId,
+					value: study.studyId,
+					disabled: shouldDisable || shouldDisableAll,
+					searchValue: study.studyName,
+				};
+			});
+	};
+
+	const onSubmit = handleSubmit(() => {
+		const requestedStudies = getValues('requestedStudies');
+
+		form.setFieldValue('requestedStudies', requestedStudies);
+		form.validateFields();
 
 		dispatch({
 			type: 'UPDATE_APPLICATION',
@@ -98,17 +139,48 @@ const RequestedStudy = () => {
 				},
 				formState: {
 					...state.formState,
-					isDirty,
+					isDirty: true,
+				},
+			},
+		});
+	});
+
+	const removeTag = (value: string) => {
+		const requestedStudies = getValues('requestedStudies');
+		const filteredStudies = requestedStudies?.filter((study) => study !== value) || null;
+
+		setValue('requestedStudies', filteredStudies);
+		form.setFieldValue('requestedStudies', filteredStudies);
+		form.validateFields();
+
+		dispatch({
+			type: 'UPDATE_APPLICATION',
+			payload: {
+				...state,
+				fields: {
+					...state.fields,
+					requestedStudies: filteredStudies,
+				},
+				formState: {
+					...state.formState,
+					isDirty: true,
 				},
 			},
 		});
 	};
+
+	const studies = watch('requestedStudies');
 
 	return (
 		<SectionWrapper>
 			<Form
 				form={form}
 				layout="vertical"
+				onKeyDown={(e) => {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+					}
+				}}
 				onBlur={() => {
 					if (canEdit) {
 						onSubmit();
@@ -127,25 +199,59 @@ const RequestedStudy = () => {
 				/>
 				<Row>
 					<DacComments sectionComments={dacComments} section="study" />
-					<RevisionsAlert sectionRevisions={revisions['study']} />
 				</Row>
 				<SectionContent showDivider={false}>
 					<Row>
-						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
-							<SelectBox
-								label={translate('requested-study.section1.form.studyName')}
-								sublabel={translate('requested-study.section1.form.studyLabel')}
-								name="requestedStudies"
-								placeholder="Select"
-								control={control}
-								rule={rule}
-								mode="multiple"
-								options={REQUESTED_STUDY_TEMP_DATA.map((study) => {
-									return { value: study.studyID, label: study.studyName };
-								})}
-								required
-								disabled={!canEdit}
-							/>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '75%' }}>
+							<Flex vertical gap={'small'}>
+								<Flex vertical>
+									<Item
+										label={translate('requested-study.section1.form.studyName')}
+										required={true}
+										style={{ margin: 0 }}
+									>
+										<Text style={{ fontSize: '0.65rem', height: '10px' }}>
+											{translate('requested-study.section1.form.studyLabel')}
+										</Text>
+									</Item>
+								</Flex>
+								<Flex wrap style={{ minHeight: '23px' }} gap={'small'}>
+									{studies && allStudies
+										? studies.map((studyId) => {
+												const study = allStudies.find((s) => s.studyId === studyId);
+												if (!study) return null;
+
+												return (
+													<Tag
+														key={study.studyId}
+														style={{ color: !canEdit ? pcglColours.darkGrey : undefined }}
+														closable={canEdit}
+														onClose={() => removeTag(study.studyId)}
+													>
+														{study.studyName}
+													</Tag>
+												);
+											})
+										: null}
+								</Flex>
+								{!isAllStudiesPending && allStudies ? (
+									<SelectBox
+										name="requestedStudies"
+										mode="multiple"
+										filterOption={(input, option) => {
+											return (option?.searchValue ?? '').toLowerCase().includes(input.toLowerCase());
+										}}
+										showSearch={true}
+										allowClear={false}
+										control={control}
+										rule={rule}
+										placeholder="Search study name..."
+										tagRender={() => <></>}
+										disabled={!canEdit}
+										options={alterAllStudiesData()}
+									/>
+								) : null}
+							</Flex>
 						</Col>
 					</Row>
 				</SectionContent>

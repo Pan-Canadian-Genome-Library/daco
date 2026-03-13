@@ -36,7 +36,6 @@ export const GenerateEmailApplicantRevision = ({
 		institution_rep_notes,
 		collaborators_notes,
 		project_notes,
-		requested_studies_notes,
 		ethics_notes,
 		agreements_notes,
 		appendices_notes,
@@ -44,12 +43,12 @@ export const GenerateEmailApplicantRevision = ({
 		comments: generalComments,
 	} = comments;
 
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${applicantName},
                 </mj-text>
-                <mj-text>                    
+                <mj-text>
                     We hope you are doing well. <br/>
                 </mj-text>
                 <mj-text>
@@ -64,12 +63,11 @@ export const GenerateEmailApplicantRevision = ({
                         <li> Institutional Representative: ${institution_rep_notes ?? ''} <br /> </li>
                         <li> Collaborator: ${collaborators_notes ?? ''} </li>
                         <li> Project Information: ${project_notes ?? ''} </li>
-                        <li> Requested Study: ${requested_studies_notes ?? ''} </li> 
                         <li> Ethics: ${ethics_notes ?? ''} </li>
-                        <li> Data Access Agreement: ${agreements_notes ?? ''} </li> 
+                        <li> Data Access Agreement: ${agreements_notes ?? ''} </li>
                         <li> Appendices: ${appendices_notes ?? ''} </li>
-                        <li> Sign & Submit: ${sign_and_submit_notes ?? ''} </li> 
-                        <li> General Comments: ${generalComments ?? ''} </li>  
+                        <li> Sign & Submit: ${sign_and_submit_notes ?? ''} </li>
+                        <li> General Comments: ${generalComments ?? ''} </li>
                     </ol>
                 </mj-text>
                 <mj-text>
@@ -105,7 +103,6 @@ export const GenerateEmailApplicantRevisionPlain = ({
 		institution_rep_notes,
 		collaborators_notes,
 		project_notes,
-		requested_studies_notes,
 		ethics_notes,
 		agreements_notes,
 		appendices_notes,
@@ -114,27 +111,26 @@ export const GenerateEmailApplicantRevisionPlain = ({
 	} = comments;
 
 	return ` Dear ${applicantName},
-    \n We hope you are doing well. 
+    \n We hope you are doing well.
     \n\n We would like to inform you that the PCGL Data Access Committee has reviewed your PCGL DACO application and has requested some revisions before the process can proceed.
     \n\n The following revisions have been requested:
     \n
-    \n A. Applicant Information: ${applicant_notes ?? ''} 
-    \n B. Institutional Representative: ${institution_rep_notes ?? ''} 
-    \n C. Collaborator: ${collaborators_notes ?? ''} 
-    \n D. Project Information: ${project_notes ?? ''} 
-    \n E. Requested Study: ${requested_studies_notes ?? ''}
-    \n F. Ethics: ${ethics_notes ?? ''} 
+    \n A. Applicant Information: ${applicant_notes ?? ''}
+    \n B. Institutional Representative: ${institution_rep_notes ?? ''}
+    \n C. Collaborator: ${collaborators_notes ?? ''}
+    \n D. Project Information: ${project_notes ?? ''}
+    \n F. Ethics: ${ethics_notes ?? ''}
     \n G. Data Access Agreement: ${agreements_notes ?? ''}
     \n H. Appendices: ${appendices_notes ?? ''}
     \n I. Sign & Submit: ${sign_and_submit_notes ?? ''}
     \n J. General Comments: ${generalComments ?? ''}
     \n\n
     \n Please go to ${ui}/application/${id} to review the revisions.
-    \n 
+    \n
     \n Please make the necessary updates to your application and resubmit it through the DACO Portal. If you have any questions or need clarification on the requested changes, feel free to reach out to us.
     \n
     \n We appreciate your attention to these revisions and your timely response.
     \n
-    \n Best regards, \n The PCGL Data Access Compliance Office 
+    \n Best regards, \n The PCGL Data Access Compliance Office
     `;
 };

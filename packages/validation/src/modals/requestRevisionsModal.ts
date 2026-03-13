@@ -25,7 +25,6 @@ export const revisionsModalSchema = z.object({
 	institutionalRep: Maximum300WordsString.optional(),
 	collaborators: Maximum300WordsString.optional(),
 	projectInformation: Maximum300WordsString.optional(),
-	requestedStudy: Maximum300WordsString.optional(),
 	ethics: Maximum300WordsString.optional(),
 	signature: Maximum300WordsString.optional(),
 	general: Maximum300WordsString.optional(),

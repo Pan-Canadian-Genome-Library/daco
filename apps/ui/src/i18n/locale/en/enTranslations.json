@@ -212,6 +212,10 @@
 			"successTitle": "DAC Comment Submitted",
 			"successMessage": "DAC comment submitted successfully"
 		},
+		"requestedStudies": {
+			"errorTitle": "Error: Multiple DACs Selected",
+			"errorMessage": "Please only select studies within the same DAC to continue."
+		},
 		"importStudies": {
 			"successMessage": "Studies imported successfully",
 			"successDescription": "DAC and studies have successfully been imported."

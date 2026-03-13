@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { pcglColours } from '@/providers/ThemeProvider';
 import { notification } from 'antd';
 import { createContext, PropsWithChildren, ReactNode } from 'react';
 
@@ -44,10 +45,24 @@ export function NotificationProvider({ children }: PropsWithChildren) {
 	const [api, contextHolder] = notification.useNotification();
 
 	const openNotification = ({ type, message, description, placement = 'top' }: openNotificationParamsType) => {
+		let styles: React.CSSProperties;
+
+		switch (type) {
+			case 'error':
+				styles = {
+					backgroundColor: pcglColours.errorBanner,
+				};
+				break;
+			default:
+				styles = {};
+		}
+
 		api[type]({
+			type,
 			message,
 			description,
 			placement,
+			style: styles,
 		});
 	};
 

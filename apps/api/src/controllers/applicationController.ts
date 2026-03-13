@@ -40,7 +40,9 @@ import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
 import { grantUserPermissions } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
+import { studySvc } from '@/service/studyService.ts';
 import {
+	StudyService,
 	type ApplicationRecord,
 	type ApplicationService,
 	type CollaboratorRecord,
@@ -98,9 +100,13 @@ export const editApplication = async ({
 }: {
 	id: number;
 	update: UpdateEditApplicationRequest;
-}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<
+	ApplicationResponseData,
+	'INVALID_REQUEST' | 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'
+> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
+	const studyService = studySvc(database);
 
 	const result = await applicationRepo.getApplicationById({ id });
 
@@ -111,9 +117,6 @@ export const editApplication = async ({
 	const application = result.data;
 	const { edit } = ApplicationStateEvents;
 
-	/**
-	 * FIXME: This does not prevent editing of fields that have already been approved. This needs to be added.
-	 */
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
 	if (!canEditResult.success) {
@@ -146,6 +149,41 @@ export const editApplication = async ({
 			const message = `Upload data contains illegal fields`;
 
 			return failure('SYSTEM_ERROR', message);
+		}
+	}
+
+	/**
+	 * Validates if the update contains valid studies with only one dac id before returning record or contains studies that are not accepting applications
+	 */
+	if (application.state === ApplicationStates.DRAFT) {
+		if (update.requestedStudies && update.requestedStudies.length >= 1) {
+			const allStudies = await studyService.getAllStudies({});
+
+			if (!allStudies.success) {
+				logger.error('Failed to retrieve studies to validate users requested studies', allStudies.message);
+				return failure('SYSTEM_ERROR', 'Something went wrong. We cannot verify your requested studies.');
+			}
+
+			const requestedStudiesData = allStudies.data.filter((study) => update.requestedStudies?.includes(study.studyId));
+			const closedStudies = requestedStudiesData.filter((study) => !study.acceptingApplications);
+
+			if (closedStudies.length > 0) {
+				const names = Array.from(closedStudies)
+					.map((study) => study.studyName)
+					.join(', ');
+				return failure('INVALID_REQUEST', `The following studies are not accepting applications: ${names}.`);
+			}
+
+			const dacIds = new Set(
+				update.requestedStudies.map((studyID) => allStudies.data.find((study) => study.studyId === studyID)?.dacId),
+			);
+
+			if (dacIds.size > 1) {
+				return failure(
+					'INVALID_REQUEST',
+					"Multiple DACs's found for requested studies. All selected studies in a single application must belong to the same DAC.",
+				);
+			}
 		}
 	}
 
@@ -270,6 +308,7 @@ export const createApplicationPDF = async ({
 	const signatureService: SignatureService = signatureSvc(database);
 	const collaboratorsService: CollaboratorsService = collaboratorsSvc(database);
 	const fileService: FilesService = filesSvc(database);
+	const studyService: StudyService = studySvc(database);
 
 	const pdfRepo: PDFService = pdfService();
 
@@ -277,6 +316,21 @@ export const createApplicationPDF = async ({
 
 	if (!applicationContents.success) {
 		return applicationContents;
+	}
+
+	let studyIds = applicationContents.data.contents?.requested_studies;
+	// Attempt to retrieve studyNames from the studyIds in requested_studies array, default to studyIds
+	if (studyIds) {
+		const studyResult = await studyService.getAllStudies({
+			studyIds,
+		});
+
+		// The length of the studyResult data should match the length of studyIds
+		if (studyResult.success && studyIds.length === studyResult.data.length) {
+			studyIds = studyResult.data.filter((study) => study.studyName).map((study) => study.studyName);
+		} else {
+			logger.error('Failed to retrieve studyNames from the studyIds in requested_studies array');
+		}
 	}
 
 	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
@@ -310,7 +364,10 @@ export const createApplicationPDF = async ({
 		}
 	}
 
-	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
+	const aliasedApplicationContents = convertToApplicationRecord({
+		...applicationContents.data,
+		contents: { ...applicationContents.data.contents, requested_studies: studyIds },
+	});
 	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
 	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
 	const aliasedFileContents = convertToFileRecord(fileContents.data);
@@ -965,9 +1022,36 @@ export const submitApplication = async ({
 			institutional_rep_last_name,
 			institutional_rep_email,
 			applicant_institutional_email,
+			requested_studies,
 		} = resultContents.data.contents;
 
 		if (result.data.state === ApplicationStates.DRAFT) {
+			const studyId = requested_studies?.[0];
+			const studyService = studySvc(database);
+
+			if (!studyId) {
+				logger.error(`Unable to retrieve studyId from requested_studies: ${applicationId}`, requested_studies);
+				return failure('SYSTEM_ERROR', `Something went wrong processing your request.`);
+			}
+
+			const studyResult = await studyService.getStudyById({ studyId });
+
+			if (!studyResult.success) {
+				logger.error(`Unable to retrieve study with id: ${studyId}`, studyResult.error);
+				return failure('SYSTEM_ERROR', `Something went wrong processing your request.`);
+			}
+
+			// Update application with DAC ID
+			const updatedResult = await service.findOneAndUpdate({
+				id: applicationId,
+				update: { dac_id: studyResult.data.dacId },
+			});
+
+			if (!updatedResult.success) {
+				logger.error(`Unable to update application with id: ${applicationId}`, updatedResult.error);
+				return failure('SYSTEM_ERROR', `Something went wrong processing your request.`);
+			}
+
 			//  email to institutional rep for review
 			emailService.sendEmailInstitutionalRepForReview({
 				id: application.id,
