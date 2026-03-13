@@ -18,42 +18,43 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateDacRevisionType } from '../../types.ts';
+import { type EmailReminderTemplateType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailDacForReview = ({
-	id,
-	applicantName,
-	submittedDate,
-}: Omit<GenerateDacRevisionType, 'actionId' | 'to'>) => {
+export const GenerateEmailReminderSubmitDraft = ({ applicantName, id, submittedDate }: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
-
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear DAC Members,
+                    Dear ${applicantName},
                 </mj-text>
-                <mj-text>                    
-                    We are writing to inform you that a <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience. <br/> <br/>
                 <mj-text>
-                    Here are the application details:
+                    We noticed that your application on the <u>PCGL Data Access Compliance Office</u> portal has been in draft status for over 7 days.
+                </mj-text>
+                <mj-text>
+                   To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
                 </mj-text>
                 <mj-text>
                     <ul>
-                        <li>Applicant Name: ${applicantName}</li>
-                        <li>Application ID: ${id}</li>
-                        <li> Submission Date: ${submittedDate}</li>
-                        <li>Link to the application: <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Application-${id}</a> </li>
+                        <li>
+                            Application ID: ${id} <br/>
+                        </li>
+                        <li>
+                            Last Modified: ${submittedDate} <br/>
+                        </li>
                     </ul>
                 </mj-text>
                 <mj-text>
-                    Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
+                    You can access your draft application here: ${ui}
                 </mj-text>
                 <mj-text>
-                    Thank you for your time and attention to this matter.<br /><br />
+                    If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
+                </mj-text>
+                <mj-text>
+                    If you have any questions or need assistance, feel free to contact us!
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -65,25 +66,24 @@ export const GenerateEmailDacForReview = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailDacForReviewPlain = ({
-	id,
+export const GenerateEmailReminderSubmitDraftPlain = ({
 	applicantName,
+	id,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
+}: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	return ` Dear DAC Members,
-    \n We are writing to inform you that a PCGL DACO application is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience.
-    \n\n Here are the application details:
-    \n Applicant Name: ${applicantName}
-    \n Application ID: ${id}
-    \n Submission Date: ${submittedDate}
-    \n Link to the application: ${ui}/application/${id}
-    \n
-    \n Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
-    \n Thank you for your time and attention to this matter.
+	return ` Dear ${applicantName},
+    \n We hope this message finds you well.
+    \n We noticed that your application on the PCGL Data Access Compliance Office portal has been in draft status for over 7 days.
+    \n To ensure timely processing and avoid delays, please review and submit your application at your earliest convenience.
+    \n\n Application ID: ${id}
+    \n Last Modified: ${submittedDate}
+    \n\n You can access your draft application here: ${ui}
+    \n If you no longer intend to submit this application, you may disregard this reminder and close the application from your portal dashboard.
+    \n If you have any questions or need assistance, feel free to contact us!
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };

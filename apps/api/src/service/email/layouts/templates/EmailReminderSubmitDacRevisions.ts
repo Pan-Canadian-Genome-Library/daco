@@ -18,15 +18,16 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateDacRevisionType } from '../../types.ts';
+import { type EmailReminderTemplateType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 // TODO: english and french translations
-export const GenerateEmailDacForReview = ({
-	id,
+export const GenerateEmailReminderSubmitDacRevisions = ({
 	applicantName,
+	repName,
+	id,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'actionId' | 'to'>) => {
+}: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -34,26 +35,29 @@ export const GenerateEmailDacForReview = ({
 	const template = `  
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear DAC Members,
+                    Dear ${applicantName},
                 </mj-text>
-                <mj-text>                    
-                    We are writing to inform you that a <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience. <br/> <br/>
                 <mj-text>
-                    Here are the application details:
+                    This is a reminder that revisions were requested for your application on the <u>PCGL Data Access Compliance Office portal</u>, and we have not yet received a response.
+                </mj-text>
+                <mj-text>
+                   To proceed with the review process, please log in to review the comments and submit the required updates.
                 </mj-text>
                 <mj-text>
                     <ul>
-                        <li>Applicant Name: ${applicantName}</li>
-                        <li>Application ID: ${id}</li>
-                        <li> Submission Date: ${submittedDate}</li>
-                        <li>Link to the application: <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Application-${id}</a> </li>
+                        <li>
+                            <b>Application ID:</b> ${id} <br/>
+                        </li>
+                        <li>
+                            <b>Revision Requested By:</b> ${repName} <br/>
+                        </li>
+                        <li>
+                            <b>Date of Request:</b> ${submittedDate} <br/>
+                        </li>
                     </ul>
                 </mj-text>
                 <mj-text>
-                    Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
-                </mj-text>
-                <mj-text>
-                    Thank you for your time and attention to this matter.<br /><br />
+                    You can view and respond to the revision request here: ${ui}
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -65,25 +69,23 @@ export const GenerateEmailDacForReview = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailDacForReviewPlain = ({
-	id,
+export const GenerateEmailReminderSubmitDacRevisionsPlain = ({
 	applicantName,
+	repName,
+	id,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
+}: EmailReminderTemplateType) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	return ` Dear DAC Members,
-    \n We are writing to inform you that a PCGL DACO application is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience.
-    \n\n Here are the application details:
-    \n Applicant Name: ${applicantName}
-    \n Application ID: ${id}
+	return ` Dear ${applicantName},
+    \n This is a reminder that revisions were requested for your application on the PCGL Data Access Compliance Office portal, and we have not yet received a response.
+    \n To proceed with the review process, please log in to review the comments and submit the required updates.
+    \n\n Application ID: ${id}
+    \n Revision Requested By: ${repName}
     \n Submission Date: ${submittedDate}
-    \n Link to the application: ${ui}/application/${id}
-    \n
-    \n Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
-    \n Thank you for your time and attention to this matter.
+    \n\n You can view and respond to the revision request here: ${ui}
     \n Best regards, \n The PCGL Data Access Compliance Office 
     `;
 };
