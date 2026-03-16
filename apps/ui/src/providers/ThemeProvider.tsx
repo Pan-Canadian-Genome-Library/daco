@@ -40,6 +40,7 @@ export const pcglColours = {
 	white: '#FFFFFF',
 	offWhite: '#f0f0f0',
 	black: '#000000',
+	a11yGrey: '#757575',
 	grey: '#D9D9D9',
 	greyLight: '#FAFAFA',
 	darkGrey: 'rgba(0, 0, 0, 0.45)',
@@ -88,6 +89,9 @@ const pcglTheme: ThemeConfig = {
 			defaultColor: pcglColours.black,
 			defaultBg: pcglColours.white,
 		},
+		Empty: {
+			colorTextDescription: pcglColours.a11yGrey,
+		},
 		Timeline: {
 			dotBorderWidth: 3,
 			dotBg: pcglColours.white,
@@ -130,6 +134,7 @@ const pcglTheme: ThemeConfig = {
 			colorPrimary: pcglColours.primary, // Checkmark icon color
 			optionActiveBg: pcglColours.tertiary,
 			optionSelectedBg: pcglColours.tertiary,
+			colorTextPlaceholder: pcglColours.a11yGrey,
 		},
 		Input: {
 			colorBgContainer: pcglColours.white,
