@@ -27,7 +27,7 @@ export const pcglColours = {
 	tertiary: '#FFF0F6',
 	quaternary: '#FFD6E7',
 
-	errorPrimary: '#FF4D4F',
+	errorPrimary: '#EB0000',
 	errorSecondary: '#FFCCC7',
 	errorBanner: '#FFF2F0',
 
