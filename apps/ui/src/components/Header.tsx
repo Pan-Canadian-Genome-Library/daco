@@ -17,10 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useState, type PropsWithChildren } from 'react';
-
 import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Divider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
+import React, { useState, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '@/api/paths';
@@ -29,6 +28,7 @@ import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { clearExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
+
 import ApplyForAccessModal from './modals/ApplyForAccessModal';
 
 const { Link } = Typography;
@@ -180,6 +180,11 @@ const HeaderComponent = () => {
 						onClick={() => {
 							clearExtraSessionInformation();
 						}}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								clearExtraSessionInformation();
+							}
+						}}
 						onMouseOver={() => {
 							setLogoutHover(true);
 						}}
@@ -198,6 +203,7 @@ const HeaderComponent = () => {
 							top: displayEmail ? 65 : 42,
 							width: isResponsiveMode ? '100%' : 'calc(100% + 20px)',
 						}}
+						tabIndex={0}
 					>
 						{translate(`button.logout`)}{' '}
 						<LogoutOutlined
@@ -222,6 +228,12 @@ const HeaderComponent = () => {
 			onMouseOut: () => {
 				setLogoutOpen(false);
 			},
+			onKeyDown: (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					setLogoutOpen(!isLogoutOpen);
+				}
+			},
+			tabIndex: 0,
 			type: 'text',
 			variant: 'text',
 			icon: isResponsiveMode ? null : isLogoutOpen ? (
@@ -293,7 +305,17 @@ const HeaderComponent = () => {
 					);
 				} else {
 					return (
-						<Link key={`menuItem-${key}`} style={linkStyle} href={menuItem.href ?? '#'} role="menuitem">
+						<Link
+							key={`menuItem-${key}`}
+							style={linkStyle}
+							href={menuItem.href ?? '#'}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									window.location.href = menuItem.href ?? '#';
+								}
+							}}
+							role="menuitem"
+						>
 							{menuItem.name}
 						</Link>
 					);
