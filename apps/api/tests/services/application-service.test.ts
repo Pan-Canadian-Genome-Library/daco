@@ -28,7 +28,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model/src/types.js';
 
 import {
 	addInitialApplications,
-	addPaginationDonors,
+	addPaginationApplications,
 	allRecordsPageSize,
 	getFirstApplicationTestByState,
 	initTestMigration,
@@ -281,7 +281,7 @@ describe('Application Service', () => {
 		});
 
 		it('should allow record pagination', async () => {
-			await addPaginationDonors(db); // Add extra pagination values
+			await addPaginationApplications(db); // Add extra pagination values
 
 			const paginationResult = await testApplicationService.listApplications({ user_id, page: 2, pageSize: 10 });
 
@@ -374,7 +374,6 @@ describe('Application Service', () => {
 					institution_rep_approved: false,
 					collaborators_approved: false,
 					project_approved: false,
-					requested_studies_approved: false,
 				},
 			});
 
@@ -473,6 +472,22 @@ describe('Application Service', () => {
 
 			assert.ok(dacCommentResult.success);
 			assert.ok(Array.isArray(dacCommentResult.data) && dacCommentResult.data.length === 2);
+		});
+
+		describe('Get Email & Action Details', () => {
+			it('should retrieve a list of Joined Application/Emails/Action Records', async () => {
+				const result = await testApplicationService.getEmailActionDetails({
+					state: [ApplicationStates.DRAFT],
+				});
+
+				assert.ok(result.success);
+				assert.ok(Array.isArray(result.data) && result.data.length);
+
+				const joinedRecord = result.data[0];
+				assert.ok(joinedRecord && joinedRecord.hasOwnProperty('application_contents'));
+				assert.ok(joinedRecord && joinedRecord.hasOwnProperty('application_actions'));
+				assert.ok(joinedRecord && joinedRecord.hasOwnProperty('sent_emails'));
+			});
 		});
 	});
 

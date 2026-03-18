@@ -18,7 +18,7 @@
  */
 
 import { Menu, MenuProps } from 'antd';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import useEditApplication from '@/api/mutations/useEditApplication';
@@ -27,7 +27,7 @@ import SectionMenuItem from '@/components/pages/application/SectionMenuItem';
 import { VerifyFormSections, VerifySectionsTouched } from '@/components/pages/application/utils/validators';
 import { ApplicationSectionRoutes } from '@/pages/AppRouter';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { ApplicationStateValues } from '@pcgl-daco/data-model';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model';
 import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 import { ValidateAllSections } from './utils/validatorFunctions';
 
@@ -42,14 +42,14 @@ type SectionMenuProps = {
 const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }: SectionMenuProps) => {
 	const navigate = useNavigate();
 	const {
-		state: { fields, formState, applicationUserRole },
+		state: { applicationState, fields, formState, applicationUserPermissions },
 	} = useApplicationContext();
 	const { mutate: editApplication } = useEditApplication();
 	const { data, isLoading } = useGetCollaborators(appId);
 
 	const handleNavigation: MenuProps['onClick'] = (e) => {
 		if (formState.isDirty) {
-			editApplication({ id: appId, revisions });
+			editApplication({ applicationId: appId, revisions });
 		}
 		navigate(`${e.key}/${isEditMode ? 'edit' : ''}`);
 	};
@@ -73,23 +73,29 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 	 * @param route The `SectionRoutesValues` representing what route we're at
 	 * @returns a `boolean` weather a route should be locked or not.
 	 */
-	const determineIfLocked = (route: SectionRoutesValues) => {
-		const currentRevision = revisions[route][0];
+	const determineIfLocked = useCallback(
+		(route: SectionRoutesValues) => {
+			if (route !== SectionRoutes.STUDY) {
+				const currentRevision = revisions[route][0];
+				if (!currentRevision) {
+					return false;
+				} else if (route === 'intro' && isEditMode === false) {
+					return true;
+				} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === true) {
+					return true;
+				} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === false) {
+					return false;
+				} else if (currentRevision.isApproved === undefined && isEditMode === false) {
+					return true;
+				}
+			} else if (route === SectionRoutes.STUDY && applicationState !== ApplicationStates.DRAFT) {
+				return true;
+			}
 
-		if (!currentRevision) {
 			return false;
-		} else if (route === 'intro' && isEditMode === false) {
-			return true;
-		} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === true) {
-			return true;
-		} else if (currentRevision.isApproved !== undefined && currentRevision.isApproved === false) {
-			return false;
-		} else if (currentRevision.isApproved === undefined && isEditMode === false) {
-			return true;
-		}
-
-		return false;
-	};
+		},
+		[revisions, isEditMode, applicationState],
+	);
 
 	return (
 		<Menu
@@ -113,7 +119,7 @@ const SectionMenu = ({ currentSection, isEditMode, appId, revisions, appState }:
 										isLocked={determineIfLocked(route)}
 										hasCollaborators={data && data.length > 0}
 										appState={appState}
-										role={applicationUserRole}
+										isApplicant={applicationUserPermissions.isApplicant}
 									/>
 								),
 								disabled: route === SectionRoutes.SIGN && !ValidateAllSections(fields),

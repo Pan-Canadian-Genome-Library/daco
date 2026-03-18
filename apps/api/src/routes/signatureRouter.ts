@@ -39,8 +39,8 @@ import {
 	getApplicationSignature,
 	updateApplicationSignature,
 } from '@/controllers/signatureController.ts';
-import { authMiddleware } from '@/middleware/authMiddleware.ts';
-import { canAccessRequest, isAssociatedRep } from '@/service/authService.ts';
+import { accessMiddleware } from '@/middleware/accessMiddleware.ts';
+import { isAssociatedRep } from '@/service/authService.ts';
 import { authErrorResponseHandler, authFailure } from '@/service/utils.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -52,7 +52,7 @@ const signatureRouter = express.Router();
  */
 signatureRouter.get(
 	'/:applicationId',
-	authMiddleware(),
+	accessMiddleware(),
 	withParamsSchemaValidation(
 		getSignatureParamsSchema,
 		apiZodErrorMapping,
@@ -64,56 +64,49 @@ signatureRouter.get(
 			>,
 		) => {
 			const { user } = request.session;
-			if (user) {
-				const applicationId = Number(request.params.applicationId);
-				if (!isPositiveInteger(applicationId)) {
-					response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
-					return;
-				}
+			if (!user) {
+				authErrorResponseHandler(response, authFailure);
+				return;
+			}
+			const applicationId = Number(request.params.applicationId);
+			if (!isPositiveInteger(applicationId)) {
+				response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application ID is not a valid number.' });
+				return;
+			}
 
-				const requestAuthResult = await canAccessRequest(user, applicationId);
-				if (requestAuthResult.success) {
-					try {
-						const applicationResult = await getApplicationById({ applicationId });
-						if (!applicationResult.success) {
-							switch (applicationResult.error) {
-								case 'SYSTEM_ERROR': {
-									response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
-									return;
-								}
-								case 'NOT_FOUND': {
-									response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-									return;
-								}
-							}
-						}
-
-						const result = await getApplicationSignature({ applicationId: Number(applicationId) });
-						if (result.success) {
-							response.status(200).json(result.data);
+			try {
+				const applicationResult = await getApplicationById({ applicationId });
+				if (!applicationResult.success) {
+					switch (applicationResult.error) {
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
 							return;
 						}
-
-						switch (result.error) {
-							case 'NOT_FOUND': {
-								response.status(404).json({ error: result.error, message: result.message });
-								return;
-							}
-							case 'SYSTEM_ERROR': {
-								response.status(500).json({ error: result.error, message: result.message });
-								return;
-							}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+							return;
 						}
-					} catch (error) {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
-						return;
 					}
-				} else {
-					authErrorResponseHandler(response, requestAuthResult);
+				}
+
+				const result = await getApplicationSignature({ applicationId: Number(applicationId) });
+				if (result.success) {
+					response.status(200).json(result.data);
 					return;
 				}
-			} else {
-				authErrorResponseHandler(response, authFailure);
+
+				switch (result.error) {
+					case 'NOT_FOUND': {
+						response.status(404).json({ error: result.error, message: result.message });
+						return;
+					}
+					case 'SYSTEM_ERROR': {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+				}
+			} catch (error) {
+				response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 				return;
 			}
 		},
@@ -128,36 +121,101 @@ signatureRouter.get(
  * To sign an application, the user must be the author of the application, or be the institutional rep assigned to the application.
  */
 signatureRouter.post(
-	'/sign',
-	authMiddleware(),
-	withBodySchemaValidation(
-		editSignatureRequestSchema,
+	'/:applicationId/sign',
+	accessMiddleware(),
+	withParamsSchemaValidation(
+		deleteSignatureParamsSchema,
 		apiZodErrorMapping,
-		async (
-			request,
-			response: ResponseWithData<
-				EditSignatureResponse,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
-			>,
-		) => {
-			const { user } = request.session;
-			if (user) {
+		withBodySchemaValidation(
+			editSignatureRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request,
+				response: ResponseWithData<
+					EditSignatureResponse,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				>,
+			) => {
+				const { user } = request.session;
+				if (!user) {
+					authErrorResponseHandler(response, authFailure);
+					return;
+				}
 				const data = request.body;
-				const { applicationId, signature } = data;
-				const requestAuthResult = await canAccessRequest(user, applicationId);
+				const { signature } = data;
+				const applicationId = Number(request.params.applicationId);
 
-				if (requestAuthResult.success) {
-					try {
-						const isApplicationInstitutionalRep = await isAssociatedRep(user, applicationId);
+				try {
+					const isRep = await isAssociatedRep(user, applicationId);
 
-						const result = await updateApplicationSignature({
+					const result = await updateApplicationSignature({
+						applicationId,
+						signature,
+						signee: isRep ? 'INSTITUTIONAL_REP' : 'APPLICANT',
+					});
+
+					if (result.success) {
+						response.json(result.data);
+						return;
+					}
+
+					switch (result.error) {
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+					}
+				} catch (error) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
+					return;
+				}
+			},
+		),
+	),
+);
+
+signatureRouter.delete(
+	'/:applicationId',
+	accessMiddleware(),
+	withParamsSchemaValidation(
+		deleteSignatureParamsSchema,
+		apiZodErrorMapping,
+		withQuerySchemaValidation(
+			deleteSignatureQuerySchema,
+			apiZodErrorMapping,
+			async (
+				request: Request,
+				response: ResponseWithData<void, ['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']>,
+			) => {
+				const { user } = request.session;
+
+				if (!user) {
+					authErrorResponseHandler(response, authFailure);
+					return;
+				}
+
+				const applicationId = Number(request.params.applicationId);
+
+				try {
+					const { signee } = request.query;
+					const isValidSignee = signee && (signee === 'APPLICANT' || signee === 'INSTITUTIONAL_REP');
+
+					if (isValidSignee) {
+						// Perform deletion
+						const result = await deleteApplicationSignature({
 							applicationId,
-							signature,
-							signee: isApplicationInstitutionalRep ? 'INSTITUTIONAL_REP' : 'APPLICANT',
+							signee: signee,
 						});
 
 						if (result.success) {
-							response.json(result.data);
+							/**
+							 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
+							 */
+							response.status(204).json();
 							return;
 						}
 
@@ -171,85 +229,14 @@ signatureRouter.post(
 								return;
 							}
 						}
-					} catch (error) {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
-						return;
-					}
-				} else {
-					authErrorResponseHandler(response, requestAuthResult);
-					return;
-				}
-			} else {
-				authErrorResponseHandler(response, authFailure);
-				return;
-			}
-		},
-	),
-);
-
-signatureRouter.delete(
-	'/:applicationId',
-	authMiddleware(),
-	withParamsSchemaValidation(
-		deleteSignatureParamsSchema,
-		apiZodErrorMapping,
-		withQuerySchemaValidation(
-			deleteSignatureQuerySchema,
-			apiZodErrorMapping,
-			async (
-				request: Request,
-				response: ResponseWithData<void, ['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']>,
-			) => {
-				const { user } = request.session;
-				if (user) {
-					const applicationId = Number(request.params.applicationId);
-					const requestAuthResult = await canAccessRequest(user, applicationId);
-					if (requestAuthResult.success) {
-						try {
-							const { signee } = request.query;
-							const isValidSignee = signee && (signee === 'APPLICANT' || signee === 'INSTITUTIONAL_REP');
-
-							if (isValidSignee) {
-								// Perform deletion
-								const result = await deleteApplicationSignature({
-									applicationId,
-									signee: signee,
-								});
-
-								if (result.success) {
-									/**
-									 * Since we've deleted the signature, we can return back a 204 and no content to indicate its success.
-									 */
-									response.status(204).json();
-									return;
-								}
-
-								switch (result.error) {
-									case 'NOT_FOUND': {
-										response.status(404).json({ error: result.error, message: result.message });
-										return;
-									}
-									case 'SYSTEM_ERROR': {
-										response.status(500).json({ error: result.error, message: result.message });
-										return;
-									}
-								}
-							} else {
-								response
-									.status(403)
-									.json({ error: 'FORBIDDEN', message: `User does not have permission to modify this signature.` });
-								return;
-							}
-						} catch (error) {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
-							return;
-						}
 					} else {
-						authErrorResponseHandler(response, requestAuthResult);
+						response
+							.status(403)
+							.json({ error: 'FORBIDDEN', message: `User does not have permission to modify this signature.` });
 						return;
 					}
-				} else {
-					authErrorResponseHandler(response, authFailure);
+				} catch (error) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: 'Unexpected error.' });
 					return;
 				}
 			},

@@ -52,9 +52,6 @@ components:
       type: object
       description: The contents of the signature details in an application.
       properties:
-        applicationId:
-          type: number
-          description: The ID of the application you want to add/modify the signature on.
         signature:
           pattern: '^(?:data\:image\/png\;base64,(\s+)?){1}([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$'
           type: string

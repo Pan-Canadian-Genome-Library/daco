@@ -16,6 +16,7 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+import { type SessionUser } from '@pcgl-daco/validation';
 import { type ExtractTablesWithRelations } from 'drizzle-orm';
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import { PgTransaction } from 'drizzle-orm/pg-core';
@@ -25,15 +26,20 @@ import { applicationActions } from '@/db/schemas/applicationActions.js';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { collaborators } from '@/db/schemas/collaborators.js';
+import { dac } from '@/db/schemas/dac.ts';
+import { files } from '@/db/schemas/files.js';
 import * as schema from '@/db/schemas/index.js';
-import { files } from '@/db/schemas/index.js';
+import { revisionRequests } from '@/db/schemas/revisionRequests.js';
+import { sentEmails } from '@/db/schemas/sentEmails.js';
 import { study } from '@/db/schemas/studies.ts';
 
-import { revisionRequests } from '@/db/schemas/revisionRequests.js';
+import { type ApplicationStateValues } from '@pcgl-daco/data-model';
+
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
-import { type SessionUser } from '@pcgl-daco/validation';
+
+import { dacSvc } from './dacService.ts';
 import { emailSvc } from './email/emailsService.ts';
 import { filesSvc } from './fileService.js';
 import { pdfService } from './pdf/pdfService.ts';
@@ -42,7 +48,7 @@ import { studySvc } from './studyService.ts';
 
 export type ApplicationsColumnName = keyof typeof applications.$inferSelect;
 export type ApplicationActionsColumnName = keyof typeof applicationActions.$inferSelect;
-export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName;
+export type SchemaKeys = ApplicationsColumnName | ApplicationActionsColumnName | EmailRecordColumnName;
 
 export type ApplicationModel = typeof applications.$inferInsert;
 export type ApplicationRecord = typeof applications.$inferSelect;
@@ -50,6 +56,7 @@ export type ApplicationUpdates = Partial<ApplicationModel>;
 export type ApplicationService = ReturnType<typeof applicationSvc>;
 
 export type ApplicationContentModel = typeof applicationContents.$inferInsert;
+export type ApplicationContentRecord = typeof applicationContents.$inferSelect;
 export type ApplicationContentUpdates = Omit<
 	Partial<ApplicationContentModel>,
 	'applicant_signature' | 'applicant_signed_at' | 'institutional_rep_signature' | 'institutional_rep_signed_at'
@@ -62,23 +69,8 @@ export type ApplicationSignatureUpdate = Pick<
 	| 'institutional_rep_signature'
 	| 'institutional_rep_signed_at'
 >;
-export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
-	contents: ApplicationContentUpdates | null;
-}
 
-export type PDFService = ReturnType<typeof pdfService>;
-
-export type FilesModel = typeof files.$inferInsert;
-export type FilesRecord = typeof files.$inferSelect;
-export type FilesUpdate = Partial<FilesRecord>;
-
-export type FilesRecordOptionalContents = Omit<FilesRecord, 'content'> & { content?: Buffer<ArrayBufferLike> };
-
-export type FilesService = ReturnType<typeof filesSvc>;
-
-export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
-	contents: ApplicationContentUpdates | null;
-}
+export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
 
 export type ApplicationActionModel = typeof applicationActions.$inferSelect;
 export type ApplicationActionRecord = typeof applicationActions.$inferSelect;
@@ -88,11 +80,40 @@ export type CollaboratorModel = typeof collaborators.$inferInsert;
 export type CollaboratorRecord = typeof collaborators.$inferSelect;
 export type CollaboratorsService = ReturnType<typeof collaboratorsSvc>;
 
-export type SignatureService = ReturnType<typeof signatureService>;
+export type EmailModel = typeof sentEmails.$inferInsert;
+export type EmailRecord = typeof sentEmails.$inferSelect;
+export type EmailRecordColumnName = keyof typeof sentEmails.$inferSelect;
+export type EmailService = ReturnType<typeof emailSvc>;
 
-export type AddActionMethods = Exclude<keyof ReturnType<typeof applicationActionSvc>, 'listActions'>;
+export type FilesModel = typeof files.$inferInsert;
+export type FilesRecord = typeof files.$inferSelect;
+export type FilesRecordOptionalContents = Omit<FilesRecord, 'content'> & { content?: Buffer<ArrayBufferLike> };
+export type FilesUpdate = Partial<FilesRecord>;
+export type FilesService = ReturnType<typeof filesSvc>;
+export type GrantUserPermissionsParams = {
+	userEmails: string[];
+	approverAccessToken: string;
+	studyIds: string[];
+};
+
+export type GrantUserPermissionsResult = {
+	successfulUserEmails: string[];
+	errorMessages: string[];
+};
+
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
+}
+
+export interface JoinedApplicationEmailsActionsRecord {
+	application_id: number;
+	user_id: string;
+	created_at: Date;
+	dac_id: string | null;
+	state: ApplicationStateValues;
+	application_contents: ApplicationContentRecord | null;
+	application_actions: ApplicationActionRecord[] | null;
+	sent_emails: EmailRecord[] | null;
 }
 
 export type OrderBy<Key extends SchemaKeys> = {
@@ -100,6 +121,7 @@ export type OrderBy<Key extends SchemaKeys> = {
 	column: Key;
 };
 
+export type PDFService = ReturnType<typeof pdfService>;
 export type PostgresTransaction = PgTransaction<
 	NodePgQueryResultHKT,
 	typeof schema,
@@ -109,9 +131,8 @@ export type PostgresTransaction = PgTransaction<
 export type RevisionRequestModel = typeof revisionRequests.$inferInsert;
 export type RevisionRequestRecord = typeof revisionRequests.$inferSelect;
 
-export type EmailService = ReturnType<typeof emailSvc>;
-
 export type SessionType = Request['session'];
+export type SignatureService = ReturnType<typeof signatureService>;
 export interface UserSession extends SessionType {
 	user: SessionUser;
 }
@@ -120,5 +141,9 @@ export interface AuthorizedRequest extends Request {
 }
 
 export type StudyService = ReturnType<typeof studySvc>;
-
 export type StudyModel = typeof study.$inferInsert;
+export type StudyRecord = typeof study.$inferSelect;
+
+export type DacService = ReturnType<typeof dacSvc>;
+export type DacModel = typeof dac.$inferInsert;
+export type DacRecord = typeof dac.$inferSelect;

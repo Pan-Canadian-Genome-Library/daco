@@ -17,7 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SectionRevision, SectionRoutesValues, UserRole } from '@pcgl-daco/validation';
+import { ApplicationUserPermission } from '@/providers/context/application/types';
+import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 /**
  *
  * Checks if a user is able to edit a section in the Application Viewer.
@@ -46,15 +47,28 @@ const canEditSection = ({
 	revisions,
 	section,
 	isEditMode,
-	userRole,
+	userPermissions,
 }: {
 	revisions: SectionRevision;
 	section: SectionRoutesValues;
 	isEditMode: boolean;
-	userRole: UserRole;
+	userPermissions: ApplicationUserPermission;
 }) => {
+	const isOnlyApplicant =
+		userPermissions.isApplicant &&
+		!userPermissions.isInstitutionalRep &&
+		!userPermissions.isDacChair &&
+		!userPermissions.isDacMember;
+
+	if (section === SectionRoutes.STUDY) {
+		// Since 'study' doesn't have revisions, its editability is purely
+		// determined by whether we're in edit mode or is an applicant.
+		return isEditMode && isOnlyApplicant;
+	}
+
 	const currentRevision = revisions[section];
-	if (userRole !== 'APPLICANT') {
+
+	if (!isOnlyApplicant) {
 		return false;
 	} else if (!currentRevision) {
 		return false;

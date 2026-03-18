@@ -59,7 +59,7 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, role, user } = useUserContext();
+	const { isLoggedIn, user } = useUserContext();
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -111,22 +111,27 @@ const HeaderComponent = () => {
 				position: 'right',
 				target: '_self',
 			};
-		} else if (role === 'DAC_MEMBER' || role === 'DAC_CHAIR') {
+		} else if (user?.dacoAdmin) {
+			return {
+				name: translate('links.admin'),
+				href: '/admin',
+				position: 'right',
+				target: '_self',
+			};
+		} else if (user && (user.dacChair.length > 0 || user.dacMember.length > 0)) {
 			return {
 				name: translate('links.manageApplications'),
 				href: '/manage/applications',
 				position: 'right',
 				target: '_self',
 			};
-		} else if (role === 'APPLICANT') {
+		} else {
 			return {
 				name: translate('links.myApplications'),
 				href: '/dashboard',
 				position: 'right',
 				target: '_self',
 			};
-		} else {
-			return undefined;
 		}
 	};
 
@@ -148,7 +153,9 @@ const HeaderComponent = () => {
 			style={{ padding: 5, width: '100%', position: 'relative', top: isLogoutOpen && !isResponsiveMode ? 5 : 0 }}
 		>
 			{isResponsiveMode && (
-				<Divider style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10 }} />
+				<Divider
+					style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10, alignSelf: 'center' }}
+				/>
 			)}
 			<Flex vertical style={{ padding: 5, width: '100%' }}>
 				<Typography style={{ fontSize: 14 }}>{displayName}</Typography>

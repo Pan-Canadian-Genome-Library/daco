@@ -43,7 +43,7 @@ paths:
             Sort application items. Sorting application items takes in a JSON representation of an array and object combination.  This contains the column you'd like to sort by (id, user_id, state, created_at, approved_at, expires_at) and the direction (asc, desc).
             <br/>
             <br/>
-            **For Example:** `[{"direction":"desc","column":"id"}]`. 
+            **For Example:** `[{"direction":"desc","column":"id"}]`.
             <br/>
             <br/>
             *Note:* you may sort by multiple columns, just keep adding objects into the array.
@@ -70,7 +70,7 @@ paths:
             Applicant view will have applications that require changes/revisions to the top of the list.
             <br/>
             By default, applications that are in state DAC_REVIEW will be sorted to the top of the list.
-            <br/> 
+            <br/>
             <br/>
             **Example:** `true` | `false`
             <br/>
@@ -243,11 +243,19 @@ paths:
                 type: object
                 $ref: '#/components/schemas/Application'
 
-  /applications/edit:
+  /applications/{applicationId}/edit:
     post:
       tags:
         - Applications
       summary: Edit the details of an application.
+      parameters:
+        - name: applicationId
+          in: path
+          description: The ID of the application you wish to approve.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
       requestBody:
         description: Changes made to an Application record
         required: true
@@ -570,7 +578,7 @@ paths:
         - Applications
       summary: Withdraws an application if in REP_REVIEW or DAC_REVIEW, placing it back to DRAFT mode.
       description: |
-        Allows an Applicant to withdraw an application. This is only available if the Application is in `REP_REVIEW`` or `DAC_REVIEW`. 
+        Allows an Applicant to withdraw an application. This is only available if the Application is in `REP_REVIEW`` or `DAC_REVIEW`.
         If withdrawn in these states the application will be moved back to `DRAFT`. All other states however, the application cannot be
         "withdrawn", and so this endpoint will return an error.
       parameters:

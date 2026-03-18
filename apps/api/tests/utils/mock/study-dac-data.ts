@@ -65,7 +65,7 @@ export const testStudyData: StudyModel[] = [
 	},
 	{
 		study_id: 'study3',
-		dac_id: 'dac2',
+		dac_id: 'dac1',
 		study_name: 'Rare Disease Cohort',
 		context: 'Clinical',
 		domain: ['RARE_DISEASE'],
@@ -201,6 +201,16 @@ export const testDacUsersData: (typeof dac.$inferInsert)[] = [
 		dac_description: 'DAC for neurological and brain imaging data.',
 		contact_name: 'Brainiac 5',
 		contact_email: 'neuro@example.com',
+		created_at: new Date(),
+		updated_at: new Date(),
+	},
+
+	{
+		dac_id: 'dac7',
+		dac_name: 'Gastrointestinal DAC',
+		dac_description: 'DAC for stomach and gastric imaging data.',
+		contact_name: 'Chef Nonna',
+		contact_email: 'nonna@example.com',
 		created_at: new Date(),
 		updated_at: new Date(),
 	},
