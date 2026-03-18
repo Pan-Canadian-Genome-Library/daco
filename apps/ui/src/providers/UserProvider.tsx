@@ -19,14 +19,19 @@
 
 /* eslint-disable react-refresh/only-export-components */
 
-import useGetUser from '@/api/queries/useGetUser';
-import { SessionUser } from '@pcgl-daco/validation';
 import { createContext, useContext, type PropsWithChildren } from 'react';
+import { useNavigate } from 'react-router';
+
+import { clearExtraSessionInformation } from '@/global/localStorage';
+import { SessionUser } from '@pcgl-daco/validation';
+
+import useGetUser from '@/api/queries/useGetUser';
 
 type UserState = {
 	isLoading: boolean;
 	isLoggedIn: boolean;
 	refresh: () => void;
+	logout: () => void;
 	user?: SessionUser;
 };
 
@@ -34,22 +39,31 @@ const UserContext = createContext<UserState>({
 	isLoading: true,
 	isLoggedIn: false,
 	refresh: () => {},
+	logout: () => {},
 });
 
 export function UserProvider({ children }: PropsWithChildren) {
 	const { data, isLoading, refetch } = useGetUser();
+	const navigate = useNavigate();
 
 	const refresh = () => {
 		refetch();
 	};
 
-	const userState: UserState = {
+	const logout = () => {
+		clearExtraSessionInformation();
+		navigate('/', { replace: true });
+	};
+
+	const initialUserState: UserState = {
 		user: data?.user,
 		isLoading,
 		refresh,
+		logout,
 		isLoggedIn: !isLoading && !!data?.user,
 	};
-	return <UserContext.Provider value={userState}>{children}</UserContext.Provider>;
+
+	return <UserContext.Provider value={initialUserState}>{children}</UserContext.Provider>;
 }
 
 export function useUserContext() {

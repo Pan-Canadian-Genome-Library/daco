@@ -59,7 +59,7 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, user } = useUserContext();
+	const { isLoggedIn, user, logout } = useUserContext();
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -154,7 +154,13 @@ const HeaderComponent = () => {
 		>
 			{isResponsiveMode && (
 				<Divider
-					style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10, alignSelf: 'center' }}
+					style={{
+						borderColor: pcglColours.secondary,
+						margin: 0,
+						position: 'absolute',
+						top: -10,
+						alignSelf: 'center',
+					}}
 				/>
 			)}
 			<Flex vertical style={{ padding: 5, width: '100%' }}>
@@ -182,7 +188,7 @@ const HeaderComponent = () => {
 						}}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
-								clearExtraSessionInformation();
+								logout();
 							}
 						}}
 						onMouseOver={() => {
@@ -217,7 +223,6 @@ const HeaderComponent = () => {
 			)}
 		</Flex>
 	);
-
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
 		children: UserInfo,
