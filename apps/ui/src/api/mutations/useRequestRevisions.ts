@@ -39,8 +39,6 @@ const useRequestRevisions = (currentState: ApplicationStateValues) => {
 						collaboratorsNotes: payload.collaborators,
 						projectApproved: !payload.projectInformation,
 						projectNotes: payload.projectInformation,
-						requestedStudiesApproved: !payload.requestedStudy,
-						requestedStudiesNotes: payload.requestedStudy,
 						ethicsApproved: !payload.ethics,
 						ethicsNotes: payload.ethics,
 						agreementsApproved: !payload.agreements,

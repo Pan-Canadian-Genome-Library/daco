@@ -37,7 +37,6 @@ import {
 	rejectApplicationRequestSchema,
 	revokeApplicationRequestSchema,
 	submitDacCommentsSchema,
-	userRoleSchema,
 } from '@pcgl-daco/validation';
 
 import {
@@ -61,10 +60,10 @@ import {
 	withdrawApplication,
 } from '@/controllers/applicationController.js';
 import BaseLogger from '@/logger.js';
-import { authMiddleware } from '@/middleware/authMiddleware.ts';
-import { canAccessRequest, getUserRole, isAssociatedRep } from '@/service/authService.ts';
+import { accessMiddleware } from '@/middleware/accessMiddleware.ts';
+import { isAssociatedRep, isUserDacChair, isUserDacMember } from '@/service/authService.ts';
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
-import { authErrorResponseHandler, authFailure, getUserName } from '@/service/utils.ts';
+import { authErrorResponseHandler, authFailure, getAuthorizedDacIds, getUserName } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
@@ -74,7 +73,6 @@ const logger = BaseLogger.forModule('applicationRouter');
 
 applicationRouter.post(
 	'/create',
-	authMiddleware({ requiredRoles: ['APPLICANT'] }),
 	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
 		if (user) {
@@ -95,26 +93,29 @@ applicationRouter.post(
 );
 
 applicationRouter.post(
-	'/edit',
-	authMiddleware({ requiredRoles: ['APPLICANT'] }),
-	withBodySchemaValidation(
-		editApplicationRequestSchema,
+	'/:applicationId/edit',
+	accessMiddleware({ accessConfig: { applicant: true } }),
+	withParamsSchemaValidation(
+		basicApplicationParamSchema,
 		apiZodErrorMapping,
-		async (
-			request: Request,
-			response: ResponseWithData<
-				ApplicationResponseData,
-				['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
-			>,
-		) => {
-			const { user } = request.session;
-			if (user) {
-				const data = request.body;
-				const { id, update } = data;
-				const requestAuthResult = await canAccessRequest(user, id);
-				if (requestAuthResult.success) {
+		withBodySchemaValidation(
+			editApplicationRequestSchema,
+			apiZodErrorMapping,
+			async (
+				request: Request,
+				response: ResponseWithData<
+					ApplicationResponseData,
+					['NOT_FOUND', 'UNAUTHORIZED', 'FORBIDDEN', 'SYSTEM_ERROR', 'INVALID_REQUEST']
+				>,
+			) => {
+				const { user } = request.session;
+				const applicationId = Number(request.params.applicationId);
+
+				if (user) {
+					const data = request.body;
+					const { update } = data;
 					try {
-						const result = await editApplication({ id, update });
+						const result = await editApplication({ id: applicationId, update });
 						if (result.success) {
 							response.status(200).json(result.data);
 							return;
@@ -142,14 +143,11 @@ applicationRouter.post(
 						return;
 					}
 				} else {
-					authErrorResponseHandler(response, requestAuthResult);
+					authErrorResponseHandler(response, authFailure);
 					return;
 				}
-			} else {
-				authErrorResponseHandler(response, authFailure);
-				return;
-			}
-		},
+			},
+		),
 	),
 );
 
@@ -158,100 +156,99 @@ applicationRouter.post(
  */
 applicationRouter.get(
 	'/',
-	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_MEMBER', 'DAC_CHAIR'] }),
 	async (
 		request: Request,
 		response: ResponseWithData<ApplicationListResponse, ['INVALID_REQUEST', 'UNAUTHORIZED', 'SYSTEM_ERROR']>,
 	) => {
 		const { user } = request.session;
-		if (user) {
-			const { userId } = user;
-			const userRole = getUserRole(user);
-			const isDAC = userRole === userRoleSchema.Values.DAC_MEMBER || userRole === userRoleSchema.Values.DAC_CHAIR;
-
-			const {
-				state: stateQuery,
-				sort: sortQuery,
-				page,
-				pageSize,
-				isApplicantView: isApplicantViewQuery,
-				search,
-			} = request.query;
-
-			const pageRequested = page ? Number(page) : undefined;
-			const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
-			const searchResult = search ? String(search) : undefined;
-
-			/**
-			 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
-			 * If it is, we need to throw a client error, warning them that that's a bad request.
-			 */
-			if (
-				(pageRequested !== undefined && pageRequested !== 0 && !isPositiveInteger(pageRequested)) ||
-				(pageSizeRequested !== undefined && !isPositiveInteger(pageSizeRequested))
-			) {
-				response
-					.status(400)
-					.json({ error: 'INVALID_REQUEST', message: 'Page and/or page size must be a positive integer.' });
-				return;
-			}
-
-			let sort = [];
-			let state = [];
-			let isApplicantView;
-
-			try {
-				sort = typeof sortQuery === 'string' ? JSON.parse(sortQuery) : [];
-				state = typeof stateQuery === 'string' ? JSON.parse(stateQuery as any) : [];
-				isApplicantView = typeof isApplicantViewQuery === 'string' ? isApplicantViewQuery === 'true' : undefined;
-			} catch {
-				response.status(400).json({
-					error: 'INVALID_REQUEST',
-					message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.',
-				});
-				return;
-			}
-
-			const result = await getAllApplications({
-				userId,
-				state,
-				sort,
-				page: pageRequested,
-				pageSize: pageSizeRequested,
-				search: searchResult,
-				isDAC,
-				isApplicantView,
-			});
-
-			if (result.success) {
-				response.status(200).json(result.data);
-				return;
-			} else {
-				switch (result.error) {
-					case 'SYSTEM_ERROR': {
-						response.status(500).json({ error: result.error, message: result.message });
-						return;
-					}
-					case 'INVALID_PARAMETERS': {
-						response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-						return;
-					}
-					default: {
-						response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-						return;
-					}
-				}
-			}
-		} else {
+		if (!user) {
 			authErrorResponseHandler(response, authFailure);
 			return;
+		}
+
+		const { userId } = user;
+
+		const {
+			state: stateQuery,
+			sort: sortQuery,
+			page,
+			pageSize,
+			isApplicantView: isApplicantViewQuery,
+			search,
+		} = request.query;
+
+		const pageRequested = page ? Number(page) : undefined;
+		const pageSizeRequested = pageSize ? Number(pageSize) : undefined;
+		const searchResult = search ? String(search) : undefined;
+
+		/**
+		 * We need to ensure that the page size or page somehow passed into here is not negative or not a number.
+		 * If it is, we need to throw a client error, warning them that that's a bad request.
+		 */
+		if (
+			(pageRequested !== undefined && pageRequested !== 0 && !isPositiveInteger(pageRequested)) ||
+			(pageSizeRequested !== undefined && !isPositiveInteger(pageSizeRequested))
+		) {
+			response
+				.status(400)
+				.json({ error: 'INVALID_REQUEST', message: 'Page and/or page size must be a positive integer.' });
+			return;
+		}
+
+		let sort = [];
+		let state = [];
+		let isApplicantView;
+
+		try {
+			sort = typeof sortQuery === 'string' ? JSON.parse(sortQuery) : [];
+			state = typeof stateQuery === 'string' ? JSON.parse(stateQuery as any) : [];
+			isApplicantView = typeof isApplicantViewQuery === 'string' ? isApplicantViewQuery === 'true' : undefined;
+		} catch {
+			response.status(400).json({
+				error: 'INVALID_REQUEST',
+				message: 'Invalid formatting - sort and/or state parameters contain invalid JSON.',
+			});
+			return;
+		}
+
+		const authorizedDacIds = getAuthorizedDacIds(user);
+
+		const result = await getAllApplications({
+			userId,
+			state,
+			sort,
+			page: pageRequested,
+			pageSize: pageSizeRequested,
+			search: searchResult,
+			isApplicantView,
+			authorizedDacIds,
+		});
+
+		if (result.success) {
+			response.status(200).json(result.data);
+			return;
+		} else {
+			switch (result.error) {
+				case 'SYSTEM_ERROR': {
+					response.status(500).json({ error: result.error, message: result.message });
+					return;
+				}
+				case 'INVALID_PARAMETERS': {
+					response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+					return;
+				}
+				default: {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+					return;
+				}
+			}
 		}
 	},
 );
 
 applicationRouter.get(
 	'/:applicationId',
-	authMiddleware(),
+	accessMiddleware(),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -294,7 +291,7 @@ applicationRouter.get(
 
 applicationRouter.post(
 	'/:applicationId/approve',
-	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
+	accessMiddleware({ accessConfig: { dacChair: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -307,7 +304,12 @@ applicationRouter.post(
 				try {
 					const applicationId = Number(request.params.applicationId);
 					const userName = getUserName(user);
-					const approvalResult = await approveApplication({ applicationId, userName });
+					const approverAccessToken = request.session.account?.accessToken || '';
+					const approvalResult = await approveApplication({
+						applicationId,
+						approverAccessToken,
+						userName,
+					});
 
 					if (approvalResult.success) {
 						/**
@@ -379,7 +381,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/reject',
-	authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
+	accessMiddleware({ accessConfig: { dacChair: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -441,7 +443,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/submit-revisions',
-	authMiddleware(),
+	accessMiddleware({ accessConfig: { applicant: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -453,65 +455,60 @@ applicationRouter.post(
 			>,
 		) => {
 			const { user } = request.session;
-			if (user) {
-				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(user, applicationId);
-				if (requestAuthResult.success) {
-					try {
-						// We need to get the application to validate that this user submit revisions
-						const applicationResult = await getApplicationById({ applicationId });
-
-						if (!applicationResult.success) {
-							response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-							return;
-						}
-
-						const userName = getUserName(user);
-						const result = await submitRevision({ applicationId, userName });
-
-						if (!result.success) {
-							switch (result.error) {
-								case 'INVALID_STATE_TRANSITION': {
-									response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-									return;
-								}
-								case 'NOT_FOUND': {
-									response.status(404).json({ error: result.error, message: result.message });
-									return;
-								}
-								case 'SYSTEM_ERROR': {
-									response.status(500).json({ error: result.error, message: result.message });
-									return;
-								}
-								default: {
-									response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-									return;
-								}
-							}
-						}
-
-						const aliasedResponse = convertToBasicApplicationRecord(result.data);
-
-						if (!aliasedResponse.success) {
-							response.status(500).json({ error: 'SYSTEM_ERROR', message: aliasedResponse.message });
-							return;
-						}
-
-						response.status(200).json(aliasedResponse.data);
-						return;
-					} catch (error) {
-						response.status(500).json({
-							error: 'SYSTEM_ERROR',
-							message: 'Sorry something went wrong, please try again later.',
-						});
-					}
-				} else {
-					authErrorResponseHandler(response, requestAuthResult);
-					return;
-				}
-			} else {
+			if (!user) {
 				authErrorResponseHandler(response, authFailure);
 				return;
+			}
+
+			const applicationId = Number(request.params.applicationId);
+
+			try {
+				// We need to get the application to validate that this user submit revisions
+				const applicationResult = await getApplicationById({ applicationId });
+
+				if (!applicationResult.success) {
+					response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+					return;
+				}
+
+				const userName = getUserName(user);
+				const result = await submitRevision({ applicationId, userName });
+
+				if (!result.success) {
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+							return;
+						}
+					}
+				}
+
+				const aliasedResponse = convertToBasicApplicationRecord(result.data);
+
+				if (!aliasedResponse.success) {
+					response.status(500).json({ error: 'SYSTEM_ERROR', message: aliasedResponse.message });
+					return;
+				}
+
+				response.status(200).json(aliasedResponse.data);
+				return;
+			} catch (error) {
+				response.status(500).json({
+					error: 'SYSTEM_ERROR',
+					message: 'Sorry something went wrong, please try again later.',
+				});
 			}
 		},
 	),
@@ -519,7 +516,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/revoke',
-	authMiddleware({ requiredRoles: ['DAC_CHAIR', 'APPLICANT'] }),
+	accessMiddleware({ accessConfig: { dacChair: true, applicant: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -534,46 +531,63 @@ applicationRouter.post(
 				>,
 			) => {
 				const { user } = request.session;
-				if (user) {
-					const applicationId = Number(request.params.applicationId);
-					const { revokeReason } = request.body;
-					const isDACMember = getUserRole(user) === userRoleSchema.Values.DAC_MEMBER;
-					const userName = getUserName(user);
-					const result = await revokeApplication(applicationId, isDACMember, revokeReason, userName);
+				const applicationId = Number(request.params.applicationId);
 
-					if (!result.success) {
-						switch (result.error) {
-							case 'INVALID_STATE_TRANSITION': {
-								response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
-								return;
-							}
-							case 'NOT_FOUND': {
-								response.status(404).json({ error: result.error, message: result.message });
-								return;
-							}
-							case 'SYSTEM_ERROR': {
-								response.status(500).json({ error: result.error, message: result.message });
-								return;
-							}
-							default: {
-								response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
-								return;
-							}
-						}
-					}
-					const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REVOKED });
-
-					if (!pdfGenerate.success) {
-						logger.error(`Application ${applicationId} failed to generate REVOKED Application PDF.`);
-						response.status(500).json({ error: pdfGenerate.error, message: pdfGenerate.message });
-						return;
-					}
-					response.status(200).json(result.data);
-					return;
-				} else {
+				if (!user) {
 					authErrorResponseHandler(response, authFailure);
 					return;
 				}
+
+				const applicationResult = await getApplicationById({ applicationId });
+
+				if (!applicationResult.success) {
+					switch (applicationResult.error) {
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						case 'SYSTEM_ERROR':
+							response.status(500);
+							break;
+						default:
+							response.status(500);
+					}
+					return;
+				}
+
+				const { revokeReason } = request.body;
+				const isChair = user.dacChair.some((dacId) => dacId === applicationResult.data.dacId);
+				const userName = getUserName(user);
+				const result = await revokeApplication(applicationId, isChair, revokeReason, userName);
+
+				if (!result.success) {
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION': {
+							response.status(400).json({ error: 'INVALID_REQUEST', message: result.message });
+							return;
+						}
+						case 'NOT_FOUND': {
+							response.status(404).json({ error: result.error, message: result.message });
+							return;
+						}
+						case 'SYSTEM_ERROR': {
+							response.status(500).json({ error: result.error, message: result.message });
+							return;
+						}
+						default: {
+							response.status(500).json({ error: 'SYSTEM_ERROR', message: result.message });
+							return;
+						}
+					}
+				}
+				const pdfGenerate = await createApplicationPDF({ applicationId, trademark: TrademarkEnum.REVOKED });
+
+				if (!pdfGenerate.success) {
+					logger.error(`Application ${applicationId} failed to generate REVOKED Application PDF.`);
+					response.status(500).json({ error: pdfGenerate.error, message: pdfGenerate.message });
+					return;
+				}
+				response.status(200).json(result.data);
+				return;
 			},
 		),
 	),
@@ -581,7 +595,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	authMiddleware({ requiredRoles: ['APPLICANT'] }),
+	accessMiddleware({ accessConfig: { applicant: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -641,7 +655,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/withdraw',
-	authMiddleware({ requiredRoles: ['APPLICANT'] }),
+	accessMiddleware({ accessConfig: { applicant: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -655,62 +669,57 @@ applicationRouter.post(
 			const { user } = request.session;
 			if (user) {
 				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(user, applicationId);
-				if (requestAuthResult.success) {
-					try {
-						const application = await getApplicationById({ applicationId });
 
-						if (!application.success) {
-							switch (application.error) {
-								case 'NOT_FOUND':
-									response.status(404);
-									break;
-								case 'SYSTEM_ERROR':
-									response.status(500);
-									break;
-								default:
-									response.status(500);
-							}
+				try {
+					const application = await getApplicationById({ applicationId });
 
-							response.send({
-								error: application.error,
-								message: application.message,
-							});
-							return;
-						}
-
-						const userName = getUserName(user);
-						const result = await withdrawApplication({ applicationId, userName });
-
-						if (result.success) {
-							response.status(200).json(result.data);
-							return;
-						}
-
-						switch (result.error) {
-							case 'INVALID_STATE_TRANSITION':
-								response.status(400);
-								break;
+					if (!application.success) {
+						switch (application.error) {
 							case 'NOT_FOUND':
 								response.status(404);
+								break;
+							case 'SYSTEM_ERROR':
+								response.status(500);
 								break;
 							default:
 								response.status(500);
 						}
 
 						response.send({
-							error: result.error === 'INVALID_STATE_TRANSITION' ? 'INVALID_REQUEST' : result.error,
-							message: result.message,
+							error: application.error,
+							message: application.message,
 						});
-					} catch (error) {
-						response.status(500).json({
-							error: 'SYSTEM_ERROR',
-							message: 'Something went wrong, please try again later.',
-						});
+						return;
 					}
-				} else {
-					authErrorResponseHandler(response, requestAuthResult);
-					return;
+
+					const userName = getUserName(user);
+					const result = await withdrawApplication({ applicationId, userName });
+
+					if (result.success) {
+						response.status(200).json(result.data);
+						return;
+					}
+
+					switch (result.error) {
+						case 'INVALID_STATE_TRANSITION':
+							response.status(400);
+							break;
+						case 'NOT_FOUND':
+							response.status(404);
+							break;
+						default:
+							response.status(500);
+					}
+
+					response.send({
+						error: result.error === 'INVALID_STATE_TRANSITION' ? 'INVALID_REQUEST' : result.error,
+						message: result.message,
+					});
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: 'Something went wrong, please try again later.',
+					});
 				}
 			} else {
 				authErrorResponseHandler(response, authFailure);
@@ -722,7 +731,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/submit',
-	authMiddleware(),
+	accessMiddleware({ accessConfig: { applicant: true, institutionalRep: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -802,7 +811,7 @@ applicationRouter.post(
 	 *
 	 */ applicationRouter.post(
 		'/:applicationId/dac-member/submit-comment',
-		authMiddleware({ requiredRoles: ['DAC_MEMBER', 'DAC_CHAIR'] }),
+		accessMiddleware({ accessConfig: { dacChair: true, dacMember: true } }),
 		withParamsSchemaValidation(
 			basicApplicationParamSchema,
 			apiZodErrorMapping,
@@ -851,7 +860,7 @@ applicationRouter.post(
 	// Endpoint for dac chair to request revisions
 	applicationRouter.post(
 		'/:applicationId/dac-chair/request-revisions',
-		authMiddleware({ requiredRoles: ['DAC_CHAIR'] }),
+		accessMiddleware({ accessConfig: { dacChair: true } }),
 		withBodySchemaValidation(
 			applicationRevisionRequestSchema,
 			apiZodErrorMapping,
@@ -890,8 +899,6 @@ applicationRouter.post(
 								collaborators_notes: revisions.collaboratorsNotes,
 								project_approved: revisions.projectApproved,
 								project_notes: revisions.projectNotes,
-								requested_studies_approved: revisions.requestedStudiesApproved,
-								requested_studies_notes: revisions.requestedStudiesNotes,
 								ethics_approved: revisions.ethicsApproved,
 								ethics_notes: revisions.ethicsNotes,
 								agreements_approved: revisions.agreementsApproved,
@@ -944,7 +951,7 @@ applicationRouter.post(
 // Endpoint for reps to request revisions
 applicationRouter.post(
 	'/:applicationId/rep/request-revisions',
-	authMiddleware(), // We determine the institutional rep by email comparison on a per application basis, not a role given by the Auth service
+	accessMiddleware({ accessConfig: { institutionalRep: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -963,14 +970,6 @@ applicationRouter.post(
 					try {
 						const applicationId = Number(request.params.applicationId);
 						const revisionData = request.body;
-						const result = await isAssociatedRep(user, applicationId);
-						if (!result) {
-							response.status(403).json({
-								error: 'FORBIDDEN',
-								message: 'You do not have permission to request revisions on this application.',
-							});
-							return;
-						}
 
 						const userName = getUserName(user);
 
@@ -989,8 +988,6 @@ applicationRouter.post(
 								collaborators_notes: revisionData.collaboratorsNotes,
 								project_approved: revisionData.projectApproved,
 								project_notes: revisionData.projectNotes,
-								requested_studies_approved: revisionData.requestedStudiesApproved,
-								requested_studies_notes: revisionData.requestedStudiesNotes,
 								ethics_approved: revisionData.ethicsApproved,
 								ethics_notes: revisionData.ethicsNotes,
 								agreements_approved: revisionData.agreementsApproved,
@@ -1045,7 +1042,7 @@ applicationRouter.post(
  */
 applicationRouter.get(
 	'/:applicationId/dac/comments/:section',
-	authMiddleware({ requiredRoles: ['DAC_CHAIR', 'DAC_MEMBER', 'APPLICANT'] }),
+	accessMiddleware({ accessConfig: { dacChair: true, dacMember: true } }),
 	withParamsSchemaValidation(
 		dacCommentsGetParamSchema,
 		apiZodErrorMapping,
@@ -1060,64 +1057,57 @@ applicationRouter.get(
 			if (user) {
 				const { applicationId: paramsId, section } = request.params;
 				const applicationId = Number(paramsId);
-				const requestAuthResult = await canAccessRequest(user, applicationId);
-				if (requestAuthResult.success) {
-					const userRole = getUserRole(user);
-
-					try {
-						if (!section) {
-							response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
-							return;
-						}
-
-						//  Need to check if user belongs to this application to retrieve comments
-						if (userRole === 'APPLICANT') {
-							const applicationResult = await getApplicationById({ applicationId: applicationId });
-
-							if (!applicationResult.success) {
-								response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
-								return;
-							}
-						}
-
-						const isDacRole = userRole === 'DAC_CHAIR' || userRole === 'DAC_MEMBER';
-
-						const result = await getDacComments({
-							applicationId: Number(applicationId),
-							section,
-							isDac: isDacRole,
-						});
-
-						if (!result.success) {
-							response.status(500).json({ error: result.error, message: result.message });
-							return;
-						}
-
-						// Return all comments if user is DAC chair
-						if (userRole === 'DAC_CHAIR') {
-							response.status(201).json(result.data);
-							return;
-						}
-
-						//  Return dacChairOnly comments if user made the comment
-						const filteredComments = result.data.filter((comment) => {
-							if (comment.dacChairOnly && comment.userId !== user.userId) {
-								return false;
-							}
-							return true;
-						});
-
-						response.status(201).json(filteredComments);
-						return;
-					} catch (error) {
-						response.status(500).json({
-							error: 'SYSTEM_ERROR',
-							message: "We're sorry, an unexpected error occurred. Please try again later.",
-						});
+				try {
+					if (!section) {
+						response.status(400).json({ error: 'INVALID_REQUEST', message: 'Invalid params, section not found.' });
 						return;
 					}
-				} else {
-					authErrorResponseHandler(response, requestAuthResult);
+
+					//  Need to check if user belongs to this application to retrieve comments
+					const applicationResult = await getApplicationById({ applicationId });
+
+					if (!applicationResult.success) {
+						response.status(404).json({ error: applicationResult.error, message: applicationResult.message });
+						return;
+					}
+
+					const isDacMember = isUserDacMember(user, applicationResult.data.dacId);
+					const isDacChair = isUserDacChair(user, applicationResult.data.dacId);
+
+					const isDacRole = isDacMember || isDacChair;
+
+					const result = await getDacComments({
+						applicationId: Number(applicationId),
+						section,
+						isDac: isDacRole,
+					});
+
+					if (!result.success) {
+						response.status(500).json({ error: result.error, message: result.message });
+						return;
+					}
+
+					// Return all comments if user is DAC chair
+					if (isDacChair) {
+						response.status(201).json(result.data);
+						return;
+					}
+
+					//  Return dacChairOnly comments if user made the comment
+					const filteredComments = result.data.filter((comment) => {
+						if (comment.dacChairOnly && comment.userId !== user.userId) {
+							return false;
+						}
+						return true;
+					});
+
+					response.status(201).json(filteredComments);
+					return;
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: "We're sorry, an unexpected error occurred. Please try again later.",
+					});
 					return;
 				}
 			} else {
@@ -1130,7 +1120,7 @@ applicationRouter.get(
 
 applicationRouter.get(
 	'/:applicationId/revisions',
-	authMiddleware({ requiredRoles: ['APPLICANT', 'DAC_CHAIR', 'DAC_MEMBER'] }),
+	accessMiddleware({ accessConfig: { dacChair: true, dacMember: true, applicant: true, institutionalRep: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -1141,26 +1131,6 @@ applicationRouter.get(
 			const { applicationId } = request.params;
 
 			try {
-				const applicationInfo = await getApplicationById({ applicationId: Number(applicationId) });
-
-				if (!applicationInfo.success) {
-					switch (applicationInfo.error) {
-						case 'NOT_FOUND':
-							response.status(404);
-							break;
-						case 'SYSTEM_ERROR':
-						default:
-							response.status(500);
-							break;
-					}
-					response.send({
-						error: applicationInfo.error,
-						message: applicationInfo.message,
-					});
-
-					return;
-				}
-
 				const result = await getRevisions({ applicationId: Number(applicationId) });
 
 				//Service only returns this if a SYSTEM_ERROR occurs, set to HTTP code 500 and bail if this is the case.
@@ -1184,7 +1154,7 @@ applicationRouter.get(
 
 applicationRouter.get(
 	'/:applicationId/history',
-	authMiddleware(),
+	accessMiddleware(),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
@@ -1198,49 +1168,26 @@ applicationRouter.get(
 			const { user } = request.session;
 			if (user) {
 				const applicationId = Number(request.params.applicationId);
-				const requestAuthResult = await canAccessRequest(user, applicationId);
-				if (requestAuthResult.success) {
-					try {
-						const applicationInfo = await getApplicationById({ applicationId });
-						if (!applicationInfo.success) {
-							switch (applicationInfo.error) {
-								case 'NOT_FOUND':
-									response.status(404);
-									break;
-								case 'SYSTEM_ERROR':
-								default:
-									response.status(500);
-									break;
-							}
-							response.send({
-								error: applicationInfo.error,
-								message: applicationInfo.message,
-							});
-							return;
-						}
 
-						const result = await getApplicationHistory({ applicationId });
+				try {
+					const result = await getApplicationHistory({ applicationId });
 
-						if (!result.success) {
-							response.status(500);
-							response.send({
-								error: result.error,
-								message: result.message,
-							});
-							return;
-						}
-
-						response.status(200).json(result.data);
-						return;
-					} catch (error) {
-						response.status(500).json({
-							error: 'SYSTEM_ERROR',
-							message: "We're sorry, an unexpected error occurred. Please try again later.",
+					if (!result.success) {
+						response.status(500);
+						response.send({
+							error: result.error,
+							message: result.message,
 						});
 						return;
 					}
-				} else {
-					authErrorResponseHandler(response, requestAuthResult);
+
+					response.status(200).json(result.data);
+					return;
+				} catch (error) {
+					response.status(500).json({
+						error: 'SYSTEM_ERROR',
+						message: "We're sorry, an unexpected error occurred. Please try again later.",
+					});
 					return;
 				}
 			} else {

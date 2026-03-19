@@ -20,12 +20,12 @@
 import { Button, Flex, Layout, theme, Typography } from 'antd';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMatch, useNavigate } from 'react-router';
 
 import { API_PATH_LOGIN } from '@/api/paths';
 import { getExtraSessionInformation, setExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
-import { useMatch, useNavigate } from 'react-router';
 
 const { useToken } = theme;
 const { Content } = Layout;
@@ -35,7 +35,7 @@ const InstitutionalRepLogin = () => {
 	const { token } = useToken();
 	const { t: translate } = useTranslation();
 	const navigation = useNavigate();
-	const { isLoggedIn, role: loggedInRole } = useUserContext();
+	const { isLoggedIn } = useUserContext();
 	const match = useMatch('review/:applicationId');
 
 	const landingPageOuter: React.CSSProperties = {
@@ -58,11 +58,7 @@ const InstitutionalRepLogin = () => {
 			const appId = Number(match.params.applicationId);
 			const existingSessionInfo = getExtraSessionInformation();
 
-			if (
-				isLoggedIn &&
-				existingSessionInfo?.role === 'INSTITUTIONAL_REP' &&
-				existingSessionInfo.applicationId === appId
-			) {
+			if (isLoggedIn && existingSessionInfo && existingSessionInfo.applicationId === appId) {
 				/**
 				 * In this case, they're just visiting the link again, so we'll
 				 * redirect them right away instead of the user clicking "Login to Review"
@@ -71,14 +67,13 @@ const InstitutionalRepLogin = () => {
 				navigation('/login/redirect', { replace: true });
 			}
 		}
-	}, [isLoggedIn, loggedInRole, match?.params.applicationId, navigation]);
+	}, [isLoggedIn, match?.params.applicationId, navigation]);
 
 	const onLoginClick = () => {
 		if (match?.params.applicationId) {
 			const appId = Number(match.params.applicationId);
 
 			const saveSessionInfo = setExtraSessionInformation({
-				role: 'INSTITUTIONAL_REP',
 				applicationId: appId,
 			});
 

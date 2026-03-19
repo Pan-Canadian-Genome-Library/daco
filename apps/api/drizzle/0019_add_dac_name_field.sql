@@ -1,0 +1,1 @@
+ALTER TABLE "study" ADD COLUMN "dac_name" varchar(255);

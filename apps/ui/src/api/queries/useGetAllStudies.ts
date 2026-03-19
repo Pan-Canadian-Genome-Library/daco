@@ -17,6 +17,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ErrorResponse } from '@pcgl-daco/validation';
+import { useQuery } from '@tanstack/react-query';
 
-export type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
+import { fetch } from '@/global/FetchClient';
+import { ServerError } from '@/global/types';
+import { type StudyDTO } from '@pcgl-daco/data-model';
+import { withErrorResponseHandler } from '../apiUtils';
+
+const useGetAllStudies = () => {
+	return useQuery<StudyDTO[], ServerError>({
+		queryKey: [`all-studies`],
+		queryFn: async () => {
+			const response = await fetch(`/study`).then(withErrorResponseHandler);
+
+			return await response.json();
+		},
+	});
+};
+
+export default useGetAllStudies;

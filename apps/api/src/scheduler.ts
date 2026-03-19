@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,22 +17,31 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z } from 'zod';
-import { userRoleSchema } from '../user.js';
+import cron from 'node-cron';
 
-export const ExtraSessionInformationSchema = z.discriminatedUnion('role', [
-	z.object({
-		role: z.literal(userRoleSchema.Values.INSTITUTIONAL_REP),
-		applicationId: z.number().int().nonnegative(),
-	}),
-	z.object({
-		role: z.literal(userRoleSchema.Values.APPLICANT),
-	}),
-	z.object({
-		role: z.literal(userRoleSchema.Values.DAC_MEMBER),
-	}),
-	z.object({
-		role: z.literal(userRoleSchema.Values.ANONYMOUS),
-	}),
-]);
-export type ExtraSessionInformation = z.infer<typeof ExtraSessionInformationSchema>;
+import { scheduleEmailReminders } from '@/jobs/emailReminders.ts';
+import BaseLogger from '@/logger.js';
+
+const { ENABLE_EMAIL_REMINDERS } = process.env;
+const logger = BaseLogger.forModule('Scheduler');
+
+/*
+ * Scheduler for managing Cron jobs
+ * New cron tasks can be added to this file using the [cron syntax](https://nodecron.com/cron-syntax.html) to define new intervals as needed.
+ * Task logic should be stored in `/src/jobs`
+ */
+const scheduler = async () => {
+	if (ENABLE_EMAIL_REMINDERS === 'true') {
+		// Scheduled to run at midnight:
+		cron.schedule('0 0 * * *', async () => {
+			logger.info('Scheduled Email Reminders run at:', new Date().toString());
+			try {
+				await scheduleEmailReminders();
+			} catch (error) {
+				logger.error(error);
+			}
+		});
+	}
+};
+
+export default scheduler;

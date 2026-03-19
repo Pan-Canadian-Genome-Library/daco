@@ -49,7 +49,6 @@ const useGetApplicationFeedback = (id?: string | number, state?: ApplicationStat
 					collaborators: [],
 					project: [],
 					ethics: [],
-					study: [],
 					agreement: [],
 					appendices: [],
 					sign: [],
@@ -99,14 +98,6 @@ const formatRevisionFeedback = (data: RevisionsDTO[]): SectionRevision => {
 			return {
 				comment: value.projectNotes ?? null,
 				isApproved: value.projectApproved,
-				isDacRequest: value.isDacRequest,
-				createdAt: value.createdAt,
-			};
-		}),
-		study: data.map((value) => {
-			return {
-				comment: value.requestedStudiesNotes ?? null,
-				isApproved: value.requestedStudiesApproved,
 				isDacRequest: value.isDacRequest,
 				createdAt: value.createdAt,
 			};

@@ -26,4 +26,5 @@ export * from './dac.ts';
 export * from './dacComments.ts';
 export * from './files.ts';
 export * from './revisionRequests.ts';
+export * from './sentEmails.ts';
 export * from './studies.ts';

@@ -33,6 +33,34 @@ export const ApplicationStates = {
 
 export type ApplicationStateValues = (typeof ApplicationStates)[keyof typeof ApplicationStates];
 
+export const EmailTypes = {
+	NOTIFY_APPLICANT_WITHDRAW: 'NOTIFY_APPLICANT_WITHDRAW',
+	NOTIFY_APPLICANT_CLOSE: 'NOTIFY_APPLICANT_CLOSE',
+	NOTIFY_APPLICANT_REVOKE: 'NOTIFY_APPLICANT_REVOKE',
+	NOTIFY_APPLICANT_REP_REVISIONS: 'NOTIFY_APPLICANT_REP_REVISIONS',
+	NOTIFY_APPLICANT_DAC_REVISIONS: 'NOTIFY_APPLICANT_DAC_REVISIONS',
+	NOTIFY_APPLICANT_DAC_REVIEW_REJECTED: 'NOTIFY_APPLICANT_DAC_REVIEW_REJECTED',
+	NOTIFY_APPLICANT_DAC_APPROVAL: 'NOTIFY_APPLICANT_DAC_APPROVAL',
+	NOTIFY_COLLABORATORS_DAC_APPROVAL: 'NOTIFY_COLLABORATORS_DAC_APPROVAL',
+	REMINDER_SUBMIT_DRAFT: 'REMINDER_SUBMIT_DRAFT',
+	REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW: 'REMINDER_SUBMIT_INSTITUTIONAL_REP_REVIEW',
+	REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP: 'REMINDER_SUBMIT_REVISIONS_INSTITUTIONAL_REP',
+	REMINDER_SUBMIT_DAC_REVIEW: 'REMINDER_SUBMIT_DAC_REVIEW',
+	REMINDER_SUBMIT_REVISIONS_DAC_REVIEW: 'REMINDER_SUBMIT_REVISIONS_DAC_REVIEW',
+	REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP: 'REMINDER_REQUEST_REVISIONS_INSTITUTIONAL_REP',
+	REMINDER_REQUEST_REVISIONS_DAC_REVIEW: 'REMINDER_REQUEST_REVISIONS_DAC_REVIEW',
+	REMINDER_REVIEW_SUBMITTED_REVISIONS: 'REMINDER_REVIEW_SUBMITTED_REVISIONS',
+	REQUEST_REVISIONS_INSTITUTIONAL_REP: 'REQUEST_REVISIONS_INSTITUTIONAL_REP',
+	REQUEST_REVISIONS_DAC_REVIEW: 'REQUEST_REVISIONS_DAC_REVIEW',
+	SUBMIT_DRAFT: 'SUBMIT_DRAFT',
+	SUBMIT_REVISIONS_INSTITUTIONAL_REP: 'SUBMIT_REVISIONS_INSTITUTIONAL_REP',
+	SUBMIT_INSTITUTIONAL_REP_REVIEW: 'SUBMIT_INSTITUTIONAL_REP_REVIEW',
+	SUBMIT_REVISIONS_DAC_REVIEW: 'SUBMIT_REVISIONS_DAC_REVIEW',
+	SUBMIT_DAC_REVIEW: 'SUBMIT_DAC_REVIEW',
+} as const;
+
+export type EmailTypeValues = (typeof EmailTypes)[keyof typeof EmailTypes];
+
 export const FileTypes = {
 	SIGNED_APPLICATION: 'SIGNED_APPLICATION',
 	ETHICS_LETTER: 'ETHICS_LETTER',
@@ -183,6 +211,7 @@ export type ApplicationDTO = {
 	userId: string;
 	state: ApplicationStateValues;
 	createdAt: Date;
+	dacId: string | null;
 	approvedAt?: Date | null;
 	updatedAt?: Date | null;
 	expiresAt?: Date | null;
@@ -261,6 +290,7 @@ export interface ApplicationListResponse {
 
 export type ApproveApplication = {
 	applicationId: number; // The ID of the application to be approved
+	approverAccessToken: string; // The access token of the user approving the application
 	userName: string; // Name of User who Approved application
 };
 
@@ -385,8 +415,6 @@ export interface RevisionsDTO {
 	collaboratorsNotes?: string | null;
 	projectApproved: boolean;
 	projectNotes?: string | null;
-	requestedStudiesApproved: boolean;
-	requestedStudiesNotes?: string | null;
 	ethicsApproved: boolean;
 	ethicsNotes?: string | null;
 	agreementsApproved: boolean;
@@ -427,7 +455,7 @@ export type StudyStatusValues = (typeof StudyStatus)[keyof typeof StudyStatus];
 export type StudyDTO = {
 	studyId: string;
 	dacId: string;
-	dacName: string;
+	dacName?: string;
 	categoryId: number | null;
 	studyName: string;
 	studyDescription: string;
@@ -442,14 +470,21 @@ export type StudyDTO = {
 	collaborators: string[] | null;
 	fundingSources: string[];
 	publicationLinks: string[] | null;
-	acceptingApplications: boolean | null;
+	acceptingApplications: boolean;
 	createdAt: Date | string;
 	updatedAt: Date | string | null;
 } & Pick<DacDTO, 'dacName'>;
 
+export type StudyClinicalDTO = Omit<StudyDTO, 'acceptingApplications'>;
+
+export type AcceptingApplicationsResponse = {
+	studyId: string;
+	acceptingApplications: boolean;
+};
+
 export type DacDTO = {
 	dacId: string;
-	dacName: string;
+	dacName?: string;
 	dacDescription: string;
 	contactName: string;
 	contactEmail: string;

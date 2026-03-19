@@ -93,8 +93,6 @@ export function parseRevisedFields(fields: ApplicationContentsResponse, revisedF
 			acc[key] = value;
 		} else if (!revisedFields.ethics[0]?.isApproved && isEthicsKey(key)) {
 			acc[key] = value;
-		} else if (!revisedFields.study[0]?.isApproved && isRequestedStudies(key)) {
-			acc[key] = value;
 		}
 
 		return acc;
