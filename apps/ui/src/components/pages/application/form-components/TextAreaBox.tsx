@@ -41,23 +41,7 @@ interface TextAreaProps extends BasicFormFieldProps {
 }
 
 const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextAreaProps) => {
-	const {
-		required,
-		label,
-		labelAlign,
-		labelCol,
-		style,
-		rows,
-		showCount,
-		maxWordCount,
-		disabled,
-		placeHolder,
-		name,
-		control,
-		subLabel,
-		rule,
-	} = props;
-	const fieldLabel = required ? RequiredLabel(label) : label;
+	const fieldLabel = props.required ? RequiredLabel(props.label) : props.label;
 	/**
 	 * Renders the TextArea component, helps reduce redefining (and making mistakes with)
 	 * the Input control.
@@ -73,17 +57,17 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 						color: pcglColours.a11yGrey,
 					},
 				}}
-				style={style ?? { height: 'auto' }}
+				style={props.style ?? { height: 'auto' }}
 				{...field}
-				rows={rows ?? 10}
+				rows={props.rows ?? 10}
 				count={{
-					show: showCount,
+					show: props.showCount,
 					strategy: (text) =>
 						text.length === 0 ? text.trim().split(WORDS).length - 1 : text.trim().split(WORDS).length,
-					max: maxWordCount,
+					max: props.maxWordCount,
 				}}
-				disabled={disabled}
-				placeholder={placeHolder}
+				disabled={props.disabled}
+				placeholder={props.placeHolder}
 				required={fieldLabel}
 			/>
 		);
@@ -91,26 +75,26 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 
 	return (
 		<Controller
-			name={name}
-			control={control}
+			name={props.name}
+			control={props.control}
 			render={({ field }) => {
 				return (
 					<Item
-						label={label}
-						name={`${name}`}
-						rules={!subLabel ? [rule] : undefined}
-						labelAlign={labelAlign}
-						labelCol={labelCol}
-						initialValue={!subLabel ? field.value : undefined}
+						label={props.label}
+						name={`${props.name}`}
+						rules={!props.subLabel ? [props.rule] : undefined}
+						labelAlign={props.labelAlign}
+						labelCol={props.labelCol}
+						initialValue={!props.subLabel ? field.value : undefined}
 						validateTrigger="onBlur"
 					>
 						{props.subLabel ? (
 							<Item
-								label={subLabel}
-								name={`${name}`}
-								rules={[rule]}
-								labelAlign={labelAlign}
-								labelCol={labelCol}
+								label={props.subLabel}
+								name={`${props.name}`}
+								rules={[props.rule]}
+								labelAlign={props.labelAlign}
+								labelCol={props.labelCol}
 								initialValue={field.value}
 								validateTrigger="onBlur"
 							>

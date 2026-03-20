@@ -51,22 +51,6 @@ interface InputBoxProps extends BasicFormFieldProps {
 }
 
 const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBoxProps) => {
-	const {
-		autoComplete,
-		type,
-		disabled,
-		required,
-		placeHolder,
-		style,
-		name,
-		control,
-		label,
-		labelAlign,
-		labelCol,
-		subLabel,
-		rule,
-		layout,
-	} = props;
 	/**
 	 * Renders the input box component. We currently use two nested labels to display certain information on the
 	 * application form (see Applicant Info). But in the case where only one label is needed, we should only render
@@ -80,40 +64,40 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 		return (
 			<Input
 				{...field}
-				autoComplete={autoComplete ?? 'on'}
-				type={type ?? 'text'}
-				disabled={disabled}
-				required={required}
-				placeholder={placeHolder}
+				autoComplete={props.autoComplete ?? 'on'}
+				type={props.type ?? 'text'}
+				disabled={props.disabled}
+				required={props.required}
+				placeholder={props.placeHolder}
 			/>
 		);
 	};
 
-	const fieldLabel = required ? RequiredLabel(label) : label;
+	const fieldLabel = props.required ? RequiredLabel(props.label) : props.label;
 	return (
 		<Controller
-			name={name}
-			control={control}
+			name={props.name}
+			control={props.control}
 			render={({ field }) => {
 				return (
 					<Item
-						style={style}
-						name={`${name}`}
+						style={props.style}
+						name={`${props.name}`}
 						label={fieldLabel}
-						labelAlign={labelAlign}
-						labelCol={labelCol}
-						rules={!subLabel ? [rule] : undefined}
-						layout={layout}
-						initialValue={!subLabel ? field.value : undefined}
+						labelAlign={props.labelAlign}
+						labelCol={props.labelCol}
+						rules={!props.subLabel ? [props.rule] : undefined}
+						layout={props.layout}
+						initialValue={!props.subLabel ? field.value : undefined}
 						validateTrigger="onBlur"
 					>
 						{props.subLabel ? (
 							<Item
-								label={subLabel}
-								name={`${name}`}
-								rules={[rule]}
-								labelAlign={labelAlign}
-								labelCol={labelCol}
+								label={props.subLabel}
+								name={`${props.name}`}
+								rules={[props.rule]}
+								labelAlign={props.labelAlign}
+								labelCol={props.labelCol}
 								initialValue={field.value}
 								validateTrigger="onBlur"
 							>

@@ -49,60 +49,41 @@ interface SelectBoxProps extends BasicFormFieldProps {
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
-	const {
-		required,
-		label,
-		name,
-		rule,
-		control,
-		initialValue,
-		sublabel,
-		mode,
-		disabled,
-		options,
-		placeholder,
-		tagRender,
-		removeIcon,
-		allowClear,
-		showSearch,
-		onSelect,
-		filterOption,
-	} = props;
-	const fieldLabel = props.required ? RequiredLabel(label) : label;
+	const fieldLabel = props.required ? RequiredLabel(props.label) : props.label;
 	return (
 		<Controller
-			name={name}
-			control={control}
+			name={props.name}
+			control={props.control}
 			render={({ field }) => {
 				return (
 					<Item
 						label={fieldLabel}
-						name={`${name}`}
-						rules={[rule]}
+						name={`${props.name}`}
+						rules={[props.rule]}
 						validateTrigger="onChange"
-						initialValue={initialValue ?? field.value}
+						initialValue={props.initialValue ?? field.value}
 					>
 						<Flex vertical>
-							{sublabel ? <Text style={{ fontSize: '0.75rem' }}>{sublabel}</Text> : null}
+							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
 							<Select
 								{...field}
-								aria-label={label}
-								mode={mode}
-								disabled={disabled}
-								options={options}
-								placeholder={placeholder}
-								required={required}
+								aria-label={props.label}
+								mode={props.mode}
+								disabled={props.disabled}
+								options={props.options}
+								placeholder={props.placeholder}
+								required={props.required}
 								menuItemSelectedIcon={
 									<Flex style={{ marginLeft: '10px' }}>
 										<CheckCircleFilled />
 									</Flex>
 								}
-								tagRender={tagRender}
-								removeIcon={removeIcon}
-								allowClear={allowClear}
-								showSearch={showSearch}
-								onSelect={onSelect}
-								filterOption={filterOption}
+								tagRender={props.tagRender}
+								removeIcon={props.removeIcon}
+								allowClear={props.allowClear}
+								showSearch={props.showSearch}
+								onSelect={props.onSelect}
+								filterOption={props.filterOption}
 							/>
 						</Flex>
 					</Item>

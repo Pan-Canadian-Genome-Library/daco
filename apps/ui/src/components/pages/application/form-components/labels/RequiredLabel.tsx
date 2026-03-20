@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { pcglColours } from '@/providers/ThemeProvider';
 import { Flex, Typography } from 'antd';
 import type { ReactNode } from 'react';
 
@@ -27,7 +28,7 @@ export const RequiredLabel = (children: string | ReactNode) => (
 		<Text
 			style={{
 				alignContent: 'center',
-				color: '#ff4d4f',
+				color: pcglColours.errorPrimary,
 				display: 'inline-block',
 				fontFamily: 'SimSun, sans-serif',
 				fontSize: '14px',
