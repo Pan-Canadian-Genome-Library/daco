@@ -34,7 +34,7 @@ const useLogout = () => {
 	const { refresh } = useUserContext();
 	const navigation = useNavigate();
 
-	return useMutation<unknown, ServerError>({
+	const mutationHook = useMutation<unknown, ServerError>({
 		mutationFn: async () => {
 			return await fetch(`/auth/logout`).then(withErrorResponseHandler);
 		},
@@ -51,6 +51,8 @@ const useLogout = () => {
 			});
 		},
 	});
+
+	return { ...mutationHook, logout: mutationHook.mutate };
 };
 
 export default useLogout;

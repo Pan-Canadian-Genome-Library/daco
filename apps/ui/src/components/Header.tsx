@@ -60,7 +60,7 @@ const HeaderComponent = () => {
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 	const { isLoggedIn, user } = useUserContext();
-	const { mutate: logout } = useLogout();
+	const { logout } = useLogout();
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
