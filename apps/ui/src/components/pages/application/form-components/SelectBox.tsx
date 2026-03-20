@@ -33,6 +33,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 	options: {
 		label: string | ReactNode;
 		value: string | number;
+		required?: boolean;
 	}[];
 	label: string;
 	initialValue?: object | string | null;
@@ -49,7 +50,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
-	const fieldLabel = props.required ? RequiredLabel(props.label) : props.label;
+	const fieldLabel = props.options.some((option) => option.required) ? RequiredLabel(props.label) : props.label;
 	return (
 		<Controller
 			name={props.name}
@@ -72,7 +73,6 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 								disabled={props.disabled}
 								options={props.options}
 								placeholder={props.placeholder}
-								required={props.required}
 								menuItemSelectedIcon={
 									<Flex style={{ marginLeft: '10px' }}>
 										<CheckCircleFilled />

@@ -68,7 +68,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 				}}
 				disabled={props.disabled}
 				placeholder={props.placeHolder}
-				required={fieldLabel}
+				required={props.required}
 			/>
 		);
 	};
@@ -80,7 +80,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 			render={({ field }) => {
 				return (
 					<Item
-						label={props.label}
+						label={fieldLabel}
 						name={`${props.name}`}
 						rules={!props.subLabel ? [props.rule] : undefined}
 						labelAlign={props.labelAlign}

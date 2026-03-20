@@ -31,6 +31,7 @@ interface CheckboxValues {
 	key: string;
 	value: boolean;
 	label: string | React.ReactElement;
+	required?: boolean;
 }
 
 interface InputBoxProps extends BasicFormFieldProps {
@@ -55,7 +56,7 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 	 */
 	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
 		return (
-			<Radio.Group required={props.required} {...field} disabled={props.disabled}>
+			<Radio.Group {...field} disabled={props.disabled}>
 				<Row justify="start" gutter={[0, 10]}>
 					{props.options.map((item) => {
 						return (
@@ -67,7 +68,9 @@ const BlockRadioBox = <T extends FieldValues>(props: UseControllerProps<T> & Inp
 									padding: token.padding,
 								}}
 							>
-								<Radio value={item.value}>{item.label}</Radio>
+								<Radio required={item.required} value={item.value}>
+									{item.label}
+								</Radio>
 							</Flex>
 						);
 					})}
