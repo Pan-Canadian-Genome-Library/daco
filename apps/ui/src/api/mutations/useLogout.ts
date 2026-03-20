@@ -17,48 +17,40 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* eslint-disable react-refresh/only-export-components */
+import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
-import { createContext, useContext, type PropsWithChildren } from 'react';
+import { withErrorResponseHandler } from '@/api/apiUtils';
+import { fetch } from '@/global/FetchClient';
+import { clearExtraSessionInformation } from '@/global/localStorage';
+import { ServerError } from '@/global/types';
+import { useUserContext } from '@/providers/UserProvider';
+import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 
-import { SessionUser } from '@pcgl-daco/validation';
+const useLogout = () => {
+	const notification = useNotificationContext();
+	const { t: translate } = useTranslation();
+	const { refresh } = useUserContext();
+	const navigation = useNavigate();
 
-import useGetUser from '@/api/queries/useGetUser';
-
-type UserState = {
-	isLoading: boolean;
-	isLoggedIn: boolean;
-	refresh: () => void;
-	user?: SessionUser;
+	return useMutation<unknown, ServerError>({
+		mutationFn: async () => {
+			return await fetch(`/auth/logout`).then(withErrorResponseHandler);
+		},
+		onSuccess: () => {
+			refresh();
+			clearExtraSessionInformation();
+			navigation('/');
+		},
+		onError: (error) => {
+			notification.openNotification({
+				type: 'error',
+				message: translate('errors.generic.title'),
+				description: error.message,
+			});
+		},
+	});
 };
 
-const UserContext = createContext<UserState>({
-	isLoading: true,
-	isLoggedIn: false,
-	refresh: () => {},
-});
-
-export function UserProvider({ children }: PropsWithChildren) {
-	const { data, isLoading, refetch } = useGetUser();
-
-	const refresh = () => {
-		refetch();
-	};
-
-	const initialUserState: UserState = {
-		user: data?.user,
-		isLoading,
-		refresh,
-		isLoggedIn: !isLoading && !!data?.user,
-	};
-
-	return <UserContext.Provider value={initialUserState}>{children}</UserContext.Provider>;
-}
-
-export function useUserContext() {
-	const context = useContext(UserContext);
-	if (context === undefined) {
-		throw new Error('useUserContext must be used within a UserProvider');
-	}
-	return context;
-}
+export default useLogout;
