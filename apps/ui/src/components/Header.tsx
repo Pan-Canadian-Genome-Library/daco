@@ -22,10 +22,10 @@ import { Button, ButtonProps, ConfigProvider, Divider, Drawer, Flex, Image, Layo
 import React, { useState, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import useLogout from '@/api/mutations/useLogout';
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '@/api/paths';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import { clearExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
 
@@ -59,8 +59,7 @@ const HeaderComponent = () => {
 	const { t: translate } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
-	const { isLoggedIn, user } = useUserContext();
-	const { logout } = useLogout();
+	const { isLoggedIn, user, logout } = useUserContext();
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -185,10 +184,10 @@ const HeaderComponent = () => {
 					<Button
 						href={API_PATH_LOGOUT}
 						onClick={() => {
-							logout();
+							clearExtraSessionInformation();
 						}}
 						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
+							if (e.key === 'Enter' || e.key === ' ') {
 								logout();
 							}
 						}}
@@ -235,7 +234,7 @@ const HeaderComponent = () => {
 				setLogoutOpen(false);
 			},
 			onKeyDown: (e) => {
-				if (e.key === 'Enter') {
+				if (e.key === 'Enter' || e.key === ' ') {
 					setLogoutOpen(!isLogoutOpen);
 				}
 			},

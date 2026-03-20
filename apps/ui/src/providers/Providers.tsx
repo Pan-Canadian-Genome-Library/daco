@@ -19,7 +19,6 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router';
-
 import { NotificationProvider } from './context/notification/NotificationProvider';
 import ThemeProvider from './ThemeProvider';
 import { UserProvider } from './UserProvider';
@@ -32,7 +31,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
 			<ThemeProvider>
 				<BrowserRouter>
 					<NotificationProvider>
-						<UserProvider>{children}</UserProvider>;
+						<UserProvider>{children}</UserProvider>
 					</NotificationProvider>
 				</BrowserRouter>
 			</ThemeProvider>
