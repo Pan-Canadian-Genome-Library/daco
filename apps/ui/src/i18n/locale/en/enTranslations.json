@@ -32,14 +32,14 @@
 	},
 	"homepage": {
 		"title": "Apply for Access to Controlled Data",
-		"introduction": "The PCGL Data Access Compliance Office (PCGL DACO) handles requests from scientists, researchers and commercial teams for access to PCGL Controlled Data.",
+		"introduction": "The PCGL Data Access Compliance Office (PCGL DACO) handles requests from researchers interested in accessing PCGL Controlled Data.",
 		"overviewTitle": "Overview",
-		"authorizationText": "Authorization for access to Pan-Canadian Genome Library controlled data is study based and is reviewed for compliance with PCGL Policies and Guidelines. The PCGL DACO is the overarching authority to ensure that data from the PCGL will only be used by qualified individuals for public health objectives.",
+		"authorizationText": "Authorization for access to Pan-Canadian Genome Library controlled data is study-based and is reviewed for compliance with PCGL Data Governance Framework, and other Policies. The PCGL DAC is the overarching authority to ensure that data from the PCGL will only be used by qualified individuals for research objectives in health.",
 		"dataAccessInfo": "Before starting your application, learn more about Data Access and Use Policies and review our <link1>frequently asked questions</link1>.",
 		"processTitle": "The Application Process is Simple",
 		"description1": "Log in and start an application. Carefully complete all required sections and review all policies and agreements.",
 		"description2": "When completed, obtain the required signatures and submit the signed application for review.",
-		"description3": "The PCGL DACO will review the application and approved project teams will be granted access to PCGL Controlled Data."
+		"description3": "The PCGL DACO will review the application and may request specific revision. Approved project teams will be granted access to PCGL Controlled Data."
 	},
 	"notFound": {
 		"title": "404 Page Not Found",
