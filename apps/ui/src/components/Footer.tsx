@@ -138,7 +138,7 @@ const FooterComponent = () => {
 									vertical={breakpoints.lg ? false : true}
 								>
 									{pcglLinks.map((itemLink) => (
-										<Link key={itemLink.name} style={linkStyle} underline target="_blank">
+										<Link tabIndex={0} key={itemLink.name} style={linkStyle} underline target="_blank">
 											{itemLink.name}
 										</Link>
 									))}
@@ -154,7 +154,7 @@ const FooterComponent = () => {
 									vertical={breakpoints.lg ? false : true}
 								>
 									{policiesConditionsLinks.map((itemLink) => (
-										<Link key={itemLink.name} style={linkStyle} underline target="_blank">
+										<Link tabIndex={0} key={itemLink.name} style={linkStyle} underline target="_blank">
 											{itemLink.name}
 										</Link>
 									))}

@@ -20,6 +20,7 @@
 import { ColProps, Form, Input } from 'antd';
 import { FormItemLayout } from 'antd/es/form/Form';
 import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
+import { RequiredLabel } from './labels/RequiredLabel';
 
 import { BasicFormFieldProps } from '@/global/types';
 
@@ -66,11 +67,13 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 				autoComplete={props.autoComplete ?? 'on'}
 				type={props.type ?? 'text'}
 				disabled={props.disabled}
+				required={props.required}
 				placeholder={props.placeHolder}
 			/>
 		);
 	};
 
+	const fieldLabel = props.required ? RequiredLabel(props.label) : props.label;
 	return (
 		<Controller
 			name={props.name}
@@ -80,10 +83,9 @@ const InputBox = <T extends FieldValues>(props: UseControllerProps<T> & InputBox
 					<Item
 						style={props.style}
 						name={`${props.name}`}
-						label={props.label}
+						label={fieldLabel}
 						labelAlign={props.labelAlign}
 						labelCol={props.labelCol}
-						required={props.required}
 						rules={!props.subLabel ? [props.rule] : undefined}
 						layout={props.layout}
 						initialValue={!props.subLabel ? field.value : undefined}

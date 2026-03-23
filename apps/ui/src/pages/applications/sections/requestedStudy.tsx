@@ -245,6 +245,7 @@ const RequestedStudy = () => {
 										allowClear={false}
 										control={control}
 										rule={rule}
+										label={'Search study name...'}
 										placeholder="Search study name..."
 										tagRender={() => <></>}
 										disabled={!canEdit}

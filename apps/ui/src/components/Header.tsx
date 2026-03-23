@@ -17,18 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useState, type PropsWithChildren } from 'react';
-
 import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
 import { Button, ButtonProps, ConfigProvider, Divider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
+import React, { useState, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useLogout from '@/api/mutations/useLogout';
 import { API_PATH_LOGIN, API_PATH_LOGOUT } from '@/api/paths';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-import { clearExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
+
 import ApplyForAccessModal from './modals/ApplyForAccessModal';
 
 const { Link } = Typography;
@@ -60,6 +60,7 @@ const HeaderComponent = () => {
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 	const { isLoggedIn, user } = useUserContext();
+	const { logout } = useLogout();
 	const [isLogoutOpen, setLogoutOpen] = useState(false);
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
@@ -154,7 +155,13 @@ const HeaderComponent = () => {
 		>
 			{isResponsiveMode && (
 				<Divider
-					style={{ borderColor: pcglColours.secondary, margin: 0, position: 'absolute', top: -10, alignSelf: 'center' }}
+					style={{
+						borderColor: pcglColours.secondary,
+						margin: 0,
+						position: 'absolute',
+						top: -10,
+						alignSelf: 'center',
+					}}
 				/>
 			)}
 			<Flex vertical style={{ padding: 5, width: '100%' }}>
@@ -178,7 +185,12 @@ const HeaderComponent = () => {
 					<Button
 						href={API_PATH_LOGOUT}
 						onClick={() => {
-							clearExtraSessionInformation();
+							logout();
+						}}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								logout();
+							}
 						}}
 						onMouseOver={() => {
 							setLogoutHover(true);
@@ -198,6 +210,7 @@ const HeaderComponent = () => {
 							top: displayEmail ? 65 : 42,
 							width: isResponsiveMode ? '100%' : 'calc(100% + 20px)',
 						}}
+						tabIndex={0}
 					>
 						{translate(`button.logout`)}{' '}
 						<LogoutOutlined
@@ -211,7 +224,6 @@ const HeaderComponent = () => {
 			)}
 		</Flex>
 	);
-
 	const logoutButton: MenuButton = {
 		name: translate(`button.logout`),
 		children: UserInfo,
@@ -222,6 +234,12 @@ const HeaderComponent = () => {
 			onMouseOut: () => {
 				setLogoutOpen(false);
 			},
+			onKeyDown: (e) => {
+				if (e.key === 'Enter') {
+					setLogoutOpen(!isLogoutOpen);
+				}
+			},
+			tabIndex: 0,
 			type: 'text',
 			variant: 'text',
 			icon: isResponsiveMode ? null : isLogoutOpen ? (
@@ -284,6 +302,7 @@ const HeaderComponent = () => {
 						<Button
 							key={`menuItem-${key}`}
 							{...(menuItem.buttonProps ?? null)}
+							role="menuitem"
 							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
 							onClick={clickAction ? () => onMenuButtonClick(clickAction) : undefined}
 						>
@@ -292,7 +311,17 @@ const HeaderComponent = () => {
 					);
 				} else {
 					return (
-						<Link key={`menuItem-${key}`} style={linkStyle} href={menuItem.href ?? '#'}>
+						<Link
+							key={`menuItem-${key}`}
+							style={linkStyle}
+							href={menuItem.href ?? '#'}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									window.location.href = menuItem.href ?? '#';
+								}
+							}}
+							role="menuitem"
+						>
 							{menuItem.name}
 						</Link>
 					);
@@ -327,8 +356,8 @@ const HeaderComponent = () => {
 				>
 					<Flex flex={1}>
 						<Flex justify="space-around" align="center" gap={40}>
-							<Link href="/">
-								<Image width={200} src={PCGL} preview={false} alt="PCGL DACO Home" />
+							<Link href="/" role="menuitem">
+								<Image width={200} src={PCGL} preview={false} alt="PCGL DACO Home" role="presentation" />
 							</Link>
 							{!isResponsiveMode ? <>{displayMenuItems(menuItems, 'left')}</> : null}
 						</Flex>
@@ -337,7 +366,12 @@ const HeaderComponent = () => {
 						{!isResponsiveMode ? (
 							<>{displayMenuItems(menuItems, 'right')}</>
 						) : !responsiveMenuOpen ? (
-							<Button type="text" aria-label="Open Menu" onClick={() => setResponsiveMenuOpen(true)}>
+							<Button
+								type="text"
+								role="menuitem"
+								aria-label="Open Menu ..."
+								onClick={() => setResponsiveMenuOpen(true)}
+							>
 								<MenuOutlined aria-hidden />
 							</Button>
 						) : (

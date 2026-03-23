@@ -20,7 +20,7 @@
 		"@pcgl-daco/validation": "workspace:^",
 		"@tanstack/react-query": "^5.63.0",
 		"@types/react-signature-canvas": "^1.0.7",
-		"antd": "^5.21.6",
+		"antd": "^5.29.3",
 		"antd-zod": "^6.0.1",
 		"i18next": "^24.1.0",
 		"react": "^18.3.1",
