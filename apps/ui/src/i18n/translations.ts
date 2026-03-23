@@ -26,6 +26,8 @@ import enModalsLang from './locale/en/enModals.json';
 import enApplicationSection from './locale/en/enSection.json';
 import enGeneralLang from './locale/en/enTranslations.json';
 import frFormErrors from './locale/fr/frFormErrors.json';
+import frModalsLang from './locale/fr/frModals.json';
+import frSectionLang from './locale/fr/frSection.json';
 import frGeneralLang from './locale/fr/frTranslations.json';
 
 i18n.use(initReactI18next).init({
@@ -42,10 +44,12 @@ i18n.use(initReactI18next).init({
 			translation: {
 				...frGeneralLang,
 				...frFormErrors,
+				...frSectionLang,
+				...frModalsLang,
 			},
 		},
 	},
-	lng: 'en',
+	lng: 'fr',
 	fallbackLng: 'en',
 	supportedLngs: ['en', 'fr'],
 	interpolation: {

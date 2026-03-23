@@ -1,0 +1,137 @@
+{
+	"modals": {
+		"buttons": {
+			"cancel": "Annuler",
+			"close": "Fermer",
+			"ok": "OK"
+		},
+		"history": {
+			"title": "",
+			"applicationId": "",
+			"submissionDate": "",
+			"currentStatus": "",
+			"lastUpdated": "",
+			"timelineItem": "",
+			"notFound": "",
+			"actions": {
+				"CLOSE": "",
+				"INSTITUTIONAL_REP_REVISION_REQUEST": "",
+				"INSTITUTIONAL_REP_SUBMIT": "",
+				"INSTITUTIONAL_REP_APPROVED": "",
+				"DAC_REVIEW_APPROVED": "",
+				"DAC_REVIEW_SUBMIT": "",
+				"DAC_REVIEW_REJECTED": "",
+				"DAC_REVIEW_REVISION_REQUEST": "",
+				"REVOKE": "",
+				"SUBMIT_DRAFT": "",
+				"WITHDRAW": ""
+			}
+		},
+		"requestRevisions": {
+			"title": "Demander des révisions",
+			"description": "Veuillez fournir les détails des révisions pour les sections présentant des problèmes. Ces détails seront envoyés par courriel au candidat/à la candidate.",
+			"applicantInformation": "",
+			"institutionalRepresentative": "",
+			"collaborators": "",
+			"projectInformation": "",
+			"requestedStudy": "",
+			"ethics": "",
+			"signSubmit": "",
+			"general": "",
+			"buttons": {
+				"sendRequest": ""
+			},
+			"notifications": {
+				"failure": {
+					"title": "",
+					"text": ""
+				},
+				"revisionsRequested": ""
+			}
+		},
+		"revokeApplication": {
+			"title": "Êtes-vous sûr/e de vouloir révoquer la demande PCGL-{{id}} ?",
+			"description": "Si oui, le candidat ou la candidate et tous les collaborateurs et collaboratrices perdront l'accès aux données.",
+			"revokeLabel": "",
+			"buttons": {
+				"revoke": ""
+			},
+			"notifications": {
+				"successTitle": "",
+				"successMessage": "",
+				"failureTitle": "",
+				"failureMessage": ""
+			}
+		},
+		"editApplication": {
+			"title": "Êtes-vous sûr de vouloir modifier la demande PCGL-{{id}} ?",
+			"description": "Votre demande PCGL-{{id}} a déjà été soumise pour examen. Si vous choisissez de la modifier, la demande repassera au statut de Brouillon, ce qui vous obligera à la soumettre à nouveau pour examen. Veuillez noter que cela prolongera le délai de traitement. Nous vous recommandons d'apporter des modifications uniquement si cela est absolument nécessaire.",
+			"buttons": {
+				"edit": ""
+			},
+			"notifications": {
+				"successTitle": "",
+				"successMessage": "",
+				"failureTitle": "",
+				"failureMessage": ""
+			}
+		},
+		"closeApplication": {
+			"title": "",
+			"description": "",
+			"notifications": {
+				"closeApplicationSuccess": "",
+				"closeApplicationFailed": ""
+			}
+		},
+		"rejectApplication": {
+			"title": "Êtes-vous sûr/e de vouloir rejeter la demande : PCGL-{{id}} ?",
+			"description": "Si oui, la candidate ou le candidat en sera informé et ne pourra pas rouvrir cette demande.",
+			"rejectionReasonLabel": "Si vous continuez, la candidate ou le candidat et tous les collaborateurs et collaboratrices ne recevront pas l'accès aux données. Veuillez fournir vos commentaires expliquant pourquoi vous rejetez la demande.",
+			"notifications": {
+				"rejectApplicationSuccess": "",
+				"rejectApplicationFailed": ""
+			}
+		},
+		"approveApplication": {
+			"title": "Êtes-vous sûr/e de vouloir approuver la demande : PCGL-{{id}} ?",
+			"description": "Si oui, la candidate ou le candidat et les collaboratrices et collaborateurs en seront informés et recevront l'accès aux données contrôlées de la BGP.",
+			"notifications": {
+				"applicationApproveSuccess": "",
+				"applicationApproveFailed": ""
+			},
+			"buttons": {
+				"sendRequest": ""
+			}
+		},
+		"authorization": {
+			"description": "Pour obtenir une autorisation, nous exigeons une adresse courriel institutionnelle valide. Cette adresse sera utilisée pour vous connecter au BCAD de la BGP et sera associée à votre accès aux données contrôlées de la BGP."
+		},
+		"applications": {
+			"global": {
+				"revisions": {
+					"title": "Demander des révisions",
+					"description": "Veuillez fournir les détails des révisions pour les sections présentant des problèmes. Ces détails seront envoyés par courriel au candidat/à la candidate.",
+					"applicantInformation": "",
+					"institutionalRepresentative": "",
+					"collaborators": "",
+					"projectInformation": "",
+					"requestedStudy": "",
+					"ethics": "",
+					"agreement": "",
+					"appendices": "",
+					"signSubmit": "",
+					"general": "",
+					"cancel": "Annuler",
+					"sendRequest": ""
+				},
+				"success": {
+					"text": ""
+				},
+				"failure": {
+					"text": ""
+				}
+			}
+		}
+	}
+}

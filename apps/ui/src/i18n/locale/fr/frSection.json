@@ -1,0 +1,238 @@
+{
+	"intro-section": {
+		"title": "Introduction",
+		"qualifyAccess": "Bien que toutes les sources de données de la BGP contiennent des données ouvertes, l'accès aux données génomiques et cliniques sensibles est contrôlé et nécessite une autorisation. Pour être admissible à la demande d'accès, vous devez :",
+		"qualifyPoint1": "être un chercheur indépendant affilié ou une chercheuse indépendante affiliée à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.) ;",
+		"qualifyPoint2": "avoir un ou une représentant(e) institutionnel(le) au sein de votre établissement ;",
+		"qualifyPoint3": "fournir un résumé scientifique et un résumé vulgarisé décrivant l'utilisation prévue des données contrôlées de la BGP ;",
+		"qualifyPoint4": "avoir au moins trois publications admissibles dont vous êtes l'auteur/autrice ou le coauteur/coautrice ;",
+		"qualifyPoint5": "inclure une lettre d'un comité d'éthique confirmant que l'utilisation des données contrôlées de la BGP a été approuvée si une approbation éthique est requise dans votre pays ou région, ou confirmant qu'une telle approbation est exemptée dans votre pays ou région.",
+		"receiveAccess": "Pour obtenir l'accès, vous devez :",
+		"accessPoint1": "remplir toutes les sections requises du présent formulaire de demande et en accepter les modalités ;",
+		"accessPoint2": "faire signer la demande finalisée par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(e) de l'entité juridique de votre établissement ; faire signer l'Entente d'utilisation des données par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(le) ;",
+		"accessPoint3": "soumettre la demande signée pour examen par le Bureau de conformité de l'accès aux données (BCAD) dans la section « Signer et soumettre » de la présente demande.",
+		"description1": "Au cours du processus de demande, vous devez soumettre un résumé de votre projet de recherche. Votre projet sera évalué afin de vérifier sa conformité aux objectifs et aux politiques du PCGL, y compris, sans s'y limiter, aux politiques relatives à la finalité et à la pertinence de la recherche, à la protection des donneurs et à la sécurité des données des donneurs. Si votre demande est approuvée, vous acceptez que le nom du demandeur ou de la demandeuse, l'établissement et le résumé scientifique vulgarisé puissent être inscrits dans un registre public des projets ayant obtenu l'accès aux données contrôlées de la BGP.",
+		"description2": "Si le Comité d'accès aux données (CAD) approuve votre demande, l'accès aux données contrôlées de la BGP sera accordé à compter de la date d'approbation. Le demandeur doit conclure une entente d'une durée d'un an. Pour accéder aux données contrôlées ou les utiliser au-delà de cette période d'un an, une demande de renouvellement devra être soumise et approuvée par le CAD."
+	},
+	"applicant-section": {
+		"title": "Renseignements sur le demandeur (chercheur principal)",
+		"description1": "Les demandeurs admissibles à l'accès aux données contrôlées de la BGP doivent être des chercheurs indépendants affiliés ou des chercheuses indépendantes affiliées à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.).",
+		"description2": "Veuillez fournir une adresse courriel institutionnelle valide qui sera utilisée pour vous connecter à la BGP et qui sera associée à votre accès aux données contrôlées de la BGP.",
+		"section1": "",
+		"section2": ""
+	},
+	"institutional-section": {
+		"title": "Représentant(e) institutionnel(le)",
+		"description1": "Un ou une représentant(e) institutionnel(le) est un représentant qualifié d'une entité juridique ayant le pouvoir administratif d'engager légalement cette entité aux modalités et conditions énoncées à la section G : Entente d'accès aux données (p. ex. vice-président/présidente à la recherche, directeur/directrice de la recherche ou agent des contrats de l'entité). La signature du ou de la représentant(e) institutionnel(le) sera requise à la fin de la présente demande avant son examen par le BCAD de la BGP.",
+		"section1": "",
+		"section2": "",
+		"primaryEmailLabel": ""
+	},
+	"collab-section": {
+		"title": "Collaborateurs et collaboratrices",
+		"description1": "Veuillez inclure les noms de tous les chercheurs et chercheuses, collaborateurs et collaboratrices, membres du personnel de recherche (y compris les stagiaires postdoctoraux) et étudiants et étudiantes (y compris celles et ceux aux cycles supérieurs) qui auront accès aux données contrôlées de la BGP afin de travailler sur le résumé de recherche décrit à la section D de la présente demande.",
+		"optional": "Les collaboratrices et collaborateurs ne sont pas requis pour que votre demande soit approuvée.",
+		"note": "* Veuillez noter : les cochercheurs et cochercheuses, collaborateurs et collaboratrices ou étudiants et étudiantes provenant d'autres établissements ne doivent pas être inclus/es dans cette liste. Ils devront soumettre une demande distincte pour obtenir l'accès aux données contrôlées.",
+		"deleteModalTitle": "",
+		"deleteModalDescription": "",
+		"addModalTitle": "Ajouter un collaborateur",
+		"addModalDescription": "Veuillez fournir les renseignements suivants concernant le collaborateur ou la collaboratrice, y compris une adresse courriel institutionnelle valide qu'il ou elle utilisera pour se connecter à la BGP. Cette adresse sera également associée à son accès aux données contrôlées de la BGP.",
+		"editModalTitle": "",
+		"editModalDescription": "",
+		"primaryEmailLabel": "",
+		"notifications": {
+			"added": {
+				"successTitle": "",
+				"successMessage": ""
+			},
+			"duplicate": {
+				"duplicateTitle": "",
+				"duplicateMessage": ""
+			},
+			"deleted": {
+				"successTitle": "",
+				"successMessage": ""
+			},
+			"edit": {
+				"successTitle": "",
+				"successMessage": ""
+			}
+		}
+	},
+	"form": {
+		"firstName": "",
+		"middleName": "",
+		"lastName": "",
+		"suffix": "",
+		"primaryEmail": "",
+		"primaryEmailLabel": "",
+		"positionTitle": "",
+		"title": "",
+		"primaryAffiliation": "",
+		"primaryAffiliationSubLabel": "",
+		"researcherProfile": "",
+		"researcherProfileLabel": "",
+		"country": "",
+		"streetAddress": "",
+		"building": "",
+		"state": "",
+		"city": "",
+		"postalCode": ""
+	},
+	"project-section": {
+		"title": "Renseignements sur le projet",
+		"description": "Veuillez remplir les détails suivants pour votre projet de recherche, y compris l'URL du site web si disponible.",
+		"section0": {
+			"form": {
+				"projectTitle": "",
+				"projectWebsite": ""
+			}
+		},
+		"section1": {
+			"title": "Résumé de la recherche - Résumé scientifique",
+			"description": "Cette section doit décrire le contexte, les objectifs et la méthodologie de votre projet de recherche, ainsi que les plans d'utilisation des données contrôlées de la BGP.",
+			"form": {
+				"background": {
+					"title": "Contexte :",
+					"example": {
+						"text": "(min. 100 mots, max. 200 mots)\nFournissez un bref résumé de la base contextuelle de votre recherche. Par exemple :",
+						"exemplar1": "Sur quelles recherches fondamentales votre projet est-il basé ?",
+						"exemplar2": "Si possible, incluez toute recherche antérieure pertinente que vous avez effectuée dans ce domaine."
+					}
+				},
+				"methodology": {
+					"title": "Utilisation des données et méthodologie :",
+					"example": {
+						"text": "(min. 100 mots, max. 200 mots)\nFournissez un résumé des méthodes de votre projet de recherche et des plans d'utilisation des données, incluant :",
+						"exemplar1": "Quels principaux outils et technologies utiliserez-vous (une méthodologie approfondie n'est pas requise) ?",
+						"exemplar2": "Comment les données contrôlées de la BGP seront-elles utilisées exactement ?",
+						"exemplar3": "Remarque importante : Si vous prévoyez de combiner les données contrôlées de la BGP avec d'autres ensembles de données, vous vous engagez à ne pas lier ou combiner ces données d'une manière qui pourrait réidentifier les personnes concernées qui ont accepté de fournir leurs données. Veuillez confirmer comment les méthodes que vous comptez utiliser pour combiner les ensembles de données minimiseront le risque de réidentification des donneurs du PCGL."
+					}
+				},
+				"aims": {
+					"title": "Objectifs :",
+					"example": {
+						"text": "(min. 100 mots, max. 200 mots)\nFournissez un résumé de ce que votre projet espère accomplir en utilisant les données de la BGP. Par exemple :\nEn quoi votre recherche impactera-t-elle l'ensemble de la recherche en santé ou une meilleure compréhension de la biologie ?\nQuels sont les résultats prévus pour votre projet de recherche ?"
+					}
+				}
+			}
+		},
+		"section2": {
+			"title": "Résumé vulgarisé du projet",
+			"form": {
+				"lay-summary": {
+					"title": "Résumé vulgarisé (Lay Summary) :",
+					"example": {
+						"text": "(min. 100 mots, max. 250 mots)\nFournissez un résumé de votre projet destiné au grand public. Lors de la rédaction de votre résumé vulgarisé :",
+						"exemplar1": "Utilisez un langage comme si vous décriviez le projet à quelqu'un en dehors de votre domaine.",
+						"exemplar2": "Définissez tous les termes techniques utilisés.",
+						"exemplar3": "Nous vous recommandons vivement d'utiliser un outil de lisibilité en ligne pour évaluer le niveau scolaire de votre texte ; le niveau de langage visé est un niveau courant ou standard (équivalent du grade 8 or 9 en anglais).",
+						"exemplar4": "Expliquez en langage clair pourquoi vous posez cette question de recherche, ce que vous espérez découvrir et comment vous comptez utiliser les résultats.",
+						"exemplar5": "Considérez ces 3 éléments clés : structure et contenu, lisibilité, et guide linguistique."
+					}
+				}
+			}
+		},
+		"section3": {
+			"title": "Publications pertinentes",
+			"description": "Veuillez fournir au moins trois liens vers des publications pertinentes dont la ou le candidate/candidat est autrice/auteur ou coautrice/coauteur. Il doit s'agir de liens (URL) vers des sites de publication tels que pubmed.gov, biorxiv.org ou medrxiv.org.",
+			"form": {
+				"urlPage": ""
+			}
+		}
+	},
+	"ethics-section": {
+		"title": "Éthique",
+		"description1": "La BGP est consciente que certains pays ou régions n'exigent pas d'approbation éthique pour l'utilisation de données codées (c.-à-d. l'utilisation des données contrôlées de la BGP). Selon la nature de votre projet de recherche, il est toutefois possible qu'une telle approbation soit nécessaire dans votre pays. Si vous n'êtes pas certain/certaine que votre projet de recherche nécessite une approbation éthique pour utiliser les données contrôlées de la BGP, nous vous suggérons de contacter votre comité d'éthique de la recherche ou votre conseil d'examen institutionnel local (CER/CEI) pour clarifier la question.",
+		"description2": "Remarque : Ni le CAD de la BGP, ni la BGP ne sont responsables de l'approbation ou du suivi éthique des projets de recherche individuels et n'assument aucune responsabilité en cas de non-respect par le candidat des exigences éthiques locales ou nationales.",
+		"approval": "Approbation éthique",
+		"pleaseChoose": "Veuillez choisir l'une des options suivantes :",
+		"ethicsLetterDescription": "Votre pays ou région exige que votre projet de recherche soit soumis à un examen éthique ; par conséquent, ce projet de recherche a été approuvé par un CER/CEI officiellement désigné pour approuver et/ou surveiller la recherche impliquant des êtres humains. Conformément à l'Accord d'accès aux données (voir Section G), l'approbation éthique actuelle et applicable relève de la responsabilité du chercheur principal/de la chercheuse principale. Une lettre d'approbation éthique a été téléchargée.",
+		"exemptionDescription": "Vous déclarez et garantissez que votre pays ou région n'exige pas que votre projet de recherche soit soumis à un examen éthique. Une lettre d'exemption d'examen éthique a été téléchargée.",
+		"attach": "",
+		"allowedFileTypes": "",
+		"deleteModalTitle": ""
+	},
+	"requested-study": {
+		"title": "Étude demandée",
+		"description1": "Pour aider le CAD à examiner votre demande d'accès aux données plus efficacement, veuillez sélectionner l'étude pour laquelle vous demandez l'accès. Vous pouvez consulter et choisir parmi les études disponibles sur le",
+		"description-link": "Portail de recherche PCGL - Études.",
+		"section1": {
+			"form": {
+				"studyName": "",
+				"studyLabel": ""
+			}
+		}
+	},
+	"data-access-section": {
+		"title": "",
+		"description1": "",
+		"section1": {
+			"title": "",
+			"description": ""
+		},
+		"section2": {
+			"title": "",
+			"description": ""
+		},
+		"section3": {
+			"title": "",
+			"description": "",
+			"agreement1": "",
+			"agreement2": "",
+			"agreement3": "",
+			"agreement4": "",
+			"agreement5": "",
+			"agreement6": "",
+			"agreement7": "",
+			"agreement8": "",
+			"agreement9": ""
+		}
+	},
+	"appendices": {
+		"title": "",
+		"description": "",
+		"section1": "",
+		"readAppendix": "",
+		"haveReadAppendix": "",
+		"appendix1": "",
+		"appendix2": "",
+		"appendix3": ""
+	},
+	"sign-and-submit-section": {
+		"title": "Signer et soumettre",
+		"description": "Vous devez inclure à la fois la signature du chercheur principal/de la chercheuse principale et celle du ou de la représentant(e) institutionnel(le) pour que votre demande soit examinée. Le ou la représentant(e) institutionnel(le) sera également invité à soumettre sa signature lors de son examen.",
+		"section": {
+			"title": "Signature électronique",
+			"description": "Veuillez utiliser votre souris ou votre pavé tactile pour signer à l'intérieur de l'encadré ci-dessous. Une fois que vous êtes satisfait/satisfaite de la signature, cliquez sur enregistrer.",
+			"buttons": {
+				"download": "",
+				"clear": "",
+				"save": ""
+			}
+		},
+		"modal": {
+			"title": "",
+			"description": "",
+			"submit": "",
+			"cancel": ""
+		},
+		"notifications": {
+			"submitApplicationSuccess": "",
+			"submitApplicationWithRevisionsSuccess": "",
+			"submitApplicationFailed": ""
+		},
+		"rep-section": {
+			"desc1": "À titre d'étape finale, veuillez examiner la signature du candidat/de la candidate. Une fois l'examen terminé, veuillez effectuer l'une des actions suivantes :",
+			"point1": "<bold>Soumettre la demande</bold> : Si vous êtes satisfait/satisfaite de la demande, veuillez apposer votre signature, car elle est requise pour l'examen par le Comité d'accès aux données de la BGP. Cliquez sur Soumettre la demande pour terminer votre examen ; nous informerons le Comité d'accès aux données que la demande est prête à être examinée.",
+			"point2": "<bold>Demander des révisions</bold> : Si la demande nécessite des modifications, cliquez sur Demander des révisions pour la renvoyer au candidat/à la candidate afin qu'il ou elle effectue les modifications requises."
+		},
+		"dac-section": {
+			"desc1": "Veuillez examiner les signatures du candidat/de la candidate et du représentant(e) institutionnel(le) pour confirmer l'autorisation de la demande. Une fois votre examen terminé, effectuez l'une des actions suivantes :",
+			"point1": "<bold>Approuver</bold> - Si la demande est complète et exacte, cliquez sur Approuver pour accorder l'accès aux données.",
+			"point2": "<bold>Demander des révisions</bold> - Si la demande nécessite des modifications, cliquez sur Demander des révisions pour la renvoyer au candidat afin qu'il effectue les mises à jour.",
+			"point3": "<bold>Rejeter</bold> - Si vous déterminez que l'accès aux données ne doit pas être accordé, cliquez sur Rejeter pour refuser la demande.",
+			"point4": "<bold>Clôturer la demande</bold> - Si la demande n'est plus valide ou pertinente, cliquez sur Clôturer la demande pour qu'elle ne soit plus prise en considération."
+		}
+	}
+}
