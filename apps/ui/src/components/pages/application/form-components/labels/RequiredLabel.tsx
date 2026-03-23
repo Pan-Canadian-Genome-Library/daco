@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,27 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router';
+import { pcglColours } from '@/providers/ThemeProvider';
+import { Flex, Typography } from 'antd';
+import type { ReactNode } from 'react';
 
-import { NotificationProvider } from './context/notification/NotificationProvider';
-import ThemeProvider from './ThemeProvider';
-import { UserProvider } from './UserProvider';
+const { Text } = Typography;
 
-export const queryClient = new QueryClient();
-
-const Providers = ({ children }: { children: React.ReactNode }) => {
-	return (
-		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>
-				<BrowserRouter>
-					<NotificationProvider>
-						<UserProvider>{children}</UserProvider>;
-					</NotificationProvider>
-				</BrowserRouter>
-			</ThemeProvider>
-		</QueryClientProvider>
-	);
-};
-
-export default Providers;
+export const RequiredLabel = (children: string | ReactNode) => (
+	<Flex>
+		<Text
+			style={{
+				alignContent: 'center',
+				color: pcglColours.errorPrimary,
+				display: 'inline-block',
+				fontFamily: 'SimSun, sans-serif',
+				fontSize: '14px',
+				lineHeight: '1',
+				marginInlineEnd: '4px',
+			}}
+		>
+			*{' '}
+		</Text>
+		{children}
+	</Flex>
+);

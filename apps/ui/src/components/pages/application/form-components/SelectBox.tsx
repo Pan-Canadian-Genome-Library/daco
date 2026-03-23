@@ -24,6 +24,8 @@ import { BasicFormFieldProps } from '@/global/types';
 import { CheckCircleFilled } from '@ant-design/icons';
 import { ReactNode } from 'react';
 
+import { RequiredLabel } from './labels/RequiredLabel';
+
 const { Item } = Form;
 const { Text } = Typography;
 
@@ -31,11 +33,14 @@ interface SelectBoxProps extends BasicFormFieldProps {
 	options: {
 		label: string | ReactNode;
 		value: string | number;
+		required?: boolean;
 	}[];
+	label: string;
 	initialValue?: object | string | null;
 	placeholder?: string;
 	mode?: 'multiple' | 'tags';
 	sublabel?: string | ReactNode;
+	required?: boolean;
 	filterOption?: SelectProps['filterOption'];
 	showSearch?: SelectProps['showSearch'];
 	allowClear?: SelectProps['allowClear'];
@@ -45,6 +50,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
+	const fieldLabel = props.options.some((option) => option.required) ? RequiredLabel(props.label) : props.label;
 	return (
 		<Controller
 			name={props.name}
@@ -52,10 +58,9 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 			render={({ field }) => {
 				return (
 					<Item
-						label={props.label}
+						label={fieldLabel}
 						name={`${props.name}`}
 						rules={[props.rule]}
-						required={props.required}
 						validateTrigger="onChange"
 						initialValue={props.initialValue ?? field.value}
 					>
@@ -63,6 +68,7 @@ const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectB
 							{props.sublabel ? <Text style={{ fontSize: '0.75rem' }}>{props.sublabel}</Text> : null}
 							<Select
 								{...field}
+								aria-label={props.label}
 								mode={props.mode}
 								disabled={props.disabled}
 								options={props.options}
