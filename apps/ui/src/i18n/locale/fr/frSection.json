@@ -1,18 +1,19 @@
 {
 	"intro-section": {
 		"title": "Introduction",
-		"qualifyAccess": "Bien que toutes les sources de données de la BGP contiennent des données ouvertes, l'accès aux données génomiques et cliniques sensibles est contrôlé et nécessite une autorisation. Pour être admissible à la demande d'accès, vous devez :",
-		"qualifyPoint1": "être un chercheur indépendant affilié ou une chercheuse indépendante affiliée à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.) ;",
-		"qualifyPoint2": "avoir un ou une représentant(e) institutionnel(le) au sein de votre établissement ;",
-		"qualifyPoint3": "fournir un résumé scientifique et un résumé vulgarisé décrivant l'utilisation prévue des données contrôlées de la BGP ;",
-		"qualifyPoint4": "avoir au moins trois publications admissibles dont vous êtes l'auteur/autrice ou le coauteur/coautrice ;",
+		"qualifyAccess": "Bien que toutes les sources de données de la BGP contiennent des données ouvertes, l'accès aux données génomiques et cliniques sensibles est contrôlé et nécessite une autorisation. Pour être admissible à la demande d'accès, vous devez:",
+		"qualifyPoint1": "être un chercheur indépendant affilié ou une chercheuse indépendante affiliée à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.);",
+		"qualifyPoint2": "avoir un ou une représentant(e) institutionnel(le) au sein de votre établissement;",
+		"qualifyPoint3": "fournir un résumé scientifique et un résumé vulgarisé décrivant l'utilisation prévue des données contrôlées de la BGP;",
+		"qualifyPoint4": "avoir au moins trois publications admissibles dont vous êtes l'auteur/autrice ou le coauteur/coautrice;",
 		"qualifyPoint5": "inclure une lettre d'un comité d'éthique confirmant que l'utilisation des données contrôlées de la BGP a été approuvée si une approbation éthique est requise dans votre pays ou région, ou confirmant qu'une telle approbation est exemptée dans votre pays ou région.",
-		"receiveAccess": "Pour obtenir l'accès, vous devez :",
-		"accessPoint1": "remplir toutes les sections requises du présent formulaire de demande et en accepter les modalités ;",
-		"accessPoint2": "faire signer la demande finalisée par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(e) de l'entité juridique de votre établissement ; faire signer l'Entente d'utilisation des données par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(le) ;",
-		"accessPoint3": "soumettre la demande signée pour examen par le Bureau de conformité de l'accès aux données (BCAD) dans la section « Signer et soumettre » de la présente demande.",
-		"description1": "Au cours du processus de demande, vous devez soumettre un résumé de votre projet de recherche. Votre projet sera évalué afin de vérifier sa conformité aux objectifs et aux politiques du PCGL, y compris, sans s'y limiter, aux politiques relatives à la finalité et à la pertinence de la recherche, à la protection des donneurs et à la sécurité des données des donneurs. Si votre demande est approuvée, vous acceptez que le nom du demandeur ou de la demandeuse, l'établissement et le résumé scientifique vulgarisé puissent être inscrits dans un registre public des projets ayant obtenu l'accès aux données contrôlées de la BGP.",
-		"description2": "Si le Comité d'accès aux données (CAD) approuve votre demande, l'accès aux données contrôlées de la BGP sera accordé à compter de la date d'approbation. Le demandeur doit conclure une entente d'une durée d'un an. Pour accéder aux données contrôlées ou les utiliser au-delà de cette période d'un an, une demande de renouvellement devra être soumise et approuvée par le CAD."
+		"receiveAccess": "Pour obtenir l'accès, vous devez:",
+		"accessPoint1": "remplir toutes les sections requises du présent formulaire de demande et en accepter les modalités;",
+		"accessPoint2": "faire signer la demande finalisée par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(e) de l'entité juridique de votre établissement;",
+		"accessPoint3": "faire signer l'Entente d'utilisation des données par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(le);",
+		"accessPoint4": "soumettre la demande signée pour examen par le Bureau de conformité de l'accès aux données (BCAD) dans la section « Signer et soumettre » de la présente demande.",
+		"accessPoint5": "Au cours du processus de demande, vous devez soumettre un résumé de votre projet de recherche. Votre projet sera évalué afin de vérifier sa conformité aux objectifs et aux politiques du PCGL, y compris, sans s'y limiter, aux politiques relatives à la finalité et à la pertinence de la recherche, à la protection des donneurs et à la sécurité des données des donneurs. Si votre demande est approuvée, vous acceptez que le nom du demandeur ou de la demandeuse, l'établissement et le résumé scientifique vulgarisé puissent être inscrits dans un registre public des projets ayant obtenu l'accès aux données contrôlées de la BGP.",
+		"description1": "Si le Comité d'accès aux données (CAD) approuve votre demande, l'accès aux données contrôlées de la BGP sera accordé à compter de la date d'approbation. Le demandeur doit conclure une entente d'une durée d'un an. Pour accéder aux données contrôlées ou les utiliser au-delà de cette période d'un an, une demande de renouvellement devra être soumise et approuvée par le CAD."
 	},
 	"applicant-section": {
 		"title": "Renseignements sur le demandeur (chercheur principal)",
