@@ -50,7 +50,7 @@
 	},
 	"dashboard": {
 		"title": "My Applications",
-		"description": "This is where you can manage your Applications for Access to PCGL Controlled Data. Access will be granted starting from the date of approval by the PCGL DACO.",
+		"description": "This is where you can manage your Applications for Access to PCGL Controlled Data. Access will be granted starting from the date of approval by the PCGL DAC.",
 		"hasAccess": "You have access to PCGL Controlled Data",
 		"noAccess": "You do not have access to PCGL Controlled Data",
 		"startNewApp": "Start A New Application"
