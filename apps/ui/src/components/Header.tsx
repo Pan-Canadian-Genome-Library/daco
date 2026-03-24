@@ -18,7 +18,7 @@
  */
 
 import { CloseOutlined, DownOutlined, LogoutOutlined, MenuOutlined, UpOutlined } from '@ant-design/icons';
-import { Button, ButtonProps, ConfigProvider, Divider, Drawer, Flex, Image, Layout, Typography, theme } from 'antd';
+import { Button, ButtonProps, ConfigProvider, Divider, Drawer, Flex, Image, Layout, theme, Typography } from 'antd';
 import React, { useState, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -29,6 +29,12 @@ import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
 
+import {
+	clearLangSessionInformation,
+	getLangSessionInformation,
+	setLangSessionInformation,
+	SupportedLangs,
+} from '@/global/localStorage';
 import ApplyForAccessModal from './modals/ApplyForAccessModal';
 
 const { Link } = Typography;
@@ -56,7 +62,7 @@ const linkStyle: React.CSSProperties = {
 };
 
 const HeaderComponent = () => {
-	const { t: translate } = useTranslation();
+	const { t: translate, i18n } = useTranslation();
 	const minWidth = useMinWidth();
 	const { token } = useToken();
 	const { isLoggedIn, user } = useUserContext();
@@ -65,6 +71,7 @@ const HeaderComponent = () => {
 	const [isLogoutHover, setLogoutHover] = useState(false);
 	const [responsiveMenuOpen, setResponsiveMenuOpen] = useState(false);
 	const [applyForAccessOpen, setApplyForAccessOpen] = useState(false);
+	const { lang } = getLangSessionInformation();
 
 	const { emails = [], familyName = '', givenName = '' } = user || {};
 	const displayName = givenName || familyName ? `${givenName} ${familyName}` : givenName;
@@ -144,6 +151,26 @@ const HeaderComponent = () => {
 			variant: 'solid',
 			iconPosition: 'end',
 			href: API_PATH_LOGIN,
+		},
+		position: 'right',
+	};
+
+	const languageButton: MenuButton = {
+		name: translate('button.languageToggle'),
+		onClickAction: () => {
+			if (lang === SupportedLangs.FRENCH) {
+				clearLangSessionInformation();
+				i18n.changeLanguage(SupportedLangs.ENGLISH);
+			} else {
+				setLangSessionInformation({ lang: SupportedLangs.FRENCH });
+				i18n.changeLanguage(SupportedLangs.FRENCH);
+			}
+		},
+		buttonProps: {
+			type: 'default',
+			color: 'default',
+			variant: 'outlined',
+			iconPosition: 'end',
 		},
 		position: 'right',
 	};
@@ -277,7 +304,12 @@ const HeaderComponent = () => {
 		},
 	];
 
-	const menuItems = [...defaultMenuItems, determineIfApplicationsShown(), isLoggedIn ? logoutButton : loginButton];
+	const menuItems = [
+		...defaultMenuItems,
+		languageButton,
+		determineIfApplicationsShown(),
+		isLoggedIn ? logoutButton : loginButton,
+	];
 
 	/**
 	 * Generates the links to display in the mobile and desktop menus.
