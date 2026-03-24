@@ -127,7 +127,8 @@
 		"rejectApp": "Reject Application",
 		"rejectApplication": "Reject",
 		"revoke": "Revoke Application",
-		"approveApplication": "Approve"
+		"approveApplication": "Approve",
+		"languageToggle": "English"
 	},
 	"label": {
 		"created": "Created",

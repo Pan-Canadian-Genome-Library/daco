@@ -18,75 +18,27 @@
 	"applicant-section": {
 		"title": "Renseignements sur le demandeur (chercheur principal)",
 		"description1": "Les demandeurs admissibles à l'accès aux données contrôlées de la BGP doivent être des chercheurs indépendants affiliés ou des chercheuses indépendantes affiliées à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.).",
-		"description2": "Veuillez fournir une adresse courriel institutionnelle valide qui sera utilisée pour vous connecter à la BGP et qui sera associée à votre accès aux données contrôlées de la BGP.",
-		"section1": "",
-		"section2": ""
+		"description2": "Veuillez fournir une adresse courriel institutionnelle valide qui sera utilisée pour vous connecter à la BGP et qui sera associée à votre accès aux données contrôlées de la BGP."
 	},
 	"institutional-section": {
 		"title": "Représentant(e) institutionnel(le)",
-		"description1": "Un ou une représentant(e) institutionnel(le) est un représentant qualifié d'une entité juridique ayant le pouvoir administratif d'engager légalement cette entité aux modalités et conditions énoncées à la section G : Entente d'accès aux données (p. ex. vice-président/présidente à la recherche, directeur/directrice de la recherche ou agent des contrats de l'entité). La signature du ou de la représentant(e) institutionnel(le) sera requise à la fin de la présente demande avant son examen par le BCAD de la BGP.",
-		"section1": "",
-		"section2": "",
-		"primaryEmailLabel": ""
+		"description1": "Un ou une représentant(e) institutionnel(le) est un représentant qualifié d'une entité juridique ayant le pouvoir administratif d'engager légalement cette entité aux modalités et conditions énoncées à la section G : Entente d'accès aux données (p. ex. vice-président/présidente à la recherche, directeur/directrice de la recherche ou agent des contrats de l'entité). La signature du ou de la représentant(e) institutionnel(le) sera requise à la fin de la présente demande avant son examen par le BCAD de la BGP."
 	},
 	"collab-section": {
 		"title": "Collaborateurs et collaboratrices",
 		"description1": "Veuillez inclure les noms de tous les chercheurs et chercheuses, collaborateurs et collaboratrices, membres du personnel de recherche (y compris les stagiaires postdoctoraux) et étudiants et étudiantes (y compris celles et ceux aux cycles supérieurs) qui auront accès aux données contrôlées de la BGP afin de travailler sur le résumé de recherche décrit à la section D de la présente demande.",
 		"optional": "Les collaboratrices et collaborateurs ne sont pas requis pour que votre demande soit approuvée.",
 		"note": "* Veuillez noter : les cochercheurs et cochercheuses, collaborateurs et collaboratrices ou étudiants et étudiantes provenant d'autres établissements ne doivent pas être inclus/es dans cette liste. Ils devront soumettre une demande distincte pour obtenir l'accès aux données contrôlées.",
-		"deleteModalTitle": "",
-		"deleteModalDescription": "",
 		"addModalTitle": "Ajouter un collaborateur",
-		"addModalDescription": "Veuillez fournir les renseignements suivants concernant le collaborateur ou la collaboratrice, y compris une adresse courriel institutionnelle valide qu'il ou elle utilisera pour se connecter à la BGP. Cette adresse sera également associée à son accès aux données contrôlées de la BGP.",
-		"editModalTitle": "",
-		"editModalDescription": "",
-		"primaryEmailLabel": "",
-		"notifications": {
-			"added": {
-				"successTitle": "",
-				"successMessage": ""
-			},
-			"duplicate": {
-				"duplicateTitle": "",
-				"duplicateMessage": ""
-			},
-			"deleted": {
-				"successTitle": "",
-				"successMessage": ""
-			},
-			"edit": {
-				"successTitle": "",
-				"successMessage": ""
-			}
-		}
-	},
-	"form": {
-		"firstName": "",
-		"middleName": "",
-		"lastName": "",
-		"suffix": "",
-		"primaryEmail": "",
-		"primaryEmailLabel": "",
-		"positionTitle": "",
-		"title": "",
-		"primaryAffiliation": "",
-		"primaryAffiliationSubLabel": "",
-		"researcherProfile": "",
-		"researcherProfileLabel": "",
-		"country": "",
-		"streetAddress": "",
-		"building": "",
-		"state": "",
-		"city": "",
-		"postalCode": ""
+		"addModalDescription": "Veuillez fournir les renseignements suivants concernant le collaborateur ou la collaboratrice, y compris une adresse courriel institutionnelle valide qu'il ou elle utilisera pour se connecter à la BGP. Cette adresse sera également associée à son accès aux données contrôlées de la BGP."
 	},
 	"project-section": {
 		"title": "Renseignements sur le projet",
 		"description": "Veuillez remplir les détails suivants pour votre projet de recherche, y compris l'URL du site web si disponible.",
 		"section0": {
 			"form": {
-				"projectTitle": "",
-				"projectWebsite": ""
+				"projectTitle": "Titre du projet",
+				"projectWebsite": "Site web du projet"
 			}
 		},
 		"section1": {
@@ -136,10 +88,7 @@
 		},
 		"section3": {
 			"title": "Publications pertinentes",
-			"description": "Veuillez fournir au moins trois liens vers des publications pertinentes dont la ou le candidate/candidat est autrice/auteur ou coautrice/coauteur. Il doit s'agir de liens (URL) vers des sites de publication tels que pubmed.gov, biorxiv.org ou medrxiv.org.",
-			"form": {
-				"urlPage": ""
-			}
+			"description": "Veuillez fournir au moins trois liens vers des publications pertinentes dont la ou le candidate/candidat est autrice/auteur ou coautrice/coauteur. Il doit s'agir de liens (URL) vers des sites de publication tels que pubmed.gov, biorxiv.org ou medrxiv.org."
 		}
 	},
 	"ethics-section": {
@@ -149,79 +98,19 @@
 		"approval": "Approbation éthique",
 		"pleaseChoose": "Veuillez choisir l'une des options suivantes :",
 		"ethicsLetterDescription": "Votre pays ou région exige que votre projet de recherche soit soumis à un examen éthique ; par conséquent, ce projet de recherche a été approuvé par un CER/CEI officiellement désigné pour approuver et/ou surveiller la recherche impliquant des êtres humains. Conformément à l'Accord d'accès aux données (voir Section G), l'approbation éthique actuelle et applicable relève de la responsabilité du chercheur principal/de la chercheuse principale. Une lettre d'approbation éthique a été téléchargée.",
-		"exemptionDescription": "Vous déclarez et garantissez que votre pays ou région n'exige pas que votre projet de recherche soit soumis à un examen éthique. Une lettre d'exemption d'examen éthique a été téléchargée.",
-		"attach": "",
-		"allowedFileTypes": "",
-		"deleteModalTitle": ""
+		"exemptionDescription": "Vous déclarez et garantissez que votre pays ou région n'exige pas que votre projet de recherche soit soumis à un examen éthique. Une lettre d'exemption d'examen éthique a été téléchargée."
 	},
 	"requested-study": {
 		"title": "Étude demandée",
 		"description1": "Pour aider le CAD à examiner votre demande d'accès aux données plus efficacement, veuillez sélectionner l'étude pour laquelle vous demandez l'accès. Vous pouvez consulter et choisir parmi les études disponibles sur le",
-		"description-link": "Portail de recherche PCGL - Études.",
-		"section1": {
-			"form": {
-				"studyName": "",
-				"studyLabel": ""
-			}
-		}
-	},
-	"data-access-section": {
-		"title": "",
-		"description1": "",
-		"section1": {
-			"title": "",
-			"description": ""
-		},
-		"section2": {
-			"title": "",
-			"description": ""
-		},
-		"section3": {
-			"title": "",
-			"description": "",
-			"agreement1": "",
-			"agreement2": "",
-			"agreement3": "",
-			"agreement4": "",
-			"agreement5": "",
-			"agreement6": "",
-			"agreement7": "",
-			"agreement8": "",
-			"agreement9": ""
-		}
-	},
-	"appendices": {
-		"title": "",
-		"description": "",
-		"section1": "",
-		"readAppendix": "",
-		"haveReadAppendix": "",
-		"appendix1": "",
-		"appendix2": "",
-		"appendix3": ""
+		"description-link": "Portail de recherche PCGL - Études."
 	},
 	"sign-and-submit-section": {
 		"title": "Signer et soumettre",
 		"description": "Vous devez inclure à la fois la signature du chercheur principal/de la chercheuse principale et celle du ou de la représentant(e) institutionnel(le) pour que votre demande soit examinée. Le ou la représentant(e) institutionnel(le) sera également invité à soumettre sa signature lors de son examen.",
 		"section": {
 			"title": "Signature électronique",
-			"description": "Veuillez utiliser votre souris ou votre pavé tactile pour signer à l'intérieur de l'encadré ci-dessous. Une fois que vous êtes satisfait/satisfaite de la signature, cliquez sur enregistrer.",
-			"buttons": {
-				"download": "",
-				"clear": "",
-				"save": ""
-			}
-		},
-		"modal": {
-			"title": "",
-			"description": "",
-			"submit": "",
-			"cancel": ""
-		},
-		"notifications": {
-			"submitApplicationSuccess": "",
-			"submitApplicationWithRevisionsSuccess": "",
-			"submitApplicationFailed": ""
+			"description": "Veuillez utiliser votre souris ou votre pavé tactile pour signer à l'intérieur de l'encadré ci-dessous. Une fois que vous êtes satisfait/satisfaite de la signature, cliquez sur enregistrer."
 		},
 		"rep-section": {
 			"desc1": "À titre d'étape finale, veuillez examiner la signature du candidat/de la candidate. Une fois l'examen terminé, veuillez effectuer l'une des actions suivantes :",

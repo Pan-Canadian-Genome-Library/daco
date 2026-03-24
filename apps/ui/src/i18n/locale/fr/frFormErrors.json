@@ -1,19 +1,6 @@
 {
-	"defaultViolationText": "",
 	"requiredField": "Veuillez remplir le champ requis",
 	"validEmail": "Merci d'entrer une adresse e-mail valide.",
 	"validURL": "Merci d'entrer une URL valide. Elle doit commencer par http:// ou https://.",
-	"validPostalCode": "Merci d'entrer un code postal valide.",
-	"tooFewWords": "",
-	"tooManyWords": "",
-	"receivedInvalidEnum": "",
-	"invalidFileTitle": "",
-	"invalidFileSizeTitle": "",
-	"invalidFileSizeDescription": "",
-	"requiredNumberOfCheckboxes": "",
-	"checkboxesNotFilledOut": "",
-	"duplicateAgreementItems": "",
-	"invalidAgreementItem": "",
-	"invalidIdNumber": "",
-	"tooSmall": ""
+	"validPostalCode": "Merci d'entrer un code postal valide."
 }
