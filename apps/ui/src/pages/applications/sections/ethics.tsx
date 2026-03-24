@@ -210,15 +210,15 @@ const Ethics = () => {
 							disabled={!canEdit}
 							options={[
 								{
-									key: 'exemption',
-									value: false,
-									label: translate('ethics-section.exemptionDescription'),
-									required: true,
-								},
-								{
 									key: 'ethicsLetter',
 									value: true,
 									label: translate('ethics-section.ethicsLetterDescription'),
+									required: true,
+								},
+								{
+									key: 'exemption',
+									value: false,
+									label: translate('ethics-section.exemptionDescription'),
 									required: true,
 								},
 							]}
