@@ -45,6 +45,8 @@ const Introduction = () => {
 		translate('intro-section.accessPoint1'),
 		translate('intro-section.accessPoint2'),
 		translate('intro-section.accessPoint3'),
+		translate('intro-section.accessPoint4'),
+		translate('intro-section.accessPoint5'),
 	];
 
 	return (
@@ -61,9 +63,6 @@ const Introduction = () => {
 					</Flex>
 					<Flex vertical>
 						<Text>{translate('intro-section.description1')}</Text>
-					</Flex>
-					<Flex vertical>
-						<Text>{translate('intro-section.description2')}</Text>
 					</Flex>
 				</SectionTitle>
 
