@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -24,6 +24,7 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
+import { PROJECT_INFORMATION } from '@/service/pdf/components/enTranslations.ts';
 
 const ProjectInformation = ({
 	projectTitle,
@@ -36,43 +37,39 @@ const ProjectInformation = ({
 }: ProjectDTO) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Project Information</Title>
-			<Paragraph>
-				Please fill out the following details for your research project, including the website URL if available.
-			</Paragraph>
-			<DataItem item="Project Title">{projectTitle}</DataItem>
-			<DataItem isLink item="Project Website">
+			<Title>{PROJECT_INFORMATION.TITLE}</Title>
+			<Paragraph>{PROJECT_INFORMATION.DESCRIPTION}</Paragraph>
+			<DataItem item={PROJECT_INFORMATION.PROJECT_TITLE_LABEL}>{projectTitle}</DataItem>
+			<DataItem isLink item={PROJECT_INFORMATION.PROJECT_WEBSITE_LABEL}>
 				{projectWebsite}
 			</DataItem>
 
-			<FormDisplay title="Research Summary - Scientific Abstract">
-				<Paragraph>
-					This section should describe the background, aims, and methodology of your research project, as well as plans
-					for how you will use the PCGL Controlled Data.
-				</Paragraph>
-				<DataItem item="Project Background" layout="stacked">
+			<FormDisplay title={PROJECT_INFORMATION.RESEARCH_SUMMARY_TITLE}>
+				<Paragraph>{PROJECT_INFORMATION.RESEARCH_SUMMARY_DESCRIPTION}</Paragraph>
+				<DataItem item={PROJECT_INFORMATION.PROJECT_BACKGROUND_LABEL} layout="stacked">
 					{projectBackground}
 				</DataItem>
-				<DataItem item="Use of Data and Methodology" layout="stacked">
+				<DataItem item={PROJECT_INFORMATION.USE_OF_DATA_METHODOLOGY_LABEL} layout="stacked">
 					{projectMethodology}
 				</DataItem>
-				<DataItem item="Aims" layout="stacked">
+				<DataItem item={PROJECT_INFORMATION.AIMS_LABEL} layout="stacked">
 					{projectAims}
 				</DataItem>
 			</FormDisplay>
-			<FormDisplay title="Project Lay Summary">
-				<DataItem item="Lay Summary" layout="stacked">
+			<FormDisplay title={PROJECT_INFORMATION.LAY_SUMMARY_TITLE}>
+				<DataItem item={PROJECT_INFORMATION.LAY_SUMMARY_LABEL} layout="stacked">
 					{projectSummary}
 				</DataItem>
 			</FormDisplay>
-			<FormDisplay title="Relevant Publications">
-				<Paragraph>
-					Please provide at least three links to relevant publications, of which the applicant is an author or a
-					co-author. These should be links (URLs) to publication websites such as pubmed.gov, biorxiv.org, or
-					medrxiv.org.
-				</Paragraph>
+			<FormDisplay title={PROJECT_INFORMATION.PUBLICATIONS_TITLE}>
+				<Paragraph>{PROJECT_INFORMATION.PUBLICATIONS_DESCRIPTION}</Paragraph>
 				{projectPublicationUrls?.map((urls, index) => (
-					<DataItem isLink key={urls} item={`Publication ${index + 1}`} layout="horizontal">
+					<DataItem
+						isLink
+						key={urls}
+						item={`${PROJECT_INFORMATION.PUBLICATION_LABEL} ${index + 1}`}
+						layout="horizontal"
+					>
 						{urls}
 					</DataItem>
 				))}

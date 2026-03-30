@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 202 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -24,6 +24,7 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
+import { APPLICANT_INFORMATION } from '@/service/pdf/components/enTranslations.ts';
 import { View } from '@react-pdf/renderer';
 import { standardStyles } from '../standardStyling.ts';
 
@@ -63,32 +64,25 @@ const ApplicantInformation = ({
 >) => {
 	return (
 		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Applicant Information (Principal Investigator)</Title>
-			<Paragraph>
-				Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated
-				with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to
-				apply for federal research grants, etc.).
-			</Paragraph>
-			<Paragraph>
-				Please include a valid institutional email address that will be used to log in to PCGL and will be the email
-				address associated with PCGL Controlled Data access.
-			</Paragraph>
-			<FormDisplay title="Principal Investigator Information">
-				<DataItem item="Title">{applicantTitle}</DataItem>
-				<DataItem item="First Name">{applicantFirstName}</DataItem>
-				<DataItem item="Middle Name">{applicantMiddleName}</DataItem>
-				<DataItem item="Last Name">{applicantLastName}</DataItem>
-				<DataItem item="Suffix">{applicantSuffix}</DataItem>
-				<DataItem item="Primary Affiliation">{applicantPrimaryAffiliation}</DataItem>
-				<DataItem isLink linkPrefix="mailto:" item="Institutional Email">
+			<Title>{APPLICANT_INFORMATION.TITLE}</Title>
+			<Paragraph>{APPLICANT_INFORMATION.QUALIFIED_APPLICANTS_PARAGRAPH}</Paragraph>
+			<Paragraph>{APPLICANT_INFORMATION.INSTITUTIONAL_EMAIL_PARAGRAPH}</Paragraph>
+			<FormDisplay title={APPLICANT_INFORMATION.PRINCIPAL_INVESTIGATOR_INFO_TITLE}>
+				<DataItem item={APPLICANT_INFORMATION.TITLE_LABEL}>{applicantTitle}</DataItem>
+				<DataItem item={APPLICANT_INFORMATION.FIRST_NAME_LABEL}>{applicantFirstName}</DataItem>
+				<DataItem item={APPLICANT_INFORMATION.MIDDLE_NAME_LABEL}>{applicantMiddleName}</DataItem>
+				<DataItem item={APPLICANT_INFORMATION.LAST_NAME_LABEL}>{applicantLastName}</DataItem>
+				<DataItem item={APPLICANT_INFORMATION.SUFFIX_LABEL}>{applicantSuffix}</DataItem>
+				<DataItem item={APPLICANT_INFORMATION.PRIMARY_AFFILIATION_LABEL}>{applicantPrimaryAffiliation}</DataItem>
+				<DataItem isLink linkPrefix="mailto:" item={APPLICANT_INFORMATION.INSTITUTIONAL_EMAIL_LABEL}>
 					{applicantInstitutionalEmail}
 				</DataItem>
-				<DataItem isLink item="Researcher Profile">
+				<DataItem isLink item={APPLICANT_INFORMATION.RESEARCHER_PROFILE_LABEL}>
 					{applicantProfileUrl}
 				</DataItem>
-				<DataItem item="Position Title">{applicantPositionTitle}</DataItem>
+				<DataItem item={APPLICANT_INFORMATION.POSITION_TITLE_LABEL}>{applicantPositionTitle}</DataItem>
 			</FormDisplay>
-			<FormDisplay title="Institution/Company Mailing Address">
+			<FormDisplay title={APPLICANT_INFORMATION.INSTITUTION_MAILING_ADDRESS_TITLE}>
 				<View
 					style={{
 						display: 'flex',
@@ -105,9 +99,9 @@ const ApplicantInformation = ({
 							gap: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem item="Country">{applicantInstitutionCountry}</DataItem>
-						<DataItem item="Street Address">{applicantInstitutionStreetAddress}</DataItem>
-						<DataItem item="Building">{applicantInstitutionBuilding}</DataItem>
+						<DataItem item={APPLICANT_INFORMATION.COUNTRY_LABEL}>{applicantInstitutionCountry}</DataItem>
+						<DataItem item={APPLICANT_INFORMATION.STREET_ADDRESS_LABEL}>{applicantInstitutionStreetAddress}</DataItem>
+						<DataItem item={APPLICANT_INFORMATION.BUILDING_LABEL}>{applicantInstitutionBuilding}</DataItem>
 					</View>
 					<View
 						style={{
@@ -118,9 +112,9 @@ const ApplicantInformation = ({
 							marginLeft: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem item="Province">{applicantInstitutionState}</DataItem>
-						<DataItem item="City">{applicantInstitutionCity}</DataItem>
-						<DataItem item="Postal Code / ZIP Code">{applicantInstitutionPostalCode}</DataItem>
+						<DataItem item={APPLICANT_INFORMATION.PROVINCE_LABEL}>{applicantInstitutionState}</DataItem>
+						<DataItem item={APPLICANT_INFORMATION.CITY_LABEL}>{applicantInstitutionCity}</DataItem>
+						<DataItem item={APPLICANT_INFORMATION.POSTAL_CODE_LABEL}>{applicantInstitutionPostalCode}</DataItem>
 					</View>
 				</View>
 			</FormDisplay>

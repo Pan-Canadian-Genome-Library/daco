@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -22,6 +22,7 @@ import { Link } from '@react-pdf/renderer';
 import { RequestedStudiesDTO } from '@pcgl-daco/data-model';
 
 import DataItem from '@/service/pdf/components/DataItem.tsx';
+import { REQUESTED_STUDY } from '@/service/pdf/components/enTranslations.ts';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
@@ -30,14 +31,19 @@ import Title from '@/service/pdf/components/Title.tsx';
 const RequestedStudy = ({ requestedStudies }: RequestedStudiesDTO) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Requested Study</Title>
+			<Title>{REQUESTED_STUDY.TITLE}</Title>
 			<Paragraph>
-				To help the DAC review your data access request more efficiently, please select the study you are requesting
-				access to. You can view and choose from the available studies on the&nbsp;
+				{REQUESTED_STUDY.DESCRIPTION}
 				{/**TODO: Add Link to this once that's figured out. */}
 				<Link style={{ color: standardStyles.colours.primary }}>PCGL Research Portal - Studies.</Link>
 			</Paragraph>
-			<DataItem item={requestedStudies?.length && requestedStudies.length > 1 ? 'Study Names' : 'Study Name'}>
+			<DataItem
+				item={
+					requestedStudies?.length && requestedStudies.length > 1
+						? REQUESTED_STUDY.STUDY_NAMES_LABEL
+						: REQUESTED_STUDY.STUDY_NAME_LABEL
+				}
+			>
 				{requestedStudies?.map((study, index) => `${study}${requestedStudies.length !== index + 1 ? ', ' : ''}`)}
 			</DataItem>
 		</StandardPage>

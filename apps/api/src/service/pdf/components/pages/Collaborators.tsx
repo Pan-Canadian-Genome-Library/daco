@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -24,21 +24,15 @@ import CollaboratorsTable from '@/service/pdf/components/CollaboratorsTable.tsx'
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
+import { COLLABORATORS } from '@/service/pdf/components/enTranslations.ts';
 
 const Collaborators = ({ collaborators }: { collaborators: CollaboratorDTO[] }) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Collaborators</Title>
-			<Paragraph>
-				Please include the names of all investigators, collaborators, research staff (including post-docs) and students
-				(including graduate students), who will have access to the PCGL Controlled Data in order to work on the Research
-				Summary as outlined in Section D of this application.
-			</Paragraph>
-			<Paragraph>Collaborators are not required for your applications to be approved.</Paragraph>
-			<Paragraph>
-				* Please note: co-investigators, collaborators or students at other institutions should not be included in this
-				list. They will have to submit a separate application for access to controlled data.
-			</Paragraph>
+			<Title>{COLLABORATORS.TITLE}</Title>
+			<Paragraph>{COLLABORATORS.DESCRIPTION}</Paragraph>
+			<Paragraph>{COLLABORATORS.NOT_REQUIRED}</Paragraph>
+			<Paragraph>{COLLABORATORS.NOTE}</Paragraph>
 			<View style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
 				<CollaboratorsTable data={collaborators} />
 			</View>
