@@ -22,7 +22,7 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import List from '@/service/pdf/components/List.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
-import { TERMS_AND_CONDITIONS } from '@/service/pdf/components/enTranslations.ts';
+import { TERMS_AND_CONDITIONS } from '@/service/pdf/components/translations/enTranslations.ts';
 import { ApplicationAgreements, type AgreementDTO } from '@pcgl-daco/data-model';
 
 const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {

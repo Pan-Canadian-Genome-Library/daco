@@ -24,7 +24,7 @@ import CollaboratorsTable from '@/service/pdf/components/CollaboratorsTable.tsx'
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { COLLABORATORS } from '@/service/pdf/components/enTranslations.ts';
+import { COLLABORATORS } from '@/service/pdf/components/translations/enTranslations.ts';
 
 const Collaborators = ({ collaborators }: { collaborators: CollaboratorDTO[] }) => {
 	return (

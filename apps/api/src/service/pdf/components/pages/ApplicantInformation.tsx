@@ -24,7 +24,7 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { APPLICANT_INFORMATION } from '@/service/pdf/components/enTranslations.ts';
+import { APPLICANT_INFORMATION } from '@/service/pdf/components/translations/enTranslations.ts';
 import { View } from '@react-pdf/renderer';
 import { standardStyles } from '../standardStyling.ts';
 

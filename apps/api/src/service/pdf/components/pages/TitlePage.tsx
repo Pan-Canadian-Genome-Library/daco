@@ -21,10 +21,10 @@ import { StyleSheet, Text, View } from '@react-pdf/renderer';
 
 import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 
-import { TITLE_PAGE } from '@/service/pdf/components/enTranslations.ts';
 import Logo from '@/service/pdf/components/Logo/Logo.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+import { TITLE_PAGE } from '@/service/pdf/components/translations/enTranslations.ts';
 
 interface TitlePageProps extends Pick<ApplicationContentsResponse, 'applicationId' | 'applicantPrimaryAffiliation'> {
 	displayLogo?: boolean;

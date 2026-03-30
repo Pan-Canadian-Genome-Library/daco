@@ -24,7 +24,7 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import Signature from '@/service/pdf/components/Signature.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { SIGN_SUBMIT } from '@/service/pdf/components/enTranslations.ts';
+import { SIGN_SUBMIT } from '@/service/pdf/components/translations/enTranslations.ts';
 
 interface SignSubmitProps
 	extends Omit<SignatureDTO, 'applicationId'>,

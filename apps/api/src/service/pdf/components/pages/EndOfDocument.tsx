@@ -19,12 +19,12 @@
 
 import { StyleSheet, View } from '@react-pdf/renderer';
 
-import { END_OF_DOCUMENT } from '@/service/pdf/components/enTranslations.ts';
 import Logo from '@/service/pdf/components/Logo/Logo.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
+import { END_OF_DOCUMENT } from '@/service/pdf/components/translations/enTranslations.ts';
 
 const styles = StyleSheet.create({
 	link: {

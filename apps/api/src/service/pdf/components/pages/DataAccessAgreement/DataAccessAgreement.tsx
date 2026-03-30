@@ -22,7 +22,7 @@ import List from '@/service/pdf/components/List.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { DATA_ACCESS_AGREEMENT } from '@/service/pdf/components/enTranslations.ts';
+import { DATA_ACCESS_AGREEMENT } from '@/service/pdf/components/translations/enTranslations.ts';
 
 const DataAccessAgreement = () => {
 	return (

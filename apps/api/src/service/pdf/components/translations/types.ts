@@ -17,24 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import List from '@/service/pdf/components/List.tsx';
-import Paragraph from '@/service/pdf/components/Paragraph.tsx';
-import StandardPage from '@/service/pdf/components/StandardPage.tsx';
-import Title from '@/service/pdf/components/Title.tsx';
-import { INTRODUCTION } from '@/service/pdf/components/translations/enTranslations.ts';
+export const SupportedLangs = {
+	ENGLISH: 'en',
+	FRENCH: 'fr',
+} as const;
 
-const IntroductionPage = () => {
-	return (
-		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{INTRODUCTION.TITLE}</Title>
-			<Paragraph>{INTRODUCTION.QUALIFICATION_INTRO}</Paragraph>
-			<List items={INTRODUCTION.QUALIFICATION_ITEMS} />
-			<Paragraph>{INTRODUCTION.RECEIVE_ACCESS_INTRO}</Paragraph>
-			<List isNumbered items={INTRODUCTION.RECEIVE_ACCESS_ITEMS} />
-			<Paragraph>{INTRODUCTION.APPLICATION_REVIEW_PARAGRAPH}</Paragraph>
-			<Paragraph>{INTRODUCTION.APPROVAL_AND_RENEWAL_PARAGRAPH}</Paragraph>
-		</StandardPage>
-	);
-};
-
-export default IntroductionPage;
+export type SupportedLangsValues = (typeof SupportedLangs)[keyof typeof SupportedLangs];

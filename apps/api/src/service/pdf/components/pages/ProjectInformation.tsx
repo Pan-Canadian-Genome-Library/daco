@@ -24,7 +24,7 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { PROJECT_INFORMATION } from '@/service/pdf/components/enTranslations.ts';
+import { PROJECT_INFORMATION } from '@/service/pdf/components/translations/enTranslations.ts';
 
 const ProjectInformation = ({
 	projectTitle,

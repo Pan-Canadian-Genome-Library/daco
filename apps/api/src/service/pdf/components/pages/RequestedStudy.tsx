@@ -22,11 +22,11 @@ import { Link } from '@react-pdf/renderer';
 import { RequestedStudiesDTO } from '@pcgl-daco/data-model';
 
 import DataItem from '@/service/pdf/components/DataItem.tsx';
-import { REQUESTED_STUDY } from '@/service/pdf/components/enTranslations.ts';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
+import { REQUESTED_STUDY } from '@/service/pdf/components/translations/enTranslations.ts';
 
 const RequestedStudy = ({ requestedStudies }: RequestedStudiesDTO) => {
 	return (

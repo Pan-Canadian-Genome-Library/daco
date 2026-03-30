@@ -20,12 +20,12 @@
 import { Link, StyleSheet, Text } from '@react-pdf/renderer';
 
 import Checkbox from '@/service/pdf/components/Checkbox.tsx';
-import { APPENDICES } from '@/service/pdf/components/enTranslations.ts';
 import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
+import { APPENDICES } from '@/service/pdf/components/translations/enTranslations.ts';
 import { type AppendicesDTO, appendicesEnum } from '@pcgl-daco/data-model';
 
 const styles = StyleSheet.create({
