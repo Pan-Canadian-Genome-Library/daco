@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,8 +17,32 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// IntroductionPage
+export const FR_INTRODUCTION = {
+	TITLE: 'Introduction',
+	QUALIFICATION_INTRO:
+		"Bien que toutes les sources de données de la BGP contiennent des données ouvertes, l'accès aux données génomiques et cliniques sensibles est contrôlé et nécessite une autorisation. Pour être admissible à la demande d'accès, vous devez:",
+	QUALIFICATION_ITEMS: [
+		"être un chercheur indépendant affilié ou une chercheuse indépendante affiliée à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.);",
+		'avoir un ou une représentant(e) institutionnel(le) au sein de votre établissement;',
+		"fournir un résumé scientifique et un résumé vulgarisé décrivant l'utilisation prévue des données contrôlées de la BGP;",
+		"avoir au moins trois publications admissibles dont vous êtes l'auteur/autrice ou le coauteur/coautrice;",
+		"inclure une lettre d'un comité d'éthique confirmant que l'utilisation des données contrôlées de la BGP a été approuvée si une approbation éthique est requise dans votre pays ou région, ou confirmant qu'une telle approbation est exemptée dans votre pays ou région.",
+	],
+	RECEIVE_ACCESS_INTRO: "Pour obtenir l'accès, vous devez:",
+	RECEIVE_ACCESS_ITEMS: [
+		'remplir toutes les sections requises du présent formulaire de demande et en accepter les modalités;',
+		"faire signer la demande finalisée par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(e) de l'entité juridique de votre établissement;",
+		"faire signer l'Entente d'utilisation des données par le chercheur principal/la chercheuse principale et le ou la représentant(e) institutionnel(le);",
+		"soumettre la demande signée pour examen par le Bureau de conformité de l'accès aux données (BCAD) dans la section « Signer et soumettre » de la présente demande.",
+		"Au cours du processus de demande, vous devez soumettre un résumé de votre projet de recherche. Votre projet sera évalué afin de vérifier sa conformité aux objectifs et aux politiques du PCGL, y compris, sans s'y limiter, aux politiques relatives à la finalité et à la pertinence de la recherche, à la protection des donneurs et à la sécurité des données des donneurs. Si votre demande est approuvée, vous acceptez que le nom du demandeur ou de la demandeuse, l'établissement et le résumé scientifique vulgarisé puissent être inscrits dans un registre public des projets ayant obtenu l'accès aux données contrôlées de la BGP.",
+	],
+	APPROVAL_AND_RENEWAL_PARAGRAPH:
+		"Si le Comité d'accès aux données (CAD) approuve votre demande, l'accès aux données contrôlées de la BGP sera accordé à compter de la date d'approbation. Le demandeur doit conclure une entente d'une durée d'un an. Pour accéder aux données contrôlées ou les utiliser au-delà de cette période d'un an, une demande de renouvellement devra être soumise et approuvée par le CAD.",
+};
+
 // Appendices Page
-export const APPENDICES = {
+export const FR_APPENDICES = {
 	TITLE: 'Appendices',
 	DESCRIPTION: 'Please review and agree to the following Appendices.',
 	PCGL_POLICIES_TITLE: 'PCGL Policies',
@@ -28,12 +52,12 @@ export const APPENDICES = {
 };
 
 // ApplicantInformation Page
-export const APPLICANT_INFORMATION = {
-	TITLE: 'Applicant Information (Principal Investigator)',
+export const FR_APPLICANT_INFORMATION = {
+	TITLE: 'Renseignements sur le demandeur (chercheur principal)',
 	QUALIFIED_APPLICANTS_PARAGRAPH:
-		'Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to apply for federal research grants, etc.).',
+		"Les demandeurs admissibles à l'accès aux données contrôlées de la BGP doivent être des chercheurs indépendants affiliés ou des chercheuses indépendantes affiliées à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.).",
 	INSTITUTIONAL_EMAIL_PARAGRAPH:
-		'Please include a valid institutional email address that will be used to log in to PCGL and will be the email address associated with PCGL Controlled Data access.',
+		'Veuillez fournir une adresse courriel institutionnelle valide qui sera utilisée pour vous connecter à la BGP et qui sera associée à votre accès aux données contrôlées de la BGP.',
 	PRINCIPAL_INVESTIGATOR_INFO_TITLE: 'Principal Investigator Information',
 	INSTITUTION_MAILING_ADDRESS_TITLE: 'Institution/Company Mailing Address',
 	TITLE_LABEL: 'Title',
@@ -54,22 +78,22 @@ export const APPLICANT_INFORMATION = {
 };
 
 // Collaborators Page
-export const COLLABORATORS = {
-	TITLE: 'Collaborators',
+export const FR_COLLABORATORS = {
+	TITLE: 'Collaborateurs et collaboratrices',
 	DESCRIPTION:
-		'Please include the names of all investigators, collaborators, research staff (including post-docs) and students (including graduate students), who will have access to the PCGL Controlled Data in order to work on the Research Summary as outlined in Section D of this application.',
-	NOT_REQUIRED: 'Collaborators are not required for your applications to be approved.',
-	NOTE: '* Please note: co-investigators, collaborators or students at other institutions should not be included in this list. They will have to submit a separate application for access to controlled data.',
+		'Veuillez inclure les noms de tous les chercheurs et chercheuses, collaborateurs et collaboratrices, membres du personnel de recherche (y compris les stagiaires postdoctoraux) et étudiants et étudiantes (y compris celles et ceux aux cycles supérieurs) qui auront accès aux données contrôlées de la BGP afin de travailler sur le résumé de recherche décrit à la section D de la présente demande.',
+	NOT_REQUIRED: 'Les collaboratrices et collaborateurs ne sont pas requis pour que votre demande soit approuvée.',
+	NOTE: "* Veuillez noter : les cochercheurs et cochercheuses, collaborateurs et collaboratrices ou étudiants et étudiantes provenant d'autres établissements ne doivent pas être inclus/es dans cette liste. Ils devront soumettre une demande distincte pour obtenir l'accès aux données contrôlées.",
 };
 
 // EndOfDocument Page
-export const END_OF_DOCUMENT = {
+export const FR_END_OF_DOCUMENT = {
 	TITLE: '—  END OF DOCUMENT  —',
 	CLOSING_MESSAGE: 'Attached Ethics Letter and Appendices to follow.',
 };
 
 // Ethics Page
-export const ETHICS = {
+export const FR_ETHICS = {
 	TITLE: 'Ethics',
 	ETHICS_AWARENESS_PARAGRAPH:
 		'PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.',
@@ -85,10 +109,10 @@ export const ETHICS = {
 };
 
 // InstitutionalRepresentative Page
-export const INSTITUTIONAL_REPRESENTATIVE = {
-	TITLE: 'Institutional Representative',
+export const FR_INSTITUTIONAL_REPRESENTATIVE = {
+	TITLE: 'Représentant(e) institutionnel(le)',
 	DESCRIPTION:
-		"An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
+		"Un ou une représentant(e) institutionnel(le) est un représentant qualifié d'une entité juridique ayant le pouvoir administratif d'engager légalement cette entité aux modalités et conditions énoncées à la section G : Entente d'accès aux données (p. ex. vice-président/présidente à la recherche, directeur/directrice de la recherche ou agent des contrats de l'entité). La signature du ou de la représentant(e) institutionnel(le) sera requise à la fin de la présente demande avant son examen par le BCAD de la BGP.",
 	INSTITUTIONAL_REP_TITLE_LABEL: 'Institutional Representative',
 	INSTITUTION_MAILING_ADDRESS_TITLE: 'Institution/Company Mailing Address',
 	TITLE_LABEL: 'Title',
@@ -108,64 +132,40 @@ export const INSTITUTIONAL_REPRESENTATIVE = {
 	POSTAL_CODE_LABEL: 'Postal Code / ZIP Code',
 };
 
-// IntroductionPage
-export const INTRODUCTION = {
-	TITLE: 'Introduction',
-	QUALIFICATION_INTRO:
-		'While all PCGL data sources contain open data, sensitive genomic and clinical data is controlled and requires permission to access. To qualify for access, you must:',
-	QUALIFICATION_ITEMS: [
-		'be an independent researcher affiliated with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to apply for federal research grants, etc.),',
-		'have an institutional representative at your institution,',
-		'have a scientific abstract and lay summary outlining the desired use of the PCGL Controlled Data,',
-		'have at least 3 qualifying publications of which you were an author/co-author,',
-		'include an ethics letter, if ethics approval for use of PCGL Controlled Data is required in your country/region.',
-	],
-	RECEIVE_ACCESS_INTRO: 'To receive access, you must:',
-	RECEIVE_ACCESS_ITEMS: [
-		'Complete all required sections on this application form and agree to its terms',
-		'Have the Principal Investigator and Institutional Representative who represents your institutions legal entity sign the finalized application.',
-		'Submit the signed application for review by the Data Access Compliance Office (DACO) in the "Sign and Submit" section of this application.',
-	],
-	APPLICATION_REVIEW_PARAGRAPH:
-		"During the application process, you must submit a summary of your research project. Your project will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the donors and the security of the donors' data. If your application is approved, you agree that your applicant's name, institution, and scientific lay summary may be included in a public registry of projects that have been granted access to PCGL Controlled Data.",
-	APPROVAL_AND_RENEWAL_PARAGRAPH:
-		'If the Data Access Compliance Office (DACO) approves your application, access to the PCGL Controlled Data will be granted starting from the date you are approved for access. An annual agreement must be made by the applicant and a bi-annual renewal must be completed in order to access/use controlled data beyond that two-year time period.',
-};
-
 // ProjectInformation Page
-export const PROJECT_INFORMATION = {
-	TITLE: 'Project Information',
+export const FR_PROJECT_INFORMATION = {
+	TITLE: 'Renseignements sur le projet',
 	DESCRIPTION:
-		'Please fill out the following details for your research project, including the website URL if available.',
-	PROJECT_TITLE_LABEL: 'Project Title',
-	PROJECT_WEBSITE_LABEL: 'Project Website',
-	RESEARCH_SUMMARY_TITLE: 'Research Summary - Scientific Abstract',
+		"Veuillez remplir les détails suivants pour votre projet de recherche, y compris l'URL du site web si disponible.",
+	PROJECT_TITLE_LABEL: 'Titre du projet',
+	PROJECT_WEBSITE_LABEL: 'Site web du projet',
+	RESEARCH_SUMMARY_TITLE: 'Résumé de la recherche - Résumé scientifique',
 	RESEARCH_SUMMARY_DESCRIPTION:
-		'This section should describe the background, aims, and methodology of your research project, as well as plans for how you will use the PCGL Controlled Data.',
-	PROJECT_BACKGROUND_LABEL: 'Project Background',
-	USE_OF_DATA_METHODOLOGY_LABEL: 'Use of Data and Methodology',
-	AIMS_LABEL: 'Aims',
-	LAY_SUMMARY_TITLE: 'Project Lay Summary',
-	LAY_SUMMARY_LABEL: 'Lay Summary',
-	PUBLICATIONS_TITLE: 'Relevant Publications',
+		"Cette section doit décrire le contexte, les objectifs et la méthodologie de votre projet de recherche, ainsi que les plans d'utilisation des données contrôlées de la BGP.",
+	PROJECT_BACKGROUND_LABEL: 'Contexte :',
+	USE_OF_DATA_METHODOLOGY_LABEL: 'Utilisation des données et méthodologie :',
+	AIMS_LABEL: 'Objectifs :',
+	LAY_SUMMARY_TITLE: 'Résumé vulgarisé du projet',
+	LAY_SUMMARY_LABEL: 'Résumé vulgarisé (Lay Summary) :',
+	PUBLICATIONS_TITLE: 'Publications pertinentes',
 	PUBLICATIONS_DESCRIPTION:
-		'Please provide at least three links to relevant publications, of which the applicant is an author or a co-author. These should be links (URLs) to publication websites such as pubmed.gov, biorxiv.org, or medrxiv.org.',
+		"Veuillez fournir au moins trois liens vers des publications pertinentes dont la ou le candidate/candidat est autrice/auteur ou coautrice/coauteur. Il doit s'agir de liens (URL) vers des sites de publication tels que pubmed.gov, biorxiv.org ou medrxiv.org.",
 	PUBLICATION_LABEL: 'Publication',
 };
 
 // RequestedStudy Page
-export const REQUESTED_STUDY = {
-	TITLE: 'Requested Study',
+export const FR_REQUESTED_STUDY = {
+	TITLE: 'Étude demandée',
 	DESCRIPTION:
-		'To help the DAC review your data access request more efficiently, please select the study you are requesting access to. You can view and choose from the available studies on the PCGL Research Portal - Studies.',
-	STUDY_NAME_LABEL: 'Study Names',
+		"Pour aider le CAD à examiner votre demande d'accès aux données plus efficacement, veuillez sélectionner l'étude pour laquelle vous demandez l'accès. Vous pouvez consulter et choisir parmi les études disponibles sur le",
+	STUDY_NAME_LABEL: 'Noms des études',
 };
 
 // SignSubmit Page
-export const SIGN_SUBMIT = {
-	TITLE: 'Sign & Submit',
+export const FR_SIGN_SUBMIT = {
+	TITLE: 'Signer et soumettre',
 	SIGNATURE_REQUIREMENT:
-		'You must include BOTH the Principal Investigator and the Institutional Representative signatures in order for your application to be reviewed.',
+		'Vous devez inclure à la fois la signature du chercheur principal/de la chercheuse principale et celle du ou de la représentant(e) institutionnel(le) pour que votre demande soit examinée. Le ou la représentant(e) institutionnel(le) sera également invité à soumettre sa signature lors de son examen.',
 	APPLICANT_AUTHORIZATION_TITLE: 'Applicant Authorization',
 	INSTITUTIONAL_REP_AUTHORIZATION_TITLE: 'Institutional Representative Authorization',
 	NAME_LABEL: 'Name',
@@ -174,17 +174,17 @@ export const SIGN_SUBMIT = {
 };
 
 // TitlePage
-export const TITLE_PAGE = {
+export const FR_TITLE_PAGE = {
 	APPLICATION_NUMBER_LABEL: 'Application Number:',
 	APPLICATION_NUMBER_PREFIX: 'PCGL-',
 	PRINCIPAL_INVESTIGATOR_LABEL: 'Principal Investigator:',
 	INSTITUTION_LABEL: 'Institution:',
 	DOCUMENT_CREATED_ON_LABEL: 'Document Created On:',
-	FRENCH_VERSION: 'A french version attached at the bottom',
+	FRENCH_VERSION: '« Une version française est jointe en bas. »',
 };
 
 // DataAccessAgreement Page
-export const DATA_ACCESS_AGREEMENT = {
+export const FR_DATA_ACCESS_AGREEMENT = {
 	TITLE: 'Data Access Agreement',
 	APPLICATION_COMPLETION_PARAGRAPH:
 		"This application form must be completed by the applicant and the legal entity with which you are affiliated (You) prior to being granted access to Pan Canadian Genome Library (PCGL) controlled data (the PCGL Controlled Data as further defined in Section F of this application). To receive access, You must complete this entire application form and agree to its terms by signing this application. All sections, as well as Appendices I through III, are integral components of this application. Your Research Project (as defined below) will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the participants and the security of the participants' data.",
@@ -210,7 +210,7 @@ export const DATA_ACCESS_AGREEMENT = {
 };
 
 // TermsAndConditions Page
-export const TERMS_AND_CONDITIONS = {
+export const FR_TERMS_AND_CONDITIONS = {
 	TITLE: 'Terms and Conditions',
 	SIGNING_INTRO: 'In signing this Agreement:',
 	TERMS_ITEMS: [
