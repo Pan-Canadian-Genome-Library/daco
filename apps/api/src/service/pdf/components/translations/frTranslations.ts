@@ -94,18 +94,18 @@ export const FR_END_OF_DOCUMENT = {
 
 // Ethics Page
 export const FR_ETHICS = {
-	TITLE: 'Ethics',
+	TITLE: 'Éthique',
 	ETHICS_AWARENESS_PARAGRAPH:
-		'PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.',
+		"La BGP est consciente que certains pays ou régions n'exigent pas d'approbation éthique pour l'utilisation de données codées (c.-à-d. l'utilisation des données contrôlées de la BGP). Selon la nature de votre projet de recherche, il est toutefois possible qu'une telle approbation soit nécessaire dans votre pays. Si vous n'êtes pas certain/certaine que votre projet de recherche nécessite une approbation éthique pour utiliser les données contrôlées de la BGP, nous vous suggérons de contacter votre comité d'éthique de la recherche ou votre conseil d'examen institutionnel local (CER/CEI) pour clarifier la question.",
 	DACO_RESPONSIBILITY_PARAGRAPH:
-		"Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual research projects and bear no responsibility for the applicant's failure to comply with local/national ethical requirements.",
-	ETHICS_APPROVAL_TITLE: 'Ethics Approval',
-	NO_REVIEW_REQUIRED:
-		'You represent and warrant that your country/region does not require your research project to undergo ethics review. An ethics exemption letter has been uploaded',
+		"Remarque : Ni le CAD de la BGP, ni la BGP ne sont responsables de l'approbation ou du suivi éthique des projets de recherche individuels et n'assument aucune responsabilité en cas de non-respect par le candidat des exigences éthiques locales ou nationales.",
+	ETHICS_APPROVAL_TITLE: 'Approbation éthique',
 	REVIEW_REQUIRED:
-		'Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator',
-	APPROVAL_LETTER_MESSAGE_APPROVAL: '—  Ethics approval letter is attached at end of this document.  —',
-	APPROVAL_LETTER_MESSAGE_EXEMPTION: '—  Ethics exemption letter is attached at end of this document.  —',
+		"Votre pays ou région exige que votre projet de recherche soit soumis à un examen éthique ; par conséquent, ce projet de recherche a été approuvé par un CER/CEI officiellement désigné pour approuver et/ou surveiller la recherche impliquant des êtres humains. Conformément à l'Accord d'accès aux données (voir Section G), l'approbation éthique actuelle et applicable relève de la responsabilité du chercheur principal/de la chercheuse principale. Une lettre d'approbation éthique a été téléchargée.",
+	NO_REVIEW_REQUIRED:
+		"Vous déclarez et garantissez que votre pays ou région n'exige pas que votre projet de recherche soit soumis à un examen éthique. Une lettre d'exemption d'examen éthique a été téléchargée.",
+	APPROVAL_LETTER_MESSAGE_APPROVAL: '—  La lettre d’approbation éthique est jointe à la fin de ce document. —',
+	APPROVAL_LETTER_MESSAGE_EXEMPTION: '—  La lettre d’exemption éthique est jointe à la fin de ce document.  —',
 };
 
 // InstitutionalRepresentative Page

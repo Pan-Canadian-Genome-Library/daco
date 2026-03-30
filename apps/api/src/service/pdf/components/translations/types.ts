@@ -23,3 +23,7 @@ export const SupportedLangs = {
 } as const;
 
 export type SupportedLangsValues = (typeof SupportedLangs)[keyof typeof SupportedLangs];
+
+export type LanguagProps = {
+	lang?: SupportedLangsValues;
+};

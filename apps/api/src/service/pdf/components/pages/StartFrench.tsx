@@ -16,38 +16,55 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { View } from '@react-pdf/renderer';
 
-import { CollaboratorDTO } from '@pcgl-daco/data-model';
+import { StyleSheet, View } from '@react-pdf/renderer';
 
-import CollaboratorsTable from '@/service/pdf/components/CollaboratorsTable.tsx';
+import Logo from '@/service/pdf/components/Logo/Logo.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
+import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
-import { COLLABORATORS } from '@/service/pdf/components/translations/enTranslations.ts';
-import { FR_COLLABORATORS } from '../translations/frTranslations.ts';
-import { LanguagProps, SupportedLangs } from '../translations/types.ts';
 
-type CollaboratorsProps = LanguagProps & {
-	collaborators: CollaboratorDTO[];
-};
+const styles = StyleSheet.create({
+	link: {
+		color: standardStyles.colours.primary,
+	},
+	text: {
+		fontSize: standardStyles.textStyles.sizes.md,
+	},
+	logoImage: {
+		width: '50%',
+		margin: '0 0 0 0',
+	},
+	content: {
+		height: '100vh',
+		width: '100vw',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+});
 
-const Collaborators = ({ collaborators, lang = SupportedLangs.ENGLISH }: CollaboratorsProps) => {
+const StartFrench = () => {
 	return (
-		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{lang === SupportedLangs.ENGLISH ? COLLABORATORS.TITLE : FR_COLLABORATORS.TITLE}</Title>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? COLLABORATORS.DESCRIPTION : FR_COLLABORATORS.DESCRIPTION}
-			</Paragraph>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? COLLABORATORS.NOT_REQUIRED : FR_COLLABORATORS.NOT_REQUIRED}
-			</Paragraph>
-			<Paragraph>{lang === SupportedLangs.ENGLISH ? COLLABORATORS.NOTE : FR_COLLABORATORS.NOTE}</Paragraph>
-			<View style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-				<CollaboratorsTable data={collaborators} />
+		<StandardPage ignorePadding showAttribution alternatingAttribution showPageNumbers>
+			<View style={styles.content}>
+				<Logo colour={true} style={styles.logoImage} />
+				<Title style={{ paddingTop: '2.5cm' }} level="h2">
+					{'- END OF ENGLISH DOCUMENTS -'}
+				</Title>
+				<Paragraph
+					style={{
+						fontWeight: 500,
+						paddingTop: '.75cm',
+					}}
+				>
+					{'French version starts now'}
+				</Paragraph>
 			</View>
 		</StandardPage>
 	);
 };
 
-export default Collaborators;
+export default StartFrench;

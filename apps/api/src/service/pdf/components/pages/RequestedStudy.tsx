@@ -27,22 +27,22 @@ import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
 import { REQUESTED_STUDY } from '@/service/pdf/components/translations/enTranslations.ts';
+import { FR_REQUESTED_STUDY } from '../translations/frTranslations.ts';
+import { LanguagProps, SupportedLangs } from '../translations/types.ts';
 
-const RequestedStudy = ({ requestedStudies }: RequestedStudiesDTO) => {
+type RequestedStudyProps = LanguagProps & RequestedStudiesDTO;
+
+const RequestedStudy = ({ requestedStudies, lang = SupportedLangs.ENGLISH }: RequestedStudyProps) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{REQUESTED_STUDY.TITLE}</Title>
+			<Title>{lang === SupportedLangs.ENGLISH ? REQUESTED_STUDY.TITLE : FR_REQUESTED_STUDY.TITLE}</Title>
 			<Paragraph>
-				{REQUESTED_STUDY.DESCRIPTION}
+				{lang === SupportedLangs.ENGLISH ? REQUESTED_STUDY.DESCRIPTION : FR_REQUESTED_STUDY.DESCRIPTION}
 				{/**TODO: Add Link to this once that's figured out. */}
 				<Link style={{ color: standardStyles.colours.primary }}>PCGL Research Portal - Studies.</Link>
 			</Paragraph>
 			<DataItem
-				item={
-					requestedStudies?.length && requestedStudies.length > 1
-						? REQUESTED_STUDY.STUDY_NAMES_LABEL
-						: REQUESTED_STUDY.STUDY_NAME_LABEL
-				}
+				item={lang === SupportedLangs.ENGLISH ? REQUESTED_STUDY.STUDY_NAME_LABEL : FR_REQUESTED_STUDY.STUDY_NAME_LABEL}
 			>
 				{requestedStudies?.map((study, index) => `${study}${requestedStudies.length !== index + 1 ? ', ' : ''}`)}
 			</DataItem>

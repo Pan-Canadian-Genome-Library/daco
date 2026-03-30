@@ -26,7 +26,11 @@ import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
 import { APPENDICES } from '@/service/pdf/components/translations/enTranslations.ts';
+import { FR_APPENDICES } from '@/service/pdf/components/translations/frTranslations.ts';
+import { type LanguagProps, SupportedLangs } from '@/service/pdf/components/translations/types.ts';
 import { type AppendicesDTO, appendicesEnum } from '@pcgl-daco/data-model';
+
+type AppendicesProps = LanguagProps & AppendicesDTO;
 
 const styles = StyleSheet.create({
 	link: {
@@ -37,15 +41,17 @@ const styles = StyleSheet.create({
 	},
 });
 
-const Appendices = ({ acceptedAppendices }: AppendicesDTO) => {
+const Appendices = ({ acceptedAppendices, lang = SupportedLangs.ENGLISH }: AppendicesProps) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{APPENDICES.TITLE}</Title>
-			<Paragraph>{APPENDICES.DESCRIPTION}</Paragraph>
-			<FormDisplay title={APPENDICES.PCGL_POLICIES_TITLE}>
+			<Title>{lang === SupportedLangs.ENGLISH ? APPENDICES.TITLE : FR_APPENDICES.TITLE}</Title>
+			<Paragraph>{lang === SupportedLangs.ENGLISH ? APPENDICES.DESCRIPTION : FR_APPENDICES.DESCRIPTION}</Paragraph>
+			<FormDisplay
+				title={lang === SupportedLangs.ENGLISH ? APPENDICES.PCGL_POLICIES_TITLE : FR_APPENDICES.PCGL_POLICIES_TITLE}
+			>
 				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[0])}>
 					<Text style={styles.text}>
-						{APPENDICES.APPENDIX_I} &mdash;{' '}
+						{lang === SupportedLangs.ENGLISH ? APPENDICES.APPENDIX_I : FR_APPENDICES.APPENDIX_I} &mdash;{' '}
 						<Link src="#" style={styles.link}>
 							PCGL Goals and Policies
 						</Link>
@@ -53,7 +59,7 @@ const Appendices = ({ acceptedAppendices }: AppendicesDTO) => {
 				</Checkbox>
 				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[1])}>
 					<Text style={styles.text}>
-						{APPENDICES.APPENDIX_II} &mdash;{' '}
+						{lang === SupportedLangs.ENGLISH ? APPENDICES.APPENDIX_II : FR_APPENDICES.APPENDIX_II} &mdash;{' '}
 						<Link src="#" style={styles.link}>
 							Data Access and Data Use Policies and Guidelines
 						</Link>
@@ -61,7 +67,7 @@ const Appendices = ({ acceptedAppendices }: AppendicesDTO) => {
 				</Checkbox>
 				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[2])}>
 					<Text style={styles.text}>
-						{APPENDICES.APPENDIX_III} &mdash;{' '}
+						{lang === SupportedLangs.ENGLISH ? APPENDICES.APPENDIX_III : FR_APPENDICES.APPENDIX_III} &mdash;{' '}
 						<Link src="#" style={styles.link}>
 							Intellectual Property Policy
 						</Link>

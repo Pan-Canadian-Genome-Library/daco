@@ -25,6 +25,10 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
 import { PROJECT_INFORMATION } from '@/service/pdf/components/translations/enTranslations.ts';
+import { FR_PROJECT_INFORMATION } from '../translations/frTranslations.ts';
+import { LanguagProps, SupportedLangs } from '../translations/types.ts';
+
+type ProjectInformationProps = LanguagProps & ProjectDTO;
 
 const ProjectInformation = ({
 	projectTitle,
@@ -34,40 +38,108 @@ const ProjectInformation = ({
 	projectMethodology,
 	projectSummary,
 	projectPublicationUrls,
-}: ProjectDTO) => {
+	lang = SupportedLangs.ENGLISH,
+}: ProjectInformationProps) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{PROJECT_INFORMATION.TITLE}</Title>
-			<Paragraph>{PROJECT_INFORMATION.DESCRIPTION}</Paragraph>
-			<DataItem item={PROJECT_INFORMATION.PROJECT_TITLE_LABEL}>{projectTitle}</DataItem>
-			<DataItem isLink item={PROJECT_INFORMATION.PROJECT_WEBSITE_LABEL}>
+			<Title>{lang === SupportedLangs.ENGLISH ? PROJECT_INFORMATION.TITLE : FR_PROJECT_INFORMATION.TITLE}</Title>
+			<Paragraph>
+				{lang === SupportedLangs.ENGLISH ? PROJECT_INFORMATION.DESCRIPTION : FR_PROJECT_INFORMATION.DESCRIPTION}
+			</Paragraph>
+			<DataItem
+				item={
+					lang === SupportedLangs.ENGLISH
+						? PROJECT_INFORMATION.PROJECT_TITLE_LABEL
+						: FR_PROJECT_INFORMATION.PROJECT_TITLE_LABEL
+				}
+			>
+				{projectTitle}
+			</DataItem>
+			<DataItem
+				isLink
+				item={
+					lang === SupportedLangs.ENGLISH
+						? PROJECT_INFORMATION.PROJECT_WEBSITE_LABEL
+						: FR_PROJECT_INFORMATION.PROJECT_WEBSITE_LABEL
+				}
+			>
 				{projectWebsite}
 			</DataItem>
 
-			<FormDisplay title={PROJECT_INFORMATION.RESEARCH_SUMMARY_TITLE}>
-				<Paragraph>{PROJECT_INFORMATION.RESEARCH_SUMMARY_DESCRIPTION}</Paragraph>
-				<DataItem item={PROJECT_INFORMATION.PROJECT_BACKGROUND_LABEL} layout="stacked">
+			<FormDisplay
+				title={
+					lang === SupportedLangs.ENGLISH
+						? PROJECT_INFORMATION.RESEARCH_SUMMARY_TITLE
+						: FR_PROJECT_INFORMATION.RESEARCH_SUMMARY_TITLE
+				}
+			>
+				<Paragraph>
+					{lang === SupportedLangs.ENGLISH
+						? PROJECT_INFORMATION.RESEARCH_SUMMARY_DESCRIPTION
+						: FR_PROJECT_INFORMATION.RESEARCH_SUMMARY_DESCRIPTION}
+				</Paragraph>
+				<DataItem
+					item={
+						lang === SupportedLangs.ENGLISH
+							? PROJECT_INFORMATION.PROJECT_BACKGROUND_LABEL
+							: FR_PROJECT_INFORMATION.PROJECT_BACKGROUND_LABEL
+					}
+					layout="stacked"
+				>
 					{projectBackground}
 				</DataItem>
-				<DataItem item={PROJECT_INFORMATION.USE_OF_DATA_METHODOLOGY_LABEL} layout="stacked">
+				<DataItem
+					item={
+						lang === SupportedLangs.ENGLISH
+							? PROJECT_INFORMATION.USE_OF_DATA_METHODOLOGY_LABEL
+							: FR_PROJECT_INFORMATION.USE_OF_DATA_METHODOLOGY_LABEL
+					}
+					layout="stacked"
+				>
 					{projectMethodology}
 				</DataItem>
-				<DataItem item={PROJECT_INFORMATION.AIMS_LABEL} layout="stacked">
+				<DataItem
+					item={lang === SupportedLangs.ENGLISH ? PROJECT_INFORMATION.AIMS_LABEL : FR_PROJECT_INFORMATION.AIMS_LABEL}
+					layout="stacked"
+				>
 					{projectAims}
 				</DataItem>
 			</FormDisplay>
-			<FormDisplay title={PROJECT_INFORMATION.LAY_SUMMARY_TITLE}>
-				<DataItem item={PROJECT_INFORMATION.LAY_SUMMARY_LABEL} layout="stacked">
+			<FormDisplay
+				title={
+					lang === SupportedLangs.ENGLISH
+						? PROJECT_INFORMATION.LAY_SUMMARY_TITLE
+						: FR_PROJECT_INFORMATION.LAY_SUMMARY_TITLE
+				}
+			>
+				<DataItem
+					item={
+						lang === SupportedLangs.ENGLISH
+							? PROJECT_INFORMATION.LAY_SUMMARY_LABEL
+							: FR_PROJECT_INFORMATION.LAY_SUMMARY_LABEL
+					}
+					layout="stacked"
+				>
 					{projectSummary}
 				</DataItem>
 			</FormDisplay>
-			<FormDisplay title={PROJECT_INFORMATION.PUBLICATIONS_TITLE}>
-				<Paragraph>{PROJECT_INFORMATION.PUBLICATIONS_DESCRIPTION}</Paragraph>
+			<FormDisplay
+				title={
+					lang === SupportedLangs.ENGLISH
+						? PROJECT_INFORMATION.PUBLICATIONS_TITLE
+						: FR_PROJECT_INFORMATION.PUBLICATIONS_TITLE
+				}
+			>
+				<Paragraph>
+					{lang === SupportedLangs.ENGLISH
+						? PROJECT_INFORMATION.PUBLICATIONS_DESCRIPTION
+						: FR_PROJECT_INFORMATION.PUBLICATIONS_DESCRIPTION}
+				</Paragraph>
 				{projectPublicationUrls?.map((urls, index) => (
 					<DataItem
 						isLink
 						key={urls}
-						item={`${PROJECT_INFORMATION.PUBLICATION_LABEL} ${index + 1}`}
+						item={`${lang === SupportedLangs.ENGLISH ? PROJECT_INFORMATION.PUBLICATION_LABEL : FR_PROJECT_INFORMATION.PUBLICATION_LABEL} ${index + 1}`}
 						layout="horizontal"
 					>
 						{urls}

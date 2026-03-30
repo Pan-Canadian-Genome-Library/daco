@@ -28,7 +28,6 @@ import { TITLE_PAGE } from '@/service/pdf/components/translations/enTranslations
 
 interface TitlePageProps extends Pick<ApplicationContentsResponse, 'applicationId' | 'applicantPrimaryAffiliation'> {
 	displayLogo?: boolean;
-	title: string;
 	principalInvestigatorName: string;
 	docCreatedAt: Date;
 }
@@ -55,6 +54,13 @@ const styles = StyleSheet.create({
 		fontFamily: 'LeagueSpartan',
 		fontWeight: 'bold',
 	},
+	subTitleText: {
+		marginTop: '5px',
+		fontSize: standardStyles.textStyles.sizes.lg,
+		fontFamily: 'LeagueSpartan',
+		fontWeight: 'bold',
+	},
+
 	infoGrid: {
 		display: 'flex',
 		width: '60%',
@@ -80,7 +86,6 @@ const styles = StyleSheet.create({
 });
 
 const TitlePage = ({
-	title,
 	displayLogo,
 	applicationId,
 	principalInvestigatorName,
@@ -91,7 +96,8 @@ const TitlePage = ({
 		<StandardPage ignorePadding showAttribution>
 			<View style={styles.content}>
 				{displayLogo ? <Logo style={styles.logoImage} /> : null}
-				<Text style={styles.titleText}>{title}</Text>
+				<Text style={styles.titleText}>{'Application for Access to PCGL Controlled Data'}</Text>
+				<Text style={styles.subTitleText}>{'Demande d’accès aux données contrôlées du PCGL'}</Text>
 				<View style={styles.infoGrid}>
 					<View style={styles.infoItem}>
 						<Text style={styles.dataQuestion}>{TITLE_PAGE.APPLICATION_NUMBER_LABEL}</Text>

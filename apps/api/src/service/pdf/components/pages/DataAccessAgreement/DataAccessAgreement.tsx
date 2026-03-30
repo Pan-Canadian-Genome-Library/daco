@@ -23,18 +23,54 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
 import { DATA_ACCESS_AGREEMENT } from '@/service/pdf/components/translations/enTranslations.ts';
+import { LanguagProps, SupportedLangs } from '@/service/pdf/components/translations/types.ts';
+import { FR_DATA_ACCESS_AGREEMENT } from '../../translations/frTranslations.ts';
 
-const DataAccessAgreement = () => {
+type DataAccessAgreementProps = LanguagProps;
+
+const DataAccessAgreement = ({ lang = SupportedLangs.ENGLISH }: DataAccessAgreementProps) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{DATA_ACCESS_AGREEMENT.TITLE}</Title>
-			<Paragraph>{DATA_ACCESS_AGREEMENT.APPLICATION_COMPLETION_PARAGRAPH}</Paragraph>
-			<Paragraph>{DATA_ACCESS_AGREEMENT.DACO_APPROVAL_PARAGRAPH}</Paragraph>
-			<Paragraph>{DATA_ACCESS_AGREEMENT.PUBLIC_REGISTRY_PARAGRAPH}</Paragraph>
-			<Paragraph>{DATA_ACCESS_AGREEMENT.AGREEMENT_ACKNOWLEDGEMENT_PARAGRAPH}</Paragraph>
-			<Paragraph>{DATA_ACCESS_AGREEMENT.DEFINITIONS_PARAGRAPH}</Paragraph>
-			<FormDisplay title={DATA_ACCESS_AGREEMENT.DEFINITIONS_TITLE}>
-				<List items={DATA_ACCESS_AGREEMENT.DEFINITIONS_ITEMS} />
+			<Title>{lang === SupportedLangs.ENGLISH ? DATA_ACCESS_AGREEMENT.TITLE : FR_DATA_ACCESS_AGREEMENT.TITLE}</Title>
+			<Paragraph>
+				{lang === SupportedLangs.ENGLISH
+					? DATA_ACCESS_AGREEMENT.APPLICATION_COMPLETION_PARAGRAPH
+					: FR_DATA_ACCESS_AGREEMENT.APPLICATION_COMPLETION_PARAGRAPH}
+			</Paragraph>
+			<Paragraph>
+				{lang === SupportedLangs.ENGLISH
+					? DATA_ACCESS_AGREEMENT.DACO_APPROVAL_PARAGRAPH
+					: FR_DATA_ACCESS_AGREEMENT.DACO_APPROVAL_PARAGRAPH}
+			</Paragraph>
+			<Paragraph>
+				{lang === SupportedLangs.ENGLISH
+					? DATA_ACCESS_AGREEMENT.PUBLIC_REGISTRY_PARAGRAPH
+					: FR_DATA_ACCESS_AGREEMENT.PUBLIC_REGISTRY_PARAGRAPH}
+			</Paragraph>
+			<Paragraph>
+				{lang === SupportedLangs.ENGLISH
+					? DATA_ACCESS_AGREEMENT.AGREEMENT_ACKNOWLEDGEMENT_PARAGRAPH
+					: FR_DATA_ACCESS_AGREEMENT.AGREEMENT_ACKNOWLEDGEMENT_PARAGRAPH}
+			</Paragraph>
+			<Paragraph>
+				{lang === SupportedLangs.ENGLISH
+					? DATA_ACCESS_AGREEMENT.DEFINITIONS_PARAGRAPH
+					: FR_DATA_ACCESS_AGREEMENT.DEFINITIONS_PARAGRAPH}
+			</Paragraph>
+			<FormDisplay
+				title={
+					lang === SupportedLangs.ENGLISH
+						? DATA_ACCESS_AGREEMENT.DEFINITIONS_TITLE
+						: FR_DATA_ACCESS_AGREEMENT.DEFINITIONS_TITLE
+				}
+			>
+				<List
+					items={
+						lang === SupportedLangs.ENGLISH
+							? DATA_ACCESS_AGREEMENT.DEFINITIONS_ITEMS
+							: FR_DATA_ACCESS_AGREEMENT.DEFINITIONS_ITEMS
+					}
+				/>
 			</FormDisplay>
 		</StandardPage>
 	);

@@ -24,29 +24,54 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { TERMS_AND_CONDITIONS } from '@/service/pdf/components/translations/enTranslations.ts';
 import { ApplicationAgreements, type AgreementDTO } from '@pcgl-daco/data-model';
+import { FR_TERMS_AND_CONDITIONS } from '../../translations/frTranslations.ts';
+import { LanguagProps, SupportedLangs } from '../../translations/types.ts';
 
-const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {
+type TermsAndConditionsProps = LanguagProps & AgreementDTO;
+
+const TermsAndConditions = ({ acceptedAgreements, lang = SupportedLangs.ENGLISH }: TermsAndConditionsProps) => {
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<FormDisplay title={TERMS_AND_CONDITIONS.TITLE}>
-				<Paragraph>{TERMS_AND_CONDITIONS.SIGNING_INTRO}</Paragraph>
-				<List items={TERMS_AND_CONDITIONS.TERMS_ITEMS} />
+			<FormDisplay title={lang === SupportedLangs.ENGLISH ? TERMS_AND_CONDITIONS.TITLE : FR_TERMS_AND_CONDITIONS.TITLE}>
+				<Paragraph>
+					{lang === SupportedLangs.ENGLISH ? TERMS_AND_CONDITIONS.SIGNING_INTRO : FR_TERMS_AND_CONDITIONS.SIGNING_INTRO}
+				</Paragraph>
+				<List
+					items={
+						lang === SupportedLangs.ENGLISH ? TERMS_AND_CONDITIONS.TERMS_ITEMS : FR_TERMS_AND_CONDITIONS.TERMS_ITEMS
+					}
+				/>
 			</FormDisplay>
-			<FormDisplay title={TERMS_AND_CONDITIONS.AGREEMENTS_TITLE} wrap={false}>
-				<Paragraph>{TERMS_AND_CONDITIONS.AGREEMENTS_INTRO}</Paragraph>
+			<FormDisplay
+				title={
+					lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.AGREEMENTS_TITLE
+						: FR_TERMS_AND_CONDITIONS.AGREEMENTS_TITLE
+				}
+				wrap={false}
+			>
+				<Paragraph>
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.AGREEMENTS_INTRO
+						: FR_TERMS_AND_CONDITIONS.AGREEMENTS_INTRO}
+				</Paragraph>
 				<Checkbox
 					unchecked={
 						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_software_updates)
 					}
 				>
-					{TERMS_AND_CONDITIONS.SOFTWARE_UPDATES}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.SOFTWARE_UPDATES
+						: FR_TERMS_AND_CONDITIONS.SOFTWARE_UPDATES}
 				</Checkbox>
 				<Checkbox
 					unchecked={
 						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_non_disclosure)
 					}
 				>
-					{TERMS_AND_CONDITIONS.NON_DISCLOSURE}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.NON_DISCLOSURE
+						: FR_TERMS_AND_CONDITIONS.NON_DISCLOSURE}
 				</Checkbox>
 				<Checkbox
 					unchecked={
@@ -55,14 +80,16 @@ const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {
 						)
 					}
 				>
-					{TERMS_AND_CONDITIONS.MONITOR_INDIVIDUAL_ACCESS}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.MONITOR_INDIVIDUAL_ACCESS
+						: FR_TERMS_AND_CONDITIONS.MONITOR_INDIVIDUAL_ACCESS}
 				</Checkbox>
 				<Checkbox
 					unchecked={
 						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_destroy_data)
 					}
 				>
-					{TERMS_AND_CONDITIONS.DESTROY_DATA}
+					{lang === SupportedLangs.ENGLISH ? TERMS_AND_CONDITIONS.DESTROY_DATA : FR_TERMS_AND_CONDITIONS.DESTROY_DATA}
 				</Checkbox>
 				<Checkbox
 					unchecked={
@@ -71,7 +98,9 @@ const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {
 						)
 					}
 				>
-					{TERMS_AND_CONDITIONS.FAMILIARIZE_RESTRICTIONS}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.FAMILIARIZE_RESTRICTIONS
+						: FR_TERMS_AND_CONDITIONS.FAMILIARIZE_RESTRICTIONS}
 				</Checkbox>
 				<Checkbox
 					unchecked={
@@ -80,7 +109,9 @@ const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {
 						)
 					}
 				>
-					{TERMS_AND_CONDITIONS.PROVIDE_IT_POLICY}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.PROVIDE_IT_POLICY
+						: FR_TERMS_AND_CONDITIONS.PROVIDE_IT_POLICY}
 				</Checkbox>
 				<Checkbox
 					unchecked={
@@ -89,7 +120,9 @@ const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {
 						)
 					}
 				>
-					{TERMS_AND_CONDITIONS.NOTIFY_UNAUTHORIZED_ACCESS}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.NOTIFY_UNAUTHORIZED_ACCESS
+						: FR_TERMS_AND_CONDITIONS.NOTIFY_UNAUTHORIZED_ACCESS}
 				</Checkbox>
 				<Checkbox
 					unchecked={
@@ -98,14 +131,18 @@ const TermsAndConditions = ({ acceptedAgreements }: AgreementDTO) => {
 						)
 					}
 				>
-					{TERMS_AND_CONDITIONS.CERTIFY_APPLICATION}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.CERTIFY_APPLICATION
+						: FR_TERMS_AND_CONDITIONS.CERTIFY_APPLICATION}
 				</Checkbox>
 				<Checkbox
 					unchecked={
 						!acceptedAgreements?.find((agreement) => agreement === ApplicationAgreements.dac_agreement_read_and_agreed)
 					}
 				>
-					{TERMS_AND_CONDITIONS.READ_AND_AGREED}
+					{lang === SupportedLangs.ENGLISH
+						? TERMS_AND_CONDITIONS.READ_AND_AGREED
+						: FR_TERMS_AND_CONDITIONS.READ_AND_AGREED}
 				</Checkbox>
 			</FormDisplay>
 		</StandardPage>
