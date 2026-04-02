@@ -17,21 +17,49 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { relations } from 'drizzle-orm';
-import { boolean, foreignKey, integer, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import {
+	boolean,
+	foreignKey,
+	integer,
+	pgEnum,
+	pgSequence,
+	pgTable,
+	text,
+	timestamp,
+	varchar,
+} from 'drizzle-orm/pg-core';
 
 import { dac } from './dac.ts';
 
 export const studyStatus = pgEnum('study_status', ['Ongoing', 'Completed']);
 export const studyContext = pgEnum('study_context', ['Clinical', 'Research']);
 
+const STUDY_ID_PADDING = 4 as const;
+const STUDY_ID_PREFIX = 'PCGLST' as const;
+const STUDY_ID_SEQUENCE_NAME = 'study_id_seq' as const;
+
+export const studyIdSequence = pgSequence(STUDY_ID_SEQUENCE_NAME, {
+	startWith: 1,
+	increment: 1,
+	maxValue: 9999,
+});
+
+export const studyIdDefault = sql.raw(`
+	'${STUDY_ID_PREFIX}' || lpad(
+		nextval('${STUDY_ID_SEQUENCE_NAME}')::text,
+		${STUDY_ID_PADDING},
+		'0'
+	)
+`);
+
 export const study = pgTable(
 	'study',
 	{
-		study_id: text().primaryKey().notNull(),
+		study_id: text().primaryKey().default(studyIdDefault),
 		dac_id: text().notNull(),
 		study_name: varchar({ length: 255 }).notNull(),
-		study_description: text().notNull(), // Assuming the description is large
+		study_description: text().notNull(),
 		dac_name: varchar({ length: 255 }),
 		program_name: varchar({ length: 255 }),
 		keywords: text().array(),
