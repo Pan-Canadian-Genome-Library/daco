@@ -18,6 +18,7 @@
  */
 
 import { authConfig } from '@/config/authConfig.ts';
+import { getDacByIds } from '@/controllers/dacController.ts';
 import { type OIDCTokenResponse, type OIDCUserInfoResponse, type PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
@@ -55,7 +56,7 @@ import {
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
-import { failure, type Result, success } from './results.ts';
+import { AsyncResult, failure, type Result, success } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
 
 export const convertToSessionAccount = (data: OIDCTokenResponse): Result<SessionAccount, 'SYSTEM_ERROR'> => {
@@ -70,15 +71,36 @@ export const convertToSessionAccount = (data: OIDCTokenResponse): Result<Session
 	return result;
 };
 
-export const convertToSessionUser = (
+export const convertToSessionUser = async (
 	oidcData: OIDCUserInfoResponse,
 	pcglData: PCGLAuthZUserInfoResponse,
-): Result<SessionUser, 'SYSTEM_ERROR'> => {
+): AsyncResult<SessionUser, 'SYSTEM_ERROR'> => {
 	const aliasedOIDCResponse = objectToCamel(oidcData);
 
 	const aliasedPCGLResponse = objectToCamel(pcglData);
 
-	let aliasedGroup = aliasedPCGLResponse.groups || [];
+	const aliasedGroup = aliasedPCGLResponse.groups || [];
+
+	const dacChair = aliasedGroup
+		.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR))
+		.map((group) => {
+			return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR.length);
+		});
+	const dacMember = aliasedGroup
+		.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER))
+		.map((group) => {
+			return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER.length);
+		});
+
+	const dacoAdmin = aliasedGroup.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN);
+
+	const dacResult = await getDacByIds({ ids: dacChair });
+
+	let isPCGLDAC = false;
+
+	if (dacResult.success) {
+		isPCGLDAC = dacResult.data.some((dac) => dac.is_pcgl_dac === true);
+	}
 
 	const finalizedUserObject: SessionUser = {
 		sub: aliasedOIDCResponse.sub,
@@ -91,20 +113,11 @@ export const convertToSessionUser = (
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedGroup,
-
 		// DACO generated values
-		dacoAdmin:
-			aliasedGroup.length > 0 ? aliasedGroup.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN) : false,
-		dacChair: aliasedGroup
-			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR))
-			.map((group) => {
-				return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR.length);
-			}),
-		dacMember: aliasedGroup
-			.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER))
-			.map((group) => {
-				return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER.length);
-			}),
+		isPCGLDAC,
+		dacoAdmin,
+		dacChair,
+		dacMember,
 	};
 
 	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
