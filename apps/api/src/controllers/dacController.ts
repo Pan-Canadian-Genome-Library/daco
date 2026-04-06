@@ -64,3 +64,19 @@ export const createDacRecords = async ({
 		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);
 	}
 };
+
+export const getDacByIds = async ({
+	ids,
+}: {
+	ids: string[];
+}): AsyncResult<DacRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const dacService = dacSvc(database);
+		const dacRecordResult = await dacService.getDacByIds({ ids });
+		return dacRecordResult;
+	} catch (error) {
+		logger.error(error);
+		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);
+	}
+};
