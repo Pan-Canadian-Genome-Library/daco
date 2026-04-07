@@ -96,10 +96,10 @@ export const convertToSessionUser = async (
 
 	const dacResult = await getDacByIds({ ids: dacChair });
 
-	let isPCGLDAC = false;
+	let isPcglDac = false;
 
 	if (dacResult.success) {
-		isPCGLDAC = dacResult.data.some((dac) => dac.is_pcgl_dac === true);
+		isPcglDac = dacResult.data.some((dac) => dac.is_pcgl_dac === true);
 	}
 
 	const finalizedUserObject: SessionUser = {
@@ -114,7 +114,7 @@ export const convertToSessionUser = async (
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedGroup,
 		// DACO generated values
-		isPCGLDAC,
+		isPcglDac,
 		dacoAdmin,
 		dacChair,
 		dacMember,

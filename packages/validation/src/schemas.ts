@@ -223,7 +223,7 @@ export const dacDTOSchema = z.object({
 	dacDescription: z.string(),
 	contactName: z.string(),
 	contactEmail: z.string(),
-	isPCGLDAC: z.boolean(),
+	isPcglDac: z.boolean(),
 	createdAt: z.union([z.date(), z.string()]),
 	updatedAt: z.union([z.date(), z.string()]).nullable(),
 });

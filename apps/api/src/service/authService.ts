@@ -83,7 +83,7 @@ export async function canAccessRequest(
 				return success(undefined);
 			} else if (accessConfig.institutionalRep && representativeOfApplication) {
 				return success(undefined);
-			} else if (user.isPCGLDAC) {
+			} else if (user.isPcglDac) {
 				return success(undefined);
 			}
 			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');
@@ -95,7 +95,7 @@ export async function canAccessRequest(
 			dacChairOfApplication ||
 			dacMemberOfApplication ||
 			representativeOfApplication ||
-			user.isPCGLDAC;
+			user.isPcglDac;
 
 		if (!canAccess) {
 			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');

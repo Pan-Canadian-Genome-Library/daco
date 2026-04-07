@@ -235,7 +235,7 @@ authRouter.get(
 						dacMember: user.dacMember,
 						dacoAdmin: user.dacoAdmin,
 						dacAuthorizations: user.dacAuthorizations,
-						isPCGLDAC: user.isPCGLDAC,
+						isPcglDac: user.isPcglDac,
 					}
 				: undefined,
 		};

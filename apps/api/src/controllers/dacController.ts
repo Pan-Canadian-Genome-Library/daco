@@ -48,7 +48,7 @@ export const createDacRecords = async ({
 			const { createdAt, updatedAt } = dacRecord;
 			const createdDate = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
 			const updatedDate = typeof updatedAt === 'string' ? new Date(updatedAt) : updatedAt;
-			const record = { ...dacRecord, isPcglDac: dacRecord.isPCGLDAC, createdAt: createdDate, updatedAt: updatedDate };
+			const record = { ...dacRecord, createdAt: createdDate, updatedAt: updatedDate };
 			const updatedRecordResult = convertToDacUpdateRecord(record);
 
 			if (updatedRecordResult.success) {

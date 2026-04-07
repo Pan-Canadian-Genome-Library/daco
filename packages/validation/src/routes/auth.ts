@@ -90,7 +90,7 @@ const dacoGeneratedSessionValues = z.object({
 	dacoAdmin: z.boolean().default(false),
 	dacChair: z.array(z.string()).default([]),
 	dacMember: z.array(z.string()).default([]),
-	isPCGLDAC: z.boolean().default(false),
+	isPcglDac: z.boolean().default(false),
 });
 
 // Session values retrieved from Authz and Auth services
@@ -102,7 +102,7 @@ const authGeneratedSessionValues = z.object({
 	emails: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ emails: true }).shape.emails,
 	siteAdmin: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_admin: true }).shape.site_admin,
 	siteCurator: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_curator: true }).shape.site_curator,
-	isPCGLDAC: z.boolean().default(false),
+	isPcglDac: z.boolean().default(false),
 	studyAuthorizations: z.object({
 		editableStudies: authZUserInfo
 			.pick({ study_authorizations: true })

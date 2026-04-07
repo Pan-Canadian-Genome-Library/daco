@@ -488,7 +488,7 @@ export type DacDTO = {
 	dacDescription: string;
 	contactName: string;
 	contactEmail: string;
-	isPCGLDAC: boolean;
+	isPcglDac: boolean;
 	createdAt: Date | string;
 	updatedAt: Date | string | null;
 };
