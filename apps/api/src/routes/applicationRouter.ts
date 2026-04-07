@@ -166,7 +166,7 @@ applicationRouter.get(
 			return;
 		}
 
-		const { userId } = user;
+		const { userId, isPCGLDAC } = user;
 
 		const {
 			state: stateQuery,
@@ -221,6 +221,7 @@ applicationRouter.get(
 			pageSize: pageSizeRequested,
 			search: searchResult,
 			isApplicantView,
+			isPCGLDAC,
 			authorizedDacIds,
 		});
 

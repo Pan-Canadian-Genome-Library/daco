@@ -53,6 +53,7 @@ const dacSvc = (db: PostgresDb) => ({
 						contact_name: sql`EXCLUDED.contact_name`,
 						contact_email: sql`EXCLUDED.contact_email`,
 						updated_at: sql`EXCLUDED.updated_at`,
+						is_pcgl_dac: sql`EXCLUDED.is_pcgl_dac`,
 					},
 				})
 				.returning();

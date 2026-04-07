@@ -224,6 +224,7 @@ export const getAllApplications = async ({
 	pageSize,
 	search,
 	isApplicantView,
+	isPCGLDAC,
 	authorizedDacIds,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
@@ -237,6 +238,7 @@ export const getAllApplications = async ({
 		pageSize,
 		search,
 		isApplicantView,
+		isPCGLDAC,
 		authorizedDacIds,
 	});
 
