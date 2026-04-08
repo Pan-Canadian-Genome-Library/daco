@@ -29,7 +29,8 @@
 				"home": ""
 			}
 		},
-		"copyright": "{{date}} L'Institut ontarien de recherche sur le cancer. Tous droits réservés."
+		"copyright": "{{date}} L'Institut ontarien de recherche sur le cancer. Tous droits réservés.",
+		"PCGL": "Librairie Pancanadienne de Génomique"
 	},
 	"homepage": {
 		"title": "Demander l'accès aux données contrôlées",
