@@ -765,7 +765,7 @@ const emailSvc = (db: PostgresDb) => {
 
 				return success(response);
 			} catch (error) {
-				const message = `Error sending email - sendEmailDacForSubmittedRevisions`;
+				const message = `Error sending email - sendEmailRepForSubmittedRevisions`;
 				logger.error(message, error);
 
 				return failure('SYSTEM_ERROR', message);
