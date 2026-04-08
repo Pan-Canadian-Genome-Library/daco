@@ -671,15 +671,13 @@ export const submitRevision = async ({
 			return submittedRevision;
 		}
 
-		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
-			resultContents.data.contents;
+		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
 		const { actionId } = submittedRevision.data;
 
 		if (result.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
 			const {
 				email: { dacAddress },
 			} = getEmailConfig;
-
 			emailService.sendEmailDacForSubmittedRevisions({
 				id: application.id,
 				to: dacAddress,
@@ -688,11 +686,9 @@ export const submitRevision = async ({
 				actionId,
 			});
 		} else {
-			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
-			emailService.sendEmailInstitutionalRepForReview({
+			emailService.sendEmailRepForSubmittedRevisions({
 				id: application.id,
 				to: institutional_rep_email,
-				repName: institutional_rep_first_name || 'N/A',
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
 				actionId,
