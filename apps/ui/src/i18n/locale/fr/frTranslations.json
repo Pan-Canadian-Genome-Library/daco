@@ -1,4 +1,36 @@
 {
+	"global": {
+		"login": {
+			"loggingIn": ""
+		},
+		"loginError": {
+			"title": "",
+			"descriptions": {
+				"NOT_FOUND": {
+					"subheading": "",
+					"description": "",
+					"description2": ""
+				},
+				"SELF_REGISTRATION_SENT": {
+					"subheading": "",
+					"description": "",
+					"description2": ""
+				},
+				"SYSTEM_ERROR": {
+					"subheading": "",
+					"description": ""
+				},
+				"FORBIDDEN": {
+					"subheading": "",
+					"description": ""
+				}
+			},
+			"buttons": {
+				"home": ""
+			}
+		},
+		"copyright": "{{date}} L'Institut ontarien de recherche sur le cancer. Tous droits réservés."
+	},
 	"homepage": {
 		"title": "Demander l'accès aux données contrôlées",
 		"introduction": "Le Bureau de conformité de l'accès aux données de la Bibliothèque génomique pancanadienne (BCAD de la BGP) traite les demandes des chercheurs souhaitant accéder aux données contrôlées de la BGP.",
@@ -10,12 +42,46 @@
 		"description2": "Une fois la demande complétée, obtenez les signatures requises et soumettez la demande signée pour examen.",
 		"description3": "Le BCAD de la BGP examinera la demande et pourra demander des révisions précises. Les équipes de projet approuvées se verront accorder l'accès aux données contrôlées de la BGP."
 	},
+	"notFound": {
+		"title": "",
+		"description": "",
+		"buttons": {
+			"home": ""
+		}
+	},
 	"dashboard": {
 		"title": "Mes demandes",
 		"description": "C'est ici que vous pouvez gérer vos demandes d'accès aux données contrôlées de la BGP. L'accès sera accordé à compter de la date d'approbation par le BCAD de la BGP.",
 		"hasAccess": "Vous avez accès aux données contrôlées de la BGP",
 		"noAccess": "Vous n'avez pas accès aux données contrôlées de la BGP",
 		"startNewApp": "Commencer une nouvelle demande"
+	},
+	"repView": {
+		"title": "",
+		"description": "",
+		"login": ""
+	},
+	"applicationViewer": {
+		"steps": {
+			"DRAFT": "",
+			"SIGN_SUBMIT": "",
+			"REP_REVIEW": "",
+			"DAC_REVIEW": "",
+			"APPROVED": "",
+			"REVOKED": "",
+			"REJECTED": "",
+			"CLOSED": ""
+		}
+	},
+	"manage": {
+		"applications": {
+			"title": "",
+			"show": "",
+			"rows": ""
+		},
+		"noResults": "",
+		"search": "",
+		"searchResults": ""
 	},
 	"status": {
 		"404": "Désolé, nous n'avons pas trouvé ce que vous cherchiez !"
@@ -36,7 +102,9 @@
 		"contact": "Contactez-nous",
 		"pcglWebsite": "Site web de la BGP",
 		"dataPlatform": "Plateforme de données",
-		"myApplications": "Mes demandes"
+		"myApplications": "Mes demandes",
+		"manageApplications": "",
+		"admin": ""
 	},
 	"button": {
 		"logout": "Déconnexion",
@@ -45,18 +113,44 @@
 		"editApplication": "Modifier la demande",
 		"cancel": "Annuler",
 		"edit": "Modifier",
+		"next": "",
+		"delete": "",
+		"history": "",
+		"closeApp": "",
 		"requestRevisions": "Demander des révisions",
+		"back": "",
 		"submitApplication": "Soumettre la demande",
-		"rejectApplication": "Rejeter",
-		"revoke": "Révoquer",
+		"submitRevisions": "",
+		"addCollab": "",
+		"upload": "",
+		"save": "",
+		"rejectApp": "",
+		"rejectApplication": "",
+		"revoke": "",
 		"approveApplication": "Approuver",
 		"languageToggle": "Français"
 	},
 	"label": {
-		"created": "Créé"
+		"created": "Créé",
+		"expires": "Expire",
+		"updated": "",
+		"updatedExtended": ""
 	},
 	"date": {
 		"intlDateTime": "{{val, datetime}}"
+	},
+	"application": {
+		"states": {
+			"DRAFT": "",
+			"INSTITUTIONAL_REP_REVIEW": "",
+			"DAC_REVIEW": "",
+			"INSTITUTIONAL_REP_REVISION_REQUESTED": "",
+			"DAC_REVISIONS_REQUESTED": "",
+			"REJECTED": "",
+			"REVOKED": "",
+			"APPROVED": "",
+			"CLOSED": ""
+		}
 	},
 	"menu": {
 		"intro": "Introduction",
@@ -69,5 +163,90 @@
 		"agreement": "G. Entente d'accès aux données",
 		"appendices": "H. Annexes",
 		"sign": "Signer et soumettre"
+	},
+	"errors": {
+		"http": {
+			"403": {
+				"title": "",
+				"message": ""
+			},
+			"404": {
+				"title": "",
+				"message": ""
+			},
+			"400": {
+				"title": "",
+				"message": ""
+			},
+			"500": {
+				"title": "",
+				"message": ""
+			}
+		},
+		"applicationNotFound": {
+			"title": "",
+			"message": ""
+		},
+		"fetchError": {
+			"title": "",
+			"message": ""
+		},
+		"generic": {
+			"title": "",
+			"message": ""
+		},
+		"downloadNotFound": {
+			"title": "",
+			"message": ""
+		}
+	},
+	"generic": {
+		"notApplicable": "",
+		"applicant": "",
+		"rep": "",
+		"dacComment": "",
+		"chairOnly": "",
+		"send": ""
+	},
+	"notifications": {
+		"createDacComment": {
+			"successTitle": "",
+			"successMessage": ""
+		},
+		"requestedStudies": {
+			"errorTitle": "",
+			"errorMessage": ""
+		},
+		"importStudies": {
+			"successMessage": "",
+			"successDescription": ""
+		},
+		"toggleAcceptingStudies": {
+			"successMessage": ""
+		}
+	},
+	"admin": {
+		"activate": {
+			"pageTitle": "",
+			"pageDescription": "",
+			"backToDashboard": ""
+		},
+		"dashboard": {
+			"pageTitle": "",
+			"pageDescription": "",
+			"quickActions": "",
+			"card": {
+				"import": {
+					"title": "",
+					"description": "",
+					"button": ""
+				},
+				"activateStudies": {
+					"title": "",
+					"description": "",
+					"button": ""
+				}
+			}
+		}
 	}
 }

@@ -56,6 +56,7 @@ i18n.use(initReactI18next).init({
 	},
 	lng: lang,
 	fallbackLng: SupportedLangs.ENGLISH, // default to 'en' if key is missing in 'fr'
+	returnEmptyString: false,
 	supportedLngs: ['en', 'fr'],
 	interpolation: {
 		escapeValue: false,
