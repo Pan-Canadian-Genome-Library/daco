@@ -142,11 +142,11 @@ export const FR_PROJECT_INFORMATION = {
 	RESEARCH_SUMMARY_TITLE: 'Résumé de la recherche - Résumé scientifique',
 	RESEARCH_SUMMARY_DESCRIPTION:
 		"Cette section doit décrire le contexte, les objectifs et la méthodologie de votre projet de recherche, ainsi que les plans d'utilisation des données contrôlées de la BGP.",
-	PROJECT_BACKGROUND_LABEL: 'Contexte :',
-	USE_OF_DATA_METHODOLOGY_LABEL: 'Utilisation des données et méthodologie :',
-	AIMS_LABEL: 'Objectifs :',
+	PROJECT_BACKGROUND_LABEL: 'Contexte',
+	USE_OF_DATA_METHODOLOGY_LABEL: 'Utilisation des données et méthodologie',
+	AIMS_LABEL: 'Objectifs',
 	LAY_SUMMARY_TITLE: 'Résumé vulgarisé du projet',
-	LAY_SUMMARY_LABEL: 'Résumé vulgarisé (Lay Summary) :',
+	LAY_SUMMARY_LABEL: 'Résumé vulgarisé (Lay Summary',
 	PUBLICATIONS_TITLE: 'Publications pertinentes',
 	PUBLICATIONS_DESCRIPTION:
 		"Veuillez fournir au moins trois liens vers des publications pertinentes dont la ou le candidate/candidat est autrice/auteur ou coautrice/coauteur. Il doit s'agir de liens (URL) vers des sites de publication tels que pubmed.gov, biorxiv.org ou medrxiv.org.",
