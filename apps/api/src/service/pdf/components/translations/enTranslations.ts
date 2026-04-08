@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,8 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import {
+	AppendicesTranslation,
+	ApplicantInformationTranslation,
+	CollaboratorsTranslation,
+	DataAccessAgreementTranslation,
+	EndOfDocumentTranslation,
+	EthicsTranslation,
+	InstitutionalRepresentativeTranslation,
+	IntroductionTranslation,
+	ProjectInformationTranslation,
+	RequestedStudyTranslation,
+	SignSubmitTranslation,
+	TermsAndConditionsTranslation,
+	TitlePageTranslation,
+} from './types.ts';
+
 // Appendices Page
-export const APPENDICES = {
+export const APPENDICES: AppendicesTranslation = {
 	TITLE: 'Appendices',
 	DESCRIPTION: 'Please review and agree to the following Appendices.',
 	PCGL_POLICIES_TITLE: 'PCGL Policies',
@@ -28,7 +44,7 @@ export const APPENDICES = {
 };
 
 // ApplicantInformation Page
-export const APPLICANT_INFORMATION = {
+export const APPLICANT_INFORMATION: ApplicantInformationTranslation = {
 	TITLE: 'Applicant Information (Principal Investigator)',
 	QUALIFIED_APPLICANTS_PARAGRAPH:
 		'Qualified applicants for access to the PCGL Controlled Data must be independent researchers who are affiliated with a legal entity (e.g. university professor, researcher in a private company, independent researchers able to apply for federal research grants, etc.).',
@@ -54,7 +70,7 @@ export const APPLICANT_INFORMATION = {
 };
 
 // Collaborators Page
-export const COLLABORATORS = {
+export const COLLABORATORS: CollaboratorsTranslation = {
 	TITLE: 'Collaborators',
 	DESCRIPTION:
 		'Please include the names of all investigators, collaborators, research staff (including post-docs) and students (including graduate students), who will have access to the PCGL Controlled Data in order to work on the Research Summary as outlined in Section D of this application.',
@@ -63,13 +79,13 @@ export const COLLABORATORS = {
 };
 
 // EndOfDocument Page
-export const END_OF_DOCUMENT = {
+export const END_OF_DOCUMENT: EndOfDocumentTranslation = {
 	TITLE: '—  END OF DOCUMENT  —',
 	CLOSING_MESSAGE: 'Attached Ethics Letter and Appendices to follow.',
 };
 
 // Ethics Page
-export const ETHICS = {
+export const ETHICS: EthicsTranslation = {
 	TITLE: 'Ethics',
 	ETHICS_AWARENESS_PARAGRAPH:
 		'PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.',
@@ -85,7 +101,7 @@ export const ETHICS = {
 };
 
 // InstitutionalRepresentative Page
-export const INSTITUTIONAL_REPRESENTATIVE = {
+export const INSTITUTIONAL_REPRESENTATIVE: InstitutionalRepresentativeTranslation = {
 	TITLE: 'Institutional Representative',
 	DESCRIPTION:
 		"An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
@@ -109,7 +125,7 @@ export const INSTITUTIONAL_REPRESENTATIVE = {
 };
 
 // IntroductionPage
-export const INTRODUCTION = {
+export const INTRODUCTION: IntroductionTranslation = {
 	TITLE: 'Introduction',
 	QUALIFICATION_INTRO:
 		'While all PCGL data sources contain open data, sensitive genomic and clinical data is controlled and requires permission to access. To qualify for access, you must:',
@@ -133,7 +149,7 @@ export const INTRODUCTION = {
 };
 
 // ProjectInformation Page
-export const PROJECT_INFORMATION = {
+export const PROJECT_INFORMATION: ProjectInformationTranslation = {
 	TITLE: 'Project Information',
 	DESCRIPTION:
 		'Please fill out the following details for your research project, including the website URL if available.',
@@ -154,7 +170,7 @@ export const PROJECT_INFORMATION = {
 };
 
 // RequestedStudy Page
-export const REQUESTED_STUDY = {
+export const REQUESTED_STUDY: RequestedStudyTranslation = {
 	TITLE: 'Requested Study',
 	DESCRIPTION:
 		'To help the DAC review your data access request more efficiently, please select the study you are requesting access to. You can view and choose from the available studies on the PCGL Research Portal - Studies.',
@@ -162,7 +178,7 @@ export const REQUESTED_STUDY = {
 };
 
 // SignSubmit Page
-export const SIGN_SUBMIT = {
+export const SIGN_SUBMIT: SignSubmitTranslation = {
 	TITLE: 'Sign & Submit',
 	SIGNATURE_REQUIREMENT:
 		'You must include BOTH the Principal Investigator and the Institutional Representative signatures in order for your application to be reviewed.',
@@ -174,7 +190,7 @@ export const SIGN_SUBMIT = {
 };
 
 // TitlePage
-export const TITLE_PAGE = {
+export const TITLE_PAGE: TitlePageTranslation = {
 	APPLICATION_NUMBER_LABEL: 'Application Number:',
 	APPLICATION_NUMBER_PREFIX: 'PCGL-',
 	PRINCIPAL_INVESTIGATOR_LABEL: 'Principal Investigator:',
@@ -184,7 +200,7 @@ export const TITLE_PAGE = {
 };
 
 // DataAccessAgreement Page
-export const DATA_ACCESS_AGREEMENT = {
+export const DATA_ACCESS_AGREEMENT: DataAccessAgreementTranslation = {
 	TITLE: 'Data Access Agreement',
 	APPLICATION_COMPLETION_PARAGRAPH:
 		"This application form must be completed by the applicant and the legal entity with which you are affiliated (You) prior to being granted access to Pan Canadian Genome Library (PCGL) controlled data (the PCGL Controlled Data as further defined in Section F of this application). To receive access, You must complete this entire application form and agree to its terms by signing this application. All sections, as well as Appendices I through III, are integral components of this application. Your Research Project (as defined below) will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the participants and the security of the participants' data.",
@@ -210,7 +226,7 @@ export const DATA_ACCESS_AGREEMENT = {
 };
 
 // TermsAndConditions Page
-export const TERMS_AND_CONDITIONS = {
+export const TERMS_AND_CONDITIONS: TermsAndConditionsTranslation = {
 	TITLE: 'Terms and Conditions',
 	SIGNING_INTRO: 'In signing this Agreement:',
 	TERMS_ITEMS: [

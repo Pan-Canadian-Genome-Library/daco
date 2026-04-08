@@ -17,8 +17,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import {
+	AppendicesTranslation,
+	ApplicantInformationTranslation,
+	CollaboratorsTranslation,
+	DataAccessAgreementTranslation,
+	EndOfDocumentTranslation,
+	EthicsTranslation,
+	InstitutionalRepresentativeTranslation,
+	IntroductionTranslation,
+	ProjectInformationTranslation,
+	RequestedStudyTranslation,
+	SignSubmitTranslation,
+	TermsAndConditionsTranslation,
+	TitlePageTranslation,
+} from './types.ts';
+
 // IntroductionPage
-export const FR_INTRODUCTION = {
+export const FR_INTRODUCTION: IntroductionTranslation = {
 	TITLE: 'Introduction',
 	QUALIFICATION_INTRO:
 		"Bien que toutes les sources de données de la BGP contiennent des données ouvertes, l'accès aux données génomiques et cliniques sensibles est contrôlé et nécessite une autorisation. Pour être admissible à la demande d'accès, vous devez:",
@@ -39,10 +55,12 @@ export const FR_INTRODUCTION = {
 	],
 	APPROVAL_AND_RENEWAL_PARAGRAPH:
 		"Si le Comité d'accès aux données (CAD) approuve votre demande, l'accès aux données contrôlées de la BGP sera accordé à compter de la date d'approbation. Le demandeur doit conclure une entente d'une durée d'un an. Pour accéder aux données contrôlées ou les utiliser au-delà de cette période d'un an, une demande de renouvellement devra être soumise et approuvée par le CAD.",
+	APPLICATION_REVIEW_PARAGRAPH:
+		"Au cours du processus de demande, vous devez soumettre un résumé de votre projet de recherche. Votre projet sera évalué afin de vérifier sa conformité aux objectifs et aux politiques de la BGP, y compris, sans s'y limiter, aux politiques relatives à la finalité et à la pertinence de la recherche, à la protection des donneurs et à la sécurité des données des donneurs. Si votre demande est approuvée, vous acceptez que le nom du demandeur ou de la demandeuse, l'établissement et le résumé scientifique vulgarisé puissent être inscrits dans un registre public des projets ayant obtenu l'accès aux données contrôlées de la BGP.",
 };
 
 // Appendices Page
-export const FR_APPENDICES = {
+export const FR_APPENDICES: AppendicesTranslation = {
 	TITLE: 'Appendices',
 	DESCRIPTION: 'Please review and agree to the following Appendices.',
 	PCGL_POLICIES_TITLE: 'PCGL Policies',
@@ -52,7 +70,7 @@ export const FR_APPENDICES = {
 };
 
 // ApplicantInformation Page
-export const FR_APPLICANT_INFORMATION = {
+export const FR_APPLICANT_INFORMATION: ApplicantInformationTranslation = {
 	TITLE: 'Renseignements sur le demandeur (chercheur principal)',
 	QUALIFIED_APPLICANTS_PARAGRAPH:
 		"Les demandeurs admissibles à l'accès aux données contrôlées de la BGP doivent être des chercheurs indépendants affiliés ou des chercheuses indépendantes affiliées à une entité juridique (p. ex. professeur/professeure d'université, chercheur/chercheuse dans une entreprise privée, chercheur indépendant/chercheuse indépendante admissible à des subventions fédérales de recherche, etc.).",
@@ -78,7 +96,7 @@ export const FR_APPLICANT_INFORMATION = {
 };
 
 // Collaborators Page
-export const FR_COLLABORATORS = {
+export const FR_COLLABORATORS: CollaboratorsTranslation = {
 	TITLE: 'Collaborateurs et collaboratrices',
 	DESCRIPTION:
 		'Veuillez inclure les noms de tous les chercheurs et chercheuses, collaborateurs et collaboratrices, membres du personnel de recherche (y compris les stagiaires postdoctoraux) et étudiants et étudiantes (y compris celles et ceux aux cycles supérieurs) qui auront accès aux données contrôlées de la BGP afin de travailler sur le résumé de recherche décrit à la section D de la présente demande.',
@@ -87,13 +105,13 @@ export const FR_COLLABORATORS = {
 };
 
 // EndOfDocument Page
-export const FR_END_OF_DOCUMENT = {
-	TITLE: '—  END OF DOCUMENT  —',
-	CLOSING_MESSAGE: 'Attached Ethics Letter and Appendices to follow.',
+export const FR_END_OF_DOCUMENT: EndOfDocumentTranslation = {
+	TITLE: '—  FIN DU DOCUMENT  —',
+	CLOSING_MESSAGE: "La lettre d'éthique et les appendices joints suivront.",
 };
 
 // Ethics Page
-export const FR_ETHICS = {
+export const FR_ETHICS: EthicsTranslation = {
 	TITLE: 'Éthique',
 	ETHICS_AWARENESS_PARAGRAPH:
 		"La BGP est consciente que certains pays ou régions n'exigent pas d'approbation éthique pour l'utilisation de données codées (c.-à-d. l'utilisation des données contrôlées de la BGP). Selon la nature de votre projet de recherche, il est toutefois possible qu'une telle approbation soit nécessaire dans votre pays. Si vous n'êtes pas certain/certaine que votre projet de recherche nécessite une approbation éthique pour utiliser les données contrôlées de la BGP, nous vous suggérons de contacter votre comité d'éthique de la recherche ou votre conseil d'examen institutionnel local (CER/CEI) pour clarifier la question.",
@@ -109,7 +127,7 @@ export const FR_ETHICS = {
 };
 
 // InstitutionalRepresentative Page
-export const FR_INSTITUTIONAL_REPRESENTATIVE = {
+export const FR_INSTITUTIONAL_REPRESENTATIVE: InstitutionalRepresentativeTranslation = {
 	TITLE: 'Représentant(e) institutionnel(le)',
 	DESCRIPTION:
 		"Un ou une représentant(e) institutionnel(le) est un représentant qualifié d'une entité juridique ayant le pouvoir administratif d'engager légalement cette entité aux modalités et conditions énoncées à la section G : Entente d'accès aux données (p. ex. vice-président/présidente à la recherche, directeur/directrice de la recherche ou agent des contrats de l'entité). La signature du ou de la représentant(e) institutionnel(le) sera requise à la fin de la présente demande avant son examen par le BCAD de la BGP.",
@@ -133,7 +151,7 @@ export const FR_INSTITUTIONAL_REPRESENTATIVE = {
 };
 
 // ProjectInformation Page
-export const FR_PROJECT_INFORMATION = {
+export const FR_PROJECT_INFORMATION: ProjectInformationTranslation = {
 	TITLE: 'Renseignements sur le projet',
 	DESCRIPTION:
 		"Veuillez remplir les détails suivants pour votre projet de recherche, y compris l'URL du site web si disponible.",
@@ -154,7 +172,7 @@ export const FR_PROJECT_INFORMATION = {
 };
 
 // RequestedStudy Page
-export const FR_REQUESTED_STUDY = {
+export const FR_REQUESTED_STUDY: RequestedStudyTranslation = {
 	TITLE: 'Étude demandée',
 	DESCRIPTION:
 		"Pour aider le CAD à examiner votre demande d'accès aux données plus efficacement, veuillez sélectionner l'étude pour laquelle vous demandez l'accès. Vous pouvez consulter et choisir parmi les études disponibles sur le",
@@ -162,7 +180,7 @@ export const FR_REQUESTED_STUDY = {
 };
 
 // SignSubmit Page
-export const FR_SIGN_SUBMIT = {
+export const FR_SIGN_SUBMIT: SignSubmitTranslation = {
 	TITLE: 'Signer et soumettre',
 	SIGNATURE_REQUIREMENT:
 		'Vous devez inclure à la fois la signature du chercheur principal/de la chercheuse principale et celle du ou de la représentant(e) institutionnel(le) pour que votre demande soit examinée. Le ou la représentant(e) institutionnel(le) sera également invité à soumettre sa signature lors de son examen.',
@@ -174,7 +192,7 @@ export const FR_SIGN_SUBMIT = {
 };
 
 // TitlePage
-export const FR_TITLE_PAGE = {
+export const FR_TITLE_PAGE: TitlePageTranslation = {
 	APPLICATION_NUMBER_LABEL: 'Application Number:',
 	APPLICATION_NUMBER_PREFIX: 'PCGL-',
 	PRINCIPAL_INVESTIGATOR_LABEL: 'Principal Investigator:',
@@ -184,7 +202,7 @@ export const FR_TITLE_PAGE = {
 };
 
 // DataAccessAgreement Page
-export const FR_DATA_ACCESS_AGREEMENT = {
+export const FR_DATA_ACCESS_AGREEMENT: DataAccessAgreementTranslation = {
 	TITLE: 'Data Access Agreement',
 	APPLICATION_COMPLETION_PARAGRAPH:
 		"This application form must be completed by the applicant and the legal entity with which you are affiliated (You) prior to being granted access to Pan Canadian Genome Library (PCGL) controlled data (the PCGL Controlled Data as further defined in Section F of this application). To receive access, You must complete this entire application form and agree to its terms by signing this application. All sections, as well as Appendices I through III, are integral components of this application. Your Research Project (as defined below) will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the participants and the security of the participants' data.",
@@ -210,7 +228,7 @@ export const FR_DATA_ACCESS_AGREEMENT = {
 };
 
 // TermsAndConditions Page
-export const FR_TERMS_AND_CONDITIONS = {
+export const FR_TERMS_AND_CONDITIONS: TermsAndConditionsTranslation = {
 	TITLE: 'Terms and Conditions',
 	SIGNING_INTRO: 'In signing this Agreement:',
 	TERMS_ITEMS: [
