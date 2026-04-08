@@ -60,6 +60,7 @@ const Appendices = () => {
 		section: 'appendices',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 	const form = useSectionForm({ section: 'appendices', sectionVisited: state.formState.sectionsVisited.appendices });
 

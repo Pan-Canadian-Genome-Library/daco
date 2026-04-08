@@ -51,7 +51,9 @@ const Applicant = () => {
 		section: 'applicant',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
+
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 
 	const {
