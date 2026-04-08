@@ -23,8 +23,8 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
 import { DATA_ACCESS_AGREEMENT } from '@/service/pdf/components/translations/enTranslations.ts';
+import { FR_DATA_ACCESS_AGREEMENT } from '@/service/pdf/components/translations/frTranslations.ts';
 import { LanguagProps, SupportedLangs } from '@/service/pdf/components/translations/types.ts';
-import { FR_DATA_ACCESS_AGREEMENT } from '../../translations/frTranslations.ts';
 
 type DataAccessAgreementProps = LanguagProps;
 
