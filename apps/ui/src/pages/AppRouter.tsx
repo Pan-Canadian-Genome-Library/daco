@@ -143,8 +143,8 @@ function AppRouter() {
 				<Route
 					path="manage/applications"
 					element={
-						// DAC
-						<ProtectedRoute requiredMembership={['DAC_CHAIR', 'DAC_MEMBER']} redirectTo={'/login/redirect/'}>
+						// DAC and Admin
+						<ProtectedRoute requiredMembership={['DAC_CHAIR', 'DAC_MEMBER', 'ADMIN']} redirectTo={'/login/redirect/'}>
 							<ManageApplicationsPage />
 						</ProtectedRoute>
 					}
