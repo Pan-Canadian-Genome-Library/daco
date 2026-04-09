@@ -20,7 +20,7 @@
 import { type EmailReminderTemplateType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
+// NOTE: verify english translations
 export const GenerateEmailApplicantClosed = ({
 	id,
 	applicantName,
@@ -29,13 +29,13 @@ export const GenerateEmailApplicantClosed = ({
 	state,
 	submittedDate,
 }: EmailReminderTemplateType) => {
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${applicantName},
                 </mj-text>
                 <mj-text>
-                    We are writing to inform you that your application PCGL-${id} has been closed. 
+                    We are writing to inform you that your application PCGL-${id} has been closed.
                 </mj-text>
                 <mj-text>
                     <ul>
@@ -54,7 +54,7 @@ export const GenerateEmailApplicantClosed = ({
                     </ul>
                 </mj-text>
                 <mj-text>
-                    Please note that once an application is closed, it cannot be reopened and is no longer valid. 
+                    Please note that once an application is closed, it cannot be reopened and is no longer valid.
                 </mj-text>
                 <mj-text>
                     If you believe this application was closed by mistake or if you did not initiate the closure, please contact us as soon as possible.
@@ -62,6 +62,41 @@ export const GenerateEmailApplicantClosed = ({
                 <mj-text>
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
+                </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Cher/Chère ${applicantName},
+                </mj-text>
+                <mj-text>
+                    Nous vous écrivons pour vous informer que votre demande PCGL-${id} a été fermée.
+                </mj-text>
+                <mj-text>
+                    <ul>
+                        <li>
+                            <b>Fermée par :</b> ${userName} <br/>
+                        </li>
+                        <li>
+                            <b>Raison de la fermeture :</b> ${message} <br/>
+                        </li>
+                        <li>
+                            <b>Statut avant fermeture :</b> ${state} <br/>
+                        </li>
+                        <li>
+                            <b>Moment de la fermeture :</b> ${submittedDate} <br/>
+                        </li>
+                    </ul>
+                </mj-text>
+                <mj-text>
+                    Veuillez noter qu'une fois une demande fermée, elle ne peut pas être rouverte et n'est plus valide.
+                </mj-text>
+                <mj-text>
+                    Si vous croyez que cette demande a été fermée par erreur ou si vous n'avez pas initié la fermeture, veuillez nous contacter dès que possible.
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP
                 </mj-text>
             </mj-column>
 `;
@@ -77,14 +112,26 @@ export const GenerateEmailApplicantClosedPlain = ({
 	state,
 	submittedDate,
 }: EmailReminderTemplateType) => {
-	return ` Dear ${applicantName},,
-    \n We are writing to inform you that your application PCGL-${id} has been closed. 
+	return ` Dear ${applicantName},
+    \n We are writing to inform you that your application PCGL-${id} has been closed.
     \n Closed By: ${userName}
-    \n Reason for Closure: ${message} 
+    \n Reason for Closure: ${message}
     \n Status Before Closure: ${state}
     \n Time of Closure: ${submittedDate}
-    \n Please note that once an application is closed, it cannot be reopened and is no longer valid. 
+    \n Please note that once an application is closed, it cannot be reopened and is no longer valid.
     \n If you believe this application was closed by mistake or if you did not initiate the closure, please contact us as soon as possible.
-    \n\n Best regards, \n The PCGL Data Access Compliance Office 
+    \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Cher/Chère ${applicantName},
+    \n Nous vous écrivons pour vous informer que votre demande PCGL-${id} a été fermée.
+    \n Fermée par : ${userName}
+    \n Raison de la fermeture : ${message}
+    \n Statut avant fermeture : ${state}
+    \n Moment de la fermeture : ${submittedDate}
+    \n Veuillez noter qu'une fois une demande fermée, elle ne peut pas être rouverte et n'est plus valide.
+    \n Si vous croyez que cette demande a été fermée par erreur ou si vous n'avez pas initié la fermeture, veuillez nous contacter dès que possible.
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
     `;
 };

@@ -17,35 +17,54 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Link } from '@react-pdf/renderer';
+import { StyleSheet, View } from '@react-pdf/renderer';
 
-import { RequestedStudiesDTO } from '@pcgl-daco/data-model';
-
-import DataItem from '@/service/pdf/components/DataItem.tsx';
+import Logo from '@/service/pdf/components/Logo/Logo.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
-import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
-type RequestedStudyProps = LanguagProps & RequestedStudiesDTO;
+const styles = StyleSheet.create({
+	link: {
+		color: standardStyles.colours.primary,
+	},
+	text: {
+		fontSize: standardStyles.textStyles.sizes.md,
+	},
+	logoImage: {
+		width: '50%',
+		margin: '0 0 0 0',
+	},
+	content: {
+		height: '100vh',
+		width: '100vw',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+});
 
-const RequestedStudy = ({ requestedStudies, lang = SupportedLangs.ENGLISH }: RequestedStudyProps) => {
-	const t = translations[lang];
-
+const StartFrench = () => {
 	return (
-		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{t.study.TITLE}</Title>
-			<Paragraph>
-				{t.study.DESCRIPTION}
-				{/**TODO: Add Link to this once that's figured out. */}
-				<Link style={{ color: standardStyles.colours.primary }}>PCGL Research Portal - Studies.</Link>
-			</Paragraph>
-			<DataItem item={t.study.STUDY_NAME_LABEL}>
-				{requestedStudies?.map((study, index) => `${study}${requestedStudies.length !== index + 1 ? ', ' : ''}`)}
-			</DataItem>
+		<StandardPage ignorePadding showAttribution alternatingAttribution showPageNumbers>
+			<View style={styles.content}>
+				<Logo colour={true} style={styles.logoImage} />
+				<Title style={{ paddingTop: '2.5cm' }} level="h2">
+					{'- END OF ENGLISH DOCUMENTS -'}
+				</Title>
+				<Paragraph
+					style={{
+						fontWeight: 500,
+						paddingTop: '.75cm',
+					}}
+				>
+					{'French version starts now'}
+				</Paragraph>
+			</View>
 		</StandardPage>
 	);
 };
 
-export default RequestedStudy;
+export default StartFrench;

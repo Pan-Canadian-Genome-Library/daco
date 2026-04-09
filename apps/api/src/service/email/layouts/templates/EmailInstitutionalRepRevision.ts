@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -18,14 +18,15 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateDacRevisionType } from '../../types.ts';
+import { GenerateDacRevisionType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-export const GenerateEmailDacForReview = ({
+// NOTE: verify english translations and generated text
+export const GenerateEmailRepForSubmittedRevision = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'actionId' | 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -33,21 +34,19 @@ export const GenerateEmailDacForReview = ({
 	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
-                    Dear DAC Members,
+                    Dear Institutional Representative,
                 </mj-text>
                 <mj-text>
-                    We are writing to inform you that a <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience. <br/> <br/>
+                    We are writing to inform you that the <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> that you requested revisions on is now ready for your review. The applicant has resubmitted the application based on your feedback, and we kindly request that you review the application at your earliest convenience. <br /> <br />
                 </mj-text>
                 <mj-text>
-                    Here are the application details:
+                    Here are the application details: <br /> <br />
                 </mj-text>
                 <mj-text>
-                    <ul>
-                        <li>Applicant Name: ${applicantName}</li>
-                        <li>Application ID: ${id}</li>
-                        <li> Submission Date: ${submittedDate}</li>
-                        <li>Link to the application: <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Application-${id}</a> </li>
-                    </ul>
+                    Applicant Name: ${applicantName}<br />
+                    Application ID: ${id}<br />
+                    Submission Date: ${submittedDate}<br />
+                    Link to the application: <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Application-${id}</a> <br /> <br />
                 </mj-text>
                 <mj-text>
                     Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
@@ -63,21 +62,19 @@ export const GenerateEmailDacForReview = ({
                 <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
 
                 <mj-text>
-                    Chers membres du CAD,
+                    Cher/Chère représentant(e) institutionnel(le),
                 </mj-text>
                 <mj-text>
-                    Nous vous écrivons pour vous informer qu'une <a href="${ui}/application/${id}" target="_blank" rel="nofollow">demande au BCAD de la BGP</a> est maintenant prête pour votre examen. Le/La représentant(e) institutionnel(le) a complété sa partie du processus, et nous vous prions d'examiner la demande dans les plus brefs délais. <br/> <br/>
+                    Nous vous informons que la demande au BCAD de la BGP pour laquelle vous aviez demandé des révisions est maintenant prête pour votre examen. Le demandeur / La demandeuse a de nouveau soumis la demande en tenant compte de vos commentaires. Nous vous prions de bien vouloir l'examiner dans les plus brefs délais. <br /> <br />
                 </mj-text>
                 <mj-text>
-                    Voici les détails de la demande :
+                    Voici les détails de la demande : <br /> <br />
                 </mj-text>
                 <mj-text>
-                    <ul>
-                        <li>Nom du demandeur/de la demandeuse : ${applicantName}</li>
-                        <li>ID de la demande : ${id}</li>
-                        <li> Date de soumission : ${submittedDate}</li>
-                        <li>Lien vers la demande : <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Demande-${id}</a> </li>
-                    </ul>
+                    Nom du demandeur/demandeuse : ${applicantName}<br />
+                    ID de la demande : ${id}<br />
+                    Date de soumission : ${submittedDate}<br />
+                    Lien vers la demande : <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Demande-${id}</a> <br /> <br />
                 </mj-text>
                 <mj-text>
                     Veuillez accéder à la demande via le portail du BCAD de la BGP pour procéder à l'examen. Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à nous contacter.
@@ -87,7 +84,7 @@ export const GenerateEmailDacForReview = ({
                 </mj-text>
                 <mj-text>
                     Cordialement,<br />
-                    Le Bureau de conformité de l'accès aux données de la BGP
+                    Le Bureau de conformité de l'accès aux données de la BGP (BCAD)
                 </mj-text>
             </mj-column>
 `;
@@ -95,7 +92,7 @@ export const GenerateEmailDacForReview = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailDacForReviewPlain = ({
+export const GenerateEmailRepForSubmittedRevisionPlain = ({
 	id,
 	applicantName,
 	submittedDate,
@@ -104,8 +101,8 @@ export const GenerateEmailDacForReviewPlain = ({
 		express: { ui },
 	} = getEmailConfig;
 
-	return ` Dear DAC Members,
-    \n We are writing to inform you that a PCGL DACO application is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience.
+	return ` Dear Institutional Representative,
+    \n We are writing to inform you that the PCGL DACO application that you requested revisions on is now ready for your review. The applicant has resubmitted the application based on your feedback, and we kindly request that you review the application at your earliest convenience.
     \n\n Here are the application details:
     \n Applicant Name: ${applicantName}
     \n Application ID: ${id}
@@ -118,16 +115,16 @@ export const GenerateEmailDacForReviewPlain = ({
     \n
     \n---
     \n
-    \n Chers membres du CAD,
-    \n Nous vous écrivons pour vous informer qu'une demande au BCAD de la BGP est maintenant prête pour votre examen. Le/La représentant(e) institutionnel(le) a complété sa partie du processus, et nous vous prions d'examiner la demande dans les plus brefs délais.
+    \n Cher/Chère représentant(e) institutionnel(le),
+    \n Nous vous informons que la demande au BCAD de la BGP pour laquelle vous aviez demandé des révisions est maintenant prête pour votre examen. Le demandeur / La demandeuse a de nouveau soumis la demande en tenant compte de vos commentaires. Nous vous prions de bien vouloir l'examiner dans les plus brefs délais.
     \n\n Voici les détails de la demande :
-    \n Nom du demandeur/de la demandeuse : ${applicantName}
+    \n Nom du demandeur/demandeuse : ${applicantName}
     \n ID de la demande : ${id}
     \n Date de soumission : ${submittedDate}
     \n Lien vers la demande : ${ui}/application/${id}
     \n
     \n Veuillez accéder à la demande via le portail du BCAD de la BGP pour procéder à l'examen. Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à nous contacter.
     \n Nous vous remercions de votre temps et de votre attention.
-    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP (BCAD)
     `;
 };
