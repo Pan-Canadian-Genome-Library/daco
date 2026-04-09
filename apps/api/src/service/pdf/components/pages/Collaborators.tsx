@@ -24,25 +24,21 @@ import CollaboratorsTable from '@/service/pdf/components/CollaboratorsTable.tsx'
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { COLLABORATORS } from '@/service/pdf/components/translations/enTranslations.ts';
-import { FR_COLLABORATORS } from '../translations/frTranslations.ts';
-import { LanguagProps, SupportedLangs } from '../translations/types.ts';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
 type CollaboratorsProps = LanguagProps & {
 	collaborators: CollaboratorDTO[];
 };
 
 const Collaborators = ({ collaborators, lang = SupportedLangs.ENGLISH }: CollaboratorsProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{lang === SupportedLangs.ENGLISH ? COLLABORATORS.TITLE : FR_COLLABORATORS.TITLE}</Title>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? COLLABORATORS.DESCRIPTION : FR_COLLABORATORS.DESCRIPTION}
-			</Paragraph>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? COLLABORATORS.NOT_REQUIRED : FR_COLLABORATORS.NOT_REQUIRED}
-			</Paragraph>
-			<Paragraph>{lang === SupportedLangs.ENGLISH ? COLLABORATORS.NOTE : FR_COLLABORATORS.NOTE}</Paragraph>
+			<Title>{t.collaborators.TITLE}</Title>
+			<Paragraph>{t.collaborators.DESCRIPTION}</Paragraph>
+			<Paragraph>{t.collaborators.NOT_REQUIRED}</Paragraph>
+			<Paragraph>{t.collaborators.NOTE}</Paragraph>
 			<View style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
 				<CollaboratorsTable data={collaborators} />
 			</View>

@@ -21,38 +21,23 @@ import List from '@/service/pdf/components/List.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { INTRODUCTION } from '@/service/pdf/components/translations/enTranslations.ts';
-import { FR_INTRODUCTION } from '../translations/frTranslations.ts';
-import { SupportedLangs, SupportedLangsValues } from '../translations/types.ts';
+import { SupportedLangs, SupportedLangsValues, translations } from '../translations/types.ts';
 
 type IntroductionPageProps = {
 	lang?: SupportedLangsValues;
 };
 
 const IntroductionPage = ({ lang = SupportedLangs.ENGLISH }: IntroductionPageProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{lang === SupportedLangs.ENGLISH ? INTRODUCTION.TITLE : FR_INTRODUCTION.TITLE}</Title>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? INTRODUCTION.QUALIFICATION_INTRO : FR_INTRODUCTION.QUALIFICATION_INTRO}
-			</Paragraph>
-			<List
-				items={lang === SupportedLangs.ENGLISH ? INTRODUCTION.QUALIFICATION_ITEMS : FR_INTRODUCTION.QUALIFICATION_ITEMS}
-			/>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? INTRODUCTION.RECEIVE_ACCESS_INTRO : FR_INTRODUCTION.RECEIVE_ACCESS_INTRO}
-			</Paragraph>
-			<List
-				isNumbered
-				items={
-					lang === SupportedLangs.ENGLISH ? INTRODUCTION.RECEIVE_ACCESS_ITEMS : FR_INTRODUCTION.RECEIVE_ACCESS_ITEMS
-				}
-			/>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH
-					? INTRODUCTION.APPROVAL_AND_RENEWAL_PARAGRAPH
-					: FR_INTRODUCTION.APPROVAL_AND_RENEWAL_PARAGRAPH}
-			</Paragraph>
+			<Title>{t.intro.TITLE}</Title>
+			<Paragraph>{t.intro.QUALIFICATION_INTRO}</Paragraph>
+			<List items={t.intro.QUALIFICATION_ITEMS} />
+			<Paragraph>{t.intro.RECEIVE_ACCESS_INTRO}</Paragraph>
+			<List isNumbered items={t.intro.RECEIVE_ACCESS_ITEMS} />
+			<Paragraph>{t.intro.APPROVAL_AND_RENEWAL_PARAGRAPH}</Paragraph>
 		</StandardPage>
 	);
 };

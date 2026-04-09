@@ -25,6 +25,7 @@ import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
 import { END_OF_DOCUMENT } from '@/service/pdf/components/translations/enTranslations.ts';
+import { FR_END_OF_DOCUMENT } from '@/service/pdf/components/translations/frTranslations.ts';
 
 const styles = StyleSheet.create({
 	link: {
@@ -55,13 +56,25 @@ const EndOfDocument = () => {
 				<Title style={{ paddingTop: '2.5cm' }} level="h2">
 					{END_OF_DOCUMENT.TITLE}
 				</Title>
+				<Title style={{ paddingTop: '0.5cm' }} level="h2">
+					{FR_END_OF_DOCUMENT.TITLE}
+				</Title>
 				<Paragraph
 					style={{
 						fontWeight: 500,
-						paddingTop: '.75cm',
+						paddingTop: '1.75cm',
 					}}
 				>
 					{END_OF_DOCUMENT.CLOSING_MESSAGE}
+				</Paragraph>
+
+				<Paragraph
+					style={{
+						fontWeight: 500,
+						paddingTop: '.5cm',
+					}}
+				>
+					{FR_END_OF_DOCUMENT.CLOSING_MESSAGE}
 				</Paragraph>
 			</View>
 		</StandardPage>

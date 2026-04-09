@@ -24,9 +24,7 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import Signature from '@/service/pdf/components/Signature.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { SIGN_SUBMIT } from '@/service/pdf/components/translations/enTranslations.ts';
-import { FR_SIGN_SUBMIT } from '../translations/frTranslations.ts';
-import { LanguagProps, SupportedLangs } from '../translations/types.ts';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
 interface SignSubmitProps
 	extends Omit<SignatureDTO, 'applicationId'>,
@@ -66,66 +64,26 @@ const SignSubmit = ({
 	institutionalRepPrimaryAffiliation,
 	lang = SupportedLangs.ENGLISH,
 }: SignSubmitProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{lang === SupportedLangs.ENGLISH ? SIGN_SUBMIT.TITLE : FR_SIGN_SUBMIT.TITLE}</Title>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? SIGN_SUBMIT.SIGNATURE_REQUIREMENT : FR_SIGN_SUBMIT.SIGNATURE_REQUIREMENT}
-			</Paragraph>
-			<FormDisplay
-				title={
-					lang === SupportedLangs.ENGLISH
-						? SIGN_SUBMIT.APPLICANT_AUTHORIZATION_TITLE
-						: FR_SIGN_SUBMIT.APPLICANT_AUTHORIZATION_TITLE
-				}
-			>
+			<Title>{t.sign.TITLE}</Title>
+			<Paragraph>{t.sign.SIGNATURE_REQUIREMENT}</Paragraph>
+			<FormDisplay title={t.sign.APPLICANT_AUTHORIZATION_TITLE}>
 				<DataItem
-					item={lang === SupportedLangs.ENGLISH ? SIGN_SUBMIT.NAME_LABEL : FR_SIGN_SUBMIT.NAME_LABEL}
+					item={t.sign.NAME_LABEL}
 				>{`${applicantFirstName} ${applicantMiddleName ?? ''}${!applicantMiddleName ? '' : ' '}${applicantLastName}`}</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? SIGN_SUBMIT.PRIMARY_AFFILIATION_LABEL
-							: FR_SIGN_SUBMIT.PRIMARY_AFFILIATION_LABEL
-					}
-				>
-					{applicantPrimaryAffiliation}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH ? SIGN_SUBMIT.POSITION_TITLE_LABEL : FR_SIGN_SUBMIT.POSITION_TITLE_LABEL
-					}
-				>
-					{applicantPositionTitle}
-				</DataItem>
+				<DataItem item={t.sign.PRIMARY_AFFILIATION_LABEL}>{applicantPrimaryAffiliation}</DataItem>
+				<DataItem item={t.sign.POSITION_TITLE_LABEL}>{applicantPositionTitle}</DataItem>
 				<Signature src={applicantSignature} date={applicantSignedAt} />
 			</FormDisplay>
-			<FormDisplay
-				title={
-					lang === SupportedLangs.ENGLISH
-						? SIGN_SUBMIT.INSTITUTIONAL_REP_AUTHORIZATION_TITLE
-						: FR_SIGN_SUBMIT.INSTITUTIONAL_REP_AUTHORIZATION_TITLE
-				}
-			>
+			<FormDisplay title={t.sign.INSTITUTIONAL_REP_AUTHORIZATION_TITLE}>
 				<DataItem
-					item={lang === SupportedLangs.ENGLISH ? SIGN_SUBMIT.NAME_LABEL : FR_SIGN_SUBMIT.NAME_LABEL}
+					item={t.sign.NAME_LABEL}
 				>{`${institutionalRepFirstName} ${institutionalRepMiddleName ?? ''}${!institutionalRepMiddleName ? '' : ' '}${institutionalRepLastName}`}</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? SIGN_SUBMIT.PRIMARY_AFFILIATION_LABEL
-							: FR_SIGN_SUBMIT.PRIMARY_AFFILIATION_LABEL
-					}
-				>
-					{institutionalRepPrimaryAffiliation}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH ? SIGN_SUBMIT.POSITION_TITLE_LABEL : FR_SIGN_SUBMIT.POSITION_TITLE_LABEL
-					}
-				>
-					{institutionalRepPositionTitle}
-				</DataItem>
+				<DataItem item={t.sign.PRIMARY_AFFILIATION_LABEL}>{institutionalRepPrimaryAffiliation}</DataItem>
+				<DataItem item={t.sign.POSITION_TITLE_LABEL}>{institutionalRepPositionTitle}</DataItem>
 				<Signature src={institutionalRepSignature} date={institutionalRepSignedAt} />
 			</FormDisplay>
 		</StandardPage>

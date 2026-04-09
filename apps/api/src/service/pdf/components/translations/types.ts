@@ -17,6 +17,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { SectionRoutes } from '@pcgl-daco/validation';
+import {
+	APPENDICES,
+	APPLICANT_INFORMATION,
+	COLLABORATORS,
+	DATA_ACCESS_AGREEMENT,
+	END_OF_DOCUMENT,
+	ETHICS,
+	INSTITUTIONAL_REPRESENTATIVE,
+	INTRODUCTION,
+	PROJECT_INFORMATION,
+	REQUESTED_STUDY,
+	SIGN_SUBMIT,
+} from './enTranslations.ts';
+import {
+	FR_APPENDICES,
+	FR_APPLICANT_INFORMATION,
+	FR_COLLABORATORS,
+	FR_DATA_ACCESS_AGREEMENT,
+	FR_END_OF_DOCUMENT,
+	FR_ETHICS,
+	FR_INSTITUTIONAL_REPRESENTATIVE,
+	FR_INTRODUCTION,
+	FR_PROJECT_INFORMATION,
+	FR_REQUESTED_STUDY,
+	FR_SIGN_SUBMIT,
+} from './frTranslations.ts';
+
 export const SupportedLangs = {
 	ENGLISH: 'en',
 	FRENCH: 'fr',
@@ -28,12 +56,50 @@ export type LanguagProps = {
 	lang?: SupportedLangsValues;
 };
 
-// Section translation Keys
-export const SectionKeys = {
-	COLLABORATORS: 'COLLABORATORS',
-} as const;
+export type TranslationsOptions = {
+	[SectionRoutes.INTRO]: IntroductionTranslation;
+	[SectionRoutes.APPLICANT]: ApplicantInformationTranslation;
+	[SectionRoutes.INSTITUTIONAL]: InstitutionalRepresentativeTranslation;
+	[SectionRoutes.PROJECT]: ProjectInformationTranslation;
+	[SectionRoutes.STUDY]: RequestedStudyTranslation;
+	[SectionRoutes.ETHICS]: EthicsTranslation;
+	[SectionRoutes.APPENDICES]: AppendicesTranslation;
+	[SectionRoutes.COLLABORATORS]: CollaboratorsTranslation;
+	[SectionRoutes.AGREEMENT]: DataAccessAgreementTranslation;
+	[SectionRoutes.SIGN]: SignSubmitTranslation;
+	EOD: EndOfDocumentTranslation;
+};
 
-export type SectionKeyValues = (typeof SectionKeys)[keyof typeof SectionKeys];
+export type TranslationsMapping = Record<SupportedLangsValues, TranslationsOptions>;
+
+export const translations: TranslationsMapping = {
+	[SupportedLangs.ENGLISH]: {
+		[SectionRoutes.INTRO]: INTRODUCTION,
+		[SectionRoutes.APPLICANT]: APPLICANT_INFORMATION,
+		[SectionRoutes.INSTITUTIONAL]: INSTITUTIONAL_REPRESENTATIVE,
+		[SectionRoutes.PROJECT]: PROJECT_INFORMATION,
+		[SectionRoutes.STUDY]: REQUESTED_STUDY,
+		[SectionRoutes.ETHICS]: ETHICS,
+		[SectionRoutes.APPENDICES]: APPENDICES,
+		[SectionRoutes.COLLABORATORS]: COLLABORATORS,
+		[SectionRoutes.AGREEMENT]: DATA_ACCESS_AGREEMENT,
+		[SectionRoutes.SIGN]: SIGN_SUBMIT,
+		EOD: END_OF_DOCUMENT,
+	},
+	[SupportedLangs.FRENCH]: {
+		[SectionRoutes.INTRO]: FR_INTRODUCTION,
+		[SectionRoutes.APPLICANT]: FR_APPLICANT_INFORMATION,
+		[SectionRoutes.INSTITUTIONAL]: FR_INSTITUTIONAL_REPRESENTATIVE,
+		[SectionRoutes.PROJECT]: FR_PROJECT_INFORMATION,
+		[SectionRoutes.STUDY]: FR_REQUESTED_STUDY,
+		[SectionRoutes.ETHICS]: FR_ETHICS,
+		[SectionRoutes.APPENDICES]: FR_APPENDICES,
+		[SectionRoutes.COLLABORATORS]: FR_COLLABORATORS,
+		[SectionRoutes.AGREEMENT]: FR_DATA_ACCESS_AGREEMENT,
+		[SectionRoutes.SIGN]: FR_SIGN_SUBMIT,
+		EOD: FR_END_OF_DOCUMENT,
+	},
+};
 
 // Define the shape of translation objects
 export type AppendicesTranslation = {

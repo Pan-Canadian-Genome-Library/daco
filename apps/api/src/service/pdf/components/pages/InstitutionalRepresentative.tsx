@@ -24,11 +24,9 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { INSTITUTIONAL_REPRESENTATIVE } from '@/service/pdf/components/translations/enTranslations.ts';
 import { View } from '@react-pdf/renderer';
 import { standardStyles } from '../standardStyling.ts';
-import { FR_INSTITUTIONAL_REPRESENTATIVE } from '../translations/frTranslations.ts';
-import { LanguagProps, SupportedLangs } from '../translations/types.ts';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
 type InstitutionalRepresentativeProps = LanguagProps &
 	Pick<
@@ -71,115 +69,28 @@ const InstitutionalRepresentative = ({
 	institutionPostalCode,
 	lang = SupportedLangs.ENGLISH,
 }: InstitutionalRepresentativeProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>
-				{lang === SupportedLangs.ENGLISH ? INSTITUTIONAL_REPRESENTATIVE.TITLE : FR_INSTITUTIONAL_REPRESENTATIVE.TITLE}
-			</Title>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH
-					? INSTITUTIONAL_REPRESENTATIVE.DESCRIPTION
-					: FR_INSTITUTIONAL_REPRESENTATIVE.DESCRIPTION}
-			</Paragraph>
-			<FormDisplay
-				title={
-					lang === SupportedLangs.ENGLISH
-						? INSTITUTIONAL_REPRESENTATIVE.INSTITUTIONAL_REP_TITLE_LABEL
-						: FR_INSTITUTIONAL_REPRESENTATIVE.INSTITUTIONAL_REP_TITLE_LABEL
-				}
-			>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.TITLE_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.TITLE_LABEL
-					}
-				>
-					{institutionalRepTitle}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.FIRST_NAME_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.FIRST_NAME_LABEL
-					}
-				>
-					{institutionalRepFirstName}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.MIDDLE_NAME_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.MIDDLE_NAME_LABEL
-					}
-				>
-					{institutionalRepMiddleName}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.LAST_NAME_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.LAST_NAME_LABEL
-					}
-				>
-					{institutionalRepLastName}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.SUFFIX_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.SUFFIX_LABEL
-					}
-				>
-					{institutionalRepSuffix}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.PRIMARY_AFFILIATION_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.PRIMARY_AFFILIATION_LABEL
-					}
-				>
-					{institutionalRepPrimaryAffiliation}
-				</DataItem>
-				<DataItem
-					isLink
-					linkPrefix="mailto:"
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.INSTITUTIONAL_EMAIL_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.INSTITUTIONAL_EMAIL_LABEL
-					}
-				>
+			<Title>{t.institutional.TITLE}</Title>
+			<Paragraph>{t.institutional.DESCRIPTION}</Paragraph>
+			<FormDisplay title={t.institutional.INSTITUTIONAL_REP_TITLE_LABEL}>
+				<DataItem item={t.institutional.TITLE_LABEL}>{institutionalRepTitle}</DataItem>
+				<DataItem item={t.institutional.FIRST_NAME_LABEL}>{institutionalRepFirstName}</DataItem>
+				<DataItem item={t.institutional.MIDDLE_NAME_LABEL}>{institutionalRepMiddleName}</DataItem>
+				<DataItem item={t.institutional.LAST_NAME_LABEL}>{institutionalRepLastName}</DataItem>
+				<DataItem item={t.institutional.SUFFIX_LABEL}>{institutionalRepSuffix}</DataItem>
+				<DataItem item={t.institutional.PRIMARY_AFFILIATION_LABEL}>{institutionalRepPrimaryAffiliation}</DataItem>
+				<DataItem isLink linkPrefix="mailto:" item={t.institutional.INSTITUTIONAL_EMAIL_LABEL}>
 					{institutionalRepEmail}
 				</DataItem>
-				<DataItem
-					isLink
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.RESEARCHER_PROFILE_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.RESEARCHER_PROFILE_LABEL
-					}
-				>
+				<DataItem isLink item={t.institutional.RESEARCHER_PROFILE_LABEL}>
 					{institutionalRepProfileUrl}
 				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? INSTITUTIONAL_REPRESENTATIVE.POSITION_TITLE_LABEL
-							: FR_INSTITUTIONAL_REPRESENTATIVE.POSITION_TITLE_LABEL
-					}
-				>
-					{institutionalRepPositionTitle}
-				</DataItem>
+				<DataItem item={t.institutional.POSITION_TITLE_LABEL}>{institutionalRepPositionTitle}</DataItem>
 			</FormDisplay>
-			<FormDisplay
-				title={
-					lang === SupportedLangs.ENGLISH
-						? INSTITUTIONAL_REPRESENTATIVE.INSTITUTION_MAILING_ADDRESS_TITLE
-						: FR_INSTITUTIONAL_REPRESENTATIVE.INSTITUTION_MAILING_ADDRESS_TITLE
-				}
-			>
+			<FormDisplay title={t.institutional.INSTITUTION_MAILING_ADDRESS_TITLE}>
 				<View
 					style={{
 						display: 'flex',
@@ -196,33 +107,9 @@ const InstitutionalRepresentative = ({
 							gap: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? INSTITUTIONAL_REPRESENTATIVE.COUNTRY_LABEL
-									: FR_INSTITUTIONAL_REPRESENTATIVE.COUNTRY_LABEL
-							}
-						>
-							{institutionCountry}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? INSTITUTIONAL_REPRESENTATIVE.STREET_ADDRESS_LABEL
-									: FR_INSTITUTIONAL_REPRESENTATIVE.STREET_ADDRESS_LABEL
-							}
-						>
-							{institutionStreetAddress}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? INSTITUTIONAL_REPRESENTATIVE.BUILDING_LABEL
-									: FR_INSTITUTIONAL_REPRESENTATIVE.BUILDING_LABEL
-							}
-						>
-							{institutionBuilding}
-						</DataItem>
+						<DataItem item={t.institutional.COUNTRY_LABEL}>{institutionCountry}</DataItem>
+						<DataItem item={t.institutional.STREET_ADDRESS_LABEL}>{institutionStreetAddress}</DataItem>
+						<DataItem item={t.institutional.BUILDING_LABEL}>{institutionBuilding}</DataItem>
 					</View>
 					<View
 						style={{
@@ -233,33 +120,9 @@ const InstitutionalRepresentative = ({
 							marginLeft: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? INSTITUTIONAL_REPRESENTATIVE.PROVINCE_LABEL
-									: FR_INSTITUTIONAL_REPRESENTATIVE.PROVINCE_LABEL
-							}
-						>
-							{institutionState}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? INSTITUTIONAL_REPRESENTATIVE.CITY_LABEL
-									: FR_INSTITUTIONAL_REPRESENTATIVE.CITY_LABEL
-							}
-						>
-							{institutionCity}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? INSTITUTIONAL_REPRESENTATIVE.POSTAL_CODE_LABEL
-									: FR_INSTITUTIONAL_REPRESENTATIVE.POSTAL_CODE_LABEL
-							}
-						>
-							{institutionPostalCode}
-						</DataItem>
+						<DataItem item={t.institutional.PROVINCE_LABEL}>{institutionState}</DataItem>
+						<DataItem item={t.institutional.CITY_LABEL}>{institutionCity}</DataItem>
+						<DataItem item={t.institutional.POSTAL_CODE_LABEL}>{institutionPostalCode}</DataItem>
 					</View>
 				</View>
 			</FormDisplay>

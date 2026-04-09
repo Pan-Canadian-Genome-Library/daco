@@ -22,12 +22,10 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { APPLICANT_INFORMATION } from '@/service/pdf/components/translations/enTranslations.ts';
 import { ApplicantDTO } from '@pcgl-daco/data-model';
 import { View } from '@react-pdf/renderer';
 import { standardStyles } from '../standardStyling.ts';
-import { FR_APPLICANT_INFORMATION } from '../translations/frTranslations.ts';
-import { LanguagProps, SupportedLangs } from '../translations/types.ts';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
 type ApplicantInformationProps = LanguagProps &
 	Pick<
@@ -67,114 +65,28 @@ const ApplicantInformation = ({
 	applicantInstitutionPostalCode,
 	lang = SupportedLangs.ENGLISH,
 }: ApplicantInformationProps) => {
+	const t = translations[lang];
 	return (
 		<StandardPage fixed useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{lang === SupportedLangs.ENGLISH ? APPLICANT_INFORMATION.TITLE : FR_APPLICANT_INFORMATION.TITLE}</Title>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH
-					? APPLICANT_INFORMATION.QUALIFIED_APPLICANTS_PARAGRAPH
-					: FR_APPLICANT_INFORMATION.QUALIFIED_APPLICANTS_PARAGRAPH}
-			</Paragraph>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH
-					? APPLICANT_INFORMATION.INSTITUTIONAL_EMAIL_PARAGRAPH
-					: FR_APPLICANT_INFORMATION.INSTITUTIONAL_EMAIL_PARAGRAPH}
-			</Paragraph>
-			<FormDisplay
-				title={
-					lang === SupportedLangs.ENGLISH
-						? APPLICANT_INFORMATION.PRINCIPAL_INVESTIGATOR_INFO_TITLE
-						: FR_APPLICANT_INFORMATION.PRINCIPAL_INVESTIGATOR_INFO_TITLE
-				}
-			>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH ? APPLICANT_INFORMATION.TITLE_LABEL : FR_APPLICANT_INFORMATION.TITLE_LABEL
-					}
-				>
-					{applicantTitle}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? APPLICANT_INFORMATION.FIRST_NAME_LABEL
-							: FR_APPLICANT_INFORMATION.FIRST_NAME_LABEL
-					}
-				>
-					{applicantFirstName}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? APPLICANT_INFORMATION.MIDDLE_NAME_LABEL
-							: FR_APPLICANT_INFORMATION.MIDDLE_NAME_LABEL
-					}
-				>
-					{applicantMiddleName}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? APPLICANT_INFORMATION.LAST_NAME_LABEL
-							: FR_APPLICANT_INFORMATION.LAST_NAME_LABEL
-					}
-				>
-					{applicantLastName}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH ? APPLICANT_INFORMATION.SUFFIX_LABEL : FR_APPLICANT_INFORMATION.SUFFIX_LABEL
-					}
-				>
-					{applicantSuffix}
-				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? APPLICANT_INFORMATION.PRIMARY_AFFILIATION_LABEL
-							: FR_APPLICANT_INFORMATION.PRIMARY_AFFILIATION_LABEL
-					}
-				>
-					{applicantPrimaryAffiliation}
-				</DataItem>
-				<DataItem
-					isLink
-					linkPrefix="mailto:"
-					item={
-						lang === SupportedLangs.ENGLISH
-							? APPLICANT_INFORMATION.INSTITUTIONAL_EMAIL_LABEL
-							: FR_APPLICANT_INFORMATION.INSTITUTIONAL_EMAIL_LABEL
-					}
-				>
+			<Title>{t.applicant.TITLE}</Title>
+			<Paragraph>{t.applicant.QUALIFIED_APPLICANTS_PARAGRAPH}</Paragraph>
+			<Paragraph>{t.applicant.INSTITUTIONAL_EMAIL_PARAGRAPH}</Paragraph>
+			<FormDisplay title={t.applicant.PRINCIPAL_INVESTIGATOR_INFO_TITLE}>
+				<DataItem item={t.applicant.TITLE_LABEL}>{applicantTitle}</DataItem>
+				<DataItem item={t.applicant.FIRST_NAME_LABEL}>{applicantFirstName}</DataItem>
+				<DataItem item={t.applicant.MIDDLE_NAME_LABEL}>{applicantMiddleName}</DataItem>
+				<DataItem item={t.applicant.LAST_NAME_LABEL}>{applicantLastName}</DataItem>
+				<DataItem item={t.applicant.SUFFIX_LABEL}>{applicantSuffix}</DataItem>
+				<DataItem item={t.applicant.PRIMARY_AFFILIATION_LABEL}>{applicantPrimaryAffiliation}</DataItem>
+				<DataItem isLink linkPrefix="mailto:" item={t.applicant.INSTITUTIONAL_EMAIL_LABEL}>
 					{applicantInstitutionalEmail}
 				</DataItem>
-				<DataItem
-					isLink
-					item={
-						lang === SupportedLangs.ENGLISH
-							? APPLICANT_INFORMATION.RESEARCHER_PROFILE_LABEL
-							: FR_APPLICANT_INFORMATION.RESEARCHER_PROFILE_LABEL
-					}
-				>
+				<DataItem isLink item={t.applicant.RESEARCHER_PROFILE_LABEL}>
 					{applicantProfileUrl}
 				</DataItem>
-				<DataItem
-					item={
-						lang === SupportedLangs.ENGLISH
-							? APPLICANT_INFORMATION.POSITION_TITLE_LABEL
-							: FR_APPLICANT_INFORMATION.POSITION_TITLE_LABEL
-					}
-				>
-					{applicantPositionTitle}
-				</DataItem>
+				<DataItem item={t.applicant.POSITION_TITLE_LABEL}>{applicantPositionTitle}</DataItem>
 			</FormDisplay>
-			<FormDisplay
-				title={
-					lang === SupportedLangs.ENGLISH
-						? APPLICANT_INFORMATION.INSTITUTION_MAILING_ADDRESS_TITLE
-						: FR_APPLICANT_INFORMATION.INSTITUTION_MAILING_ADDRESS_TITLE
-				}
-			>
+			<FormDisplay title={t.applicant.INSTITUTION_MAILING_ADDRESS_TITLE}>
 				<View
 					style={{
 						display: 'flex',
@@ -191,33 +103,9 @@ const ApplicantInformation = ({
 							gap: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? APPLICANT_INFORMATION.COUNTRY_LABEL
-									: FR_APPLICANT_INFORMATION.COUNTRY_LABEL
-							}
-						>
-							{applicantInstitutionCountry}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? APPLICANT_INFORMATION.STREET_ADDRESS_LABEL
-									: FR_APPLICANT_INFORMATION.STREET_ADDRESS_LABEL
-							}
-						>
-							{applicantInstitutionStreetAddress}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? APPLICANT_INFORMATION.BUILDING_LABEL
-									: FR_APPLICANT_INFORMATION.BUILDING_LABEL
-							}
-						>
-							{applicantInstitutionBuilding}
-						</DataItem>
+						<DataItem item={t.applicant.COUNTRY_LABEL}>{applicantInstitutionCountry}</DataItem>
+						<DataItem item={t.applicant.STREET_ADDRESS_LABEL}>{applicantInstitutionStreetAddress}</DataItem>
+						<DataItem item={t.applicant.BUILDING_LABEL}>{applicantInstitutionBuilding}</DataItem>
 					</View>
 					<View
 						style={{
@@ -228,31 +116,9 @@ const ApplicantInformation = ({
 							marginLeft: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? APPLICANT_INFORMATION.PROVINCE_LABEL
-									: FR_APPLICANT_INFORMATION.PROVINCE_LABEL
-							}
-						>
-							{applicantInstitutionState}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH ? APPLICANT_INFORMATION.CITY_LABEL : FR_APPLICANT_INFORMATION.CITY_LABEL
-							}
-						>
-							{applicantInstitutionCity}
-						</DataItem>
-						<DataItem
-							item={
-								lang === SupportedLangs.ENGLISH
-									? APPLICANT_INFORMATION.POSTAL_CODE_LABEL
-									: FR_APPLICANT_INFORMATION.POSTAL_CODE_LABEL
-							}
-						>
-							{applicantInstitutionPostalCode}
-						</DataItem>
+						<DataItem item={t.applicant.PROVINCE_LABEL}>{applicantInstitutionState}</DataItem>
+						<DataItem item={t.applicant.CITY_LABEL}>{applicantInstitutionCity}</DataItem>
+						<DataItem item={t.applicant.POSTAL_CODE_LABEL}>{applicantInstitutionPostalCode}</DataItem>
 					</View>
 				</View>
 			</FormDisplay>

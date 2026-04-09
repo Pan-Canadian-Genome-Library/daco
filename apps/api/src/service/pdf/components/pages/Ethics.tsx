@@ -24,38 +24,28 @@ import FormDisplay from '@/service/pdf/components/FormDisplay.tsx';
 import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
-import { ETHICS } from '@/service/pdf/components/translations/enTranslations.ts';
 import { EthicsLetterDTO } from '@pcgl-daco/data-model/src/types.ts';
-import { FR_ETHICS } from '../translations/frTranslations.ts';
-import { LanguagProps, SupportedLangs } from '../translations/types.ts';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
 type EthicsProps = LanguagProps & EthicsLetterDTO;
 
 const Ethics = ({ ethicsReviewRequired, lang = SupportedLangs.ENGLISH }: EthicsProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>{lang === SupportedLangs.ENGLISH ? ETHICS.TITLE : FR_ETHICS.TITLE}</Title>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH ? ETHICS.ETHICS_AWARENESS_PARAGRAPH : FR_ETHICS.ETHICS_AWARENESS_PARAGRAPH}
-			</Paragraph>
-			<Paragraph>
-				{lang === SupportedLangs.ENGLISH
-					? ETHICS.DACO_RESPONSIBILITY_PARAGRAPH
-					: FR_ETHICS.DACO_RESPONSIBILITY_PARAGRAPH}
-			</Paragraph>
-			<FormDisplay
-				title={lang === SupportedLangs.ENGLISH ? ETHICS.ETHICS_APPROVAL_TITLE : FR_ETHICS.ETHICS_APPROVAL_TITLE}
-			>
+			<Title>{t.ethics.TITLE}</Title>
+			<Paragraph>{t.ethics.ETHICS_AWARENESS_PARAGRAPH}</Paragraph>
+			<Paragraph>{t.ethics.DACO_RESPONSIBILITY_PARAGRAPH}</Paragraph>
+			<FormDisplay title={t.ethics.ETHICS_APPROVAL_TITLE}>
 				<Checkbox
 					unchecked={
 						ethicsReviewRequired === true || ethicsReviewRequired === null || ethicsReviewRequired === undefined
 					}
 				>
-					{lang === SupportedLangs.ENGLISH ? ETHICS.NO_REVIEW_REQUIRED : FR_ETHICS.NO_REVIEW_REQUIRED}
+					{t.ethics.NO_REVIEW_REQUIRED}
 				</Checkbox>
-				<Checkbox unchecked={!ethicsReviewRequired}>
-					{lang === SupportedLangs.ENGLISH ? ETHICS.REVIEW_REQUIRED : FR_ETHICS.REVIEW_REQUIRED}
-				</Checkbox>
+				<Checkbox unchecked={!ethicsReviewRequired}>{t.ethics.REVIEW_REQUIRED}</Checkbox>
 				{ethicsReviewRequired !== undefined && ethicsReviewRequired !== null ? (
 					<View
 						wrap={false}
@@ -69,8 +59,8 @@ const Ethics = ({ ethicsReviewRequired, lang = SupportedLangs.ENGLISH }: EthicsP
 						<Paragraph notice>
 							&mdash;&nbsp;Ethics{' '}
 							{ethicsReviewRequired === true
-								? ETHICS.APPROVAL_LETTER_MESSAGE_APPROVAL
-								: ETHICS.APPROVAL_LETTER_MESSAGE_EXEMPTION}
+								? t.ethics.APPROVAL_LETTER_MESSAGE_APPROVAL
+								: t.ethics.APPROVAL_LETTER_MESSAGE_EXEMPTION}
 							&nbsp;&mdash;
 						</Paragraph>
 					</View>
