@@ -74,17 +74,6 @@ const HeaderComponent = () => {
 
 	const isResponsiveMode = minWidth <= token.screenXL;
 
-	const menuButtonStyle: React.CSSProperties = {
-		width: isResponsiveMode ? '100%' : 'auto',
-	};
-
-	const buttonLinkStyle: React.CSSProperties = {
-		fontWeight: 'normal',
-		fontSize: token.fontSizeLG,
-		justifyContent: isResponsiveMode ? 'start' : 'center',
-		padding: isResponsiveMode ? '0 0' : '1rem',
-	};
-
 	/**
 	 * Default action when a button in the menu is clicked, used particularly for the mobile menu which should close after click.
 	 * @param buttonAction The function for the action needed to be performed.
@@ -102,41 +91,55 @@ const HeaderComponent = () => {
 	 *
 	 * @returns `MenuLink` | `undefined` - returns `undefined` if the user is a Institutional Rep
 	 */
-	const determineIfApplicationsShown = (): MenuLink | MenuButton | undefined => {
-		if (!isLoggedIn) {
-			return {
-				name: translate('links.apply'),
-				buttonProps: {
-					style: { ...buttonLinkStyle },
-					variant: 'text',
-					type: 'text',
-				},
-				onClickAction: () => setApplyForAccessOpen(true),
-				position: 'right',
-				target: '_self',
-			};
-		} else if (user?.dacoAdmin) {
-			return {
-				name: translate('links.admin'),
-				href: '/admin',
-				position: 'right',
-				target: '_self',
-			};
-		} else if (user && (user.dacChair.length > 0 || user.dacMember.length > 0)) {
-			return {
-				name: translate('links.manageApplications'),
-				href: '/manage/applications',
-				position: 'right',
-				target: '_self',
-			};
-		} else {
-			return {
-				name: translate('links.myApplications'),
-				href: '/dashboard',
-				position: 'right',
-				target: '_self',
-			};
+	const determineIfApplicationsShown = (): (MenuLink | MenuButton) | (MenuLink | MenuButton)[] => {
+		if (isLoggedIn && user) {
+			if (user.dacChair.length > 0 || user.dacMember.length > 0) {
+				const adminButton: MenuLink = {
+					name: translate('links.admin'),
+					href: '/admin',
+					position: 'right',
+					target: '_self',
+				};
+				const manageButton: MenuLink = {
+					name: translate('links.manageApplications'),
+					href: '/manage/applications',
+					position: 'right',
+					target: '_self',
+				};
+				return user.dacoAdmin ? [adminButton, manageButton] : [manageButton];
+			} else if (user.dacoAdmin) {
+				return {
+					name: translate('links.admin'),
+					href: '/admin',
+					position: 'right',
+					target: '_self',
+				};
+			} else {
+				return {
+					name: translate('links.myApplications'),
+					href: '/dashboard',
+					position: 'right',
+					target: '_self',
+				};
+			}
 		}
+
+		return {
+			name: translate('links.apply'),
+			buttonProps: {
+				style: {
+					fontWeight: 'normal',
+					fontSize: token.fontSizeLG,
+					justifyContent: isResponsiveMode ? 'start' : 'center',
+					padding: isResponsiveMode ? '0 0' : '1rem',
+				},
+				variant: 'text',
+				type: 'text',
+			},
+			onClickAction: () => setApplyForAccessOpen(true),
+			position: 'right',
+			target: '_self',
+		};
 	};
 
 	const languageButton: MenuButton = {
@@ -212,6 +215,8 @@ const HeaderComponent = () => {
 	 * @returns JSX Element array containing the link elements or `null` if the link is not shown.
 	 */
 	const displayMenuItems = (position: 'left' | 'right' | 'both'): (JSX.Element | null)[] => {
+		const userMenuItems = determineIfApplicationsShown();
+
 		const menuItems = [
 			{
 				name: translate('links.policies'),
@@ -229,9 +234,10 @@ const HeaderComponent = () => {
 				position: 'left',
 			},
 			languageButton,
-			determineIfApplicationsShown(),
+			...(Array.isArray(userMenuItems) ? userMenuItems : [userMenuItems]),
 			isLoggedIn ? logoutButton : loginButton,
 		];
+
 		return menuItems
 			.filter((menuItem) => (position !== 'both' ? menuItem?.position === position : menuItem?.position))
 			.map((menuItem, key) => {
@@ -246,7 +252,10 @@ const HeaderComponent = () => {
 							key={`menuItem-${key}`}
 							{...(menuItem.buttonProps ?? null)}
 							role="menuitem"
-							style={{ ...menuButtonStyle, ...menuItem.buttonProps?.style }}
+							style={{
+								width: isResponsiveMode ? '100%' : 'auto',
+								...menuItem.buttonProps?.style,
+							}}
 							onClick={clickAction ? () => onMenuButtonClick(clickAction) : undefined}
 						>
 							{menuItem.children ? menuItem.children : menuItem.name}
