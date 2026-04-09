@@ -62,14 +62,12 @@ const ProtectedRoute = ({ requiredMembership, redirectTo, children }: ProtectedR
 	}
 
 	if (requiredMembership) {
-		if (requiredMembership.includes('ADMIN') && !user?.dacoAdmin) {
-			return <Redirect />;
-		}
-
 		if (
 			requiredMembership.some((role) => role === 'DAC_CHAIR' || role === 'DAC_MEMBER') &&
 			!(isDacChair || isDacMember)
 		) {
+			return <Redirect />;
+		} else if (requiredMembership.includes('ADMIN') && !user?.dacoAdmin) {
 			return <Redirect />;
 		}
 	}
