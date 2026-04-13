@@ -29,6 +29,7 @@
 				"home": "Go to Homepage"
 			}
 		},
+		"Supported-CIHR": "PCGL is supported by the Canadian Institutes of Health Research (CIHR)",
 		"copyright": "{{date}} The Ontario Institute for Cancer Research. All rights reserved.",
 		"PCGL": "Pan-Canadian Genome Library"
 	},
