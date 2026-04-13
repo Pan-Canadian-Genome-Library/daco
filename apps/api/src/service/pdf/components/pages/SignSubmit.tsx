@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
- *
+ * Copyright (c) 2026
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
  * GNU Affero General Public License along with this program.
@@ -25,6 +24,7 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import Signature from '@/service/pdf/components/Signature.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
 interface SignSubmitProps
 	extends Omit<SignatureDTO, 'applicationId'>,
@@ -43,7 +43,8 @@ interface SignSubmitProps
 			| 'institutionalRepLastName'
 			| 'institutionalRepPrimaryAffiliation'
 			| 'institutionalRepPositionTitle'
-		> {}
+		>,
+		LanguagProps {}
 
 const SignSubmit = ({
 	applicantFirstName,
@@ -61,24 +62,28 @@ const SignSubmit = ({
 	institutionalRepSignedAt,
 	institutionalRepPositionTitle,
 	institutionalRepPrimaryAffiliation,
+	lang = SupportedLangs.ENGLISH,
 }: SignSubmitProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Sign &amp; Submit</Title>
-			<Paragraph>
-				You must include BOTH the Principal Investigator and the Institutional Representative signatures in order for
-				your application to be reviewed.
-			</Paragraph>
-			<FormDisplay title="Applicant Authorization">
-				<DataItem item="Name">{`${applicantFirstName} ${applicantMiddleName ?? ''}${!applicantMiddleName ? '' : ' '}${applicantLastName}`}</DataItem>
-				<DataItem item="Primary Affiliation">{applicantPrimaryAffiliation}</DataItem>
-				<DataItem item="Position Title">{applicantPositionTitle}</DataItem>
+			<Title>{t.sign.TITLE}</Title>
+			<Paragraph>{t.sign.SIGNATURE_REQUIREMENT}</Paragraph>
+			<FormDisplay title={t.sign.APPLICANT_AUTHORIZATION_TITLE}>
+				<DataItem
+					item={t.sign.NAME_LABEL}
+				>{`${applicantFirstName} ${applicantMiddleName ?? ''}${!applicantMiddleName ? '' : ' '}${applicantLastName}`}</DataItem>
+				<DataItem item={t.sign.PRIMARY_AFFILIATION_LABEL}>{applicantPrimaryAffiliation}</DataItem>
+				<DataItem item={t.sign.POSITION_TITLE_LABEL}>{applicantPositionTitle}</DataItem>
 				<Signature src={applicantSignature} date={applicantSignedAt} />
 			</FormDisplay>
-			<FormDisplay title="Institutional Representative Authorization">
-				<DataItem item="Name">{`${institutionalRepFirstName} ${institutionalRepMiddleName ?? ''}${!institutionalRepMiddleName ? '' : ' '}${institutionalRepLastName}`}</DataItem>
-				<DataItem item="Primary Affiliation">{institutionalRepPrimaryAffiliation}</DataItem>
-				<DataItem item="Position Title">{institutionalRepPositionTitle}</DataItem>
+			<FormDisplay title={t.sign.INSTITUTIONAL_REP_AUTHORIZATION_TITLE}>
+				<DataItem
+					item={t.sign.NAME_LABEL}
+				>{`${institutionalRepFirstName} ${institutionalRepMiddleName ?? ''}${!institutionalRepMiddleName ? '' : ' '}${institutionalRepLastName}`}</DataItem>
+				<DataItem item={t.sign.PRIMARY_AFFILIATION_LABEL}>{institutionalRepPrimaryAffiliation}</DataItem>
+				<DataItem item={t.sign.POSITION_TITLE_LABEL}>{institutionalRepPositionTitle}</DataItem>
 				<Signature src={institutionalRepSignature} date={institutionalRepSignedAt} />
 			</FormDisplay>
 		</StandardPage>

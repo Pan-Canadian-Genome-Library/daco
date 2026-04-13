@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -24,10 +24,10 @@ import { ApplicationContentsResponse } from '@pcgl-daco/data-model';
 import Logo from '@/service/pdf/components/Logo/Logo.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
+import { TITLE_PAGE } from '@/service/pdf/components/translations/enTranslations.ts';
 
 interface TitlePageProps extends Pick<ApplicationContentsResponse, 'applicationId' | 'applicantPrimaryAffiliation'> {
 	displayLogo?: boolean;
-	title: string;
 	principalInvestigatorName: string;
 	docCreatedAt: Date;
 }
@@ -54,6 +54,13 @@ const styles = StyleSheet.create({
 		fontFamily: 'LeagueSpartan',
 		fontWeight: 'bold',
 	},
+	subTitleText: {
+		marginTop: '5px',
+		fontSize: standardStyles.textStyles.sizes.lg,
+		fontFamily: 'LeagueSpartan',
+		fontWeight: 'bold',
+	},
+
 	infoGrid: {
 		display: 'flex',
 		width: '60%',
@@ -79,7 +86,6 @@ const styles = StyleSheet.create({
 });
 
 const TitlePage = ({
-	title,
 	displayLogo,
 	applicationId,
 	principalInvestigatorName,
@@ -90,22 +96,23 @@ const TitlePage = ({
 		<StandardPage ignorePadding showAttribution>
 			<View style={styles.content}>
 				{displayLogo ? <Logo style={styles.logoImage} /> : null}
-				<Text style={styles.titleText}>{title}</Text>
+				<Text style={styles.titleText}>{'Application for Access to PCGL Controlled Data'}</Text>
+				<Text style={styles.subTitleText}>{'Demande d’accès aux données contrôlées du PCGL'}</Text>
 				<View style={styles.infoGrid}>
 					<View style={styles.infoItem}>
-						<Text style={styles.dataQuestion}>Application Number:</Text>
-						<Text style={styles.dataAnswer}>{`PCGL-${applicationId}`}</Text>
+						<Text style={styles.dataQuestion}>{TITLE_PAGE.APPLICATION_NUMBER_LABEL}</Text>
+						<Text style={styles.dataAnswer}>{`${TITLE_PAGE.APPLICATION_NUMBER_PREFIX}${applicationId}`}</Text>
 					</View>
 					<View style={styles.infoItem}>
-						<Text style={styles.dataQuestion}>Principal Investigator:</Text>
+						<Text style={styles.dataQuestion}>{TITLE_PAGE.PRINCIPAL_INVESTIGATOR_LABEL}</Text>
 						<Text style={styles.dataAnswer}>{principalInvestigatorName}</Text>
 					</View>
 					<View style={styles.infoItem}>
-						<Text style={styles.dataQuestion}>Institution:</Text>
+						<Text style={styles.dataQuestion}>{TITLE_PAGE.INSTITUTION_LABEL}</Text>
 						<Text style={styles.dataAnswer}>{applicantPrimaryAffiliation}</Text>
 					</View>
 					<View style={styles.infoItem}>
-						<Text style={styles.dataQuestion}>Document Created On:</Text>
+						<Text style={styles.dataQuestion}>{TITLE_PAGE.DOCUMENT_CREATED_ON_LABEL}</Text>
 						<Text style={styles.dataAnswer}>
 							{docCreatedAt.toLocaleString('en-CA', { dateStyle: 'full', timeStyle: 'long' })}
 						</Text>

@@ -28,7 +28,9 @@
 			"buttons": {
 				"home": "Go to Homepage"
 			}
-		}
+		},
+		"copyright": "{{date}} The Ontario Institute for Cancer Research. All rights reserved.",
+		"PCGL": "Pan-Canadian Genome Library"
 	},
 	"homepage": {
 		"title": "Apply for Access to Controlled Data",
