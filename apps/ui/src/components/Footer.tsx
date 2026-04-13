@@ -57,9 +57,6 @@ const FooterComponent = () => {
 		{
 			name: translate('links.dataPlatform'),
 		},
-	];
-
-	const policiesConditionsLinks: LinkType[] = [
 		{
 			name: translate('links.privacy'),
 		},
@@ -77,7 +74,7 @@ const FooterComponent = () => {
 	};
 
 	const complianceTextStyle: React.CSSProperties = {
-		textAlign: breakpoints.lg ? 'center' : 'start',
+		textAlign: 'start',
 		alignSelf: 'center',
 		width: '100%',
 	};
@@ -86,6 +83,7 @@ const FooterComponent = () => {
 		display: 'flex',
 		flexDirection: breakpoints.lg ? 'row' : 'column',
 		justifyItems: 'center',
+		width: '100%',
 		alignItems: 'center',
 		padding: breakpoints.lg ? token.Layout?.footerPadding : `2rem 1.75rem`,
 		gap: breakpoints.lg ? '0rem' : token.paddingXL,
@@ -101,61 +99,51 @@ const FooterComponent = () => {
 			}
 			return '1rem auto';
 		})(),
-		position: (() => {
-			if (breakpoints.xl) {
-				return 'absolute';
-			}
-
-			return 'relative';
-		})(),
 	};
 
 	return (
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
 				{breakpoints.lg ? (
-					<>
-						<Link target="_blank" style={logoStyles}>
-							<Image width={200} src={PCGLFOOTER} preview={false} alt={translate('global.PCGL')} />
-						</Link>
-						<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={token.paddingMD}>
-							<Flex
-								gap={token.paddingMD}
-								style={{ width: '100%' }}
-								vertical={breakpoints.lg ? true : false}
-								justify={breakpoints.lg ? 'center' : 'space-between'}
-								align={breakpoints.lg ? 'center' : 'flex-start'}
-							>
-								<Flex
-									gap={token.paddingMD}
-									justify="center"
-									align={breakpoints.lg ? 'center' : 'start'}
-									vertical={breakpoints.lg ? false : true}
-								>
-									{pcglLinks.map((itemLink) => (
-										<Link tabIndex={0} key={itemLink.name} style={linkStyle} underline target="_blank">
-											{itemLink.name}
-										</Link>
-									))}
-								</Flex>
+					<Flex justify="space-around" style={{ width: '100%' }}>
+						<Flex vertical flex={1.5}>
+							<Link target="_blank" style={logoStyles}>
+								<Image width={200} src={PCGLFOOTER} preview={false} alt={translate('global.PCGL')} />
+							</Link>
+							<Flex vertical gap={'middle'} style={{ marginTop: '10px' }}>
+								<Text style={complianceTextStyle}>{translate('global.Supported-CIHR')}</Text>
+
 								<Text style={complianceTextStyle}>
 									&copy; {translate('global.copyright', { date: new Date().getFullYear() })}
 								</Text>
-								<Flex
-									gap={token.paddingMD}
-									justify="center"
-									align={breakpoints.lg ? 'center' : 'start'}
-									vertical={breakpoints.lg ? false : true}
-								>
-									{policiesConditionsLinks.map((itemLink) => (
-										<Link tabIndex={0} key={itemLink.name} style={linkStyle} underline target="_blank">
-											{itemLink.name}
-										</Link>
-									))}
-								</Flex>
 							</Flex>
 						</Flex>
-					</>
+						<Flex style={{ ...contentWrapperStyles, width: '100%' }} flex={1} vertical gap={token.paddingMD}>
+							<Flex
+								// gap={token.paddingMD}
+								style={{ width: '100%', minWidth: 475, margin: 'auto' }}
+								justify={'center'}
+								align={'center'}
+							>
+								<Row align={'middle'} justify={'center'} gutter={[0, '20px']}>
+									{pcglLinks.map((itemLink) => (
+										<Col key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
+											<Flex justify={breakpoints.md ? 'flex-start' : 'center'}>
+												<Link
+													key={itemLink.name}
+													style={{ ...linkStyle, width: breakpoints.md ? 'auto' : 100 }}
+													underline
+													target="_blank"
+												>
+													{itemLink.name}
+												</Link>
+											</Flex>
+										</Col>
+									))}
+								</Row>
+							</Flex>
+						</Flex>
+					</Flex>
 				) : (
 					<>
 						<Flex
@@ -169,7 +157,7 @@ const FooterComponent = () => {
 								<Image width={200} src={PCGLFOOTER} preview={false} alt={translate('global.PCGL')} />
 							</Link>
 							<Row align={'middle'} justify={'center'} gutter={[0, token.padding]} wrap>
-								{pcglLinks.concat(policiesConditionsLinks).map((itemLink) => (
+								{pcglLinks.map((itemLink) => (
 									<Col key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
 										<Flex justify={breakpoints.md ? 'flex-start' : 'center'}>
 											<Link
@@ -185,6 +173,7 @@ const FooterComponent = () => {
 								))}
 							</Row>
 						</Flex>
+						<Text style={complianceTextStyle}>{translate('global.Supported-CIHR')}</Text>
 						<Text style={complianceTextStyle}>
 							&copy; {translate('global.copyright', { date: new Date().getFullYear() })}
 						</Text>
