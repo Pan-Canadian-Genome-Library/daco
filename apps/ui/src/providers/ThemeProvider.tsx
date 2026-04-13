@@ -36,6 +36,11 @@ export const pcglColours = {
 	successPrimary: '#52C41A',
 	successSecondary: '#D9F7BE',
 
+	// Application States Cards Dashboard
+	approved: '#95DE64',
+	inprogress: `#FADB14`,
+	blocked: '#F4A1A4',
+
 	white: '#FFFFFF',
 	offWhite: '#f0f0f0',
 	black: '#000000',
