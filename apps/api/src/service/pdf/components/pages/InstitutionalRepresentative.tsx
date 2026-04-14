@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -26,6 +26,30 @@ import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
 import { View } from '@react-pdf/renderer';
 import { standardStyles } from '../standardStyling.ts';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
+
+type InstitutionalRepresentativeProps = LanguagProps &
+	Pick<
+		InstitutionalRepDTO,
+		| 'institutionalRepTitle'
+		| 'institutionalRepFirstName'
+		| 'institutionalRepMiddleName'
+		| 'institutionalRepLastName'
+		| 'institutionalRepSuffix'
+		| 'institutionalRepPrimaryAffiliation'
+		| 'institutionalRepEmail'
+		| 'institutionalRepProfileUrl'
+		| 'institutionalRepPositionTitle'
+	> &
+	Pick<
+		InstitutionDTO,
+		| 'institutionCountry'
+		| 'institutionState'
+		| 'institutionStreetAddress'
+		| 'institutionBuilding'
+		| 'institutionCity'
+		| 'institutionPostalCode'
+	>;
 
 const InstitutionalRepresentative = ({
 	institutionalRepTitle,
@@ -43,52 +67,30 @@ const InstitutionalRepresentative = ({
 	institutionBuilding,
 	institutionCity,
 	institutionPostalCode,
-}: Pick<
-	InstitutionalRepDTO,
-	| 'institutionalRepTitle'
-	| 'institutionalRepFirstName'
-	| 'institutionalRepMiddleName'
-	| 'institutionalRepLastName'
-	| 'institutionalRepSuffix'
-	| 'institutionalRepPrimaryAffiliation'
-	| 'institutionalRepEmail'
-	| 'institutionalRepProfileUrl'
-	| 'institutionalRepPositionTitle'
-> &
-	Pick<
-		InstitutionDTO,
-		| 'institutionCountry'
-		| 'institutionState'
-		| 'institutionStreetAddress'
-		| 'institutionBuilding'
-		| 'institutionCity'
-		| 'institutionPostalCode'
-	>) => {
+	lang = SupportedLangs.ENGLISH,
+}: InstitutionalRepresentativeProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Institutional Representative</Title>
-			<Paragraph>
-				An Institutional Representative is a qualified representative of a legal entity who has the administrative power
-				to legally commit that entity to the terms and conditions in Section F: Data Access Agreement (e.g.
-				Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional
-				Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.
-			</Paragraph>
-			<FormDisplay title="Institutional Representative">
-				<DataItem item="Title">{institutionalRepTitle}</DataItem>
-				<DataItem item="First Name">{institutionalRepFirstName}</DataItem>
-				<DataItem item="Middle Name">{institutionalRepMiddleName}</DataItem>
-				<DataItem item="Last Name">{institutionalRepLastName}</DataItem>
-				<DataItem item="Suffix">{institutionalRepSuffix}</DataItem>
-				<DataItem item="Primary Affiliation">{institutionalRepPrimaryAffiliation}</DataItem>
-				<DataItem isLink linkPrefix="mailto:" item="Institutional Email">
+			<Title>{t.institutional.TITLE}</Title>
+			<Paragraph>{t.institutional.DESCRIPTION}</Paragraph>
+			<FormDisplay title={t.institutional.INSTITUTIONAL_REP_TITLE_LABEL}>
+				<DataItem item={t.institutional.TITLE_LABEL}>{institutionalRepTitle}</DataItem>
+				<DataItem item={t.institutional.FIRST_NAME_LABEL}>{institutionalRepFirstName}</DataItem>
+				<DataItem item={t.institutional.MIDDLE_NAME_LABEL}>{institutionalRepMiddleName}</DataItem>
+				<DataItem item={t.institutional.LAST_NAME_LABEL}>{institutionalRepLastName}</DataItem>
+				<DataItem item={t.institutional.SUFFIX_LABEL}>{institutionalRepSuffix}</DataItem>
+				<DataItem item={t.institutional.PRIMARY_AFFILIATION_LABEL}>{institutionalRepPrimaryAffiliation}</DataItem>
+				<DataItem isLink linkPrefix="mailto:" item={t.institutional.INSTITUTIONAL_EMAIL_LABEL}>
 					{institutionalRepEmail}
 				</DataItem>
-				<DataItem isLink item="Researcher Profile">
+				<DataItem isLink item={t.institutional.RESEARCHER_PROFILE_LABEL}>
 					{institutionalRepProfileUrl}
 				</DataItem>
-				<DataItem item="Position Title">{institutionalRepPositionTitle}</DataItem>
+				<DataItem item={t.institutional.POSITION_TITLE_LABEL}>{institutionalRepPositionTitle}</DataItem>
 			</FormDisplay>
-			<FormDisplay title="Institution/Company Mailing Address">
+			<FormDisplay title={t.institutional.INSTITUTION_MAILING_ADDRESS_TITLE}>
 				<View
 					style={{
 						display: 'flex',
@@ -105,9 +107,9 @@ const InstitutionalRepresentative = ({
 							gap: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem item="Country">{institutionCountry}</DataItem>
-						<DataItem item="Street Address">{institutionStreetAddress}</DataItem>
-						<DataItem item="Building">{institutionBuilding}</DataItem>
+						<DataItem item={t.institutional.COUNTRY_LABEL}>{institutionCountry}</DataItem>
+						<DataItem item={t.institutional.STREET_ADDRESS_LABEL}>{institutionStreetAddress}</DataItem>
+						<DataItem item={t.institutional.BUILDING_LABEL}>{institutionBuilding}</DataItem>
 					</View>
 					<View
 						style={{
@@ -118,9 +120,9 @@ const InstitutionalRepresentative = ({
 							marginLeft: standardStyles.textStyles.sizes.md,
 						}}
 					>
-						<DataItem item="Province">{institutionState}</DataItem>
-						<DataItem item="City">{institutionCity}</DataItem>
-						<DataItem item="Postal Code / ZIP Code">{institutionPostalCode}</DataItem>
+						<DataItem item={t.institutional.PROVINCE_LABEL}>{institutionState}</DataItem>
+						<DataItem item={t.institutional.CITY_LABEL}>{institutionCity}</DataItem>
+						<DataItem item={t.institutional.POSTAL_CODE_LABEL}>{institutionPostalCode}</DataItem>
 					</View>
 				</View>
 			</FormDisplay>
