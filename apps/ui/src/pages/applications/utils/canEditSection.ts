@@ -18,6 +18,7 @@
  */
 
 import { ApplicationUserPermission } from '@/providers/context/application/types';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model';
 import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 /**
  *
@@ -48,11 +49,13 @@ const canEditSection = ({
 	section,
 	isEditMode,
 	userPermissions,
+	currentApplicationState,
 }: {
 	revisions: SectionRevision;
 	section: SectionRoutesValues;
 	isEditMode: boolean;
 	userPermissions: ApplicationUserPermission;
+	currentApplicationState: ApplicationStateValues;
 }) => {
 	const isOnlyApplicant =
 		userPermissions.isApplicant &&
@@ -67,12 +70,19 @@ const canEditSection = ({
 	}
 
 	const currentRevision = revisions[section];
+	const isEditableState =
+		currentApplicationState === ApplicationStates.DRAFT ||
+		currentApplicationState === ApplicationStates.DAC_REVISIONS_REQUESTED ||
+		currentApplicationState === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED;
 
 	if (!isOnlyApplicant) {
 		return false;
 	} else if (!currentRevision) {
 		return false;
-	} else if ((currentRevision[0]?.isApproved !== undefined && !currentRevision[0]?.isApproved) || isEditMode) {
+	} else if (
+		(currentRevision[0]?.isApproved !== undefined && !currentRevision[0]?.isApproved && isEditableState) ||
+		isEditMode
+	) {
 		return true;
 	}
 	return false;

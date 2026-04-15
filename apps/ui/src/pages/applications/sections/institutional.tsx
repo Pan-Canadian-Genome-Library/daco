@@ -51,6 +51,7 @@ const Institutional = () => {
 		section: 'institutional',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 	const { fields, formState } = state;
 
