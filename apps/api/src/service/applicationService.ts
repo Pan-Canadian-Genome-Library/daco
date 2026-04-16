@@ -333,16 +333,16 @@ const applicationSvc = (db: PostgresDb) => ({
 				})
 				.from(applications)
 				.where(
-					!isPcglDac
-						? and(
-								state.length ? inArray(applications.state, state) : undefined,
-								search ? transformSearchIntoQuery(search) : undefined,
-								isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
-								authorizedDacIds?.length && !isApplicantView
-									? inArray(applications.dac_id, authorizedDacIds)
-									: undefined,
-							)
-						: undefined,
+					and(
+						state.length ? inArray(applications.state, state) : undefined,
+						search ? transformSearchIntoQuery(search) : undefined,
+						isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						!isPcglDac
+							? authorizedDacIds?.length && !isApplicantView
+								? inArray(applications.dac_id, authorizedDacIds)
+								: undefined
+							: undefined,
+					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
 				.orderBy(...applicationsSortQuery(sort))
@@ -364,15 +364,15 @@ const applicationSvc = (db: PostgresDb) => ({
 				})
 				.from(applications)
 				.where(
-					!isPcglDac
-						? and(
-								search ? transformSearchIntoQuery(search) : undefined,
-								isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
-								authorizedDacIds?.length && !isApplicantView
-									? inArray(applications.dac_id, authorizedDacIds)
-									: undefined,
-							)
-						: undefined,
+					and(
+						search ? transformSearchIntoQuery(search) : undefined,
+						isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
+						!isPcglDac
+							? authorizedDacIds?.length && !isApplicantView
+								? inArray(applications.dac_id, authorizedDacIds)
+								: undefined
+							: undefined,
+					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
 
