@@ -17,29 +17,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { sql } from 'drizzle-orm';
-import { boolean, pgSequence, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
-
-const DAC_ID_PADDING = 4 as const;
-const DAC_ID_PREFIX = 'PCGLDA' as const;
-const DAC_ID_SEQUENCE_NAME = 'dac_id_seq' as const;
-
-export const dacIdSequence = pgSequence(DAC_ID_SEQUENCE_NAME, {
-	startWith: 1,
-	increment: 1,
-	maxValue: 9999,
-});
-
-export const dacIdDefault = sql.raw(`
-	'${DAC_ID_PREFIX}' || lpad(
-		nextval('${DAC_ID_SEQUENCE_NAME}')::text,
-		${DAC_ID_PADDING},
-		'0'
-	)
-`);
+import { boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const dac = pgTable('dac', {
-	dac_id: text().primaryKey().default(dacIdDefault),
+	dac_id: text().primaryKey().notNull(),
 	dac_name: varchar({ length: 255 }).notNull(),
 	dac_description: text().notNull(),
 	contact_name: varchar({ length: 255 }).notNull(),
