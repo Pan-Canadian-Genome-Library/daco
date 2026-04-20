@@ -211,6 +211,7 @@ export const dacModelSchema = z.object({
 	dac_description: z.string(),
 	contact_name: z.string(),
 	contact_email: z.string(),
+	is_pcgl_dac: z.boolean(),
 	created_at: z.date(),
 	updated_at: z.union([z.date(), z.undefined()]).nullable(),
 });
@@ -222,6 +223,7 @@ export const dacDTOSchema = z.object({
 	dacDescription: z.string(),
 	contactName: z.string(),
 	contactEmail: z.string(),
+	isPcglDac: z.boolean(),
 	createdAt: z.union([z.date(), z.string()]),
 	updatedAt: z.union([z.date(), z.string()]).nullable(),
 });

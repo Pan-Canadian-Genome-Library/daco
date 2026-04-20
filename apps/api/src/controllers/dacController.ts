@@ -50,6 +50,7 @@ export const createDacRecords = async ({
 			const updatedDate = typeof updatedAt === 'string' ? new Date(updatedAt) : updatedAt;
 			const record = { ...dacRecord, createdAt: createdDate, updatedAt: updatedDate };
 			const updatedRecordResult = convertToDacUpdateRecord(record);
+
 			if (updatedRecordResult.success) {
 				return updatedRecordResult.data;
 			}
@@ -59,6 +60,22 @@ export const createDacRecords = async ({
 		const updatedStudies = await dacService.createDacRecords({ dacGroups, transaction });
 
 		return updatedStudies;
+	} catch (error) {
+		logger.error(error);
+		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);
+	}
+};
+
+export const getDacByIds = async ({
+	ids,
+}: {
+	ids: string[];
+}): AsyncResult<DacRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	try {
+		const database = getDbInstance();
+		const dacService = dacSvc(database);
+		const dacRecordResult = await dacService.getDacByIds({ ids });
+		return dacRecordResult;
 	} catch (error) {
 		logger.error(error);
 		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);

@@ -276,6 +276,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		pageSize = 20,
 		search,
 		isApplicantView = false,
+		isPcglDac = false,
 		authorizedDacIds,
 	}: {
 		user_id?: string;
@@ -285,6 +286,7 @@ const applicationSvc = (db: PostgresDb) => ({
 		pageSize?: number;
 		search?: string;
 		isApplicantView?: boolean;
+		isPcglDac?: boolean;
 		authorizedDacIds?: string[];
 	}): AsyncResult<ApplicationListResponse, 'SYSTEM_ERROR' | 'INVALID_PARAMETERS'> => {
 		try {
@@ -335,7 +337,11 @@ const applicationSvc = (db: PostgresDb) => ({
 						state.length ? inArray(applications.state, state) : undefined,
 						search ? transformSearchIntoQuery(search) : undefined,
 						isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
-						authorizedDacIds?.length && !isApplicantView ? inArray(applications.dac_id, authorizedDacIds) : undefined,
+						!isPcglDac
+							? authorizedDacIds?.length && !isApplicantView
+								? inArray(applications.dac_id, authorizedDacIds)
+								: undefined
+							: undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id))
@@ -361,10 +367,15 @@ const applicationSvc = (db: PostgresDb) => ({
 					and(
 						search ? transformSearchIntoQuery(search) : undefined,
 						isApplicantView && user_id ? eq(applications.user_id, String(user_id)) : undefined,
-						authorizedDacIds?.length && !isApplicantView ? inArray(applications.dac_id, authorizedDacIds) : undefined,
+						!isPcglDac
+							? authorizedDacIds?.length && !isApplicantView
+								? inArray(applications.dac_id, authorizedDacIds)
+								: undefined
+							: undefined,
 					),
 				)
 				.leftJoin(applicationContents, eq(applications.contents, applicationContents.id));
+
 			if (!countResult[0]) {
 				return failure('SYSTEM_ERROR', 'Failed to retrieve application totals');
 			}

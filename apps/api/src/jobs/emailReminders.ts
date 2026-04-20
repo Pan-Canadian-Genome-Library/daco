@@ -177,9 +177,9 @@ export const getDacUserDataResult = async ({
 	let dacMemberName = user_name;
 	let dacEmail = (recipient_emails && recipient_emails[0]) || user_id;
 	if (dac_id) {
-		const dacRecordResult = await dacService.getDacById({ id: dac_id });
-		if (dacRecordResult.success) {
-			const { contact_name, contact_email } = dacRecordResult.data;
+		const dacRecordResult = await dacService.getDacByIds({ ids: [dac_id] });
+		if (dacRecordResult.success && dacRecordResult.data[0]) {
+			const { contact_name, contact_email } = dacRecordResult.data[0];
 			dacMemberName = contact_name;
 			dacEmail = contact_email;
 		}
