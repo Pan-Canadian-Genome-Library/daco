@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { eq, sql } from 'drizzle-orm';
+import { inArray, sql } from 'drizzle-orm';
 
 import { type PostgresDb } from '@/db/index.js';
 import { dac } from '@/db/schemas/dac.ts';
@@ -53,6 +53,7 @@ const dacSvc = (db: PostgresDb) => ({
 						contact_name: sql`EXCLUDED.contact_name`,
 						contact_email: sql`EXCLUDED.contact_email`,
 						updated_at: sql`EXCLUDED.updated_at`,
+						is_pcgl_dac: sql`EXCLUDED.is_pcgl_dac`,
 					},
 				})
 				.returning();
@@ -70,17 +71,17 @@ const dacSvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	getDacById: async ({ id }: { id: string }): AsyncResult<DacRecord, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	getDacByIds: async ({ ids }: { ids: string[] }): AsyncResult<DacRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
-			const dacRecords = await db.select().from(dac).where(eq(dac.dac_id, id));
+			const dacRecords = await db.select().from(dac).where(inArray(dac.dac_id, ids));
 
-			if (!dacRecords[0]) {
-				return failure('NOT_FOUND', `No DAC records found with id: ${id}.`);
+			if (!dacRecords[0] || dacRecords.length === 0) {
+				return failure('NOT_FOUND', `No DAC records found with id: ${ids}.`);
 			}
 
-			return success(dacRecords[0]);
+			return success(dacRecords);
 		} catch (error) {
-			const message = 'Error at getDacById';
+			const message = 'Error at getDacByIds';
 
 			logger.error(message, error);
 
