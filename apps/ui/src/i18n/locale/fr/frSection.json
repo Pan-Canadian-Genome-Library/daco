@@ -157,6 +157,8 @@
 	"requested-study": {
 		"title": "Étude demandée",
 		"description1": "Pour aider le CAD à examiner votre demande d'accès aux données plus efficacement, veuillez sélectionner l'étude pour laquelle vous demandez l'accès. Vous pouvez consulter et choisir parmi les études disponibles sur le",
+		"description2": "",
+		"description3": "",
 		"description-link": "Portail de recherche PCGL - Études.",
 		"section1": {
 			"form": {

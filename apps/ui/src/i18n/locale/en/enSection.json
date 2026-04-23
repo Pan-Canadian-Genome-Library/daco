@@ -158,7 +158,7 @@
 		"title": "Requested Study",
 		"description1": "Access to PCGL studies is managed by different Data Access Committees (DACs). Each DACO application may only include studies governed by the same DAC.",
 		"description2": "You may request access to multiple studies within the same DAC in a single application.",
-		"description3": " Please select studies from the list below. For the full catalogue of PCGL studies, visit the PCGL Research Portal. To request access to studies from different DACs, you must submit a separate application for each DAC.",
+		"description3": "To request access to studies from different DACs, you must submit a separate application for each DAC. Please select studies from the list below. For the full catalogue of PCGL studies, visit the PCGL Research Portal.",
 		"description-link": "PCGL Research Portal - Studies.",
 		"section1": {
 			"form": {
