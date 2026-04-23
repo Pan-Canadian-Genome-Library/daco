@@ -71,7 +71,7 @@ const FooterComponent = () => {
 	];
 
 	const linkStyle: React.CSSProperties = {
-		textAlign: breakpoints.md ? 'center' : 'left',
+		textAlign: 'left',
 		textWrap: 'nowrap',
 	};
 
@@ -93,7 +93,7 @@ const FooterComponent = () => {
 
 	const logoStyles: React.CSSProperties = {
 		margin: (() => {
-			if (breakpoints.md) {
+			if (breakpoints.lg) {
 				return 'auto 0';
 			}
 			if (breakpoints.xl) {
@@ -107,14 +107,14 @@ const FooterComponent = () => {
 		<ConfigProvider theme={pcglFooterTheme}>
 			<Footer style={footerStyle}>
 				{breakpoints.lg ? (
-					<Flex justify="space-around" style={{ width: '100%' }}>
-						<Flex vertical flex={1.5}>
+					<Flex justify="space-around" style={{ width: '100%' }} gap={30}>
+						<Flex vertical style={{ width: '100%' }}>
 							<Flex justify={'start'} gap={'40px'}>
 								<Link target="_blank" style={logoStyles}>
 									<Image width={200} src={PCGL_FOOTER} preview={false} alt={translate('global.PCGL')} />
 								</Link>
 								<Link target="_blank" style={logoStyles}>
-									<Image width={200} src={PCGL_FOOTER_CIHR} preview={false} alt={translate('global.CIHR')} />
+									<Image width={200} src={PCGL_FOOTER_CIHR} preview={false} alt={translate('global.')} />
 								</Link>
 							</Flex>
 							<Flex vertical gap={'small'} style={{ marginTop: '15px' }}>
@@ -124,32 +124,17 @@ const FooterComponent = () => {
 								</Text>
 							</Flex>
 						</Flex>
-						<Flex flex={1} style={{ ...contentWrapperStyles, width: '100%' }} vertical gap={token.paddingMD}>
-							<Flex style={{ width: '100%', minWidth: 475, margin: 'auto' }} justify={'center'} align={'center'}>
-								<Row align={'middle'} justify={'center'} gutter={[0, '20px']}>
-									{pcglLinks.map((itemLink) => (
-										<Col
-											key={itemLink.name}
-											md={{ flex: '33%' }}
-											sm={{ flex: '50%' }}
-											xs={{ flex: '50%' }}
-											style={{ minWidth: '200px' }}
-										>
-											<Flex justify={breakpoints.md ? 'flex-start' : 'center'}>
-												<Link
-													key={itemLink.name}
-													style={{ ...linkStyle, width: breakpoints.md ? 'auto' : 100 }}
-													underline
-													target="_blank"
-												>
-													{itemLink.name}
-												</Link>
-											</Flex>
-										</Col>
-									))}
-								</Row>
-							</Flex>
-						</Flex>
+						<Row align={'middle'} justify={'center'} gutter={[24, 24]}>
+							{pcglLinks.map((itemLink) => (
+								<Col span={12} key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
+									<Flex justify={'flex-start'}>
+										<Link key={itemLink.name} style={{ ...linkStyle }} underline target="_blank">
+											{itemLink.name}
+										</Link>
+									</Flex>
+								</Col>
+							))}
+						</Row>
 					</Flex>
 				) : (
 					<>
@@ -157,25 +142,22 @@ const FooterComponent = () => {
 							style={{ ...contentWrapperStyles, width: '100%' }}
 							flex={1}
 							gap={token.paddingMD}
-							justify={breakpoints.md ? 'space-between' : 'center'}
-							vertical={breakpoints.md ? false : true}
+							justify={'center'}
+							vertical={true}
 						>
-							<Link target="_blank" style={logoStyles}>
-								<Image width={200} src={PCGL_FOOTER} preview={false} alt={translate('global.PCGL')} />
-							</Link>
-							<Link target="_blank" style={logoStyles}>
-								<Image width={200} src={PCGL_FOOTER_CIHR} preview={false} alt={translate('global.CIHR')} />
-							</Link>
+							<Flex align="center" justify="center">
+								<Link target="_blank" style={logoStyles}>
+									<Image width={200} src={PCGL_FOOTER} preview={false} alt={translate('global.PCGL')} />
+								</Link>
+								<Link target="_blank" style={logoStyles}>
+									<Image width={200} src={PCGL_FOOTER_CIHR} preview={false} alt={translate('global.CIHR')} />
+								</Link>
+							</Flex>
 							<Row align={'middle'} justify={'center'} gutter={[0, token.padding]} wrap>
 								{pcglLinks.map((itemLink) => (
-									<Col key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
-										<Flex justify={breakpoints.md ? 'flex-start' : 'center'}>
-											<Link
-												key={itemLink.name}
-												style={{ ...linkStyle, width: breakpoints.md ? 'auto' : 100 }}
-												underline
-												target="_blank"
-											>
+									<Col span={12} key={itemLink.name} md={{ flex: '40%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
+										<Flex justify={'center'}>
+											<Link key={itemLink.name} style={{ ...linkStyle, width: 100 }} underline target="_blank">
 												{itemLink.name}
 											</Link>
 										</Flex>
