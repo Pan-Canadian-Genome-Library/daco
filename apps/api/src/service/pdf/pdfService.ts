@@ -45,20 +45,6 @@ import { standardStyles } from './components/standardStyling.ts';
 const PDF_CREATOR_PRODUCER = `Pan-Canadian Genome Library DACO (ver. ${serverConfig.npm_package_version})`;
 const PDF_AUTHOR = `Data Access Compliance Office, Pan-Canadian Genome Library`;
 
-/**
- * Sets the PDF language in the metadata, EN-CA - English Canada
- *
- * This metadata feature can be useful for a11y reasons:
- * @see https://www.w3.org/TR/WCAG20-TECHS/PDF16.html
- *
- * TODO: -
- * 	When we eventually do translation we should make this a toggle to set this to
- * 	FR-CA - French Canada. However, if we make the PDF have both languages
- * 	(English followed by French for example), we should set this based on the pages
- * 	instead of the entire document.
- */
-const PDF_LANGUAGE = `en-ca`;
-
 export const TrademarkEnum = {
 	APPROVED: 'APPROVED',
 	NOT_APPROVED: 'NOT APPROVED',
@@ -104,7 +90,6 @@ const pdfService = () => ({
 			const finalApplication = await PDFDocument.create();
 
 			finalApplication.registerFontkit(fontkit);
-			finalApplication.setLanguage(PDF_LANGUAGE);
 			finalApplication.setTitle(filename, {
 				showInWindowTitleBar: true,
 			});

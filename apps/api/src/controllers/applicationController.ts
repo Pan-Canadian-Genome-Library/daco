@@ -224,6 +224,7 @@ export const getAllApplications = async ({
 	pageSize,
 	search,
 	isApplicantView,
+	isPcglDac,
 	authorizedDacIds,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
@@ -237,6 +238,7 @@ export const getAllApplications = async ({
 		pageSize,
 		search,
 		isApplicantView,
+		isPcglDac,
 		authorizedDacIds,
 	});
 
@@ -671,15 +673,13 @@ export const submitRevision = async ({
 			return submittedRevision;
 		}
 
-		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
-			resultContents.data.contents;
+		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
 		const { actionId } = submittedRevision.data;
 
-		if (result.data.state === ApplicationStates.DAC_REVIEW) {
+		if (result.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
 			const {
 				email: { dacAddress },
 			} = getEmailConfig;
-
 			emailService.sendEmailDacForSubmittedRevisions({
 				id: application.id,
 				to: dacAddress,
@@ -688,11 +688,9 @@ export const submitRevision = async ({
 				actionId,
 			});
 		} else {
-			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
-			emailService.sendEmailInstitutionalRepForReview({
+			emailService.sendEmailRepForSubmittedRevisions({
 				id: application.id,
 				to: institutional_rep_email,
-				repName: institutional_rep_first_name || 'N/A',
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
 				actionId,
@@ -842,14 +840,11 @@ export const requestApplicationRevisionsByDac = async ({
 		}
 
 		const { actionId } = actionResult.data;
-		const { applicant_first_name } = resultContents.data.contents;
-		const {
-			email: { dacAddress },
-		} = getEmailConfig;
+		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
 
 		emailService.sendEmailApplicantDacRevisions({
 			id: application.id,
-			to: dacAddress,
+			to: applicant_institutional_email,
 			actionId,
 			applicantName: applicant_first_name || 'N/A',
 			comments: revisionRequestResult.data,
@@ -939,13 +934,17 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return aliasResult;
 		}
 
-		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
-			resultContents.data.contents;
+		const {
+			applicant_first_name,
+			institutional_rep_first_name,
+			institutional_rep_last_name,
+			applicant_institutional_email,
+		} = resultContents.data.contents;
 		const { actionId } = actionResult.data;
 
 		emailService.sendEmailApplicantRepRevisions({
 			id: application.id,
-			to: institutional_rep_email,
+			to: applicant_institutional_email,
 			actionId,
 			applicantName: applicant_first_name || 'N/A',
 			institutionalRepFirstName: institutional_rep_first_name || 'N/A',

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -25,38 +25,27 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import Title from '@/service/pdf/components/Title.tsx';
 import { EthicsLetterDTO } from '@pcgl-daco/data-model/src/types.ts';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
-const Ethics = ({ ethicsReviewRequired }: EthicsLetterDTO) => {
+type EthicsProps = LanguagProps & EthicsLetterDTO;
+
+const Ethics = ({ ethicsReviewRequired, lang = SupportedLangs.ENGLISH }: EthicsProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Ethics</Title>
-			<Paragraph>
-				PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the
-				PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such
-				approval is needed in your country. If you are uncertain as to whether your research project needs ethics
-				approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research
-				ethics committee (IRB/REC) to clarify the matter.
-			</Paragraph>
-			<Paragraph>
-				Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual
-				research projects and bear no responsibility for the applicant's failure to comply with local/national ethical
-				requirements.
-			</Paragraph>
-			<FormDisplay title="Ethics Approval">
+			<Title>{t.ethics.TITLE}</Title>
+			<Paragraph>{t.ethics.ETHICS_AWARENESS_PARAGRAPH}</Paragraph>
+			<Paragraph>{t.ethics.DACO_RESPONSIBILITY_PARAGRAPH}</Paragraph>
+			<FormDisplay title={t.ethics.ETHICS_APPROVAL_TITLE}>
 				<Checkbox
 					unchecked={
 						ethicsReviewRequired === true || ethicsReviewRequired === null || ethicsReviewRequired === undefined
 					}
 				>
-					You represent and warrant that your country/region does not require your research project to undergo ethics
-					review. An ethics exemption letter has been uploaded
+					{t.ethics.NO_REVIEW_REQUIRED}
 				</Checkbox>
-				<Checkbox unchecked={!ethicsReviewRequired}>
-					Your country/region requires your Research Project to undergo ethics review, and therefore, this research
-					project has been approved by an IRB/REC formally designated to approve and/or monitor research involving
-					humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the
-					responsibility of the Principal Investigator
-				</Checkbox>
+				<Checkbox unchecked={!ethicsReviewRequired}>{t.ethics.REVIEW_REQUIRED}</Checkbox>
 				{ethicsReviewRequired !== undefined && ethicsReviewRequired !== null ? (
 					<View
 						wrap={false}
@@ -68,8 +57,11 @@ const Ethics = ({ ethicsReviewRequired }: EthicsLetterDTO) => {
 						}}
 					>
 						<Paragraph notice>
-							&mdash;&nbsp;Ethics {ethicsReviewRequired === true ? `approval` : 'exemption'} letter is attached at end
-							of this document.&nbsp;&mdash;
+							&mdash;&nbsp;Ethics{' '}
+							{ethicsReviewRequired === true
+								? t.ethics.APPROVAL_LETTER_MESSAGE_APPROVAL
+								: t.ethics.APPROVAL_LETTER_MESSAGE_EXEMPTION}
+							&nbsp;&mdash;
 						</Paragraph>
 					</View>
 				) : null}

@@ -61,6 +61,7 @@ const Collaborators = () => {
 		section: 'collaborators',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 	const { token } = useToken();
 	const { data, isLoading, isError } = useGetCollaborators(appId);

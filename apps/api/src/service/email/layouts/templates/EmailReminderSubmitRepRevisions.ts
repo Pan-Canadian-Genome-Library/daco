@@ -21,7 +21,6 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import { type EmailReminderTemplateType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
 export const GenerateEmailReminderSubmitRepRevisions = ({
 	applicantName,
 	repName,
@@ -32,7 +31,7 @@ export const GenerateEmailReminderSubmitRepRevisions = ({
 		express: { ui },
 	} = getEmailConfig;
 
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${applicantName},
@@ -63,6 +62,38 @@ export const GenerateEmailReminderSubmitRepRevisions = ({
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
                 </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Cher/Chère ${applicantName},
+                </mj-text>
+                <mj-text>
+                    Ceci est un rappel indiquant que des révisions ont été demandées pour votre demande sur le portail du <u>Bureau de conformité de l'accès aux données de la BGP</u>, et que nous n'avons pas encore reçu de réponse.
+                </mj-text>
+                <mj-text>
+                   Pour poursuivre le processus d'examen, veuillez vous connecter afin de consulter les commentaires et de soumettre les mises à jour requises.
+                </mj-text>
+                <mj-text>
+                    <ul>
+                        <li>
+                            <b>ID de la demande :</b> ${id} <br/>
+                        </li>
+                        <li>
+                            <b>Révisions demandées par :</b> ${repName} <br/>
+                        </li>
+                        <li>
+                            <b>Date de la demande :</b> ${submittedDate} <br/>
+                        </li>
+                    </ul>
+                </mj-text>
+                <mj-text>
+                    Vous pouvez consulter et répondre à la demande de révision ici : ${ui}
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP
+                </mj-text>
             </mj-column>
 `;
 
@@ -86,6 +117,17 @@ export const GenerateEmailReminderSubmitRepRevisionsPlain = ({
     \n Revision Requested By: ${repName}
     \n Submission Date: ${submittedDate}
     \n\n You can view and respond to the revision request here: ${ui}
-    \n Best regards, \n The PCGL Data Access Compliance Office 
+    \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Cher/Chère ${applicantName},
+    \n Ceci est un rappel indiquant que des révisions ont été demandées pour votre demande sur le portail du Bureau de conformité de l'accès aux données de la BGP, et que nous n'avons pas encore reçu de réponse.
+    \n Pour poursuivre le processus d'examen, veuillez vous connecter afin de consulter les commentaires et de soumettre les mises à jour requises.
+    \n\n ID de la demande : ${id}
+    \n Révisions demandées par : ${repName}
+    \n Date de la demande : ${submittedDate}
+    \n\n Vous pouvez consulter et répondre à la demande de révision ici : ${ui}
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
     `;
 };

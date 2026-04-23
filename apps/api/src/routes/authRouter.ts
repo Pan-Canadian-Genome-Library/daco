@@ -181,7 +181,7 @@ authRouter.get('/token', async (request, response) => {
 		if (!userAccountAliasing.success) {
 			throw new Error(userAccountAliasing.message);
 		}
-		const sessionUserAliasing = convertToSessionUser(oidcDataResponse.data, pcglAuthzResponse.data);
+		const sessionUserAliasing = await convertToSessionUser(oidcDataResponse.data, pcglAuthzResponse.data);
 		if (!sessionUserAliasing.success) {
 			throw new Error(sessionUserAliasing.message);
 		}
@@ -235,6 +235,7 @@ authRouter.get(
 						dacMember: user.dacMember,
 						dacoAdmin: user.dacoAdmin,
 						dacAuthorizations: user.dacAuthorizations,
+						isPcglDac: user.isPcglDac,
 					}
 				: undefined,
 		};

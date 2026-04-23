@@ -69,6 +69,7 @@ const RequestedStudy = () => {
 		section: 'study',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 
 	// Should be able to change the requested studies while in DRAFT, once past this, the user should not be able to change them
