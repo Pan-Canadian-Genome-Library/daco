@@ -192,10 +192,12 @@ const RequestedStudy = () => {
 					title={translate('requested-study.title')}
 					showLockIcon={!canEdit}
 					text={
-						<Col>
-							<Text>{translate('requested-study.description1') + ' '}</Text>
+						<Flex vertical>
+							<Text>{translate('requested-study.description1')}</Text>
+							<Text style={{ marginTop: '1rem' }}>{translate('requested-study.description2')}</Text>
+							<Text style={{ marginTop: '1rem' }}>{translate('requested-study.description3')}</Text>
 							<Link href="#">{translate('requested-study.description-link')}</Link>
-						</Col>
+						</Flex>
 					}
 				/>
 				<Row>
@@ -211,7 +213,7 @@ const RequestedStudy = () => {
 										required={true}
 										style={{ margin: 0 }}
 									>
-										<Text style={{ fontSize: '0.65rem', height: '10px' }}>
+										<Text style={{ fontSize: '0.8rem', height: '10px' }}>
 											{translate('requested-study.section1.form.studyLabel')}
 										</Text>
 									</Item>
