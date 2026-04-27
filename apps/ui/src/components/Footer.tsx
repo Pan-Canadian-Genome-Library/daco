@@ -114,7 +114,7 @@ const FooterComponent = () => {
 									<Image width={200} src={PCGL_FOOTER} preview={false} alt={translate('global.PCGL')} />
 								</Link>
 								<Link target="_blank" style={logoStyles}>
-									<Image width={200} src={PCGL_FOOTER_CIHR} preview={false} alt={translate('global.')} />
+									<Image width={200} src={PCGL_FOOTER_CIHR} preview={false} alt={translate('global.CIHR')} />
 								</Link>
 							</Flex>
 							<Flex vertical gap={'small'} style={{ marginTop: '15px' }}>
