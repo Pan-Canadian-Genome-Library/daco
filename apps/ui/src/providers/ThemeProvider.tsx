@@ -38,7 +38,7 @@ export const pcglColours = {
 
 	// Application States Cards Dashboard
 	approved: '#95DE64',
-	inprogress: `#FADB14`,
+	inProgress: `#FADB14`,
 	blocked: '#F4A1A4',
 
 	white: '#FFFFFF',
