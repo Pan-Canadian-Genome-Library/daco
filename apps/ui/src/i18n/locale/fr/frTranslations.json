@@ -1,32 +1,32 @@
 {
 	"global": {
 		"login": {
-			"loggingIn": ""
+			"loggingIn": "Connexion en cours..."
 		},
 		"loginError": {
-			"title": "",
+			"title": "Impossible de se connecter.",
 			"descriptions": {
 				"NOT_FOUND": {
-					"subheading": "",
-					"description": "",
-					"description2": ""
+					"subheading": "Le compte n'est pas associé au projet PCGL.",
+					"description": "Il semble que votre compte n'est actuellement pas associé au projet PCGL et ne peut donc pas accéder au service BCAD de la BGP. Cela peut être dû au fait que vous n'avez pas terminé le processus d'intégration pour les nouveaux comptes, ou que vous vous êtes connecté/e avec un compte non utilisé précédemment pour accéder au service.",
+					"description2": "Veuillez vous inscrire vous-même en cliquant sur le bouton « Commencer » ci-dessous pour terminer votre intégration et accéder au service BCAD de la BGP."
 				},
 				"SELF_REGISTRATION_SENT": {
-					"subheading": "",
-					"description": "",
-					"description2": ""
+					"subheading": "Votre compte est presque prêt !",
+					"description": "Merci de vous être inscrit/e au projet PCGL. Nous avons envoyé un courriel de vérification à votre adresse courriel. Veuillez ouvrir ce message et suivre les instructions pour confirmer votre adresse et retourner au service BCAD de la BGP.",
+					"description2": "Si vous n'avez pas reçu le courriel dans quelques minutes, vous pouvez renvoyer le courriel de vérification ou contacter l'équipe de soutien de la BGP."
 				},
 				"SYSTEM_ERROR": {
-					"subheading": "",
-					"description": ""
+					"subheading": "Il semble que nous ayons rencontré un petit problème lors du processus de connexion.",
+					"description": "Veuillez réessayer en cliquant sur le bouton « Connexion » ci-dessus ou en retournant à notre page d'accueil ci-dessous."
 				},
 				"FORBIDDEN": {
-					"subheading": "",
-					"description": ""
+					"subheading": "Il semble que votre navigateur ait utilisé une session périmée pour tenter de se connecter au BCAD.",
+					"description": "Veuillez réessayer en cliquant sur le bouton « Connexion » ci-dessus ou en retournant à notre page d'accueil ci-dessous."
 				}
 			},
 			"buttons": {
-				"home": ""
+				"home": "Aller à la page d'accueil"
 			}
 		},
 		"Supported-CIHR": "PCGL est soutenu par les Instituts de recherche en santé du Canada (IRSC)",
@@ -46,10 +46,10 @@
 		"description3": "Le BCAD de la BGP examinera la demande et pourra demander des révisions précises. Les équipes de projet approuvées se verront accorder l'accès aux données contrôlées de la BGP."
 	},
 	"notFound": {
-		"title": "",
-		"description": "",
+		"title": "404 Page non trouvée",
+		"description": "Désolé, cette page n'existe pas.",
 		"buttons": {
-			"home": ""
+			"home": "Aller à la page d'accueil"
 		}
 	},
 	"dashboard": {
@@ -60,31 +60,32 @@
 		"startNewApp": "Commencer une nouvelle demande"
 	},
 	"repView": {
-		"title": "",
-		"description": "",
-		"login": ""
+		"title": "Bienvenue",
+		"description": "Vous allez être redirigé vers une page de connexion. Veuillez vous connecter en utilisant votre courriel institutionnel et commencer l'examen.",
+		"login": "Se connecter pour examiner"
 	},
 	"applicationViewer": {
+		"title": "Ma demande : PCGL-{{id}}",
 		"steps": {
-			"DRAFT": "",
-			"SIGN_SUBMIT": "",
-			"REP_REVIEW": "",
-			"DAC_REVIEW": "",
-			"APPROVED": "",
-			"REVOKED": "",
-			"REJECTED": "",
-			"CLOSED": ""
+			"DRAFT": "Brouillon",
+			"SIGN_SUBMIT": "Signer et soumettre",
+			"REP_REVIEW": "Examen par le représentant",
+			"DAC_REVIEW": "Examen par le CAD",
+			"APPROVED": "Demande approuvée : Lecture seule",
+			"REVOKED": "Demande révoquée : Lecture seule",
+			"REJECTED": "Demande rejetée : Lecture seule",
+			"CLOSED": "Demande clôturée : Lecture seule"
 		}
 	},
 	"manage": {
 		"applications": {
-			"title": "",
-			"show": "",
-			"rows": ""
+			"title": "Gérer les demandes",
+			"show": "Afficher",
+			"rows": "lignes"
 		},
-		"noResults": "",
-		"search": "",
-		"searchResults": ""
+		"noResults": "Aucune demande ne correspond à vos critères de recherche",
+		"search": "Rechercher",
+		"searchResults": "Résultats de recherche pour \"{{search}}\""
 	},
 	"status": {
 		"404": "Désolé, nous n'avons pas trouvé ce que vous cherchiez !"
@@ -106,8 +107,8 @@
 		"pcglWebsite": "Site web de la BGP",
 		"dataPlatform": "Plateforme de données",
 		"myApplications": "Mes demandes",
-		"manageApplications": "",
-		"admin": ""
+		"manageApplications": "Gérer les demandes",
+		"admin": "Tableau de bord administrateur"
 	},
 	"button": {
 		"logout": "Déconnexion",
@@ -116,43 +117,43 @@
 		"editApplication": "Modifier la demande",
 		"cancel": "Annuler",
 		"edit": "Modifier",
-		"next": "",
-		"delete": "",
-		"history": "",
-		"closeApp": "",
+		"next": "Suivant",
+		"delete": "Supprimer",
+		"history": "Historique",
+		"closeApp": "Clôturer la demande",
 		"requestRevisions": "Demander des révisions",
-		"back": "",
+		"back": "Retour",
 		"submitApplication": "Soumettre la demande",
-		"submitRevisions": "",
-		"addCollab": "",
-		"upload": "",
-		"save": "",
-		"rejectApp": "",
-		"rejectApplication": "",
-		"revoke": "",
+		"submitRevisions": "Soumettre les révisions",
+		"addCollab": "Ajouter un collaborateur",
+		"upload": "Télécharger",
+		"save": "Enregistrer les modifications",
+		"rejectApp": "Rejeter la demande",
+		"rejectApplication": "Rejeter",
+		"revoke": "Révoquer la demande",
 		"approveApplication": "Approuver",
 		"languageToggle": "Français"
 	},
 	"label": {
 		"created": "Créé",
 		"expires": "Expire",
-		"updated": "",
-		"updatedExtended": ""
+		"updated": "Mis à jour",
+		"updatedExtended": "Dernière mise à jour"
 	},
 	"date": {
 		"intlDateTime": "{{val, datetime}}"
 	},
 	"application": {
 		"states": {
-			"DRAFT": "",
-			"INSTITUTIONAL_REP_REVIEW": "",
-			"DAC_REVIEW": "",
-			"INSTITUTIONAL_REP_REVISION_REQUESTED": "",
-			"DAC_REVISIONS_REQUESTED": "",
-			"REJECTED": "",
-			"REVOKED": "",
-			"APPROVED": "",
-			"CLOSED": ""
+			"DRAFT": "Brouillon",
+			"INSTITUTIONAL_REP_REVIEW": "Examen par le représentant",
+			"DAC_REVIEW": "Examen par le CAD",
+			"INSTITUTIONAL_REP_REVISION_REQUESTED": "Révisions demandées par le représentant",
+			"DAC_REVISIONS_REQUESTED": "Révisions demandées par le CAD",
+			"REJECTED": "Rejeté",
+			"REVOKED": "Révoqué",
+			"APPROVED": "Approuvé",
+			"CLOSED": "Clôturé"
 		}
 	},
 	"menu": {
@@ -170,84 +171,84 @@
 	"errors": {
 		"http": {
 			"403": {
-				"title": "",
-				"message": ""
+				"title": "Non autorisé.",
+				"message": "Désolé, il semble que vous n'êtes pas autorisé/e à accéder à cette ressource."
 			},
 			"404": {
-				"title": "",
-				"message": ""
+				"title": "La ressource demandée est introuvable.",
+				"message": "Désolé, il semble que la ressource à laquelle vous essayez d'accéder n'existe pas."
 			},
 			"400": {
-				"title": "",
-				"message": ""
+				"title": "Cette demande était incorrecte.",
+				"message": "Désolé, il semble que votre navigateur ait envoyé une demande incorrecte, veuillez recharger la page et réessayer."
 			},
 			"500": {
-				"title": "",
-				"message": ""
+				"title": "Une erreur s'est produite.",
+				"message": "Désolé, une erreur s'est produite lors du traitement de votre demande de notre côté, veuillez réessayer plus tard."
 			}
 		},
 		"applicationNotFound": {
-			"title": "",
-			"message": ""
+			"title": "La demande que vous avez demandée est introuvable.",
+			"message": "Désolé, il semble que la demande à laquelle vous essayez d'accéder n'existe pas"
 		},
 		"fetchError": {
-			"title": "",
-			"message": ""
+			"title": "Impossible de contacter le serveur",
+			"message": "Hmm, impossible de contacter le serveur, veuillez vérifier votre connexion Internet."
 		},
 		"generic": {
-			"title": "",
-			"message": ""
+			"title": "Une erreur s'est produite.",
+			"message": "Impossible de traiter votre demande, veuillez réessayer plus tard."
 		},
 		"downloadNotFound": {
-			"title": "",
-			"message": ""
+			"title": "Le fichier PDF que vous avez demandé est introuvable.",
+			"message": "Désolé, une erreur s'est produite lors de la génération de votre PDF de demande, veuillez réessayer plus tard."
 		}
 	},
 	"generic": {
-		"notApplicable": "",
-		"applicant": "",
-		"rep": "",
-		"dacComment": "",
-		"chairOnly": "",
-		"send": ""
+		"notApplicable": "S/O",
+		"applicant": "Demandeur",
+		"rep": "Représentant institutionnel",
+		"dacComment": "Commentaires du CAD",
+		"chairOnly": "Pour le président uniquement",
+		"send": "Envoyer"
 	},
 	"notifications": {
 		"createDacComment": {
-			"successTitle": "",
-			"successMessage": ""
+			"successTitle": "Commentaire du CAD soumis",
+			"successMessage": "Le commentaire du CAD a été soumis avec succès"
 		},
 		"requestedStudies": {
-			"errorTitle": "",
-			"errorMessage": ""
+			"errorTitle": "Erreur : Plusieurs CAD sélectionnés",
+			"errorMessage": "Veuillez sélectionner uniquement des études du même CAD pour continuer."
 		},
 		"importStudies": {
-			"successMessage": "",
-			"successDescription": ""
+			"successMessage": "Études importées avec succès",
+			"successDescription": "Le CAD et les études ont été importés avec succès."
 		},
 		"toggleAcceptingStudies": {
-			"successMessage": ""
+			"successMessage": "Le statut d'acceptation de l'étude:{{studyId}} a été mis à jour avec succès"
 		}
 	},
 	"admin": {
 		"activate": {
-			"pageTitle": "",
-			"pageDescription": "",
-			"backToDashboard": ""
+			"pageTitle": "Activer les études",
+			"pageDescription": "Examinez et basculez le statut d'acceptation des demandes pour chaque étude ci-dessous.",
+			"backToDashboard": "Retour au tableau de bord"
 		},
 		"dashboard": {
-			"pageTitle": "",
-			"pageDescription": "",
-			"quickActions": "",
+			"pageTitle": "Tableau de bord administrateur",
+			"pageDescription": "Gérer les études, les comités d'accès aux données et les configurations de la plateforme.",
+			"quickActions": "Actions rapides",
 			"card": {
 				"import": {
-					"title": "",
-					"description": "",
-					"button": ""
+					"title": "Importer CAD et études",
+					"description": "Synchroniser les comités d'accès aux données et les études depuis la plateforme clinique. Exécutez ceci pour obtenir les dernières configurations d'études et affectations de CAD.",
+					"button": "Importer depuis Clinical"
 				},
 				"activateStudies": {
-					"title": "",
-					"description": "",
-					"button": ""
+					"title": "Gérer les études",
+					"description": "Gérer les études sur la plateforme. Gérer leur statut, permettant aux demandeurs de faire une demande d'accès.",
+					"button": "Gérer les études"
 				}
 			}
 		}

@@ -6,82 +6,82 @@
 			"ok": "OK"
 		},
 		"history": {
-			"title": "",
-			"applicationId": "",
-			"submissionDate": "",
-			"currentStatus": "",
-			"lastUpdated": "",
-			"timelineItem": "",
-			"notFound": "",
+			"title": "Historique de la demande",
+			"applicationId": "ID de la demande",
+			"submissionDate": "Date de soumission",
+			"currentStatus": "Statut actuel",
+			"lastUpdated": "Dernière mise à jour",
+			"timelineItem": " par {{userName}} le {{actionDate}}",
+			"notFound": "Il n'y a pas encore d'éléments d'historique liés à votre demande.",
 			"actions": {
-				"CLOSE": "",
-				"INSTITUTIONAL_REP_REVISION_REQUEST": "",
-				"INSTITUTIONAL_REP_SUBMIT": "",
-				"INSTITUTIONAL_REP_APPROVED": "",
-				"DAC_REVIEW_APPROVED": "",
-				"DAC_REVIEW_SUBMIT": "",
-				"DAC_REVIEW_REJECTED": "",
-				"DAC_REVIEW_REVISION_REQUEST": "",
-				"REVOKE": "",
-				"SUBMIT_DRAFT": "",
-				"WITHDRAW": ""
+				"CLOSE": "Clôturé",
+				"INSTITUTIONAL_REP_REVISION_REQUEST": "Révision demandée par le représentant institutionnel",
+				"INSTITUTIONAL_REP_SUBMIT": "Soumission du représentant institutionnel",
+				"INSTITUTIONAL_REP_APPROVED": "Approuvé par le représentant institutionnel",
+				"DAC_REVIEW_APPROVED": "Approuvé par le CAD",
+				"DAC_REVIEW_SUBMIT": "Soumis pour examen par le CAD",
+				"DAC_REVIEW_REJECTED": "Rejeté par le CAD",
+				"DAC_REVIEW_REVISION_REQUEST": "Révision demandée par le CAD",
+				"REVOKE": "Révoqué",
+				"SUBMIT_DRAFT": "Brouillon soumis",
+				"WITHDRAW": "Retiré"
 			}
 		},
 		"requestRevisions": {
 			"title": "Demander des révisions",
 			"description": "Veuillez fournir les détails des révisions pour les sections présentant des problèmes. Ces détails seront envoyés par courriel au candidat/à la candidate.",
-			"applicantInformation": "",
-			"institutionalRepresentative": "",
-			"collaborators": "",
-			"projectInformation": "",
-			"requestedStudy": "",
-			"ethics": "",
-			"signSubmit": "",
-			"general": "",
+			"applicantInformation": "A. Renseignements sur le demandeur",
+			"institutionalRepresentative": "B. Représentant(e) institutionnel(le)",
+			"collaborators": "C. Collaborateurs",
+			"projectInformation": "D. Renseignements sur le projet",
+			"requestedStudy": "E. Étude demandée",
+			"ethics": "F. Éthique",
+			"signSubmit": "Signer et soumettre",
+			"general": "Commentaires généraux",
 			"buttons": {
-				"sendRequest": ""
+				"sendRequest": "Envoyer la demande"
 			},
 			"notifications": {
 				"failure": {
-					"title": "",
-					"text": ""
+					"title": "Échec de la demande de révisions",
+					"text": "Désolé, une erreur s'est produite lors de la demande de révisions pour cette demande. Veuillez réessayer plus tard."
 				},
-				"revisionsRequested": ""
+				"revisionsRequested": "La demande de révisions a été envoyée pour la demande PCGL-{{id}}"
 			}
 		},
 		"revokeApplication": {
 			"title": "Êtes-vous sûr/e de vouloir révoquer la demande PCGL-{{id}} ?",
 			"description": "Si oui, le candidat ou la candidate et tous les collaborateurs et collaboratrices perdront l'accès aux données.",
-			"revokeLabel": "",
+			"revokeLabel": "Raison de la révocation de cette demande :",
 			"buttons": {
-				"revoke": ""
+				"revoke": "Révoquer"
 			},
 			"notifications": {
-				"successTitle": "",
-				"successMessage": "",
-				"failureTitle": "",
-				"failureMessage": ""
+				"successTitle": "Demande révoquée avec succès.",
+				"successMessage": "La demande PCGL-{{id}} a été révoquée. Le candidat et tous les collaborateurs n'ont plus accès aux données.",
+				"failureTitle": "Échec de la révocation de la demande",
+				"failureMessage": "Une erreur s'est produite. La demande n'a pas pu être révoquée. Veuillez réessayer plus tard."
 			}
 		},
 		"editApplication": {
 			"title": "Êtes-vous sûr de vouloir modifier la demande PCGL-{{id}} ?",
 			"description": "Votre demande PCGL-{{id}} a déjà été soumise pour examen. Si vous choisissez de la modifier, la demande repassera au statut de Brouillon, ce qui vous obligera à la soumettre à nouveau pour examen. Veuillez noter que cela prolongera le délai de traitement. Nous vous recommandons d'apporter des modifications uniquement si cela est absolument nécessaire.",
 			"buttons": {
-				"edit": ""
+				"edit": "Modifier la demande"
 			},
 			"notifications": {
-				"successTitle": "",
-				"successMessage": "",
-				"failureTitle": "",
-				"failureMessage": ""
+				"successTitle": "Demande retirée de l'examen avec succès",
+				"successMessage": "La demande PCGL-{{id}} a été retirée de l'examen et est maintenant disponible pour modification.",
+				"failureTitle": "Échec du retrait de la demande de l'examen",
+				"failureMessage": "Une erreur s'est produite. La demande n'a pas pu être retirée de l'examen et n'est pas disponible pour modification. Veuillez réessayer plus tard."
 			}
 		},
 		"closeApplication": {
-			"title": "",
-			"description": "",
+			"title": "Êtes-vous sûr/e de vouloir clôturer la demande : PCGL-{{id}} ?",
+			"description": "Les demandes clôturées ne peuvent pas être rouvertes.",
 			"notifications": {
-				"closeApplicationSuccess": "",
-				"closeApplicationFailed": ""
+				"closeApplicationSuccess": "Votre demande, PCGL-{{id}}, a été clôturée.",
+				"closeApplicationFailed": "Désolé, une erreur inattendue s'est produite lors de la clôture de votre demande. Veuillez réessayer plus tard."
 			}
 		},
 		"rejectApplication": {
@@ -89,19 +89,19 @@
 			"description": "Si oui, la candidate ou le candidat en sera informé et ne pourra pas rouvrir cette demande.",
 			"rejectionReasonLabel": "Si vous continuez, la candidate ou le candidat et tous les collaborateurs et collaboratrices ne recevront pas l'accès aux données. Veuillez fournir vos commentaires expliquant pourquoi vous rejetez la demande.",
 			"notifications": {
-				"rejectApplicationSuccess": "",
-				"rejectApplicationFailed": ""
+				"rejectApplicationSuccess": "Votre demande, PCGL-{{id}}, a été rejetée.",
+				"rejectApplicationFailed": "Désolé, une erreur inattendue s'est produite lors du rejet de votre demande. Veuillez réessayer plus tard."
 			}
 		},
 		"approveApplication": {
 			"title": "Êtes-vous sûr/e de vouloir approuver la demande : PCGL-{{id}} ?",
 			"description": "Si oui, la candidate ou le candidat et les collaboratrices et collaborateurs en seront informés et recevront l'accès aux données contrôlées de la BGP.",
 			"notifications": {
-				"applicationApproveSuccess": "",
-				"applicationApproveFailed": ""
+				"applicationApproveSuccess": "La demande, PCGL-{{id}}, a été approuvée.",
+				"applicationApproveFailed": "Désolé, une erreur inattendue s'est produite lors de l'approbation de votre demande. Veuillez réessayer plus tard."
 			},
 			"buttons": {
-				"sendRequest": ""
+				"sendRequest": "Envoyer la demande"
 			}
 		},
 		"authorization": {
@@ -112,24 +112,24 @@
 				"revisions": {
 					"title": "Demander des révisions",
 					"description": "Veuillez fournir les détails des révisions pour les sections présentant des problèmes. Ces détails seront envoyés par courriel au candidat/à la candidate.",
-					"applicantInformation": "",
-					"institutionalRepresentative": "",
-					"collaborators": "",
-					"projectInformation": "",
-					"requestedStudy": "",
-					"ethics": "",
-					"agreement": "",
-					"appendices": "",
-					"signSubmit": "",
-					"general": "",
+					"applicantInformation": "A. Renseignements sur le demandeur",
+					"institutionalRepresentative": "B. Représentant(e) institutionnel(le)",
+					"collaborators": "C. Collaborateurs",
+					"projectInformation": "D. Renseignements sur le projet",
+					"requestedStudy": "E. Étude demandée",
+					"ethics": "F. Éthique",
+					"agreement": "G. Entente d'accès aux données",
+					"appendices": "H. Annexes",
+					"signSubmit": "Signer et soumettre",
+					"general": "Commentaires généraux",
 					"cancel": "Annuler",
-					"sendRequest": ""
+					"sendRequest": "Envoyer la demande"
 				},
 				"success": {
-					"text": ""
+					"text": "La demande de révisions a été envoyée pour la demande PCGL-{{id}}"
 				},
 				"failure": {
-					"text": ""
+					"text": "La demande de révisions a échoué"
 				}
 			}
 		}
