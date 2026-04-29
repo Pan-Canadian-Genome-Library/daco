@@ -29,8 +29,10 @@
 				"home": "Aller à la page d'accueil"
 			}
 		},
+		"Supported-CIHR": "PCGL est soutenu par les Instituts de recherche en santé du Canada (IRSC)",
 		"copyright": "{{date}} L'Institut ontarien de recherche sur le cancer. Tous droits réservés.",
-		"PCGL": "Librairie Pancanadienne de Génomique"
+		"PCGL": "Bibliothèque Génomique Pancanadienne",
+		"CIHR": "Institut de recherche en santé du Canada"
 	},
 	"homepage": {
 		"title": "Demander l'accès aux données contrôlées",

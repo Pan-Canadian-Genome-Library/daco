@@ -22,20 +22,24 @@ import { ConfigProvider, notification, ThemeConfig } from 'antd';
 
 export const pcglColours = {
 	// Main Colors
-	primary: '#C41D7F',
-	secondary: '#520339',
-	tertiary: '#FFF0F6',
-	quaternary: '#FFD6E7',
+	primary: '#843961',
+	secondary: '#761248',
+	tertiary: '#F2EBEB',
 
-	errorPrimary: '#EB0000',
-	errorSecondary: '#FFCCC7',
+	errorPrimary: '#EC1C24',
+	errorSecondary: '#F4A1A4',
 	errorBanner: '#FFF2F0',
 
-	warningPrimary: '#F5DC4D',
+	warningPrimary: '#FADB14',
 	warningSecondary: '#FFFFB8',
 
-	successPrimary: '#73D13D',
+	successPrimary: '#52C41A',
 	successSecondary: '#D9F7BE',
+
+	// Application States Cards Dashboard
+	approved: '#95DE64',
+	inProgress: `#FADB14`,
+	blocked: '#F4A1A4',
 
 	white: '#FFFFFF',
 	offWhite: '#f0f0f0',
@@ -53,7 +57,7 @@ export const pcglColours = {
 const pcglTheme: ThemeConfig = {
 	token: {
 		fontFamily:
-			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+			"Work Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 
 		colorPrimary: pcglColours.primary,
 		colorFillAlter: pcglColours.white,
@@ -168,7 +172,7 @@ export const pcglFooterTheme: ThemeConfig = {
 		Typography: {
 			fontSize: 12,
 			colorText: pcglColours.white,
-			colorLink: pcglColours.quaternary,
+			colorLink: pcglColours.white,
 			colorLinkHover: 'rgba(255, 214, 231, 0.5)',
 		},
 	},
@@ -192,7 +196,7 @@ export const pcglTableTheme: ThemeConfig = {
 export const pcglSkeletonTheme: ThemeConfig = {
 	token: {
 		fontFamily:
-			"Open Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+			"Work Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 
 		colorPrimary: pcglColours.tertiary,
 		colorFillSecondary: '#f5f5f5',

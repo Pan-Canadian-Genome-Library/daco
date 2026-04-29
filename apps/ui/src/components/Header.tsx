@@ -23,6 +23,7 @@ import React, { useState, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { API_PATH_LOGIN } from '@/api/paths';
+import PCGL_FR from '@/assets/pcgl-logo-full-fr.png';
 import PCGL from '@/assets/pcgl-logo-full.png';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { pcglColours, pcglHeaderTheme } from '@/providers/ThemeProvider';
@@ -309,7 +310,13 @@ const HeaderComponent = () => {
 					<Flex flex={1}>
 						<Flex justify="space-around" align="center" gap={40}>
 							<Link href="/" role="menuitem">
-								<Image width={200} src={PCGL} preview={false} alt="PCGL DACO Home" role="presentation" />
+								<Image
+									width={200}
+									src={lang === 'fr' ? PCGL_FR : PCGL}
+									preview={false}
+									alt="PCGL DACO Home"
+									role="presentation"
+								/>
 							</Link>
 							{!isResponsiveMode ? <>{displayMenuItems('left')}</> : null}
 						</Flex>
