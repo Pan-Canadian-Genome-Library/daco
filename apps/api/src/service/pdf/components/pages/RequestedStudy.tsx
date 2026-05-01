@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -26,18 +26,22 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
+import { LanguagProps, SupportedLangs, translations } from '../translations/types.ts';
 
-const RequestedStudy = ({ requestedStudies }: RequestedStudiesDTO) => {
+type RequestedStudyProps = LanguagProps & RequestedStudiesDTO;
+
+const RequestedStudy = ({ requestedStudies, lang = SupportedLangs.ENGLISH }: RequestedStudyProps) => {
+	const t = translations[lang];
+
 	return (
 		<StandardPage useVerticalStackLayout showAttribution alternatingAttribution showPageNumbers>
-			<Title>Requested Study</Title>
+			<Title>{t.study.TITLE}</Title>
 			<Paragraph>
-				To help the DAC review your data access request more efficiently, please select the study you are requesting
-				access to. You can view and choose from the available studies on the&nbsp;
+				{t.study.DESCRIPTION}
 				{/**TODO: Add Link to this once that's figured out. */}
 				<Link style={{ color: standardStyles.colours.primary }}>PCGL Research Portal - Studies.</Link>
 			</Paragraph>
-			<DataItem item={requestedStudies?.length && requestedStudies.length > 1 ? 'Study Names' : 'Study Name'}>
+			<DataItem item={t.study.STUDY_NAME_LABEL}>
 				{requestedStudies?.map((study, index) => `${study}${requestedStudies.length !== index + 1 ? ', ' : ''}`)}
 			</DataItem>
 		</StandardPage>

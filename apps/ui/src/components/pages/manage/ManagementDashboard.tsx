@@ -18,7 +18,7 @@
  */
 import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@pcgl-daco/data-model';
 import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
-import { FilterValue, SorterResult } from 'antd/es/table/interface';
+import { ColumnsType, FilterValue, SorterResult } from 'antd/es/table/interface';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
@@ -61,7 +61,7 @@ interface ManagementDashboardProps {
 	search?: string;
 }
 
-const tableColumnConfiguration = [
+const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 	{
 		title: 'Application #',
 		dataIndex: 'id',
@@ -71,6 +71,11 @@ const tableColumnConfiguration = [
 			</Link>
 		),
 		sorter: { multiple: 1 },
+	},
+	{
+		title: 'DAC',
+		dataIndex: 'dacId',
+		render: (_, record) => `${record.dacId || '-'}`,
 	},
 	{
 		title: 'Institution',
@@ -83,7 +88,7 @@ const tableColumnConfiguration = [
 		title: 'Country',
 		dataIndex: ['applicant', 'country'],
 		key: 'country',
-		render: (value: string, record: ApplicationListSummary) =>
+		render: (_: string, record) =>
 			//FIXME: i18n: When french support is added, we need to make this toggle dynamic somehow
 			record.applicant?.country
 				? (GC_STANDARD_GEOGRAPHIC_AREAS.find((country) => country.iso === record.applicant?.country)?.en ?? '-')
@@ -93,7 +98,7 @@ const tableColumnConfiguration = [
 		title: 'Applicant',
 		dataIndex: ['applicant', 'firstName'],
 		key: 'applicant',
-		render: (value: string, record: ApplicationListSummary) =>
+		render: (_: string, record) =>
 			record.applicant?.firstName && record.applicant.lastName
 				? `${record.applicant.firstName} ${record.applicant.lastName}`
 				: '-',
@@ -102,7 +107,7 @@ const tableColumnConfiguration = [
 		title: 'Email',
 		dataIndex: ['applicant', 'email'],
 		key: 'email',
-		render: (value: string, record: ApplicationListSummary) => (record.applicant?.email ? record.applicant.email : '-'),
+		render: (_: string, record) => (record.applicant?.email ? record.applicant.email : '-'),
 	},
 	{
 		title: 'Updated',

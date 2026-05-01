@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -24,6 +24,8 @@ import Paragraph from '@/service/pdf/components/Paragraph.tsx';
 import StandardPage from '@/service/pdf/components/StandardPage.tsx';
 import { standardStyles } from '@/service/pdf/components/standardStyling.ts';
 import Title from '@/service/pdf/components/Title.tsx';
+import { END_OF_DOCUMENT } from '@/service/pdf/components/translations/enTranslations.ts';
+import { FR_END_OF_DOCUMENT } from '@/service/pdf/components/translations/frTranslations.ts';
 
 const styles = StyleSheet.create({
 	link: {
@@ -52,15 +54,27 @@ const EndOfDocument = () => {
 			<View style={styles.content}>
 				<Logo colour={true} style={styles.logoImage} />
 				<Title style={{ paddingTop: '2.5cm' }} level="h2">
-					&mdash;&nbsp;END OF DOCUMENT&nbsp;&mdash;
+					{END_OF_DOCUMENT.TITLE}
+				</Title>
+				<Title style={{ paddingTop: '0.5cm' }} level="h2">
+					{FR_END_OF_DOCUMENT.TITLE}
 				</Title>
 				<Paragraph
 					style={{
 						fontWeight: 500,
-						paddingTop: '.75cm',
+						paddingTop: '1.75cm',
 					}}
 				>
-					Attached Ethics Letter and Appendices to follow.
+					{END_OF_DOCUMENT.CLOSING_MESSAGE}
+				</Paragraph>
+
+				<Paragraph
+					style={{
+						fontWeight: 500,
+						paddingTop: '.5cm',
+					}}
+				>
+					{FR_END_OF_DOCUMENT.CLOSING_MESSAGE}
 				</Paragraph>
 			</View>
 		</StandardPage>

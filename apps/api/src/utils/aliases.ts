@@ -18,38 +18,45 @@
  */
 
 import { authConfig } from '@/config/authConfig.ts';
-import { OIDCTokenResponse, OIDCUserInfoResponse, PCGLAuthZUserInfoResponse } from '@/external/types.ts';
+import { getDacByIds } from '@/controllers/dacController.ts';
+import { type OIDCTokenResponse, type OIDCUserInfoResponse, type PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
 	type ApplicationContentUpdates,
 	type ApplicationRecord,
 	type ApplicationSignatureUpdate,
 	type CollaboratorRecord,
+	type DacModel,
 	type FilesRecordOptionalContents,
 	type JoinedApplicationRecord,
+	type StudyModel,
 } from '@/service/types.js';
 import {
 	type ApplicationDTO,
 	type ApplicationHistoryResponseData,
 	type ApplicationResponseData,
 	type CollaboratorsResponseDTO,
+	type DacDTO,
 	type FilesDTO,
 	type SignatureDTO,
+	type StudyDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicationHistoryResponseSchema,
 	applicationResponseSchema,
 	basicApplicationResponseSchema,
+	dacModelSchema,
 	fileResponseSchema,
 	sessionAccount,
 	type SessionAccount,
 	sessionUser,
 	type SessionUser,
 	signatureResponseSchema,
+	studyModelSchema,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
-import { failure, Result, success } from './results.ts';
+import { AsyncResult, failure, type Result, success } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
 
 export const convertToSessionAccount = (data: OIDCTokenResponse): Result<SessionAccount, 'SYSTEM_ERROR'> => {
@@ -64,13 +71,36 @@ export const convertToSessionAccount = (data: OIDCTokenResponse): Result<Session
 	return result;
 };
 
-export const convertToSessionUser = (
+export const convertToSessionUser = async (
 	oidcData: OIDCUserInfoResponse,
 	pcglData: PCGLAuthZUserInfoResponse,
-): Result<SessionUser, 'SYSTEM_ERROR'> => {
+): AsyncResult<SessionUser, 'SYSTEM_ERROR'> => {
 	const aliasedOIDCResponse = objectToCamel(oidcData);
 
 	const aliasedPCGLResponse = objectToCamel(pcglData);
+
+	const aliasedGroup = aliasedPCGLResponse.groups || [];
+
+	const dacChair = aliasedGroup
+		.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR))
+		.map((group) => {
+			return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR.length);
+		});
+	const dacMember = aliasedGroup
+		.filter((group) => group.name.startsWith(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER))
+		.map((group) => {
+			return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER.length);
+		});
+
+	const dacoAdmin = aliasedGroup.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN);
+
+	const dacResult = await getDacByIds({ ids: dacChair });
+
+	let isPcglDac = false;
+
+	if (dacResult.success) {
+		isPcglDac = dacResult.data.some((dac) => dac.is_pcgl_dac === true);
+	}
 
 	const finalizedUserObject: SessionUser = {
 		sub: aliasedOIDCResponse.sub,
@@ -82,12 +112,12 @@ export const convertToSessionUser = (
 		siteCurator: aliasedPCGLResponse.userinfo.siteCurator,
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
-		groups: aliasedPCGLResponse.groups,
-
+		groups: aliasedGroup,
 		// DACO generated values
-		dacoAdmin: aliasedPCGLResponse.groups
-			? aliasedPCGLResponse.groups.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN)
-			: false,
+		isPcglDac,
+		dacoAdmin,
+		dacChair,
+		dacMember,
 	};
 
 	const userAccountValidation = sessionUser.safeParse(finalizedUserObject);
@@ -214,23 +244,61 @@ export const convertToFileRecord = (data: FilesRecordOptionalContents): Result<F
  * @param data type CollaboratorRecord in snake_case
  * @returns  type GetCollaboratorsResponse in camelCase w/ Collaborator added
  */
-export const convertToCollaboratorRecords = (data: CollaboratorRecord[]): CollaboratorsResponseDTO[] => {
-	const formattedUpdate: CollaboratorsResponseDTO[] = [];
+export const convertToCollaboratorRecords = (
+	data: CollaboratorRecord[],
+): Result<CollaboratorsResponseDTO[], 'SYSTEM_ERROR'> => {
+	try {
+		const formattedUpdate: CollaboratorsResponseDTO[] = [];
 
-	data.forEach((value) => {
-		formattedUpdate.push({
-			applicationId: value.application_id,
-			collaboratorFirstName: value.first_name,
-			collaboratorMiddleName: value.middle_name,
-			collaboratorLastName: value.last_name,
-			collaboratorInstitutionalEmail: value.institutional_email,
-			collaboratorPositionTitle: value.position_title,
-			collaboratorPrimaryAffiliation: value.title,
-			collaboratorResearcherProfileURL: value.profile_url,
-			collaboratorSuffix: value.suffix,
-			collaboratorType: value.collaborator_type,
+		data.forEach((value) => {
+			formattedUpdate.push({
+				applicationId: value.application_id,
+				collaboratorFirstName: value.first_name,
+				collaboratorMiddleName: value.middle_name,
+				collaboratorLastName: value.last_name,
+				collaboratorInstitutionalEmail: value.institutional_email,
+				collaboratorPositionTitle: value.position_title,
+				collaboratorPrimaryAffiliation: value.title,
+				collaboratorResearcherProfileURL: value.profile_url,
+				collaboratorSuffix: value.suffix,
+				collaboratorType: value.collaborator_type,
+			});
 		});
-	});
 
-	return formattedUpdate;
+		return success(formattedUpdate);
+	} catch (error) {
+		return failure('SYSTEM_ERROR', `Validation Error while aliasing data at convertToCollaboratorRecords: \n${error}`);
+	}
+};
+
+/** Converts retrieved Submission Service Study Data into database insert using snake_case model format
+ * @param data type StudyDTO study data in camelCase
+ * @returns  type StudyModel study data in snake_case
+ */
+export const convertToStudyUpdateRecord = (data: StudyDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
+	const snakeCaseRecord = objectToSnake(data);
+	const validationResult = studyModelSchema.safeParse(snakeCaseRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToStudyUpdateRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
+};
+
+/** Converts retrieved Submission Service Dac Data into database insert using snake_case model format
+ * @param data type DacDTO study data in camelCase
+ * @returns  type DacModel study data in snake_case
+ */
+export const convertToDacUpdateRecord = (data: DacDTO): Result<DacModel, 'SYSTEM_ERROR'> => {
+	const snakeCaseRecord = objectToSnake(data);
+	const validationResult = dacModelSchema.safeParse(snakeCaseRecord);
+	const result = validationResult.success
+		? success(validationResult.data)
+		: failure(
+				'SYSTEM_ERROR',
+				`Validation Error while aliasing data at convertToDacUpdateRecord: \n${validationResult.error.issues[0]?.message || ''}`,
+			);
+	return result;
 };

@@ -50,7 +50,8 @@ const Institutional = () => {
 		revisions,
 		section: 'institutional',
 		isEditMode,
-		userRole: state.applicationUserRole,
+		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 	const { fields, formState } = state;
 
@@ -256,10 +257,9 @@ const Institutional = () => {
 								control={control}
 								rule={rule}
 								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
-									return { value: areas.iso, label: areas.en };
+									return { value: areas.iso, label: areas.en, required: true };
 								})}
 								initialValue={'CAN'}
-								required
 								disabled={!canEdit}
 							/>
 						</Col>

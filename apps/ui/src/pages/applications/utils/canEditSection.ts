@@ -17,7 +17,9 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SectionRevision, SectionRoutesValues, UserRole } from '@pcgl-daco/validation';
+import { ApplicationUserPermission } from '@/providers/context/application/types';
+import { ApplicationStates, ApplicationStateValues } from '@pcgl-daco/data-model';
+import { SectionRevision, SectionRoutes, SectionRoutesValues } from '@pcgl-daco/validation';
 /**
  *
  * Checks if a user is able to edit a section in the Application Viewer.
@@ -46,19 +48,41 @@ const canEditSection = ({
 	revisions,
 	section,
 	isEditMode,
-	userRole,
+	userPermissions,
+	currentApplicationState,
 }: {
 	revisions: SectionRevision;
 	section: SectionRoutesValues;
 	isEditMode: boolean;
-	userRole: UserRole;
+	userPermissions: ApplicationUserPermission;
+	currentApplicationState: ApplicationStateValues;
 }) => {
+	const isOnlyApplicant =
+		userPermissions.isApplicant &&
+		!userPermissions.isInstitutionalRep &&
+		!userPermissions.isDacChair &&
+		!userPermissions.isDacMember;
+
+	if (section === SectionRoutes.STUDY) {
+		// Since 'study' doesn't have revisions, its editability is purely
+		// determined by whether we're in edit mode or is an applicant.
+		return isEditMode && isOnlyApplicant;
+	}
+
 	const currentRevision = revisions[section];
-	if (userRole !== 'APPLICANT') {
+	const isEditableState =
+		currentApplicationState === ApplicationStates.DRAFT ||
+		currentApplicationState === ApplicationStates.DAC_REVISIONS_REQUESTED ||
+		currentApplicationState === ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED;
+
+	if (!isOnlyApplicant) {
 		return false;
 	} else if (!currentRevision) {
 		return false;
-	} else if ((currentRevision[0]?.isApproved !== undefined && !currentRevision[0]?.isApproved) || isEditMode) {
+	} else if (
+		(currentRevision[0]?.isApproved !== undefined && !currentRevision[0]?.isApproved && isEditableState) ||
+		isEditMode
+	) {
 		return true;
 	}
 	return false;

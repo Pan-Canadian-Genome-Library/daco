@@ -39,10 +39,9 @@ const useEditCollaborator = () => {
 		}
 	>({
 		mutationFn: async ({ applicationId, collaboratorEmail, collaboratorUpdates }) => {
-			const response = await fetch('/collaborators/update', {
+			const response = await fetch(`/collaborators/${applicationId}/update`, {
 				method: 'POST',
 				body: JSON.stringify({
-					applicationId,
 					collaboratorEmail,
 					collaboratorUpdates,
 				}),

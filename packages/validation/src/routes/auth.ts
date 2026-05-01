@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { z } from 'zod';
-import { userRoleSchema } from '../user.js';
 
 export const userResponseSchema = z.object({
 	user: z
@@ -27,7 +26,6 @@ export const userResponseSchema = z.object({
 			familyName: z.string().optional(),
 		})
 		.optional(),
-	role: userRoleSchema,
 });
 export type UserResponse = z.infer<typeof userResponseSchema>;
 
@@ -90,6 +88,9 @@ export type PCGLAuthZUserInfoResponse = z.infer<typeof authZUserInfo>;
 // Session values calculated in DACO services
 const dacoGeneratedSessionValues = z.object({
 	dacoAdmin: z.boolean().default(false),
+	dacChair: z.array(z.string()).default([]),
+	dacMember: z.array(z.string()).default([]),
+	isPcglDac: z.boolean().default(false),
 });
 
 // Session values retrieved from Authz and Auth services
@@ -101,6 +102,7 @@ const authGeneratedSessionValues = z.object({
 	emails: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ emails: true }).shape.emails,
 	siteAdmin: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_admin: true }).shape.site_admin,
 	siteCurator: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_curator: true }).shape.site_curator,
+	isPcglDac: z.boolean().default(false),
 	studyAuthorizations: z.object({
 		editableStudies: authZUserInfo
 			.pick({ study_authorizations: true })
@@ -121,11 +123,22 @@ const authGeneratedSessionValues = z.object({
 	groups: authZUserInfo.pick({ groups: true }).shape.groups,
 });
 
-export const sessionUser = z.intersection(dacoGeneratedSessionValues, authGeneratedSessionValues);
+export const sessionUser = authGeneratedSessionValues.merge(dacoGeneratedSessionValues);
 
 export type SessionUser = z.infer<typeof sessionUser>;
 
-// TODO: create SessionUserUI type based off SessionUser, once its determined what fields are to be returned to the UI
+export const sessionUserResponse = sessionUser.pick({
+	userId: true,
+	givenName: true,
+	familyName: true,
+	emails: true,
+	dacChair: true,
+	dacMember: true,
+	dacoAdmin: true,
+	dacAuthorizations: true,
+});
+
+export type SessionUserResponse = z.infer<typeof sessionUserResponse>;
 
 export const sessionAccount = z.object({
 	idToken: z.string(),

@@ -33,10 +33,19 @@ const useEditApplication = () => {
 	return useMutation<
 		ApplicationResponseData,
 		ServerError,
-		{ id: number | string; update?: Partial<ApplicationContentsResponse>; revisions: SectionRevision }
+		{ applicationId: number | string; update?: Partial<ApplicationContentsResponse>; revisions: SectionRevision }
 	>({
-		mutationFn: async ({ id, update, revisions }) => {
+		mutationFn: async ({ applicationId, update, revisions }) => {
 			let fields = state.fields;
+
+			// Do not allow editing if the application is not in a editiable states
+			if (
+				state.applicationState !== 'DRAFT' &&
+				state.applicationState !== 'DAC_REVISIONS_REQUESTED' &&
+				state.applicationState !== 'INSTITUTIONAL_REP_REVISION_REQUESTED'
+			) {
+				return;
+			}
 
 			// If applications state is in revisions, then send only relevant fields in each sections
 			if (
@@ -46,11 +55,9 @@ const useEditApplication = () => {
 			) {
 				fields = parseRevisedFields(state.fields, revisions);
 			}
-
-			const response = await fetch('/applications/edit', {
+			const response = await fetch(`/applications/${applicationId}/edit`, {
 				method: 'POST',
 				body: JSON.stringify({
-					id,
 					update: {
 						...fields,
 						...update,

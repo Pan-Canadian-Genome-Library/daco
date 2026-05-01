@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { applications } from '@/db/schemas/applications.ts';
+import { type ApplicationModel } from '@/service/types.ts';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
 // Sample revision request data
@@ -32,15 +32,13 @@ export const revisionRequestData = {
 	collaborators_notes: 'Requires additional clarification',
 	project_approved: false,
 	project_notes: 'Not sufficient justification',
-	requested_studies_approved: false,
-	requested_studies_notes: 'Unclear scope',
 	ethics_approved: false,
 	agreements_approved: false,
 	appendices_approved: false,
 	sign_and_submit_approved: false,
 };
 
-export const applicationArray: (typeof applications.$inferInsert)[] = [
+export const applicationArray: ApplicationModel[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',
 		state: ApplicationStates.DRAFT,
@@ -62,12 +60,14 @@ export const applicationArray: (typeof applications.$inferInsert)[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVIEW,
+		dac_id: 'dac1',
 		created_at: new Date('2025-01-01T14:00:00Z'),
 		updated_at: new Date('2025-01-01T14:30:00Z'),
 	},
 	{
 		user_id: 'testUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVISIONS_REQUESTED,
+		dac_id: 'dac1',
 		created_at: new Date('2025-01-01T15:00:00Z'),
 		updated_at: new Date('2025-01-01T15:45:00Z'),
 	},
@@ -110,6 +110,7 @@ export const applicationArray: (typeof applications.$inferInsert)[] = [
 	{
 		user_id: 'testUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVIEW,
+		dac_id: 'dac1',
 		created_at: new Date('2025-01-02T12:00:00Z'),
 		updated_at: new Date('2025-01-02T12:30:00Z'),
 	},
@@ -138,14 +139,16 @@ export const applicationArray: (typeof applications.$inferInsert)[] = [
 		updated_at: new Date('2025-01-02T16:45:00Z'),
 	},
 	{
-		user_id: 'testUser@oicr.on.ca',
+		user_id: 'nextTestUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVIEW,
+		dac_id: 'dac2',
 		created_at: new Date('2025-01-02T17:00:00Z'),
 		updated_at: new Date('2025-01-02T17:30:00Z'),
 	},
 	{
-		user_id: 'testUser@oicr.on.ca',
+		user_id: 'nextTestUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVISIONS_REQUESTED,
+		dac_id: 'dac2',
 		created_at: new Date('2025-01-02T18:00:00Z'),
 		updated_at: new Date('2025-01-02T18:45:00Z'),
 	},
@@ -162,9 +165,64 @@ export const applicationArray: (typeof applications.$inferInsert)[] = [
 		updated_at: new Date('2025-01-02T20:30:00Z'),
 	},
 	{
-		user_id: 'testUser@oicr.on.ca',
+		user_id: 'nextTestUser@oicr.on.ca',
 		state: ApplicationStates.DAC_REVIEW,
+		dac_id: 'dac3',
 		created_at: new Date('2025-01-02T20:00:00Z'),
 		updated_at: new Date('2025-01-02T20:30:00Z'),
+	},
+];
+
+export const reminderApplicationArray: ApplicationModel[] = [
+	{
+		user_id: 'testUser@oicr.on.ca',
+		state: ApplicationStates.DRAFT,
+		dac_id: 'dac1',
+		created_at: new Date('2025-01-01T11:00:00Z'),
+		updated_at: new Date('2025-01-01T11:30:00Z'),
+	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		state: ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+		created_at: new Date('2025-01-01T12:00:00Z'),
+		updated_at: new Date('2025-01-01T12:15:00Z'),
+	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		state: ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED,
+		created_at: new Date('2025-01-01T13:00:00Z'),
+		updated_at: new Date('2025-01-01T13:45:00Z'),
+	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		state: ApplicationStates.INSTITUTIONAL_REP_REVIEW,
+		created_at: new Date('2025-01-01T14:00:00Z'),
+		updated_at: new Date('2025-01-01T14:30:00Z'),
+	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		state: ApplicationStates.DAC_REVIEW,
+		created_at: new Date('2025-01-01T14:00:00Z'),
+		updated_at: new Date('2025-01-01T14:30:00Z'),
+	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		dac_id: 'dac6',
+		state: ApplicationStates.DAC_REVISIONS_REQUESTED,
+		created_at: new Date('2025-01-01T15:00:00Z'),
+		updated_at: new Date('2025-01-01T15:45:00Z'),
+	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		dac_id: 'dac7',
+		state: ApplicationStates.DAC_REVIEW,
+		created_at: new Date('2025-01-01T15:00:00Z'),
+		updated_at: new Date('2025-01-01T15:45:00Z'),
+	},
+	{
+		user_id: 'testUser@oicr.on.ca',
+		state: ApplicationStates.DRAFT,
+		created_at: new Date('2025-01-01T15:00:00Z'),
+		updated_at: new Date('2025-01-01T15:45:00Z'),
 	},
 ];

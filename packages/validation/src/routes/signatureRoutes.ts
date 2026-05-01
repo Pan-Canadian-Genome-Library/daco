@@ -21,7 +21,6 @@ import { z } from 'zod';
 import { BASE64_IMAGE } from '../utils/regex.js';
 
 export const editSignatureRequestSchema = z.object({
-	applicationId: z.number().nonnegative().positive(),
 	signature: z.string().regex(BASE64_IMAGE),
 });
 export type EditSignatureRequest = z.infer<typeof editSignatureRequestSchema>;

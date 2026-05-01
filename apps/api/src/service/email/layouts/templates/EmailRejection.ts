@@ -21,13 +21,12 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import { type GenerateRejectType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
-export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejectType, 'to'>) => {
+export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejectType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${name},
@@ -39,11 +38,30 @@ export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejec
                     This is the Data Access Committee's comment on your application: ${comment}
                 </mj-text>
                 <mj-text>
-                    We appreciate your interest in the PCGL controlled data, thank you again for your time!        
+                    We appreciate your interest in the PCGL controlled data, thank you again for your time!
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
+                </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Cher/Chère ${name},
+                </mj-text>
+                <mj-text>
+                    Merci d'avoir soumis <a href="${ui}/application/${id}" target="_blank" rel="nofollow">votre demande</a> au BCAD de la BGP. Après un examen attentif, nous avons le regret de vous informer que votre demande n'a pas été approuvée. Par conséquent, vous n'aurez pas accès aux données demandées.
+                </mj-text>
+                <mj-text>
+                    Voici les commentaires du Comité d'accès aux données concernant votre demande : ${comment}
+                </mj-text>
+                <mj-text>
+                    Nous vous remercions de votre intérêt pour les données contrôlées de la BGP et vous remercions encore pour votre temps !
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP
                 </mj-text>
             </mj-column>
 `;
@@ -51,10 +69,18 @@ export const GenerateEmailRejection = ({ id, name, comment }: Omit<GenerateRejec
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailRejectionPlain = ({ name, comment }: Omit<GenerateRejectType, 'id' | 'to'>) => {
+export const GenerateEmailRejectionPlain = ({ name, comment }: Omit<GenerateRejectType, 'id' | 'to' | 'actionId'>) => {
 	return ` Dear ${name},
     \n Thank you for submitting your application to the PCGL DACO. After careful review, we regret to inform you that your application has not been approved. As a result, you will not have access to the requested data.
     \n This is the Data Access Committee's comment on your application: ${comment}
-    \n We appreciate your interest in the PCGL controlled data, thank you again for your time! 
-    \n Best regards, \n The PCGL Data Access Compliance Office`;
+    \n We appreciate your interest in the PCGL controlled data, thank you again for your time!
+    \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Cher/Chère ${name},
+    \n Merci d'avoir soumis votre demande au BCAD de la BGP. Après un examen attentif, nous avons le regret de vous informer que votre demande n'a pas été approuvée. Par conséquent, vous n'aurez pas accès aux données demandées.
+    \n Voici les commentaires du Comité d'accès aux données concernant votre demande : ${comment}
+    \n Nous vous remercions de votre intérêt pour les données contrôlées de la BGP et vous remercions encore pour votre temps !
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP`;
 };

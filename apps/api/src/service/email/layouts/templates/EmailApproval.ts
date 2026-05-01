@@ -21,19 +21,19 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import { GenerateApproveType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
-export const GenerateEmailApproval = ({ id, name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApproval = ({ id, name }: Omit<GenerateApproveType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. 
+                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. <br /> <br />
+                </mj-text>
                 <mj-text>
                     Should you have any questions or need assistance, feel free to reach out to us. <br /> <br />
                 </mj-text>
@@ -41,16 +41,39 @@ export const GenerateEmailApproval = ({ id, name }: Omit<GenerateApproveType, 't
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
                 </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Cher/Chère ${name},
+                </mj-text>
+                <mj-text>
+                    Nous avons le plaisir de vous informer que votre <a href="${ui}/application/${id}" target="_blank" rel="nofollow">demande au BCAD</a> a été approuvée avec succès par le Comité d'accès aux données de la BGP. <br /> <br />
+                </mj-text>
+                <mj-text>
+                    Si vous avez des questions ou besoin d'assistance, n'hésitez pas à nous contacter. <br /> <br />
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP
+                </mj-text>
             </mj-column>
 `;
 
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApprovalPlain = ({ name }: Omit<GenerateApproveType, 'to'>) => {
+export const GenerateEmailApprovalPlain = ({ name }: Omit<GenerateApproveType, 'to' | 'actionId'>) => {
 	return ` Dear ${name},
-    \n We are pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. 
-    \n Should you have any questions or need assistance, feel free to reach out to us. 
-    \n Best regards, \n The PCGL Data Access Compliance Office 
+    \n We are pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee.
+    \n Should you have any questions or need assistance, feel free to reach out to us.
+    \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Cher/Chère ${name},
+    \n Nous avons le plaisir de vous informer que votre demande au BCAD a été approuvée avec succès par le Comité d'accès aux données de la BGP.
+    \n Si vous avez des questions ou besoin d'assistance, n'hésitez pas à nous contacter.
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
     `;
 };

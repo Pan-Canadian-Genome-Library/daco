@@ -35,9 +35,9 @@ const { Text } = Typography;
 
 const rule = createSchemaFieldRule(collaboratorsSchema);
 
-const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStateProps) => {
+const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen, canEdit }: ModalStateProps) => {
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode } = useOutletContext<ApplicationOutletContext>();
+	const { appId } = useOutletContext<ApplicationOutletContext>();
 	const { mutateAsync: editCollaborator } = useEditCollaborator();
 
 	const { handleSubmit, control, reset, setFocus } = useForm<CollaboratorsSchemaType>({
@@ -107,7 +107,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -116,7 +116,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 									name="collaboratorMiddleName"
 									control={control}
 									rule={rule}
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>
@@ -128,7 +128,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -137,7 +137,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 									name="collaboratorSuffix"
 									control={control}
 									rule={rule}
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>
@@ -150,7 +150,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 									control={control}
 									rule={rule}
 									required
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 							<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
@@ -160,7 +160,7 @@ const EditCollaboratorModal = memo(({ rowData, isOpen, setIsOpen }: ModalStatePr
 									name="collaboratorPositionTitle"
 									control={control}
 									rule={rule}
-									disabled={!isEditMode}
+									disabled={!canEdit}
 								/>
 							</Col>
 						</Row>

@@ -46,7 +46,14 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'applicant', isEditMode, userRole: state.applicationUserRole });
+	const canEdit = canEditSection({
+		revisions,
+		section: 'applicant',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
+	});
+
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
 
 	const {
@@ -55,7 +62,7 @@ const Applicant = () => {
 		control,
 	} = useForm<Nullable<ApplicantInformationSchemaType>>({
 		defaultValues: {
-			applicantInstitutionCountry: 'CAN',
+			applicantInstitutionCountry: state.fields.applicantInstitutionCountry ?? 'CAN',
 			applicantTitle: state.fields.applicantTitle,
 			applicantFirstName: state.fields.applicantFirstName,
 			applicantMiddleName: state.fields.applicantMiddleName,

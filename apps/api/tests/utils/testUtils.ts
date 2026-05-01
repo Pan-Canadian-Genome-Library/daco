@@ -26,14 +26,17 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 import { type PostgresDb } from '@/db/index.js';
+import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.js';
-import { ApplicationService } from '@/service/types.ts';
-import { ApplicationListSummary, ApplicationStateValues } from '@pcgl-daco/data-model';
-import { applicationArray } from './mock/application-data.ts';
+import { type ApplicationActionModel, type ApplicationModel, type ApplicationService } from '@/service/types.ts';
+import { ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model';
+import { actionArray } from './mock/action-data.ts';
+import { applicationArray, reminderApplicationArray } from './mock/application-data.ts';
+import { emailActionArray } from './mock/email-reminder-action-data.ts';
 import { testDacUsersData, testStudyData } from './mock/study-dac-data.ts';
 
 const logger = BaseLogger.forModule('testUtils');
@@ -65,9 +68,9 @@ export const numTestApplications = 20;
 /** Used to bypass pagination impacting test results */
 export const allRecordsPageSize = 5 * applicationArray.length;
 
-export const addInitialApplications = async (db: PostgresDb) => {
-	for (let i = 0; i < applicationArray.length; i++) {
-		const newApplication = applicationArray[i];
+export const addTestApplications = (testApplications: ApplicationModel[]) => async (db: PostgresDb) => {
+	for (let i = 0; i < testApplications.length; i++) {
+		const newApplication = testApplications[i];
 
 		if (!newApplication) {
 			continue;
@@ -92,6 +95,25 @@ export const addInitialApplications = async (db: PostgresDb) => {
 	}
 };
 
+export const addInitialApplications = addTestApplications(applicationArray);
+export const addReminderApplications = addTestApplications(reminderApplicationArray);
+
+export const addTestActions = (testActions: Omit<ApplicationActionModel, 'id'>[]) => async (db: PostgresDb) => {
+	for (let i = 0; i < testActions.length; i++) {
+		const newAction = testActions[i];
+
+		if (!newAction) {
+			continue;
+		}
+
+		const newRecord = await db.insert(applicationActions).values(newAction).returning();
+		if (!newRecord[0]) throw new Error('Error creating test action records');
+	}
+};
+
+export const addInitialActions = addTestActions(actionArray);
+export const addEmailReminderActions = addTestActions(emailActionArray);
+
 /**
  * Create test data for study and dac users
  */
@@ -101,7 +123,7 @@ export const addStudyAndDacUsers = async (db: PostgresDb) => {
 };
 
 /** Create additional 20 Applications to test paginated results */
-export const addPaginationDonors = async (db: PostgresDb) => {
+export const addPaginationApplications = async (db: PostgresDb) => {
 	const newApplication: typeof applications.$inferInsert = {
 		user_id: testUserId,
 		state: ApplicationStates.DRAFT,

@@ -17,7 +17,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { userRoleSchema } from '@pcgl-daco/validation';
 import { Col, Flex, Layout, Row } from 'antd';
 import { useEffect } from 'react';
 import { Outlet, useMatch, useNavigate, useParams } from 'react-router';
@@ -39,8 +38,9 @@ const ApplicationViewer = () => {
 	const params = useParams();
 	const navigation = useNavigate();
 	const {
-		state: { applicationUserRole },
+		state: { applicationUserPermissions },
 	} = useApplicationContext();
+
 	// grab current route and its relevant information
 	const match = useMatch('application/:id/:section/:edit?');
 	const isEditMode = !!match?.params.edit;
@@ -60,14 +60,10 @@ const ApplicationViewer = () => {
 		isLoading: revisionsLoading,
 	} = useGetApplicationFeedback(params.id, applicationData?.state);
 
-	const {
-		data: dacCommentsData,
-		isLoading: dacCommentsIsLoading,
-		isError: dacCommentsIsErrored,
-		error: dacCommentsError,
-	} = useGetDacComments({
+	const { data: dacCommentsData } = useGetDacComments({
 		applicationId: params.id,
 		section: currentSection,
+		isApplicationLoading: applicationIsLoading,
 	});
 
 	useEffect(() => {
@@ -75,14 +71,18 @@ const ApplicationViewer = () => {
 			return;
 		}
 		// Application can only be in edit if the application-state is in DRAFT and if the user is an APPLICANT
-		const forceToViewMode =
-			(applicationData.state !== ApplicationStates.DRAFT || applicationUserRole !== userRoleSchema.Values.APPLICANT) &&
-			isEditMode;
+		const isNotApplicant =
+			applicationUserPermissions.isDacChair ||
+			applicationUserPermissions.isDacMember ||
+			applicationUserPermissions.isInstitutionalRep;
+		const isNotInDraft = applicationData.state !== ApplicationStates.DRAFT;
+
+		const forceToViewMode = (isNotInDraft || isNotApplicant) && isEditMode;
 
 		if (forceToViewMode) {
 			navigation(`/application/${applicationData.id}/`, { replace: true });
 		}
-	}, [applicationData, applicationError, isEditMode, navigation, applicationUserRole]);
+	}, [applicationData, applicationError, isEditMode, navigation, applicationUserPermissions]);
 
 	// scroll to top on page change
 	useEffect(() => {
@@ -95,16 +95,9 @@ const ApplicationViewer = () => {
 		applicationIsErrored ||
 		applicationIsLoading ||
 		revisionsLoading ||
-		revisionsIsErrored ||
-		dacCommentsIsLoading ||
-		dacCommentsIsErrored
+		revisionsIsErrored
 	)
-		return (
-			<ErrorPage
-				loading={applicationIsLoading || revisionsLoading || dacCommentsIsLoading}
-				error={applicationError || revisionsError || dacCommentsError}
-			/>
-		);
+		return <ErrorPage loading={applicationIsLoading || revisionsLoading} error={applicationError || revisionsError} />;
 
 	return (
 		<Content>
@@ -137,7 +130,7 @@ const ApplicationViewer = () => {
 											appId: applicationData.id,
 											isEditMode,
 											revisions: revisionsData,
-											dacComments: dacCommentsData,
+											dacComments: dacCommentsData ? dacCommentsData : [],
 										}}
 									/>
 								</Col>

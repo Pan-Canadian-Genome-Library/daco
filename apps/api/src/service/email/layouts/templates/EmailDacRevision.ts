@@ -21,23 +21,23 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import { GenerateDacRevisionType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
 export const GenerateEmailDacForSubmittedRevision = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear DAC Members,
                 </mj-text>
-                <mj-text>                    
+                <mj-text>
                     We are writing to inform you that the <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> that you requested revisions on is now ready for your review. The applicant has re-submitted the application based on your feedback, and we kindly request that you review the application at your earliest convenience. <br /> <br />
+                </mj-text>
                 <mj-text>
                     Here are the application details: <br /> <br />
                 </mj-text>
@@ -57,6 +57,34 @@ export const GenerateEmailDacForSubmittedRevision = ({
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
                 </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Chers membres du CAD,
+                </mj-text>
+                <mj-text>
+                    Nous vous informons que la demande au BCAD de la BGP pour laquelle vous aviez demandé des révisions est maintenant prête pour votre examen. Le demandeur / La demandeuse a de nouveau soumis la demande en tenant compte de vos commentaires. Nous vous prions de bien vouloir l'examiner dans les plus brefs délais. <br /> <br />
+                </mj-text>
+                <mj-text>
+                    Voici les détails de la demande : <br /> <br />
+                </mj-text>
+                <mj-text>
+                    Nom du demandeur/demandeuse : ${applicantName}<br />
+                    ID de la demande : ${id}<br />
+                    Date de soumission : ${submittedDate}<br />
+                    Lien vers la demande : <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Demande-${id}</a> <br /> <br />
+                </mj-text>
+                <mj-text>
+                    Veuillez accéder à la demande via le portail du BCAD de la BGP pour procéder à l'examen. Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à nous contacter.
+                </mj-text>
+                <mj-text>
+                    Nous vous remercions de votre temps et de votre attention.<br /><br />
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP (BCAD)
+                </mj-text>
             </mj-column>
 `;
 
@@ -67,7 +95,7 @@ export const GenerateEmailDacForSubmittedRevisionPlain = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -82,6 +110,20 @@ export const GenerateEmailDacForSubmittedRevisionPlain = ({
     \n
     \n Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
     \n Thank you for your time and attention to this matter.
-    \n Best regards, \n The PCGL Data Access Compliance Office 
+    \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Chers membres du CAD,
+    \n Nous vous informons que la demande au BCAD de la BGP pour laquelle vous aviez demandé des révisions est maintenant prête pour votre examen. Le demandeur / La demandeuse a de nouveau soumis la demande en tenant compte de vos commentaires. Nous vous prions de bien vouloir l'examiner dans les plus brefs délais.
+    \n\n Voici les détails de la demande :
+    \n Nom du demandeur/demandeuse : ${applicantName}
+    \n ID de la demande : ${id}
+    \n Date de soumission : ${submittedDate}
+    \n Lien vers la demande : ${ui}/application/${id}
+    \n
+    \n Veuillez accéder à la demande via le portail du BCAD de la BGP pour procéder à l'examen. Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à nous contacter.
+    \n Nous vous remercions de votre temps et de votre attention.
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP (BCAD)
     `;
 };

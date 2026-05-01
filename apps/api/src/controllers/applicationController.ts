@@ -38,10 +38,14 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
+import { grantUserPermissions } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
+import { studySvc } from '@/service/studyService.ts';
 import {
+	StudyService,
 	type ApplicationRecord,
 	type ApplicationService,
+	type CollaboratorRecord,
 	type CollaboratorsService,
 	type FilesService,
 	type PDFService,
@@ -57,7 +61,7 @@ import {
 	convertToFileRecord,
 	convertToSignatureRecord,
 } from '@/utils/aliases.js';
-import { failure, type AsyncResult, type Result } from '@/utils/results.js';
+import { failure, type AsyncResult } from '@/utils/results.js';
 import { validateRevisedFields } from '@/utils/validation.ts';
 import { ApplicationStateEvents, ApplicationStateManager } from './stateManager.js';
 
@@ -96,9 +100,13 @@ export const editApplication = async ({
 }: {
 	id: number;
 	update: UpdateEditApplicationRequest;
-}): AsyncResult<ApplicationResponseData, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<
+	ApplicationResponseData,
+	'INVALID_REQUEST' | 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'
+> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
+	const studyService = studySvc(database);
 
 	const result = await applicationRepo.getApplicationById({ id });
 
@@ -109,9 +117,6 @@ export const editApplication = async ({
 	const application = result.data;
 	const { edit } = ApplicationStateEvents;
 
-	/**
-	 * FIXME: This does not prevent editing of fields that have already been approved. This needs to be added.
-	 */
 	const canEditResult = new ApplicationStateManager(application)._canPerformAction(edit);
 
 	if (!canEditResult.success) {
@@ -147,6 +152,41 @@ export const editApplication = async ({
 		}
 	}
 
+	/**
+	 * Validates if the update contains valid studies with only one dac id before returning record or contains studies that are not accepting applications
+	 */
+	if (application.state === ApplicationStates.DRAFT) {
+		if (update.requestedStudies && update.requestedStudies.length >= 1) {
+			const allStudies = await studyService.getAllStudies({});
+
+			if (!allStudies.success) {
+				logger.error('Failed to retrieve studies to validate users requested studies', allStudies.message);
+				return failure('SYSTEM_ERROR', 'Something went wrong. We cannot verify your requested studies.');
+			}
+
+			const requestedStudiesData = allStudies.data.filter((study) => update.requestedStudies?.includes(study.studyId));
+			const closedStudies = requestedStudiesData.filter((study) => !study.acceptingApplications);
+
+			if (closedStudies.length > 0) {
+				const names = Array.from(closedStudies)
+					.map((study) => study.studyName)
+					.join(', ');
+				return failure('INVALID_REQUEST', `The following studies are not accepting applications: ${names}.`);
+			}
+
+			const dacIds = new Set(
+				update.requestedStudies.map((studyID) => allStudies.data.find((study) => study.studyId === studyID)?.dacId),
+			);
+
+			if (dacIds.size > 1) {
+				return failure(
+					'INVALID_REQUEST',
+					"Multiple DACs's found for requested studies. All selected studies in a single application must belong to the same DAC.",
+				);
+			}
+		}
+	}
+
 	const formattedResult = convertToApplicationContentsRecord(update);
 
 	if (!formattedResult.success) {
@@ -171,9 +211,9 @@ export const editApplication = async ({
  * @param sort - sorting options
  * @param page - page offset
  * @param pageSize - page limit
- * @param isDACMember - Boolean which represents if the user is a DAC Member (they can see all applications)
  * @param isApplicantView - Boolean which represents if the user is an applicant (they can only see their own applications)
  * @param search - text to search
+ * @param authorizedDacIds - Array of allowed DacId string values
  * @returns Success with list of Applications / Failure with Error
  */
 export const getAllApplications = async ({
@@ -183,16 +223,12 @@ export const getAllApplications = async ({
 	page,
 	pageSize,
 	search,
-	isDAC,
 	isApplicantView,
+	isPcglDac,
+	authorizedDacIds,
 }: ApplicationListRequest) => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
-
-	if (isDAC) {
-		//If we set UserID to undefined, it will not add in the where clause for limiting by userID.
-		userId = undefined;
-	}
 
 	const result = await applicationRepo.listApplications({
 		user_id: userId,
@@ -202,6 +238,8 @@ export const getAllApplications = async ({
 		pageSize,
 		search,
 		isApplicantView,
+		isPcglDac,
+		authorizedDacIds,
 	});
 
 	return result;
@@ -268,6 +306,7 @@ export const createApplicationPDF = async ({
 	const signatureService: SignatureService = signatureSvc(database);
 	const collaboratorsService: CollaboratorsService = collaboratorsSvc(database);
 	const fileService: FilesService = filesSvc(database);
+	const studyService: StudyService = studySvc(database);
 
 	const pdfRepo: PDFService = pdfService();
 
@@ -275,6 +314,21 @@ export const createApplicationPDF = async ({
 
 	if (!applicationContents.success) {
 		return applicationContents;
+	}
+
+	let studyIds = applicationContents.data.contents?.requested_studies;
+	// Attempt to retrieve studyNames from the studyIds in requested_studies array, default to studyIds
+	if (studyIds) {
+		const studyResult = await studyService.getAllStudies({
+			studyIds,
+		});
+
+		// The length of the studyResult data should match the length of studyIds
+		if (studyResult.success && studyIds.length === studyResult.data.length) {
+			studyIds = studyResult.data.filter((study) => study.studyName).map((study) => study.studyName);
+		} else {
+			logger.error('Failed to retrieve studyNames from the studyIds in requested_studies array');
+		}
 	}
 
 	const signatureContents = await signatureService.getApplicationSignature({ application_id: applicationId });
@@ -308,7 +362,10 @@ export const createApplicationPDF = async ({
 		}
 	}
 
-	const aliasedApplicationContents = convertToApplicationRecord(applicationContents.data);
+	const aliasedApplicationContents = convertToApplicationRecord({
+		...applicationContents.data,
+		contents: { ...applicationContents.data.contents, requested_studies: studyIds },
+	});
 	const aliasedSignatureContents = convertToSignatureRecord(signatureContents.data);
 	const aliasedCollaboratorsContents = convertToCollaboratorRecords(collaboratorsContents.data);
 	const aliasedFileContents = convertToFileRecord(fileContents.data);
@@ -316,7 +373,7 @@ export const createApplicationPDF = async ({
 	if (
 		!aliasedApplicationContents.success ||
 		!aliasedSignatureContents.success ||
-		!aliasedFileContents.success ||
+		!aliasedCollaboratorsContents.success ||
 		!aliasedFileContents.success
 	) {
 		return failure('SYSTEM_ERROR', 'Error aliasing data records. Unknown keys.');
@@ -328,7 +385,7 @@ export const createApplicationPDF = async ({
 	const renderedPDF = await pdfRepo.renderPCGLApplicationPDF({
 		applicationContents: aliasedApplicationContents.data,
 		signatureContents: aliasedSignatureContents.data,
-		collaboratorsContents: aliasedCollaboratorsContents,
+		collaboratorsContents: aliasedCollaboratorsContents.data,
 		fileContents: aliasedFileContents.data,
 		filename: `PCGL-${applicationContents.data.id} - Application for Access to PCGL Controlled Data`,
 		trademark,
@@ -368,29 +425,28 @@ export const createApplicationPDF = async ({
 };
 
 /**
- * Approves the application by providing the applicationId
+ * This function moves the application status to `dacApproved`.
+ * It grants the applicant and all the collaborators permission to the requested study.
  *
  * @async
- * @param {ApproveApplication} param0
- * @param {ApproveApplication} param0.applicationId
- * @returns {Promise<{
- * 	success: boolean;
- * 	message?: string;
- * 	errors?: string | Error;
- * 	data?: any;
- * }>}
+ * @param applicationId - ID of the application
+ * @param approverAccessToken - Bearer token with sufficient privileges to grant study access
+ * @param userName - Name of the user approving the application
+ * @returns The application on success, or a failure containing the error
  */
 export const approveApplication = async ({
 	applicationId,
+	approverAccessToken,
 	userName,
 }: ApproveApplication): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
 		const database = getDbInstance();
-		const service: ApplicationService = applicationSvc(database);
-		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const applicationService: ApplicationService = applicationSvc(database);
+		const emailService = await emailSvc(database);
 		const collaboratorsService = await collaboratorsSvc(database);
+
+		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
 			return result;
@@ -411,13 +467,13 @@ export const approveApplication = async ({
 		}
 
 		const update = { state: appStateManager.state, approved_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
+		const updatedResult = await applicationService.findOneAndUpdate({ id: applicationId, update });
 
 		if (!updatedResult.success) {
 			return updatedResult;
 		}
 
-		const updatedApplication = await service.getApplicationById({ id: applicationId });
+		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
 			return updatedApplication;
@@ -430,20 +486,40 @@ export const approveApplication = async ({
 		}
 
 		// Fetch the application with contents to send the email
-		const resultContents = await service.getApplicationWithContents({ id: applicationId });
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
 
 		if (!resultContents.success || !resultContents.data.contents) {
 			logger.error(`Unable to retrieve information to send approval email: ${applicationId}`, resultContents);
 			return dtoFriendlyData;
 		}
 
-		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
+		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
 
-		emailService.sendEmailApproval({
-			id: application.id,
-			to: applicant_institutional_email,
-			name: applicant_first_name || 'N/A',
+		if (!requested_studies || !requested_studies.length) {
+			logger.error(`No studies were requested for application: ${applicationId}`);
+			return dtoFriendlyData;
+		}
+
+		if (!applicant_institutional_email) {
+			logger.warn(`Applicant does not have an institutional email for application: ${applicationId}`);
+			return dtoFriendlyData;
+		}
+
+		const permissionAdded = await grantUserPermissions({
+			userEmails: [applicant_institutional_email],
+			approverAccessToken,
+			studyIds: requested_studies,
 		});
+
+		if (permissionAdded.successfulUserEmails.length === 1) {
+			// Notify Applicant of approval
+			emailService.sendEmailApproval({
+				id: application.id,
+				to: applicant_institutional_email,
+				actionId: approvalResult.data.actionId,
+				name: applicant_first_name || 'N/A',
+			});
+		}
 
 		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
 
@@ -455,13 +531,19 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		collaboratorResponse.data.forEach((collab) => {
-			emailService.sendEmailApproval({
-				id: application.id,
-				to: collab.institutional_email,
-				name: collab.first_name || 'N/A',
-			});
+		const collaboratorsByEmail: Record<string, CollaboratorRecord> = {};
+		for (const collaborator of collaboratorResponse.data) {
+			collaboratorsByEmail[collaborator.institutional_email] = collaborator;
+		}
+
+		await grantUserPermissions({
+			userEmails: Object.keys(collaboratorsByEmail),
+			approverAccessToken,
+			studyIds: requested_studies,
 		});
+
+		// TODO: Notify each collaborator of approval.
+		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/579
 
 		return dtoFriendlyData;
 	} catch (error) {
@@ -484,7 +566,7 @@ export const dacRejectApplication = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -522,10 +604,12 @@ export const dacRejectApplication = async ({
 		}
 
 		const { applicant_institutional_email, applicant_first_name } = resultContents.data.contents;
+		const { actionId } = rejectResult.data;
 
 		emailService.sendEmailReject({
 			id: application.id,
 			to: applicant_institutional_email,
+			actionId,
 			name: applicant_first_name || 'N/A',
 			comment: rejectionReason,
 		});
@@ -551,14 +635,13 @@ export const submitRevision = async ({
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		if (!result.success) {
 			return result;
 		}
 
 		const application = result.data;
-
 		const appStateManager = new ApplicationStateManager(application);
 
 		if (
@@ -590,28 +673,27 @@ export const submitRevision = async ({
 			return submittedRevision;
 		}
 
-		const { applicant_first_name, institutional_rep_email, institutional_rep_first_name } =
-			resultContents.data.contents;
+		const { applicant_first_name, institutional_rep_email } = resultContents.data.contents;
+		const { actionId } = submittedRevision.data;
 
-		if (result.data.state === ApplicationStates.DAC_REVIEW) {
+		if (result.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
 			const {
 				email: { dacAddress },
 			} = getEmailConfig;
-
 			emailService.sendEmailDacForSubmittedRevisions({
 				id: application.id,
 				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 		} else {
-			// TODO: Theres no email template for specifically to notify institutional rep for revisions similar to DAC
-			emailService.sendEmailInstitutionalRepForReview({
+			emailService.sendEmailRepForSubmittedRevisions({
 				id: application.id,
 				to: institutional_rep_email,
-				repName: institutional_rep_first_name || 'N/A',
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 		}
 
@@ -635,7 +717,7 @@ export const revokeApplication = async (
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -666,9 +748,11 @@ export const revokeApplication = async (
 			return applicationDTO;
 		}
 
+		const { actionId } = revokeApplicationResult.data;
 		emailService.sendEmailApplicantRevoke({
 			id: application.id,
 			to: applicationWithContents.data.contents?.applicant_institutional_email,
+			actionId,
 			name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
 			comment: revokeReason,
 			dacRevoked: isDACMember,
@@ -694,7 +778,7 @@ export const requestApplicationRevisionsByDac = async ({
 	try {
 		const database = getDbInstance();
 		const applicationService = applicationSvc(database);
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 		const result = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!result.success) {
@@ -755,14 +839,13 @@ export const requestApplicationRevisionsByDac = async ({
 			return aliasResult;
 		}
 
-		const { applicant_first_name } = resultContents.data.contents;
-		const {
-			email: { dacAddress },
-		} = getEmailConfig;
+		const { actionId } = actionResult.data;
+		const { applicant_first_name, applicant_institutional_email } = resultContents.data.contents;
 
 		emailService.sendEmailApplicantDacRevisions({
 			id: application.id,
-			to: dacAddress,
+			to: applicant_institutional_email,
+			actionId,
 			applicantName: applicant_first_name || 'N/A',
 			comments: revisionRequestResult.data,
 		});
@@ -786,7 +869,7 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 	try {
 		const database = getDbInstance();
 		const applicationService = applicationSvc(database);
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		const result = await applicationService.getApplicationById({ id: applicationId });
 
@@ -851,12 +934,18 @@ export const requestApplicationRevisionsByInstitutionalRep = async ({
 			return aliasResult;
 		}
 
-		const { applicant_first_name, institutional_rep_first_name, institutional_rep_last_name, institutional_rep_email } =
-			resultContents.data.contents;
+		const {
+			applicant_first_name,
+			institutional_rep_first_name,
+			institutional_rep_last_name,
+			applicant_institutional_email,
+		} = resultContents.data.contents;
+		const { actionId } = actionResult.data;
 
 		emailService.sendEmailApplicantRepRevisions({
 			id: application.id,
-			to: institutional_rep_email,
+			to: applicant_institutional_email,
+			actionId,
 			applicantName: applicant_first_name || 'N/A',
 			institutionalRepFirstName: institutional_rep_first_name || 'N/A',
 			institutionalRepLastName: institutional_rep_last_name || 'N/A',
@@ -881,7 +970,7 @@ export const submitApplication = async ({
 	try {
 		const database = getDbInstance();
 		const service: ApplicationService = applicationSvc(database);
-		const emailService = await emailSvc();
+		const emailService = await emailSvc(database);
 
 		// Fetch the application
 		const result = await service.getApplicationById({ id: applicationId });
@@ -896,7 +985,7 @@ export const submitApplication = async ({
 		const appStateManager = new ApplicationStateManager(application);
 
 		// Transition application to the next state (e.g., under review)
-		let submissionResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
+		let submissionResult;
 
 		if (appStateManager.state === ApplicationStates.DRAFT) {
 			submissionResult = await appStateManager.submitDraft(userName);
@@ -920,6 +1009,7 @@ export const submitApplication = async ({
 			return applicationDTO;
 		}
 
+		const { actionId } = submissionResult.data;
 		const {
 			applicant_first_name,
 			applicant_last_name,
@@ -927,9 +1017,36 @@ export const submitApplication = async ({
 			institutional_rep_last_name,
 			institutional_rep_email,
 			applicant_institutional_email,
+			requested_studies,
 		} = resultContents.data.contents;
 
 		if (result.data.state === ApplicationStates.DRAFT) {
+			const studyId = requested_studies?.[0];
+			const studyService = studySvc(database);
+
+			if (!studyId) {
+				logger.error(`Unable to retrieve studyId from requested_studies: ${applicationId}`, requested_studies);
+				return failure('SYSTEM_ERROR', `Something went wrong processing your request.`);
+			}
+
+			const studyResult = await studyService.getStudyById({ studyId });
+
+			if (!studyResult.success) {
+				logger.error(`Unable to retrieve study with id: ${studyId}`, studyResult.error);
+				return failure('SYSTEM_ERROR', `Something went wrong processing your request.`);
+			}
+
+			// Update application with DAC ID
+			const updatedResult = await service.findOneAndUpdate({
+				id: applicationId,
+				update: { dac_id: studyResult.data.dacId },
+			});
+
+			if (!updatedResult.success) {
+				logger.error(`Unable to update application with id: ${applicationId}`, updatedResult.error);
+				return failure('SYSTEM_ERROR', `Something went wrong processing your request.`);
+			}
+
 			//  email to institutional rep for review
 			emailService.sendEmailInstitutionalRepForReview({
 				id: application.id,
@@ -937,6 +1054,7 @@ export const submitApplication = async ({
 				applicantName: `${applicant_first_name} ${applicant_last_name}` || 'N/A',
 				repName: `${institutional_rep_first_name} ${institutional_rep_last_name}` || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
 			const {
@@ -949,6 +1067,7 @@ export const submitApplication = async ({
 				to: dacAddress,
 				applicantName: applicant_first_name || 'N/A',
 				submittedDate: new Date(),
+				actionId,
 			});
 
 			//  send email to applicant that application is submitted to DAC
@@ -956,6 +1075,7 @@ export const submitApplication = async ({
 				id: application.id,
 				to: applicant_institutional_email,
 				name: applicant_first_name || 'N/A',
+				actionId,
 			});
 		}
 		return applicationDTO;
@@ -976,6 +1096,7 @@ export const closeApplication = async ({
 }): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
+		const emailService = await emailSvc(database);
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 
@@ -991,7 +1112,7 @@ export const closeApplication = async ({
 			return failure('INVALID_STATE_TRANSITION', 'Application is already closed.');
 		}
 
-		let closeResult: Result<ApplicationRecord, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'>;
+		let closeResult;
 
 		switch (appStateManager.state) {
 			case ApplicationStates.DRAFT:
@@ -1012,6 +1133,35 @@ export const closeApplication = async ({
 		}
 
 		const applicationDTO = convertToBasicApplicationRecord(closeResult.data);
+		const { id } = application;
+		const { actionId } = closeResult.data;
+		const contentsResult = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!contentsResult.success || !contentsResult.data.contents) {
+			logger.error(
+				`Unable to retrieve information to send closing email for application with ID: ${applicationId}`,
+				contentsResult,
+			);
+			return applicationDTO;
+		}
+
+		const { applicant_first_name, applicant_last_name, applicant_institutional_email } = contentsResult.data.contents;
+
+		const applicantName = `${applicant_first_name} ${applicant_last_name}` || 'Applicant';
+
+		// Send email to applicant that application is closed
+		await emailService.sendEmailApplicantClose({
+			id,
+			actionId,
+			userName,
+			applicantName,
+			// TODO: Need Definition for Closing Messages
+			// https://github.com/Pan-Canadian-Genome-Library/daco/issues/419
+			message: '',
+			state: appStateManager.state,
+			submittedDate: new Date(),
+			to: applicant_institutional_email,
+		});
 
 		return applicationDTO;
 	} catch (error) {

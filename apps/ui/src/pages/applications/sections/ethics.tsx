@@ -57,7 +57,14 @@ const Ethics = () => {
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'ethics', isEditMode, userRole: state.applicationUserRole });
+
+	const canEdit = canEditSection({
+		revisions,
+		section: 'ethics',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
+	});
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const { mutateAsync: editApplication } = useEditApplication();
 
@@ -174,7 +181,7 @@ const Ethics = () => {
 
 							// This page should edit the backend immediately
 							editApplication({
-								id: appId,
+								applicationId: appId,
 								update: {
 									ethicsReviewRequired: ethicsReviewReq,
 								},
@@ -201,18 +208,19 @@ const Ethics = () => {
 							name="ethicsReviewRequired"
 							control={control}
 							rule={rule}
-							required
 							disabled={!canEdit}
 							options={[
-								{
-									key: 'exemption',
-									value: false,
-									label: translate('ethics-section.exemptionDescription'),
-								},
 								{
 									key: 'ethicsLetter',
 									value: true,
 									label: translate('ethics-section.ethicsLetterDescription'),
+									required: true,
+								},
+								{
+									key: 'exemption',
+									value: false,
+									label: translate('ethics-section.exemptionDescription'),
+									required: true,
 								},
 							]}
 						/>

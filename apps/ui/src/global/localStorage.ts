@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,9 +17,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ExtraSessionInformation, ExtraSessionInformationSchema } from '@pcgl-daco/validation';
-
 const SESSION_INFO_KEY = 'pcgl-daco-session';
+const LANG_SESSION_INFO_KEY = 'pcgl-daco-lang-session';
+
+import z from 'zod';
+
+export const ExtraSessionInformationSchema = z.object({
+	applicationId: z.number(),
+});
+
+export type ExtraSessionInformation = z.infer<typeof ExtraSessionInformationSchema>;
 
 export function clearExtraSessionInformation() {
 	localStorage.removeItem(SESSION_INFO_KEY);
@@ -35,8 +42,9 @@ export function getExtraSessionInformation(): ExtraSessionInformation | undefine
 		if (parsedSessionInfo.success) {
 			return parsedSessionInfo.data;
 		}
-		clearExtraSessionInformation();
 	}
+	clearExtraSessionInformation();
+	return;
 }
 
 export function setExtraSessionInformation(sessionInfo: ExtraSessionInformation): boolean {
@@ -44,6 +52,49 @@ export function setExtraSessionInformation(sessionInfo: ExtraSessionInformation)
 
 	if (validSessionInfo.success) {
 		localStorage.setItem(SESSION_INFO_KEY, JSON.stringify(sessionInfo));
+	}
+
+	return validSessionInfo.success;
+}
+
+// LANGUAGE SESSION
+
+export const SupportedLangs = {
+	ENGLISH: 'en',
+	FRENCH: 'fr',
+} as const;
+
+export type SupportedLangsValues = (typeof SupportedLangs)[keyof typeof SupportedLangs];
+
+export const LangSessionInformationSchema = z.object({
+	lang: z.string().default(SupportedLangs.ENGLISH),
+});
+
+export type LangSessionInformation = z.infer<typeof LangSessionInformationSchema>;
+
+export function clearLangSessionInformation() {
+	localStorage.removeItem(LANG_SESSION_INFO_KEY);
+}
+
+export function getLangSessionInformation(): LangSessionInformation {
+	const extraSessionInfo = localStorage.getItem(LANG_SESSION_INFO_KEY);
+
+	if (extraSessionInfo) {
+		const parsedSession = JSON.parse(extraSessionInfo);
+		const parsedSessionInfo = LangSessionInformationSchema.safeParse(parsedSession);
+
+		if (parsedSessionInfo.success) {
+			return parsedSessionInfo.data;
+		}
+	}
+	return { lang: SupportedLangs.ENGLISH };
+}
+
+export function setLangSessionInformation(sessionInfo: LangSessionInformation): boolean {
+	const validSessionInfo = LangSessionInformationSchema.safeParse(sessionInfo);
+
+	if (validSessionInfo.success) {
+		localStorage.setItem(LANG_SESSION_INFO_KEY, JSON.stringify(sessionInfo));
 	}
 
 	return validSessionInfo.success;

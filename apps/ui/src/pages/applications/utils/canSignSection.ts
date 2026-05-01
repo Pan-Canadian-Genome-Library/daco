@@ -17,18 +17,19 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { ApplicationUserPermission } from '@/providers/context/application/types';
 import { ApplicationStates, ApplicationStateValues, SignatureDTO } from '@pcgl-daco/data-model';
-import { SectionRevision, UserRole } from '@pcgl-daco/validation';
+import { SectionRevision } from '@pcgl-daco/validation';
 
 export const canSignSection = ({
-	role,
+	userPermissions,
 	state,
 	isEditMode,
 	signatures,
 	revisions,
 }: {
 	signatures?: SignatureDTO;
-	role?: UserRole;
+	userPermissions?: ApplicationUserPermission;
 	state: ApplicationStateValues;
 	revisions: SectionRevision;
 	isEditMode: boolean;
@@ -41,18 +42,18 @@ export const canSignSection = ({
 	switch (state) {
 		case ApplicationStates.DRAFT:
 			return {
-				disableSignature: !(role === 'APPLICANT' && isEditMode),
-				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature && isEditMode),
+				disableSignature: !(userPermissions?.isApplicant && isEditMode),
+				disableSubmit: !(userPermissions?.isApplicant && signatures.applicantSignature && isEditMode),
 			};
 		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
 			return {
-				disableSignature: !(role === 'INSTITUTIONAL_REP'),
-				disableSubmit: !(role === 'INSTITUTIONAL_REP' && signatures.institutionalRepSignature),
+				disableSignature: !userPermissions?.isInstitutionalRep,
+				disableSubmit: !(userPermissions?.isInstitutionalRep && signatures.institutionalRepSignature),
 			};
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
 			return {
-				disableSignature: !(role === 'APPLICANT' && !revisions['sign'][0]?.isApproved),
-				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature),
+				disableSignature: !(userPermissions?.isApplicant && !revisions['sign'][0]?.isApproved),
+				disableSubmit: !(userPermissions?.isApplicant && signatures.applicantSignature),
 			};
 		case ApplicationStates.DAC_REVIEW:
 			return {
@@ -61,8 +62,8 @@ export const canSignSection = ({
 			};
 		case ApplicationStates.DAC_REVISIONS_REQUESTED:
 			return {
-				disableSignature: !(role === 'APPLICANT' && !revisions['sign'][0]?.isApproved),
-				disableSubmit: !(role === 'APPLICANT' && signatures.applicantSignature),
+				disableSignature: !(userPermissions?.isApplicant && !revisions['sign'][0]?.isApproved),
+				disableSubmit: !(userPermissions?.isApplicant && signatures.applicantSignature),
 			};
 		default:
 			return { disableSignature: true, disableSubmit: true };

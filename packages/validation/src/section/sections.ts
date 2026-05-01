@@ -49,6 +49,6 @@ export type VerifySectionRevisionType<T extends string> = {
 	[section in T]: RevisionType;
 };
 
-export type SectionRevision = VerifySectionRevisionType<SectionRoutesValues> & {
+export type SectionRevision = VerifySectionRevisionType<Exclude<SectionRoutesValues, 'study'>> & {
 	general: GeneralType;
 };

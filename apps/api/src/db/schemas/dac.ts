@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const dac = pgTable('dac', {
 	dac_id: text().primaryKey().notNull(),
@@ -25,6 +25,7 @@ export const dac = pgTable('dac', {
 	dac_description: text().notNull(),
 	contact_name: varchar({ length: 255 }).notNull(),
 	contact_email: varchar({ length: 255 }).notNull(),
+	is_pcgl_dac: boolean().notNull().default(false),
 	created_at: timestamp().notNull().defaultNow(),
 	updated_at: timestamp(),
 });

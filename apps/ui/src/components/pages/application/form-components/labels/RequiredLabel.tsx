@@ -17,6 +17,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { ErrorResponse } from '@pcgl-daco/validation';
+import { pcglColours } from '@/providers/ThemeProvider';
+import { Flex, Typography } from 'antd';
+import type { ReactNode } from 'react';
 
-export type AuthenticationErrorResponse = ErrorResponse<['FORBIDDEN', 'UNAUTHORIZED']>;
+const { Text } = Typography;
+
+export const RequiredLabel = (children: string | ReactNode) => (
+	<Flex>
+		<Text
+			style={{
+				alignContent: 'center',
+				color: pcglColours.errorPrimary,
+				display: 'inline-block',
+				fontFamily: 'SimSun, sans-serif',
+				fontSize: '14px',
+				lineHeight: '1',
+				marginInlineEnd: '4px',
+			}}
+		>
+			*{' '}
+		</Text>
+		{children}
+	</Flex>
+);

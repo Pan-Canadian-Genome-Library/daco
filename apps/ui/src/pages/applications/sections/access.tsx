@@ -45,7 +45,13 @@ const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
-	const canEdit = canEditSection({ revisions, section: 'agreement', isEditMode, userRole: state.applicationUserRole });
+	const canEdit = canEditSection({
+		revisions,
+		section: 'agreement',
+		isEditMode,
+		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
+	});
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {
 		control,

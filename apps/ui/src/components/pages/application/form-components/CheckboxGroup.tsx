@@ -69,7 +69,11 @@ const CheckboxGroup = <T extends FieldValues>(props: UseControllerProps<T> & Che
 									<Checkbox
 										value={checkbox.value}
 										disabled={props.disabled}
-										style={{ width: '100%', backgroundColor: pcglColours.greyLight, padding: token.padding }}
+										style={{
+											width: '100%',
+											backgroundColor: pcglColours.greyLight,
+											padding: token.padding,
+										}}
 									>
 										{checkbox.label}
 									</Checkbox>

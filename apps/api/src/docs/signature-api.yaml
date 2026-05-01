@@ -122,7 +122,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/responses/ServerErrors'
-  /signature/sign:
+  /signature/{applicationId}/sign:
     post:
       tags:
         - Signature

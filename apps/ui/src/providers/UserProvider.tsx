@@ -19,15 +19,16 @@
 
 /* eslint-disable react-refresh/only-export-components */
 
-import useGetUser from '@/api/queries/useGetUser';
-import { SessionUser, UserRole } from '@pcgl-daco/validation';
 import { createContext, useContext, type PropsWithChildren } from 'react';
+
+import { SessionUser } from '@pcgl-daco/validation';
+
+import useGetUser from '@/api/queries/useGetUser';
 
 type UserState = {
 	isLoading: boolean;
 	isLoggedIn: boolean;
 	refresh: () => void;
-	role: UserRole;
 	user?: SessionUser;
 };
 
@@ -35,7 +36,6 @@ const UserContext = createContext<UserState>({
 	isLoading: true,
 	isLoggedIn: false,
 	refresh: () => {},
-	role: 'ANONYMOUS',
 });
 
 export function UserProvider({ children }: PropsWithChildren) {
@@ -45,14 +45,14 @@ export function UserProvider({ children }: PropsWithChildren) {
 		refetch();
 	};
 
-	const userState: UserState & { role: UserRole } = {
+	const initialUserState: UserState = {
 		user: data?.user,
-		role: data?.role ?? 'ANONYMOUS',
 		isLoading,
-		isLoggedIn: isLoading ? false : data ? data.role !== 'ANONYMOUS' : true,
 		refresh,
+		isLoggedIn: !isLoading && !!data?.user,
 	};
-	return <UserContext.Provider value={userState}>{children}</UserContext.Provider>;
+
+	return <UserContext.Provider value={initialUserState}>{children}</UserContext.Provider>;
 }
 
 export function useUserContext() {

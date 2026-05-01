@@ -19,8 +19,8 @@
 
 import { pcglColours } from '@/providers/ThemeProvider';
 import { ApplicationStateValues } from '@pcgl-daco/data-model';
-import { UserRole } from '@pcgl-daco/validation';
 import { Flex, Typography } from 'antd';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RenderIcon } from './utils/IconSelector';
 
@@ -35,7 +35,7 @@ export type SectionMenuItemProps = {
 	isLocked?: boolean;
 	hasCollaborators?: boolean;
 	appState: ApplicationStateValues;
-	role?: UserRole;
+	isApplicant?: boolean;
 };
 
 const SectionMenuItem = (props: SectionMenuItemProps) => {
@@ -43,13 +43,17 @@ const SectionMenuItem = (props: SectionMenuItemProps) => {
 
 	const iconColour = props.isEditMode ? pcglColours.primary : 'inherit';
 
+	const icon = useMemo(() => {
+		return RenderIcon(props);
+	}, [props]);
+
 	return (
 		<Flex style={{ width: '100%' }} justify="space-between">
 			<Text style={{ color: 'inherit' }} ellipsis>
 				{translate(`menu.${props.label}`)}
 			</Text>
 
-			<Flex style={{ color: iconColour }}>{RenderIcon(props)}</Flex>
+			<Flex style={{ color: iconColour }}>{icon}</Flex>
 		</Flex>
 	);
 };

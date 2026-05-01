@@ -17,42 +17,15 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { SessionUser, userRoleSchema } from '@pcgl-daco/validation';
+import { SessionUser } from '@pcgl-daco/validation';
 
-import { authConfig } from '@/config/authConfig.js';
 import { getApplicationById } from '@/controllers/applicationController.ts';
 import { getDbInstance } from '@/db/index.ts';
 import logger from '@/logger.ts';
-import { type UserRoleOmitRep } from '@/middleware/authMiddleware.ts';
+import type { AccessConfig } from '@/middleware/utils/types.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
 import { applicationSvc } from './applicationService.ts';
 import type { ApplicationService } from './types.ts';
-
-/**
- * Will check if the user is APPLICANT, DAC_MEMBER or DAC_CHAIR
- *
- * Since the INSTITUTIONAL_REP role is determined by users email
- * comparisons between session and institutional_rep email from the application contents, the logic
- * is not included here but instead custom to endpoints that require specific rep functionality.
- * As such reps will have an APPLICANT role.
- *
- */
-export function getUserRole(user: SessionUser | undefined): UserRoleOmitRep {
-	if (!user) {
-		return userRoleSchema.Values.ANONYMOUS;
-	}
-
-	const isDacReviewer = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_MEMBER);
-	const isDacChair = user.groups?.some((group) => group.name === authConfig.AUTHZ_GROUP_DAC_CHAIR);
-
-	if (isDacChair) {
-		return userRoleSchema.Values.DAC_CHAIR;
-	} else if (isDacReviewer) {
-		return userRoleSchema.Values.DAC_MEMBER;
-	}
-	return userRoleSchema.Values.APPLICANT;
-}
-
 /**
  * Based on user data stored in session data, determine the user's role & if the application is associated with them.
  */
@@ -77,7 +50,7 @@ export async function isAssociatedRep(user: SessionUser, applicationId: number):
 }
 
 /**
- * Validate User is allowed access to this specific Application based on userRole or userId
+ * Validate User is allowed access to this specific Application based on user groups or userId
  * @param session Session data with user info used to confirm their role and id
  * @param applicationId - The ID of the application to confirm User's association
  * @returns boolean
@@ -85,19 +58,44 @@ export async function isAssociatedRep(user: SessionUser, applicationId: number):
 export async function canAccessRequest(
 	user: SessionUser,
 	applicationId: number,
+	config: AccessConfig,
 ): AsyncResult<void, 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_ERROR'> {
-	const userRole = getUserRole(user);
-
-	const hasSpecialAccess =
-		userRole === userRoleSchema.Values.DAC_MEMBER ||
-		userRole === userRoleSchema.Values.DAC_CHAIR ||
-		(await isAssociatedRep(user, applicationId));
-
 	const result = await getApplicationById({ applicationId });
 	if (result.success) {
 		const { data } = result;
-		const { userId } = user;
-		const canAccess = data.userId === userId || hasSpecialAccess;
+		const { dacoAdmin } = user;
+
+		const ownsApplication = isUserApplicant(user, data.userId);
+		const dacChairOfApplication = isUserDacChair(user, data.dacId);
+		const dacMemberOfApplication = isUserDacMember(user, data.dacId);
+		const representativeOfApplication = await isAssociatedRep(user, applicationId);
+
+		// If accessConfig exists, this means we are stricter with who can access this resource.
+		if (config?.accessConfig) {
+			const { accessConfig } = config;
+			if (accessConfig.applicant && ownsApplication) {
+				return success(undefined);
+			} else if (accessConfig.dacChair && dacChairOfApplication) {
+				return success(undefined);
+			} else if (accessConfig.dacMember && dacMemberOfApplication) {
+				return success(undefined);
+			} else if (accessConfig.dacoAdmin && dacoAdmin) {
+				return success(undefined);
+			} else if (accessConfig.institutionalRep && representativeOfApplication) {
+				return success(undefined);
+			} else if (user.isPcglDac) {
+				return success(undefined);
+			}
+			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');
+		}
+
+		// At least one needs to be authorizied
+		const canAccess =
+			ownsApplication ||
+			dacChairOfApplication ||
+			dacMemberOfApplication ||
+			representativeOfApplication ||
+			user.isPcglDac;
 
 		if (!canAccess) {
 			return failure('FORBIDDEN', 'User does not have permission to access or modify this application.');
@@ -106,4 +104,14 @@ export async function canAccessRequest(
 		return result;
 	}
 	return success(undefined);
+}
+
+export function isUserDacMember(user: SessionUser, applicationDac: string | null): boolean {
+	return user.dacMember.some((dacId) => dacId === applicationDac);
+}
+export function isUserDacChair(user: SessionUser, applicationDac: string | null): boolean {
+	return user.dacChair.some((dacId) => dacId === applicationDac);
+}
+export function isUserApplicant(user: SessionUser, applicationUserId: string): boolean {
+	return user.userId === applicationUserId;
 }

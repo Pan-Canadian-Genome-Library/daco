@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -21,23 +21,23 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import { GenerateDacRevisionType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
 export const GenerateEmailDacForReview = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'actionId' | 'to'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
 
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear DAC Members,
                 </mj-text>
-                <mj-text>                    
+                <mj-text>
                     We are writing to inform you that a <a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a> is now ready for your review. The institutional representative has completed their part of the process, and we kindly request that you review the application at your earliest convenience. <br/> <br/>
+                </mj-text>
                 <mj-text>
                     Here are the application details:
                 </mj-text>
@@ -59,6 +59,36 @@ export const GenerateEmailDacForReview = ({
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
                 </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Chers membres du CAD,
+                </mj-text>
+                <mj-text>
+                    Nous vous écrivons pour vous informer qu'une <a href="${ui}/application/${id}" target="_blank" rel="nofollow">demande au BCAD de la BGP</a> est maintenant prête pour votre examen. Le/La représentant(e) institutionnel(le) a complété sa partie du processus, et nous vous prions d'examiner la demande dans les plus brefs délais. <br/> <br/>
+                </mj-text>
+                <mj-text>
+                    Voici les détails de la demande :
+                </mj-text>
+                <mj-text>
+                    <ul>
+                        <li>Nom du demandeur/de la demandeuse : ${applicantName}</li>
+                        <li>ID de la demande : ${id}</li>
+                        <li> Date de soumission : ${submittedDate}</li>
+                        <li>Lien vers la demande : <a href="${ui}/application/${id}" target="_blank" rel="nofollow">Demande-${id}</a> </li>
+                    </ul>
+                </mj-text>
+                <mj-text>
+                    Veuillez accéder à la demande via le portail du BCAD de la BGP pour procéder à l'examen. Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à nous contacter.
+                </mj-text>
+                <mj-text>
+                    Nous vous remercions de votre temps et de votre attention.<br /><br />
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP
+                </mj-text>
             </mj-column>
 `;
 
@@ -69,7 +99,7 @@ export const GenerateEmailDacForReviewPlain = ({
 	id,
 	applicantName,
 	submittedDate,
-}: Omit<GenerateDacRevisionType, 'to'>) => {
+}: Omit<GenerateDacRevisionType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -84,6 +114,20 @@ export const GenerateEmailDacForReviewPlain = ({
     \n
     \n Please access the application through the PCGL DACO portal to proceed with the review. If you encounter any issues or have any questions, please feel free to reach out.
     \n Thank you for your time and attention to this matter.
-    \n Best regards, \n The PCGL Data Access Compliance Office 
+    \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Chers membres du CAD,
+    \n Nous vous écrivons pour vous informer qu'une demande au BCAD de la BGP est maintenant prête pour votre examen. Le/La représentant(e) institutionnel(le) a complété sa partie du processus, et nous vous prions d'examiner la demande dans les plus brefs délais.
+    \n\n Voici les détails de la demande :
+    \n Nom du demandeur/de la demandeuse : ${applicantName}
+    \n ID de la demande : ${id}
+    \n Date de soumission : ${submittedDate}
+    \n Lien vers la demande : ${ui}/application/${id}
+    \n
+    \n Veuillez accéder à la demande via le portail du BCAD de la BGP pour procéder à l'examen. Si vous rencontrez des problèmes ou avez des questions, n'hésitez pas à nous contacter.
+    \n Nous vous remercions de votre temps et de votre attention.
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
     `;
 };
