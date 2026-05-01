@@ -22,7 +22,10 @@ import { CSSProperties, ReactNode } from 'react';
 import { Controller, ControllerRenderProps, FieldValues, Path, UseControllerProps } from 'react-hook-form';
 
 import { BasicFormFieldProps } from '@/global/types';
+import { pcglColours } from '@/providers/ThemeProvider';
 import { WORDS } from '@pcgl-daco/validation';
+
+import { RequiredLabel } from './labels/RequiredLabel';
 
 const { Item } = Form;
 
@@ -38,6 +41,7 @@ interface TextAreaProps extends BasicFormFieldProps {
 }
 
 const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextAreaProps) => {
+	const fieldLabel = props.required ? RequiredLabel(props.label) : props.label;
 	/**
 	 * Renders the TextArea component, helps reduce redefining (and making mistakes with)
 	 * the Input control.
@@ -48,11 +52,12 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 	const renderControl = (field: ControllerRenderProps<T, Path<T>>) => {
 		return (
 			<Input.TextArea
-				style={
-					props.style ?? {
-						height: 'auto',
-					}
-				}
+				styles={{
+					count: {
+						color: pcglColours.a11yGrey,
+					},
+				}}
+				style={props.style ?? { height: 'auto' }}
 				{...field}
 				rows={props.rows ?? 10}
 				count={{
@@ -63,6 +68,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 				}}
 				disabled={props.disabled}
 				placeholder={props.placeHolder}
+				required={props.required}
 			/>
 		);
 	};
@@ -74,8 +80,7 @@ const TextAreaBox = <T extends FieldValues>(props: UseControllerProps<T> & TextA
 			render={({ field }) => {
 				return (
 					<Item
-						label={props.label}
-						required={props.required}
+						label={fieldLabel}
 						name={`${props.name}`}
 						rules={!props.subLabel ? [props.rule] : undefined}
 						labelAlign={props.labelAlign}

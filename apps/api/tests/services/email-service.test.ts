@@ -32,6 +32,7 @@ import { ApplicationStates } from '@pcgl-daco/data-model';
 import {
 	addInitialActions,
 	addInitialApplications,
+	addStudyAndDacUsers,
 	initTestMigration,
 	PG_DATABASE,
 	PG_PASSWORD,
@@ -78,6 +79,7 @@ describe('Email Service', () => {
 		db = connectToDb(connectionString);
 
 		await initTestMigration(db);
+		await addStudyAndDacUsers(db);
 		await addInitialApplications(db);
 		await addInitialActions(db);
 

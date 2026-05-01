@@ -40,12 +40,8 @@ import ProjectInformation from '@/service/pdf/components/pages/ProjectInformatio
 import RequestedStudy from '@/service/pdf/components/pages/RequestedStudy.tsx';
 import SignSubmit from '@/service/pdf/components/pages/SignSubmit.tsx';
 import TitlePage from '@/service/pdf/components/pages/TitlePage.tsx';
-
-/**
- * FIXME: This should be dynamically set based on the language
- * the PDF is being generated in.
- */
-const PDF_LANGUAGE = 'en';
+import StartFrench from '../components/pages/StartFrench.tsx';
+import { SupportedLangs } from '../components/translations/types.ts';
 
 interface PCGLApplicationProps {
 	applicationContents: ApplicationResponseData;
@@ -119,11 +115,12 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 			<TitlePage
 				applicationId={applicationContents.id}
 				docCreatedAt={docCreatedAt}
-				title={'Application for Access to PCGL Controlled Data'}
 				principalInvestigatorName={`${contents?.applicantFirstName ?? ''} ${contents?.applicantLastName ?? '—'}`}
 				applicantPrimaryAffiliation={contents?.applicantPrimaryAffiliation ?? '—'}
 				displayLogo
 			/>
+
+			{/*ENGLISJ*/}
 			<IntroductionPage />
 			<ApplicantInformation
 				applicantFirstName={contents?.applicantFirstName}
@@ -137,7 +134,7 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				applicantPositionTitle={contents?.applicantPositionTitle}
 				applicantInstitutionCountry={translateCountryCode({
 					isoCode: contents?.applicantInstitutionCountry,
-					languageSetting: PDF_LANGUAGE,
+					languageSetting: SupportedLangs.ENGLISH,
 				})}
 				applicantInstitutionState={contents?.applicantInstitutionState}
 				applicantInstitutionStreetAddress={contents?.applicantInstitutionStreetAddress}
@@ -157,7 +154,7 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				institutionalRepPositionTitle={contents?.institutionalRepPositionTitle}
 				institutionCountry={translateCountryCode({
 					isoCode: contents?.institutionCountry,
-					languageSetting: PDF_LANGUAGE,
+					languageSetting: SupportedLangs.ENGLISH,
 				})}
 				institutionState={contents?.institutionState}
 				institutionStreetAddress={contents?.institutionStreetAddress}
@@ -196,6 +193,87 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				institutionalRepSignature={signature?.institutionalRepSignature}
 				institutionalRepSignedAt={signature?.institutionalRepSignedAt}
 			/>
+
+			{/*FRENCH*/}
+			<StartFrench />
+
+			<IntroductionPage lang={SupportedLangs.FRENCH} />
+			<ApplicantInformation
+				applicantFirstName={contents?.applicantFirstName}
+				applicantMiddleName={contents?.applicantMiddleName}
+				applicantLastName={contents?.applicantLastName}
+				applicantTitle={contents?.applicantTitle}
+				applicantSuffix={contents?.applicantSuffix}
+				applicantPrimaryAffiliation={contents?.applicantPrimaryAffiliation}
+				applicantInstitutionalEmail={contents?.applicantInstitutionalEmail}
+				applicantProfileUrl={contents?.applicantProfileUrl}
+				applicantPositionTitle={contents?.applicantPositionTitle}
+				applicantInstitutionCountry={translateCountryCode({
+					isoCode: contents?.applicantInstitutionCountry,
+					languageSetting: SupportedLangs.FRENCH,
+				})}
+				applicantInstitutionState={contents?.applicantInstitutionState}
+				applicantInstitutionStreetAddress={contents?.applicantInstitutionStreetAddress}
+				applicantInstitutionBuilding={contents?.applicantInstitutionBuilding}
+				applicantInstitutionCity={contents?.applicantInstitutionCity}
+				applicantInstitutionPostalCode={contents?.applicantInstitutionPostalCode}
+				lang={SupportedLangs.FRENCH}
+			/>
+			<InstitutionalRepresentative
+				institutionalRepTitle={contents?.institutionalRepTitle}
+				institutionalRepFirstName={contents?.institutionalRepFirstName}
+				institutionalRepMiddleName={contents?.institutionalRepMiddleName}
+				institutionalRepLastName={contents?.institutionalRepLastName}
+				institutionalRepSuffix={contents?.institutionalRepSuffix}
+				institutionalRepPrimaryAffiliation={contents?.institutionalRepPrimaryAffiliation}
+				institutionalRepEmail={contents?.institutionalRepEmail}
+				institutionalRepProfileUrl={contents?.institutionalRepProfileUrl}
+				institutionalRepPositionTitle={contents?.institutionalRepPositionTitle}
+				institutionCountry={translateCountryCode({
+					isoCode: contents?.institutionCountry,
+					languageSetting: SupportedLangs.FRENCH,
+				})}
+				institutionState={contents?.institutionState}
+				institutionStreetAddress={contents?.institutionStreetAddress}
+				institutionBuilding={contents?.institutionBuilding}
+				institutionCity={contents?.institutionCity}
+				institutionPostalCode={contents?.institutionPostalCode}
+				lang={SupportedLangs.FRENCH}
+			/>
+			<Collaborators collaborators={collaborators} lang={SupportedLangs.FRENCH} />
+			<ProjectInformation
+				projectTitle={contents?.projectTitle}
+				projectWebsite={contents?.projectWebsite}
+				projectBackground={contents?.projectBackground}
+				projectAims={contents?.projectAims}
+				projectSummary={contents?.projectSummary}
+				projectMethodology={contents?.projectMethodology}
+				projectPublicationUrls={contents?.projectPublicationUrls}
+				lang={SupportedLangs.FRENCH}
+			/>
+			<RequestedStudy requestedStudies={contents?.requestedStudies} lang={SupportedLangs.FRENCH} />
+			<Ethics ethicsReviewRequired={contents?.ethicsReviewRequired} lang={SupportedLangs.FRENCH} />
+			<DataAccessAgreement lang={SupportedLangs.FRENCH} />
+			<TermsAndConditions acceptedAgreements={contents?.acceptedAgreements} lang={SupportedLangs.FRENCH} />
+			<Appendices acceptedAppendices={contents?.acceptedAppendices} lang={SupportedLangs.FRENCH} />
+			<SignSubmit
+				applicantFirstName={contents?.applicantFirstName}
+				applicantMiddleName={contents?.applicantMiddleName}
+				applicantLastName={contents?.applicantLastName}
+				applicantPositionTitle={contents?.applicantPositionTitle}
+				applicantPrimaryAffiliation={contents?.applicantPrimaryAffiliation}
+				applicantSignature={signature?.applicantSignature}
+				applicantSignedAt={signature?.applicantSignedAt}
+				institutionalRepFirstName={contents?.institutionalRepFirstName}
+				institutionalRepMiddleName={contents?.institutionalRepMiddleName}
+				institutionalRepLastName={contents?.institutionalRepLastName}
+				institutionalRepPositionTitle={contents?.institutionalRepPositionTitle}
+				institutionalRepPrimaryAffiliation={contents?.institutionalRepPrimaryAffiliation}
+				institutionalRepSignature={signature?.institutionalRepSignature}
+				institutionalRepSignedAt={signature?.institutionalRepSignedAt}
+				lang={SupportedLangs.FRENCH}
+			/>
+
 			<EndOfDocument />
 		</Document>
 	);

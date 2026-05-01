@@ -34,42 +34,42 @@ export const getApplicationStateProperties = (applicationState: ApplicationState
 	switch (applicationState) {
 		case ApplicationStates.DRAFT:
 			showEdit = true;
-			colour = pcglColours.warningPrimary;
+			colour = pcglColours.inProgress;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.INSTITUTIONAL_REP_REVIEW:
 			showEdit = true;
-			colour = pcglColours.warningPrimary;
+			colour = pcglColours.inProgress;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.DAC_REVIEW:
 			showEdit = true;
-			colour = pcglColours.warningPrimary;
+			colour = pcglColours.inProgress;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.INSTITUTIONAL_REP_REVISION_REQUESTED:
 			showEdit = true;
-			colour = pcglColours.warningPrimary;
+			colour = pcglColours.inProgress;
 			showActionRequired = true;
 			break;
 		case ApplicationStates.DAC_REVISIONS_REQUESTED:
 			showEdit = true;
-			colour = pcglColours.warningPrimary;
+			colour = pcglColours.inProgress;
 			showActionRequired = true;
 			break;
 		case ApplicationStates.REJECTED:
 			showEdit = false;
-			colour = pcglColours.errorSecondary;
+			colour = pcglColours.blocked;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.REVOKED:
 			showEdit = false;
-			colour = pcglColours.errorSecondary;
+			colour = pcglColours.blocked;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.APPROVED:
 			showEdit = false;
-			colour = pcglColours.successSecondary;
+			colour = pcglColours.approved;
 			showActionRequired = false;
 			break;
 		case ApplicationStates.CLOSED:
