@@ -25,7 +25,7 @@ import useToggleAccptingStudies from '@/api/mutations/useToggleAcceptingStudies'
 import useGetStudies from '@/api/queries/useGetStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import { pcglColours } from '@/providers/ThemeProvider';
-import { StudyDTO } from '@pcgl-daco/data-model';
+import { StudyDacoDTO } from '@pcgl-daco/data-model';
 import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph, Text } = Typography;
@@ -36,7 +36,7 @@ const AdminStudiesPage = () => {
 	const navigate = useNavigate();
 	const { t: translate } = useTranslation();
 
-	const columns: TableColumnsType<StudyDTO> = [
+	const columns: TableColumnsType<StudyDacoDTO> = [
 		{
 			key: 'names',
 			title: 'Study Name',

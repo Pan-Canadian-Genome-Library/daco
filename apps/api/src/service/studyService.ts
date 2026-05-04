@@ -24,7 +24,7 @@ import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { type StudyDTO } from '@pcgl-daco/data-model';
+import { type StudyDacoDTO } from '@pcgl-daco/data-model';
 import { type PostgresTransaction, type StudyModel, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
@@ -34,7 +34,7 @@ const logger = BaseLogger.forModule('studyService');
  * @param db - Drizzle Postgres DB Instance
  */
 const studySvc = (db: PostgresDb) => ({
-	getStudyById: async ({ studyId }: { studyId: string }): AsyncResult<StudyDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	getStudyById: async ({ studyId }: { studyId: string }): AsyncResult<StudyDacoDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecord = await db
 				.select({
@@ -82,7 +82,7 @@ const studySvc = (db: PostgresDb) => ({
 	}: {
 		studyId: string;
 		enabled: boolean;
-	}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	}): AsyncResult<Pick<StudyDacoDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecord = await db
 				.update(study)
@@ -102,7 +102,7 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	getAllStudies: async ({ studyIds }: { studyIds?: string[] }): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+	getAllStudies: async ({ studyIds }: { studyIds?: string[] }): AsyncResult<StudyDacoDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecords = await db
 				.select({
