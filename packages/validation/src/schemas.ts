@@ -185,20 +185,28 @@ export const studyClinicalDTOSchema = z.object({
 	dacName: z.union([z.undefined(), z.string()]),
 	categoryId: z.number().nullable(),
 	studyName: z.string(),
-	studyDescription: z.string(),
-	programName: z.string().nullable(),
-	keywords: z.array(z.string()),
 	status: z.nativeEnum(StudyStatus),
 	context: z.nativeEnum(StudyContext),
 	domain: z.array(z.string()),
-	participantCriteria: z.string().nullable(),
 	principalInvestigators: z.array(z.string()),
 	leadOrganizations: z.array(z.string()),
 	collaborators: z.array(z.string()),
-	fundingSources: z.array(z.string()),
 	publicationLinks: z.array(z.string()),
 	createdAt: z.union([z.date(), z.string()]),
 	updatedAt: z.union([z.date(), z.string()]).nullable(),
+	defaultTranslation: z.number().optional(),
+	translations: z.array(
+		z.object({
+			languageId: z.string(),
+			studyDescription: z.string(),
+			programName: z.string().nullable(),
+			keywords: z.array(z.string()),
+			participantCriteria: z.string().nullable(),
+			fundingSources: z.array(z.string()),
+			createdAt: z.union([z.date(), z.string()]),
+			updatedAt: z.union([z.date(), z.string()]).nullable(),
+		}),
+	),
 });
 export const studyClinicalDTOResponseSchema = z.array(studyClinicalDTOSchema);
 
