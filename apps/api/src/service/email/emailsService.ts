@@ -29,6 +29,10 @@ import { AsyncResult, failure, success } from '@/utils/results.ts';
 
 import emailClient from './index.ts';
 import {
+	GenerateEmailRepForSubmittedRevision,
+	GenerateEmailRepForSubmittedRevisionPlain,
+} from './layouts/templates/EmailInstitutionalRepRevision.ts';
+import {
 	GenerateEmailApplicantAppSubmitted,
 	GenerateEmailApplicantAppSubmittedPlain,
 	GenerateEmailApplicantClosed,
@@ -714,6 +718,54 @@ const emailSvc = (db: PostgresDb) => {
 				return success(response);
 			} catch (error) {
 				const message = `Error sending email - sendEmailDacForSubmittedRevisions`;
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
+			}
+		},
+		// Email to REP about Submitted Revisions
+		sendEmailRepForSubmittedRevisions: async ({
+			id,
+			actionId,
+			applicantName,
+			submittedDate,
+			to,
+		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
+
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
+
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_REP_REVIEW_REVISIONS,
+					html: GenerateEmailRepForSubmittedRevision({
+						id,
+						applicantName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+					text: GenerateEmailRepForSubmittedRevisionPlain({
+						id,
+						applicantName,
+						submittedDate: dateConverter(submittedDate),
+					}),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.SUBMIT_INSTITUTIONAL_REP_REVIEW,
+					recipient_emails: [to],
+				});
+
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendEmailRepForSubmittedRevisions`;
 				logger.error(message, error);
 
 				return failure('SYSTEM_ERROR', message);

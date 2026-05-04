@@ -6,13 +6,14 @@
 		"qualifyPoint2": "have an institutional representative at your institution",
 		"qualifyPoint3": "have a scientific abstract and lay summary outlining the desired use of the PCGL Controlled Data",
 		"qualifyPoint4": "have at least 3 qualifying publications of which you were an author/co-author",
-		"qualifyPoint5": "include an ethics letter, if ethics approval for use of PCGL Controlled Data is required in your country/region",
+		"qualifyPoint5": "include an ethics letter, confirming that the use of PCGL Controlled Data was approved if ethics approval for such use is required in your country/region, or confirming that the ethics approval is exempted for such use in your country/region.",
 		"receiveAccess": "To receive access, you must:",
 		"accessPoint1": "Complete all required sections on this application form and agree to its terms.",
 		"accessPoint2": "Have the Principal Investigator and Institutional Representative who represents your institutions legal entity sign the finalized application.",
-		"accessPoint3": "Submit the signed application for review by the Data Access Compliance Office (DACO) in the “Sign and Submit” section of this application.",
-		"description1": "During the application process, you must submit a summary of your research project. Your project will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the donors and the security of the donors' data. If your application is approved, you agree that your applicant's name, institution, and scientific lay summary may be included in a public registry of projects that have been granted access to PCGL Controlled Data.",
-		"description2": "If the Data Access Compliance Office (DACO) approves your application, access to the PCGL Controlled Data will be granted starting from the date you are approved for access. An annual agreement must be made by the applicant and a bi-annual renewal must be completed in order to access/use controlled data beyond that two-year time period."
+		"accessPoint3": "Have the Principal Investigator and Institutional Representative sign the Data Use Agreement",
+		"accessPoint4": "Submit the signed application for review by the Data Access Compliance Office (DACO) in the “Sign and Submit” section of this application.",
+		"accessPoint5": "During the application process, you must submit a summary of your research project. Your project will be checked for conformity with the goals and policies of PCGL including, but not limited to, policies concerning the purpose and relevance of the research, the protection of the participant and the security of the participants' data. If your application is approved, you agree that your applicant's name, institution, and scientific lay summary may be included in a public registry of projects that have been granted access to PCGL Controlled Data.",
+		"description1": "If the Data Access Committee (DAC) approves your application, access to the PCGL Controlled Data will be granted starting from the date you are approved for access. The applicant must enter a 1 year agreement. In order to access/use controlled data beyond that 1 -year time period, a renewal application has to be submitted and approved by the DAC."
 	},
 	"applicant-section": {
 		"title": "Applicant Information (Principal Investigator)",
@@ -23,7 +24,7 @@
 	},
 	"institutional-section": {
 		"title": "Institutional Representative",
-		"description1": "An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section G: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DACO.",
+		"description1": "An Institutional Representative is a qualified representative of a legal entity who has the administrative power to legally commit that entity to the terms and conditions in Section G: Data Access Agreement (e.g. Vice-President Research, a Research Director, or a Contracts Officer for the entity). The Institutional Representative's signature will be required at the end of this application before being reviewed by PCGL DAC.",
 		"section1": "Institutional Representative",
 		"section2": "Institution/Company Mailing Address",
 		"primaryEmailLabel": "Must be affiliated with the same institution as the Principal Investigator."
@@ -143,11 +144,11 @@
 	},
 	"ethics-section": {
 		"title": "Ethics",
-		"description1": "PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data). Depending on the nature of your research project, it is possible, however, that such approval is needed in your country. If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.",
-		"description2": "Please note: The PCGL DACO and the PCGL are not responsible for the ethics approval/monitoring of individual research projects and bear no responsibility for the applicant's failure to comply with local/national ethical requirements.",
+		"description1": "PCGL DAC requires ethics approval for use of data. PCGL is aware that some countries/regions do not require ethics approval for use of coded data (i.e. use of the PCGL Controlled Data).If you are uncertain as to whether your research project needs ethics approval to use PCGL Controlled Data, we suggest you contact your local institutional review board / research ethics committee (IRB/REC) to clarify the matter.",
+		"description2": "Please note: The PCGL DAC and the PCGL are not responsible for the ethics approval/monitoring of individual research projects and bear no responsibility for the applicant's failure to comply with local/national ethical requirements.",
 		"approval": "Ethics Approval",
 		"pleaseChoose": "Please choose one of the following options",
-		"ethicsLetterDescription": "Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section F) current and applicable ethical approval is the responsibility of the Principal Investigator.",
+		"ethicsLetterDescription": "Your country/region requires your Research Project to undergo ethics review, and therefore, this research project has been approved by an IRB/REC formally designated to approve and/or monitor research involving humans. As per the Data Access Agreement (see Section G) current and applicable ethical approval is the responsibility of the Principal Investigator. An ethics approval letter has been uploaded.",
 		"exemptionDescription": "You represent and warrant that your country/region does not require your research project to undergo ethics review. An ethics exemption letter has been uploaded.",
 		"attach": "Please attach a PDF version of the ethics {{letter}} letter to this application:",
 		"allowedFileTypes": "Allowed file types: pdf, | Max file size: 5MB",
@@ -155,11 +156,13 @@
 	},
 	"requested-study": {
 		"title": "Requested Study",
-		"description1": "To help the DAC review your data access request more efficiently, please select the study you are requesting access to. You can view and choose from the available studies on the",
+		"description1": "Access to PCGL studies is managed by different Data Access Committees (DACs). Each DACO application may only include studies governed by the same DAC.",
+		"description2": "You may request access to multiple studies within the same DAC in a single application.",
+		"description3": "To request access to studies from different DACs, you must submit a separate application for each DAC. Please select studies from the list below. For the full catalogue of PCGL studies, visit the PCGL Research Portal.",
 		"description-link": "PCGL Research Portal - Studies.",
 		"section1": {
 			"form": {
-				"studyName": "Choose Study for List:",
+				"studyName": "Choose Study from the List:",
 				"studyLabel": "Choose one or multiple studies. Studies must be from the same DAC."
 			}
 		}

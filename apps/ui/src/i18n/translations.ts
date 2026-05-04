@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,16 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { getLangSessionInformation, SupportedLangs } from '@/global/localStorage';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { z } from 'zod';
 
+// English
 import enFormErrors from './locale/en/enFormErrors.json';
 import enModalsLang from './locale/en/enModals.json';
 import enApplicationSection from './locale/en/enSection.json';
 import enGeneralLang from './locale/en/enTranslations.json';
+// French
 import frFormErrors from './locale/fr/frFormErrors.json';
+import frModalsLang from './locale/fr/frModals.json';
+import frSectionLang from './locale/fr/frSection.json';
 import frGeneralLang from './locale/fr/frTranslations.json';
+
+const { lang } = getLangSessionInformation();
 
 i18n.use(initReactI18next).init({
 	resources: {
@@ -42,11 +49,14 @@ i18n.use(initReactI18next).init({
 			translation: {
 				...frGeneralLang,
 				...frFormErrors,
+				...frSectionLang,
+				...frModalsLang,
 			},
 		},
 	},
-	lng: 'en',
-	fallbackLng: 'en',
+	lng: lang,
+	fallbackLng: SupportedLangs.ENGLISH, // default to 'en' if key is missing in 'fr'
+	returnEmptyString: false,
 	supportedLngs: ['en', 'fr'],
 	interpolation: {
 		escapeValue: false,

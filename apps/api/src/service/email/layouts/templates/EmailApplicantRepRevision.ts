@@ -21,7 +21,6 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import { GenerateApplicantRepRevisionType } from '../../types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
 export const GenerateEmailApplicantRepRevision = ({
 	id,
 	applicantName,
@@ -85,6 +84,47 @@ export const GenerateEmailApplicantRepRevision = ({
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
                 </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Cher/Chère ${applicantName},
+                </mj-text>
+                <mj-text>
+                    Nous espérons que vous allez bien.
+                </mj-text>
+                <mj-text>
+                    Nous souhaitons vous informer que le/la représentant(e) institutionnel(le), ${institutionalRepFirstName} ${institutionalRepLastName}, a examiné votre demande au BCAD de la BGP et a demandé certaines révisions avant que le processus puisse se poursuivre.
+                </mj-text>
+                <mj-text>
+                    Les révisions suivantes ont été demandées : <br />
+                </mj-text>
+                <mj-text>
+                    <ol type="A">
+                        <li> Informations sur le/la demandeur/demandeuse : ${applicant_notes ?? ''} </li>
+                        <li> Représentant(e) institutionnel(le) : ${institution_rep_notes ?? ''} <br /> </li>
+                        <li> Collaborateur/Collaboratrice : ${collaborators_notes ?? ''} </li>
+                        <li> Informations sur le projet : ${project_notes ?? ''} </li>
+                        <li> Éthique : ${ethics_notes ?? ''} </li>
+                        <li> Entente d'accès aux données : ${agreements_notes ?? ''} </li>
+                        <li> Annexes : ${appendices_notes ?? ''} </li>
+                        <li> Signature et soumission : ${sign_and_submit_notes ?? ''} </li>
+                        <li> Commentaires généraux : ${generalComments ?? ''} </li>
+                    </ol>
+                </mj-text>
+                <mj-text>
+                    Veuillez accéder à <a href="${ui}/application/${id}" target="_blank" rel="nofollow">votre demande</a> afin d'y apporter les modifications requises. <br/>
+                </mj-text>
+                <mj-text>
+                    Merci d'effectuer les mises à jour nécessaires et de soumettre de nouveau votre demande par l'intermédiaire du <a href="${ui}" target="_blank" rel="nofollow">portail BCAD</a>. Si vous avez des questions ou avez besoin de précisions concernant les modifications demandées, n'hésitez pas à communiquer avec nous.<br />
+                </mj-text>
+                <mj-text>
+                    Nous vous remercions de l'attention portée à ces révisions et de votre diligence à y répondre dans les meilleurs délais. <br/><br/>
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP
+                </mj-text>
             </mj-column>
 `;
 
@@ -136,5 +176,31 @@ export const GenerateEmailApplicantRepRevisionPlain = ({
     \n We appreciate your attention to these revisions and your timely response.
     \n
     \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Cher/Chère ${applicantName},
+    \n Nous espérons que vous allez bien.
+    \n\n Nous souhaitons vous informer que le/la représentant(e) institutionnel(le), ${institutionalRepFirstName} ${institutionalRepLastName}, a examiné votre demande au BCAD de la BGP et a demandé certaines révisions avant que le processus puisse se poursuivre.
+    \n\n Les révisions suivantes ont été demandées :
+    \n
+    \n A. Informations sur le/la demandeur/demandeuse : ${applicant_notes ?? ''}
+    \n B. Représentant(e) institutionnel(le) : ${institution_rep_notes ?? ''}
+    \n C. Collaborateur/Collaboratrice : ${collaborators_notes ?? ''}
+    \n D. Informations sur le projet : ${project_notes ?? ''}
+    \n E. Étude demandée : [Note non fournie]
+    \n F. Éthique : ${ethics_notes ?? ''}
+    \n G. Entente d'accès aux données : ${agreements_notes ?? ''}
+    \n H. Annexes : ${appendices_notes ?? ''}
+    \n I. Signature et soumission : ${sign_and_submit_notes ?? ''}
+    \n J. Commentaires généraux : ${generalComments ?? ''}
+    \n\n
+    \n Veuillez accéder à votre demande afin d'y apporter les modifications requises.
+    \n
+    \n Merci d'effectuer les mises à jour nécessaires et de soumettre de nouveau votre demande par l'intermédiaire du portail BCAD ${ui}/application/${id}. Si vous avez des questions ou avez besoin de précisions concernant les modifications demandées, n'hésitez pas à communiquer avec nous.
+    \n
+    \n Nous vous remercions de l'attention portée à ces révisions et de votre diligence à y répondre dans les meilleurs délais.
+    \n
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
     `;
 };

@@ -63,6 +63,7 @@ const Ethics = () => {
 		section: 'ethics',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const { mutateAsync: editApplication } = useEditApplication();
@@ -207,18 +208,19 @@ const Ethics = () => {
 							name="ethicsReviewRequired"
 							control={control}
 							rule={rule}
-							required
 							disabled={!canEdit}
 							options={[
-								{
-									key: 'exemption',
-									value: false,
-									label: translate('ethics-section.exemptionDescription'),
-								},
 								{
 									key: 'ethicsLetter',
 									value: true,
 									label: translate('ethics-section.ethicsLetterDescription'),
+									required: true,
+								},
+								{
+									key: 'exemption',
+									value: false,
+									label: translate('ethics-section.exemptionDescription'),
+									required: true,
 								},
 							]}
 						/>

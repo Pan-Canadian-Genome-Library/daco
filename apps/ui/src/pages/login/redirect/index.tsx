@@ -43,11 +43,11 @@ const LoginRedirect = () => {
 		} else if (existingSessionInfo !== undefined) {
 			navigate(`/application/${existingSessionInfo.applicationId}`);
 			return;
-		} else if (user?.dacoAdmin) {
-			navigate('/admin');
-			return;
 		} else if (isDacChair || isDacMember) {
 			navigate('/manage/applications', { replace: true });
+			return;
+		} else if (user?.dacoAdmin) {
+			navigate('/admin');
 			return;
 		} else {
 			navigate('/dashboard', { replace: true });

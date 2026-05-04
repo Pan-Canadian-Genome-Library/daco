@@ -50,6 +50,7 @@ const Project = () => {
 		section: 'project',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 

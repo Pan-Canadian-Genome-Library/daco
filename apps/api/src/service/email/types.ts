@@ -27,19 +27,28 @@ import {
 } from '@pcgl-daco/data-model';
 import { type RevisionRequestModel } from '../types.ts';
 
-// TODO: Likely to be refactored once we add translations
 export const EmailSubjects = {
-	INSTITUTIONAL_REP_REVIEW_REQUEST: 'Review Request for PCGL DACO Application',
-	NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW: ' Your PCGL DACO Application Has Been Submitted for DAC Review',
-	NOTIFY_DAC_REVIEW_REVISIONS: 'Request for DAC Review of PCGL DACO Application',
-	NOTIFY_REVISION: 'Revisions Requested on Your PCGL DACO Application',
-	NOTIFY_APPROVAL: 'Congratulations! Your DACO Application Has Been Approved',
-	DACO_APPLICATION_STATUS: 'DACO Application Status',
-	DACO_APPLICATION_STATUS_UPDATE: 'DACO Application Status Update',
-	REMINDER_SUBMIT_DRAFT: 'Please Complete Your DACO Application',
-	REMINDER_SUBMIT_REVIEW: 'Reminder: Pending Application Review Required',
-	REMINDER_SUBMIT_REVISIONS: 'Reminder: Action Required – Revisions Requested on Your Application',
-	REMINDER_REVIEW_SUBMITTED_REVISIONS: 'Reminder: Revised Application Awaiting Your Review',
+	INSTITUTIONAL_REP_REVIEW_REQUEST:
+		'Review Request for PCGL DACO Application | Demande de révision pour la demande au BCAD de la BGP',
+	NOTIFY_REP_REVIEW_REVISIONS:
+		'Request for Institutional Representative Review of PCGL DACO Application | Demande de révisions concernant votre demande au BCAD de la BGP',
+	NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW:
+		'Your PCGL DACO Application Has Been Submitted for DAC Review | Votre demande au BCAD de la BGP a été soumise pour examen par le CAD',
+	NOTIFY_DAC_REVIEW_REVISIONS:
+		'Request for DAC Review of PCGL DACO Application | Demande d’examen par le CAD de la demande au BCAD de la BGP',
+	NOTIFY_REVISION:
+		'Revisions Requested on Your PCGL DACO Application | : Révisions demandées pour votre demande au BCAD de la BGP',
+	NOTIFY_APPROVAL:
+		'Congratulations! Your DACO Application Has Been Approved | élicitations! Votre demande au BCAD a été approuvée',
+	DACO_APPLICATION_STATUS: 'DACO Application Status | Statut de la demande au BCAD',
+	DACO_APPLICATION_STATUS_UPDATE: 'DACO Application Status Update | Statut de la demande au BCAD',
+	REMINDER_SUBMIT_DRAFT: 'Please Complete Your DACO Application | Veuillez compléter votre demande au BCAD',
+	REMINDER_SUBMIT_REVIEW:
+		'Reminder: Pending Application Review Required | Rappel : Examen d’une demande en attente requis',
+	REMINDER_SUBMIT_REVISIONS:
+		'Reminder: Action Required – Revisions Requested on Your Application | Rappel : Action requise – Révisions demandées pour votre demande',
+	REMINDER_REVIEW_SUBMITTED_REVISIONS:
+		'Reminder: Revised Application Awaiting Your Review | Rappel : Application Révisée en Attente de Votre Révision',
 } as const;
 
 export type EmailSubjectsType = (typeof EmailSubjects)[keyof typeof EmailSubjects];

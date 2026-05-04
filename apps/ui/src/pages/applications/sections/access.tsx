@@ -50,6 +50,7 @@ const AccessAgreement = () => {
 		section: 'agreement',
 		isEditMode,
 		userPermissions: state.applicationUserPermissions,
+		currentApplicationState: state.applicationState,
 	});
 	const form = useSectionForm({ section: 'agreement', sectionVisited: state.formState.sectionsVisited.agreement });
 	const {

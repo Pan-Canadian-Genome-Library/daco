@@ -21,7 +21,6 @@ import { getEmailConfig } from '@/config/emailConfig.ts';
 import { type EmailReminderTemplateType, type GenerateReviewReminderEmailType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
-// TODO: english and french translations
 export const GenerateEmailReminderRepReview = ({
 	applicantName,
 	repName,
@@ -32,7 +31,7 @@ export const GenerateEmailReminderRepReview = ({
 		express: { ui },
 	} = getEmailConfig;
 
-	const template = `  
+	const template = `
             <mj-column css-class="section-wrapper">
                 <mj-text>
                     Dear ${repName},
@@ -66,6 +65,41 @@ export const GenerateEmailReminderRepReview = ({
                     Best regards,<br />
                     The PCGL Data Access Compliance Office
                 </mj-text>
+
+                <mj-divider padding-bottom="40px" padding-top="40px" border-width="1px" border-color="lightgrey" />
+
+                <mj-text>
+                    Cher/Chère ${repName},
+                </mj-text>
+                <mj-text>
+                    Ceci est un rappel amical concernant une ou plusieurs demandes qui vous sont assignées sur le portail du <u>Bureau de conformité de l'accès aux données de la BGP</u> et qui sont en attente de votre examen depuis plus de 7 jours.
+                </mj-text>
+                <mj-text>
+                   Un examen rapide des demandes nous aide à maintenir un traitement efficace et à respecter les normes de conformité.
+                </mj-text>
+                <mj-text>
+                    <b>Demande(s) en attente :</b>
+                </mj-text>
+                <mj-text>
+                    <ul>
+                        <li>
+                            <b>ID de la demande :</b> ${id} <br/>
+                        </li>
+                        <li>
+                            <b>Demandeur/Demandeuse :</b> ${applicantName} <br/>
+                        </li>
+                        <li>
+                            <b>Date de soumission :</b> ${submittedDate} <br/>
+                        </li>
+                    </ul>
+                </mj-text>
+                <mj-text>
+                    Veuillez vous connecter au portail du BCAD pour procéder à l'examen : ${ui}
+                </mj-text>
+                <mj-text>
+                    Cordialement,<br />
+                    Le Bureau de conformité de l'accès aux données de la BGP
+                </mj-text>
             </mj-column>
 `;
 
@@ -91,6 +125,18 @@ export const GenerateEmailReminderRepReviewPlain = ({
     \n Applicant Name: ${applicantName}
     \n Submission Date: ${submittedDate}
     \n Please log in to the DACO portal to review: ${ui}
-    \n Best regards, \n The PCGL Data Access Compliance Office 
+    \n Best regards, \n The PCGL Data Access Compliance Office
+    \n
+    \n---
+    \n
+    \n Cher/Chère ${repName},
+    \n Ceci est un rappel amical concernant une ou plusieurs demandes qui vous sont assignées sur le portail du <u>Bureau de conformité de l'accès aux données de la BGP</u> et qui sont en attente de votre examen depuis plus de 7 jours.
+    \n Un examen rapide des demandes nous aide à maintenir un traitement efficace et à respecter les normes de conformité.
+    \n Demande(s) en attente :
+    \n ID de la demande : ${id}
+    \n Demandeur/Demandeuse : ${applicantName}
+    \n Date de soumission : ${submittedDate}
+    \n Veuillez vous connecter au portail du BCAD pour procéder à l'examen : ${ui}
+    \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
     `;
 };
