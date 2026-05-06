@@ -22,9 +22,11 @@ import { eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
+import { studyTranslations } from '@/db/schemas/studyTranslationsSchema.ts';
+import { isPostgresError, PostgresErrors } from '@/db/utils.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { type StudyDacoDTO } from '@pcgl-daco/data-model';
+import type { StudyDacoDTO, StudyTranslationDTO, StudyTranslationFields } from '@pcgl-daco/data-model';
 import { type PostgresTransaction, type StudyModel, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
@@ -169,6 +171,49 @@ const studySvc = (db: PostgresDb) => ({
 			const message = 'Error at updateStudies';
 			logger.error(message, error);
 			return failure('SYSTEM_ERROR', message);
+		}
+	},
+	createStudyTranslation: async (
+		translations: StudyTranslationFields & { studyId: string },
+	): AsyncResult<StudyTranslationDTO | undefined, 'DUPLICATE_RECORD' | 'SYSTEM_ERROR'> => {
+		try {
+			const result = await db
+				.insert(studyTranslations)
+				.values({
+					study_id: translations.studyId,
+					language_id: translations.languageId,
+					study_description: translations.studyDescription,
+					program_name: translations.programName,
+					keywords: translations.keywords,
+					participant_criteria: translations.participantCriteria,
+					funding_sources: translations.fundingSources,
+				})
+				.returning({
+					studyId: studyTranslations.study_id,
+					languageId: studyTranslations.language_id,
+					studyDescription: studyTranslations.study_description,
+					programName: studyTranslations.program_name,
+					keywords: studyTranslations.keywords,
+					participantCriteria: studyTranslations.participant_criteria,
+					fundingSources: studyTranslations.funding_sources,
+					createdAt: studyTranslations.created_at,
+					updatedAt: studyTranslations.updated_at,
+				});
+
+			return success(result[0]);
+		} catch (error) {
+			logger.error(error, 'Error at createStudyTranslation service');
+			const postgresError = isPostgresError(error);
+
+			switch (postgresError?.code) {
+				case PostgresErrors.UNIQUE_KEY_VIOLATION:
+					return failure(
+						'DUPLICATE_RECORD',
+						`${translations.languageId} already exists in studies. Study name must be unique.`,
+					);
+				default:
+					return failure('SYSTEM_ERROR', 'Something went wrong while creating a new study. Please try again later.');
+			}
 		}
 	},
 });

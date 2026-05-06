@@ -490,7 +490,7 @@ export type StudyTranslationDTO = {
 	createdAt: string | Date;
 	updatedAt?: string | Date | null;
 };
-
+export type StudyTranslationFields = Omit<StudyTranslationDTO, 'createdAt' | 'updatedAt'>;
 export type TranslationFields = Omit<StudyTranslationDTO, 'studyTranslationId' | 'createdAt' | 'updatedAt'>;
 
 export type UpsertStudyParams = StudyDacoDTO & TranslationFields;
