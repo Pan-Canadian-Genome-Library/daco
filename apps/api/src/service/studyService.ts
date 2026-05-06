@@ -24,7 +24,7 @@ import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { type StudyDTO } from '@pcgl-daco/data-model';
+import { type StudyDacoDTO } from '@pcgl-daco/data-model';
 import { type PostgresTransaction, type StudyModel, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
@@ -34,7 +34,7 @@ const logger = BaseLogger.forModule('studyService');
  * @param db - Drizzle Postgres DB Instance
  */
 const studySvc = (db: PostgresDb) => ({
-	getStudyById: async ({ studyId }: { studyId: string }): AsyncResult<StudyDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	getStudyById: async ({ studyId }: { studyId: string }): AsyncResult<StudyDacoDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecord = await db
 				.select({
@@ -43,17 +43,12 @@ const studySvc = (db: PostgresDb) => ({
 					dacName: dac.dac_name,
 					categoryId: study.category_id,
 					studyName: study.study_name,
-					studyDescription: study.study_description,
-					programName: study.program_name,
-					keywords: study.keywords,
 					status: study.status,
 					context: study.context,
 					domain: study.domain,
-					participantCriteria: study.participant_criteria,
 					principalInvestigators: study.principal_investigators,
 					leadOrganizations: study.lead_organizations,
 					collaborators: study.collaborators,
-					fundingSources: study.funding_sources,
 					publicationLinks: study.publication_links,
 					acceptingApplications: study.accepting_applications,
 					createdAt: study.created_at,
@@ -82,7 +77,7 @@ const studySvc = (db: PostgresDb) => ({
 	}: {
 		studyId: string;
 		enabled: boolean;
-	}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	}): AsyncResult<Pick<StudyDacoDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecord = await db
 				.update(study)
@@ -102,7 +97,7 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	getAllStudies: async ({ studyIds }: { studyIds?: string[] }): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+	getAllStudies: async ({ studyIds }: { studyIds?: string[] }): AsyncResult<StudyDacoDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecords = await db
 				.select({
@@ -111,17 +106,12 @@ const studySvc = (db: PostgresDb) => ({
 					dacName: dac.dac_name,
 					categoryId: study.category_id,
 					studyName: study.study_name,
-					studyDescription: study.study_description,
-					programName: study.program_name,
-					keywords: study.keywords,
 					status: study.status,
 					context: study.context,
 					domain: study.domain,
-					participantCriteria: study.participant_criteria,
 					principalInvestigators: study.principal_investigators,
 					leadOrganizations: study.lead_organizations,
 					collaborators: study.collaborators,
-					fundingSources: study.funding_sources,
 					publicationLinks: study.publication_links,
 					acceptingApplications: study.accepting_applications,
 					createdAt: study.created_at,
@@ -156,17 +146,12 @@ const studySvc = (db: PostgresDb) => ({
 					set: {
 						dac_id: sql`EXCLUDED.dac_id`,
 						study_name: sql`EXCLUDED.study_name`,
-						study_description: sql`EXCLUDED.study_description`,
 						status: sql`EXCLUDED.status`,
 						context: sql`EXCLUDED.context`,
 						domain: sql`EXCLUDED.domain`,
 						principal_investigators: sql`EXCLUDED.principal_investigators`,
 						lead_organizations: sql`EXCLUDED.lead_organizations`,
-						funding_sources: sql`EXCLUDED.funding_sources`,
 						dac_name: sql`EXCLUDED.dac_name`,
-						program_name: sql`EXCLUDED.program_name`,
-						keywords: sql`EXCLUDED.keywords`,
-						participant_criteria: sql`EXCLUDED.participant_criteria`,
 						collaborators: sql`EXCLUDED.collaborators`,
 						publication_links: sql`EXCLUDED.publication_links`,
 						updated_at: sql`EXCLUDED.updated_at`,

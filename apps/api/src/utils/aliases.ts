@@ -39,7 +39,7 @@ import {
 	type DacDTO,
 	type FilesDTO,
 	type SignatureDTO,
-	type StudyDTO,
+	type StudyDacoDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicationHistoryResponseSchema,
@@ -272,10 +272,10 @@ export const convertToCollaboratorRecords = (
 };
 
 /** Converts retrieved Submission Service Study Data into database insert using snake_case model format
- * @param data type StudyDTO study data in camelCase
+ * @param data type StudyDacoDTO study data in camelCase
  * @returns  type StudyModel study data in snake_case
  */
-export const convertToStudyUpdateRecord = (data: StudyDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
+export const convertToStudyUpdateRecord = (data: StudyDacoDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
 	const snakeCaseRecord = objectToSnake(data);
 	const validationResult = studyModelSchema.safeParse(snakeCaseRecord);
 	const result = validationResult.success

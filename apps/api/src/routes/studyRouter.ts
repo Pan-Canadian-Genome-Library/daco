@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { AcceptingApplicationsResponse, StudyDTO } from '@pcgl-daco/data-model';
+import type { AcceptingApplicationsResponse, StudyDacoDTO } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	activateBodyParamSchema,
@@ -135,7 +135,7 @@ studyRouter.get(
 	withParamsSchemaValidation(
 		basicStudyParamSchema,
 		apiZodErrorMapping,
-		async (request, response: ResponseWithData<StudyDTO, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+		async (request, response: ResponseWithData<StudyDacoDTO, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
 			const studyId = String(request.params.studyId);
 
 			const result = await getStudyById({ studyId });
@@ -200,7 +200,7 @@ studyRouter.patch(
 /*
  * Get all studies
  */
-studyRouter.get('/', async (_, response: ResponseWithData<StudyDTO[], ['SYSTEM_ERROR']>) => {
+studyRouter.get('/', async (_, response: ResponseWithData<StudyDacoDTO[], ['SYSTEM_ERROR']>) => {
 	const result = await getAllStudies();
 
 	if (!result.success) {

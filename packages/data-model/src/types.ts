@@ -452,30 +452,48 @@ export const StudyStatus = {
 
 export type StudyStatusValues = (typeof StudyStatus)[keyof typeof StudyStatus];
 
-export type StudyDTO = {
+export const AllowedLanguages = {
+	ENGLISH_CANADA: 'en_ca',
+	FRENCH_CANADA: 'fr_ca',
+} as const;
+
+export type AllowedLanguagesValues = (typeof AllowedLanguages)[keyof typeof AllowedLanguages];
+
+export type StudyDacoDTO = {
 	studyId: string;
 	dacId: string;
-	dacName?: string;
-	categoryId: number | null;
 	studyName: string;
-	studyDescription: string;
-	programName: string | null;
-	keywords: string[] | null;
 	status: StudyStatusValues;
 	context: StudyContextValues;
 	domain: string[];
-	participantCriteria: string | null;
 	principalInvestigators: string[];
 	leadOrganizations: string[];
-	collaborators: string[] | null;
-	fundingSources: string[];
-	publicationLinks: string[] | null;
-	acceptingApplications: boolean;
+	collaborators?: string[] | null;
+	publicationLinks?: string[] | null;
 	createdAt: Date | string;
 	updatedAt: Date | string | null;
+	categoryId?: number | null;
+	defaultTranslation?: number;
+	acceptingApplications: boolean;
 } & Pick<DacDTO, 'dacName'>;
 
-export type StudyClinicalDTO = Omit<StudyDTO, 'acceptingApplications'>;
+export type StudyClinicalDTO = Omit<StudyDacoDTO, 'acceptingApplications'>;
+
+export type StudyTranslationDTO = {
+	studyTranslationId?: number;
+	languageId: AllowedLanguagesValues;
+	studyDescription: string;
+	programName?: string | null;
+	keywords?: string[] | null;
+	participantCriteria?: string | null;
+	fundingSources: string[];
+	createdAt: string | Date;
+	updatedAt?: string | Date | null;
+};
+
+export type TranslationFields = Omit<StudyTranslationDTO, 'studyTranslationId' | 'createdAt' | 'updatedAt'>;
+
+export type UpsertStudyParams = StudyDacoDTO & TranslationFields;
 
 export type AcceptingApplicationsResponse = {
 	studyId: string;

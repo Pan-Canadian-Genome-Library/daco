@@ -38,7 +38,7 @@ import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { pcglColours } from '@/providers/ThemeProvider';
-import { ApplicationStates, type StudyDTO } from '@pcgl-daco/data-model';
+import { ApplicationStates, type StudyDacoDTO } from '@pcgl-daco/data-model';
 import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
@@ -46,7 +46,7 @@ const { Text } = Typography;
 const rule = createSchemaFieldRule(requestedStudiesSchema);
 const { Item } = Form;
 
-const getDacIds = (requestedStudies: string[] | null, studies: StudyDTO[]): string[] => {
+const getDacIds = (requestedStudies: string[] | null, studies: StudyDacoDTO[]): string[] => {
 	if (!requestedStudies?.length) {
 		return [];
 	}
