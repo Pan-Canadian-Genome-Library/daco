@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -17,15 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export * from './applicationActions.ts';
-export * from './applicationContents.ts';
-export * from './applications.ts';
-export * from './collaborators.ts';
-export * from './common.ts';
-export * from './dac.ts';
-export * from './dacComments.ts';
-export * from './files.ts';
-export * from './revisionRequests.ts';
-export * from './sentEmails.ts';
-export * from './studies.ts';
-export * from './studyTranslationsSchema.ts';
+import { integer, pgEnum, pgTable, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
+
+export const languages = pgEnum('languages', ['en_ca', 'fr_ca']);
+
+export const studyTranslations = pgTable(
+	'study_translations',
+	{
+		study_translation_id: integer().primaryKey().generatedAlwaysAsIdentity(),
+		study_id: text().notNull(),
+		language_id: languages().notNull(),
+		study_description: text().notNull(),
+		program_name: varchar({ length: 255 }),
+		keywords: text().array(),
+		participant_criteria: text(),
+		funding_sources: text().array().notNull(),
+		created_at: timestamp().notNull().defaultNow(),
+		updated_at: timestamp(),
+	},
+	(table) => [uniqueIndex().on(table.study_id, table.language_id)],
+);
