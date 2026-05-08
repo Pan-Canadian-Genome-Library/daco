@@ -17,14 +17,13 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { StudyClinicalDTO, StudyDacoDTO } from '@pcgl-daco/data-model';
+import type { StudyClinicalDTO, StudyDacoDTO, UpsertStudy } from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { studySvc } from '@/service/studyService.ts';
-import { type PostgresTransaction, type StudyRecord } from '@/service/types.ts';
-import { convertToStudyUpdateRecord } from '@/utils/aliases.ts';
-import { failure, type AsyncResult } from '@/utils/results.ts';
+import { type PostgresTransaction } from '@/service/types.ts';
+import { failure, success, type AsyncResult } from '@/utils/results.ts';
 
 const logger = BaseLogger.forModule('studyController');
 
@@ -90,37 +89,46 @@ export const getAllStudies = async (): AsyncResult<StudyDacoDTO[], 'SYSTEM_ERROR
 		return failure('SYSTEM_ERROR', `Unexpected error fetching studies`);
 	}
 };
-/*
- * Inserts & Updates Multiple Study Records
- * @param studies - An array of Study DTO objects from the Submission Service
- * @returns
- */
-export const updateStudies = async ({
+export const createStudyFromClinical = async ({
 	studies,
 	transaction,
 }: {
 	studies: StudyClinicalDTO[];
 	transaction?: PostgresTransaction;
-}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<string, 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
 
-		const studyData = studies.map((study) => {
-			const createdDate = typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt;
-			const updatedDate = typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt;
+		for (const study of studies) {
+			const studyModel: UpsertStudy = {
+				...study,
+				defaultLanguage: study.translations[0]?.languageId || 'en_ca',
+				createdAt: typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt,
+				updatedAt: typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt,
+				acceptingApplications: false,
+			};
 
-			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications: false };
-			const updatedRecordResult = convertToStudyUpdateRecord(studyModel);
-			if (updatedRecordResult.success) {
-				return updatedRecordResult.data;
+			const result = await studyService.createStudyFromClinical({ studyData: studyModel, transaction });
+
+			if (!result.success || !result.data) {
+				return failure('SYSTEM_ERROR', 'Failed to sync studies');
 			}
-			throw new Error(updatedRecordResult.message);
-		});
 
-		const updatedStudies = await studyService.updateStudies({ studyData, transaction });
+			if (studyModel.translations.length > 1) {
+				for (const translations of studyModel.translations) {
+					const translationResult = await studyService.createStudyTranslation({
+						...translations,
+						studyId: study.studyId,
+					});
+					if (!translationResult.success) {
+						return failure('SYSTEM_ERROR', 'Failed to sync translations');
+					}
+				}
+			}
+		}
 
-		return updatedStudies;
+		return success('Success');
 	} catch (error) {
 		logger.error(error);
 		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);

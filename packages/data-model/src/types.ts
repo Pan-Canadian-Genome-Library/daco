@@ -477,7 +477,7 @@ export type StudyDacoDTO = {
 	acceptingApplications: boolean;
 } & Pick<DacDTO, 'dacName'>;
 
-export type StudyClinicalDTO = Omit<StudyDacoDTO, 'acceptingApplications'>;
+export type StudyClinicalDTO = Omit<StudyDacoDTO, 'acceptingApplications'> & { translations: StudyTranslationDTO[] };
 
 export type StudyTranslationDTO = {
 	studyTranslationId?: number;
@@ -493,7 +493,14 @@ export type StudyTranslationDTO = {
 export type StudyTranslationFields = Omit<StudyTranslationDTO, 'createdAt' | 'updatedAt'>;
 export type TranslationFields = Omit<StudyTranslationDTO, 'studyTranslationId' | 'createdAt' | 'updatedAt'>;
 
-export type UpsertStudyParams = StudyDacoDTO & TranslationFields;
+export type UpsertStudy = StudyClinicalDTO & {
+	defaultLanguage: AllowedLanguagesValues;
+	acceptingApplications: boolean;
+};
+
+export type StudyResponse = {
+	translations?: StudyTranslationDTO[];
+} & StudyClinicalDTO;
 
 export type AcceptingApplicationsResponse = {
 	studyId: string;
