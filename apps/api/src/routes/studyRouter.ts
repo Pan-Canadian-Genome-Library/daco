@@ -105,9 +105,6 @@ studyRouter.get(
 
 			if (!updatedStudiesResult.success) {
 				switch (updatedStudiesResult.error) {
-					case 'NOT_FOUND':
-						response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
-						break;
 					case 'SYSTEM_ERROR':
 						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
 						break;
