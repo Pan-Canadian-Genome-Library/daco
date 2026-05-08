@@ -30,10 +30,10 @@ import express from 'express';
 import { serverConfig } from '@/config/serverConfig.js';
 import { createDacRecords } from '@/controllers/dacController.ts';
 import {
-	createStudyFromClinical,
 	getAllStudies,
 	getStudyById,
 	setStudyAcceptingApplications,
+	upsertStudy,
 } from '@/controllers/studyController.ts';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
@@ -101,7 +101,7 @@ studyRouter.get(
 			}
 
 			const studyData = parsedStudyData.data;
-			const updatedStudiesResult = await createStudyFromClinical({ studies: studyData, transaction: tx });
+			const updatedStudiesResult = await upsertStudy({ studies: studyData, transaction: tx });
 
 			if (!updatedStudiesResult.success) {
 				switch (updatedStudiesResult.error) {

@@ -89,7 +89,7 @@ export const getAllStudies = async (): AsyncResult<StudyDacoDTO[], 'SYSTEM_ERROR
 		return failure('SYSTEM_ERROR', `Unexpected error fetching studies`);
 	}
 };
-export const createStudyFromClinical = async ({
+export const upsertStudy = async ({
 	studies,
 	transaction,
 }: {
