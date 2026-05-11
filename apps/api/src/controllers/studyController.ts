@@ -114,18 +114,6 @@ export const upsertStudy = async ({
 			if (!result.success || !result.data) {
 				return failure('SYSTEM_ERROR', 'Failed to sync studies');
 			}
-
-			if (studyModel.translations.length > 1) {
-				for (const translations of studyModel.translations) {
-					const translationResult = await studyService.createStudyTranslation({
-						...translations,
-						studyId: study.studyId,
-					});
-					if (!translationResult.success) {
-						return failure('SYSTEM_ERROR', 'Failed to sync translations');
-					}
-				}
-			}
 		}
 
 		return success('Success');

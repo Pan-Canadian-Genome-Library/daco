@@ -26,13 +26,7 @@ import { studyTranslations } from '@/db/schemas/studyTranslationsSchema.ts';
 import { isPostgresError, PostgresErrors } from '@/db/utils.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import type {
-	StudyDacoDTO,
-	StudyResponse,
-	StudyTranslationDTO,
-	StudyTranslationFields,
-	UpsertStudy,
-} from '@pcgl-daco/data-model';
+import type { StudyDacoDTO, StudyResponse, StudyTranslationDTO, UpsertStudy } from '@pcgl-daco/data-model';
 import { StudyTranslationRecord, type PostgresTransaction, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
@@ -148,7 +142,7 @@ const studySvc = (db: PostgresDb) => ({
 		try {
 			const studyRecord = await db
 				.update(study)
-				.set({ accepting_applications: enabled })
+				.set({ accepting_applications: enabled, updated_at: sql`CURRENT_TIMESTAMP` })
 				.where(eq(study.study_id, studyId))
 				.returning({
 					acceptingApplications: study.accepting_applications,
@@ -222,14 +216,29 @@ const studySvc = (db: PostgresDb) => ({
 			const insertTranslation = dbDriver.$with('insert_translation').as(
 				dbDriver
 					.insert(studyTranslations)
-					.values({
-						study_id: studyData.studyId,
-						language_id: studyData.defaultLanguage,
-						study_description: translations.studyDescription,
-						program_name: translations.programName,
-						keywords: translations.keywords,
-						participant_criteria: translations.participantCriteria,
-						funding_sources: translations.fundingSources,
+					.values(
+						studyData.translations.map((translation) => {
+							return {
+								study_id: studyData.studyId,
+								language_id: translation.languageId,
+								study_description: translation.studyDescription,
+								program_name: translation.programName,
+								keywords: translation.keywords,
+								participant_criteria: translation.participantCriteria,
+								funding_sources: translation.fundingSources,
+							};
+						}),
+					)
+					.onConflictDoUpdate({
+						target: [studyTranslations.study_id, studyTranslations.language_id],
+						set: {
+							study_description: sql`EXCLUDED.study_description`,
+							program_name: sql`EXCLUDED.program_name`,
+							keywords: sql`EXCLUDED.keywords`,
+							participant_criteria: sql`EXCLUDED.participant_criteria`,
+							funding_sources: sql`EXCLUDED.funding_sources`,
+							updated_at: sql`CURRENT_TIMESTAMP`,
+						},
 					})
 					.returning(),
 			);
@@ -239,8 +248,8 @@ const studySvc = (db: PostgresDb) => ({
 				.with(insertTranslation)
 				.insert(study)
 				.values({
-					study_id: sql`(SELECT study_id FROM ${insertTranslation})`,
-					default_translation: sql`(SELECT study_translation_id FROM ${insertTranslation})`,
+					study_id: sql`(SELECT study_id FROM ${insertTranslation} LIMIT 1)`,
+					default_translation: sql`(SELECT study_translation_id FROM ${insertTranslation} LIMIT 1)`,
 					dac_id: studyData.dacId,
 					study_name: studyData.studyName,
 					status: studyData.status,
@@ -252,7 +261,6 @@ const studySvc = (db: PostgresDb) => ({
 					category_id: studyData.categoryId,
 					publication_links: studyData.publicationLinks,
 				})
-				.returning()
 				.onConflictDoUpdate({
 					target: study.study_id,
 					set: {
@@ -266,8 +274,10 @@ const studySvc = (db: PostgresDb) => ({
 						collaborators: sql`EXCLUDED.collaborators`,
 						category_id: sql`EXCLUDED.category_id`,
 						publication_links: sql`EXCLUDED.publication_links`,
+						updated_at: sql`CURRENT_TIMESTAMP`,
 					},
-				});
+				})
+				.returning();
 
 			if (!studyResult[0]) {
 				logger.error(`No results returned from the insertTranslation CTE for study ${studyData.studyName}`);
@@ -291,58 +301,6 @@ const studySvc = (db: PostgresDb) => ({
 					return failure(
 						'SYSTEM_ERROR',
 						`${studyData.dacId} does not appear to be a valid DAC ID, please ensure this DAC record exists prior to creating a study.`,
-					);
-				default:
-					return failure('SYSTEM_ERROR', 'Something went wrong while creating a new study. Please try again later.');
-			}
-		}
-	},
-	createStudyTranslation: async (
-		translations: StudyTranslationFields & { studyId: string },
-	): AsyncResult<StudyTranslationDTO | undefined, 'DUPLICATE_RECORD' | 'SYSTEM_ERROR'> => {
-		try {
-			const result = await db
-				.insert(studyTranslations)
-				.values({
-					study_id: translations.studyId,
-					language_id: translations.languageId,
-					study_description: translations.studyDescription,
-					program_name: translations.programName,
-					keywords: translations.keywords,
-					participant_criteria: translations.participantCriteria,
-					funding_sources: translations.fundingSources,
-				})
-				.returning({
-					studyId: studyTranslations.study_id,
-					languageId: studyTranslations.language_id,
-					studyDescription: studyTranslations.study_description,
-					programName: studyTranslations.program_name,
-					keywords: studyTranslations.keywords,
-					participantCriteria: studyTranslations.participant_criteria,
-					fundingSources: studyTranslations.funding_sources,
-					createdAt: studyTranslations.created_at,
-					updatedAt: studyTranslations.updated_at,
-				})
-				.onConflictDoUpdate({
-					target: [studyTranslations.study_id, studyTranslations.language_id],
-					set: {
-						study_description: sql`EXCLUDED.study_description`,
-						program_name: sql`EXCLUDED.program_name`,
-						keywords: sql`EXCLUDED.keywords`,
-						participant_criteria: sql`EXCLUDED.participant_criteria`,
-						funding_sources: sql`EXCLUDED.funding_sources`,
-					},
-				});
-			return success(result[0]);
-		} catch (error) {
-			logger.error(error, 'Error at createStudyTranslation service');
-			const postgresError = isPostgresError(error);
-
-			switch (postgresError?.code) {
-				case PostgresErrors.UNIQUE_KEY_VIOLATION:
-					return failure(
-						'DUPLICATE_RECORD',
-						`${translations.languageId} already exists in studies. Study name must be unique.`,
 					);
 				default:
 					return failure('SYSTEM_ERROR', 'Something went wrong while creating a new study. Please try again later.');
