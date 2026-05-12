@@ -31,7 +31,6 @@ const emailClient = createTransport({
 				pass: config.email.auth?.password,
 			}
 		: undefined,
-	// TODO: type this
-} as any);
+});
 
 export default emailClient;

@@ -55,7 +55,7 @@ const Introduction = () => {
 				<SectionTitle title={translate('intro-section.title')} showDivider={false}>
 					<Flex vertical>
 						<Text>{translate('intro-section.qualifyAccess')}</Text>
-						<TextList data={qualifyData} />
+						<TextList data={qualifyData} isNumbered />
 					</Flex>
 					<Flex vertical>
 						<Text>{translate('intro-section.receiveAccess')}</Text>
