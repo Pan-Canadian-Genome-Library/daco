@@ -26,6 +26,7 @@ const emailClient = createTransport({
 	host: config.email.host,
 	port: config.email.port,
 	secure: config.email.secure,
+	service: config.email.service,
 	auth: config.email.auth.user
 		? {
 				user: config.email.auth?.user,
