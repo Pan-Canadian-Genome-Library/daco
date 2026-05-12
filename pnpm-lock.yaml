@@ -17,6 +17,9 @@ importers:
       nx:
         specifier: ^20.4.4
         version: 20.7.2
+      pnpm:
+        specifier: 11.1.0
+        version: 11.1.0
       prettier:
         specifier: ^3.5.1
         version: 3.5.3
@@ -4080,6 +4083,11 @@ packages:
   picomatch@4.0.2:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
+
+  pnpm@11.1.0:
+    resolution: {integrity: sha512-DEToQuVoaywGGoGt2osiWL2IGOlwSyzyxj1WuTGnsukQCS4IUCcAO5bKORGrVqB/bfWrrtK+mSUDTN1oalNbFA==}
+    engines: {node: '>=22.13'}
+    hasBin: true
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -9266,6 +9274,8 @@ snapshots:
   picomatch@2.3.1: {}
 
   picomatch@4.0.2: {}
+
+  pnpm@11.1.0: {}
 
   possible-typed-array-names@1.1.0: {}
 
