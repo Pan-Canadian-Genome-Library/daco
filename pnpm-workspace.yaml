@@ -1,3 +1,11 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+allowBuilds:
+  '@scarf/scarf': false
+  cpu-features: false
+  dtrace-provider: false
+  esbuild: false
+  nx: false
+  protobufjs: false
+  ssh2: false

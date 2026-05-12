@@ -18,7 +18,6 @@
  */
 
 import { EmailTypeValues, EmailTypes } from '@pcgl-daco/data-model/src/types.js';
-import SMTPPool from 'nodemailer/lib/smtp-pool/index.js';
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
 import { type PostgresDb } from '@/db/index.js';
@@ -27,6 +26,7 @@ import BaseLogger from '@/logger.ts';
 import { EmailModel, EmailRecord } from '@/service/types.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 
+import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js';
 import emailClient from './index.ts';
 import {
 	GenerateEmailRepForSubmittedRevision,
@@ -143,7 +143,7 @@ const emailSvc = (db: PostgresDb) => {
 			actionId,
 			submittedDate,
 			to,
-		}: GenerateDraftReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateDraftReminderEmailType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -193,7 +193,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateInstitutionalRepType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -244,7 +244,7 @@ const emailSvc = (db: PostgresDb) => {
 			actionId,
 			repName,
 			to,
-		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -297,7 +297,7 @@ const emailSvc = (db: PostgresDb) => {
 			institutionalRepLastName,
 			comments,
 			to,
-		}: GenerateApplicantRepRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateApplicantRepRevisionType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -351,7 +351,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateReviewReminderEmailType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -403,7 +403,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateInstitutionalRepType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -453,7 +453,7 @@ const emailSvc = (db: PostgresDb) => {
 			actionId,
 			name: applicantName,
 			to,
-		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateApproveType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -494,7 +494,7 @@ const emailSvc = (db: PostgresDb) => {
 			applicantName,
 			submittedDate,
 			to,
-		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateDacRevisionType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -536,7 +536,7 @@ const emailSvc = (db: PostgresDb) => {
 			actionId,
 			submittedDate,
 			to,
-		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateReviewReminderEmailType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -587,7 +587,7 @@ const emailSvc = (db: PostgresDb) => {
 			applicantName,
 			comments,
 			to,
-		}: GenerateApplicantRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateApplicantRevisionType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -629,7 +629,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -682,7 +682,7 @@ const emailSvc = (db: PostgresDb) => {
 			applicantName,
 			submittedDate,
 			to,
-		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateDacRevisionType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -730,7 +730,7 @@ const emailSvc = (db: PostgresDb) => {
 			applicantName,
 			submittedDate,
 			to,
-		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateDacRevisionType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -779,7 +779,7 @@ const emailSvc = (db: PostgresDb) => {
 			repName,
 			submittedDate,
 			to,
-		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateReviewReminderEmailType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -830,7 +830,7 @@ const emailSvc = (db: PostgresDb) => {
 			actionId,
 			name,
 			to,
-		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateApproveType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -870,7 +870,7 @@ const emailSvc = (db: PostgresDb) => {
 			name,
 			to,
 			comment,
-		}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateRejectType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -912,7 +912,7 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 			comment,
 			dacRevoked = false,
-		}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -956,7 +956,7 @@ const emailSvc = (db: PostgresDb) => {
 			state,
 			submittedDate,
 			to,
-		}: GenerateClosedType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+		}: GenerateClosedType): AsyncResult<SMTPTransport.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
