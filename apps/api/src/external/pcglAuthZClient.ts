@@ -22,6 +22,7 @@ import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 import {
 	addUserToStudyPermissionResponse,
+	authzGroupResponseValidation,
 	authZUserInfo,
 	ServiceTokenResponse,
 	type PCGLAddUserToStudyPermissionResponse,
@@ -217,5 +218,54 @@ export const addUsersToStudyPermission = async (
 		const message = `Unexpected error while adding ${userEmails.join(', ')} to study ${studyId}`;
 		logger.error('[AUTHZ]:', message, error);
 		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+/**
+ * @param accessToken
+ * @param group
+ * @returns returns a list of emails associated with the given group
+ */
+export const getGroupEmails = async (
+	group: string,
+): AsyncResult<string[], 'SYSTEM_ERROR' | 'FORBIDDEN' | 'NOT_FOUND'> => {
+	const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_ID, AUTHZ_SERVICE_UUID } = authConfig;
+	try {
+		const serviceTokenResponse = await fetch(`${AUTHZ_ENDPOINT}/service/${AUTHZ_SERVICE_ID}/verify`, {
+			method: 'POST',
+			body: JSON.stringify({ service_uuid: AUTHZ_SERVICE_UUID }),
+		});
+
+		const serviceToken = (await serviceTokenResponse.json()) as ServiceTokenResponse;
+
+		const response = await fetch(`${AUTHZ_ENDPOINT}/group/${group}`, {
+			headers: new Headers({
+				'Content-Type': 'application/json',
+				'X-Service-ID': `${AUTHZ_SERVICE_ID}`,
+				'X-Service-Token': `${serviceToken}`,
+			}),
+		});
+
+		if (response.status === 204) {
+			// A "204 No content" response is returned when the user is not registered.
+			return failure('NOT_FOUND', 'Unable to retrieve user information from the PCGL AuthZ service.');
+		}
+
+		const res = await response.json();
+
+		console.log('gakkk----', res);
+
+		const resultGroup = authzGroupResponseValidation.safeParse(res);
+
+		if (!resultGroup.success) {
+			const message = `AuthZ service returned unexpected when look for groups`;
+			logger.error(`[AUTHZ]: ${message}`, JSON.stringify(res));
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultGroup.data.emails);
+	} catch (error) {
+		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
+		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
 	}
 };
