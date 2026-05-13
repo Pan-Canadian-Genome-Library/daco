@@ -24,6 +24,7 @@ import urlJoin from 'url-join';
 import { fetchWithRetry } from './fetchWithRetry.ts';
 import {
 	addUserToStudyPermissionResponse,
+	authzGroupResponseValidation,
 	authZUserInfo,
 	ServiceTokenResponse,
 	type PCGLAddUserToStudyPermissionResponse,
@@ -217,5 +218,39 @@ export const addUsersToStudyPermission = async (
 		const message = `Unexpected error while adding ${userEmails.join(', ')} to study ${studyId}`;
 		logger.error('[AUTHZ]:', message, error);
 		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+/**
+ * @param accessToken
+ * @param group
+ * @returns returns a list of emails associated with the given group
+ */
+export const getGroupEmails = async (
+	accessToken: string,
+	group: string,
+): AsyncResult<string[], 'SYSTEM_ERROR' | 'FORBIDDEN' | 'NOT_FOUND'> => {
+	try {
+		const response = await fetchAuthZResource(`/group/${group}`, accessToken);
+
+		if (response.status === 204) {
+			// A "204 No content" response is returned when the user is not registered.
+			return failure('NOT_FOUND', 'Unable to retrieve user information from the PCGL AuthZ service.');
+		}
+
+		const res = await response.json();
+
+		const resultGroup = authzGroupResponseValidation.safeParse(res);
+
+		if (!resultGroup.success) {
+			const message = `AuthZ service returned unexpected when look for groups`;
+			logger.error(`[AUTHZ]: ${message}`, JSON.stringify(res));
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultGroup.data.emails);
+	} catch (error) {
+		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
+		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
 	}
 };
