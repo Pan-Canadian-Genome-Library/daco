@@ -26,6 +26,7 @@ export const emailConfigSchema = z.object({
 	UI_HOST: z.string().url(),
 	EMAIL_HOST: z.string(),
 	EMAIL_PORT: z.coerce.number().default(1025),
+	EMAIL_SECURE: z.string().optional().default('false'),
 	EMAIL_FROM_ADDRESS: z.string().email(),
 	EMAIL_FROM_NAME: z.string(),
 	EMAIL_CONTACT_ADDRESS: z.string().email(),
@@ -33,6 +34,7 @@ export const emailConfigSchema = z.object({
 	IMAGE_BASE_URL: z.string(),
 	EMAIL_USER: z.string(),
 	EMAIL_PASSWORD: z.string(),
+	EMAIL_SERVICE: z.string().optional(),
 });
 
 const parseResult = emailConfigSchema.safeParse(process.env);
@@ -50,6 +52,8 @@ export const getEmailConfig = {
 	email: {
 		host: parseResult.data.EMAIL_HOST,
 		port: parseResult.data.EMAIL_PORT,
+		secure: parseResult.data.EMAIL_SECURE.toLocaleLowerCase() === 'true',
+		service: parseResult.data.EMAIL_SERVICE,
 		fromAddress: parseResult.data.EMAIL_FROM_ADDRESS,
 		fromName: parseResult.data.EMAIL_FROM_NAME,
 		contactAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
