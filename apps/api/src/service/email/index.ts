@@ -22,9 +22,13 @@ import { createTransport } from 'nodemailer';
 
 const config = getEmailConfig;
 
+// https://nodemailer.com/smtp
 const emailClient = createTransport({
+	name: config.email.name,
 	host: config.email.host,
 	port: config.email.port,
+	secure: config.email.secure,
+	service: config.email.service,
 	auth: config.email.auth.user
 		? {
 				user: config.email.auth?.user,
