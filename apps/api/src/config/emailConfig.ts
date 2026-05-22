@@ -33,7 +33,7 @@ export const emailConfigSchema = z.object({
 	IMAGE_BASE_URL: z.string(),
 	EMAIL_USER: z.string(),
 	EMAIL_PASSWORD: z.string(),
-	HOSTNAME: z.string().optional().default('localhost'),
+	HOSTNAME: z.string().optional().default('example.daco.domain.com'),
 	EMAIL_SECURE: z.string().optional().default('false'),
 	EMAIL_SERVICE: z.string().optional(),
 });
