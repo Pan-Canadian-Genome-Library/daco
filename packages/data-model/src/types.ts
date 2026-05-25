@@ -491,10 +491,6 @@ export type StudyTranslationDTO = {
 	updatedAt?: string | Date | null;
 };
 
-export type TranslationFields = Omit<StudyTranslationDTO, 'studyTranslationId' | 'createdAt' | 'updatedAt'>;
-
-export type UpsertStudyParams = StudyDacoDTO & TranslationFields;
-
 export type AcceptingApplicationsResponse = {
 	studyId: string;
 	acceptingApplications: boolean;
