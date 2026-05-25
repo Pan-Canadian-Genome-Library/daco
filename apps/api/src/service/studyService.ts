@@ -271,6 +271,7 @@ const studySvc = (db: PostgresDb) => ({
 						domain: sql`EXCLUDED.domain`,
 						principal_investigators: sql`EXCLUDED.principal_investigators`,
 						lead_organizations: sql`EXCLUDED.lead_organizations`,
+						dac_name: sql`EXCLUDED.dac_name`,
 						collaborators: sql`EXCLUDED.collaborators`,
 						category_id: sql`EXCLUDED.category_id`,
 						publication_links: sql`EXCLUDED.publication_links`,

@@ -189,6 +189,7 @@ export const studyClinicalDTOSchema = z.object({
 	publicationLinks: z.array(z.string()),
 	createdAt: z.union([z.date(), z.string()]),
 	updatedAt: z.union([z.date(), z.string()]).nullable(),
+	defaultTranslation: z.number().optional(),
 	translations: z.array(
 		z.object({
 			languageId: z.nativeEnum(AllowedLanguages),
