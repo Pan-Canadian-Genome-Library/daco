@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { StudyClinicalDTO, StudyDTO } from '@pcgl-daco/data-model';
+import type { StudyClinicalDTO, StudyDacoDTO } from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
@@ -31,13 +31,13 @@ const logger = BaseLogger.forModule('studyController');
 /**
  * Gets a study.
  * @param studyId - The study ID
- * @returns {StudyDTO} - The study data
+ * @returns {StudyDacoDTO} - The study data
  */
 export const getStudyById = async ({
 	studyId,
 }: {
 	studyId: string;
-}): AsyncResult<StudyDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<StudyDacoDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
@@ -62,7 +62,7 @@ export const setStudyAcceptingApplications = async ({
 }: {
 	studyId: string;
 	enabled: boolean;
-}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<Pick<StudyDacoDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
@@ -77,9 +77,9 @@ export const setStudyAcceptingApplications = async ({
 
 /**
  * Returns all studies.
- * @returns {StudyDTO[]}
+ * @returns {StudyDacoDTO[]}
  */
-export const getAllStudies = async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+export const getAllStudies = async (): AsyncResult<StudyDacoDTO[], 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);

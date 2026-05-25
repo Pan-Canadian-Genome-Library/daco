@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -21,6 +21,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, foreignKey, integer, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 import { dac } from './dac.ts';
+import { studyTranslations } from './studyTranslationsSchema.ts';
 
 export const studyStatus = pgEnum('study_status', ['Ongoing', 'Completed']);
 export const studyContext = pgEnum('study_context', ['Clinical', 'Research']);
@@ -30,23 +31,20 @@ export const study = pgTable(
 	{
 		study_id: text().primaryKey().notNull(),
 		dac_id: text().notNull(),
+		default_translation: integer().notNull(),
 		study_name: varchar({ length: 255 }).notNull(),
-		study_description: text().notNull(), // Assuming the description is large
-		dac_name: varchar({ length: 255 }),
-		program_name: varchar({ length: 255 }),
-		keywords: text().array(),
 		status: studyStatus().notNull(),
 		context: studyContext().notNull(),
 		domain: text().array().notNull(),
-		participant_criteria: text(),
 		principal_investigators: text().array().notNull(),
 		lead_organizations: text().array().notNull(),
 		collaborators: text().array(),
-		funding_sources: text().array().notNull(),
 		publication_links: text().array(),
 		created_at: timestamp().notNull().defaultNow(),
 		updated_at: timestamp(),
 		category_id: integer().unique(),
+		// PCGL specific
+		dac_name: varchar({ length: 255 }),
 		accepting_applications: boolean().notNull().default(false),
 	},
 	(table) => [
@@ -55,6 +53,11 @@ export const study = pgTable(
 			foreignColumns: [dac.dac_id],
 			name: 'dac_id_fk',
 		}),
+		foreignKey({
+			columns: [table.default_translation],
+			foreignColumns: [studyTranslations.study_translation_id],
+			name: 'default_translation_fk',
+		}),
 	],
 );
 
@@ -62,5 +65,9 @@ export const studyRelations = relations(study, ({ one }) => ({
 	dac_id: one(dac, {
 		fields: [study.dac_id],
 		references: [dac.dac_id],
+	}),
+	default_translation: one(studyTranslations, {
+		fields: [study.default_translation],
+		references: [studyTranslations.study_translation_id],
 	}),
 }));
