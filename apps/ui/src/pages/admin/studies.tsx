@@ -25,7 +25,7 @@ import useToggleAccptingStudies from '@/api/mutations/useToggleAcceptingStudies'
 import useGetStudies from '@/api/queries/useGetStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
 import { pcglColours } from '@/providers/ThemeProvider';
-import { StudyDacoDTO } from '@pcgl-daco/data-model';
+import { type StudyDacoDTO } from '@pcgl-daco/data-model';
 import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph, Text } = Typography;

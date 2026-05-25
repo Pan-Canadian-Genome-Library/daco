@@ -21,7 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { StudyDacoDTO } from '@pcgl-daco/data-model';
+import { type StudyDacoDTO } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useGetStudies = () => {
