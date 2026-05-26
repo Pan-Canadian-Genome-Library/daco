@@ -18,9 +18,9 @@
  */
 
 import { dac } from '@/db/schemas/dac.ts';
-import { UpsertStudy } from '@pcgl-daco/data-model';
+import { type StudyClinicalDTO } from '@pcgl-daco/data-model';
 
-export const testStudyData: UpsertStudy[] = [
+export const testStudyData: StudyClinicalDTO[] = [
 	{
 		studyId: 'study1',
 		dacId: 'dac1',
@@ -30,12 +30,10 @@ export const testStudyData: UpsertStudy[] = [
 		leadOrganizations: ['Ontario Institute for Cancer Research'],
 		principalInvestigators: ['John Doe', 'Jane Smith'],
 		status: 'Completed',
-		acceptingApplications: false,
 		defaultTranslation: 1,
 		categoryId: null,
 		collaborators: [],
 		publicationLinks: [],
-		defaultLanguage: 'en_ca',
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		translations: [
@@ -61,12 +59,10 @@ export const testStudyData: UpsertStudy[] = [
 		leadOrganizations: ['University of Toronto'],
 		principalInvestigators: ['Alice Wonder'],
 		status: 'Ongoing',
-		acceptingApplications: true,
 		defaultTranslation: 1,
 		categoryId: null,
 		collaborators: ['Hospital for Sick Children'],
 		publicationLinks: ['http://example.com/publication1'],
-		defaultLanguage: 'en_ca',
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		translations: [
@@ -92,12 +88,10 @@ export const testStudyData: UpsertStudy[] = [
 		leadOrganizations: ['Mayo Clinic'],
 		principalInvestigators: ['Dr. Gregory House'],
 		status: 'Ongoing',
-		acceptingApplications: true,
 		defaultTranslation: 1,
 		categoryId: null,
 		collaborators: [],
 		publicationLinks: [],
-		defaultLanguage: 'en_ca',
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		translations: [
@@ -123,12 +117,10 @@ export const testStudyData: UpsertStudy[] = [
 		leadOrganizations: ['World Health Organization'],
 		principalInvestigators: ['Dr. Tedros'],
 		status: 'Completed',
-		acceptingApplications: false,
 		defaultTranslation: 1,
 		categoryId: null,
 		collaborators: ['CDC'],
 		publicationLinks: ['http://example.com/report2024'],
-		defaultLanguage: 'en_ca',
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		translations: [
@@ -154,12 +146,10 @@ export const testStudyData: UpsertStudy[] = [
 		leadOrganizations: ["St. Jude Children's Research Hospital"],
 		principalInvestigators: ['Dr. Phil'],
 		status: 'Ongoing',
-		acceptingApplications: true,
 		defaultTranslation: 1,
 		categoryId: null,
 		collaborators: [],
 		publicationLinks: [],
-		defaultLanguage: 'en_ca',
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		translations: [
@@ -185,12 +175,10 @@ export const testStudyData: UpsertStudy[] = [
 		leadOrganizations: ['Harvard Medical School'],
 		principalInvestigators: ['Dr. Strange'],
 		status: 'Ongoing',
-		acceptingApplications: true,
 		defaultTranslation: 1,
 		categoryId: null,
 		collaborators: ['MIT'],
 		publicationLinks: ['http://example.com/brain-study'],
-		defaultLanguage: 'en_ca',
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		translations: [

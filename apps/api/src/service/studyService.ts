@@ -26,7 +26,7 @@ import { studyTranslations } from '@/db/schemas/studyTranslationsSchema.ts';
 import { isPostgresError, PostgresErrors } from '@/db/utils.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import type { StudyDacoDTO, StudyResponse, StudyTranslationDTO, UpsertStudy } from '@pcgl-daco/data-model';
+import type { StudyClinicalDTO, StudyDacoDTO, StudyResponse, StudyTranslationDTO } from '@pcgl-daco/data-model';
 import { StudyTranslationRecord, type PostgresTransaction, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
@@ -200,7 +200,7 @@ const studySvc = (db: PostgresDb) => ({
 		studyData,
 		transaction,
 	}: {
-		studyData: UpsertStudy;
+		studyData: StudyClinicalDTO;
 		transaction?: PostgresTransaction;
 	}): AsyncResult<StudyResponse | undefined, 'DUPLICATE_RECORD' | 'SYSTEM_ERROR'> => {
 		const dbDriver = transaction ? transaction : db;
@@ -211,7 +211,6 @@ const studySvc = (db: PostgresDb) => ({
 			if (!translations) {
 				return failure(`SYSTEM_ERROR`, 'Malformed data, no existing translations are associated with this study');
 			}
-
 			// Create CTE to insert translation first
 			const insertTranslation = dbDriver.$with('insert_translation').as(
 				dbDriver

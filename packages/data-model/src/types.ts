@@ -491,11 +491,6 @@ export type StudyTranslationDTO = {
 	updatedAt?: string | Date | null;
 };
 
-export type UpsertStudy = StudyClinicalDTO & {
-	defaultLanguage: AllowedLanguagesValues;
-	acceptingApplications: boolean;
-};
-
 export type StudyResponse = {
 	translations?: StudyTranslationDTO[];
 } & StudyClinicalDTO;

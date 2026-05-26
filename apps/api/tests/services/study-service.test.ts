@@ -26,7 +26,7 @@ import { connectToDb, type PostgresDb } from '@/db/index.js';
 
 import { studySvc } from '@/service/studyService.ts';
 import { type StudyService } from '@/service/types.ts';
-import { UpsertStudy } from '@pcgl-daco/data-model';
+import { type StudyClinicalDTO } from '@pcgl-daco/data-model';
 import { addStudyAndDacUsers, initTestMigration, PG_DATABASE, PG_PASSWORD, PG_USER } from '../utils/testUtils.ts';
 
 describe('Study Service', () => {
@@ -70,7 +70,7 @@ describe('Study Service', () => {
 		});
 
 		it('should allow creating studies', async () => {
-			const testRecords: UpsertStudy = {
+			const testRecords: StudyClinicalDTO = {
 				studyId: 'study7',
 				dacId: 'dac7',
 				studyName: 'Macronutrient Study',
@@ -79,12 +79,10 @@ describe('Study Service', () => {
 				leadOrganizations: ['Mayo Clinic'],
 				principalInvestigators: ['Emeril Lagasse'],
 				status: 'Completed',
-				acceptingApplications: true,
 				defaultTranslation: 1,
 				categoryId: null,
 				collaborators: ['Canadian Cancer Society'],
 				publicationLinks: ['http://example.com/stomach-study'],
-				defaultLanguage: 'en_ca',
 				createdAt: new Date(),
 				updatedAt: new Date(),
 				translations: [
@@ -109,7 +107,7 @@ describe('Study Service', () => {
 		});
 
 		it('should updating existing studies', async () => {
-			const testRecords: UpsertStudy = {
+			const testRecords: StudyClinicalDTO = {
 				studyId: 'study7',
 				dacId: 'dac7',
 				studyName: 'Macronutrient Study',
@@ -119,8 +117,6 @@ describe('Study Service', () => {
 				principalInvestigators: ['Emeril Lagasse'],
 				status: 'Completed',
 				defaultTranslation: 1,
-				defaultLanguage: 'en_ca',
-				acceptingApplications: false,
 				categoryId: null,
 				collaborators: null,
 				createdAt: new Date(),

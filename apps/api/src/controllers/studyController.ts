@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { StudyClinicalDTO, StudyDacoDTO, UpsertStudy } from '@pcgl-daco/data-model';
+import type { StudyClinicalDTO, StudyDacoDTO } from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
@@ -101,12 +101,10 @@ export const upsertStudy = async ({
 		const studyService = studySvc(database);
 
 		for (const study of studies) {
-			const studyModel: UpsertStudy = {
+			const studyModel: StudyClinicalDTO = {
 				...study,
-				defaultLanguage: study.translations[0]?.languageId || 'en_ca',
 				createdAt: typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt,
 				updatedAt: typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt,
-				acceptingApplications: false,
 			};
 
 			const result = await studyService.createStudyFromClinical({ studyData: studyModel, transaction });
