@@ -126,7 +126,7 @@ const FooterComponent = () => {
 						</Flex>
 						<Row align={'middle'} justify={'center'} gutter={[24, 24]}>
 							{pcglLinks.map((itemLink) => (
-								<Col span={12} key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
+								<Col span={7} key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
 									<Flex justify={'flex-start'}>
 										<Link key={itemLink.name} style={{ ...linkStyle }} underline target="_blank" tabIndex={0}>
 											{itemLink.name}
