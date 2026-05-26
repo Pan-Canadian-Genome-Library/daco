@@ -596,7 +596,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	accessMiddleware({ accessConfig: { applicant: true } }),
+	accessMiddleware({ accessConfig: { applicant: true, dacChair: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,
