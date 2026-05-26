@@ -19,7 +19,7 @@
 
 import { z } from 'zod';
 
-import { ApplicationAgreements, StudyContext, StudyStatus } from '@pcgl-daco/data-model';
+import { AllowedLanguages, ApplicationAgreements, StudyContext, StudyStatus } from '@pcgl-daco/data-model';
 
 import {
 	Concise200WordCountString,
@@ -178,7 +178,6 @@ export type studySchemaType = z.infer<typeof studyModelSchema>;
 export const studyClinicalDTOSchema = z.object({
 	studyId: z.string(),
 	dacId: z.string(),
-	dacName: z.union([z.undefined(), z.string()]),
 	categoryId: z.number().nullable(),
 	studyName: z.string(),
 	status: z.nativeEnum(StudyStatus),
@@ -193,7 +192,7 @@ export const studyClinicalDTOSchema = z.object({
 	defaultTranslation: z.number().optional(),
 	translations: z.array(
 		z.object({
-			languageId: z.string(),
+			languageId: z.nativeEnum(AllowedLanguages),
 			studyDescription: z.string(),
 			programName: z.string().nullable(),
 			keywords: z.array(z.string()),
