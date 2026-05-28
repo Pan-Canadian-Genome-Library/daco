@@ -148,9 +148,10 @@ export const getUserInformation = async (
 	try {
 		const response = await fetchAuthZResource('/user/me', accessToken);
 
-		if (response.status === 204) {
-			// A "204 No content" response is returned when the user is not registered.
-			return failure('NOT_FOUND', 'Unable to retrieve user information from the PCGL AuthZ service.');
+		if (response.status === 404) {
+			// A "404 Not Found" response is returned when the user is not registered.
+			logger.warn(`[AUTHZ]: User not found in PCGL AuthZ service.`);
+			return failure('NOT_FOUND', 'User not found in PCGL AuthZ service.');
 		}
 
 		const res = await response.json();
