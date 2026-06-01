@@ -477,7 +477,7 @@ export type StudyDacoDTO = {
 	acceptingApplications: boolean;
 } & Pick<DacDTO, 'dacName'>;
 
-export type StudyClinicalDTO = Omit<StudyDacoDTO, 'acceptingApplications'>;
+export type StudyClinicalDTO = Omit<StudyDacoDTO, 'acceptingApplications'> & { translations: StudyTranslationDTO[] };
 
 export type StudyTranslationDTO = {
 	studyTranslationId?: number;
@@ -490,6 +490,10 @@ export type StudyTranslationDTO = {
 	createdAt: string | Date;
 	updatedAt?: string | Date | null;
 };
+
+export type StudyResponse = {
+	translations?: StudyTranslationDTO[];
+} & StudyClinicalDTO;
 
 export type AcceptingApplicationsResponse = {
 	studyId: string;
