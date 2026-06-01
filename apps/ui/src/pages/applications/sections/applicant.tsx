@@ -215,7 +215,7 @@ const Applicant = () => {
 								control={control}
 								rule={rule}
 								required
-								disabled={!canEdit}
+								disabled
 							/>
 						</Col>
 					</Row>
