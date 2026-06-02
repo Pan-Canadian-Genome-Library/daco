@@ -461,7 +461,7 @@ export type AllowedLanguagesValues = (typeof AllowedLanguages)[keyof typeof Allo
 
 export type StudyDacoDTO = {
 	studyId: string;
-	dacId: string;
+	dacId?: string | null;
 	studyName: string;
 	status: StudyStatusValues;
 	context: StudyContextValues;
