@@ -66,6 +66,17 @@ export const setStudyAcceptingApplications = async ({
 		const database = getDbInstance();
 		const studyService = studySvc(database);
 
+		const currentStudy = await studyService.getStudyById({ studyId });
+
+		if (!currentStudy.success) {
+			return currentStudy;
+		}
+
+		if (!currentStudy.data.dacId || currentStudy.data.dacId === null) {
+			logger.error(`Studies require an associated DAC to update accepting applications`);
+			return failure('SYSTEM_ERROR', `Cannot update accepting applications for a study without an associated DAC`);
+		}
+
 		const study = await studyService.updateStudyAcceptingApplication({ studyId, enabled });
 
 		return study;

@@ -35,6 +35,7 @@ const convertFromRecordToStudyDTO = (study: StudyRecord): StudyDacoDTO => {
 	return {
 		studyId: study.study_id,
 		dacId: study.dac_id,
+		dacName: study.dac_name,
 		studyName: study.study_name,
 		status: study.status,
 		context: study.context,
@@ -179,7 +180,7 @@ const studySvc = (db: PostgresDb) => ({
 					updatedAt: study.updated_at,
 				})
 				.from(study)
-				.innerJoin(dac, eq(dac.dac_id, study.dac_id))
+				.leftJoin(dac, eq(dac.dac_id, study.dac_id))
 				.where(studyIds ? inArray(study.study_id, studyIds) : undefined);
 
 			return success(studyRecords);
