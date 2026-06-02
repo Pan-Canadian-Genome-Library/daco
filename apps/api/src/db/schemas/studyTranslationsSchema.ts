@@ -17,22 +17,23 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { integer, pgEnum, pgTable, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { type StudyDacoDTO } from '@pcgl-daco/data-model';
-import { withErrorResponseHandler } from '../apiUtils';
+export const languages = pgEnum('languages', ['en_ca', 'fr_ca']);
 
-const useGetAllStudies = () => {
-	return useQuery<StudyDacoDTO[], ServerError>({
-		queryKey: [`all-studies`],
-		queryFn: async () => {
-			const response = await fetch(`/study`).then(withErrorResponseHandler);
-
-			return await response.json();
-		},
-	});
-};
-
-export default useGetAllStudies;
+export const studyTranslations = pgTable(
+	'study_translations',
+	{
+		study_translation_id: integer().primaryKey().generatedAlwaysAsIdentity(),
+		study_id: text().notNull(),
+		language_id: languages().notNull(),
+		study_description: text().notNull(),
+		program_name: varchar({ length: 255 }),
+		keywords: text().array(),
+		participant_criteria: text(),
+		funding_sources: text().array().notNull(),
+		created_at: timestamp().notNull().defaultNow(),
+		updated_at: timestamp(),
+	},
+	(table) => [uniqueIndex().on(table.study_id, table.language_id)],
+);
