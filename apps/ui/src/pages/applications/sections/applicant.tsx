@@ -39,6 +39,7 @@ import { PERSONAL_TITLES } from '@/global/constants';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useUserContext } from '@/providers/UserProvider';
 
 const rule = createSchemaFieldRule(applicantInformationSchema);
 
@@ -46,6 +47,7 @@ const Applicant = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const { user } = useUserContext();
 	const canEdit = canEditSection({
 		revisions,
 		section: 'applicant',
@@ -53,9 +55,9 @@ const Applicant = () => {
 		userPermissions: state.applicationUserPermissions,
 		currentApplicationState: state.applicationState,
 	});
+	const primaryEmail = user?.emails[0]?.address || '';
 
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
-
 	const {
 		formState: { isDirty },
 		getValues,
@@ -69,7 +71,7 @@ const Applicant = () => {
 			applicantLastName: state.fields.applicantLastName,
 			applicantSuffix: state.fields.applicantSuffix,
 			applicantPrimaryAffiliation: state.fields.applicantPrimaryAffiliation,
-			applicantInstituteEmail: state.fields.applicantInstitutionalEmail,
+			applicantInstituteEmail: primaryEmail,
 			applicantProfileUrl: state.fields.applicantProfileUrl,
 			applicantPositionTitle: state.fields.applicantPositionTitle,
 			applicantInstitutionState: state.fields.applicantInstitutionState,
@@ -96,7 +98,6 @@ const Applicant = () => {
 					applicantLastName: data.applicantLastName,
 					applicantSuffix: data.applicantSuffix,
 					applicantPrimaryAffiliation: data.applicantPrimaryAffiliation,
-					applicantInstitutionalEmail: data.applicantInstituteEmail,
 					applicantProfileUrl: data.applicantProfileUrl,
 					applicantPositionTitle: data.applicantPositionTitle,
 					applicantInstitutionCountry: data.applicantInstitutionCountry,
@@ -214,6 +215,7 @@ const Applicant = () => {
 								name="applicantInstituteEmail"
 								control={control}
 								rule={rule}
+								defaultValue={primaryEmail}
 								required
 								disabled
 							/>
