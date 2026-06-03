@@ -319,6 +319,23 @@ describe('Application Service', () => {
 			assert.strictEqual(application?.user_id, user_id);
 			assert.strictEqual(application?.state, ApplicationStates.DRAFT);
 		});
+
+		it('should create Application Contents and populate applicant email ', async () => {
+			const applicationResult = await testApplicationService.createApplication({
+				user_id,
+				applicant_institutional_email: user_id,
+			});
+
+			assert.ok(applicationResult.success && applicationResult.data);
+
+			const application = applicationResult.data;
+			const { id } = application;
+
+			const contentsResult = await testApplicationService.getApplicationWithContents({ id });
+
+			assert.ok(contentsResult.success && contentsResult.data);
+			assert.strictEqual(contentsResult.data.contents?.applicant_institutional_email, user_id);
+		});
 	});
 
 	describe('FindOneAndUpdate Application', () => {
