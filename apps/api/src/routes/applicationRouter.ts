@@ -75,10 +75,12 @@ applicationRouter.post(
 	'/create',
 	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
-		if (user) {
-			const { userId } = user;
 
-			const result = await createApplication({ user_id: userId });
+		if (user) {
+			const { userId, emails } = user;
+			const applicantPrimaryEmail = emails[0]?.address;
+
+			const result = await createApplication({ user_id: userId, applicant_institutional_email: applicantPrimaryEmail });
 
 			if (result.success) {
 				response.status(201).json(result.data);
