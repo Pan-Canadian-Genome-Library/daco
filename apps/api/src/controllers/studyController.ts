@@ -119,7 +119,7 @@ export const upsertStudy = async ({
 		}
 
 		const studiesToRemove = allStudiesFromDACO.data.filter(
-			(study) => !studies.some((s) => s.studyId === study.studyId),
+			(study) => !studies.some((currentStudy) => currentStudy.studyId === study.studyId),
 		);
 		if (studiesToRemove.length > 0) {
 			logger.warn('Some studies have been removed', studiesToRemove);
