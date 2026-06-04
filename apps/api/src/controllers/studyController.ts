@@ -122,7 +122,9 @@ export const upsertStudy = async ({
 			(study) => !studies.some((currentStudy) => currentStudy.studyId === study.studyId),
 		);
 		if (studiesToRemove.length > 0) {
-			logger.warn('Some studies have been removed', studiesToRemove);
+			logger.warn(
+				'Studies have been removed from clinical submission, start removing the missing studies from clinical in DACO.',
+			);
 			for (const study of studiesToRemove) {
 				const deleteResult = await studyService.deleteStudy({ studyId: study.studyId, transaction });
 				if (!deleteResult.success || !deleteResult.data) {
