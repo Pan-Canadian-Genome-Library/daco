@@ -65,6 +65,7 @@ import { isAssociatedRep, isUserDacChair, isUserDacMember } from '@/service/auth
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { authErrorResponseHandler, authFailure, getAuthorizedDacIds, getUserName } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
+import { failure } from '@/utils/results.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
 
@@ -78,7 +79,15 @@ applicationRouter.post(
 
 		if (user) {
 			const { userId, emails } = user;
-			const applicantPrimaryEmail = emails[0]?.address;
+			const applicantPrimaryEmail = emails.find((record) => record.type === 'official')?.address || emails[0]?.address;
+
+			if (!applicantPrimaryEmail) {
+				authErrorResponseHandler(
+					response,
+					failure('NOT_FOUND', 'No primary email address provided, cannot create Application.'),
+				);
+				return;
+			}
 
 			const result = await createApplication({ user_id: userId, applicant_institutional_email: applicantPrimaryEmail });
 
