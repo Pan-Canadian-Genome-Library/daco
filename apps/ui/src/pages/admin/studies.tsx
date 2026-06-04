@@ -44,6 +44,14 @@ const AdminStudiesPage = () => {
 			render: (name: string) => <Text strong>{name}</Text>,
 		},
 		{
+			key: 'dacId',
+			title: 'DAC ID',
+			dataIndex: 'dacId',
+			width: 150,
+			align: 'center',
+			render: (dacId: string | null) => <Text type={!dacId ? 'secondary' : undefined}>{dacId || 'N/A'}</Text>,
+		},
+		{
 			key: 'status',
 			title: 'Status',
 			dataIndex: 'acceptingApplications',
@@ -70,6 +78,7 @@ const AdminStudiesPage = () => {
 			align: 'center',
 			render: (_, record) => {
 				const isAccepting = record.acceptingApplications;
+				const hasDacId = !!record.dacId;
 				return (
 					<Button
 						onClick={() => {
@@ -78,6 +87,7 @@ const AdminStudiesPage = () => {
 						color={isAccepting ? 'danger' : 'green'}
 						variant="outlined"
 						style={{ width: '150px' }}
+						disabled={!hasDacId}
 					>
 						{isAccepting ? 'Deactivate' : 'Activate'}
 					</Button>

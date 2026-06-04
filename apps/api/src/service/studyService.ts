@@ -35,6 +35,7 @@ const convertFromRecordToStudyDTO = (study: StudyRecord): StudyDacoDTO => {
 	return {
 		studyId: study.study_id,
 		dacId: study.dac_id,
+		dacName: study.dac_name,
 		studyName: study.study_name,
 		status: study.status,
 		context: study.context,
@@ -179,7 +180,7 @@ const studySvc = (db: PostgresDb) => ({
 					updatedAt: study.updated_at,
 				})
 				.from(study)
-				.innerJoin(dac, eq(dac.dac_id, study.dac_id))
+				.leftJoin(dac, eq(dac.dac_id, study.dac_id))
 				.where(studyIds ? inArray(study.study_id, studyIds) : undefined);
 
 			return success(studyRecords);
@@ -305,6 +306,35 @@ const studySvc = (db: PostgresDb) => ({
 				default:
 					return failure('SYSTEM_ERROR', 'Something went wrong while creating a new study. Please try again later.');
 			}
+		}
+	},
+	deleteStudy: async ({
+		studyId,
+		transaction,
+	}: {
+		studyId: string;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<string, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const dbDriver = transaction ? transaction : db;
+			const result = await dbDriver.delete(study).where(eq(study.study_id, studyId)).returning();
+
+			if (!result[0]) {
+				return failure('NOT_FOUND', 'Study not found');
+			}
+
+			const resultTranslations = await dbDriver
+				.delete(studyTranslations)
+				.where(eq(studyTranslations.study_id, studyId));
+
+			if (resultTranslations.rowCount === 0) {
+				return failure('NOT_FOUND', 'Study translations not found');
+			}
+
+			return success('Study deleted successfully');
+		} catch (error) {
+			logger.error(error, 'Error at deleteStudy in StudyService');
+			return failure('SYSTEM_ERROR', 'Something went wrong while deleting the study. Please try again later.');
 		}
 	},
 });
