@@ -461,7 +461,7 @@ export type AllowedLanguagesValues = (typeof AllowedLanguages)[keyof typeof Allo
 
 export type StudyDacoDTO = {
 	studyId: string;
-	dacId: string;
+	dacId?: string | null;
 	studyName: string;
 	status: StudyStatusValues;
 	context: StudyContextValues;
@@ -475,7 +475,7 @@ export type StudyDacoDTO = {
 	categoryId?: number | null;
 	defaultTranslation?: number;
 	acceptingApplications: boolean;
-} & Pick<DacDTO, 'dacName'>;
+} & { dacName?: DacDTO['dacName'] | null };
 
 export type StudyClinicalDTO = Omit<StudyDacoDTO, 'acceptingApplications'> & { translations: StudyTranslationDTO[] };
 
