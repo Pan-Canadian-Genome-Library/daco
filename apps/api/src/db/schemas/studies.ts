@@ -30,7 +30,7 @@ export const study = pgTable(
 	'study',
 	{
 		study_id: text().primaryKey().notNull(),
-		dac_id: text().notNull(),
+		dac_id: text(),
 		default_translation: integer().notNull(),
 		study_name: varchar({ length: 255 }).notNull(),
 		status: studyStatus().notNull(),
