@@ -30,8 +30,8 @@ import { applicationActions } from '@/db/schemas/applicationActions.ts';
 import { applicationContents } from '@/db/schemas/applicationContents.js';
 import { applications } from '@/db/schemas/applications.js';
 import { dac } from '@/db/schemas/dac.ts';
-import { study } from '@/db/schemas/studies.ts';
 import BaseLogger from '@/logger.js';
+import { studySvc } from '@/service/studyService.ts';
 import { type ApplicationActionModel, type ApplicationModel, type ApplicationService } from '@/service/types.ts';
 import { ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model';
 import { actionArray } from './mock/action-data.ts';
@@ -118,8 +118,9 @@ export const addEmailReminderActions = addTestActions(emailActionArray);
  * Create test data for study and dac users
  */
 export const addStudyAndDacUsers = async (db: PostgresDb) => {
+	const service = studySvc(db);
 	await Promise.all(testDacUsersData.map((user) => db.insert(dac).values(user)));
-	await Promise.all(testStudyData.map((currentStudy) => db.insert(study).values(currentStudy)));
+	await Promise.all(testStudyData.map((currentStudy) => service.createStudyFromClinical({ studyData: currentStudy })));
 };
 
 /** Create additional 20 Applications to test paginated results */

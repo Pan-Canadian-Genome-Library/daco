@@ -17,27 +17,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { StudyClinicalDTO, StudyDTO } from '@pcgl-daco/data-model';
+import type { StudyClinicalDTO, StudyDacoDTO } from '@pcgl-daco/data-model';
 
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
 import { studySvc } from '@/service/studyService.ts';
-import { type PostgresTransaction, type StudyRecord } from '@/service/types.ts';
-import { convertToStudyUpdateRecord } from '@/utils/aliases.ts';
-import { failure, type AsyncResult } from '@/utils/results.ts';
+import { type PostgresTransaction } from '@/service/types.ts';
+import { failure, success, type AsyncResult } from '@/utils/results.ts';
 
 const logger = BaseLogger.forModule('studyController');
 
 /**
  * Gets a study.
  * @param studyId - The study ID
- * @returns {StudyDTO} - The study data
+ * @returns {StudyDacoDTO} - The study data
  */
 export const getStudyById = async ({
 	studyId,
 }: {
 	studyId: string;
-}): AsyncResult<StudyDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<StudyDacoDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
@@ -62,10 +61,21 @@ export const setStudyAcceptingApplications = async ({
 }: {
 	studyId: string;
 	enabled: boolean;
-}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<Pick<StudyDacoDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
+
+		const currentStudy = await studyService.getStudyById({ studyId });
+
+		if (!currentStudy.success) {
+			return currentStudy;
+		}
+
+		if (!currentStudy.data.dacId || currentStudy.data.dacId === null) {
+			logger.error(`Studies require an associated DAC to update accepting applications`);
+			return failure('SYSTEM_ERROR', `Cannot update accepting applications for a study without an associated DAC`);
+		}
 
 		const study = await studyService.updateStudyAcceptingApplication({ studyId, enabled });
 
@@ -77,9 +87,9 @@ export const setStudyAcceptingApplications = async ({
 
 /**
  * Returns all studies.
- * @returns {StudyDTO[]}
+ * @returns {StudyDacoDTO[]}
  */
-export const getAllStudies = async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+export const getAllStudies = async (): AsyncResult<StudyDacoDTO[], 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
@@ -90,37 +100,54 @@ export const getAllStudies = async (): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> =
 		return failure('SYSTEM_ERROR', `Unexpected error fetching studies`);
 	}
 };
-/*
- * Inserts & Updates Multiple Study Records
- * @param studies - An array of Study DTO objects from the Submission Service
- * @returns
- */
-export const updateStudies = async ({
+export const upsertStudy = async ({
 	studies,
 	transaction,
 }: {
 	studies: StudyClinicalDTO[];
 	transaction?: PostgresTransaction;
-}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+}): AsyncResult<string, 'SYSTEM_ERROR'> => {
 	try {
 		const database = getDbInstance();
 		const studyService = studySvc(database);
 
-		const studyData = studies.map((study) => {
-			const createdDate = typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt;
-			const updatedDate = typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt;
+		// Check if any studies have been removed from clinical submission then delete them from the database
+		const allStudiesFromDACO = await studyService.getAllStudies({});
+		if (!allStudiesFromDACO.success) {
+			logger.error('Failed to fetch all studies to verify if any have been removed', allStudiesFromDACO.message);
+			return failure('SYSTEM_ERROR', 'Failed to upsert studies from clinical.');
+		}
 
-			const studyModel = { ...study, createdAt: createdDate, updatedAt: updatedDate, acceptingApplications: false };
-			const updatedRecordResult = convertToStudyUpdateRecord(studyModel);
-			if (updatedRecordResult.success) {
-				return updatedRecordResult.data;
+		const studiesToRemove = allStudiesFromDACO.data.filter(
+			(study) => !studies.some((currentStudy) => currentStudy.studyId === study.studyId),
+		);
+		if (studiesToRemove.length > 0) {
+			logger.warn(
+				'Studies have been removed from clinical submission, start removing the missing studies from clinical in DACO.',
+			);
+			for (const study of studiesToRemove) {
+				const deleteResult = await studyService.deleteStudy({ studyId: study.studyId, transaction });
+				if (!deleteResult.success || !deleteResult.data) {
+					return failure('SYSTEM_ERROR', 'Failed to sync studies');
+				}
 			}
-			throw new Error(updatedRecordResult.message);
-		});
+		}
 
-		const updatedStudies = await studyService.updateStudies({ studyData, transaction });
+		for (const study of studies) {
+			const studyModel: StudyClinicalDTO = {
+				...study,
+				createdAt: typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt,
+				updatedAt: typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt,
+			};
 
-		return updatedStudies;
+			const result = await studyService.createStudyFromClinical({ studyData: studyModel, transaction });
+
+			if (!result.success || !result.data) {
+				return failure('SYSTEM_ERROR', 'Failed to sync studies');
+			}
+		}
+
+		return success('Success');
 	} catch (error) {
 		logger.error(error);
 		return failure('SYSTEM_ERROR', `Unexpected error fetching updated studies`);

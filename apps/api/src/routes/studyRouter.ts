@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { AcceptingApplicationsResponse, StudyDTO } from '@pcgl-daco/data-model';
+import type { AcceptingApplicationsResponse, StudyDacoDTO } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
 	activateBodyParamSchema,
@@ -33,7 +33,7 @@ import {
 	getAllStudies,
 	getStudyById,
 	setStudyAcceptingApplications,
-	updateStudies,
+	upsertStudy,
 } from '@/controllers/studyController.ts';
 import { getDbInstance } from '@/db/index.js';
 import BaseLogger from '@/logger.js';
@@ -101,13 +101,10 @@ studyRouter.get(
 			}
 
 			const studyData = parsedStudyData.data;
-			const updatedStudiesResult = await updateStudies({ studies: studyData, transaction: tx });
+			const updatedStudiesResult = await upsertStudy({ studies: studyData, transaction: tx });
 
 			if (!updatedStudiesResult.success) {
 				switch (updatedStudiesResult.error) {
-					case 'NOT_FOUND':
-						response.status(404).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
-						break;
 					case 'SYSTEM_ERROR':
 						response.status(500).json({ error: updatedStudiesResult.error, message: updatedStudiesResult.message });
 						break;
@@ -135,7 +132,7 @@ studyRouter.get(
 	withParamsSchemaValidation(
 		basicStudyParamSchema,
 		apiZodErrorMapping,
-		async (request, response: ResponseWithData<StudyDTO, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
+		async (request, response: ResponseWithData<StudyDacoDTO, ['SYSTEM_ERROR', 'NOT_FOUND']>) => {
 			const studyId = String(request.params.studyId);
 
 			const result = await getStudyById({ studyId });
@@ -200,7 +197,7 @@ studyRouter.patch(
 /*
  * Get all studies
  */
-studyRouter.get('/', async (_, response: ResponseWithData<StudyDTO[], ['SYSTEM_ERROR']>) => {
+studyRouter.get('/', async (_, response: ResponseWithData<StudyDacoDTO[], ['SYSTEM_ERROR']>) => {
 	const result = await getAllStudies();
 
 	if (!result.success) {

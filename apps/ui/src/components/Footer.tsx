@@ -82,13 +82,13 @@ const FooterComponent = () => {
 	};
 
 	const footerStyle: React.CSSProperties = {
+		alignItems: 'center',
 		display: 'flex',
 		flexDirection: breakpoints.lg ? 'row' : 'column',
-		justifyItems: 'center',
-		width: '100%',
-		alignItems: 'center',
-		padding: breakpoints.lg ? token.Layout?.footerPadding : `2rem 1.75rem`,
 		gap: breakpoints.lg ? '0rem' : token.paddingXL,
+		justifyItems: 'center',
+		padding: breakpoints.lg ? token.Layout?.footerPadding : `2rem 1.75rem`,
+		width: '100%',
 	};
 
 	const logoStyles: React.CSSProperties = {
@@ -110,10 +110,10 @@ const FooterComponent = () => {
 					<Flex justify="space-around" style={{ width: '100%' }} gap={30}>
 						<Flex vertical style={{ width: '100%' }}>
 							<Flex justify={'start'} gap={'40px'}>
-								<Link target="_blank" style={logoStyles}>
+								<Link target="_blank" style={logoStyles} tabIndex={0}>
 									<Image width={200} src={PCGL_FOOTER} preview={false} alt={translate('global.PCGL')} />
 								</Link>
-								<Link target="_blank" style={logoStyles}>
+								<Link target="_blank" style={logoStyles} tabIndex={0}>
 									<Image width={200} src={PCGL_FOOTER_CIHR} preview={false} alt={translate('global.CIHR')} />
 								</Link>
 							</Flex>
@@ -126,9 +126,9 @@ const FooterComponent = () => {
 						</Flex>
 						<Row align={'middle'} justify={'center'} gutter={[24, 24]}>
 							{pcglLinks.map((itemLink) => (
-								<Col span={12} key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
+								<Col span={7} key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
 									<Flex justify={'flex-start'}>
-										<Link key={itemLink.name} style={{ ...linkStyle }} underline target="_blank">
+										<Link key={itemLink.name} style={{ ...linkStyle }} underline target="_blank" tabIndex={0}>
 											{itemLink.name}
 										</Link>
 									</Flex>

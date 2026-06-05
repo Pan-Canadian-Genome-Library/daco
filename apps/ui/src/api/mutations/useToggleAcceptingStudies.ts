@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { AcceptingApplicationsResponse, StudyDTO } from '@pcgl-daco/data-model';
+import type { AcceptingApplicationsResponse, StudyDacoDTO } from '@pcgl-daco/data-model';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
@@ -48,10 +48,10 @@ const useToggleAccptingStudies = () => {
 			return await response.json();
 		},
 		onSuccess: (data) => {
-			const currentStudies = queryClient.getQueryData<StudyDTO[]>([`all-studies`]);
+			const currentStudies = queryClient.getQueryData<StudyDacoDTO[]>([`all-studies`]);
 
 			if (currentStudies) {
-				queryClient.setQueryData<StudyDTO[]>(
+				queryClient.setQueryData<StudyDacoDTO[]>(
 					['all-studies'],
 					currentStudies.map((study) =>
 						study.studyId === data.studyId ? { ...study, acceptingApplications: data.acceptingApplications } : study,

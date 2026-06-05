@@ -22,19 +22,81 @@ import { eq, inArray, sql } from 'drizzle-orm';
 import { type PostgresDb } from '@/db/index.js';
 import { dac } from '@/db/schemas/dac.ts';
 import { study } from '@/db/schemas/studies.ts';
+import { studyTranslations } from '@/db/schemas/studyTranslationsSchema.ts';
+import { isPostgresError, PostgresErrors } from '@/db/utils.ts';
 import BaseLogger from '@/logger.ts';
 import { failure, success, type AsyncResult } from '@/utils/results.js';
-import { type StudyDTO } from '@pcgl-daco/data-model';
-import { type PostgresTransaction, type StudyModel, type StudyRecord } from './types.ts';
+import type { StudyClinicalDTO, StudyDacoDTO, StudyResponse, StudyTranslationDTO } from '@pcgl-daco/data-model';
+import { StudyTranslationRecord, type PostgresTransaction, type StudyRecord } from './types.ts';
 
 const logger = BaseLogger.forModule('studyService');
+
+const convertFromRecordToStudyDTO = (study: StudyRecord): StudyDacoDTO => {
+	return {
+		studyId: study.study_id,
+		dacId: study.dac_id,
+		dacName: study.dac_name,
+		studyName: study.study_name,
+		status: study.status,
+		context: study.context,
+		domain: study.domain,
+		principalInvestigators: study.principal_investigators,
+		leadOrganizations: study.lead_organizations,
+		collaborators: study.collaborators,
+		publicationLinks: study.publication_links,
+		defaultTranslation: study.default_translation,
+		acceptingApplications: study.accepting_applications,
+		createdAt: study.created_at,
+		updatedAt: study.updated_at,
+		categoryId: study.category_id,
+	};
+};
+
+const convertStudyTranslations = (translations: StudyTranslationRecord[]): StudyTranslationDTO[] => {
+	return translations.map((translation) => ({
+		languageId: translation.language_id,
+		studyDescription: translation.study_description,
+		fundingSources: translation.funding_sources,
+		keywords: translation.keywords,
+		participantCriteria: translation.participant_criteria,
+		programName: translation.program_name,
+		createdAt: translation.created_at,
+		updatedAt: translation.updated_at,
+	}));
+};
+
+/*
+ * Converts a StudyRecord from the database into a StudyResponse DTO
+ * with associated translations.
+ * @param study - The StudyRecord to convert
+ * @param db - The database connection or transaction
+ * @returns A StudyResponse DTO with translations appended
+ */
+const convertFromRecordToStudyResponse = async (
+	study: StudyRecord,
+	db: PostgresTransaction | PostgresDb,
+): Promise<StudyResponse> => {
+	// Format return object
+	const result = await db.select().from(studyTranslations).where(eq(studyTranslations.study_id, study.study_id));
+	let resultTranslations: StudyTranslationDTO[] = [];
+
+	// Group translations into an array
+	if (result.length > 0 && result[0]) {
+		resultTranslations = convertStudyTranslations(result);
+	}
+
+	return {
+		...convertFromRecordToStudyDTO(study),
+		translations: resultTranslations,
+	};
+};
 
 /**
  * Study service provides methods for study DB access
  * @param db - Drizzle Postgres DB Instance
  */
 const studySvc = (db: PostgresDb) => ({
-	getStudyById: async ({ studyId }: { studyId: string }): AsyncResult<StudyDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	getStudyById: async ({ studyId }: { studyId: string }): AsyncResult<StudyDacoDTO, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecord = await db
 				.select({
@@ -43,17 +105,12 @@ const studySvc = (db: PostgresDb) => ({
 					dacName: dac.dac_name,
 					categoryId: study.category_id,
 					studyName: study.study_name,
-					studyDescription: study.study_description,
-					programName: study.program_name,
-					keywords: study.keywords,
 					status: study.status,
 					context: study.context,
 					domain: study.domain,
-					participantCriteria: study.participant_criteria,
 					principalInvestigators: study.principal_investigators,
 					leadOrganizations: study.lead_organizations,
 					collaborators: study.collaborators,
-					fundingSources: study.funding_sources,
 					publicationLinks: study.publication_links,
 					acceptingApplications: study.accepting_applications,
 					createdAt: study.created_at,
@@ -82,11 +139,11 @@ const studySvc = (db: PostgresDb) => ({
 	}: {
 		studyId: string;
 		enabled: boolean;
-	}): AsyncResult<Pick<StudyDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	}): AsyncResult<Pick<StudyDacoDTO, 'acceptingApplications'>, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecord = await db
 				.update(study)
-				.set({ accepting_applications: enabled })
+				.set({ accepting_applications: enabled, updated_at: sql`CURRENT_TIMESTAMP` })
 				.where(eq(study.study_id, studyId))
 				.returning({
 					acceptingApplications: study.accepting_applications,
@@ -102,7 +159,7 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	getAllStudies: async ({ studyIds }: { studyIds?: string[] }): AsyncResult<StudyDTO[], 'SYSTEM_ERROR'> => {
+	getAllStudies: async ({ studyIds }: { studyIds?: string[] }): AsyncResult<StudyDacoDTO[], 'SYSTEM_ERROR'> => {
 		try {
 			const studyRecords = await db
 				.select({
@@ -111,24 +168,19 @@ const studySvc = (db: PostgresDb) => ({
 					dacName: dac.dac_name,
 					categoryId: study.category_id,
 					studyName: study.study_name,
-					studyDescription: study.study_description,
-					programName: study.program_name,
-					keywords: study.keywords,
 					status: study.status,
 					context: study.context,
 					domain: study.domain,
-					participantCriteria: study.participant_criteria,
 					principalInvestigators: study.principal_investigators,
 					leadOrganizations: study.lead_organizations,
 					collaborators: study.collaborators,
-					fundingSources: study.funding_sources,
 					publicationLinks: study.publication_links,
 					acceptingApplications: study.accepting_applications,
 					createdAt: study.created_at,
 					updatedAt: study.updated_at,
 				})
 				.from(study)
-				.innerJoin(dac, eq(dac.dac_id, study.dac_id))
+				.leftJoin(dac, eq(dac.dac_id, study.dac_id))
 				.where(studyIds ? inArray(study.study_id, studyIds) : undefined);
 
 			return success(studyRecords);
@@ -139,51 +191,150 @@ const studySvc = (db: PostgresDb) => ({
 			return failure('SYSTEM_ERROR', message);
 		}
 	},
-	updateStudies: async ({
+	/*
+	 * Create a new study
+	 * @param studyData - The study data to create
+	 * @param transaction - Optional transaction object
+	 * @returns The created study or undefined if creation fails, will throw bad request in controller
+	 */
+	createStudyFromClinical: async ({
 		studyData,
 		transaction,
 	}: {
-		studyData: StudyModel[];
+		studyData: StudyClinicalDTO;
 		transaction?: PostgresTransaction;
-	}): AsyncResult<StudyRecord[], 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+	}): AsyncResult<StudyResponse | undefined, 'DUPLICATE_RECORD' | 'SYSTEM_ERROR'> => {
+		const dbDriver = transaction ? transaction : db;
+
 		try {
-			const dbTransaction = transaction ? transaction : db;
-			const studyRecords = await dbTransaction
+			const translations = studyData.translations[0];
+
+			if (!translations) {
+				return failure(`SYSTEM_ERROR`, 'Malformed data, no existing translations are associated with this study');
+			}
+			// Create CTE to insert translation first
+			const insertTranslation = dbDriver.$with('insert_translation').as(
+				dbDriver
+					.insert(studyTranslations)
+					.values(
+						studyData.translations.map((translation) => {
+							return {
+								study_id: studyData.studyId,
+								language_id: translation.languageId,
+								study_description: translation.studyDescription,
+								program_name: translation.programName,
+								keywords: translation.keywords,
+								participant_criteria: translation.participantCriteria,
+								funding_sources: translation.fundingSources,
+							};
+						}),
+					)
+					.onConflictDoUpdate({
+						target: [studyTranslations.study_id, studyTranslations.language_id],
+						set: {
+							study_description: sql`EXCLUDED.study_description`,
+							program_name: sql`EXCLUDED.program_name`,
+							keywords: sql`EXCLUDED.keywords`,
+							participant_criteria: sql`EXCLUDED.participant_criteria`,
+							funding_sources: sql`EXCLUDED.funding_sources`,
+							updated_at: sql`CURRENT_TIMESTAMP`,
+						},
+					})
+					.returning(),
+			);
+
+			// Insert study using the translation_id from the CTE
+			const studyResult = await dbDriver
+				.with(insertTranslation)
 				.insert(study)
-				.values(studyData)
+				.values({
+					study_id: sql`(SELECT study_id FROM ${insertTranslation} LIMIT 1)`,
+					default_translation: sql`(SELECT study_translation_id FROM ${insertTranslation} LIMIT 1)`,
+					dac_id: studyData.dacId,
+					study_name: studyData.studyName,
+					status: studyData.status,
+					context: studyData.context,
+					domain: studyData.domain.map((domains) => domains.toUpperCase()),
+					principal_investigators: studyData.principalInvestigators,
+					lead_organizations: studyData.leadOrganizations,
+					collaborators: studyData.collaborators,
+					category_id: studyData.categoryId,
+					publication_links: studyData.publicationLinks,
+				})
 				.onConflictDoUpdate({
 					target: study.study_id,
 					set: {
 						dac_id: sql`EXCLUDED.dac_id`,
 						study_name: sql`EXCLUDED.study_name`,
-						study_description: sql`EXCLUDED.study_description`,
 						status: sql`EXCLUDED.status`,
 						context: sql`EXCLUDED.context`,
 						domain: sql`EXCLUDED.domain`,
 						principal_investigators: sql`EXCLUDED.principal_investigators`,
 						lead_organizations: sql`EXCLUDED.lead_organizations`,
-						funding_sources: sql`EXCLUDED.funding_sources`,
 						dac_name: sql`EXCLUDED.dac_name`,
-						program_name: sql`EXCLUDED.program_name`,
-						keywords: sql`EXCLUDED.keywords`,
-						participant_criteria: sql`EXCLUDED.participant_criteria`,
 						collaborators: sql`EXCLUDED.collaborators`,
-						publication_links: sql`EXCLUDED.publication_links`,
-						updated_at: sql`EXCLUDED.updated_at`,
 						category_id: sql`EXCLUDED.category_id`,
+						publication_links: sql`EXCLUDED.publication_links`,
+						updated_at: sql`CURRENT_TIMESTAMP`,
 					},
 				})
 				.returning();
 
-			if (!studyRecords[0]) {
-				return failure('NOT_FOUND', `Unable to update study records.`);
+			if (!studyResult[0]) {
+				logger.error(`No results returned from the insertTranslation CTE for study ${studyData.studyName}`);
+				throw new Error();
 			}
 
-			return success(studyRecords);
+			const returnResult = await convertFromRecordToStudyResponse(studyResult[0], dbDriver);
+
+			return success(returnResult);
 		} catch (error) {
-			const message = 'Error at updateStudies';
-			logger.error(message, error);
-			return failure('SYSTEM_ERROR', message);
+			logger.error(error, 'Error at createStudy in StudyService');
+			const postgresError = isPostgresError(error);
+
+			switch (postgresError?.code) {
+				case PostgresErrors.UNIQUE_KEY_VIOLATION:
+					return failure(
+						'DUPLICATE_RECORD',
+						`${studyData.studyName} already exists in studies. Study name must be unique.`,
+					);
+				case PostgresErrors.FOREIGN_KEY_VIOLATION:
+					return failure(
+						'SYSTEM_ERROR',
+						`${studyData.dacId} does not appear to be a valid DAC ID, please ensure this DAC record exists prior to creating a study.`,
+					);
+				default:
+					return failure('SYSTEM_ERROR', 'Something went wrong while creating a new study. Please try again later.');
+			}
+		}
+	},
+	deleteStudy: async ({
+		studyId,
+		transaction,
+	}: {
+		studyId: string;
+		transaction?: PostgresTransaction;
+	}): AsyncResult<string, 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
+		try {
+			const dbDriver = transaction ? transaction : db;
+			const result = await dbDriver.delete(study).where(eq(study.study_id, studyId)).returning();
+
+			if (!result[0]) {
+				return failure('NOT_FOUND', 'Study not found');
+			}
+
+			const resultTranslations = await dbDriver
+				.delete(studyTranslations)
+				.where(eq(studyTranslations.study_id, studyId));
+
+			if (resultTranslations.rowCount === 0) {
+				return failure('NOT_FOUND', 'Study translations not found');
+			}
+
+			return success('Study deleted successfully');
+		} catch (error) {
+			logger.error(error, 'Error at deleteStudy in StudyService');
+			return failure('SYSTEM_ERROR', 'Something went wrong while deleting the study. Please try again later.');
 		}
 	},
 });
