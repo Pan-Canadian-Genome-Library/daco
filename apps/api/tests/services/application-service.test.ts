@@ -323,7 +323,7 @@ describe('Application Service', () => {
 		it('should create Application Contents and populate applicant email ', async () => {
 			const applicationResult = await testApplicationService.createApplication({
 				user_id,
-				applicant_institutional_email: user_id,
+				applicant_institutional_email: 'testUser@oicr.on.ca',
 			});
 
 			assert.ok(applicationResult.success && applicationResult.data);

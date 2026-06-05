@@ -77,7 +77,7 @@ export const createApplication = async ({
 	applicant_institutional_email,
 }: {
 	user_id: string;
-	applicant_institutional_email?: string;
+	applicant_institutional_email: string;
 }): AsyncResult<ApplicationDTO> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
