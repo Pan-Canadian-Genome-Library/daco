@@ -40,7 +40,7 @@ export const GenerateEmailInstitutionalRepReview = ({
                     We hope this message finds you well.
                 </mj-text>
                 <mj-text>
-                   <b>${applicantName} has identified you as the Institutional Representative of their&nbsp;<a href="${ui}/application/${id}" target="_blank" rel="nofollow">PCGL DACO application</a>. The application has been submitted and is now awaiting your review.</b> Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
+                   <b>${applicantName} has identified you as the institutional representative of a PCGL DACO application. The application has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
                 </mj-text>
                 <mj-text>
                     Here are the details of the application:
@@ -62,16 +62,27 @@ export const GenerateEmailInstitutionalRepReview = ({
                     Action Required
                 </mj-text>
                 <mj-text>
-                    Please carefully review the application. There are two ways to do so, you can review using the <a href="${ui}" target="_blank" rel="nofollow">DACO Portal</a>, or download the application PDF from the 'Sign & Submit' page.
+                    Please carefully review the application. There are two ways to do so, you can review using the DACO Portal, or download the application PDF from the 'Sign & Submit' page.
                 </mj-text>
                 <mj-text>
-                    If you are satisfied with the details, proceed to the 'Sign & Submit' page' provide your e-signature, and click on the 'Submit Application' button to complete the review. The application will be forwarded to the Data Access Committee for further review. The applicant will receive an email notification regarding your submission.
+                    If you are satisfied with the details, proceed to the 'Sign & Submit' page, provide your e-signature, and click on the 'Submit Application' button to complete the review. The application will be forwarded to the Data Access Committee for further review. The applicant will receive an email notification regarding your submission.
                 </mj-text>
                 <mj-text>
-                    If you are not satisfied with the application and would like to request revisions, click the 'Request Revisions' button. A window will open where you can enter requests. When you are done, click the 'Send Request' button to complete the review. Please do not submit the application if you requested revisions. The applicant will receive an email notification about your requests and comments, and they will update the application based on your feedback. DACO will notify you when the application is re-submitted for your review.
+                    If you are not satisfied with the application and would like to request revisions, click the 'Request Revisions' button. A window will open where you can enter requests. When you are done, click the 'Send Request' button to complete the review. Please <b>do not</b> submit the application if you requested revisions. The applicant will receive an email notification about your requests and comments, and they will update the application based on your feedback. DACO will notify you when the application is re-submitted for your review.
                 </mj-text>
                 <mj-text>
-                    Please access the application through <a href="${ui}" target="_blank" rel="nofollow">DACO Portal</a> at your earliest convenience. If you encounter any issues or have questions, feel free to reach out, and we would be happy to assist.
+                    To access the application, please:
+                    <ol>
+                        <li>
+                            Register or login to the PCGL DACO Portal.
+                        </li>
+                        <li>
+                            Use this link to access the application.
+                        </li>
+                    </ol>
+                </mj-text>
+                <mj-text>
+                    If you encounter any issues or have questions, feel free to reach out, and we would be happy to assist.
                 </mj-text>
                 <mj-text>
                     Best regards,<br />
@@ -142,17 +153,19 @@ export const GenerateEmailInstitutionalRepReviewPlain = ({
 
 	return ` Dear ${repName},
     \n We hope this message finds you well.
-    \n ${applicantName} has identified you as the Institutional Representative of their PCGL DACO application. The application has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
+    \n ${applicantName} has identified you as the institutional representative of a PCGL DACO application. The application has been submitted and is now awaiting your review. Please login to the DACO portal using your institutional email and review the application. Your timely input and approval are essential for the next steps in the process.
     \n Here are the details of the application:
     \n Applicant Name: ${applicantName}
     \n Application ID: ${id}
     \n Submission Date: ${submittedDate}
     \n\n Action Required
     \n Please carefully review the application. There are two ways to do so, you can review using the ${ui}, or download the application PDF from the 'Sign & Submit' page.
-    \n If you are satisfied with the details, proceed to the 'Sign & Submit' page' provide your e-signature, and click on the 'Submit Application' button to complete the review. The application will be forwarded to the Data Access Committee for further review. The applicant will receive an email notification regarding your submission.
-    \n If you are not satisfied with the application and would like to request revisions, click the 'Request Revisions' button. A window will open where you can enter requests. When you are done, click the 'Send Request' button to complete the review. Please do not submit the application if you requested revisions. The applicant will receive an email notification about your requests and comments, and they will update the application based on your feedback. DACO will notify you when the application is re-submitted for your review.
-    \n Should you have any questions or need assistance, feel free to reach out to us.
-    \n Please access the application through ${ui} at your earliest convenience. If you encounter any issues or have questions, feel free to reach out, and we would be happy to assist.
+    \n If you are satisfied with the details, proceed to the 'Sign & Submit' page, provide your e-signature, and click on the 'Submit Application' button to complete the review. The application will be forwarded to the Data Access Committee for further review. The applicant will receive an email notification regarding your submission.
+    \n If you are not satisfied with the application and would like to request revisions, click the ‘Request Revisions’ button. A window will open where you can enter requests. When you are done, click the ‘Send Request’ button to complete the review. Please do not submit the application if you requested revisions. The applicant will receive an email notification about your requests and comments, and they will update the application based on your feedback. DACO will notify you when the application is re-submitted for your review.
+    \n To access the application, please:
+    \n  1. Register or login to the PCGL DACO Portal
+    \n  2.Use this link to access the application
+    \n If you encounter any issues or have questions, feel free to reach out, and we would be happy to assist.
     \n Best regards, \n The PCGL Data Access Compliance Office
     \n
     \m
