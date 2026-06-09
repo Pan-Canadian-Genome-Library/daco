@@ -108,7 +108,8 @@
 		"dataPlatform": "Plateforme de données",
 		"myApplications": "Mes demandes",
 		"manageApplications": "Gérer les demandes",
-		"admin": "Tableau de bord administrateur"
+		"admin": "Tableau de bord administrateur",
+		"register": "S'inscrire"
 	},
 	"button": {
 		"logout": "Déconnexion",
@@ -132,7 +133,7 @@
 		"rejectApplication": "Rejeter",
 		"revoke": "Révoquer la demande",
 		"approveApplication": "Approuver",
-		"languageToggle": "Français"
+		"languageToggle": "English"
 	},
 	"label": {
 		"created": "Créé",
