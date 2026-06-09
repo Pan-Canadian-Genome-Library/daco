@@ -28,8 +28,9 @@ import type {
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import type { SectionRoutesValues, UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
-import { getEmailConfig } from '@/config/emailConfig.ts';
+import { authConfig } from '@/config/authConfig.ts';
 import { getDbInstance } from '@/db/index.js';
+import { getGroupEmails } from '@/external/pcglAuthZClient.ts';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationActionSvc } from '@/service/applicationActionService.ts';
@@ -683,16 +684,25 @@ export const submitRevision = async ({
 		const { actionId } = submittedRevision.data;
 
 		if (result.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-			const {
-				email: { dacAddress },
-			} = getEmailConfig;
-			emailService.sendEmailDacForSubmittedRevisions({
-				id: application.id,
-				to: dacAddress,
-				applicantName: applicant_first_name || 'N/A',
-				submittedDate: new Date(),
-				actionId,
-			});
+			const accessToken = request.session.account?.accessToken || '';
+			const emails = await getGroupEmails(
+				accessToken,
+				`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}:${application.dac_id}`,
+			);
+
+			if (emails.success) {
+				emails.data.forEach((email) => {
+					emailService.sendEmailDacForSubmittedRevisions({
+						id: application.id,
+						to: email,
+						applicantName: applicant_first_name || 'N/A',
+						submittedDate: new Date(),
+						actionId,
+					});
+				});
+			} else {
+				logger.error('Failed to retrieve group emails, email to dac members has not been sent', emails.error);
+			}
 		} else {
 			emailService.sendEmailRepForSubmittedRevisions({
 				id: application.id,
@@ -1063,18 +1073,25 @@ export const submitApplication = async ({
 				actionId,
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			const {
-				email: { dacAddress },
-			} = getEmailConfig;
-
-			// Send email to DAC for review
-			emailService.sendEmailDacForReview({
-				id: application.id,
-				to: dacAddress,
-				applicantName: applicant_first_name || 'N/A',
-				submittedDate: new Date(),
-				actionId,
-			});
+			const accessToken = request.session.account?.accessToken || '';
+			const emails = await getGroupEmails(
+				accessToken,
+				`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}:${application.dac_id}`,
+			);
+			if (emails.success) {
+				emails.data.forEach((email) => {
+					// Send email to DAC for review
+					emailService.sendEmailDacForReview({
+						id: application.id,
+						to: email,
+						applicantName: applicant_first_name || 'N/A',
+						submittedDate: new Date(),
+						actionId,
+					});
+				});
+			} else {
+				logger.error('Failed to retrieve group emails, email to dac members has not been sent', emails.error);
+			}
 
 			//  send email to applicant that application is submitted to DAC
 			emailService.sendEmailApplicantApplicationSubmitted({

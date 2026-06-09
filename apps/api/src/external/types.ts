@@ -85,3 +85,9 @@ export const ServiceTokenResponse = z.object({
 	token: z.string(),
 });
 export type ServiceTokenResponse = z.infer<typeof ServiceTokenResponse>;
+
+export const authzGroupResponseValidation = z.object({
+	user_id: z.array(z.string()),
+	emails: z.array(z.string()),
+});
+export type PCGLAuthZGroupResponse = z.infer<typeof authzGroupResponseValidation>;
