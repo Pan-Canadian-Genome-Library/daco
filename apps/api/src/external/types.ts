@@ -48,7 +48,6 @@ export const authZUserInfo = z.object({
 		),
 		pcgl_id: z.string(),
 		site_admin: z.boolean(),
-		site_curator: z.boolean(),
 	}),
 	study_authorizations: z.object({
 		editable_studies: z.array(z.string()).optional(),

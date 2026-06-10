@@ -101,7 +101,6 @@ const authGeneratedSessionValues = z.object({
 	familyName: z.string().optional(),
 	emails: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ emails: true }).shape.emails,
 	siteAdmin: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_admin: true }).shape.site_admin,
-	siteCurator: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_curator: true }).shape.site_curator,
 	isPcglDac: z.boolean().default(false),
 	studyAuthorizations: z.object({
 		editableStudies: authZUserInfo

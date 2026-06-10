@@ -109,7 +109,6 @@ export const convertToSessionUser = async (
 		givenName: aliasedOIDCResponse.givenName,
 		familyName: aliasedOIDCResponse.familyName,
 		siteAdmin: aliasedPCGLResponse.userinfo.siteAdmin,
-		siteCurator: aliasedPCGLResponse.userinfo.siteCurator,
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
 		groups: aliasedGroup,
