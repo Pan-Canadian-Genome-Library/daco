@@ -45,11 +45,13 @@ const AdminStudiesPage = () => {
 		},
 		{
 			key: 'dacId',
-			title: 'DAC ID',
-			dataIndex: 'dacId',
+			title: 'DAC',
+			dataIndex: 'dacName',
 			width: 150,
 			align: 'center',
-			render: (dacId: string | null) => <Text type={!dacId ? 'secondary' : undefined}>{dacId || 'N/A'}</Text>,
+			render: (dacName: string | null) => (
+				<Text type={!dacName ? 'secondary' : undefined}>{dacName || 'No DAC Assigned'}</Text>
+			),
 		},
 		{
 			key: 'status',
