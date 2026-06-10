@@ -19,13 +19,11 @@
 
 import { AuditOutlined, FileOutlined, SignatureOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, Flex, Layout, Row, Typography, theme } from 'antd';
-import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
+import { API_PATH_LOGIN } from '@/api/paths';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
-
-import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
 
 const { Content } = Layout;
 const { Title, Paragraph, Link, Text } = Typography;
@@ -42,7 +40,6 @@ const HomePage = () => {
 	const { t: translate } = useTranslation();
 	const { token } = useToken();
 	const minWidth = useMinWidth();
-	const [openModal, setOpenModal] = useState(false);
 
 	const isResponsiveMode = minWidth <= token.screenLG;
 
@@ -55,8 +52,8 @@ const HomePage = () => {
 							<Title style={{ color: token.colorTextSecondary }}> {translate('homepage.title')}</Title>
 							<Paragraph style={{ color: token.colorTextSecondary }}>{translate('homepage.introduction')}</Paragraph>
 							<Col span={6} style={{ padding: 0 }}>
-								<Button type="link" color="primary" variant="solid" onClick={() => setOpenModal(true)}>
-									{translate('button.getStarted')}
+								<Button type="link" color="primary" variant="solid" href={API_PATH_LOGIN}>
+									{translate('links.apply')}
 								</Button>
 							</Col>
 						</Flex>
@@ -114,7 +111,6 @@ const HomePage = () => {
 					</Flex>
 				</Col>
 			</Row>
-			<ApplyForAccessModal openModal={openModal} setOpenModal={setOpenModal} />
 		</Content>
 	);
 };

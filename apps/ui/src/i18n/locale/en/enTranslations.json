@@ -108,7 +108,8 @@
 		"dataPlatform": "Data Platform",
 		"myApplications": "My Applications",
 		"manageApplications": "Manage Applications",
-		"admin": "Admin Dashboard"
+		"admin": "Admin Dashboard",
+		"register": "Register"
 	},
 	"button": {
 		"logout": "Logout",
@@ -132,7 +133,7 @@
 		"rejectApplication": "Reject",
 		"revoke": "Revoke Application",
 		"approveApplication": "Approve",
-		"languageToggle": "English"
+		"languageToggle": "Français"
 	},
 	"label": {
 		"created": "Created",
