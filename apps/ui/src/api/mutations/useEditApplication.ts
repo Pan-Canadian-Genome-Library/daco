@@ -37,7 +37,6 @@ const useEditApplication = () => {
 	>({
 		mutationFn: async ({ applicationId, update, revisions }) => {
 			let fields = state.fields;
-			delete fields.applicantInstitutionalEmail;
 
 			// Do not allow editing if the application is not in a editiable states
 			if (
