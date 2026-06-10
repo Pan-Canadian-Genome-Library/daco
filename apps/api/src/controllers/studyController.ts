@@ -127,7 +127,7 @@ export const upsertStudy = async ({
 			);
 			for (const study of studiesToRemove) {
 				const deleteResult = await studyService.deleteStudy({ studyId: study.studyId, transaction });
-				if (!deleteResult.success || !deleteResult.data) {
+				if (!deleteResult.success && deleteResult.error !== 'NOT_FOUND') {
 					return failure('SYSTEM_ERROR', 'Failed to sync studies');
 				}
 			}
