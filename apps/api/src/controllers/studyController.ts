@@ -111,6 +111,20 @@ export const upsertStudy = async ({
 		const database = getDbInstance();
 		const studyService = studySvc(database);
 
+		for (const study of studies) {
+			const studyModel: StudyClinicalDTO = {
+				...study,
+				createdAt: typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt,
+				updatedAt: typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt,
+			};
+
+			const result = await studyService.createStudyFromClinical({ studyData: studyModel, transaction });
+
+			if (!result.success || !result.data) {
+				return failure('SYSTEM_ERROR', 'Failed to sync studies');
+			}
+		}
+
 		// Check if any studies have been removed from clinical submission then delete them from the database
 		const allStudiesFromDACO = await studyService.getAllStudies({});
 		if (!allStudiesFromDACO.success) {
@@ -128,22 +142,9 @@ export const upsertStudy = async ({
 			for (const study of studiesToRemove) {
 				const deleteResult = await studyService.deleteStudy({ studyId: study.studyId, transaction });
 				if (!deleteResult.success && deleteResult.error !== 'NOT_FOUND') {
+					logger.error('Removing studies from clinical failed:', deleteResult.message);
 					return failure('SYSTEM_ERROR', 'Failed to sync studies');
 				}
-			}
-		}
-
-		for (const study of studies) {
-			const studyModel: StudyClinicalDTO = {
-				...study,
-				createdAt: typeof study.createdAt === 'string' ? new Date(study.createdAt) : study.createdAt,
-				updatedAt: typeof study.updatedAt === 'string' ? new Date(study.updatedAt) : study.updatedAt,
-			};
-
-			const result = await studyService.createStudyFromClinical({ studyData: studyModel, transaction });
-
-			if (!result.success || !result.data) {
-				return failure('SYSTEM_ERROR', 'Failed to sync studies');
 			}
 		}
 
