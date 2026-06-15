@@ -215,6 +215,20 @@ describe('Application API', () => {
 
 			assert.strictEqual(application.userId, user_id);
 		});
+
+		it('should successfully be able to create a new application with the provided user_id', async () => {
+			const result = await createApplication({ user_id, applicant_institutional_email: user_id });
+
+			assert.ok(result.success && result.data);
+
+			const application = result.data;
+			const { id } = application;
+
+			const resultWithContents = await getApplicationById({ applicationId: id });
+
+			assert.ok(resultWithContents.success && resultWithContents.data);
+			assert.strictEqual(resultWithContents.data.contents?.applicantInstitutionalEmail, user_id);
+		});
 	});
 
 	describe('Reject Application', () => {

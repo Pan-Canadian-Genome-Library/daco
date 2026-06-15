@@ -72,11 +72,17 @@ const logger = BaseLogger.forModule('applicationController');
  * @param user_id - The ID of the user requesting the creation of the application.
  * @returns Success with Application data / Failure with Error.
  */
-export const createApplication = async ({ user_id }: { user_id: string }): AsyncResult<ApplicationDTO> => {
+export const createApplication = async ({
+	user_id,
+	applicant_institutional_email,
+}: {
+	user_id: string;
+	applicant_institutional_email: string;
+}): AsyncResult<ApplicationDTO> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const result = await applicationRepo.createApplication({ user_id });
+	const result = await applicationRepo.createApplication({ user_id, applicant_institutional_email });
 
 	if (!result.success) {
 		return result;

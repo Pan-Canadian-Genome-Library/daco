@@ -55,7 +55,6 @@ const Applicant = () => {
 	});
 
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
-
 	const {
 		formState: { isDirty },
 		getValues,
@@ -96,7 +95,6 @@ const Applicant = () => {
 					applicantLastName: data.applicantLastName,
 					applicantSuffix: data.applicantSuffix,
 					applicantPrimaryAffiliation: data.applicantPrimaryAffiliation,
-					applicantInstitutionalEmail: data.applicantInstituteEmail,
 					applicantProfileUrl: data.applicantProfileUrl,
 					applicantPositionTitle: data.applicantPositionTitle,
 					applicantInstitutionCountry: data.applicantInstitutionCountry,
@@ -214,8 +212,9 @@ const Applicant = () => {
 								name="applicantInstituteEmail"
 								control={control}
 								rule={rule}
+								defaultValue={state.fields.applicantInstitutionalEmail}
 								required
-								disabled={!canEdit}
+								disabled
 							/>
 						</Col>
 					</Row>

@@ -61,7 +61,13 @@ const logger = BaseLogger.forModule('applicationService');
  */
 const applicationSvc = (db: PostgresDb) => ({
 	/** @method createApplication: Create new Application record */
-	createApplication: async ({ user_id }: { user_id: string }): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR'> => {
+	createApplication: async ({
+		user_id,
+		applicant_institutional_email,
+	}: {
+		user_id: string;
+		applicant_institutional_email?: string;
+	}): AsyncResult<ApplicationRecord, 'SYSTEM_ERROR'> => {
 		const newApplication: typeof applications.$inferInsert = {
 			user_id,
 			state: ApplicationStates.DRAFT,
@@ -78,8 +84,12 @@ const applicationSvc = (db: PostgresDb) => ({
 				// Create associated ApplicationContents
 				const { id: application_id } = newApplicationRecord[0];
 
-				const newAppContents: Pick<ApplicationContentModel, 'application_id' | 'created_at' | 'updated_at'> = {
+				const newAppContents: Pick<
+					ApplicationContentModel,
+					'application_id' | 'applicant_institutional_email' | 'created_at' | 'updated_at'
+				> = {
 					application_id,
+					applicant_institutional_email,
 					created_at: new Date(),
 					updated_at: new Date(),
 				};

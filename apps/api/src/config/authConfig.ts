@@ -37,7 +37,6 @@ const authConfigSchema = z.object({
 	AUTH_CLIENT_SECRET: z.string(),
 	AUTHZ_ENDPOINT: z.string().url(),
 	AUTHZ_GROUP_PREFIX_DAC_MEMBER: z.string(),
-	AUTHZ_GROUP_ADMIN: z.string(),
 	AUTHZ_GROUP_PREFIX_DAC_CHAIR: z.string(),
 	AUTHZ_SERVICE_ID: z.string(),
 	AUTHZ_SERVICE_UUID: z.string(),
