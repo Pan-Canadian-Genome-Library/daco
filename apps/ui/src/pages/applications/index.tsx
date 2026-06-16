@@ -128,7 +128,7 @@ const ApplicationViewer = () => {
 									<Outlet
 										context={{
 											appId: applicationData.id,
-											applicantEmail: applicationData.contents?.applicantInstitutionalEmail,
+											applicantInstituteEmail: applicationData.contents?.applicantInstitutionalEmail,
 											isEditMode,
 											revisions: revisionsData,
 											dacComments: dacCommentsData ? dacCommentsData : [],

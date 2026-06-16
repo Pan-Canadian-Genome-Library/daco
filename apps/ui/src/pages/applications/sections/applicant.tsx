@@ -44,7 +44,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, applicantEmail, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, applicantInstituteEmail, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({
 		revisions,
@@ -68,7 +68,7 @@ const Applicant = () => {
 			applicantLastName: state.fields.applicantLastName,
 			applicantSuffix: state.fields.applicantSuffix,
 			applicantPrimaryAffiliation: state.fields.applicantPrimaryAffiliation,
-			applicantInstituteEmail: applicantEmail,
+			applicantInstituteEmail,
 			applicantProfileUrl: state.fields.applicantProfileUrl,
 			applicantPositionTitle: state.fields.applicantPositionTitle,
 			applicantInstitutionState: state.fields.applicantInstitutionState,

@@ -58,7 +58,7 @@ export interface FetchError extends ServerError {
 
 export interface ApplicationOutletContext {
 	appId: string | number;
-	applicantEmail: ApplicantDTO['applicantInstitutionalEmail'];
+	applicantInstituteEmail: ApplicantDTO['applicantInstitutionalEmail'];
 	isEditMode: boolean;
 	revisions: SectionRevision;
 	dacComments: DacCommentRecord[];
