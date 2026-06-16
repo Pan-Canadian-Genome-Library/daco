@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { DacCommentRecord } from '@pcgl-daco/data-model';
+import { ApplicantDTO, DacCommentRecord } from '@pcgl-daco/data-model';
 import { ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { SectionRevision } from '@pcgl-daco/validation';
 import { RuleRender } from 'antd/es/form';
@@ -58,6 +58,7 @@ export interface FetchError extends ServerError {
 
 export interface ApplicationOutletContext {
 	appId: string | number;
+	applicantEmail: ApplicantDTO['applicantInstitutionalEmail'];
 	isEditMode: boolean;
 	revisions: SectionRevision;
 	dacComments: DacCommentRecord[];
