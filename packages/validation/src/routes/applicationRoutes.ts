@@ -82,7 +82,7 @@ export const applicationContentsSchema = z
 	})
 	.partial();
 
-export const updateEditApplicationRequestSchema = applicationContentsSchema;
+export const updateEditApplicationRequestSchema = applicationContentsSchema.omit({ applicantInstitutionalEmail: true });
 
 export const applicationContentsResponseSchema = applicationContentsSchema
 	.extend({
