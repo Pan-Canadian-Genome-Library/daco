@@ -61,6 +61,17 @@ interface ManagementDashboardProps {
 	search?: string;
 }
 
+const stringSorter = (a: any, b: any) => {
+	const valueA = a ? a : 0;
+	const valueB = b ? b : 0;
+	if (typeof valueA === 'string') {
+		return valueA.localeCompare(String(valueB));
+	} else if (typeof valueB === 'string') {
+		return valueB.localeCompare(String(valueA));
+	}
+	return 0;
+};
+
 const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 	{
 		title: 'Application #',
@@ -76,6 +87,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 		title: 'DAC',
 		dataIndex: 'dacId',
 		render: (_, record) => `${record.dacId || '-'}`,
+		sorter: (a, b) => stringSorter(a.dacId, b.dacId),
 	},
 	{
 		title: 'Institution',
@@ -83,6 +95,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 		key: 'institution',
 		render: (value: string, record: ApplicationListSummary) =>
 			record.applicant?.institution ? record.applicant.institution : '-',
+		sorter: (a, b) => stringSorter(a.applicant?.institution, b.applicant?.institution),
 	},
 	{
 		title: 'Country',
@@ -93,6 +106,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 			record.applicant?.country
 				? (GC_STANDARD_GEOGRAPHIC_AREAS.find((country) => country.iso === record.applicant?.country)?.en ?? '-')
 				: '-',
+		sorter: (a, b) => stringSorter(a.applicant?.country, b.applicant?.country),
 	},
 	{
 		title: 'Applicant',
@@ -102,26 +116,28 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 			record.applicant?.firstName && record.applicant.lastName
 				? `${record.applicant.firstName} ${record.applicant.lastName}`
 				: '-',
+		sorter: (a, b) => stringSorter(a.applicant?.firstName, b.applicant?.firstName),
 	},
 	{
 		title: 'Email',
 		dataIndex: ['applicant', 'email'],
 		key: 'email',
 		render: (_: string, record) => (record.applicant?.email ? record.applicant.email : '-'),
+		sorter: (a, b) => stringSorter(a.applicant?.email, b.applicant?.email),
 	},
 	{
 		title: 'Updated',
 		dataIndex: 'updatedAt',
 		key: 'updatedAt',
 		render: (value?: string) => (value ? new Date(value).toLocaleDateString('en-CA') : '-'),
-		sorter: { multiple: 2 },
+		sorter: (a, b) => stringSorter(a.updatedAt?.toISOString(), b.updatedAt?.toISOString()),
 	},
 	{
 		title: 'Status',
 		dataIndex: 'state',
 		key: 'state',
 		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
-		sorter: { multiple: 3 },
+		sorter: (a, b) => stringSorter(a.applicant?.email, b.applicant?.email),
 	},
 ];
 
