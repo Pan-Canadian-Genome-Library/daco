@@ -67,13 +67,12 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 	{
 		title: 'Application #',
 		dataIndex: 'id',
-		defaultSortOrder: 'ascend',
 		render: (value: number) => (
 			<Link href={`/application/${value}`} style={{ textDecoration: 'underline' }}>
 				PCGL-{value}
 			</Link>
 		),
-		sorter: { compare: (a, b) => stringSorter(String(a.id), String(b.id)), multiple: 1 },
+		sorter: (a, b) => stringSorter(String(a.id), String(b.id)),
 	},
 	{
 		title: 'DAC',
