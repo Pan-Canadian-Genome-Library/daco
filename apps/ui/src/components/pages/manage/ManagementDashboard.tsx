@@ -133,7 +133,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 		dataIndex: 'state',
 		key: 'state',
 		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
-		sorter: (a, b) => stringSorter(a.applicant?.email, b.applicant?.email),
+		sorter: (a, b) => stringSorter(a.state, b.state),
 	},
 ];
 
