@@ -17,16 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@pcgl-daco/data-model';
+import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
 import { ColumnsType, FilterValue, SorterResult } from 'antd/es/table/interface';
+import { useTranslation } from 'react-i18next';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import RowCount from '@/components/pages/manage/RowCount';
 import { pcglTableTheme } from '@/providers/ThemeProvider';
-import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { useTranslation } from 'react-i18next';
+
+import { stringSorter } from './utils/manageUtils';
 
 const { Link, Text } = Typography;
 const { useToken } = theme;
@@ -60,17 +62,6 @@ interface ManagementDashboardProps {
 	pagination: TablePaginationConfig;
 	search?: string;
 }
-
-const stringSorter = (a: string | null | undefined, b: string | null | undefined) => {
-	const valueA = a ? a : 0;
-	const valueB = b ? b : 0;
-	if (typeof valueA === 'string') {
-		return valueA.localeCompare(String(valueB));
-	} else if (typeof valueB === 'string') {
-		return valueB.localeCompare(String(valueA));
-	}
-	return 0;
-};
 
 const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 	{
