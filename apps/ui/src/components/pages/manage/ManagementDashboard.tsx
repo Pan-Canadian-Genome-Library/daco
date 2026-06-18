@@ -61,7 +61,7 @@ interface ManagementDashboardProps {
 	search?: string;
 }
 
-const stringSorter = (a: any, b: any) => {
+const stringSorter = (a: string | null | undefined, b: string | null | undefined) => {
 	const valueA = a ? a : 0;
 	const valueB = b ? b : 0;
 	if (typeof valueA === 'string') {
@@ -81,7 +81,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 				PCGL-{value}
 			</Link>
 		),
-		sorter: { multiple: 1 },
+		sorter: { compare: (a, b) => stringSorter(a.dacId, b.dacId), multiple: 1 },
 	},
 	{
 		title: 'DAC',
@@ -130,7 +130,11 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 		dataIndex: 'updatedAt',
 		key: 'updatedAt',
 		render: (value?: string) => (value ? new Date(value).toLocaleDateString('en-CA') : '-'),
-		sorter: (a, b) => stringSorter(a.updatedAt?.toISOString(), b.updatedAt?.toISOString()),
+		sorter: (a, b) => {
+			const updateA = a.updatedAt instanceof Date ? a.updatedAt.toISOString() : a.updatedAt;
+			const updateB = b.updatedAt instanceof Date ? b.updatedAt.toISOString() : b.updatedAt;
+			return stringSorter(updateA, updateB);
+		},
 	},
 	{
 		title: 'Status',
