@@ -131,9 +131,20 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 	{
 		title: 'Status',
 		dataIndex: 'state',
+		defaultSortOrder: 'descend',
 		key: 'state',
 		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
-		sorter: (a, b) => stringSorter(a.state, b.state),
+		sorter: {
+			compare: (a, b) => {
+				if (a.state === 'DAC_REVIEW') {
+					return 1;
+				} else if (b.state === 'DAC_REVIEW') {
+					return -1;
+				}
+				return stringSorter(a.state, b.state);
+			},
+			multiple: 2,
+		},
 	},
 ];
 
