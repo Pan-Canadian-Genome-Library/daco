@@ -44,7 +44,7 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, applicantInstituteEmail, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({
 		revisions,
@@ -55,7 +55,6 @@ const Applicant = () => {
 	});
 
 	const form = useSectionForm({ section: 'applicant', sectionVisited: state.formState.sectionsVisited.applicant });
-
 	const {
 		formState: { isDirty },
 		getValues,
@@ -69,7 +68,7 @@ const Applicant = () => {
 			applicantLastName: state.fields.applicantLastName,
 			applicantSuffix: state.fields.applicantSuffix,
 			applicantPrimaryAffiliation: state.fields.applicantPrimaryAffiliation,
-			applicantInstituteEmail: state.fields.applicantInstitutionalEmail,
+			applicantInstituteEmail,
 			applicantProfileUrl: state.fields.applicantProfileUrl,
 			applicantPositionTitle: state.fields.applicantPositionTitle,
 			applicantInstitutionState: state.fields.applicantInstitutionState,
@@ -96,7 +95,6 @@ const Applicant = () => {
 					applicantLastName: data.applicantLastName,
 					applicantSuffix: data.applicantSuffix,
 					applicantPrimaryAffiliation: data.applicantPrimaryAffiliation,
-					applicantInstitutionalEmail: data.applicantInstituteEmail,
 					applicantProfileUrl: data.applicantProfileUrl,
 					applicantPositionTitle: data.applicantPositionTitle,
 					applicantInstitutionCountry: data.applicantInstitutionCountry,
@@ -214,8 +212,9 @@ const Applicant = () => {
 								name="applicantInstituteEmail"
 								control={control}
 								rule={rule}
+								defaultValue={state.fields.applicantInstitutionalEmail}
 								required
-								disabled={!canEdit}
+								disabled
 							/>
 						</Col>
 					</Row>
