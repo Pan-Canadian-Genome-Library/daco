@@ -45,6 +45,8 @@ import {
 	GenerateEmailApplicantRevokePlain,
 	GenerateEmailApproval,
 	GenerateEmailApprovalPlain,
+	GenerateEmailCollaboratorApproval,
+	GenerateEmailCollaboratorApprovalPlain,
 	GenerateEmailDacForReview,
 	GenerateEmailDacForReviewPlain,
 	GenerateEmailDacForSubmittedRevision,
@@ -823,9 +825,8 @@ const emailSvc = (db: PostgresDb) => {
 				return failure('SYSTEM_ERROR', message);
 			}
 		},
-		// Email to Collaborators & Notify Approval
 		// Email to Applicant & Notify Approval
-		sendEmailApproval: async ({
+		sendApplicantEmailApproval: async ({
 			id,
 			actionId,
 			name,
@@ -857,7 +858,46 @@ const emailSvc = (db: PostgresDb) => {
 
 				return success(response);
 			} catch (error) {
-				const message = `Error sending email - sendEmailApproval`;
+				const message = `Error sending email - sendApplicantEmailApproval`;
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
+			}
+		},
+		// Email to Collaborators & Notify Approval
+		sendCollaboratorEmailApproval: async ({
+			id,
+			actionId,
+			name,
+			to,
+		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
+
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
+
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_APPROVAL,
+					html: GenerateEmailCollaboratorApproval({ id, name }),
+					text: GenerateEmailCollaboratorApprovalPlain({ id, name }),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_APPLICANT_DAC_APPROVAL,
+					recipient_emails: [to],
+				});
+
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendApplicantEmailApproval`;
 				logger.error(message, error);
 
 				return failure('SYSTEM_ERROR', message);

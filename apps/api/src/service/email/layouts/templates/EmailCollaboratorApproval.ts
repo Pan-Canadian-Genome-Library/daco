@@ -70,7 +70,7 @@ export const GenerateEmailCollaboratorApproval = ({
 	return basicLayout({ body: template }).html;
 };
 
-export const GenerateEmailApprovalPlain = ({
+export const GenerateEmailCollaboratorApprovalPlain = ({
 	name,
 	studies,
 }: Omit<GenerateApproveCollaboratorType, 'to' | 'actionId'>) => {

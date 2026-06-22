@@ -519,7 +519,7 @@ export const approveApplication = async ({
 
 		if (permissionAdded.successfulUserEmails.length === 1) {
 			// Notify Applicant of approval
-			emailService.sendEmailApproval({
+			emailService.sendApplicantEmailApproval({
 				id: application.id,
 				to: applicant_institutional_email,
 				actionId: approvalResult.data.actionId,
@@ -542,14 +542,23 @@ export const approveApplication = async ({
 			collaboratorsByEmail[collaborator.institutional_email] = collaborator;
 		}
 
+		const userEmails = Object.keys(collaboratorsByEmail);
+
 		await grantUserPermissions({
-			userEmails: Object.keys(collaboratorsByEmail),
+			userEmails,
 			approverAccessToken,
 			studyIds: requested_studies,
 		});
 
-		// TODO: Notify each collaborator of approval.
-		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/579
+		for (const email in userEmails) {
+			// Notify Collaborators of approval
+			emailService.sendCollaboratorEmailApproval({
+				id: application.id,
+				to: email,
+				actionId: approvalResult.data.actionId,
+				name: applicant_first_name || 'N/A',
+			});
+		}
 
 		return dtoFriendlyData;
 	} catch (error) {

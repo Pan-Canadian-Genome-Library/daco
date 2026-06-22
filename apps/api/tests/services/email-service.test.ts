@@ -171,9 +171,9 @@ describe('Email Service', () => {
 		});
 	});
 
-	describe('sendEmailApproval', () => {
+	describe('sendApplicantEmailApproval', () => {
 		it('Should throw an error if recipient email is undefined or null', async () => {
-			const response = await testEmailService.sendEmailApproval({
+			const response = await testEmailService.sendApplicantEmailApproval({
 				id: 1,
 				to: null,
 				name: 'Terry',

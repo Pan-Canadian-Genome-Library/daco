@@ -55,3 +55,8 @@ export {
 	GenerateEmailReminderSubmitRepRevisions,
 	GenerateEmailReminderSubmitRepRevisionsPlain,
 } from './EmailReminderSubmitRepRevisions.ts';
+
+export {
+	GenerateEmailCollaboratorApproval,
+	GenerateEmailCollaboratorApprovalPlain,
+} from './EmailCollaboratorApproval.ts';
