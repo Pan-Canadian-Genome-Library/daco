@@ -36,7 +36,7 @@ export const GenerateEmailCollaboratorApproval = ({
                     Dear ${name},
                 </mj-text>
                 <mj-text>
-                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. You now have access to the following studies: ${studies} <br /> <br />
+                    We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. You now have access to the following studies: ${studies.join(', ')} <br /> <br />
                 </mj-text>
                 <mj-text>
                     Please go to the Research Portal to access your token and download data. 

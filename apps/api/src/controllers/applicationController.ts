@@ -559,13 +559,14 @@ export const approveApplication = async ({
 
 		const studyNames = studyResult.data.map((study) => study.studyName);
 
-		for (const email in userEmails) {
+		for (const [email, collaborator] of Object.entries(collaboratorsByEmail)) {
 			// Notify Collaborators of approval
+			const collaboratorName = `${collaborator.first_name} ${collaborator.last_name}`;
 			emailService.sendCollaboratorEmailApproval({
 				id: application.id,
 				to: email,
 				actionId: approvalResult.data.actionId,
-				name: applicant_first_name || 'N/A',
+				name: collaboratorName,
 				studies: studyNames,
 			});
 		}
