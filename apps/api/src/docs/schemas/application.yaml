@@ -301,6 +301,16 @@ components:
           type: string
           nullable: false
 
+    RevokeApplication:
+      type: object
+      required:
+        - revokeReason
+      properties:
+        revokeReason:
+          description: The reason the DAC has revoked approval for this Application.
+          type: string
+          nullable: false
+
     SubmitApplicationRequest:
       type: object
       properties:
