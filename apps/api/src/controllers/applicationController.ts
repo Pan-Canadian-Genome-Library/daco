@@ -451,6 +451,7 @@ export const approveApplication = async ({
 		const applicationService: ApplicationService = applicationSvc(database);
 		const emailService = await emailSvc(database);
 		const collaboratorsService = await collaboratorsSvc(database);
+		const studyService = await studySvc(database);
 
 		const result = await applicationService.getApplicationById({ id: applicationId });
 
@@ -550,6 +551,14 @@ export const approveApplication = async ({
 			studyIds: requested_studies,
 		});
 
+		const studyResult = await studyService.getAllStudies({ studyIds: requested_studies });
+
+		if (!studyResult.success) {
+			return studyResult;
+		}
+
+		const studyNames = studyResult.data.map((study) => study.studyName);
+
 		for (const email in userEmails) {
 			// Notify Collaborators of approval
 			emailService.sendCollaboratorEmailApproval({
@@ -557,6 +566,7 @@ export const approveApplication = async ({
 				to: email,
 				actionId: approvalResult.data.actionId,
 				name: applicant_first_name || 'N/A',
+				studies: studyNames,
 			});
 		}
 

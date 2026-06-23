@@ -60,3 +60,8 @@ export {
 	GenerateEmailCollaboratorApproval,
 	GenerateEmailCollaboratorApprovalPlain,
 } from './EmailCollaboratorApproval.ts';
+
+export {
+	GenerateEmailRepForSubmittedRevision,
+	GenerateEmailRepForSubmittedRevisionPlain,
+} from './EmailInstitutionalRepRevision.ts';

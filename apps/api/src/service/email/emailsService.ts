@@ -29,10 +29,6 @@ import { AsyncResult, failure, success } from '@/utils/results.ts';
 
 import emailClient from './index.ts';
 import {
-	GenerateEmailRepForSubmittedRevision,
-	GenerateEmailRepForSubmittedRevisionPlain,
-} from './layouts/templates/EmailInstitutionalRepRevision.ts';
-import {
 	GenerateEmailApplicantAppSubmitted,
 	GenerateEmailApplicantAppSubmittedPlain,
 	GenerateEmailApplicantClosed,
@@ -69,6 +65,8 @@ import {
 	GenerateEmailReminderSubmitDraftPlain,
 	GenerateEmailReminderSubmitRepRevisions,
 	GenerateEmailReminderSubmitRepRevisionsPlain,
+	GenerateEmailRepForSubmittedRevision,
+	GenerateEmailRepForSubmittedRevisionPlain,
 } from './layouts/templates/index.ts';
 import {
 	EmailSubjects,
@@ -76,6 +74,7 @@ import {
 	type GenerateApplicantRevisionType,
 	type GenerateApproveType,
 	type GenerateClosedType,
+	type GenerateCollaboratorApproveType,
 	type GenerateDacRevisionType,
 	type GenerateDraftReminderEmailType,
 	type GenerateInstitutionalRepType,
@@ -866,11 +865,12 @@ const emailSvc = (db: PostgresDb) => {
 		},
 		// Email to Collaborators & Notify Approval
 		sendCollaboratorEmailApproval: async ({
-			id,
 			actionId,
+			id,
 			name,
 			to,
-		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			studies,
+		}: GenerateCollaboratorApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
 				const {
 					email: { fromAddress },
@@ -884,20 +884,20 @@ const emailSvc = (db: PostgresDb) => {
 					from: fromAddress,
 					to,
 					subject: EmailSubjects.NOTIFY_APPROVAL,
-					html: GenerateEmailCollaboratorApproval({ id, name }),
-					text: GenerateEmailCollaboratorApprovalPlain({ id, name }),
+					html: GenerateEmailCollaboratorApproval({ id, name, studies }),
+					text: GenerateEmailCollaboratorApprovalPlain({ id, name, studies }),
 				});
 
 				await createEmailRecord({
 					application_id: Number(id),
 					application_action_id: actionId,
-					email_type: EmailTypes.NOTIFY_APPLICANT_DAC_APPROVAL,
+					email_type: EmailTypes.NOTIFY_COLLABORATORS_DAC_APPROVAL,
 					recipient_emails: [to],
 				});
 
 				return success(response);
 			} catch (error) {
-				const message = `Error sending email - sendApplicantEmailApproval`;
+				const message = `Error sending email - sendCollaboratorsEmailApproval`;
 				logger.error(message, error);
 
 				return failure('SYSTEM_ERROR', message);
