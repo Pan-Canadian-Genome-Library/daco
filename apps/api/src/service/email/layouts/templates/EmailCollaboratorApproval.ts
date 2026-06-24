@@ -18,14 +18,14 @@
  */
 
 import { getEmailConfig } from '@/config/emailConfig.ts';
-import { GenerateApproveCollaboratorType } from '@/service/email/types.ts';
+import { GenerateCollaboratorApproveType } from '@/service/email/types.ts';
 import { basicLayout } from '../renderBaseHtml.ts';
 
 export const GenerateEmailCollaboratorApproval = ({
 	id,
 	name,
 	studies,
-}: Omit<GenerateApproveCollaboratorType, 'to' | 'actionId'>) => {
+}: Omit<GenerateCollaboratorApproveType, 'to' | 'actionId'>) => {
 	const {
 		express: { ui },
 	} = getEmailConfig;
@@ -73,7 +73,7 @@ export const GenerateEmailCollaboratorApproval = ({
 export const GenerateEmailCollaboratorApprovalPlain = ({
 	name,
 	studies,
-}: Omit<GenerateApproveCollaboratorType, 'to' | 'actionId'>) => {
+}: Omit<GenerateCollaboratorApproveType, 'to' | 'actionId'>) => {
 	return ` Dear ${name},
     \n We are pleased to inform you that your DACO application has been successfully approved by the PCGL Data Access Committee. You now have access to the following studies: ${studies}
     /n Please go to the Research Portal to access your token and download data. 

@@ -97,14 +97,6 @@ export type GenerateCollaboratorApproveType = GenerateApproveType & {
 	studies: string[];
 };
 
-export type GenerateApproveCollaboratorType = {
-	id: string | number;
-	actionId: number;
-	name: string;
-	studies: string[];
-	lang?: string;
-} & BaseEmailType;
-
 export type GenerateDacRevisionType = {
 	id: string | number;
 	actionId: number;
