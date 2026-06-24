@@ -184,6 +184,20 @@ describe('Email Service', () => {
 		});
 	});
 
+	describe('sendCollaboratorEmailApproval', () => {
+		it('Should throw an error if recipient email is undefined or null', async () => {
+			const response = await testEmailService.sendCollaboratorEmailApproval({
+				id: 1,
+				to: null,
+				name: 'Terry',
+				actionId: 0,
+				studies: [],
+			});
+
+			assert.ok(!response.success);
+		});
+	});
+
 	describe('sendEmailReject', () => {
 		it('Should throw an error if recipient email is undefined or null', async () => {
 			const response = await testEmailService.sendEmailReject({
