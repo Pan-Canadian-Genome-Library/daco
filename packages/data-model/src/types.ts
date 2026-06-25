@@ -235,9 +235,10 @@ export interface ApplicantSummary {
 	institution: string | null;
 }
 
-export interface ApplicationListSummary extends ApplicationDTO {
+export type ApplicationListSummary = Omit<ApplicationDTO, 'updatedAt'> & {
 	applicant: ApplicantSummary | null;
-}
+	updatedAt?: Date | string | null;
+};
 
 export type ApplicationContentsResponse = {
 	applicationId?: number;
@@ -263,10 +264,6 @@ export interface ApplicantSummary {
 	email: string | null;
 	country: string | null;
 	institution: string | null;
-}
-
-export interface ApplicationListSummary extends ApplicationDTO {
-	applicant: ApplicantSummary | null;
 }
 
 export type ApplicationStateTotals = {
