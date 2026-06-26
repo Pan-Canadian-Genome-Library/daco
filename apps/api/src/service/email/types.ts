@@ -93,6 +93,10 @@ export type GenerateApproveType = {
 	lang?: string;
 } & BaseEmailType;
 
+export type GenerateCollaboratorApproveType = GenerateApproveType & {
+	studies: string[];
+};
+
 export type GenerateDacRevisionType = {
 	id: string | number;
 	actionId: number;
