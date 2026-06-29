@@ -36,8 +36,9 @@ const useEditApplication = () => {
 		{ applicationId: number | string; update?: Partial<ApplicationContentsResponse>; revisions: SectionRevision }
 	>({
 		mutationFn: async ({ applicationId, update, revisions }) => {
-			let fields = state.fields;
-
+			let fields = { ...state.fields };
+			// This field is read-only & removed from update body
+			delete fields.applicantInstitutionalEmail;
 			// Do not allow editing if the application is not in a editiable states
 			if (
 				state.applicationState !== 'DRAFT' &&

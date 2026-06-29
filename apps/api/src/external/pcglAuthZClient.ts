@@ -20,15 +20,15 @@
 import { authConfig } from '@/config/authConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
-import urlJoin from 'url-join';
-import { fetchWithRetry } from './fetchWithRetry.ts';
 import {
 	addUserToStudyPermissionResponse,
 	authZUserInfo,
 	ServiceTokenResponse,
 	type PCGLAddUserToStudyPermissionResponse,
 	type PCGLAuthZUserInfoResponse,
-} from './types.ts';
+} from '@pcgl-daco/validation';
+import urlJoin from 'url-join';
+import { fetchWithRetry } from './fetchWithRetry.ts';
 
 const logger = BaseLogger.forModule('authZClient');
 

@@ -57,8 +57,8 @@ export const authZUserInfo = z.object({
 			}),
 		),
 		pcgl_id: z.string(),
-		site_admin: z.boolean(),
-		site_curator: z.boolean(),
+		site_admin: z.boolean().default(false),
+		data_admin: z.boolean().default(false),
 	}),
 	study_authorizations: z.object({
 		editable_studies: z.array(z.string()).optional(),
@@ -101,7 +101,7 @@ const authGeneratedSessionValues = z.object({
 	familyName: z.string().optional(),
 	emails: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ emails: true }).shape.emails,
 	siteAdmin: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_admin: true }).shape.site_admin,
-	siteCurator: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ site_curator: true }).shape.site_curator,
+	dataAdmin: authZUserInfo.pick({ userinfo: true }).shape.userinfo.pick({ data_admin: true }).shape.data_admin,
 	isPcglDac: z.boolean().default(false),
 	studyAuthorizations: z.object({
 		editableStudies: authZUserInfo
@@ -122,6 +122,17 @@ const authGeneratedSessionValues = z.object({
 	),
 	groups: authZUserInfo.pick({ groups: true }).shape.groups,
 });
+
+export const ServiceTokenResponse = z.object({
+	token: z.string(),
+});
+export type ServiceTokenResponse = z.infer<typeof ServiceTokenResponse>;
+
+export const addUserToStudyPermissionResponse = z.object({
+	success: z.array(z.string()),
+	error: z.string().or(z.array(z.string())),
+});
+export type PCGLAddUserToStudyPermissionResponse = z.infer<typeof addUserToStudyPermissionResponse>;
 
 export const sessionUser = authGeneratedSessionValues.merge(dacoGeneratedSessionValues);
 

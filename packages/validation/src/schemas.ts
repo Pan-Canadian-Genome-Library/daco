@@ -177,7 +177,7 @@ export type studySchemaType = z.infer<typeof studyModelSchema>;
 
 export const studyClinicalDTOSchema = z.object({
 	studyId: z.string(),
-	dacId: z.string(),
+	dacId: z.string().nullable().optional(),
 	categoryId: z.number().nullable(),
 	studyName: z.string(),
 	status: z.nativeEnum(StudyStatus),

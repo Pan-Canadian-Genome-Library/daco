@@ -17,16 +17,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@pcgl-daco/data-model';
+import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
 import { ConfigProvider, Flex, Table, TablePaginationConfig, theme, Typography } from 'antd';
 import { ColumnsType, FilterValue, SorterResult } from 'antd/es/table/interface';
+import { useTranslation } from 'react-i18next';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import StatusTableColumn from '@/components/pages/manage/ApplicationStatusColumn';
 import DashboardFilter, { type FilterKeys } from '@/components/pages/manage/DashboardFilter';
 import RowCount from '@/components/pages/manage/RowCount';
 import { pcglTableTheme } from '@/providers/ThemeProvider';
-import { type ApplicationListSummary, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types';
-import { useTranslation } from 'react-i18next';
+
+import { stringSorter } from './utils/manageUtils';
 
 const { Link, Text } = Typography;
 const { useToken } = theme;
@@ -70,12 +72,13 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 				PCGL-{value}
 			</Link>
 		),
-		sorter: { multiple: 1 },
+		sorter: (a, b) => stringSorter(String(a.id), String(b.id)),
 	},
 	{
 		title: 'DAC',
 		dataIndex: 'dacId',
 		render: (_, record) => `${record.dacId || '-'}`,
+		sorter: (a, b) => stringSorter(a.dacId, b.dacId),
 	},
 	{
 		title: 'Institution',
@@ -83,6 +86,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 		key: 'institution',
 		render: (value: string, record: ApplicationListSummary) =>
 			record.applicant?.institution ? record.applicant.institution : '-',
+		sorter: (a, b) => stringSorter(a.applicant?.institution, b.applicant?.institution),
 	},
 	{
 		title: 'Country',
@@ -93,6 +97,7 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 			record.applicant?.country
 				? (GC_STANDARD_GEOGRAPHIC_AREAS.find((country) => country.iso === record.applicant?.country)?.en ?? '-')
 				: '-',
+		sorter: (a, b) => stringSorter(a.applicant?.country, b.applicant?.country),
 	},
 	{
 		title: 'Applicant',
@@ -102,26 +107,43 @@ const tableColumnConfiguration: ColumnsType<ApplicationListSummary> = [
 			record.applicant?.firstName && record.applicant.lastName
 				? `${record.applicant.firstName} ${record.applicant.lastName}`
 				: '-',
+		sorter: (a, b) => stringSorter(a.applicant?.firstName, b.applicant?.firstName),
 	},
 	{
 		title: 'Email',
 		dataIndex: ['applicant', 'email'],
 		key: 'email',
 		render: (_: string, record) => (record.applicant?.email ? record.applicant.email : '-'),
+		sorter: (a, b) => stringSorter(a.applicant?.email, b.applicant?.email),
 	},
 	{
 		title: 'Updated',
 		dataIndex: 'updatedAt',
 		key: 'updatedAt',
 		render: (value?: string) => (value ? new Date(value).toLocaleDateString('en-CA') : '-'),
-		sorter: { multiple: 2 },
+		sorter: (a, b) => {
+			const updateA = a.updatedAt instanceof Date ? a.updatedAt.toISOString() : a.updatedAt;
+			const updateB = b.updatedAt instanceof Date ? b.updatedAt.toISOString() : b.updatedAt;
+			return stringSorter(updateA, updateB);
+		},
 	},
 	{
 		title: 'Status',
 		dataIndex: 'state',
+		defaultSortOrder: 'descend',
 		key: 'state',
 		render: (value: ApplicationStateValues) => <StatusTableColumn value={value} />,
-		sorter: { multiple: 3 },
+		sorter: {
+			compare: (a, b) => {
+				if (a.state === 'DAC_REVIEW') {
+					return 1;
+				} else if (b.state === 'DAC_REVIEW') {
+					return -1;
+				}
+				return stringSorter(a.state, b.state);
+			},
+			multiple: 2,
+		},
 	},
 ];
 

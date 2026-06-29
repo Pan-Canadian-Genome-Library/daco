@@ -66,6 +66,17 @@ export const setStudyAcceptingApplications = async ({
 		const database = getDbInstance();
 		const studyService = studySvc(database);
 
+		const currentStudy = await studyService.getStudyById({ studyId });
+
+		if (!currentStudy.success) {
+			return currentStudy;
+		}
+
+		if (!currentStudy.data.dacId || currentStudy.data.dacId === null) {
+			logger.error(`Studies require an associated DAC to update accepting applications`);
+			return failure('SYSTEM_ERROR', `Cannot update accepting applications for a study without an associated DAC`);
+		}
+
 		const study = await studyService.updateStudyAcceptingApplication({ studyId, enabled });
 
 		return study;
@@ -110,7 +121,32 @@ export const upsertStudy = async ({
 			const result = await studyService.createStudyFromClinical({ studyData: studyModel, transaction });
 
 			if (!result.success || !result.data) {
+				logger.error('Failed upsert studies from clinical to DACO', result);
+
 				return failure('SYSTEM_ERROR', 'Failed to sync studies');
+			}
+		}
+
+		// Check if any studies have been removed from clinical submission then delete them from the database
+		const allStudiesFromDACO = await studyService.getAllStudies({});
+		if (!allStudiesFromDACO.success) {
+			logger.error('Failed to fetch all studies to verify if any have been removed', allStudiesFromDACO.message);
+			return failure('SYSTEM_ERROR', 'Failed to upsert studies from clinical.');
+		}
+
+		const studiesToRemove = allStudiesFromDACO.data.filter(
+			(study) => !studies.some((currentStudy) => currentStudy.studyId === study.studyId),
+		);
+		if (studiesToRemove.length > 0) {
+			logger.warn(
+				'Studies have been removed from clinical submission, start removing the missing studies in clinical from DACO.',
+			);
+			for (const study of studiesToRemove) {
+				const deleteResult = await studyService.deleteStudy({ studyId: study.studyId, transaction });
+				if (!deleteResult.success && deleteResult.error !== 'NOT_FOUND') {
+					logger.error('Failed to remove non-existent study in clinical from DACO:', deleteResult.message);
+					return failure('SYSTEM_ERROR', 'Failed to sync studies');
+				}
 			}
 		}
 
