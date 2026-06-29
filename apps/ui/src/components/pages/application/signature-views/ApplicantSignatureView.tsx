@@ -64,18 +64,8 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />
 				</Row>
 			</SectionContent>
-			<SectionContent showDivider={true}>
-				{!signatureLoading ? (
-					<SignatureViewer
-						title="Institutional Representative"
-						name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
-						signature={signatureData?.institutionalRepSignature}
-						date={signatureData?.institutionalRepSignedAt}
-					/>
-				) : null}
-			</SectionContent>
 			<SectionContent
-				showDivider={false}
+				showDivider={true}
 				title={translate('sign-and-submit-section.section.title')}
 				text={translate('sign-and-submit-section.section.description')}
 			>
@@ -97,6 +87,20 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 								onSaveClicked={onSaveClicked}
 								saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
 								clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
+							/>
+						) : null}
+					</Col>
+				</Row>
+			</SectionContent>
+			<SectionContent showDivider={false}>
+				<Row>
+					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
+						{!signatureLoading ? (
+							<SignatureViewer
+								title="Institutional Representative"
+								name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
+								signature={signatureData?.institutionalRepSignature}
+								date={signatureData?.institutionalRepSignedAt}
 							/>
 						) : null}
 					</Col>
