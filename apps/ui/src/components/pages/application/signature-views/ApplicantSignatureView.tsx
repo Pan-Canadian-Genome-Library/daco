@@ -21,9 +21,11 @@ import ESignature from '@/components/pages/application/form-components/ESignatur
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import SignatureViewer from '@/components/pages/application/SignatureViewer';
 import { useSignatureForm } from '@/components/pages/application/utils/useSignatureForm';
 import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Col, Row } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -37,10 +39,14 @@ type Props = {
 
 const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Props) => {
 	const { t: translate } = useTranslation();
+	const {
+		state: { fields },
+	} = useApplicationContext();
 	const { revisions } = useOutletContext<ApplicationOutletContext>();
 	const { form, disableSignature, disableSubmit, signatureRef, onSaveClicked } = useSignatureForm({
 		signatureData: signatureData,
 	});
+	const { institutionalRepFirstName, institutionalRepLastName } = fields;
 	const { control, setValue, formState, watch, clearErrors, reset } = form;
 
 	const watchSignature = watch('signature');
@@ -57,6 +63,16 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 				<Row>
 					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />
 				</Row>
+			</SectionContent>
+			<SectionContent showDivider={true}>
+				{!signatureLoading ? (
+					<SignatureViewer
+						title="Institutional Representative"
+						name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
+						signature={signatureData?.institutionalRepSignature}
+						date={signatureData?.institutionalRepSignedAt}
+					/>
+				) : null}
 			</SectionContent>
 			<SectionContent
 				showDivider={false}
