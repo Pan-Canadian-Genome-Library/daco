@@ -148,9 +148,13 @@ export const getUserInformation = async (
 	try {
 		const response = await fetchAuthZResource('/user/me', accessToken);
 
-		if (response.status === 204) {
-			// A "204 No content" response is returned when the user is not registered.
-			return failure('NOT_FOUND', 'Unable to retrieve user information from the PCGL AuthZ service.');
+		if (response.status === 404) {
+			// A "404 Not Found" response is returned when the user is not registered.
+			// Attempt to reload user information from the AuthZ service in case the user was just registered.
+			await reloadAuthZService();
+
+			logger.warn(`[AUTHZ]: User not found in PCGL AuthZ service.`);
+			return failure('NOT_FOUND', 'User not found in PCGL AuthZ service.');
 		}
 
 		const res = await response.json();
@@ -215,6 +219,31 @@ export const addUsersToStudyPermission = async (
 		return success(resultAddPermission.data);
 	} catch (error) {
 		const message = `Unexpected error while adding ${userEmails.join(', ')} to study ${studyId}`;
+		logger.error('[AUTHZ]:', message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+/**
+ * Function to reload the AuthZ service
+ * Reloading the AuthZ service will refresh the users information and permissions in the AuthZ service.
+ */
+export const reloadAuthZService = async (): AsyncResult<null, 'SYSTEM_ERROR'> => {
+	try {
+		const response = await fetchAuthZResource('/reload', '', {
+			method: 'POST',
+		});
+
+		if (!response.ok) {
+			const responseText = await response.text();
+			const message = `Failed to reload AuthZ service`;
+			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${responseText}`);
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(null);
+	} catch (error) {
+		const message = `Unexpected error while reloading AuthZ service`;
 		logger.error('[AUTHZ]:', message, error);
 		return failure('SYSTEM_ERROR', message);
 	}
