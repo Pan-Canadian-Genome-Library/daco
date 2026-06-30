@@ -97,7 +97,7 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
 						{!signatureLoading ? (
 							<SignatureViewer
-								title="Institutional Representative"
+								title={translate('generic.rep')}
 								name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
 								signature={signatureData?.institutionalRepSignature}
 								date={signatureData?.institutionalRepSignedAt}
