@@ -464,6 +464,13 @@ paths:
             type: integer
           required: true
           description: The ID of the application to revoke.
+      requestBody:
+        description: Request body containing revoked approval details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requests/RevokeApplication'
       responses:
         '401':
           description: Unauthorized. Will occur when the user is not logged in.
