@@ -207,7 +207,7 @@ describe('Application API', () => {
 
 	describe('Create a new application', () => {
 		it('should successfully be able to create a new application with the provided user_id', async () => {
-			const result = await createApplication({ user_id });
+			const result = await createApplication({ user_id, applicant_institutional_email: user_id });
 
 			assert.ok(result.success && result.data);
 
@@ -216,7 +216,7 @@ describe('Application API', () => {
 			assert.strictEqual(application.userId, user_id);
 		});
 
-		it('should successfully be able to create a new application with the provided user_id', async () => {
+		it('should successfully create an associated application contents record', async () => {
 			const result = await createApplication({ user_id, applicant_institutional_email: user_id });
 
 			assert.ok(result.success && result.data);
@@ -557,7 +557,7 @@ describe('Application API', () => {
 
 	describe('Submit Application', () => {
 		it('should successfully submit an application in DRAFT', async () => {
-			const createResult = await createApplication({ user_id: testUserId });
+			const createResult = await createApplication({ user_id: testUserId, applicant_institutional_email: user_id });
 
 			assert.ok(createResult.success);
 
@@ -596,7 +596,10 @@ describe('Application API', () => {
 		});
 
 		it('should assign dacId to application during submission', async () => {
-			const createApplicationResult = await createApplication({ user_id: testUserId });
+			const createApplicationResult = await createApplication({
+				user_id: testUserId,
+				applicant_institutional_email: user_id,
+			});
 
 			assert.ok(createApplicationResult.success);
 
@@ -620,7 +623,10 @@ describe('Application API', () => {
 		});
 
 		it('should fail to submit application if there is no requested studies', async () => {
-			const createApplicationResult = await createApplication({ user_id: testUserId });
+			const createApplicationResult = await createApplication({
+				user_id: testUserId,
+				applicant_institutional_email: user_id,
+			});
 
 			assert.ok(createApplicationResult.success);
 
@@ -633,7 +639,10 @@ describe('Application API', () => {
 		});
 
 		it("should fail to submit application if the requested study doesn't exist in the database", async () => {
-			const createApplicationResult = await createApplication({ user_id: testUserId });
+			const createApplicationResult = await createApplication({
+				user_id: testUserId,
+				applicant_institutional_email: user_id,
+			});
 
 			assert.ok(createApplicationResult.success);
 
@@ -653,6 +662,17 @@ describe('Application API', () => {
 			assert.strictEqual(result.error, 'SYSTEM_ERROR');
 		});
 	});
+
+	// describe('Approve Application', () => {
+	// 	it('should successfully approve an Application in DAC Review ', async () => {
+	// 		const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.DAC_REVIEW);
+
+	// 		const approveResult = await approveApplication({ applicationId: testApp.id, userName: testUserName });
+
+	// 		assert.ok(!result.success);
+	// 		assert.strictEqual(result.error, 'NOT_FOUND');
+	// 	});
+	// });
 
 	describe('Application History', () => {
 		it('should successfully retrieve Application History for a given ID', async () => {
@@ -731,7 +751,10 @@ describe('Application API', () => {
 		});
 
 		it('should fail to edit application if requested studies contain studyIds belonging to multiple DACs', async () => {
-			const createApplicationResult = await createApplication({ user_id: testUserId });
+			const createApplicationResult = await createApplication({
+				user_id: testUserId,
+				applicant_institutional_email: user_id,
+			});
 
 			assert.ok(createApplicationResult.success);
 
@@ -800,7 +823,10 @@ describe('Application API', () => {
 		});
 
 		it('should allow to edit application if requested studies contain studyIds belonging to a singlular DAC', async () => {
-			const createApplicationResult = await createApplication({ user_id: testUserId });
+			const createApplicationResult = await createApplication({
+				user_id: testUserId,
+				applicant_institutional_email: user_id,
+			});
 
 			assert.ok(createApplicationResult.success);
 
@@ -816,7 +842,10 @@ describe('Application API', () => {
 		});
 
 		it('should fail to edit application if requested studies contain studyIds that are not accepting applications', async () => {
-			const createApplicationResult = await createApplication({ user_id: testUserId });
+			const createApplicationResult = await createApplication({
+				user_id: testUserId,
+				applicant_institutional_email: user_id,
+			});
 
 			assert.ok(createApplicationResult.success);
 
