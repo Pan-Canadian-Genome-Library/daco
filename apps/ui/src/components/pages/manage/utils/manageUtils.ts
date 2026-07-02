@@ -178,3 +178,22 @@ export const transformSearchText = (searchValue: string): string => {
 
 	return searchValue;
 };
+
+/**
+ * Basic sorting function for use with AntDesign table configuration.
+ * Compares two strings and returns comparison value as a number:
+ * 0 (no change), 1 (a before b), or -1 (b before a)
+ * @param fieldA Value from record A to compare
+ * @param fieldB Value from record B to compare
+ * @returns number
+ */
+export const stringSorter = (fieldA: string | null | undefined, fieldB: string | null | undefined) => {
+	const valueA = fieldA ? fieldA : 0;
+	const valueB = fieldB ? fieldB : 0;
+	if (typeof valueA === 'string') {
+		return valueA.localeCompare(String(valueB));
+	} else if (typeof valueB === 'string') {
+		return valueB.localeCompare(String(valueA));
+	}
+	return 0;
+};

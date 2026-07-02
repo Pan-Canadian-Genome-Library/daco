@@ -46,7 +46,7 @@ const { Text } = Typography;
 const rule = createSchemaFieldRule(requestedStudiesSchema);
 const { Item } = Form;
 
-const getDacIds = (requestedStudies: string[] | null, studies: StudyDacoDTO[]): string[] => {
+const getDacIds = (requestedStudies: string[] | null, studies: StudyDacoDTO[]): (string | null)[] => {
 	if (!requestedStudies?.length) {
 		return [];
 	}
