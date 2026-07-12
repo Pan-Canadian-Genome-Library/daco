@@ -29,10 +29,6 @@ import { AsyncResult, failure, success } from '@/utils/results.ts';
 
 import emailClient from './index.ts';
 import {
-	GenerateEmailRepForSubmittedRevision,
-	GenerateEmailRepForSubmittedRevisionPlain,
-} from './layouts/templates/EmailInstitutionalRepRevision.ts';
-import {
 	GenerateEmailApplicantAppSubmitted,
 	GenerateEmailApplicantAppSubmittedPlain,
 	GenerateEmailApplicantClosed,
@@ -45,6 +41,8 @@ import {
 	GenerateEmailApplicantRevokePlain,
 	GenerateEmailApproval,
 	GenerateEmailApprovalPlain,
+	GenerateEmailCollaboratorApproval,
+	GenerateEmailCollaboratorApprovalPlain,
 	GenerateEmailDacForReview,
 	GenerateEmailDacForReviewPlain,
 	GenerateEmailDacForSubmittedRevision,
@@ -67,6 +65,8 @@ import {
 	GenerateEmailReminderSubmitDraftPlain,
 	GenerateEmailReminderSubmitRepRevisions,
 	GenerateEmailReminderSubmitRepRevisionsPlain,
+	GenerateEmailRepForSubmittedRevision,
+	GenerateEmailRepForSubmittedRevisionPlain,
 } from './layouts/templates/index.ts';
 import {
 	EmailSubjects,
@@ -74,6 +74,7 @@ import {
 	type GenerateApplicantRevisionType,
 	type GenerateApproveType,
 	type GenerateClosedType,
+	type GenerateCollaboratorApproveType,
 	type GenerateDacRevisionType,
 	type GenerateDraftReminderEmailType,
 	type GenerateInstitutionalRepType,
@@ -823,9 +824,8 @@ const emailSvc = (db: PostgresDb) => {
 				return failure('SYSTEM_ERROR', message);
 			}
 		},
-		// Email to Collaborators & Notify Approval
 		// Email to Applicant & Notify Approval
-		sendEmailApproval: async ({
+		sendApplicantEmailApproval: async ({
 			id,
 			actionId,
 			name,
@@ -857,7 +857,47 @@ const emailSvc = (db: PostgresDb) => {
 
 				return success(response);
 			} catch (error) {
-				const message = `Error sending email - sendEmailApproval`;
+				const message = `Error sending email - sendApplicantEmailApproval`;
+				logger.error(message, error);
+
+				return failure('SYSTEM_ERROR', message);
+			}
+		},
+		// Email to Collaborators & Notify Approval
+		sendCollaboratorEmailApproval: async ({
+			actionId,
+			id,
+			name,
+			to,
+			studies,
+		}: GenerateCollaboratorApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
+			try {
+				const {
+					email: { fromAddress },
+				} = getEmailConfig;
+
+				if (!to) {
+					throw new Error(`Error retrieving address to send email to user id: ${id} `);
+				}
+
+				const response = await emailClient.sendMail({
+					from: fromAddress,
+					to,
+					subject: EmailSubjects.NOTIFY_APPROVAL,
+					html: GenerateEmailCollaboratorApproval({ id, name, studies }),
+					text: GenerateEmailCollaboratorApprovalPlain({ id, name, studies }),
+				});
+
+				await createEmailRecord({
+					application_id: Number(id),
+					application_action_id: actionId,
+					email_type: EmailTypes.NOTIFY_COLLABORATORS_DAC_APPROVAL,
+					recipient_emails: [to],
+				});
+
+				return success(response);
+			} catch (error) {
+				const message = `Error sending email - sendCollaboratorsEmailApproval`;
 				logger.error(message, error);
 
 				return failure('SYSTEM_ERROR', message);
