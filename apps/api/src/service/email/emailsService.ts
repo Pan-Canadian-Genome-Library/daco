@@ -978,6 +978,7 @@ const emailSvc = (db: PostgresDb) => {
 					application_id: Number(id),
 					application_action_id: actionId,
 					email_type: EmailTypes.NOTIFY_APPLICANT_REVOKE,
+					comment,
 					recipient_emails: [to],
 				});
 
