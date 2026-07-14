@@ -100,6 +100,10 @@ const dateConverter = (date: Date | string) => {
  * @param db - Drizzle Postgres DB Instance
  */
 const emailSvc = (db: PostgresDb) => {
+	const {
+		email: { from },
+	} = getEmailConfig;
+
 	const createEmailRecord = async ({
 		application_id,
 		application_action_id,
@@ -146,16 +150,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateDraftReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_DRAFT,
 					html: GenerateEmailReminderSubmitDraft({
@@ -196,16 +196,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.INSTITUTIONAL_REP_REVIEW_REQUEST,
 					html: GenerateEmailInstitutionalRepReview({
@@ -247,16 +243,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
 					html: GenerateEmailReminderRepReview({
@@ -300,16 +292,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateApplicantRepRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_REVISION,
 					html: GenerateEmailApplicantRepRevision({
@@ -354,16 +342,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
 					html: GenerateEmailReminderSubmitRepRevisions({
@@ -406,16 +390,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateInstitutionalRepType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 					html: GenerateEmailReminderRepReviewRevisions({
@@ -456,16 +436,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_APPLICANT_REP_SUBMIT_DAC_REVIEW,
 					html: GenerateEmailApplicantAppSubmitted({ id, applicantName }),
@@ -497,16 +473,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
 					html: GenerateEmailDacForReview({ id, applicantName, submittedDate: dateConverter(submittedDate) }),
@@ -539,16 +511,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVIEW,
 					html: GenerateEmailReminderDacReview({
@@ -590,16 +558,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateApplicantRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_REVISION,
 					html: GenerateEmailApplicantRevision({ id, applicantName, comments }),
@@ -632,16 +596,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateSubmitRevisionReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.REMINDER_SUBMIT_REVISIONS,
 					html: GenerateEmailReminderSubmitDacRevisions({
@@ -685,16 +645,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_DAC_REVIEW_REVISIONS,
 					html: GenerateEmailDacForSubmittedRevision({
@@ -733,16 +689,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateDacRevisionType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_REP_REVIEW_REVISIONS,
 					html: GenerateEmailRepForSubmittedRevision({
@@ -782,16 +734,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateReviewReminderEmailType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.REMINDER_REVIEW_SUBMITTED_REVISIONS,
 					html: GenerateEmailReminderDacReviewRevisions({
@@ -832,16 +780,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_APPROVAL,
 					html: GenerateEmailApproval({ id, name }),
@@ -872,16 +816,12 @@ const emailSvc = (db: PostgresDb) => {
 			studies,
 		}: GenerateCollaboratorApproveType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.NOTIFY_APPROVAL,
 					html: GenerateEmailCollaboratorApproval({ id, name, studies }),
@@ -912,16 +852,12 @@ const emailSvc = (db: PostgresDb) => {
 			comment,
 		}: GenerateRejectType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.DACO_APPLICATION_STATUS,
 					html: GenerateEmailRejection({ id, name, comment }),
@@ -954,16 +890,12 @@ const emailSvc = (db: PostgresDb) => {
 			dacRevoked = false,
 		}: GenerateRejectType & { dacRevoked?: boolean }): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.DACO_APPLICATION_STATUS,
 					html: GenerateEmailApplicantRevoke({ id, name, comment, dacRevoked }),
@@ -998,16 +930,12 @@ const emailSvc = (db: PostgresDb) => {
 			to,
 		}: GenerateClosedType): AsyncResult<SMTPPool.SentMessageInfo, 'SYSTEM_ERROR'> => {
 			try {
-				const {
-					email: { fromAddress },
-				} = getEmailConfig;
-
 				if (!to) {
 					throw new Error(`Error retrieving address to send email to user id: ${id} `);
 				}
 
 				const response = await emailClient.sendMail({
-					from: fromAddress,
+					from,
 					to,
 					subject: EmailSubjects.DACO_APPLICATION_STATUS_UPDATE,
 					html: GenerateEmailApplicantClosed({ id, userName, applicantName, message, state, submittedDate }),

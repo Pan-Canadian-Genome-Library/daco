@@ -56,7 +56,7 @@ export const getEmailConfig = {
 		port: parseResult.data.EMAIL_PORT,
 		secure: parseResult.data.EMAIL_SECURE.toLocaleLowerCase() === 'true',
 		service: parseResult.data.EMAIL_SERVICE,
-		fromAddress: parseResult.data.EMAIL_FROM_ADDRESS,
+		from: `${parseResult.data.EMAIL_FROM_NAME} <${parseResult.data.EMAIL_FROM_ADDRESS}>`,
 		fromName: parseResult.data.EMAIL_FROM_NAME,
 		contactAddress: parseResult.data.EMAIL_CONTACT_ADDRESS,
 		dacAddress: parseResult.data.EMAIL_DACO_ADDRESS,
