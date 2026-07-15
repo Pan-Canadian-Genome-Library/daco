@@ -109,17 +109,20 @@ const emailSvc = (db: PostgresDb) => {
 		application_action_id,
 		email_type,
 		recipient_emails,
+		comment,
 	}: {
 		application_id: number;
 		application_action_id?: number;
 		email_type: EmailTypeValues;
 		recipient_emails: string[];
+		comment?: string;
 	}): AsyncResult<EmailRecord, 'SYSTEM_ERROR'> => {
 		const newEmail: EmailModel = {
 			application_id,
 			application_action_id,
 			created_at: new Date(),
 			email_type,
+			comment,
 			recipient_emails,
 		};
 
@@ -869,6 +872,7 @@ const emailSvc = (db: PostgresDb) => {
 					application_action_id: actionId,
 					email_type: EmailTypes.NOTIFY_APPLICANT_DAC_REVIEW_REJECTED,
 					recipient_emails: [to],
+					comment,
 				});
 
 				return success(response);
@@ -906,6 +910,7 @@ const emailSvc = (db: PostgresDb) => {
 					application_id: Number(id),
 					application_action_id: actionId,
 					email_type: EmailTypes.NOTIFY_APPLICANT_REVOKE,
+					comment,
 					recipient_emails: [to],
 				});
 
