@@ -7,13 +7,13 @@
 			"title": "Impossible de se connecter.",
 			"descriptions": {
 				"NOT_FOUND": {
-					"subheading": "Le compte n'est pas associé au projet PCGL.",
-					"description": "Il semble que votre compte n'est actuellement pas associé au projet PCGL et ne peut donc pas accéder au service BCAD de la BGP. Cela peut être dû au fait que vous n'avez pas terminé le processus d'intégration pour les nouveaux comptes, ou que vous vous êtes connecté/e avec un compte non utilisé précédemment pour accéder au service.",
-					"description2": "Veuillez vous inscrire vous-même en cliquant sur le bouton « Commencer » ci-dessous pour terminer votre intégration et accéder au service BCAD de la BGP."
+					"subheading": "Le compte n'est pas associé au projet BGPC.",
+					"description": "Il semble que votre compte n'est actuellement pas associé au projet BGPC et ne peut donc pas accéder au service BCAD de la BGP.",
+					"description2": "Si vous n'avez pas terminé le processus d'intégration pour les nouveaux comptes, veuillez cliquer sur le bouton \"Commencer\" ci-dessous. Sinon, si vous venez de vous inscrire, veuillez attendre quelques minutes et réessayer de vous connecter."
 				},
 				"SELF_REGISTRATION_SENT": {
 					"subheading": "Votre compte est presque prêt !",
-					"description": "Merci de vous être inscrit/e au projet PCGL. Nous avons envoyé un courriel de vérification à votre adresse courriel. Veuillez ouvrir ce message et suivre les instructions pour confirmer votre adresse et retourner au service BCAD de la BGP.",
+					"description": "Merci de vous être inscrit/e au projet BGPC. Nous avons envoyé un courriel de vérification à votre adresse courriel. Veuillez ouvrir ce message et suivre les instructions pour confirmer votre adresse et retourner au service BCAD de la BGP.",
 					"description2": "Si vous n'avez pas reçu le courriel dans quelques minutes, vous pouvez renvoyer le courriel de vérification ou contacter l'équipe de soutien de la BGP."
 				},
 				"SYSTEM_ERROR": {

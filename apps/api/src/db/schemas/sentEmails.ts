@@ -18,7 +18,7 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { bigint, pgEnum, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { bigint, pgEnum, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 import { EmailTypes } from '@pcgl-daco/data-model';
 
@@ -59,6 +59,7 @@ export const sentEmails = pgTable('emails', {
 	application_action_id: bigint({ mode: 'number' }).references(() => applicationActions.id),
 	created_at: timestamp().notNull().defaultNow(),
 	email_type: emailTypesEnum().notNull(),
+	comment: text(),
 	recipient_emails: varchar({ length: 320 }).array().notNull(),
 });
 
