@@ -54,6 +54,14 @@ const AdminStudiesPage = () => {
 			),
 		},
 		{
+			key: 'studyId',
+			title: 'Study Id',
+			dataIndex: 'studyId',
+			width: 150,
+			align: 'center',
+			render: (studyId: string) => <Text>{studyId}</Text>,
+		},
+		{
 			key: 'status',
 			title: 'Status',
 			dataIndex: 'acceptingApplications',
