@@ -74,6 +74,7 @@ export const projectInformationSchema = z.object({
 	projectTitle: NonEmptyString,
 	projectWebsite: OptionalURLString,
 	projectBackground: Concise200WordCountString,
+	projectCountry: NonEmptyString,
 	projectAims: Concise200WordCountString,
 	projectMethodology: Concise200WordCountString,
 	projectSummary: Concise250WordCountString,

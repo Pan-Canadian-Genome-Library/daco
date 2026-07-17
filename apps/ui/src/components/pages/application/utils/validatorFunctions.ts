@@ -73,6 +73,7 @@ export const ValidatorProject = (fields: ApplicationContentsResponse): boolean =
 		projectTitle: fields.projectTitle,
 		projectWebsite: fields.projectWebsite,
 		projectBackground: fields.projectBackground, // Abstract
+		projectCountry: fields.projectCountry,
 		projectAims: fields.projectAims,
 		projectMethodology: fields.projectMethodology,
 		projectSummary: fields.projectSummary,

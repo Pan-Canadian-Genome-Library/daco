@@ -18,6 +18,7 @@
  */
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { GC_STANDARD_GEOGRAPHIC_AREAS } from '@pcgl-daco/data-model';
 import { projectInformationSchema, type ProjectInformationSchemaType } from '@pcgl-daco/validation';
 import { Col, Form, Row } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
@@ -29,6 +30,7 @@ import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
 import InputBox from '@/components/pages/application/form-components/InputBox';
 import LabelWithExample from '@/components/pages/application/form-components/labels/LabelWithExample';
+import SelectBox from '@/components/pages/application/form-components/SelectBox';
 import TextAreaBox from '@/components/pages/application/form-components/TextAreaBox';
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
@@ -59,6 +61,7 @@ const Project = () => {
 			projectTitle: state.fields.projectTitle,
 			projectWebsite: state.fields.projectWebsite,
 			projectBackground: state.fields.projectBackground,
+			projectCountry: state.fields.projectCountry,
 			projectAims: state.fields.projectAims,
 			projectMethodology: state.fields.projectMethodology,
 			projectSummary: state.fields.projectSummary,
@@ -94,6 +97,7 @@ const Project = () => {
 					projectWebsite: data.projectWebsite,
 					projectAims: data.projectAims,
 					projectBackground: data.projectBackground,
+					projectCountry: data.projectCountry,
 					projectMethodology: data.projectMethodology,
 					projectSummary: data.projectSummary,
 					projectPublicationUrls,
@@ -170,6 +174,22 @@ const Project = () => {
 								}
 								name="projectBackground"
 								control={control}
+								rule={rule}
+								required
+								disabled={!canEdit}
+							/>
+						</Col>
+					</Row>
+					<Row>
+						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
+							<SelectBox
+								label={translate('project-section.section1.form.country.title')}
+								name="projectCountry"
+								control={control}
+								options={GC_STANDARD_GEOGRAPHIC_AREAS.map((areas) => {
+									return { value: areas.iso, label: areas.en };
+								})}
+								initialValue={'CAN'}
 								rule={rule}
 								required
 								disabled={!canEdit}

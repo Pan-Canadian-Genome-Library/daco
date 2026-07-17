@@ -197,6 +197,7 @@ export type ProjectInformationTranslation = {
 	RESEARCH_SUMMARY_TITLE: string;
 	RESEARCH_SUMMARY_DESCRIPTION: string;
 	PROJECT_BACKGROUND_LABEL: string;
+	PROJECT_COUNTRY_LABEL: string;
 	USE_OF_DATA_METHODOLOGY_LABEL: string;
 	AIMS_LABEL: string;
 	LAY_SUMMARY_TITLE: string;
