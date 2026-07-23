@@ -43,6 +43,7 @@ const FooterComponent = () => {
 	const pcglLinks: LinkType[] = [
 		{
 			name: translate('links.contact'),
+			href: 'mailto:helpdesk@genomelibrary.ca',
 		},
 		{
 			name: translate('links.policies'),
@@ -128,7 +129,14 @@ const FooterComponent = () => {
 							{pcglLinks.map((itemLink) => (
 								<Col span={7} key={itemLink.name} md={{ flex: '33%' }} sm={{ flex: '50%' }} xs={{ flex: '50%' }}>
 									<Flex justify={'flex-start'}>
-										<Link key={itemLink.name} style={{ ...linkStyle }} underline target="_blank" tabIndex={0}>
+										<Link
+											key={itemLink.name}
+											href={itemLink.href}
+											style={{ ...linkStyle }}
+											underline
+											target="_blank"
+											tabIndex={0}
+										>
 											{itemLink.name}
 										</Link>
 									</Flex>
