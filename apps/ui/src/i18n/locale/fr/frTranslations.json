@@ -180,8 +180,8 @@
 				"message": "Désolé, il semble que la ressource à laquelle vous essayez d'accéder n'existe pas."
 			},
 			"400": {
-				"title": "Cette demande était incorrecte.",
-				"message": "Désolé, il semble que votre navigateur ait envoyé une demande incorrecte, veuillez recharger la page et réessayer."
+				"title": "Demande invalide.",
+				"message": "Il semble que votre demande soit invalide et ne peut pas être complétée pour le moment."
 			},
 			"500": {
 				"title": "Une erreur s'est produite.",

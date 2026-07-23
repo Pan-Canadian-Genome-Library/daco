@@ -180,8 +180,8 @@
 				"message": "Sorry, looks like the resource you're trying to access does not exist."
 			},
 			"400": {
-				"title": "That was a bad request.",
-				"message": "Sorry, looks like your browser sent a bad request, please reload the page and try again."
+				"title": "Invalid Request.",
+				"message": "Looks like your request is invalid and cannot be completed at this time."
 			},
 			"500": {
 				"title": "Something went wrong.",
