@@ -53,7 +53,8 @@ export interface ModalStateProps extends ModalState {
 
 const Collaborators = () => {
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisions, dacComments, disabledDacComments } =
+		useOutletContext<ApplicationOutletContext>();
 	const { state } = useApplicationContext();
 
 	const canEdit = canEditSection({
@@ -137,7 +138,7 @@ const Collaborators = () => {
 					showDivider={false}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="collaborators" />
+					<DacComments sectionComments={dacComments} section="collaborators" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['collaborators']} />
 				</Row>
 				<SectionContent showDivider={false}>
