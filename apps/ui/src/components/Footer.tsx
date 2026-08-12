@@ -43,7 +43,7 @@ const FooterComponent = () => {
 	const pcglLinks: LinkType[] = [
 		{
 			name: translate('links.contact'),
-			href: 'mailto:' + process.env.VITE_HELP_DESK_EMAIL,
+			href: 'mailto:' + import.meta.env.VITE_HELP_DESK_EMAIL,
 		},
 		{
 			name: translate('links.policies'),
