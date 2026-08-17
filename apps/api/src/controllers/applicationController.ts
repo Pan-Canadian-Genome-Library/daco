@@ -704,11 +704,7 @@ export const submitRevision = async ({
 		const { actionId } = submittedRevision.data;
 
 		if (result.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-			const accessToken = request.session.account?.accessToken || '';
-			const emails = await getGroupEmails(
-				accessToken,
-				`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}:${application.dac_id}`,
-			);
+			const emails = await getGroupEmails(`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}${application.dac_id}`);
 
 			if (emails.success) {
 				emails.data.forEach((email) => {
@@ -1093,11 +1089,7 @@ export const submitApplication = async ({
 				actionId,
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			const accessToken = request.session.account?.accessToken || '';
-			const emails = await getGroupEmails(
-				accessToken,
-				`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}:${application.dac_id}`,
-			);
+			const emails = await getGroupEmails(`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}${application.dac_id}`);
 			if (emails.success) {
 				emails.data.forEach((email) => {
 					// Send email to DAC for review

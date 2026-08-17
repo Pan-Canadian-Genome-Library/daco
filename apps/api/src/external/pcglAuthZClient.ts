@@ -82,11 +82,12 @@ export const refreshAuthZServiceToken = async () => {
  * It uses a retry mechanishm
  *
  * @param resource endpoint to query from authz
- * @param token authorization token
+ * @param token authorization token as Bearer - No token passed will remove Authorization header entirely
  * @param options optional additional request configurations for the fetch call
  *
+ *
  */
-export const fetchAuthZResource = async (resource: string, token: string, options?: RequestInit) => {
+export const fetchAuthZResource = async (resource: string, token?: string, options?: RequestInit) => {
 	const { AUTHZ_ENDPOINT, AUTHZ_SERVICE_ID, AUTHZ_FETCH_RETRIES, AUTHZ_FETCH_RETRY_DELAY_MS } = authConfig;
 	/**
 	 * Internal function that does the work of fetching the resource from AuthZ.
@@ -95,10 +96,10 @@ export const fetchAuthZResource = async (resource: string, token: string, option
 	async function _fetchFromAuthZ() {
 		const url = urlJoin(AUTHZ_ENDPOINT, resource);
 		const headers = new Headers({
-			Authorization: `Bearer ${token}`,
 			'Content-Type': 'application/json',
 			'X-Service-ID': `${AUTHZ_SERVICE_ID}`,
 			'X-Service-Token': `${serviceToken}`,
+			...(token ? { Authorization: `Bearer ${token}` } : {}),
 		});
 
 		try {
@@ -142,7 +143,6 @@ export const fetchAuthZResource = async (resource: string, token: string, option
 		}
 	}
 };
-
 export const getUserInformation = async (
 	accessToken: string,
 ): AsyncResult<PCGLAuthZUserInfoResponse, 'SYSTEM_ERROR' | 'FORBIDDEN' | 'NOT_FOUND'> => {
@@ -231,11 +231,10 @@ export const addUsersToStudyPermission = async (
  * @returns returns a list of emails associated with the given group
  */
 export const getGroupEmails = async (
-	accessToken: string,
 	group: string,
 ): AsyncResult<string[], 'SYSTEM_ERROR' | 'FORBIDDEN' | 'NOT_FOUND'> => {
 	try {
-		const response = await fetchAuthZResource(`/group/${group}`, accessToken);
+		const response = await fetchAuthZResource(`/group/${group}`);
 
 		if (response.status === 204) {
 			// A "204 No content" response is returned when the user is not registered.
@@ -252,7 +251,8 @@ export const getGroupEmails = async (
 			return failure('SYSTEM_ERROR', message);
 		}
 
-		return success(resultGroup.data.emails);
+		const emails = resultGroup.data.flatMap((member) => member.emails.map((e) => e.address));
+		return success(emails);
 	} catch (error) {
 		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
 		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
