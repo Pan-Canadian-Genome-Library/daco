@@ -32,7 +32,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
 			<ThemeProvider>
 				<BrowserRouter>
 					<NotificationProvider>
-						<UserProvider>{children}</UserProvider>;
+						<UserProvider>{children}</UserProvider>
 					</NotificationProvider>
 				</BrowserRouter>
 			</ThemeProvider>

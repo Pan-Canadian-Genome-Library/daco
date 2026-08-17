@@ -73,11 +73,17 @@ const logger = BaseLogger.forModule('applicationController');
  * @param user_id - The ID of the user requesting the creation of the application.
  * @returns Success with Application data / Failure with Error.
  */
-export const createApplication = async ({ user_id }: { user_id: string }): AsyncResult<ApplicationDTO> => {
+export const createApplication = async ({
+	user_id,
+	applicant_institutional_email,
+}: {
+	user_id: string;
+	applicant_institutional_email: string;
+}): AsyncResult<ApplicationDTO> => {
 	const database = getDbInstance();
 	const applicationRepo: ApplicationService = applicationSvc(database);
 
-	const result = await applicationRepo.createApplication({ user_id });
+	const result = await applicationRepo.createApplication({ user_id, applicant_institutional_email });
 
 	if (!result.success) {
 		return result;
@@ -446,6 +452,7 @@ export const approveApplication = async ({
 		const applicationService: ApplicationService = applicationSvc(database);
 		const emailService = await emailSvc(database);
 		const collaboratorsService = await collaboratorsSvc(database);
+		const studyService = await studySvc(database);
 
 		const result = await applicationService.getApplicationById({ id: applicationId });
 
@@ -514,7 +521,7 @@ export const approveApplication = async ({
 
 		if (permissionAdded.successfulUserEmails.length === 1) {
 			// Notify Applicant of approval
-			emailService.sendEmailApproval({
+			emailService.sendApplicantEmailApproval({
 				id: application.id,
 				to: applicant_institutional_email,
 				actionId: approvalResult.data.actionId,
@@ -537,14 +544,33 @@ export const approveApplication = async ({
 			collaboratorsByEmail[collaborator.institutional_email] = collaborator;
 		}
 
+		const userEmails = Object.keys(collaboratorsByEmail);
+
 		await grantUserPermissions({
-			userEmails: Object.keys(collaboratorsByEmail),
+			userEmails,
 			approverAccessToken,
 			studyIds: requested_studies,
 		});
 
-		// TODO: Notify each collaborator of approval.
-		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/579
+		const studyResult = await studyService.getAllStudies({ studyIds: requested_studies });
+
+		if (!studyResult.success) {
+			return studyResult;
+		}
+
+		const studyNames = studyResult.data.map((study) => study.studyName);
+
+		for (const [email, collaborator] of Object.entries(collaboratorsByEmail)) {
+			// Notify Collaborators of approval
+			const collaboratorName = `${collaborator.first_name} ${collaborator.last_name}`;
+			emailService.sendCollaboratorEmailApproval({
+				id: application.id,
+				to: email,
+				actionId: approvalResult.data.actionId,
+				name: collaboratorName,
+				studies: studyNames,
+			});
+		}
 
 		return dtoFriendlyData;
 	} catch (error) {

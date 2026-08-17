@@ -26,6 +26,7 @@ components:
           description: The ID of the study.
         dacId:
           type: string
+          nullable: true
           description: The DAC ID associated with the study.
         dacName:
           type: string

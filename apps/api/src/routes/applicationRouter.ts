@@ -65,6 +65,7 @@ import { isAssociatedRep, isUserDacChair, isUserDacMember } from '@/service/auth
 import { TrademarkEnum } from '@/service/pdf/pdfService.ts';
 import { authErrorResponseHandler, authFailure, getAuthorizedDacIds, getUserName } from '@/service/utils.ts';
 import { convertToBasicApplicationRecord } from '@/utils/aliases.ts';
+import { failure } from '@/utils/results.js';
 import { apiZodErrorMapping } from '@/utils/validation.js';
 import type { ResponseWithData } from './types.ts';
 
@@ -75,10 +76,20 @@ applicationRouter.post(
 	'/create',
 	async (request: Request, response: ResponseWithData<ApplicationDTO, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
 		const { user } = request.session;
-		if (user) {
-			const { userId } = user;
 
-			const result = await createApplication({ user_id: userId });
+		if (user) {
+			const { userId, emails } = user;
+			const applicantPrimaryEmail = emails.find((record) => record.type === 'official')?.address || emails[0]?.address;
+
+			if (!applicantPrimaryEmail) {
+				authErrorResponseHandler(
+					response,
+					failure('NOT_FOUND', 'No primary email address provided, cannot create Application.'),
+				);
+				return;
+			}
+
+			const result = await createApplication({ user_id: userId, applicant_institutional_email: applicantPrimaryEmail });
 
 			if (result.success) {
 				response.status(201).json(result.data);
@@ -596,7 +607,7 @@ applicationRouter.post(
 
 applicationRouter.post(
 	'/:applicationId/close',
-	accessMiddleware({ accessConfig: { applicant: true } }),
+	accessMiddleware({ accessConfig: { applicant: true, dacChair: true } }),
 	withParamsSchemaValidation(
 		basicApplicationParamSchema,
 		apiZodErrorMapping,

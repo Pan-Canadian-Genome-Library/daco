@@ -22,9 +22,13 @@ import { createTransport } from 'nodemailer';
 
 const config = getEmailConfig;
 
+// More info on transport configuration: https://nodemailer.com/smtp
 const emailClient = createTransport({
+	name: config.email.name,
 	host: config.email.host,
 	port: config.email.port,
+	secure: config.email.secure, // nodemailer defaults to false, setting true will use TLS immediately upon connection. Refer to https://nodemailer.com/smtp/ for more info
+	service: config.email.service, // Alternate solution to providing host/port/secure. If service is provided, host/port/secure are ignored.
 	auth: config.email.auth.user
 		? {
 				user: config.email.auth?.user,

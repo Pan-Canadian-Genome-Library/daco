@@ -19,7 +19,6 @@
 
 import { authConfig } from '@/config/authConfig.ts';
 import { getDacByIds } from '@/controllers/dacController.ts';
-import { type OIDCTokenResponse, type OIDCUserInfoResponse, type PCGLAuthZUserInfoResponse } from '@/external/types.ts';
 import {
 	type ApplicationActionRecord,
 	type ApplicationContentUpdates,
@@ -39,7 +38,7 @@ import {
 	type DacDTO,
 	type FilesDTO,
 	type SignatureDTO,
-	type StudyDTO,
+	type StudyDacoDTO,
 } from '@pcgl-daco/data-model';
 import {
 	applicationHistoryResponseSchema,
@@ -48,15 +47,18 @@ import {
 	dacModelSchema,
 	fileResponseSchema,
 	sessionAccount,
-	type SessionAccount,
 	sessionUser,
-	type SessionUser,
 	signatureResponseSchema,
 	studyModelSchema,
+	type OIDCTokenResponse,
+	type OIDCUserInfoResponse,
+	type PCGLAuthZUserInfoResponse,
+	type SessionAccount,
+	type SessionUser,
 	type UpdateEditApplicationRequest,
 } from '@pcgl-daco/validation';
 import { objectToCamel, objectToSnake } from 'ts-case-convert';
-import { AsyncResult, failure, type Result, success } from './results.ts';
+import { AsyncResult, failure, success, type Result } from './results.ts';
 import { applicationContentUpdateSchema } from './schemas.ts';
 
 export const convertToSessionAccount = (data: OIDCTokenResponse): Result<SessionAccount, 'SYSTEM_ERROR'> => {
@@ -92,7 +94,7 @@ export const convertToSessionUser = async (
 			return group.name.slice(authConfig.AUTHZ_GROUP_PREFIX_DAC_MEMBER.length);
 		});
 
-	const dacoAdmin = aliasedGroup.some((group) => group.name === authConfig.AUTHZ_GROUP_ADMIN);
+	const dacoAdmin = aliasedPCGLResponse.userinfo.dataAdmin;
 
 	const dacResult = await getDacByIds({ ids: dacChair });
 
@@ -109,9 +111,9 @@ export const convertToSessionUser = async (
 		givenName: aliasedOIDCResponse.givenName,
 		familyName: aliasedOIDCResponse.familyName,
 		siteAdmin: aliasedPCGLResponse.userinfo.siteAdmin,
-		siteCurator: aliasedPCGLResponse.userinfo.siteCurator,
 		studyAuthorizations: aliasedPCGLResponse.studyAuthorizations,
 		dacAuthorizations: aliasedPCGLResponse.dacAuthorizations,
+		dataAdmin: aliasedPCGLResponse.userinfo.dataAdmin,
 		groups: aliasedGroup,
 		// DACO generated values
 		isPcglDac,
@@ -272,10 +274,10 @@ export const convertToCollaboratorRecords = (
 };
 
 /** Converts retrieved Submission Service Study Data into database insert using snake_case model format
- * @param data type StudyDTO study data in camelCase
+ * @param data type StudyDacoDTO study data in camelCase
  * @returns  type StudyModel study data in snake_case
  */
-export const convertToStudyUpdateRecord = (data: StudyDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
+export const convertToStudyUpdateRecord = (data: StudyDacoDTO): Result<StudyModel, 'SYSTEM_ERROR'> => {
 	const snakeCaseRecord = objectToSnake(data);
 	const validationResult = studyModelSchema.safeParse(snakeCaseRecord);
 	const result = validationResult.success

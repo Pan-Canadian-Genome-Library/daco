@@ -25,8 +25,9 @@ export const pcglColours = {
 	primary: '#843961',
 	secondary: '#761248',
 	tertiary: '#F2EBEB',
+	quad: '#B27696',
 
-	errorPrimary: '#EC1C24',
+	errorPrimary: '#E7131A',
 	errorSecondary: '#F4A1A4',
 	errorBanner: '#FFF2F0',
 
@@ -92,6 +93,14 @@ const pcglTheme: ThemeConfig = {
 			fontWeight: 700,
 			defaultColor: pcglColours.black,
 			defaultBg: pcglColours.white,
+
+			// Hover
+			colorPrimaryTextHover: pcglColours.secondary,
+			defaultHoverColor: pcglColours.secondary,
+
+			// Active/Pressed
+			defaultActiveColor: pcglColours.quad,
+			defaultActiveBorderColor: pcglColours.quad,
 		},
 		Empty: {
 			colorTextDescription: pcglColours.a11yGrey,

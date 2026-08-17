@@ -28,3 +28,4 @@ export * from './files.ts';
 export * from './revisionRequests.ts';
 export * from './sentEmails.ts';
 export * from './studies.ts';
+export * from './studyTranslationsSchema.ts';

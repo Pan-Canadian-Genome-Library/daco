@@ -120,7 +120,7 @@ const PCGLApplication = ({ applicationContents, signature, collaborators, docCre
 				displayLogo
 			/>
 
-			{/*ENGLISJ*/}
+			{/*ENGLISH*/}
 			<IntroductionPage />
 			<ApplicantInformation
 				applicantFirstName={contents?.applicantFirstName}

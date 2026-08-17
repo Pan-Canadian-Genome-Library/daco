@@ -21,11 +21,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { fetch } from '@/global/FetchClient';
 import { ServerError } from '@/global/types';
-import { type StudyDTO } from '@pcgl-daco/data-model';
+import { type StudyDacoDTO } from '@pcgl-daco/data-model';
 import { withErrorResponseHandler } from '../apiUtils';
 
 const useGetAllStudies = () => {
-	return useQuery<StudyDTO[], ServerError>({
+	return useQuery<StudyDacoDTO[], ServerError>({
 		queryKey: [`all-studies`],
 		queryFn: async () => {
 			const response = await fetch(`/study`).then(withErrorResponseHandler);

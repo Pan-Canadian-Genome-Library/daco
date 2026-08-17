@@ -16,38 +16,24 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import { withErrorResponseHandler } from '@/api/apiUtils';
-import { fetch } from '@/global/FetchClient';
-import { ServerError } from '@/global/types';
-import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
-import { useMutation } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
-const useImportStudies = () => {
-	const notification = useNotificationContext();
-	const { t: translate } = useTranslation();
+import { integer, pgEnum, pgTable, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 
-	return useMutation<unknown, ServerError>({
-		mutationFn: async () => {
-			return await fetch(`/study/import`, {
-				method: 'GET',
-			}).then(withErrorResponseHandler);
-		},
-		onSuccess: () => {
-			notification.openNotification({
-				type: 'success',
-				message: translate('notifications.importStudies.successMessage'),
-				description: translate('notifications.importStudies.successDescription'),
-			});
-		},
-		onError: (error) => {
-			notification.openNotification({
-				type: 'error',
-				message: translate('errors.generic.title'),
-				description: error.error,
-			});
-		},
-	});
-};
+export const languages = pgEnum('languages', ['en_ca', 'fr_ca']);
 
-export default useImportStudies;
+export const studyTranslations = pgTable(
+	'study_translations',
+	{
+		study_translation_id: integer().primaryKey().generatedAlwaysAsIdentity(),
+		study_id: text().notNull(),
+		language_id: languages().notNull(),
+		study_description: text().notNull(),
+		program_name: varchar({ length: 255 }),
+		keywords: text().array(),
+		participant_criteria: text(),
+		funding_sources: text().array().notNull(),
+		created_at: timestamp().notNull().defaultNow(),
+		updated_at: timestamp(),
+	},
+	(table) => [uniqueIndex().on(table.study_id, table.language_id)],
+);

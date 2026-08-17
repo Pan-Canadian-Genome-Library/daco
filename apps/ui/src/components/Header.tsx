@@ -126,7 +126,7 @@ const HeaderComponent = () => {
 		}
 
 		return {
-			name: translate('links.apply'),
+			name: translate('links.register'),
 			buttonProps: {
 				style: {
 					fontWeight: 'normal',
