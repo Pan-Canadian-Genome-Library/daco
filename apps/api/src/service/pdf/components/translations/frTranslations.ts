@@ -161,6 +161,7 @@ export const FR_PROJECT_INFORMATION: ProjectInformationTranslation = {
 	RESEARCH_SUMMARY_DESCRIPTION:
 		"Cette section doit décrire le contexte, les objectifs et la méthodologie de votre projet de recherche, ainsi que les plans d'utilisation des données contrôlées de la BGP.",
 	PROJECT_BACKGROUND_LABEL: 'Contexte',
+	PROJECT_COUNTRY_LABEL: 'Dans quel pays les données seront-elles hébergées ?',
 	USE_OF_DATA_METHODOLOGY_LABEL: 'Utilisation des données et méthodologie',
 	AIMS_LABEL: 'Objectifs',
 	LAY_SUMMARY_TITLE: 'Résumé vulgarisé du projet',

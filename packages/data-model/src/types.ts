@@ -182,6 +182,7 @@ export type ProjectDTO = {
 	projectTitle?: string | null;
 	projectWebsite?: string | null;
 	projectBackground?: string | null;
+	projectCountry?: string | null;
 	projectAims?: string | null;
 	projectMethodology?: string | null;
 	projectSummary?: string | null;
