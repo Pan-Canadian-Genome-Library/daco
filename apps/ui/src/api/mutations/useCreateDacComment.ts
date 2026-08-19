@@ -59,6 +59,7 @@ const useCreateDacComments = ({
 			notification.openNotification({
 				type: 'error',
 				message: error.message,
+				description: error.error,
 			});
 		},
 		onSuccess: async (data) => {

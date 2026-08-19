@@ -62,6 +62,7 @@ export interface ApplicationOutletContext {
 	isEditMode: boolean;
 	revisions: SectionRevision;
 	dacComments: DacCommentRecord[];
+	disabledDacComments: boolean;
 }
 
 export interface BasicFormFieldProps {

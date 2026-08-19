@@ -48,10 +48,11 @@ const useSubmitRevisions = () => {
 			await queryClient.invalidateQueries({ queryKey: [`application-${data.id}`] });
 			navigation(`/dashboard`);
 		},
-		onError: () => {
+		onError: (error) => {
 			notification.openNotification({
 				type: 'error',
 				message: translate('sign-and-submit-section.notifications.submitApplicationFailed'),
+				description: error.error,
 			});
 		},
 	});
