@@ -251,8 +251,10 @@ export const getGroupEmails = async (
 			return failure('SYSTEM_ERROR', message);
 		}
 
-		const emails = resultGroup.data.flatMap((member) => member.emails.map((e) => e.address));
-		return success(emails);
+		const emails = resultGroup.data.flatMap((member) => member.emails.map((e) => e.address.toLowerCase()));
+
+		// new Set(emails) sanitizies the emails for duplicates
+		return success([...new Set(emails)]);
 	} catch (error) {
 		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
 		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
