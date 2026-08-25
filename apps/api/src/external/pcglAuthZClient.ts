@@ -22,6 +22,7 @@ import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 import {
 	addUserToStudyPermissionResponse,
+	authzGroupResponseValidation,
 	authZUserInfo,
 	ServiceTokenResponse,
 	type PCGLAddUserToStudyPermissionResponse,
@@ -29,7 +30,6 @@ import {
 } from '@pcgl-daco/validation';
 import urlJoin from 'url-join';
 import { fetchWithRetry } from './fetchWithRetry.ts';
-import { authzGroupResponseValidation } from './types.ts';
 
 const logger = BaseLogger.forModule('authZClient');
 
