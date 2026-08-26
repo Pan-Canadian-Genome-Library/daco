@@ -24,6 +24,7 @@ To use environment variables, copy the file `.env.schema` to `.env` and modify a
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | `API_URL` | The base URL used to proxy all requests to the DACO API. Default is 'http://localhost:3000' | `string` |
 | `VITE_SELF_ENROLMENT_URL` | Specifies the URL endpoint for user self-enrolment. (COmanage Self-enrolment flow) | `string` |
+| `VITE_HELP_DESK_EMAIL` | The email address for the help desk contact information | `string` |
 
 ### Production Environment Variables
 
