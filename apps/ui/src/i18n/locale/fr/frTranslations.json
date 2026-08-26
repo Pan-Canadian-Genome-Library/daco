@@ -14,7 +14,7 @@
 				"SELF_REGISTRATION_SENT": {
 					"subheading": "Votre compte est presque prêt !",
 					"description": "Merci de vous être inscrit/e au projet BGPC. Nous avons envoyé un courriel de vérification à votre adresse courriel. Veuillez ouvrir ce message et suivre les instructions pour confirmer votre adresse et retourner au service BCAD de la BGP.",
-					"description2": "Si vous n'avez pas reçu le courriel dans quelques minutes, vous pouvez renvoyer le courriel de vérification ou contacter l'équipe de soutien de la BGP."
+					"description2": "Si vous n'avez pas reçu le courriel dans quelques minutes, veuillez contacter l'équipe de soutien de la BGP."
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Il semble que nous ayons rencontré un petit problème lors du processus de connexion.",
