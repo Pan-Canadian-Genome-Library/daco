@@ -34,6 +34,7 @@ import CommentLabel from './CommentLabel';
 interface DacCommentsProps {
 	sectionComments: DacCommentRecord[];
 	section: SectionRoutesValues;
+	disabled?: boolean;
 }
 
 const itemStyles = {
@@ -44,7 +45,7 @@ const itemStyles = {
 	maxHeight: '375px',
 };
 
-const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
+const DacComments = ({ sectionComments, section, disabled = false }: DacCommentsProps) => {
 	const { appId } = useOutletContext<ApplicationOutletContext>();
 	const [dacComment, setDacComment] = useState('');
 	const [dacCommentChairOnly, setDacCommentChairOnly] = useState('');
@@ -73,6 +74,7 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 		{
 			key: '1',
 			label: <CommentLabel label={translate('generic.dacComment')} numOfComments={dacComments.length} />,
+
 			children: (
 				<>
 					<Flex style={{ flexDirection: 'column-reverse', overflowY: 'scroll', maxHeight: '200px' }}>
@@ -86,10 +88,11 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 						))}
 					</Flex>
 					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-						<Input allowClear value={dacComment} onChange={(e) => setDacComment(e.target.value)} />
+						<Input allowClear disabled={disabled} value={dacComment} onChange={(e) => setDacComment(e.target.value)} />
 						<Button
 							style={{ background: pcglColours.blue }}
 							type="primary"
+							disabled={disabled}
 							onClick={(e) => {
 								e.preventDefault();
 								onCreateCommentHandler(dacComment, false);
@@ -119,10 +122,16 @@ const DacComments = ({ sectionComments, section }: DacCommentsProps) => {
 						))}
 					</Flex>
 					<Space.Compact style={{ marginTop: '10px', width: '100%' }}>
-						<Input onChange={(e) => setDacCommentChairOnly(e.target.value)} allowClear value={dacCommentChairOnly} />
+						<Input
+							disabled={disabled}
+							onChange={(e) => setDacCommentChairOnly(e.target.value)}
+							allowClear
+							value={dacCommentChairOnly}
+						/>
 						<Button
 							style={{ background: pcglColours.blue }}
 							type="primary"
+							disabled={disabled}
 							onClick={(e) => {
 								e.preventDefault();
 

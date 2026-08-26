@@ -60,7 +60,7 @@ const getDacIds = (requestedStudies: string[] | null, studies: StudyDacoDTO[]): 
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const { data: allStudies, isPending: isAllStudiesPending } = useGetAllStudies();
 
@@ -201,7 +201,7 @@ const RequestedStudy = () => {
 					}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="study" />
+					<DacComments sectionComments={dacComments} section="study" disabled={disabledDacComments} />
 				</Row>
 				<SectionContent showDivider={false}>
 					<Row>
