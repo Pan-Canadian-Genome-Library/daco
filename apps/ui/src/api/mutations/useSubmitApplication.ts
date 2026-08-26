@@ -48,10 +48,11 @@ const useSubmitApplication = () => {
 			});
 			navigation(`/dashboard`);
 		},
-		onError: () => {
+		onError: (error) => {
 			notification.openNotification({
 				type: 'error',
 				message: translate('sign-and-submit-section.notifications.submitApplicationFailed'),
+				description: error.error,
 			});
 		},
 	});

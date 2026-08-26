@@ -43,7 +43,7 @@ const rule = createSchemaFieldRule(appendicesSchema);
 
 const Appendices = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const {
 		control,
@@ -97,7 +97,7 @@ const Appendices = () => {
 					text={[translate('appendices.description')]}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="appendices" />
+					<DacComments sectionComments={dacComments} section="appendices" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['appendices']} />
 				</Row>
 				<SectionContent title={translate('appendices.section1')} showDivider={false}>

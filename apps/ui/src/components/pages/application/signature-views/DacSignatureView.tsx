@@ -44,7 +44,7 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 	const {
 		state: { fields },
 	} = useApplicationContext();
-	const { revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
 
 	const { applicantFirstName, applicantLastName, institutionalRepFirstName, institutionalRepLastName } = fields;
 
@@ -65,7 +65,7 @@ const DacSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Pro
 			</SectionTitle>
 			<SectionContent showDivider={false}>
 				<Row>
-					<DacComments sectionComments={dacComments} section="sign" />
+					<DacComments sectionComments={dacComments} section="sign" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['sign']} general={revisions.general} />{' '}
 				</Row>
 			</SectionContent>
