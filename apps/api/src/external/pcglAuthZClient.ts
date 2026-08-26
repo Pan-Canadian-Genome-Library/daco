@@ -226,7 +226,6 @@ export const addUsersToStudyPermission = async (
 };
 
 /**
- * @param accessToken
  * @param group
  * @returns returns a list of emails associated with the given group
  */
@@ -256,7 +255,7 @@ export const getGroupEmails = async (
 		// new Set(emails) sanitizies the emails for duplicates
 		return success([...new Set(emails)]);
 	} catch (error) {
-		logger.error(`[AUTHZ]: Unexpected error while getting user info from the AuthZ service.`, error);
+		logger.error(`[AUTHZ]: Unexpected error while fetching group membership from the Authz service`, error);
 		return failure('SYSTEM_ERROR', `Error contacting the PCGL Authorization Service.`);
 	}
 };
