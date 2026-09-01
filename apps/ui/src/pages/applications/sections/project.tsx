@@ -97,7 +97,7 @@ const Project = () => {
 					projectWebsite: data.projectWebsite,
 					projectAims: data.projectAims,
 					projectBackground: data.projectBackground,
-					projectCountry: data.projectCountry,
+					projectCountry: state.fields.projectCountry ?? 'CAN',
 					projectMethodology: data.projectMethodology,
 					projectSummary: data.projectSummary,
 					projectPublicationUrls,

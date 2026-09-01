@@ -50,7 +50,7 @@ interface SelectBoxProps extends BasicFormFieldProps {
 }
 
 const SelectBox = <T extends FieldValues>(props: UseControllerProps<T> & SelectBoxProps) => {
-	const fieldLabel = props.options.some((option) => option.required) ? RequiredLabel(props.label) : props.label;
+	const fieldLabel = props.required ? RequiredLabel(props.label) : props.label;
 	return (
 		<Controller
 			name={props.name}
