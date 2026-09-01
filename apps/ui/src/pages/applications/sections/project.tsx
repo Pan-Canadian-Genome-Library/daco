@@ -45,7 +45,7 @@ const rule = createSchemaFieldRule(projectInformationSchema);
 
 const Project = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({
 		revisions,
@@ -127,7 +127,7 @@ const Project = () => {
 					showLockIcon={!canEdit}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="project" />
+					<DacComments sectionComments={dacComments} section="project" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['project']} />
 				</Row>
 				<Row gutter={26}>

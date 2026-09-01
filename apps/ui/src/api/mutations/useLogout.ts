@@ -47,7 +47,7 @@ const useLogout = () => {
 			notification.openNotification({
 				type: 'error',
 				message: translate('errors.generic.title'),
-				description: error.message,
+				description: error.error,
 			});
 		},
 	});
