@@ -13,8 +13,8 @@
 				},
 				"SELF_REGISTRATION_SENT": {
 					"subheading": "Your account is almost ready!",
-					"description": "Thanks for enroling to PCGL project. We've sent a verification email to your email address. Please open that message and folow the instructions to confirm your address and return to the PCGL DACO service.",
-					"description2": "If you didn't receive the email within a few minutes, you can resend the verification email or contact the PCGL support team."
+					"description": "Thanks for enroling to PCGL project. We've sent a verification email to your email address. Please open that message and follow the instructions to confirm your address and return to the PCGL DACO service.",
+					"description2": "If you didn't receive the email within a few minutes, please contact the PCGL support team."
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Looks like we ran into a little hiccup while completing the login process.",
@@ -180,8 +180,8 @@
 				"message": "Sorry, looks like the resource you're trying to access does not exist."
 			},
 			"400": {
-				"title": "That was a bad request.",
-				"message": "Sorry, looks like your browser sent a bad request, please reload the page and try again."
+				"title": "Invalid Request.",
+				"message": "Looks like your request is invalid and cannot be completed at this time."
 			},
 			"500": {
 				"title": "Something went wrong.",

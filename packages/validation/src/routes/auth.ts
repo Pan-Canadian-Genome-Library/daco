@@ -158,3 +158,16 @@ export const sessionAccount = z.object({
 	refreshTokenIat: z.number().int(),
 });
 export type SessionAccount = z.infer<typeof sessionAccount>;
+
+export const authzGroupResponseValidation = z.array(
+	z.object({
+		pcgl_id: z.string(),
+		emails: z.array(
+			z.object({
+				address: z.string(),
+				type: z.string().optional(),
+			}),
+		),
+	}),
+);
+export type PCGLAuthZGroupResponse = z.infer<typeof authzGroupResponseValidation>;
