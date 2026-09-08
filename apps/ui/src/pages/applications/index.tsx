@@ -60,6 +60,12 @@ const ApplicationViewer = () => {
 		isLoading: revisionsLoading,
 	} = useGetApplicationFeedback(params.id, applicationData?.state);
 
+	const disabledDacComments =
+		applicationData?.state === ApplicationStates.APPROVED ||
+		applicationData?.state === ApplicationStates.REJECTED ||
+		applicationData?.state === ApplicationStates.REVOKED ||
+		applicationData?.state === ApplicationStates.CLOSED;
+
 	const { data: dacCommentsData } = useGetDacComments({
 		applicationId: params.id,
 		section: currentSection,
@@ -132,6 +138,7 @@ const ApplicationViewer = () => {
 											isEditMode,
 											revisions: revisionsData,
 											dacComments: dacCommentsData ? dacCommentsData : [],
+											disabledDacComments,
 										}}
 									/>
 								</Col>

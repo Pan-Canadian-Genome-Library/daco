@@ -71,6 +71,7 @@ export const applicationContentsSchema = z
 		projectAims: z.string().nullable(),
 		projectMethodology: z.string().nullable(),
 		projectBackground: z.string().nullable(),
+		projectCountry: z.string().nullable(),
 		projectSummary: z.string().nullable(),
 		projectPublicationUrls: z.array(z.string()).nullable(),
 		ethicsReviewRequired: z.boolean().nullable(),

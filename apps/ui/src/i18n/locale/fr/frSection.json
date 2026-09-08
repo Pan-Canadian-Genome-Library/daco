@@ -101,6 +101,9 @@
 						"exemplar2": "Si possible, incluez toute recherche antérieure pertinente que vous avez effectuée dans ce domaine."
 					}
 				},
+				"country": {
+					"title": "Dans quel pays les données seront-elles hébergées ?"
+				},
 				"methodology": {
 					"title": "Utilisation des données et méthodologie :",
 					"example": {
