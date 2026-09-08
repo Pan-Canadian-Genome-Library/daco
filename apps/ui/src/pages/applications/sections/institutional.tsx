@@ -44,7 +44,7 @@ const rule = createSchemaFieldRule(institutionalRepSchema);
 
 const Institutional = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({
 		revisions,
@@ -128,7 +128,7 @@ const Institutional = () => {
 					text={[translate('institutional-section.description1')]}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="institutional" />
+					<DacComments sectionComments={dacComments} section="institutional" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['institutional']} />
 				</Row>
 				<SectionContent title={translate('institutional-section.section1')}>

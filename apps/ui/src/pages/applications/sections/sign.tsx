@@ -30,6 +30,7 @@ import RepSignatureView from '@/components/pages/application/signature-views/Rep
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
+import { useUserContext } from '@/providers/UserProvider';
 import { ApplicationStates } from '@pcgl-daco/data-model';
 
 const SignAndSubmit = () => {
@@ -41,6 +42,7 @@ const SignAndSubmit = () => {
 	const { isEditMode, appId } = useOutletContext<ApplicationOutletContext>();
 	const navigation = useNavigate();
 	const { data, isLoading } = useGetSignatures({ applicationId: appId });
+	const { user } = useUserContext();
 
 	// Push user back to intro if they did not complete/fix all the sections
 	useEffect(() => {
@@ -59,7 +61,7 @@ const SignAndSubmit = () => {
 					{isInstitutionalRep && (
 						<RepSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
 					)}
-					{(isDacChair || isDacMember) && (
+					{(isDacChair || isDacMember || user?.isPcglDac) && (
 						<DacSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
 					)}
 				</Form>

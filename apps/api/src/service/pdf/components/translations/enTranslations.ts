@@ -159,6 +159,7 @@ export const PROJECT_INFORMATION: ProjectInformationTranslation = {
 	RESEARCH_SUMMARY_DESCRIPTION:
 		'This section should describe the background, aims, and methodology of your research project, as well as plans for how you will use the PCGL Controlled Data.',
 	PROJECT_BACKGROUND_LABEL: 'Project Background',
+	PROJECT_COUNTRY_LABEL: 'Which country will the data reside in?',
 	USE_OF_DATA_METHODOLOGY_LABEL: 'Use of Data and Methodology',
 	AIMS_LABEL: 'Aims',
 	LAY_SUMMARY_TITLE: 'Project Lay Summary',

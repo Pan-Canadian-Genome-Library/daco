@@ -28,8 +28,9 @@ import type {
 import { ApplicationStates } from '@pcgl-daco/data-model';
 import type { SectionRoutesValues, UpdateEditApplicationRequest } from '@pcgl-daco/validation';
 
-import { getEmailConfig } from '@/config/emailConfig.ts';
+import { authConfig } from '@/config/authConfig.ts';
 import { getDbInstance } from '@/db/index.js';
+import { getGroupEmails } from '@/external/pcglAuthZClient.ts';
 import BaseLogger from '@/logger.js';
 import { type ApplicationListRequest } from '@/routes/types.js';
 import { applicationActionSvc } from '@/service/applicationActionService.ts';
@@ -451,6 +452,7 @@ export const approveApplication = async ({
 		const applicationService: ApplicationService = applicationSvc(database);
 		const emailService = await emailSvc(database);
 		const collaboratorsService = await collaboratorsSvc(database);
+		const studyService = await studySvc(database);
 
 		const result = await applicationService.getApplicationById({ id: applicationId });
 
@@ -519,7 +521,7 @@ export const approveApplication = async ({
 
 		if (permissionAdded.successfulUserEmails.length === 1) {
 			// Notify Applicant of approval
-			emailService.sendEmailApproval({
+			emailService.sendApplicantEmailApproval({
 				id: application.id,
 				to: applicant_institutional_email,
 				actionId: approvalResult.data.actionId,
@@ -542,14 +544,33 @@ export const approveApplication = async ({
 			collaboratorsByEmail[collaborator.institutional_email] = collaborator;
 		}
 
+		const userEmails = Object.keys(collaboratorsByEmail);
+
 		await grantUserPermissions({
-			userEmails: Object.keys(collaboratorsByEmail),
+			userEmails,
 			approverAccessToken,
 			studyIds: requested_studies,
 		});
 
-		// TODO: Notify each collaborator of approval.
-		// https://github.com/Pan-Canadian-Genome-Library/daco/issues/579
+		const studyResult = await studyService.getAllStudies({ studyIds: requested_studies });
+
+		if (!studyResult.success) {
+			return studyResult;
+		}
+
+		const studyNames = studyResult.data.map((study) => study.studyName);
+
+		for (const [email, collaborator] of Object.entries(collaboratorsByEmail)) {
+			// Notify Collaborators of approval
+			const collaboratorName = `${collaborator.first_name} ${collaborator.last_name}`;
+			emailService.sendCollaboratorEmailApproval({
+				id: application.id,
+				to: email,
+				actionId: approvalResult.data.actionId,
+				name: collaboratorName,
+				studies: studyNames,
+			});
+		}
 
 		return dtoFriendlyData;
 	} catch (error) {
@@ -683,16 +704,21 @@ export const submitRevision = async ({
 		const { actionId } = submittedRevision.data;
 
 		if (result.data.state === ApplicationStates.DAC_REVISIONS_REQUESTED) {
-			const {
-				email: { dacAddress },
-			} = getEmailConfig;
-			emailService.sendEmailDacForSubmittedRevisions({
-				id: application.id,
-				to: dacAddress,
-				applicantName: applicant_first_name || 'N/A',
-				submittedDate: new Date(),
-				actionId,
-			});
+			const emails = await getGroupEmails(`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}${application.dac_id}`);
+
+			if (emails.success) {
+				emails.data.forEach((email) => {
+					emailService.sendEmailDacForSubmittedRevisions({
+						id: application.id,
+						to: email,
+						applicantName: applicant_first_name || 'N/A',
+						submittedDate: new Date(),
+						actionId,
+					});
+				});
+			} else {
+				logger.error('Failed to retrieve group emails, email to dac members has not been sent', emails.error);
+			}
 		} else {
 			emailService.sendEmailRepForSubmittedRevisions({
 				id: application.id,
@@ -1063,18 +1089,21 @@ export const submitApplication = async ({
 				actionId,
 			});
 		} else if (result.data.state === ApplicationStates.INSTITUTIONAL_REP_REVIEW) {
-			const {
-				email: { dacAddress },
-			} = getEmailConfig;
-
-			// Send email to DAC for review
-			emailService.sendEmailDacForReview({
-				id: application.id,
-				to: dacAddress,
-				applicantName: applicant_first_name || 'N/A',
-				submittedDate: new Date(),
-				actionId,
-			});
+			const emails = await getGroupEmails(`${authConfig.AUTHZ_GROUP_PREFIX_DAC_CHAIR}${application.dac_id}`);
+			if (emails.success) {
+				emails.data.forEach((email) => {
+					// Send email to DAC for review
+					emailService.sendEmailDacForReview({
+						id: application.id,
+						to: email,
+						applicantName: applicant_first_name || 'N/A',
+						submittedDate: new Date(),
+						actionId,
+					});
+				});
+			} else {
+				logger.error('Failed to retrieve group emails, email to dac members has not been sent', emails.error);
+			}
 
 			//  send email to applicant that application is submitted to DAC
 			emailService.sendEmailApplicantApplicationSubmitted({

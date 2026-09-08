@@ -75,6 +75,7 @@ export const applicationContents = pgTable(
 		project_title: text(),
 		project_website: text(),
 		project_background: text(),
+		project_country: varchar({ length: 255 }),
 		project_methodology: text(),
 		project_aims: text(),
 		project_summary: text(),

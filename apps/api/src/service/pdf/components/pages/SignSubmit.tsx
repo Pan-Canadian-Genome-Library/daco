@@ -54,7 +54,6 @@ const SignSubmit = ({
 	applicantSignedAt,
 	applicantPositionTitle,
 	applicantPrimaryAffiliation,
-
 	institutionalRepFirstName,
 	institutionalRepMiddleName,
 	institutionalRepLastName,

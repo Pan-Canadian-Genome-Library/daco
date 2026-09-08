@@ -55,7 +55,8 @@ const MAX_FILE_SIZE = 5000000;
 const Ethics = () => {
 	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
-	const { appId, isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { appId, isEditMode, revisions, dacComments, disabledDacComments } =
+		useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 
 	const canEdit = canEditSection({
@@ -169,7 +170,7 @@ const Ethics = () => {
 					showDivider={true}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="ethics" />
+					<DacComments sectionComments={dacComments} section="ethics" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['ethics']} />
 				</Row>
 				<SectionContent title={translate('ethics-section.approval')} showDivider={false}>

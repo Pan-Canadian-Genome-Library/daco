@@ -19,13 +19,14 @@
 
 import express, { type Request } from 'express';
 
-import type {
-	ApplicationDTO,
-	ApplicationHistoryResponseData,
-	ApplicationListResponse,
-	ApplicationResponseData,
-	DacCommentRecord,
-	RevisionsDTO,
+import {
+	ApplicationStates,
+	type ApplicationDTO,
+	type ApplicationHistoryResponseData,
+	type ApplicationListResponse,
+	type ApplicationResponseData,
+	type DacCommentRecord,
+	type RevisionsDTO,
 } from '@pcgl-daco/data-model';
 import { withBodySchemaValidation, withParamsSchemaValidation } from '@pcgl-daco/request-utils';
 import {
@@ -830,7 +831,13 @@ applicationRouter.post(
 			withBodySchemaValidation(
 				submitDacCommentsSchema,
 				apiZodErrorMapping,
-				async (request, response: ResponseWithData<DacCommentRecord, ['UNAUTHORIZED', 'SYSTEM_ERROR']>) => {
+				async (
+					request,
+					response: ResponseWithData<
+						DacCommentRecord,
+						['UNAUTHORIZED', 'SYSTEM_ERROR', 'NOT_FOUND', 'INVALID_REQUEST']
+					>,
+				) => {
 					const { user } = request.session;
 					if (user) {
 						try {
@@ -838,6 +845,24 @@ applicationRouter.post(
 							const { message, section, toDacChair } = request.body;
 							const { userId } = user;
 							const userName = getUserName(user);
+
+							const applicationResult = await getApplicationById({ applicationId });
+
+							if (!applicationResult.success) {
+								response.status(500).json({ error: applicationResult.error, message: applicationResult.message });
+								return;
+							}
+
+							if (
+								applicationResult.data.state === ApplicationStates.APPROVED ||
+								applicationResult.data.state === ApplicationStates.REJECTED ||
+								applicationResult.data.state === ApplicationStates.REVOKED ||
+								applicationResult.data.state === ApplicationStates.CLOSED
+							) {
+								response.status(400).json({ error: 'INVALID_REQUEST', message: 'Application not open for comments.' });
+								return;
+							}
+
 							const result = await submitDacComment({
 								applicationId,
 								userId,

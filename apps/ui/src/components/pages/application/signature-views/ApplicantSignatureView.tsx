@@ -21,9 +21,11 @@ import ESignature from '@/components/pages/application/form-components/ESignatur
 import SectionContent from '@/components/pages/application/SectionContent';
 import SectionFooter from '@/components/pages/application/SectionFooter';
 import SectionTitle from '@/components/pages/application/SectionTitle';
+import SignatureViewer from '@/components/pages/application/SignatureViewer';
 import { useSignatureForm } from '@/components/pages/application/utils/useSignatureForm';
 import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext } from '@/global/types';
+import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { SignatureDTO } from '@pcgl-daco/data-model';
 import { Col, Row } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -37,10 +39,14 @@ type Props = {
 
 const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal }: Props) => {
 	const { t: translate } = useTranslation();
+	const {
+		state: { fields },
+	} = useApplicationContext();
 	const { revisions } = useOutletContext<ApplicationOutletContext>();
 	const { form, disableSignature, disableSubmit, signatureRef, onSaveClicked } = useSignatureForm({
 		signatureData: signatureData,
 	});
+	const { institutionalRepFirstName, institutionalRepLastName } = fields;
 	const { control, setValue, formState, watch, clearErrors, reset } = form;
 
 	const watchSignature = watch('signature');
@@ -59,7 +65,7 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 				</Row>
 			</SectionContent>
 			<SectionContent
-				showDivider={false}
+				showDivider={true}
 				title={translate('sign-and-submit-section.section.title')}
 				text={translate('sign-and-submit-section.section.description')}
 			>
@@ -81,6 +87,20 @@ const ApplicantSignatureView = ({ signatureData, signatureLoading, setOpenModal 
 								onSaveClicked={onSaveClicked}
 								saveButtonText={translate('sign-and-submit-section.section.buttons.save')}
 								clearButtonText={translate('sign-and-submit-section.section.buttons.clear')}
+							/>
+						) : null}
+					</Col>
+				</Row>
+			</SectionContent>
+			<SectionContent showDivider={false}>
+				<Row>
+					<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '100%' }}>
+						{!signatureLoading ? (
+							<SignatureViewer
+								title={translate('generic.rep')}
+								name={`${institutionalRepFirstName} ${institutionalRepLastName}`}
+								signature={signatureData?.institutionalRepSignature}
+								date={signatureData?.institutionalRepSignedAt}
 							/>
 						) : null}
 					</Col>
