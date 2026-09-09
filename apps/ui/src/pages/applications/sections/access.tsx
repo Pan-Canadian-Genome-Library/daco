@@ -43,7 +43,7 @@ const rule = createSchemaFieldRule(agreementsSchema);
 
 const AccessAgreement = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({
 		revisions,
@@ -126,7 +126,7 @@ const AccessAgreement = () => {
 					</Row>
 				</SectionContent>
 				<Row>
-					<DacComments sectionComments={dacComments} section="agreement" />
+					<DacComments sectionComments={dacComments} section="agreement" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['agreement']} />
 				</Row>
 				<SectionContent title={translate('data-access-section.section3.title')}>

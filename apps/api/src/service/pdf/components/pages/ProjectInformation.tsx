@@ -32,6 +32,7 @@ const ProjectInformation = ({
 	projectTitle,
 	projectWebsite,
 	projectBackground,
+	projectCountry,
 	projectAims,
 	projectMethodology,
 	projectSummary,
@@ -53,6 +54,9 @@ const ProjectInformation = ({
 				<Paragraph>{t.project.RESEARCH_SUMMARY_DESCRIPTION}</Paragraph>
 				<DataItem item={t.project.PROJECT_BACKGROUND_LABEL} layout="stacked">
 					{projectBackground}
+				</DataItem>
+				<DataItem item={t.project.PROJECT_COUNTRY_LABEL} layout="stacked">
+					{projectCountry}
 				</DataItem>
 				<DataItem item={t.project.USE_OF_DATA_METHODOLOGY_LABEL} layout="stacked">
 					{projectMethodology}

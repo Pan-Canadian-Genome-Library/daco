@@ -200,6 +200,9 @@ components:
         projectBackground:
           type: string
           description: Brief description of project
+        projectCountry:
+          type: string
+          description: The country that the project's data resides in
         projectMethodology:
           type: string
           description: Description of scientific approach used in the project
@@ -488,6 +491,9 @@ components:
         projectBackground:
           type: string
           description: Brief description of project
+        projectCountry:
+          type: string
+          description: The country that the project's data resides in
         projectMethodology:
           type: string
           description: Description of scientific approach used in the project

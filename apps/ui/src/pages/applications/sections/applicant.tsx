@@ -44,7 +44,8 @@ const rule = createSchemaFieldRule(applicantInformationSchema);
 
 const Applicant = () => {
 	const { t: translate } = useTranslation();
-	const { isEditMode, applicantInstituteEmail, revisions, dacComments } = useOutletContext<ApplicationOutletContext>();
+	const { isEditMode, applicantInstituteEmail, revisions, dacComments, disabledDacComments } =
+		useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
 	const canEdit = canEditSection({
 		revisions,
@@ -129,7 +130,7 @@ const Applicant = () => {
 					text={[translate('applicant-section.description1'), translate('applicant-section.description2')]}
 				/>
 				<Row>
-					<DacComments sectionComments={dacComments} section="applicant" />
+					<DacComments sectionComments={dacComments} section="applicant" disabled={disabledDacComments} />
 					<RevisionsAlert sectionRevisions={revisions['applicant']} />
 				</Row>
 				<SectionContent title={translate('applicant-section.section1')}>
