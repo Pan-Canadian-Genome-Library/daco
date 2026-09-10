@@ -27,6 +27,7 @@ import SubmitApplicationModal from '@/components/pages/application/modals/Submit
 import ApplicantSignatureView from '@/components/pages/application/signature-views/ApplicantSignatureView';
 import DacSignatureView from '@/components/pages/application/signature-views/DacSignatureView';
 import RepSignatureView from '@/components/pages/application/signature-views/RepSignatureView';
+import SignatureViewOnly from '@/components/pages/application/signature-views/SignatureViewOnly';
 import { ValidateAllSections } from '@/components/pages/application/utils/validatorFunctions';
 import { ApplicationOutletContext } from '@/global/types';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
@@ -51,19 +52,23 @@ const SignAndSubmit = () => {
 		}
 	}, [appId, fields, isEditMode, navigation, applicationState]);
 
+	const renderSignatureView = () => {
+		if (isApplicant && applicationState === 'DRAFT') {
+			return <ApplicantSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />;
+		} else if (isInstitutionalRep && applicationState === 'INSTITUTIONAL_REP_REVIEW') {
+			return <RepSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />;
+		} else if (isDacChair || isDacMember || user?.isPcglDac) {
+			return <DacSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />;
+		}
+
+		return <SignatureViewOnly signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />;
+	};
+
 	return (
 		<>
 			<SectionWrapper>
 				<Form layout="vertical" onFinish={() => setOpenModal(true)}>
-					{isApplicant && (
-						<ApplicantSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
-					)}
-					{isInstitutionalRep && (
-						<RepSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
-					)}
-					{(isDacChair || isDacMember || user?.isPcglDac) && (
-						<DacSignatureView signatureData={data} signatureLoading={isLoading} setOpenModal={setOpenModal} />
-					)}
+					{renderSignatureView()}
 				</Form>
 			</SectionWrapper>
 			<SubmitApplicationModal isOpen={openModal} setIsOpen={setOpenModal} />
