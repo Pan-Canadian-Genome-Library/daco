@@ -56,12 +56,16 @@ const Project = () => {
 	});
 	const form = useSectionForm({ section: 'project', sectionVisited: state.formState.sectionsVisited.project });
 
-	const { control, getValues } = useForm<Nullable<ProjectInformationSchemaType>>({
+	const {
+		formState: { isDirty },
+		control,
+		getValues,
+	} = useForm<Nullable<ProjectInformationSchemaType>>({
 		defaultValues: {
 			projectTitle: state.fields.projectTitle,
 			projectWebsite: state.fields.projectWebsite,
 			projectBackground: state.fields.projectBackground,
-			projectCountry: state.fields.projectCountry,
+			projectCountry: state.fields.projectCountry ?? 'CAN',
 			projectAims: state.fields.projectAims,
 			projectMethodology: state.fields.projectMethodology,
 			projectSummary: state.fields.projectSummary,
@@ -97,14 +101,14 @@ const Project = () => {
 					projectWebsite: data.projectWebsite,
 					projectAims: data.projectAims,
 					projectBackground: data.projectBackground,
-					projectCountry: state.fields.projectCountry ?? 'CAN',
+					projectCountry: data.projectCountry,
 					projectMethodology: data.projectMethodology,
 					projectSummary: data.projectSummary,
 					projectPublicationUrls,
 				},
 				formState: {
 					...state.formState,
-					isDirty: true,
+					isDirty,
 				},
 			},
 		});
