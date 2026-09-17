@@ -211,6 +211,7 @@
 		"section": {
 			"title": "Signature électronique",
 			"description": "Veuillez utiliser votre souris ou votre pavé tactile pour signer à l'intérieur de l'encadré ci-dessous. Une fois que vous êtes satisfait/satisfaite de la signature, cliquez sur enregistrer.",
+			"descriptionViewOnly": "Vous devez inclure à la fois la signature du chercheur principal/de la chercheuse principale ET celle du ou de la représentant(e) institutionnel(le) pour que votre demande soit examinée.",
 			"buttons": {
 				"download": "Télécharger le PDF de la demande",
 				"clear": "Effacer",

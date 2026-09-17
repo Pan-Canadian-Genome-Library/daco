@@ -105,7 +105,7 @@
 			}
 		},
 		"authorization": {
-			"description": "Pour obtenir une autorisation, nous exigeons une adresse courriel institutionnelle valide. Cette adresse sera utilisée pour vous connecter au BCAD de la BGP et sera associée à votre accès aux données contrôlées de la BGP."
+			"description": "Pour obtenir une autorisation, nous exigeons une adresse courriel valide. Cette adresse sera utilisée pour vous connecter au BCAD de la BGP et sera associée à votre accès aux données contrôlées de la BGP."
 		},
 		"applications": {
 			"global": {
