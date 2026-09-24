@@ -28,6 +28,8 @@ import { Flex, Row, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 import DacComments from '../collapse/DacComments';
+import SectionFooter from '../SectionFooter';
+import { useSignatureForm } from '../utils/useSignatureForm';
 
 type Props = {
 	signatureData?: SignatureDTO;
@@ -37,13 +39,15 @@ type Props = {
 
 const { Text } = Typography;
 
-const SignatureViewOnly = ({ signatureData, signatureLoading }: Props) => {
+const SignatureViewOnly = ({ signatureData, signatureLoading, setOpenModal }: Props) => {
 	const { t: translate } = useTranslation();
 	const {
 		state: { fields },
 	} = useApplicationContext();
 	const { revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
-
+	const { disableSubmit } = useSignatureForm({
+		signatureData: signatureData,
+	});
 	const { applicantFirstName, applicantLastName, institutionalRepFirstName, institutionalRepLastName } = fields;
 
 	return (
@@ -79,6 +83,14 @@ const SignatureViewOnly = ({ signatureData, signatureLoading }: Props) => {
 					) : null}
 				</Flex>
 			</SectionContent>
+			<SectionFooter
+				currentRoute="sign"
+				isEditMode={disableSubmit}
+				signSubmitHandler={() => {
+					setOpenModal(true);
+				}}
+				submitDisabled={disableSubmit}
+			/>
 		</>
 	);
 };
