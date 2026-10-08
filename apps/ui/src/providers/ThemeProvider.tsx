@@ -201,6 +201,17 @@ export const pcglTableTheme: ThemeConfig = {
 		},
 	},
 };
+// StudyTableTheme
+export const studyTableTheme: ThemeConfig = {
+	token: {
+		colorBgContainer: '#fff',
+	},
+	components: {
+		Table: {
+			headerBg: '#054A741A',
+		},
+	},
+};
 
 export const pcglSkeletonTheme: ThemeConfig = {
 	token: {
