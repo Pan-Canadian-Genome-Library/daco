@@ -25,6 +25,7 @@ import { studyTranslations } from './studyTranslationsSchema.ts';
 
 export const studyStatus = pgEnum('study_status', ['Ongoing', 'Completed']);
 export const studyContext = pgEnum('study_context', ['Clinical', 'Research']);
+const DEFAULT_DUO = 'DUO:0000047';
 
 export const study = pgTable(
 	'study',
@@ -40,6 +41,8 @@ export const study = pgTable(
 		lead_organizations: text().array().notNull(),
 		collaborators: text().array(),
 		publication_links: text().array(),
+		duo_permission: text().notNull().default(DEFAULT_DUO),
+		disease_specific_modifier: text().array().notNull().default([]),
 		created_at: timestamp().notNull().defaultNow(),
 		updated_at: timestamp(),
 		category_id: integer().unique(),
