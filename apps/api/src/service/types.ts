@@ -91,14 +91,16 @@ export type FilesRecord = typeof files.$inferSelect;
 export type FilesRecordOptionalContents = Omit<FilesRecord, 'content'> & { content?: Buffer<ArrayBufferLike> };
 export type FilesUpdate = Partial<FilesRecord>;
 export type FilesService = ReturnType<typeof filesSvc>;
-export type GrantUserPermissionsParams = {
-	userEmails: string[];
+export type GrantDacAuthorizationsParams = {
+	applicantEmail: string;
+	applicationId: string;
 	approverAccessToken: string;
+	collaboratorEmails: string[];
 	studyIds: string[];
 };
 
-export type GrantUserPermissionsResult = {
-	successfulUserEmails: string[];
+export type GrantDacAuthorizationsResult = {
+	successfulStudyIds: string[];
 	errorMessages: string[];
 };
 

@@ -39,7 +39,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
-import { grantUserPermissions } from '@/service/permissionService.ts';
+import { grantDacAuthorizations } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import { studySvc } from '@/service/studyService.ts';
 import {
@@ -513,13 +513,37 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		const permissionAdded = await grantUserPermissions({
-			userEmails: [applicant_institutional_email],
+		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
+
+		const collaboratorsByEmail: Record<string, CollaboratorRecord> = {};
+
+		if (collaboratorResponse.success) {
+			for (const collaborator of collaboratorResponse.data) {
+				collaboratorsByEmail[collaborator.institutional_email] = collaborator;
+			}
+		} else {
+			// Do not block the applicant's dac_authorizations when collaborators can't be retrieved
+			logger.error(
+				`Unable to retrieve collaborators for application: ${applicationId}. Only the applicant will be authorized.`,
+				collaboratorResponse,
+			);
+		}
+
+		const userEmails = Object.keys(collaboratorsByEmail);
+
+		const permissionAdded = await grantDacAuthorizations({
+			applicationId: String(applicationId),
+			applicantEmail: applicant_institutional_email,
 			approverAccessToken,
+			collaboratorEmails: userEmails,
 			studyIds: requested_studies,
 		});
 
-		if (permissionAdded.successfulUserEmails.length === 1) {
+		if (permissionAdded.errorMessages.length > 0) {
+			logger.error(`Failed to add dac_authorizations for application: ${applicationId}`, permissionAdded.errorMessages);
+		}
+
+		if (permissionAdded.successfulStudyIds.length > 0) {
 			// Notify Applicant of approval
 			emailService.sendApplicantEmailApproval({
 				id: application.id,
@@ -527,32 +551,15 @@ export const approveApplication = async ({
 				actionId: approvalResult.data.actionId,
 				name: applicant_first_name || 'N/A',
 			});
+		} else {
+			return failure('SYSTEM_ERROR', `Failed to add dac_authorizations for application: ${applicationId}`);
 		}
 
-		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
-
 		if (!collaboratorResponse.success) {
-			logger.error(
-				`Unable to retrieve information to send approval email to collaborators: ${applicationId}`,
-				collaboratorResponse,
-			);
 			return dtoFriendlyData;
 		}
 
-		const collaboratorsByEmail: Record<string, CollaboratorRecord> = {};
-		for (const collaborator of collaboratorResponse.data) {
-			collaboratorsByEmail[collaborator.institutional_email] = collaborator;
-		}
-
-		const userEmails = Object.keys(collaboratorsByEmail);
-
-		await grantUserPermissions({
-			userEmails,
-			approverAccessToken,
-			studyIds: requested_studies,
-		});
-
-		const studyResult = await studyService.getAllStudies({ studyIds: requested_studies });
+		const studyResult = await studyService.getAllStudies({ studyIds: permissionAdded.successfulStudyIds });
 
 		if (!studyResult.success) {
 			return studyResult;

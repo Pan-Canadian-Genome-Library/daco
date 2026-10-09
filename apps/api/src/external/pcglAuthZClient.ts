@@ -21,11 +21,11 @@ import { authConfig } from '@/config/authConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 import {
-	addUserToStudyPermissionResponse,
+	authZAddDacAuthorizationsResponse,
 	authzGroupResponseValidation,
 	authZUserInfo,
 	ServiceTokenResponse,
-	type PCGLAddUserToStudyPermissionResponse,
+	type AuthZAddDacAuthorizationsResponse,
 	type PCGLAuthZUserInfoResponse,
 } from '@pcgl-daco/validation';
 import urlJoin from 'url-join';
@@ -175,26 +175,33 @@ export const getUserInformation = async (
 };
 
 /**
- * Function to Add user to study permission in the AuthZ service
- * @param studyId
- * @param userEmails
- * @param accessToken
- * @returns a list of study permissions for the user, otherwise returns failure with SYSTEM_ERROR
+ * Function to Add dac_authorizations to study in the AuthZ service
+ * @returns the AuthZ response when the dac_authorizations were added, otherwise failure with SYSTEM_ERROR
  */
-export const addUsersToStudyPermission = async (
-	studyId: string,
-	userEmails: string[],
-	accessToken: string,
-): AsyncResult<PCGLAddUserToStudyPermissionResponse, 'SYSTEM_ERROR'> => {
+export const addDacAuthorizations = async ({
+	applicantEmail,
+	applicationId,
+	approverAccessToken,
+	collaboratorEmails,
+	studyId,
+}: {
+	applicantEmail: string;
+	applicationId: string;
+	approverAccessToken: string;
+	collaboratorEmails: string[];
+	studyId: string;
+}): AsyncResult<AuthZAddDacAuthorizationsResponse, 'SYSTEM_ERROR'> => {
 	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
 
 	const today = new Date().toISOString();
 
 	try {
-		const response = await fetchAuthZResource(`/study/${studyId}`, accessToken, {
+		const response = await fetchAuthZResource(`/study/${studyId}/dac_authorizations`, approverAccessToken, {
 			method: 'POST',
 			body: JSON.stringify({
-				user_emails: userEmails,
+				application_id: applicationId,
+				applicant_email: applicantEmail,
+				collaborator_emails: collaboratorEmails,
 				start_date: today,
 				end_date: addDaysToDateString(today, APPROVED_PERMISSION_EXPIRES_IN_DAYS),
 			}),
@@ -202,24 +209,23 @@ export const addUsersToStudyPermission = async (
 
 		if (!response.ok) {
 			const responseText = await response.text();
-			const message = `Failed to add users '${userEmails.join(', ')}' to study '${studyId}'`;
+			const message = `Failed to add dac_authorizations to study '${studyId}'`;
 			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${responseText}`);
 			return failure('SYSTEM_ERROR', message);
 		}
 
 		const res = await response.json();
 
-		const resultAddPermission = addUserToStudyPermissionResponse.safeParse(res);
-
-		if (!resultAddPermission.success) {
-			const message = `AuthZ service returned unexpected data to add user to study permission`;
+		const resultAddDacAuthorizations = authZAddDacAuthorizationsResponse.safeParse(res);
+		if (!resultAddDacAuthorizations.success) {
+			const message = `AuthZ service returned unexpected response when adding dac_authorizations to study ${studyId}`;
 			logger.error(`[AUTHZ]: ${message}`, JSON.stringify(res));
 			return failure('SYSTEM_ERROR', message);
 		}
 
-		return success(resultAddPermission.data);
+		return success(resultAddDacAuthorizations.data);
 	} catch (error) {
-		const message = `Unexpected error while adding ${userEmails.join(', ')} to study ${studyId}`;
+		const message = `Unexpected error while adding dac_authorizations to study ${studyId}`;
 		logger.error('[AUTHZ]:', message, error);
 		return failure('SYSTEM_ERROR', message);
 	}

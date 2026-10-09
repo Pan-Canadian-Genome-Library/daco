@@ -128,11 +128,11 @@ export const ServiceTokenResponse = z.object({
 });
 export type ServiceTokenResponse = z.infer<typeof ServiceTokenResponse>;
 
-export const addUserToStudyPermissionResponse = z.object({
-	success: z.array(z.string()),
-	error: z.string().or(z.array(z.string())),
+export const authZAddDacAuthorizationsResponse = z.object({
+	success: z.array(z.string().or(z.record(z.string(), z.unknown()))),
+	error: z.array(z.string()),
 });
-export type PCGLAddUserToStudyPermissionResponse = z.infer<typeof addUserToStudyPermissionResponse>;
+export type AuthZAddDacAuthorizationsResponse = z.infer<typeof authZAddDacAuthorizationsResponse>;
 
 export const sessionUser = authGeneratedSessionValues.merge(dacoGeneratedSessionValues);
 
