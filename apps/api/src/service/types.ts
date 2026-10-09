@@ -104,6 +104,14 @@ export type GrantDacAuthorizationsResult = {
 	errorMessages: string[];
 };
 
+export type RevokeDacAuthorizationsParams = {
+	applicationId: string;
+	accessToken: string;
+	studyIds: string[];
+};
+
+export type RevokeDacAuthorizationsResult = GrantDacAuthorizationsResult;
+
 export interface JoinedApplicationRecord extends Omit<ApplicationRecord, 'contents'> {
 	contents: ApplicationContentUpdates | null;
 }

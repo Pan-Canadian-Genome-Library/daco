@@ -17,9 +17,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { addDacAuthorizations } from '@/external/pcglAuthZClient.ts';
+import { addDacAuthorizations, removeDacAuthorizations } from '@/external/pcglAuthZClient.ts';
 
-import type { GrantDacAuthorizationsParams, GrantDacAuthorizationsResult } from './types.ts';
+import type {
+	GrantDacAuthorizationsParams,
+	GrantDacAuthorizationsResult,
+	RevokeDacAuthorizationsParams,
+	RevokeDacAuthorizationsResult,
+} from './types.ts';
 
 /**
  * This function adds dac_authorizations to the requested studies
@@ -43,6 +48,30 @@ export const grantDacAuthorizations = async ({
 			collaboratorEmails,
 			studyId,
 		});
+		if (!result.success) {
+			failureMessages.push(result.message);
+		} else {
+			successfulStudyIds.push(studyId);
+		}
+	}
+
+	return { successfulStudyIds, errorMessages: failureMessages };
+};
+
+/**
+ * This function removes the dac_authorizations of an application from the requested studies
+ * For each study, the AuthZ service is called using the user's access token
+ * Returns the ids of the studies that were successfully updated and any failure messages
+ */
+export const revokeDacAuthorizations = async ({
+	applicationId,
+	accessToken,
+	studyIds,
+}: RevokeDacAuthorizationsParams): Promise<RevokeDacAuthorizationsResult> => {
+	const failureMessages: string[] = [];
+	const successfulStudyIds: string[] = [];
+	for (const studyId of studyIds) {
+		const result = await removeDacAuthorizations({ applicationId, accessToken, studyId });
 		if (!result.success) {
 			failureMessages.push(result.message);
 		} else {

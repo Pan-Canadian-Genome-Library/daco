@@ -134,6 +134,12 @@ export const authZAddDacAuthorizationsResponse = z.object({
 });
 export type AuthZAddDacAuthorizationsResponse = z.infer<typeof authZAddDacAuthorizationsResponse>;
 
+export const authZRemoveDacAuthorizationsResponse = z.object({
+	success: z.array(z.string()),
+	error: z.array(z.string()),
+});
+export type AuthZRemoveDacAuthorizationsResponse = z.infer<typeof authZRemoveDacAuthorizationsResponse>;
+
 export const sessionUser = authGeneratedSessionValues.merge(dacoGeneratedSessionValues);
 
 export type SessionUser = z.infer<typeof sessionUser>;

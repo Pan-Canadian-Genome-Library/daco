@@ -39,7 +39,7 @@ import { collaboratorsSvc } from '@/service/collaboratorsService.ts';
 import { emailSvc } from '@/service/email/emailsService.ts';
 import { filesSvc } from '@/service/fileService.ts';
 import { pdfService, TrademarkValues } from '@/service/pdf/pdfService.ts';
-import { grantDacAuthorizations } from '@/service/permissionService.ts';
+import { grantDacAuthorizations, revokeDacAuthorizations } from '@/service/permissionService.ts';
 import { signatureService as signatureSvc } from '@/service/signatureService.ts';
 import { studySvc } from '@/service/studyService.ts';
 import {
@@ -552,6 +552,7 @@ export const approveApplication = async ({
 				name: applicant_first_name || 'N/A',
 			});
 		} else {
+			// TODO: revert application state if adding dac_authorizations fails
 			return failure('SYSTEM_ERROR', `Failed to add dac_authorizations for application: ${applicationId}`);
 		}
 
@@ -750,6 +751,7 @@ export const revokeApplication = async (
 	isDACMember: boolean,
 	revokeReason: string,
 	userName: string,
+	accessToken: string,
 ): AsyncResult<ApplicationDTO, 'INVALID_STATE_TRANSITION' | 'NOT_FOUND' | 'SYSTEM_ERROR'> => {
 	try {
 		// Fetch application
@@ -783,8 +785,35 @@ export const revokeApplication = async (
 		const applicationWithContents = await service.getApplicationWithContents({ id: applicationId });
 
 		if (!applicationWithContents.success) {
-			logger.error(`Unable to retrieve information to send revoke email: ${applicationId}`);
+			logger.error(
+				`Unable to retrieve application contents to remove dac_authorizations and send revoke email: ${applicationId}`,
+			);
 			return applicationDTO;
+		}
+
+		const requestedStudies = applicationWithContents.data.contents?.requested_studies;
+
+		if (!requestedStudies || !requestedStudies.length) {
+			logger.error(`No studies were requested for application: ${applicationId}`);
+			return applicationDTO;
+		}
+
+		const permissionRemoved = await revokeDacAuthorizations({
+			applicationId: String(applicationId),
+			accessToken,
+			studyIds: requestedStudies,
+		});
+
+		if (permissionRemoved.errorMessages.length > 0) {
+			logger.error(
+				`Failed to remove dac_authorizations for application: ${applicationId}`,
+				permissionRemoved.errorMessages,
+			);
+		}
+
+		if (permissionRemoved.successfulStudyIds.length === 0) {
+			// TODO: revert application state if removing dac_authorizations fails
+			return failure('SYSTEM_ERROR', `Failed to remove dac_authorizations for application: ${applicationId}`);
 		}
 
 		const { actionId } = revokeApplicationResult.data;
