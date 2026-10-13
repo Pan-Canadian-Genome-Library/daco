@@ -235,15 +235,18 @@ export const addDacAuthorizations = async ({
 
 /**
  * Function to remove the dac_authorizations of an application from a study in the AuthZ service
- * @returns the AuthZ response (unvalidated) when the dac_authorizations were removed, otherwise failure with SYSTEM_ERROR
+ * A 404 from AuthZ (already removed) is treated as success so removal can be safely retried
+ * @returns the AuthZ response when the dac_authorizations were removed, otherwise failure with SYSTEM_ERROR
  */
 export const removeDacAuthorizations = async ({
 	applicationId,
 	accessToken,
+	collaboratorEmails,
 	studyId,
 }: {
 	applicationId: string;
 	accessToken: string;
+	collaboratorEmails: string[];
 	studyId: string;
 }): AsyncResult<AuthZRemoveDacAuthorizationsResponse, 'SYSTEM_ERROR'> => {
 	try {
@@ -251,9 +254,22 @@ export const removeDacAuthorizations = async ({
 			method: 'DELETE',
 			body: JSON.stringify({
 				application_id: applicationId,
-				collaborator_emails: [],
+				collaborator_emails: collaboratorEmails,
 			}),
 		});
+
+		logger.info(
+			`using token ${accessToken} to remove dac_authorizations for application '${applicationId}' from study '${studyId}'. response: ${response.status}`,
+		);
+
+		// AuthZ returns 404 when the dac_authorizations were already removed, which is the desired end state
+		if (response.status === 404) {
+			logger.warn(
+				'[AUTHZ]:',
+				`No dac_authorizations found for application '${applicationId}' in study '${studyId}'. Treating as already removed.`,
+			);
+			return success({ success: [], error: [] });
+		}
 
 		if (!response.ok) {
 			const responseText = await response.text();

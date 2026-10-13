@@ -468,9 +468,100 @@ export const approveApplication = async ({
 			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
 		}
 
+		// Validate the transition without committing it. The state is only committed once AuthZ has been updated.
+		const canApprove = appStateManager._canPerformAction(ApplicationStateEvents.dac_approve_review);
+
+		if (!canApprove.success) {
+			return canApprove;
+		}
+
+		// Fetch the application with contents, required to know who to authorize and for which studies
+		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
+
+		if (!resultContents.success || !resultContents.data.contents) {
+			logger.error(`Unable to retrieve application contents to approve application: ${applicationId}`, resultContents);
+			return failure(
+				'SYSTEM_ERROR',
+				`Unable to retrieve application contents to approve application: ${applicationId}`,
+			);
+		}
+
+		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
+
+		if (!requested_studies || !requested_studies.length) {
+			logger.error(`No studies were requested for application: ${applicationId}`);
+			return failure('SYSTEM_ERROR', `No studies were requested for application: ${applicationId}`);
+		}
+
+		if (!applicant_institutional_email) {
+			logger.error(`Applicant does not have an institutional email for application: ${applicationId}`);
+			return failure(
+				'SYSTEM_ERROR',
+				`Applicant does not have an institutional email for application: ${applicationId}`,
+			);
+		}
+
+		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
+
+		const collaboratorsByEmail: Record<string, CollaboratorRecord> = {};
+
+		if (collaboratorResponse.success) {
+			for (const collaborator of collaboratorResponse.data) {
+				collaboratorsByEmail[collaborator.institutional_email] = collaborator;
+			}
+		} else {
+			// Do not block the applicant's dac_authorizations when collaborators can't be retrieved
+			logger.error(
+				`Unable to retrieve collaborators for application: ${applicationId}. Only the applicant will be authorized.`,
+				collaboratorResponse,
+			);
+		}
+
+		const userEmails = Object.keys(collaboratorsByEmail);
+
+		/**
+		 * Compensation: removes the dac_authorizations from every requested study.
+		 * Removing is idempotent (AuthZ 404 is treated as success), so it is also safe for studies that were never granted.
+		 */
+		const rollbackDacAuthorizations = async () => {
+			const rollback = await revokeDacAuthorizations({
+				applicationId: String(applicationId),
+				accessToken: approverAccessToken,
+				collaboratorEmails: userEmails,
+				studyIds: requested_studies,
+			});
+
+			if (rollback.failedStudyIds.length > 0) {
+				logger.error(
+					`Unable to roll back dac_authorizations for application: ${applicationId}. Manual cleanup required for studies: ${rollback.failedStudyIds.join(', ')}`,
+					rollback.errorMessages,
+				);
+			}
+		};
+
+		logger.info(`testing token: ${approverAccessToken}`);
+		const permissionAdded = await grantDacAuthorizations({
+			applicationId: String(applicationId),
+			applicantEmail: applicant_institutional_email,
+			approverAccessToken,
+			collaboratorEmails: userEmails,
+			studyIds: requested_studies,
+		});
+
+		if (permissionAdded.failedStudyIds.length > 0) {
+			logger.error(`Failed to add dac_authorizations for application: ${applicationId}`, permissionAdded.errorMessages);
+			await rollbackDacAuthorizations();
+			return failure(
+				'SYSTEM_ERROR',
+				`Application was not approved. Failed to add dac_authorizations for studies: ${permissionAdded.failedStudyIds.join(', ')}. Please try again.`,
+			);
+		}
+
+		// AuthZ is up to date, commit the state transition
 		const approvalResult = await appStateManager.approveDacReview(userName);
 
 		if (!approvalResult.success) {
+			await rollbackDacAuthorizations();
 			return failure('SYSTEM_ERROR', approvalResult.message);
 		}
 
@@ -493,68 +584,13 @@ export const approveApplication = async ({
 			return dtoFriendlyData;
 		}
 
-		// Fetch the application with contents to send the email
-		const resultContents = await applicationService.getApplicationWithContents({ id: applicationId });
-
-		if (!resultContents.success || !resultContents.data.contents) {
-			logger.error(`Unable to retrieve information to send approval email: ${applicationId}`, resultContents);
-			return dtoFriendlyData;
-		}
-
-		const { applicant_first_name, applicant_institutional_email, requested_studies } = resultContents.data.contents;
-
-		if (!requested_studies || !requested_studies.length) {
-			logger.error(`No studies were requested for application: ${applicationId}`);
-			return dtoFriendlyData;
-		}
-
-		if (!applicant_institutional_email) {
-			logger.warn(`Applicant does not have an institutional email for application: ${applicationId}`);
-			return dtoFriendlyData;
-		}
-
-		const collaboratorResponse = await collaboratorsService.listCollaborators(application.id);
-
-		const collaboratorsByEmail: Record<string, CollaboratorRecord> = {};
-
-		if (collaboratorResponse.success) {
-			for (const collaborator of collaboratorResponse.data) {
-				collaboratorsByEmail[collaborator.institutional_email] = collaborator;
-			}
-		} else {
-			// Do not block the applicant's dac_authorizations when collaborators can't be retrieved
-			logger.error(
-				`Unable to retrieve collaborators for application: ${applicationId}. Only the applicant will be authorized.`,
-				collaboratorResponse,
-			);
-		}
-
-		const userEmails = Object.keys(collaboratorsByEmail);
-
-		const permissionAdded = await grantDacAuthorizations({
-			applicationId: String(applicationId),
-			applicantEmail: applicant_institutional_email,
-			approverAccessToken,
-			collaboratorEmails: userEmails,
-			studyIds: requested_studies,
+		// Notify Applicant of approval
+		emailService.sendApplicantEmailApproval({
+			id: application.id,
+			to: applicant_institutional_email,
+			actionId: approvalResult.data.actionId,
+			name: applicant_first_name || 'N/A',
 		});
-
-		if (permissionAdded.errorMessages.length > 0) {
-			logger.error(`Failed to add dac_authorizations for application: ${applicationId}`, permissionAdded.errorMessages);
-		}
-
-		if (permissionAdded.successfulStudyIds.length > 0) {
-			// Notify Applicant of approval
-			emailService.sendApplicantEmailApproval({
-				id: application.id,
-				to: applicant_institutional_email,
-				actionId: approvalResult.data.actionId,
-				name: applicant_first_name || 'N/A',
-			});
-		} else {
-			// TODO: revert application state if adding dac_authorizations fails
-			return failure('SYSTEM_ERROR', `Failed to add dac_authorizations for application: ${applicationId}`);
-		}
 
 		if (!collaboratorResponse.success) {
 			return dtoFriendlyData;
@@ -759,6 +795,7 @@ export const revokeApplication = async (
 		const service: ApplicationService = applicationSvc(database);
 		const result = await service.getApplicationById({ id: applicationId });
 		const emailService = await emailSvc(database);
+		const collaboratorsService = await collaboratorsSvc(database);
 
 		if (!result.success) {
 			return result;
@@ -768,6 +805,63 @@ export const revokeApplication = async (
 
 		const appStateManager = new ApplicationStateManager(application);
 
+		// Validate the transition without committing it. The state is only committed once AuthZ has been updated.
+		const canRevoke = appStateManager._canPerformAction(ApplicationStateEvents.revoked);
+
+		if (!canRevoke.success) {
+			return canRevoke;
+		}
+
+		const applicationWithContents = await service.getApplicationWithContents({ id: applicationId });
+
+		if (!applicationWithContents.success) {
+			logger.error(`Unable to retrieve application contents to revoke application: ${applicationId}`);
+			return applicationWithContents;
+		}
+
+		const contents = applicationWithContents.data.contents;
+		const requestedStudies = contents?.requested_studies;
+
+		if (!requestedStudies || !requestedStudies.length) {
+			logger.error(`No studies were requested for application: ${applicationId}, no dac_authorizations to remove.`);
+		} else {
+			// AuthZ requires the collaborators' emails to remove their dac_authorizations
+			const collaboratorResponse = await collaboratorsService.listCollaborators(applicationId);
+
+			if (!collaboratorResponse.success) {
+				logger.error(
+					`Unable to retrieve collaborators to remove dac_authorizations for application: ${applicationId}`,
+					collaboratorResponse,
+				);
+				return failure(
+					'SYSTEM_ERROR',
+					`Application was not revoked. Unable to retrieve collaborators to remove dac_authorizations. Please try again.`,
+				);
+			}
+
+			const collaboratorEmails = collaboratorResponse.data.map((collaborator) => collaborator.institutional_email);
+
+			const permissionRemoved = await revokeDacAuthorizations({
+				applicationId: String(applicationId),
+				accessToken,
+				collaboratorEmails,
+				studyIds: requestedStudies,
+			});
+
+			if (permissionRemoved.failedStudyIds.length > 0) {
+				// The application stays APPROVED so the revoke can be retried. Removing dac_authorizations is idempotent.
+				logger.error(
+					`Failed to remove dac_authorizations for application: ${applicationId}`,
+					permissionRemoved.errorMessages,
+				);
+				return failure(
+					'SYSTEM_ERROR',
+					`Application was not revoked. Failed to remove dac_authorizations for studies: ${permissionRemoved.failedStudyIds.join(', ')}. Please try again.`,
+				);
+			}
+		}
+
+		// AuthZ is up to date, commit the state transition
 		const revokeApplicationResult = await appStateManager.revokeApproval(userName);
 
 		if (!revokeApplicationResult.success) {
@@ -782,46 +876,13 @@ export const revokeApplication = async (
 		}
 
 		const applicationDTO = convertToBasicApplicationRecord(updatedResult.data);
-		const applicationWithContents = await service.getApplicationWithContents({ id: applicationId });
-
-		if (!applicationWithContents.success) {
-			logger.error(
-				`Unable to retrieve application contents to remove dac_authorizations and send revoke email: ${applicationId}`,
-			);
-			return applicationDTO;
-		}
-
-		const requestedStudies = applicationWithContents.data.contents?.requested_studies;
-
-		if (!requestedStudies || !requestedStudies.length) {
-			logger.error(`No studies were requested for application: ${applicationId}`);
-			return applicationDTO;
-		}
-
-		const permissionRemoved = await revokeDacAuthorizations({
-			applicationId: String(applicationId),
-			accessToken,
-			studyIds: requestedStudies,
-		});
-
-		if (permissionRemoved.errorMessages.length > 0) {
-			logger.error(
-				`Failed to remove dac_authorizations for application: ${applicationId}`,
-				permissionRemoved.errorMessages,
-			);
-		}
-
-		if (permissionRemoved.successfulStudyIds.length === 0) {
-			// TODO: revert application state if removing dac_authorizations fails
-			return failure('SYSTEM_ERROR', `Failed to remove dac_authorizations for application: ${applicationId}`);
-		}
 
 		const { actionId } = revokeApplicationResult.data;
 		emailService.sendEmailApplicantRevoke({
 			id: application.id,
-			to: applicationWithContents.data.contents?.applicant_institutional_email,
+			to: contents?.applicant_institutional_email,
 			actionId,
-			name: `${applicationWithContents.data.contents?.applicant_first_name} ${applicationWithContents.data.contents?.applicant_last_name}`,
+			name: `${contents?.applicant_first_name} ${contents?.applicant_last_name}`,
 			comment: revokeReason,
 			dacRevoked: isDACMember,
 		});

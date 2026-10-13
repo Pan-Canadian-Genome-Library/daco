@@ -29,7 +29,7 @@ import type {
 /**
  * This function adds dac_authorizations to the requested studies
  * For each study, the AuthZ service is called using the approver's access token
- * Returns the ids of the studies that were successfully updated and any failure messages
+ * Returns the ids of the studies that were successfully and unsuccessfully updated, and any failure messages
  */
 export const grantDacAuthorizations = async ({
 	applicationId,
@@ -40,6 +40,7 @@ export const grantDacAuthorizations = async ({
 }: GrantDacAuthorizationsParams): Promise<GrantDacAuthorizationsResult> => {
 	const failureMessages: string[] = [];
 	const successfulStudyIds: string[] = [];
+	const failedStudyIds: string[] = [];
 	for (const studyId of studyIds) {
 		const result = await addDacAuthorizations({
 			applicantEmail,
@@ -50,34 +51,38 @@ export const grantDacAuthorizations = async ({
 		});
 		if (!result.success) {
 			failureMessages.push(result.message);
+			failedStudyIds.push(studyId);
 		} else {
 			successfulStudyIds.push(studyId);
 		}
 	}
 
-	return { successfulStudyIds, errorMessages: failureMessages };
+	return { successfulStudyIds, failedStudyIds, errorMessages: failureMessages };
 };
 
 /**
  * This function removes the dac_authorizations of an application from the requested studies
  * For each study, the AuthZ service is called using the user's access token
- * Returns the ids of the studies that were successfully updated and any failure messages
+ * Returns the ids of the studies that were successfully and unsuccessfully updated, and any failure messages
  */
 export const revokeDacAuthorizations = async ({
 	applicationId,
 	accessToken,
+	collaboratorEmails,
 	studyIds,
 }: RevokeDacAuthorizationsParams): Promise<RevokeDacAuthorizationsResult> => {
 	const failureMessages: string[] = [];
 	const successfulStudyIds: string[] = [];
+	const failedStudyIds: string[] = [];
 	for (const studyId of studyIds) {
-		const result = await removeDacAuthorizations({ applicationId, accessToken, studyId });
+		const result = await removeDacAuthorizations({ applicationId, accessToken, collaboratorEmails, studyId });
 		if (!result.success) {
 			failureMessages.push(result.message);
+			failedStudyIds.push(studyId);
 		} else {
 			successfulStudyIds.push(studyId);
 		}
 	}
 
-	return { successfulStudyIds, errorMessages: failureMessages };
+	return { successfulStudyIds, failedStudyIds, errorMessages: failureMessages };
 };

@@ -101,12 +101,14 @@ export type GrantDacAuthorizationsParams = {
 
 export type GrantDacAuthorizationsResult = {
 	successfulStudyIds: string[];
+	failedStudyIds: string[];
 	errorMessages: string[];
 };
 
 export type RevokeDacAuthorizationsParams = {
 	applicationId: string;
 	accessToken: string;
+	collaboratorEmails: string[];
 	studyIds: string[];
 };
 
