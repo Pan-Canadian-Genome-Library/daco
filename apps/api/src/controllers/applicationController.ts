@@ -539,7 +539,6 @@ export const approveApplication = async ({
 			}
 		};
 
-		logger.info(`testing token: ${approverAccessToken}`);
 		const permissionAdded = await grantDacAuthorizations({
 			applicationId: String(applicationId),
 			applicantEmail: applicant_institutional_email,

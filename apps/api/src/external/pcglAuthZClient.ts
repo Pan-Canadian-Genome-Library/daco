@@ -258,10 +258,6 @@ export const removeDacAuthorizations = async ({
 			}),
 		});
 
-		logger.info(
-			`using token ${accessToken} to remove dac_authorizations for application '${applicationId}' from study '${studyId}'. response: ${response.status}`,
-		);
-
 		// AuthZ returns 404 when the dac_authorizations were already removed, which is the desired end state
 		if (response.status === 404) {
 			logger.warn(
