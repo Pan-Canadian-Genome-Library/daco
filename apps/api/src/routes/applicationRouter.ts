@@ -570,7 +570,8 @@ applicationRouter.post(
 				const { revokeReason } = request.body;
 				const isChair = user.dacChair.some((dacId) => dacId === applicationResult.data.dacId);
 				const userName = getUserName(user);
-				const result = await revokeApplication(applicationId, isChair, revokeReason, userName);
+				const accessToken = request.session.account?.accessToken || '';
+				const result = await revokeApplication(applicationId, isChair, revokeReason, userName, accessToken);
 
 				if (!result.success) {
 					switch (result.error) {
