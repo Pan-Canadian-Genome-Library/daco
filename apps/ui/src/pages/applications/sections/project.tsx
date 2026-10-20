@@ -254,7 +254,6 @@ const Project = () => {
 												translate('project-section.section2.form.lay-summary.example.exemplar2'),
 												translate('project-section.section2.form.lay-summary.example.exemplar3'),
 												translate('project-section.section2.form.lay-summary.example.exemplar4'),
-												translate('project-section.section2.form.lay-summary.example.exemplar5'),
 											]}
 										/>
 									}
