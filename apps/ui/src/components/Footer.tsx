@@ -22,7 +22,6 @@ import { useTranslation } from 'react-i18next';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { FooterContainer } from '@repo/ui/footer';
 
-
 const temp_footer_items = [
 	{
 		title: 'about',
@@ -44,13 +43,15 @@ const temp_footer_items = [
 
 const PortalBand = () => {
 	const { t } = useTranslation();
-	return (<span>{t('global.copyright', { date: new Date().getFullYear() })}</span>)
-}
+	return <span>{t('global.copyright', { date: new Date().getFullYear() })}</span>;
+};
 
 export const FooterComponent = () => {
 	const brandColor = pcglColours.secondary;
 	const { t } = useTranslation();
-	return <FooterContainer brand={brandColor} translator={t} PortalBand={<PortalBand />} footerItems={temp_footer_items} />;
+	return (
+		<FooterContainer brand={brandColor} translator={t} PortalBand={<PortalBand />} footerItems={temp_footer_items} />
+	);
 };
 
 export default FooterComponent;
