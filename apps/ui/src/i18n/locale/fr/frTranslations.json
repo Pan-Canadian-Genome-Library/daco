@@ -34,6 +34,35 @@
 		"PCGL": "Bibliothèque Génomique Pancanadienne",
 		"CIHR": "Institut de recherche en santé du Canada"
 	},
+	"footer": {
+		"meta": {
+			"fundingTitle": "Reconnaissance du financement",
+			"logoText": "Logo de la Bibliothèque génomique pancanadienne",
+			"cihrLogoText": "Logo des Instituts de recherche en santé du Canada",
+			"cihrSupport": "La BGPC est soutenu par les Instituts de recherche en santé du Canada (IRSC)."
+		},
+		"section": {
+			"about": "À propos de la BGPC",
+			"resources": "Ressources et documentation",
+			"connect": "Restez en contact"
+		},
+		"label": {
+			"pcglWebsite": "Site web de la BGPC",
+			"publicationPolicy": "Politique de publication",
+			"helpGuides": "Guides d'aide",
+			"contact": "Contactez-nous",
+			"subscribe": "S'abonner",
+			"linkedin": "LinkedIn"
+		},
+		"href": {
+			"pcglWebsite": "https://genomelibrary.ca/fr",
+			"publicationPolicy": "https://pan-canadian-genome-library.github.io/fr/researcher/publications-policies",
+			"helpGuides": "https://pan-canadian-genome-library.github.io/fr/participant-public/docs",
+			"contact": "https://genomelibrary.ca/fr/nous-joindre",
+			"subscribe": "https://genomelibrary.ca/fr/abonnez-vous",
+			"linkedin": "https://fr.linkedin.com/company/genome-library"
+		}
+	},
 	"homepage": {
 		"title": "Demander l'accès aux données contrôlées",
 		"introduction": "Le Bureau de conformité de l'accès aux données de la Bibliothèque génomique pancanadienne (BCAD de la BGP) traite les demandes des chercheurs souhaitant accéder aux données contrôlées de la BGP.",
