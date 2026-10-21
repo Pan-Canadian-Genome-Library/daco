@@ -78,7 +78,7 @@ services:
       - POSTGRES_DB=submission
   dictionary-manager-mongo:
     container_name: dictionary-manager.api.db
-    image: bitnami/mongodb:latest
+    image: soldevelo/mongodb:latest
     ports:
       - 27017:27017
     volumes:
