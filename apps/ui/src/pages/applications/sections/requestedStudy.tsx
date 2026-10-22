@@ -19,7 +19,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { requestedStudiesSchema, type RequestedStudiesSchemaType } from '@pcgl-daco/validation';
-import { Col, Flex, Form, Row, Tag, Typography } from 'antd';
+import { Button, Col, ConfigProvider, Flex, Form, Row, Table, Typography } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -37,33 +37,41 @@ import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
 import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
-import { pcglColours } from '@/providers/ThemeProvider';
+import { studyTableTheme } from '@/providers/ThemeProvider';
+import { CloseCircleOutlined } from '@ant-design/icons';
 import { ApplicationStates, type StudyDacoDTO } from '@pcgl-daco/data-model';
 import Link from 'antd/es/typography/Link';
 
 const { Text } = Typography;
-
-const rule = createSchemaFieldRule(requestedStudiesSchema);
 const { Item } = Form;
 
-const getDacIds = (requestedStudies: string[] | null, studies: StudyDacoDTO[]): (string | null)[] => {
-	if (!requestedStudies?.length) {
-		return [];
-	}
+const rule = createSchemaFieldRule(requestedStudiesSchema);
 
-	const dacIds = requestedStudies
-		.map((studyId) => studies.find((study) => study.studyId === studyId)?.dacId)
-		.filter((study) => study !== undefined);
+export const AllowedDUOPermissions = {
+	GENERAL_RESEARCH_USE: 'DUO:0000042', // general research use
+	HEALTH_MEDICAL_BIOMEDICAL_RESEARCH: 'DUO:0000006', // health or medical or biomedical research
+	DISEASE_SPECIFIC_MODIFIER: 'DUO:0000007', // disease specific research
+	POPULATION_ORIGINS_ANCESTRY_RESEARCH_ONLY: 'DUO:0000011', // population origins or ancestry research only
+	NO_RESTRICTION: `DUO:0000004`, // no restriction
+} as const;
 
-	return dacIds;
+export type AllowedDUOPermissionsValues = (typeof AllowedDUOPermissions)[keyof typeof AllowedDUOPermissions];
+
+const DUO_PERMISSION_DISPLAY: Record<string, string> = {
+	[AllowedDUOPermissions.GENERAL_RESEARCH_USE]: 'DUO:0000042 (general research use)',
+	[AllowedDUOPermissions.HEALTH_MEDICAL_BIOMEDICAL_RESEARCH]: 'DUO:0000006 (health or medical or biomedical research)',
+	[AllowedDUOPermissions.DISEASE_SPECIFIC_MODIFIER]: 'DUO:0000007 (disease specific research)',
+	[AllowedDUOPermissions.POPULATION_ORIGINS_ANCESTRY_RESEARCH_ONLY]:
+		'DUO:0000011 (population origins or ancestry research only)',
+	[AllowedDUOPermissions.NO_RESTRICTION]: 'DUO:0000004 (no restriction)',
 };
 
 const RequestedStudy = () => {
 	const { t: translate } = useTranslation();
 	const { isEditMode, revisions, dacComments, disabledDacComments } = useOutletContext<ApplicationOutletContext>();
 	const { state, dispatch } = useApplicationContext();
+	const notification = useNotificationContext();
 	const { data: allStudies, isPending: isAllStudiesPending } = useGetAllStudies();
-
 	const canEditFromPermissions = canEditSection({
 		revisions,
 		section: 'study',
@@ -71,22 +79,29 @@ const RequestedStudy = () => {
 		userPermissions: state.applicationUserPermissions,
 		currentApplicationState: state.applicationState,
 	});
-
-	// Should be able to change the requested studies while in DRAFT, once past this, the user should not be able to change them
-	const canEdit = canEditFromPermissions && state.applicationState === ApplicationStates.DRAFT;
-
-	const notification = useNotificationContext();
-
 	const form = useSectionForm({ section: 'study', sectionVisited: state.formState.sectionsVisited.study });
-
 	const { control, watch, getValues, setValue, handleSubmit } = useForm<Nullable<RequestedStudiesSchemaType>>({
 		defaultValues: {
 			requestedStudies: state.fields.requestedStudies,
 		},
 		resolver: zodResolver(requestedStudiesSchema),
 	});
+	const studies = watch('requestedStudies');
+	// Should be able to change the requested studies while in DRAFT, once past this, the user should not be able to change them
+	const canEdit = canEditFromPermissions && state.applicationState === ApplicationStates.DRAFT;
 
 	const alterAllStudiesData = () => {
+		const getDacIds = (requestedStudies: string[] | null, studies: StudyDacoDTO[]): (string | null)[] => {
+			if (!requestedStudies?.length) {
+				return [];
+			}
+
+			const dacIds = requestedStudies
+				.map((studyId) => studies.find((study) => study.studyId === studyId)?.dacId)
+				.filter((study) => study !== undefined);
+
+			return dacIds;
+		};
 		const requestedStudies = getValues('requestedStudies');
 
 		if (!allStudies) return [];
@@ -170,8 +185,6 @@ const RequestedStudy = () => {
 		});
 	};
 
-	const studies = watch('requestedStudies');
-
 	return (
 		<SectionWrapper>
 			<Form
@@ -205,7 +218,7 @@ const RequestedStudy = () => {
 				</Row>
 				<SectionContent showDivider={false}>
 					<Row>
-						<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '75%' }}>
+						<Col xs={{ flex: '100%' }}>
 							<Flex vertical gap={'small'}>
 								<Flex vertical>
 									<Item
@@ -218,25 +231,7 @@ const RequestedStudy = () => {
 										</Text>
 									</Item>
 								</Flex>
-								<Flex wrap style={{ minHeight: '23px' }} gap={'small'}>
-									{studies && allStudies
-										? studies.map((studyId) => {
-												const study = allStudies.find((s) => s.studyId === studyId);
-												if (!study) return null;
 
-												return (
-													<Tag
-														key={study.studyId}
-														style={{ color: !canEdit ? pcglColours.darkGrey : undefined }}
-														closable={canEdit}
-														onClose={() => removeTag(study.studyId)}
-													>
-														{study.studyName}
-													</Tag>
-												);
-											})
-										: null}
-								</Flex>
 								{!isAllStudiesPending && allStudies ? (
 									<SelectBox
 										name="requestedStudies"
@@ -256,6 +251,57 @@ const RequestedStudy = () => {
 									/>
 								) : null}
 							</Flex>
+							<ConfigProvider theme={studyTableTheme}>
+								{/*TABLE*/}
+								{studies && allStudies && (
+									<Table
+										dataSource={studies.map((studyId) => {
+											const study = allStudies.find((s) => s.studyId === studyId);
+											if (!study) return null;
+
+											return {
+												study: study.studyName,
+												duo: DUO_PERMISSION_DISPLAY[study.duoPermission] ?? study.duoPermission, // Display with additional description if found, otherwise just the DUO code
+												diseaseSpecificModifier: study.diseaseSpecificModifier,
+												deleteStudy: (
+													<Flex>
+														<Button
+															color="default"
+															onClick={() => removeTag(study.studyId)}
+															variant="text"
+															icon={<CloseCircleOutlined style={{ fontSize: '20px' }} />}
+															shape="circle"
+															disabled={!canEdit}
+														/>
+													</Flex>
+												),
+											};
+										})}
+										columns={[
+											{
+												title: 'Study',
+												dataIndex: 'study',
+												key: 'study',
+											},
+											{
+												title: 'Duo Permission',
+												dataIndex: 'duo',
+												key: 'duo',
+											},
+											{
+												title: 'Disease Specific Modifier',
+												dataIndex: 'diseaseSpecificModifier',
+												key: 'diseaseSpecificModifier',
+											},
+											{
+												title: '',
+												dataIndex: 'deleteStudy',
+												key: 'deleteStudy',
+											},
+										]}
+									/>
+								)}
+							</ConfigProvider>
 						</Col>
 					</Row>
 				</SectionContent>
