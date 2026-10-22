@@ -13,8 +13,8 @@
 				},
 				"SELF_REGISTRATION_SENT": {
 					"subheading": "Your account is almost ready!",
-					"description": "Thanks for enroling to PCGL project. We've sent a verification email to your email address. Please open that message and follow the instructions to confirm your address and return to the PCGL DACO portal to login.",
-					"description2": "If you didn't receive the email within a few minutes, please contact the PCGL helpdesk."
+					"description": "Thanks for registering with the PCGL. We've sent a verification email to the address you provided. Please open it and follow the instructions to confirm your email, then return to the PCGL DACO portal to log in.",
+					"description2": "If you don't see the email within a few minutes, check your spam or junk folder. If it's still not there, please contact the PCGL Helpdesk."
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Looks like we ran into a little hiccup while completing the login process.",
