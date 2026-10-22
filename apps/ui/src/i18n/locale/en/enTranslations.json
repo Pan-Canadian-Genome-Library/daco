@@ -34,6 +34,35 @@
 		"PCGL": "Pan-Canadian Genome Library",
 		"CIHR": "Canadian Institutes of Health Research"
 	},
+	"footer": {
+		"meta": {
+			"fundingTitle": "Acknowledgement of funding",
+			"logoText": "Pan-Canadian Genome Library logo",
+			"cihrLogoText": "Canadian Institutes of Health Research logo",
+			"cihrSupport": "PCGL is supported by the Canadian Institutes of Health Research (CIHR)."
+		},
+		"section": {
+			"about": "About PCGL",
+			"resources": "Resources & Documentation",
+			"connect": "Connect with us"
+		},
+		"label": {
+			"pcglWebsite": "PCGL Website",
+			"publicationPolicy": "Publication Policy",
+			"helpGuides": "Help Guides",
+			"contact": "Contact Us",
+			"subscribe": "Subscribe to our mailing list",
+			"linkedin": "LinkedIn"
+		},
+		"href": {
+			"pcglWebsite": "https://genomelibrary.ca",
+			"publicationPolicy": "https://pan-canadian-genome-library.github.io/researcher/publications-policies",
+			"helpGuides": "https://pan-canadian-genome-library.github.io/researcher/docs",
+			"contact": "https://www.genomelibrary.ca/contact-us",
+			"subscribe": "https://genomelibrary.ca/subscribe",
+			"linkedin": "https://www.linkedin.com/company/genome-library"
+		}
+	},
 	"homepage": {
 		"title": "Apply for Access to Controlled Data",
 		"introduction": "The PCGL Data Access Compliance Office (PCGL DACO) handles requests from researchers interested in accessing PCGL Controlled Data.",

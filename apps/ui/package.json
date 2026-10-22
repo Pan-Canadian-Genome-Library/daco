@@ -18,6 +18,7 @@
 		"@hookform/resolvers": "^3.10.0",
 		"@pcgl-daco/data-model": "workspace:^",
 		"@pcgl-daco/validation": "workspace:^",
+		"@repo/ui": "https://github.com/Pan-Canadian-Genome-Library/pcgl-common-react-components/releases/download/v0.0.1/repo-ui-0.0.1.tgz",
 		"@tanstack/react-query": "^5.63.0",
 		"@types/react-signature-canvas": "^1.0.7",
 		"antd": "^5.29.3",
