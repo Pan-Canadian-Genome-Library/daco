@@ -283,7 +283,7 @@ describe('Application API', () => {
 		it('should successfully revoke an application in APPROVED state', async () => {
 			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.APPROVED);
 
-			const result = await revokeApplication(testApp.id, true, 'TEST-REVOKE-COMMENT', 'Test-User');
+			const result = await revokeApplication(testApp.id, true, 'TEST-REVOKE-COMMENT', 'Test-User', '');
 
 			assert.ok(result.success);
 			assert.strictEqual(result.data.state, ApplicationStates.REVOKED);
@@ -297,7 +297,7 @@ describe('Application API', () => {
 		it('should fail to revoke an application not in APPROVED state', async () => {
 			const testApp = await getFirstApplicationTestByState(testApplicationRepo, ApplicationStates.CLOSED);
 
-			const result = await revokeApplication(testApp.id, true, 'TEST-REVOKE-COMMENT', 'Test-User');
+			const result = await revokeApplication(testApp.id, true, 'TEST-REVOKE-COMMENT', 'Test-User', '');
 
 			// Verify the revocation failed
 			assert.ok(!result.success);
@@ -307,7 +307,7 @@ describe('Application API', () => {
 		it('should fail if application does not exist', async () => {
 			const nonExistentId = 9999;
 
-			const result = await revokeApplication(nonExistentId, true, 'TEST-REVOKE-COMMENT', testUserName);
+			const result = await revokeApplication(nonExistentId, true, 'TEST-REVOKE-COMMENT', testUserName, '');
 
 			// Assert: Verify the revocation failed
 			assert.ok(!result.success);
