@@ -271,6 +271,7 @@ const RequestedStudy = () => {
 															variant="text"
 															icon={<CloseCircleOutlined style={{ fontSize: '20px' }} />}
 															shape="circle"
+															disabled={!canEdit}
 														/>
 													</Flex>
 												),
