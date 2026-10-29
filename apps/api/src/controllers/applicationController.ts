@@ -866,15 +866,6 @@ export const revokeApplication = async (
 			return revokeApplicationResult;
 		}
 
-		const update = { state: appStateManager.state, approved_at: new Date() };
-		const updatedResult = await service.findOneAndUpdate({ id: applicationId, update });
-
-		if (!updatedResult.success) {
-			return updatedResult;
-		}
-
-		const applicationDTO = convertToBasicApplicationRecord(updatedResult.data);
-
 		const { actionId } = revokeApplicationResult.data;
 		emailService.sendEmailApplicantRevoke({
 			id: application.id,
@@ -884,6 +875,8 @@ export const revokeApplication = async (
 			comment: revokeReason,
 			dacRevoked: isDACMember,
 		});
+
+		const applicationDTO = convertToBasicApplicationRecord(revokeApplicationResult.data);
 
 		return applicationDTO;
 	} catch (error) {
