@@ -568,13 +568,6 @@ export const approveApplication = async ({
 			return failure('SYSTEM_ERROR', approvalResult.message);
 		}
 
-		const update = { state: appStateManager.state, approved_at: new Date() };
-		const updatedResult = await applicationService.findOneAndUpdate({ id: applicationId, update });
-
-		if (!updatedResult.success) {
-			return updatedResult;
-		}
-
 		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
 
 		if (!updatedApplication.success) {
