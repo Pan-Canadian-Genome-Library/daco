@@ -23,6 +23,7 @@ import { after, afterEach, before, beforeEach, describe, it, mock } from 'node:t
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { approveApplication, revokeApplication } from '@/controllers/applicationController.js';
+import { ApplicationStateManager } from '@/controllers/stateManager.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
@@ -129,6 +130,12 @@ describe('Application AuthZ dac_authorizations sync', () => {
 		const result = await applicationRepo.getApplicationById({ id });
 		assert.ok(result.success);
 		return result.data.state;
+	};
+
+	const getApprovedAt = async (id: number) => {
+		const result = await applicationRepo.getApplicationById({ id });
+		assert.ok(result.success);
+		return result.data.approved_at;
 	};
 
 	const callsFor = (method: string) => authZCalls.filter((call) => call.method === method);
@@ -322,6 +329,78 @@ describe('Application AuthZ dac_authorizations sync', () => {
 			assert.strictEqual(result.error, 'INVALID_STATE_TRANSITION');
 			assert.strictEqual(authZCalls.length, 0);
 			assert.strictEqual(await getState(id), ApplicationStates.CLOSED);
+		});
+	});
+
+	describe('approved_at', () => {
+		it('is set in the same commit as the approval', async () => {
+			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
+			const before = Date.now();
+
+			const result = await approveApplication({
+				applicationId: id,
+				approverAccessToken: 'token',
+				userName: 'Test User',
+			});
+
+			assert.ok(result.success);
+			const approvedAt = await getApprovedAt(id);
+			assert.ok(approvedAt);
+			assert.ok(approvedAt.getTime() >= before - 1000);
+			assert.ok(result.data.approvedAt);
+		});
+
+		it('is not set when the approval fails', async () => {
+			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
+			grantBehaviour['study1'] = 'fail';
+
+			const result = await approveApplication({
+				applicationId: id,
+				approverAccessToken: 'token',
+				userName: 'Test User',
+			});
+
+			assert.ok(!result.success);
+			const approvedAtAfterApproved = await getApprovedAt(id);
+			assert.strictEqual(approvedAtAfterApproved, null);
+		});
+
+		it('is not set by other transitions, such as the institutional rep approval', async () => {
+			const id = await createTestApplication(ApplicationStates.INSTITUTIONAL_REP_REVIEW);
+			const application = await applicationRepo.getApplicationById({ id });
+			assert.ok(application.success);
+
+			const result = await new ApplicationStateManager(application.data).approveRepReview('Test User');
+
+			assert.ok(result.success);
+
+			const stateAfterRepApproved = await getState(id);
+			const approvedAtAfterRepApproved = await getApprovedAt(id);
+
+			assert.strictEqual(stateAfterRepApproved, ApplicationStates.DAC_REVIEW);
+			assert.strictEqual(approvedAtAfterRepApproved, null);
+		});
+
+		it('keeps the approval date when the application is revoked', async () => {
+			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
+			const approved = await approveApplication({
+				applicationId: id,
+				approverAccessToken: 'token',
+				userName: 'Test User',
+			});
+			assert.ok(approved.success);
+
+			const approvedAt = await getApprovedAt(id);
+			assert.ok(approvedAt);
+
+			const revoked = await revokeApplication(id, true, 'reason', 'Test User', 'token');
+
+			assert.ok(revoked.success);
+
+			const stateAfterRevoke = await getState(id);
+			const approvedAtAfterRevoke = await getApprovedAt(id);
+			assert.strictEqual(stateAfterRevoke, ApplicationStates.REVOKED);
+			assert.deepStrictEqual(approvedAtAfterRevoke, approvedAt);
 		});
 	});
 
