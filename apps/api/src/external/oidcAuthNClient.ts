@@ -132,17 +132,7 @@ export const refreshUserSession = async (
 		}
 		return success(parsedTokenResponse.data);
 	} catch (error: unknown) {
-		/**
-		 * Check if we got back a valid error response. We use this because for certain errors we can recover.
-		 */
-		if (axios.isAxiosError(error) && error.status === 400 && error.response) {
-			const parsedTokenResponse = oidcTokenResponseSchema.safeParse(error.response.data);
-			if (parsedTokenResponse.success) {
-				return success(parsedTokenResponse.data);
-			}
-		}
-
-		logger.error(error, `Unexpected error using refresh_token to retrieve user tokens.`);
+		logger.error(`Unexpected error using refresh_token to retrieve user tokens.`, error);
 		return failure('SYSTEM_ERROR', 'Unable to refresh user session from OIDC provider.');
 	}
 };

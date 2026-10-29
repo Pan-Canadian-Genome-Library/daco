@@ -530,10 +530,14 @@ export const approveApplication = async ({
 				collaboratorEmails: userEmails,
 				studyIds: requested_studies,
 			});
-
+			if (rollback.successfulStudyIds.length > 0) {
+				logger.info(
+					`Rolled back dac_authorizations for application: ${applicationId}. Studies: ${rollback.successfulStudyIds.join(', ')}`,
+				);
+			}
 			if (rollback.failedStudyIds.length > 0) {
 				logger.error(
-					`Unable to roll back dac_authorizations for application: ${applicationId}. Manual cleanup required for studies: ${rollback.failedStudyIds.join(', ')}`,
+					`Unable to roll back dac_authorizations for application: ${applicationId}. Manual cleanup required for studies: ${rollback.failedStudyIds.join(', ')}.`,
 					rollback.errorMessages,
 				);
 			}

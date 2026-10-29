@@ -570,7 +570,12 @@ applicationRouter.post(
 				const { revokeReason } = request.body;
 				const isChair = user.dacChair.some((dacId) => dacId === applicationResult.data.dacId);
 				const userName = getUserName(user);
-				const accessToken = request.session.account?.accessToken || '';
+				const accessToken = request.session.account?.accessToken;
+
+				if (!accessToken) {
+					response.status(401).json({ error: 'UNAUTHORIZED', message: 'Access token is missing.' });
+					return;
+				}
 				const result = await revokeApplication(applicationId, isChair, revokeReason, userName, accessToken);
 
 				if (!result.success) {

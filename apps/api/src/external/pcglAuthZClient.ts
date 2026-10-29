@@ -225,6 +225,13 @@ export const addDacAuthorizations = async ({
 			return failure('SYSTEM_ERROR', message);
 		}
 
+		if (resultAddDacAuthorizations.data.error.length > 0) {
+			// this means Authz returned 200 OK but with some errors, we consider this as a failure.
+			const message = `Failed to add dac_authorizations to study '${studyId}' for some collaborators`;
+			logger.error('[AUTHZ]:', message, JSON.stringify(resultAddDacAuthorizations.data.error));
+			return failure('SYSTEM_ERROR', message);
+		}
+
 		return success(resultAddDacAuthorizations.data);
 	} catch (error) {
 		const message = `Unexpected error while adding dac_authorizations to study ${studyId}`;
