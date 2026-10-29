@@ -4,7 +4,7 @@
 
 When a DAC chair approves an application, the DACO API grants the applicant and the application's collaborators access to the requested studies by creating `dac_authorizations` in the PCGL AuthZ service. When an application is revoked, those `dac_authorizations` are removed.
 
-The AuthZ sync runs **before** the application state is committed, so the DACO database and AuthZ do not drift apart. If AuthZ cannot be updated, the application keeps its current state and the user can try again.
+On **approve**, the application state is committed first and AuthZ is updated afterwards. There is no rollback: if AuthZ cannot be updated, the application stays approved and the failure is logged for manual follow-up. On **revoke**, AuthZ is updated before the state is committed, so a failure keeps the application `APPROVED` and the user can try again.
 
 ## AuthZ endpoints
 
@@ -25,24 +25,23 @@ Both calls are made once per requested study, using the access token of the user
 
 ```
 DAC chair approves
-  1. Check the transition DAC_REVIEW -> APPROVED is allowed (nothing is committed yet)
+  1. Check the transition DAC_REVIEW -> APPROVED is allowed
   2. Load application contents (requested studies, applicant email) and collaborators
-  3. POST dac_authorizations for every requested study
-       any study fails?  -> roll back (see below), return error, state stays DAC_REVIEW
-  4. Commit state DAC_REVIEW -> APPROVED (and set approved_at)
-       commit fails?     -> roll back, return error
-  5. Send approval emails to the applicant and collaborators
+  3. Commit state DAC_REVIEW -> APPROVED (and set approved_at, in the same transaction)
+       commit fails?     -> return error, state stays DAC_REVIEW
+  4. POST dac_authorizations for every requested study
+       any study fails?  -> log for manual follow-up (see below), return error, state stays APPROVED
+  5. Send approval emails to the applicant and collaborators, listing only the studies that were granted
+       no study was granted? -> no emails are sent
 ```
 
-The approval emails are only sent after the state has been committed.
+The approval emails are only sent after AuthZ has been updated, and only for the studies that were granted.
 
-### Rollback
+### AuthZ failure after approval
 
-On any failure in step 3 or 4, the API sends a `DELETE` for **every requested study** (not only the ones that succeeded), including the collaborator emails. A study whose grant looked like a failure may still have been applied on the AuthZ side, and DELETE is safe to repeat because a `404` counts as success.
+If AuthZ fails for any study, the API logs an error that starts with `Application: <id> was approved but its dac_authorizations are out of sync with AuthZ. Manual action required.` It lists the studies that were granted and the studies that failed, followed by the AuthZ error messages. If at least one study was granted, the approval emails are still sent for the granted studies only; if none was granted, no email is sent. The client receives a `500 SYSTEM_ERROR` naming the failed studies and asking the user to contact an administrator.
 
-The application stays in `DAC_REVIEW`, so the DAC chair can approve it again. The error returned to the client names the studies that failed.
-
-If the rollback itself fails for some studies, the API logs the studies that need manual cleanup (`Manual cleanup required for studies: ...`).
+The application cannot be approved again, because it is already `APPROVED`. The missing `dac_authorizations` have to be granted manually.
 
 ### Preconditions
 
@@ -75,8 +74,8 @@ If the application has no requested studies, there is nothing to remove in AuthZ
 
 | Situation | Application state | Response |
 | --- | --- | --- |
-| Approve, a study fails in AuthZ | Stays `DAC_REVIEW` | `500 SYSTEM_ERROR`, message lists the failed studies |
 | Approve, state commit fails | Stays `DAC_REVIEW` | `500 SYSTEM_ERROR` |
+| Approve, a study fails in AuthZ | Is `APPROVED`, no rollback | `500 SYSTEM_ERROR`, message lists the failed studies, logged for manual follow-up |
 | Revoke, a study fails in AuthZ | Stays `APPROVED` | `500 SYSTEM_ERROR`, message lists the failed studies |
 | Revoke, collaborators cannot be loaded | Stays `APPROVED` | `500 SYSTEM_ERROR` |
 | Transition not allowed for the current state | Unchanged | `400 INVALID_REQUEST`, no AuthZ calls |

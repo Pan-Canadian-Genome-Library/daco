@@ -27,6 +27,7 @@ import { ApplicationStateManager } from '@/controllers/stateManager.js';
 import { connectToDb, type PostgresDb } from '@/db/index.js';
 import { applicationSvc } from '@/service/applicationService.js';
 import { collaboratorsSvc } from '@/service/collaboratorsService.js';
+import emailClient from '@/service/email/index.ts';
 import { type ApplicationService } from '@/service/types.js';
 import { ApplicationStates, type ApplicationStateValues } from '@pcgl-daco/data-model/src/types.js';
 
@@ -56,6 +57,7 @@ describe('Application AuthZ dac_authorizations sync', () => {
 	let grantBehaviour: Record<string, StudyBehaviour>;
 	let removeBehaviour: Record<string, StudyBehaviour>;
 	let authZCalls: AuthZCall[];
+	let sentEmails: { to: string; html: string }[];
 
 	const jsonResponse = (body: unknown, status = 200) =>
 		new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -64,6 +66,12 @@ describe('Application AuthZ dac_authorizations sync', () => {
 		grantBehaviour = {};
 		removeBehaviour = {};
 		authZCalls = [];
+		sentEmails = [];
+
+		mock.method(emailClient, 'sendMail', async (mail: { to: string; html: string }) => {
+			sentEmails.push({ to: mail.to, html: mail.html });
+			return {};
+		});
 
 		mock.method(globalThis, 'fetch', async (input: string | URL | Request, init?: RequestInit) => {
 			const url = String(input);
@@ -132,6 +140,9 @@ describe('Application AuthZ dac_authorizations sync', () => {
 		return result.data.state;
 	};
 
+	// Emails are sent without being awaited by the controller, so give them time to be dispatched
+	const waitForEmails = () => new Promise((resolve) => setTimeout(resolve, 100));
+
 	const getApprovedAt = async (id: number) => {
 		const result = await applicationRepo.getApplicationById({ id });
 		assert.ok(result.success);
@@ -176,7 +187,7 @@ describe('Application AuthZ dac_authorizations sync', () => {
 			assert.strictEqual(await getState(id), ApplicationStates.APPROVED);
 		});
 
-		it('does not approve and rolls back the grants when AuthZ fails for a study', async () => {
+		it('keeps the application approved even when AuthZ fails for a study', async () => {
 			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
 			grantBehaviour['study2'] = 'fail';
 
@@ -191,31 +202,71 @@ describe('Application AuthZ dac_authorizations sync', () => {
 			assert.ok(result.message.includes('study2'));
 			assert.ok(!result.message.includes('study1'));
 
-			// State was never committed
-			assert.strictEqual(await getState(id), ApplicationStates.DAC_REVIEW);
-
-			// Every requested study is cleaned up, including the collaborators' dac_authorizations
-			assert.deepStrictEqual(studiesCalled('DELETE'), STUDY_IDS);
-			assert.ok(collaboratorEmailsSent('DELETE').every((emails) => emails.join() === COLLABORATOR_EMAILS.join()));
+			// State was committed before AuthZ and is not reverted
+			assert.strictEqual(await getState(id), ApplicationStates.APPROVED);
+			assert.strictEqual(callsFor('DELETE').length, 0);
 		});
 
-		it('still fails cleanly when the rollback finds nothing to remove (AuthZ 404)', async () => {
+		it('sends the approval emails to the applicant and collaborators with every study when AuthZ succeeds', async () => {
 			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
-			grantBehaviour['study1'] = 'fail';
-			removeBehaviour['study1'] = 'not_found';
-			removeBehaviour['study2'] = 'not_found';
 
 			const result = await approveApplication({
 				applicationId: id,
 				approverAccessToken: 'token',
 				userName: 'Test User',
 			});
+			await waitForEmails();
 
-			assert.ok(!result.success);
-			assert.strictEqual(await getState(id), ApplicationStates.DAC_REVIEW);
+			assert.ok(result.success);
+			assert.deepStrictEqual(
+				sentEmails.map((email) => email.to).sort(),
+				[APPLICANT_EMAIL, ...COLLABORATOR_EMAILS].sort(),
+			);
+			for (const email of sentEmails.filter((sent) => COLLABORATOR_EMAILS.includes(sent.to))) {
+				assert.ok(email.html.includes('Test Study'));
+				assert.ok(email.html.includes('Genomic Research on Cancer'));
+			}
 		});
 
-		it('can be approved again after a failed attempt', async () => {
+		it('sends the approval emails only for the studies that were granted when AuthZ partially fails', async () => {
+			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
+			grantBehaviour['study2'] = 'fail';
+
+			const result = await approveApplication({
+				applicationId: id,
+				approverAccessToken: 'token',
+				userName: 'Test User',
+			});
+			await waitForEmails();
+
+			assert.ok(!result.success);
+			assert.deepStrictEqual(
+				sentEmails.map((email) => email.to).sort(),
+				[APPLICANT_EMAIL, ...COLLABORATOR_EMAILS].sort(),
+			);
+			for (const email of sentEmails.filter((sent) => COLLABORATOR_EMAILS.includes(sent.to))) {
+				assert.ok(email.html.includes('Test Study'));
+				assert.ok(!email.html.includes('Genomic Research on Cancer'));
+			}
+		});
+
+		it('does not send any email when AuthZ fails for every study', async () => {
+			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
+			grantBehaviour = { study1: 'fail', study2: 'fail' };
+
+			const result = await approveApplication({
+				applicationId: id,
+				approverAccessToken: 'token',
+				userName: 'Test User',
+			});
+			await waitForEmails();
+
+			assert.ok(!result.success);
+			assert.strictEqual(await getState(id), ApplicationStates.APPROVED);
+			assert.strictEqual(sentEmails.length, 0);
+		});
+
+		it('cannot be approved again after the state was committed', async () => {
 			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
 			grantBehaviour['study2'] = 'fail';
 
@@ -233,8 +284,8 @@ describe('Application AuthZ dac_authorizations sync', () => {
 				userName: 'Test User',
 			});
 
-			assert.ok(retried.success);
-			assert.strictEqual(await getState(id), ApplicationStates.APPROVED);
+			assert.ok(!retried.success);
+			assert.strictEqual(retried.error, 'INVALID_STATE_TRANSITION');
 		});
 
 		it('does not call AuthZ when the application is not in DAC_REVIEW', async () => {
@@ -350,7 +401,7 @@ describe('Application AuthZ dac_authorizations sync', () => {
 			assert.ok(result.data.approvedAt);
 		});
 
-		it('is not set when the approval fails', async () => {
+		it('is set before even when AuthZ fails', async () => {
 			const id = await createTestApplication(ApplicationStates.DAC_REVIEW);
 			grantBehaviour['study1'] = 'fail';
 
@@ -361,8 +412,7 @@ describe('Application AuthZ dac_authorizations sync', () => {
 			});
 
 			assert.ok(!result.success);
-			const approvedAtAfterApproved = await getApprovedAt(id);
-			assert.strictEqual(approvedAtAfterApproved, null);
+			assert.ok(await getApprovedAt(id));
 		});
 
 		it('is not set by other transitions, such as the institutional rep approval', async () => {

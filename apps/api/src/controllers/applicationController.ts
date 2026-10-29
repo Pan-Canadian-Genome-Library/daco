@@ -468,7 +468,6 @@ export const approveApplication = async ({
 			return failure('INVALID_STATE_TRANSITION', 'Application is already approved.');
 		}
 
-		// Validate the transition without committing it. The state is only committed once AuthZ has been updated.
 		const canApprove = appStateManager._canPerformAction(ApplicationStateEvents.dac_approve_review);
 
 		if (!canApprove.success) {
@@ -517,89 +516,74 @@ export const approveApplication = async ({
 			);
 		}
 
-		const userEmails = Object.keys(collaboratorsByEmail);
+		const collaboratorEmails = Object.keys(collaboratorsByEmail);
 
-		/**
-		 * Compensation: removes the dac_authorizations from every requested study.
-		 * Removing is idempotent (AuthZ 404 is treated as success), so it is also safe for studies that were never granted.
-		 */
-		const rollbackDacAuthorizations = async () => {
-			const rollback = await revokeDacAuthorizations({
-				applicationId: String(applicationId),
-				accessToken: approverAccessToken,
-				collaboratorEmails: userEmails,
-				studyIds: requested_studies,
-			});
-			if (rollback.successfulStudyIds.length > 0) {
-				logger.info(
-					`Rolled back dac_authorizations for application: ${applicationId}. Studies: ${rollback.successfulStudyIds.join(', ')}`,
-				);
-			}
-			if (rollback.failedStudyIds.length > 0) {
-				logger.error(
-					`Unable to roll back dac_authorizations for application: ${applicationId}. Manual cleanup required for studies: ${rollback.failedStudyIds.join(', ')}.`,
-					rollback.errorMessages,
-				);
-			}
-		};
+		// Store the approval in the database first, before updating AuthZ
+		const approvalResult = await appStateManager.approveDacReview(userName);
+
+		if (!approvalResult.success) {
+			return failure('SYSTEM_ERROR', approvalResult.message);
+		}
 
 		const permissionAdded = await grantDacAuthorizations({
 			applicationId: String(applicationId),
 			applicantEmail: applicant_institutional_email,
 			approverAccessToken,
-			collaboratorEmails: userEmails,
+			collaboratorEmails,
 			studyIds: requested_studies,
 		});
 
+		const authZFailed = permissionAdded.failedStudyIds.length > 0;
+
 		if (permissionAdded.failedStudyIds.length > 0) {
-			logger.error(`Failed to add dac_authorizations for application: ${applicationId}`, permissionAdded.errorMessages);
-			await rollbackDacAuthorizations();
-			return failure(
-				'SYSTEM_ERROR',
-				`Application was not approved. Failed to add dac_authorizations for studies: ${permissionAdded.failedStudyIds.join(', ')}. Please try again.`,
+			logger.error(
+				`Application: ${applicationId} was approved but its dac_authorizations are out of sync with AuthZ. Manual action required. Granted studies: [${permissionAdded.successfulStudyIds.join(', ')}]. Failed studies: [${permissionAdded.failedStudyIds.join(', ')}]`,
+				permissionAdded.errorMessages,
 			);
 		}
 
-		// AuthZ is up to date, commit the state transition
-		const approvalResult = await appStateManager.approveDacReview(userName);
+		// Notify only when access was granted for at least one study, and only for the studies that were granted
+		// Failures below must not fail the request
+		if (permissionAdded.successfulStudyIds.length > 0) {
+			// Notify Applicant of approval
+			emailService.sendApplicantEmailApproval({
+				id: application.id,
+				to: applicant_institutional_email,
+				actionId: approvalResult.data.actionId,
+				name: applicant_first_name || 'N/A',
+			});
 
-		if (!approvalResult.success) {
-			await rollbackDacAuthorizations();
-			return failure('SYSTEM_ERROR', approvalResult.message);
-		}
+			if (collaboratorEmails.length > 0) {
+				const studyPermissionAdded = await studyService.getAllStudies({ studyIds: permissionAdded.successfulStudyIds });
 
-		// The approval is committed from here on: failures below must not fail the request
-		// Notify Applicant of approval
-		emailService.sendApplicantEmailApproval({
-			id: application.id,
-			to: applicant_institutional_email,
-			actionId: approvalResult.data.actionId,
-			name: applicant_first_name || 'N/A',
-		});
+				if (!studyPermissionAdded.success) {
+					logger.error(
+						`Application: ${applicationId} was approved but collaborators were not notified. Unable to retrieve study names.`,
+						studyPermissionAdded,
+					);
+				} else {
+					const studyNames = studyPermissionAdded.data.map((study) => study.studyName);
 
-		if (collaboratorResponse.success) {
-			const studyResult = await studyService.getAllStudies({ studyIds: permissionAdded.successfulStudyIds });
-
-			if (!studyResult.success) {
-				logger.error(
-					`Application: ${applicationId} was approved but collaborators were not notified. Unable to retrieve study names.`,
-					{ error: studyResult.error, message: studyResult.message },
-				);
-			} else {
-				const studyNames = studyResult.data.map((study) => study.studyName);
-
-				for (const [email, collaborator] of Object.entries(collaboratorsByEmail)) {
-					// Notify Collaborators of approval
-					const collaboratorName = `${collaborator.first_name} ${collaborator.last_name}`;
-					emailService.sendCollaboratorEmailApproval({
-						id: application.id,
-						to: email,
-						actionId: approvalResult.data.actionId,
-						name: collaboratorName,
-						studies: studyNames,
-					});
+					for (const [email, collaborator] of Object.entries(collaboratorsByEmail)) {
+						// Notify Collaborators of approval
+						const collaboratorName = `${collaborator.first_name} ${collaborator.last_name}`;
+						emailService.sendCollaboratorEmailApproval({
+							id: application.id,
+							to: email,
+							actionId: approvalResult.data.actionId,
+							name: collaboratorName,
+							studies: studyNames,
+						});
+					}
 				}
 			}
+		}
+
+		if (authZFailed) {
+			return failure(
+				'SYSTEM_ERROR',
+				`Application was approved, but failed to add dac_authorizations for studies: ${permissionAdded.failedStudyIds.join(', ')}. Please contact an administrator.`,
+			);
 		}
 
 		// The record returned by the transaction already holds the committed state and approved_at
@@ -794,7 +778,6 @@ export const revokeApplication = async (
 
 		const appStateManager = new ApplicationStateManager(application);
 
-		// Validate the transition without committing it. The state is only committed once AuthZ has been updated.
 		const canRevoke = appStateManager._canPerformAction(ApplicationStateEvents.revoked);
 
 		if (!canRevoke.success) {
