@@ -568,18 +568,7 @@ export const approveApplication = async ({
 			return failure('SYSTEM_ERROR', approvalResult.message);
 		}
 
-		const updatedApplication = await applicationService.getApplicationById({ id: applicationId });
-
-		if (!updatedApplication.success) {
-			return updatedApplication;
-		}
-
-		const dtoFriendlyData = convertToBasicApplicationRecord(updatedApplication.data);
-
-		if (!dtoFriendlyData.success) {
-			return dtoFriendlyData;
-		}
-
+		// The approval is committed from here on: failures below must not fail the request
 		// Notify Applicant of approval
 		emailService.sendApplicantEmailApproval({
 			id: application.id,
@@ -588,29 +577,33 @@ export const approveApplication = async ({
 			name: applicant_first_name || 'N/A',
 		});
 
-		if (!collaboratorResponse.success) {
-			return dtoFriendlyData;
+		if (collaboratorResponse.success) {
+			const studyResult = await studyService.getAllStudies({ studyIds: permissionAdded.successfulStudyIds });
+
+			if (!studyResult.success) {
+				logger.error(
+					`Application: ${applicationId} was approved but collaborators were not notified. Unable to retrieve study names.`,
+					{ error: studyResult.error, message: studyResult.message },
+				);
+			} else {
+				const studyNames = studyResult.data.map((study) => study.studyName);
+
+				for (const [email, collaborator] of Object.entries(collaboratorsByEmail)) {
+					// Notify Collaborators of approval
+					const collaboratorName = `${collaborator.first_name} ${collaborator.last_name}`;
+					emailService.sendCollaboratorEmailApproval({
+						id: application.id,
+						to: email,
+						actionId: approvalResult.data.actionId,
+						name: collaboratorName,
+						studies: studyNames,
+					});
+				}
+			}
 		}
 
-		const studyResult = await studyService.getAllStudies({ studyIds: permissionAdded.successfulStudyIds });
-
-		if (!studyResult.success) {
-			return studyResult;
-		}
-
-		const studyNames = studyResult.data.map((study) => study.studyName);
-
-		for (const [email, collaborator] of Object.entries(collaboratorsByEmail)) {
-			// Notify Collaborators of approval
-			const collaboratorName = `${collaborator.first_name} ${collaborator.last_name}`;
-			emailService.sendCollaboratorEmailApproval({
-				id: application.id,
-				to: email,
-				actionId: approvalResult.data.actionId,
-				name: collaboratorName,
-				studies: studyNames,
-			});
-		}
+		// The record returned by the transaction already holds the committed state and approved_at
+		const dtoFriendlyData = convertToBasicApplicationRecord(approvalResult.data);
 
 		return dtoFriendlyData;
 	} catch (error) {
