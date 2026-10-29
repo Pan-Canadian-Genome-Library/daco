@@ -826,7 +826,9 @@ export const revokeApplication = async (
 		const requestedStudies = contents?.requested_studies;
 
 		if (!requestedStudies || !requestedStudies.length) {
-			logger.error(`No studies were requested for application: ${applicationId}, no dac_authorizations to remove.`);
+			logger.warn(
+				`No studies were requested for application: ${applicationId}, no dac_authorizations to remove on authz side. Application will still be revoked on DACO.`,
+			);
 		} else {
 			// AuthZ requires the collaborators' emails to remove their dac_authorizations
 			const collaboratorResponse = await collaboratorsService.listCollaborators(applicationId);
