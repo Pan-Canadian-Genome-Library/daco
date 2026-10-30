@@ -21,11 +21,13 @@ import { authConfig } from '@/config/authConfig.ts';
 import BaseLogger from '@/logger.ts';
 import { AsyncResult, failure, success } from '@/utils/results.ts';
 import {
-	addUserToStudyPermissionResponse,
+	authZAddDacAuthorizationsResponse,
 	authzGroupResponseValidation,
+	authZRemoveDacAuthorizationsResponse,
 	authZUserInfo,
 	ServiceTokenResponse,
-	type PCGLAddUserToStudyPermissionResponse,
+	type AuthZAddDacAuthorizationsResponse,
+	type AuthZRemoveDacAuthorizationsResponse,
 	type PCGLAuthZUserInfoResponse,
 } from '@pcgl-daco/validation';
 import urlJoin from 'url-join';
@@ -175,26 +177,33 @@ export const getUserInformation = async (
 };
 
 /**
- * Function to Add user to study permission in the AuthZ service
- * @param studyId
- * @param userEmails
- * @param accessToken
- * @returns a list of study permissions for the user, otherwise returns failure with SYSTEM_ERROR
+ * Function to Add dac_authorizations to study in the AuthZ service
+ * @returns the AuthZ response when the dac_authorizations were added, otherwise failure with SYSTEM_ERROR
  */
-export const addUsersToStudyPermission = async (
-	studyId: string,
-	userEmails: string[],
-	accessToken: string,
-): AsyncResult<PCGLAddUserToStudyPermissionResponse, 'SYSTEM_ERROR'> => {
+export const addDacAuthorizations = async ({
+	applicantEmail,
+	applicationId,
+	approverAccessToken,
+	collaboratorEmails,
+	studyId,
+}: {
+	applicantEmail: string;
+	applicationId: string;
+	approverAccessToken: string;
+	collaboratorEmails: string[];
+	studyId: string;
+}): AsyncResult<AuthZAddDacAuthorizationsResponse, 'SYSTEM_ERROR'> => {
 	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
 
 	const today = new Date().toISOString();
 
 	try {
-		const response = await fetchAuthZResource(`/study/${studyId}`, accessToken, {
+		const response = await fetchAuthZResource(`/study/${studyId}/dac_authorizations`, approverAccessToken, {
 			method: 'POST',
 			body: JSON.stringify({
-				user_emails: userEmails,
+				application_id: applicationId,
+				applicant_email: applicantEmail,
+				collaborator_emails: collaboratorEmails,
 				start_date: today,
 				end_date: addDaysToDateString(today, APPROVED_PERMISSION_EXPIRES_IN_DAYS),
 			}),
@@ -202,24 +211,88 @@ export const addUsersToStudyPermission = async (
 
 		if (!response.ok) {
 			const responseText = await response.text();
-			const message = `Failed to add users '${userEmails.join(', ')}' to study '${studyId}'`;
+			const message = `Failed to add dac_authorizations to study '${studyId}'`;
 			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${responseText}`);
 			return failure('SYSTEM_ERROR', message);
 		}
 
 		const res = await response.json();
 
-		const resultAddPermission = addUserToStudyPermissionResponse.safeParse(res);
-
-		if (!resultAddPermission.success) {
-			const message = `AuthZ service returned unexpected data to add user to study permission`;
+		const resultAddDacAuthorizations = authZAddDacAuthorizationsResponse.safeParse(res);
+		if (!resultAddDacAuthorizations.success) {
+			const message = `AuthZ service returned unexpected response when adding dac_authorizations to study ${studyId}`;
 			logger.error(`[AUTHZ]: ${message}`, JSON.stringify(res));
 			return failure('SYSTEM_ERROR', message);
 		}
 
-		return success(resultAddPermission.data);
+		if (resultAddDacAuthorizations.data.error.length > 0) {
+			// this means Authz returned 200 OK but with some errors, we consider this as a failure.
+			const message = `Failed to add dac_authorizations to study '${studyId}' for some collaborators`;
+			logger.error('[AUTHZ]:', message, JSON.stringify(resultAddDacAuthorizations.data.error));
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultAddDacAuthorizations.data);
 	} catch (error) {
-		const message = `Unexpected error while adding ${userEmails.join(', ')} to study ${studyId}`;
+		const message = `Unexpected error while adding dac_authorizations to study ${studyId}`;
+		logger.error('[AUTHZ]:', message, error);
+		return failure('SYSTEM_ERROR', message);
+	}
+};
+
+/**
+ * Function to remove the dac_authorizations of an application from a study in the AuthZ service
+ * A 404 from AuthZ (already removed) is treated as success so removal can be safely retried
+ * @returns the AuthZ response when the dac_authorizations were removed, otherwise failure with SYSTEM_ERROR
+ */
+export const removeDacAuthorizations = async ({
+	applicationId,
+	accessToken,
+	collaboratorEmails,
+	studyId,
+}: {
+	applicationId: string;
+	accessToken: string;
+	collaboratorEmails: string[];
+	studyId: string;
+}): AsyncResult<AuthZRemoveDacAuthorizationsResponse, 'SYSTEM_ERROR'> => {
+	try {
+		const response = await fetchAuthZResource(`/study/${studyId}/dac_authorizations`, accessToken, {
+			method: 'DELETE',
+			body: JSON.stringify({
+				application_id: applicationId,
+				collaborator_emails: collaboratorEmails,
+			}),
+		});
+
+		// AuthZ returns 404 when the dac_authorizations were already removed, which is the desired end state
+		if (response.status === 404) {
+			logger.warn(
+				'[AUTHZ]:',
+				`No dac_authorizations found for application '${applicationId}' in study '${studyId}'. Treating as already removed.`,
+			);
+			return success({ success: [], error: [] });
+		}
+
+		if (!response.ok) {
+			const responseText = await response.text();
+			const message = `Failed to remove dac_authorizations of application '${applicationId}' from study '${studyId}'`;
+			logger.error('[AUTHZ]:', message, `Status: ${response.status}, Message: ${responseText}`);
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		const res = await response.json();
+
+		const resultRemoveDacAuthorizations = authZRemoveDacAuthorizationsResponse.safeParse(res);
+		if (!resultRemoveDacAuthorizations.success) {
+			const message = `AuthZ service returned unexpected response when removing dac_authorizations from study ${studyId}`;
+			logger.error(`[AUTHZ]: ${message}`, JSON.stringify(res));
+			return failure('SYSTEM_ERROR', message);
+		}
+
+		return success(resultRemoveDacAuthorizations.data);
+	} catch (error) {
+		const message = `Unexpected error while removing dac_authorizations of application ${applicationId} from study ${studyId}`;
 		logger.error('[AUTHZ]:', message, error);
 		return failure('SYSTEM_ERROR', message);
 	}
