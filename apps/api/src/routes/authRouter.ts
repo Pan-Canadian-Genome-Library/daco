@@ -29,14 +29,27 @@ import * as pcglAuthZClient from '@/external/pcglAuthZClient.ts';
 import BaseLogger from '@/logger.js';
 import { type ResponseWithData } from '@/routes/types.ts';
 import { resetSession } from '@/session/index.js';
+import { refreshSessionUser } from '@/session/refreshSessionUser.ts';
 import { convertToSessionAccount, convertToSessionUser } from '@/utils/aliases.ts';
-import { type SessionUserResponse } from '@pcgl-daco/validation';
+import { type SessionUser, type SessionUserResponse } from '@pcgl-daco/validation';
 
 const logger = BaseLogger.forModule(`authRouter`);
 
 const getOauthRedirectUri = (host: string) => urlJoin(host, `/api/auth/token`);
 
 const authRouter = Router();
+
+const toSessionUserResponse = (user: SessionUser) => ({
+	userId: user.userId,
+	givenName: user.givenName,
+	familyName: user.familyName,
+	emails: user.emails,
+	dacChair: user.dacChair,
+	dacMember: user.dacMember,
+	dacoAdmin: user.dacoAdmin,
+	dacAuthorizations: user.dacAuthorizations,
+	isPcglDac: user.isPcglDac,
+});
 
 /**
  * Initiate login process.
@@ -199,6 +212,7 @@ authRouter.get('/token', async (request, response) => {
 
 		request.session.account = userAccountAliasing.data;
 		request.session.user = sessionUserAliasing.data;
+		request.session.userRefreshedAt = Date.now();
 
 		request.session.save();
 	} catch (error) {
@@ -235,24 +249,36 @@ authRouter.get(
 
 		const { user } = request.session;
 
-		const output = {
-			user: user
-				? {
-						userId: user.userId,
-						givenName: user.givenName,
-						familyName: user.familyName,
-						emails: user.emails,
-						dacChair: user.dacChair,
-						dacMember: user.dacMember,
-						dacoAdmin: user.dacoAdmin,
-						dacAuthorizations: user.dacAuthorizations,
-						isPcglDac: user.isPcglDac,
-					}
-				: undefined,
-		};
+		const output = { user: user ? toSessionUserResponse(user) : undefined };
 
 		response.json(output);
 		return;
 	},
 );
+
+/**
+ * Reload the logged in user's dac_authorizations from the AuthZ service and return the updated user.
+ * dac_authorizations change after login (e.g. when an application is approved or revoked), so the UI
+ * calls this to show up to date access. Calls within a short interval return the session user as it is.
+ */
+authRouter.post(
+	'/user/refresh',
+	async (request, response: ResponseWithData<{ user: SessionUserResponse }, ['AUTH_DISABLED', 'UNAUTHORIZED']>) => {
+		if (!authConfig.enabled) {
+			response.status(400).json({ error: 'AUTH_DISABLED', message: 'Authentication is disabled.' });
+			return;
+		}
+
+		const user = await refreshSessionUser(request.session);
+
+		if (!user) {
+			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not logged in.' });
+			return;
+		}
+
+		response.json({ user: toSessionUserResponse(user) });
+		return;
+	},
+);
+
 export default authRouter;
