@@ -13,8 +13,8 @@
 				},
 				"SELF_REGISTRATION_SENT": {
 					"subheading": "Votre compte est presque prêt !",
-					"description": "Merci de vous être inscrit(e) au projet BGPC. Nous avons envoyé un courriel de vérification à votre adresse courriel. Veuillez ouvrir ce message et suivre les instructions pour confirmer votre adresse et retourner au portail BCAD de la BGP pour vous connecter.",
-					"description2": "Si vous n'avez pas reçu le courriel dans quelques minutes, veuillez contacter l'équipe d'assistance de la BGP."
+					"description": "Merci de vous être inscrit(e) au PCGL. Nous avons envoyé un courriel de vérification à l'adresse que vous avez fournie. Veuillez ouvrir ce message et suivre les instructions pour confirmer votre adresse courriel, puis retourner au portail PCGL DACO pour vous connecter.",
+					"description2": "Si vous ne voyez pas le courriel dans quelques minutes, vérifiez votre dossier de courrier indésirable ou de pourriel. S'il n'y est toujours pas, veuillez contacter le service d'assistance du PCGL."
 				},
 				"SYSTEM_ERROR": {
 					"subheading": "Il semble que nous ayons rencontré un petit problème lors du processus de connexion.",
