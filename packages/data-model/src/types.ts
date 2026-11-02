@@ -468,6 +468,8 @@ export type StudyDacoDTO = {
 	leadOrganizations: string[];
 	collaborators?: string[] | null;
 	publicationLinks?: string[] | null;
+	duoPermission: string;
+	diseaseSpecificModifier: string[];
 	createdAt: Date | string;
 	updatedAt: Date | string | null;
 	categoryId?: number | null;

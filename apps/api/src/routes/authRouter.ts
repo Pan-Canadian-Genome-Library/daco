@@ -166,7 +166,18 @@ authRouter.get('/token', async (request, response) => {
 			throw new ExternalAuthError(tokenResponse.error, tokenResponse.message);
 		}
 
-		const pcglAuthzResponse = await pcglAuthZClient.getUserInformation(tokenResponse.data.access_token);
+		// IMPORTANT-NOTE: The first token exchange refresh token, does not return userInfo from CILogon, but the
+		// token returned from `refreshUserSession` does. To resolve this, we immediately call `refreshUserSession`
+		// once on login and return those tokens instead, allowing AuthZ to use the refresh token as a long-lived access token.
+		const refreshTokenResponse = await oidcAuthClient.refreshUserSession(authConfig, {
+			refreshToken: tokenResponse.data.refresh_token,
+		});
+
+		if ('error' in refreshTokenResponse) {
+			throw new ExternalAuthError(refreshTokenResponse.error, refreshTokenResponse.message);
+		}
+
+		const pcglAuthzResponse = await pcglAuthZClient.getUserInformation(refreshTokenResponse.data.access_token);
 
 		if (!pcglAuthzResponse.success) {
 			throw new ExternalAuthError(pcglAuthzResponse.error, pcglAuthzResponse.message);
@@ -177,7 +188,7 @@ authRouter.get('/token', async (request, response) => {
 			throw new ExternalAuthError(oidcDataResponse.error, oidcDataResponse.message);
 		}
 
-		const userAccountAliasing = convertToSessionAccount(tokenResponse.data);
+		const userAccountAliasing = convertToSessionAccount(refreshTokenResponse.data);
 		if (!userAccountAliasing.success) {
 			throw new Error(userAccountAliasing.message);
 		}
