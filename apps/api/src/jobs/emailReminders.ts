@@ -209,6 +209,11 @@ export const checkDraftApplicationNeedsReminder = ({
 	// Early Draft applications will not have any state transition Action records
 	// If Application is in DRAFT (with no previous Actions), check Application created_at Date instead of Action date
 	if (state === ApplicationStates.DRAFT && dateDiffCheck({ actionDate: created_at })) {
+		// Stop sending reminder emails if application is older than 6 months.
+		if (dateDiffCheck({ actionDate: created_at, intervalDays: 180 })) {
+			return false;
+		}
+
 		// Reminders should be sent if no reminder has been sent yet, or if a reminder email was sent #{interval} days ago
 		if (!mostRecentEmail || dateDiffCheck({ actionDate: mostRecentEmail.created_at })) {
 			return true;
