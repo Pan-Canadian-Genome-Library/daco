@@ -27,7 +27,7 @@ export const GenerateEmailCollaboratorApproval = ({
 	studies,
 }: Omit<GenerateCollaboratorApproveType, 'to' | 'actionId'>) => {
 	const {
-		express: { ui },
+		express: { ui, researchPortalUrl },
 	} = getEmailConfig;
 
 	const template = `
@@ -39,7 +39,15 @@ export const GenerateEmailCollaboratorApproval = ({
                     We are pleased to inform you that your <a href="${ui}/application/${id}" target="_blank" rel="nofollow">DACO application</a> has been successfully approved by the PCGL Data Access Committee. You now have access to the following studies: ${studies.join(', ')} <br /> <br />
                 </mj-text>
                 <mj-text>
-                    Please go to the Research Portal to access your token and download data. 
+                    Please follow the steps to download data: 
+                    <ol>
+                        <li>
+                            Register on the <a href="${researchPortalUrl}" target="_blank" rel="nofollow">PCGL Research Portal</a> using this email address.
+                        </li>
+                        <li>
+                            Once you have registered, find the above studies and download the data.
+                        </li>
+                    </ol>
                 </mj-text>
                 <mj-text>
                     Should you have any questions or need assistance, feel free to reach out to us. <br /> <br />
@@ -56,6 +64,17 @@ export const GenerateEmailCollaboratorApproval = ({
                 </mj-text>
                 <mj-text>
                     Nous avons le plaisir de vous informer que votre <a href="${ui}/application/${id}" target="_blank" rel="nofollow">demande au BCAD</a> a été approuvée avec succès par le Comité d'accès aux données de la BGP. <br /> <br />
+                </mj-text>
+                <mj-text>
+                    Veuillez suivre les étapes pour télécharger les données : 
+                    <ol>
+                        <li>
+                            Inscrivez-vous sur le <a href="${researchPortalUrl}" target="_blank" rel="nofollow">Portail de recherche BGP</a> en utilisant cette adresse e-mail.
+                        </li>
+                        <li>
+                            Une fois inscrit, trouvez les études ci-dessus et téléchargez les données.
+                        </li>
+                    </ol>
                 </mj-text>
                 <mj-text>
                     Si vous avez des questions ou besoin d'assistance, n'hésitez pas à nous contacter. <br /> <br />
@@ -84,6 +103,9 @@ export const GenerateEmailCollaboratorApprovalPlain = ({
     \n
     \n Cher/Chère ${name},
     \n Nous avons le plaisir de vous informer que votre demande au BCAD a été approuvée avec succès par le Comité d'accès aux données de la BGP.
+    \n Veuillez suivre les étapes pour télécharger les données : 
+    \n 1. Inscrivez-vous sur le Portail de recherche BGP en utilisant cette adresse e-mail.
+    \n 2. Une fois inscrit, trouvez les études ci-dessus et téléchargez les données.
     \n Si vous avez des questions ou besoin d'assistance, n'hésitez pas à nous contacter.
     \n Cordialement, \n Le Bureau de conformité de l'accès aux données de la BGP
     `;
