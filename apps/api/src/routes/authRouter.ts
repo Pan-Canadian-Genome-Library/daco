@@ -39,7 +39,7 @@ const getOauthRedirectUri = (host: string) => urlJoin(host, `/api/auth/token`);
 
 const authRouter = Router();
 
-const toSessionUserResponse = (user: SessionUser) => ({
+const toSessionUserResponse = (user: SessionUser): SessionUserResponse => ({
 	userId: user.userId,
 	givenName: user.givenName,
 	familyName: user.familyName,
@@ -48,7 +48,6 @@ const toSessionUserResponse = (user: SessionUser) => ({
 	dacMember: user.dacMember,
 	dacoAdmin: user.dacoAdmin,
 	dacAuthorizations: user.dacAuthorizations,
-	isPcglDac: user.isPcglDac,
 });
 
 /**
