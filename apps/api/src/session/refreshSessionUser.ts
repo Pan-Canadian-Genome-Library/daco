@@ -64,6 +64,7 @@ export const refreshSessionUser = async (
 
 	const refreshedUser: SessionUser = {
 		...user,
+		...pcglAuthzResponse.data,
 		dacAuthorizations: convertToSessionDacAuthorizations(pcglAuthzResponse.data),
 	};
 
