@@ -20,13 +20,14 @@
 import assert from 'node:assert';
 import { afterEach, beforeEach, describe, it, mock } from 'node:test';
 
-import { refreshSessionUser, SESSION_USER_REFRESH_INTERVAL_MS } from '@/session/refreshSessionUser.ts';
+import { refreshSessionUser } from '@/session/refreshSessionUser.ts';
 import type { SessionAccount, SessionUser } from '@pcgl-daco/validation';
 import { type Request } from 'express';
 
 type TestSession = Pick<Request['session'], 'user' | 'account' | 'userRefreshedAt'> & { save: () => void };
 
 const START_TIME = 1_000_000;
+const SESSION_USER_REFRESH_INTERVAL_MS = 60_000;
 
 const staleAuthorization = {
 	studyId: 'study1',
@@ -74,7 +75,8 @@ describe('refreshSessionUser', () => {
 	const jsonResponse = (body: unknown, status = 200) =>
 		new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-	const refresh = (now: number) => refreshSessionUser(session as unknown as Request['session'], now);
+	const refresh = (now: number) =>
+		refreshSessionUser(session as unknown as Request['session'], SESSION_USER_REFRESH_INTERVAL_MS, now);
 
 	beforeEach(() => {
 		authZDacAuthorizations = [

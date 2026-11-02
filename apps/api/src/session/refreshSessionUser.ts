@@ -26,23 +26,23 @@ import { type Request } from 'express';
 const logger = BaseLogger.forModule('refreshSessionUser');
 
 /**
- * Minimum time between two reloads of the session user from the AuthZ service.
- * Calls made within this window return the session user as it is.
- */
-export const SESSION_USER_REFRESH_INTERVAL_MS = 60_000;
-
-/**
- * Reloads the dac_authorizations of the logged in user from the AuthZ service and updates the session.
+ * Reloads the information of the logged in user (groups, dac_authorizations and other properties) from the AuthZ service
+ * and updates the session.
  *
- * The session user is only populated at login, so dac_authorizations granted or revoked afterwards
- * (e.g. when an application is approved) are not visible until the user is refreshed.
+ * The session user is only populated at login, so changes made afterwards (e.g. dac_authorizations granted when an
+ * application is approved, or group membership changes) are not visible until the user is refreshed.
  *
  * - Returns undefined when there is no logged in user.
- * - Skips AuthZ when the user was refreshed less than `SESSION_USER_REFRESH_INTERVAL_MS` ago.
+ * - Skips AuthZ when the user was refreshed less than `refreshIntervalMs` ago.
  * - When AuthZ cannot be reached the session user is returned unchanged, to be retried on the next call.
+ *
+ * @param session - The request session
+ * @param refreshIntervalMs - Minimum time between two reloads of the session user from the AuthZ service
+ * @param now - Current time in milliseconds
  */
 export const refreshSessionUser = async (
 	session: Request['session'],
+	refreshIntervalMs: number,
 	now: number = Date.now(),
 ): Promise<SessionUser | undefined> => {
 	const { user, account, userRefreshedAt } = session;
@@ -51,7 +51,7 @@ export const refreshSessionUser = async (
 		return undefined;
 	}
 
-	if (userRefreshedAt !== undefined && now - userRefreshedAt < SESSION_USER_REFRESH_INTERVAL_MS) {
+	if (userRefreshedAt !== undefined && now - userRefreshedAt < refreshIntervalMs) {
 		return user;
 	}
 

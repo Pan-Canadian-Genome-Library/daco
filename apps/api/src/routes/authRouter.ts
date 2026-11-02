@@ -268,7 +268,7 @@ authRouter.post(
 			return;
 		}
 
-		const user = await refreshSessionUser(request.session);
+		const user = await refreshSessionUser(request.session, serverConfig.SESSION_USER_REFRESH_INTERVAL_MS);
 
 		if (!user) {
 			response.status(401).json({ error: 'UNAUTHORIZED', message: 'User is not logged in.' });
