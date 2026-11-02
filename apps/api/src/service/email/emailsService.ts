@@ -840,7 +840,7 @@ const emailSvc = (db: PostgresDb) => {
 
 				return success(response);
 			} catch (error) {
-				const message = `Error sending email - sendCollaboratorsEmailApproval`;
+				const message = `Error sending email - sendCollaboratorsEmailApproval for application id: ${id}`;
 				logger.error(message, error);
 
 				return failure('SYSTEM_ERROR', message);

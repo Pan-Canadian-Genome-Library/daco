@@ -188,6 +188,8 @@ export const studyClinicalDTOSchema = z.object({
 	leadOrganizations: z.array(z.string()),
 	collaborators: z.array(z.string()).nullable().optional(),
 	publicationLinks: z.array(z.string()).nullable().optional(),
+	duoPermission: z.string(),
+	diseaseSpecificModifier: z.array(z.string()).default([]),
 	createdAt: z.union([z.date(), z.string()]),
 	updatedAt: z.union([z.date(), z.string()]).nullable(),
 	defaultTranslation: z.number().optional(),
