@@ -26,6 +26,8 @@ declare module 'express-session' {
 	interface SessionData {
 		user: SessionUser;
 		account: SessionAccount;
+		/** Epoch milliseconds of the last time the session user was loaded from the AuthZ service */
+		userRefreshedAt: number;
 	}
 }
 

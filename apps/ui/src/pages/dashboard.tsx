@@ -20,6 +20,7 @@
 import { Alert, Col, Flex, Layout, Row, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+import useRefreshUser from '@/api/mutations/useRefreshUser';
 import useGetApplicationList from '@/api/queries/useGetApplicationList';
 
 import ContentWrapper, { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
@@ -34,8 +35,6 @@ import { useEffect, useState } from 'react';
 
 const { Content } = Layout;
 
-const todayDate = new Date();
-
 const DashboardPage = () => {
 	const { useToken } = theme;
 	const { t: translate } = useTranslation();
@@ -45,6 +44,7 @@ const DashboardPage = () => {
 	const { user } = useUserContext();
 	const [expiresAt, setExpiresAt] = useState<Date | undefined>(undefined);
 	const showDeviceRestriction = minWidth <= 1024;
+	const { mutate: refreshUser } = useRefreshUser();
 
 	const { data: applicationData, error } = useGetApplicationList({
 		sort: [
@@ -58,7 +58,19 @@ const DashboardPage = () => {
 	});
 
 	useEffect(() => {
+		// DAC authorizations change after login (e.g. when an application is approved or revoked),
+		// reload them when the dashboard is opened and whenever the window regains focus.
+		const onFocus = () => refreshUser();
+
+		onFocus();
+		window.addEventListener('focus', onFocus);
+
+		return () => window.removeEventListener('focus', onFocus);
+	}, [refreshUser]);
+
+	useEffect(() => {
 		// Determine any expiration date from the user's DAC authorizations
+		const todayDate = new Date();
 		const anyDacPermission = user?.dacAuthorizations.find(
 			(auth) =>
 				auth?.startDate &&
@@ -67,10 +79,8 @@ const DashboardPage = () => {
 				new Date(auth.endDate) >= todayDate,
 		)?.endDate;
 
-		if (anyDacPermission) {
-			setExpiresAt(new Date(anyDacPermission));
-			return;
-		}
+		// Clears the expiration date when the user no longer has a valid DAC authorization (e.g. after a revoke)
+		setExpiresAt(anyDacPermission ? new Date(anyDacPermission) : undefined);
 	}, [user]);
 
 	return (
