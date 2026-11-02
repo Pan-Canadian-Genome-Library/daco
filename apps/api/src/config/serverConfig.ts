@@ -34,6 +34,7 @@ const serverConfigSchema = z.object({
 		.int()
 		.optional()
 		.default(1000 * 60 * 30), // default 30 minutes
+	SESSION_USER_REFRESH_INTERVAL_MS: z.coerce.number().int().nonnegative().optional().default(60_000), // default 1 minute
 	UI_HOST: z.string().url(),
 	CLINICAL_URL: z.string().url(),
 });

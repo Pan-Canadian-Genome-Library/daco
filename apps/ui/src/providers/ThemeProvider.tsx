@@ -58,7 +58,7 @@ export const pcglColours = {
 const pcglTheme: ThemeConfig = {
 	token: {
 		fontFamily:
-			"Work Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+			"Jost, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 
 		colorPrimary: pcglColours.primary,
 		colorFillAlter: pcglColours.white,
@@ -216,7 +216,7 @@ export const studyTableTheme: ThemeConfig = {
 export const pcglSkeletonTheme: ThemeConfig = {
 	token: {
 		fontFamily:
-			"Work Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+			"Jost, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
 
 		colorPrimary: pcglColours.tertiary,
 		colorFillSecondary: '#f5f5f5',
