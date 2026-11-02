@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH D
  */
 import { Button, Flex, Layout, Typography, theme } from 'antd';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
 import { errorStyles, errorStylesCondensed } from '@/components/pages/global/ErrorPage';
@@ -26,7 +26,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Title, Text, Link } = Typography;
 const { useToken } = theme;
 
 const LoginError = () => {
@@ -65,7 +65,14 @@ const LoginError = () => {
 						])}
 					</Text>
 
-					<Text>{translate([`global.loginError.descriptions.${code}.description2`, ''])}</Text>
+					<Text>
+						<Trans
+							i18nKey={`global.loginError.descriptions.${code}.description2`}
+							components={{
+								link1: <Link href={'mailto:' + import.meta.env.VITE_HELP_DESK_EMAIL} underline />,
+							}}
+						/>
+					</Text>
 				</Flex>
 				<Flex style={{ ...buttonContainerStyles }}>
 					{code === 'NOT_FOUND' ? (
