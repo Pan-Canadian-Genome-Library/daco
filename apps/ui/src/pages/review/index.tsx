@@ -23,13 +23,14 @@ import { useTranslation } from 'react-i18next';
 import { useMatch, useNavigate } from 'react-router';
 
 import { API_PATH_LOGIN } from '@/api/paths';
+import Title from '@/components/Title';
 import { getExtraSessionInformation, setExtraSessionInformation } from '@/global/localStorage';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { useUserContext } from '@/providers/UserProvider';
 
 const { useToken } = theme;
 const { Content } = Layout;
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const InstitutionalRepLogin = () => {
 	const { token } = useToken();

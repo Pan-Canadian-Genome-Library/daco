@@ -18,11 +18,12 @@
  */
 
 import StatusBannerWrapper from '@/components/layouts/StatusBarWrapper';
+import Title from '@/components/Title';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { Col, Flex, Row, theme, Typography } from 'antd';
 import { PropsWithChildren } from 'react';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 interface PageHeaderProps extends PropsWithChildren {

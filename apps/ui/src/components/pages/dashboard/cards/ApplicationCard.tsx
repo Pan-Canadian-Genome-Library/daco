@@ -22,12 +22,13 @@ import { Card, Flex, theme, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { getApplicationStateProperties } from '@/components/pages/dashboard/getApplicationStateProps';
+import Title from '@/components/Title';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ApplicationDTO } from '@pcgl-daco/data-model';
 import { ApplicationStates } from '@pcgl-daco/data-model/src/types';
 import { useNavigate } from 'react-router';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 type ApplicationCardProps = {

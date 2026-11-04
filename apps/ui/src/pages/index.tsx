@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 The Ontario Institute for Cancer Research. All rights reserved
+ * Copyright (c) 2026 The Ontario Institute for Cancer Research. All rights reserved
  *
  * This program and the accompanying materials are made available under the terms of
  * the GNU Affero General Public License v3.0. You should have received a copy of the
@@ -23,10 +23,11 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { API_PATH_LOGIN } from '@/api/paths';
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
+import { default as PcglTitle, default as Title } from '@/components/Title';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
 const { Content } = Layout;
-const { Title, Paragraph, Link, Text } = Typography;
+const { Paragraph, Link, Text } = Typography;
 const { useToken } = theme;
 
 const heroStyle: React.CSSProperties = {
@@ -49,7 +50,7 @@ const HomePage = () => {
 				<Row align="middle" style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} gutter={[90, 60]}>
 					<Col span={24} lg={12}>
 						<Flex vertical>
-							<Title style={{ color: token.colorTextSecondary }}> {translate('homepage.title')}</Title>
+							<PcglTitle style={{ color: token.colorTextSecondary }}>{translate('homepage.title')}</PcglTitle>
 							<Paragraph style={{ color: token.colorTextSecondary }}>{translate('homepage.introduction')}</Paragraph>
 							<Col span={6} style={{ padding: 0 }}>
 								<Button type="link" color="primary" variant="solid" href={API_PATH_LOGIN}>
@@ -63,7 +64,7 @@ const HomePage = () => {
 			<Row style={{ ...heroStyle, width: isResponsiveMode ? '95%' : '90%' }} align={'top'} gutter={[90, 60]}>
 				<Col xs={{ flex: '100%' }} md={{ flex: '100%' }} lg={{ flex: '50%' }}>
 					<Flex vertical gap={'middle'}>
-						<Title level={2}>{translate('homepage.overviewTitle')}</Title>
+						<PcglTitle level={2}>{translate('homepage.overviewTitle')}</PcglTitle>
 						<Paragraph>{translate('homepage.authorizationText')}</Paragraph>
 						<Paragraph>
 							<Trans
