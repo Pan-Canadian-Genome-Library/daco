@@ -17,6 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { pcglFonts } from '@/providers/ThemeProvider';
 import { Typography } from 'antd';
 import type { ComponentProps } from 'react';
 
@@ -26,7 +27,7 @@ type PcglTitleProps = ComponentProps<typeof AntdTitle>;
 
 const Title = ({ style, children, ...rest }: PcglTitleProps) => {
 	return (
-		<AntdTitle style={{ fontFamily: 'Jost', ...style }} {...rest}>
+		<AntdTitle style={{ fontFamily: pcglFonts.primary, ...style }} {...rest}>
 			{children}
 		</AntdTitle>
 	);
