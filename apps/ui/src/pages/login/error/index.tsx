@@ -21,12 +21,13 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
 import { errorStyles, errorStylesCondensed } from '@/components/pages/global/ErrorPage';
+import Title from '@/components/Title';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 
 const { Content } = Layout;
-const { Title, Text, Link } = Typography;
+const { Text, Link } = Typography;
 const { useToken } = theme;
 
 const LoginError = () => {
