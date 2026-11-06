@@ -76,7 +76,7 @@ export const authZUserInfo = z.object({
 	groups: z
 		.array(
 			z.object({
-				description: z.string(),
+				description: z.string().optional(),
 				id: z.number().int(),
 				name: z.string(),
 			}),
