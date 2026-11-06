@@ -165,7 +165,11 @@ export const getUserInformation = async (
 		const validatedAuthZData = authZUserInfo.safeParse(res);
 
 		if (!validatedAuthZData.success) {
-			logger.error(`[AUTHZ]: AuthZ service returned unexpected, or malformed data.`, validatedAuthZData.error);
+			logger.error(
+				`[AUTHZ]: Could not validate AuthZ response. The response did not match the expected format.
+`,
+				validatedAuthZData.error,
+			);
 			return failure('SYSTEM_ERROR', 'Unable to retrieve user information from the PCGL AuthZ service.');
 		}
 
