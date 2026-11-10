@@ -195,14 +195,12 @@
 		}
 	},
 	"appendices": {
-		"title": "",
-		"description": "",
-		"section1": "",
-		"readAppendix": "",
-		"haveReadAppendix": "",
-		"appendix1": "",
-		"appendix2": "",
-		"appendix3": ""
+		"title": "Annexes",
+		"description": "Veuillez consulter et accepter les annexes suivantes.",
+		"section1": "Politiques du PCGL",
+		"readAppendix": "LIRE L'ANNEXE",
+		"haveReadAppendix": "Vous avez lu {{value}}",
+		"appendix1": "Le Cadre de gouvernance des données"
 	},
 	"sign-and-submit-section": {
 		"title": "Signer et soumettre",
