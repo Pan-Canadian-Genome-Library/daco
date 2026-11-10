@@ -24,6 +24,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
+import GovernancePDF from '@/assets/PCGL_GovernanceFramework_v2.pdf';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
 import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
@@ -120,31 +121,12 @@ const Appendices = () => {
 									description: (
 										<LabelWithLink
 											label={translate('appendices.appendix1')}
-											link={{ label: translate('appendices.readAppendix'), href: '#' }}
+											link={{ label: translate('appendices.readAppendix'), href: GovernancePDF }}
+											isPdf
 										/>
 									),
-									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX I' }),
+									label: translate('appendices.haveReadAppendix', { value: 'Data Governance Framework' }),
 									value: appendicesEnum[0],
-								},
-								{
-									description: (
-										<LabelWithLink
-											label={translate('appendices.appendix2')}
-											link={{ label: translate('appendices.readAppendix'), href: '#' }}
-										/>
-									),
-									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX II' }),
-									value: appendicesEnum[1],
-								},
-								{
-									description: (
-										<LabelWithLink
-											label={translate('appendices.appendix3')}
-											link={{ label: translate('appendices.readAppendix'), href: '#' }}
-										/>
-									),
-									label: translate('appendices.haveReadAppendix', { value: 'APPENDIX III' }),
-									value: appendicesEnum[2],
 								},
 							]}
 						/>
