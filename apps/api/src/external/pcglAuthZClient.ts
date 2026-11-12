@@ -37,10 +37,17 @@ const logger = BaseLogger.forModule('authZClient');
 
 let serviceToken: string | undefined = undefined;
 
+const formatDateAsYYYYMMDD = (date: Date): string => {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+};
+
 const addDaysToDateString = (dateString: string, days: number) => {
 	const date = new Date(dateString);
 	date.setDate(date.getDate() + days);
-	return date.toISOString();
+	return formatDateAsYYYYMMDD(date);
 };
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
@@ -199,7 +206,7 @@ export const addDacAuthorizations = async ({
 }): AsyncResult<AuthZAddDacAuthorizationsResponse, 'SYSTEM_ERROR'> => {
 	const { APPROVED_PERMISSION_EXPIRES_IN_DAYS } = authConfig;
 
-	const today = new Date().toISOString();
+	const today = formatDateAsYYYYMMDD(new Date());
 
 	try {
 		const response = await fetchAuthZResource(`/study/${studyId}/dac_authorizations`, approverAccessToken, {
