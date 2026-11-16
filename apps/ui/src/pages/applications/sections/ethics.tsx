@@ -19,7 +19,7 @@
 
 import { CloseOutlined, UploadOutlined } from '@ant-design/icons';
 import { ethicsSchema, type EthicsSchemaType } from '@pcgl-daco/validation';
-import { Button, Flex, Form, Row, theme, Typography, Upload, UploadFile } from 'antd';
+import { Alert, Button, Flex, Form, Row, theme, Typography, Upload, UploadFile } from 'antd';
 import { createSchemaFieldRule } from 'antd-zod';
 import { RcFile, UploadChangeParam } from 'antd/es/upload';
 import { useState } from 'react';
@@ -42,7 +42,6 @@ import RevisionsAlert from '@/components/RevisionsAlert';
 import { ApplicationOutletContext, Nullable } from '@/global/types';
 import { canEditSection } from '@/pages/applications/utils/canEditSection';
 import { useApplicationContext } from '@/providers/context/application/ApplicationContext';
-import { useNotificationContext } from '@/providers/context/notification/NotificationContext';
 import { FileExtensionTypes, FilesDTO } from '@pcgl-daco/data-model';
 
 const { Text } = Typography;
@@ -53,7 +52,6 @@ const rule = createSchemaFieldRule(ethicsSchema);
 const MAX_FILE_SIZE = 5000000;
 
 const Ethics = () => {
-	const notification = useNotificationContext();
 	const { t: translate } = useTranslation();
 	const { appId, isEditMode, revisions, dacComments, disabledDacComments } =
 		useOutletContext<ApplicationOutletContext>();
@@ -67,6 +65,7 @@ const Ethics = () => {
 		currentApplicationState: state.applicationState,
 	});
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [displayAlert, setDisplayAlert] = useState(false);
 	const { mutateAsync: editApplication } = useEditApplication();
 
 	const form = useSectionForm({
@@ -91,23 +90,15 @@ const Ethics = () => {
 		const isValidImage = new Set(Object.values(FileExtensionTypes)).has(file.type);
 
 		if (!isValidImage) {
-			notification.openNotification({
-				type: 'error',
-				message: translate('invalidFileTitle'),
-			});
-
+			setDisplayAlert(true);
 			return isValidImage || Upload.LIST_IGNORE;
 		}
 
 		if (file.size > MAX_FILE_SIZE) {
-			notification.openNotification({
-				type: 'error',
-				message: translate('invalidFileSizeTitle'),
-				description: translate('invalidFileSizeDescription'),
-			});
-
-			return false;
+			setDisplayAlert(true);
+			return Upload.LIST_IGNORE;
 		}
+		setDisplayAlert(false);
 	};
 
 	// Generate download url and then remove the link after downloading
@@ -273,6 +264,13 @@ const Ethics = () => {
 							</Flex>
 						) : null}
 					</Form>
+					{displayAlert ? (
+						<Alert
+							type="error"
+							message={translate('invalidFileTitle')}
+							description={translate('invalidFileDescription')}
+						/>
+					) : null}
 				</SectionContent>
 				<SectionFooter currentRoute="ethics" isEditMode={canEdit} />
 				<DeleteEthicsFileModal
