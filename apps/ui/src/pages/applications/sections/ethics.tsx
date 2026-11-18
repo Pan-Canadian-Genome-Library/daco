@@ -91,7 +91,7 @@ const Ethics = () => {
 
 		if (!isValidImage) {
 			setDisplayAlert(true);
-			return isValidImage || Upload.LIST_IGNORE;
+			return Upload.LIST_IGNORE;
 		}
 
 		if (file.size > MAX_FILE_SIZE) {
