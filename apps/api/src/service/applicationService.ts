@@ -17,7 +17,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 
 import { RevisionsDTO, type ApplicationStateTotals, type DacCommentRecord } from '@pcgl-daco/data-model';
 import {
@@ -724,7 +724,9 @@ const applicationSvc = (db: PostgresDb) => ({
 							.where((email) =>
 								and(
 									eq(email.application_id, applicationRecord.application_id),
-									inArray(email.application_action_id, actionIds),
+									actionIds.length
+										? or(inArray(email.application_action_id, actionIds), isNull(email.application_action_id))
+										: undefined,
 								),
 							)
 							.orderBy(...emailSortQuery());

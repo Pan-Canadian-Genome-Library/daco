@@ -23,10 +23,11 @@ import { useNavigate } from 'react-router';
 
 import useImportStudies from '@/api/mutations/useImportStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
+import Title from '@/components/Title';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { useTranslation } from 'react-i18next';
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 const cardStyle: React.CSSProperties = {
 	borderTop: `4px solid ${pcglColours.primary}`,

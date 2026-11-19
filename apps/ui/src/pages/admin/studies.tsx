@@ -24,11 +24,12 @@ import { useNavigate } from 'react-router';
 import useToggleAccptingStudies from '@/api/mutations/useToggleAcceptingStudies';
 import useGetStudies from '@/api/queries/useGetStudies';
 import ContentWrapper from '@/components/layouts/ContentWrapper';
+import Title from '@/components/Title';
 import { pcglColours } from '@/providers/ThemeProvider';
 import { type StudyDacoDTO } from '@pcgl-daco/data-model';
 import { useTranslation } from 'react-i18next';
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 const AdminStudiesPage = () => {
 	const { data, isLoading, isError } = useGetStudies();

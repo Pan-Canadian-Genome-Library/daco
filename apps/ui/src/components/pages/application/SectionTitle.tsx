@@ -17,11 +17,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import Title from '@/components/Title';
 import { LockFilled } from '@ant-design/icons';
 import { Divider, Flex, Typography } from 'antd';
 import { PropsWithChildren, ReactNode } from 'react';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface SectionTitleProps extends PropsWithChildren {
 	title: string;

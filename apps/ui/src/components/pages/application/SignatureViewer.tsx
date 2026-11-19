@@ -17,10 +17,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import Title from '@/components/Title';
 import { Flex, Image, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 type SignatureViewerProps = {
 	title: string;
