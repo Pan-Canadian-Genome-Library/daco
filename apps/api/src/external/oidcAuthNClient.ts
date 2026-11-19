@@ -32,6 +32,8 @@ import {
 
 const logger = BaseLogger.forModule('oidcAuthClient');
 
+const OIDC_SCOPE = `openid profile email org.cilogon.userinfo offline_access`;
+
 /**
  * OIDC Authorization Flow Step 1
  * This is a redirection to the OIDC provider /authorize endpoint
@@ -40,7 +42,7 @@ export const getOidcAuthorizeUrl = (authConfig: AuthConfig, onSuccessRedirectUrl
 	const params = new URLSearchParams({
 		client_id: authConfig.AUTH_CLIENT_ID,
 		response_type: `code`,
-		scope: `openid profile email org.cilogon.userinfo`,
+		scope: OIDC_SCOPE,
 		redirect_uri: onSuccessRedirectUrl,
 	});
 	return urlJoin(authConfig.AUTH_PROVIDER_HOST, `/authorize?${params.toString()}`);
@@ -96,5 +98,41 @@ export const getUserInfo = async (
 		// we'll just log the result and return a system error
 		logger.error(`Unexpected error occurred fetching OIDC User Info.`, error);
 		return failure('SYSTEM_ERROR', 'Unable to retrieve user info from OIDC Provider.');
+	}
+};
+
+/**
+ * Refreshes the user session using the given refresh token.
+ * @param authConfig Authentication configuration
+ * @param refreshToken Refresh token to use for refreshing the session
+ * @returns Refreshed token response
+ */
+export const refreshUserSession = async (
+	authConfig: AuthConfig,
+	{ refreshToken }: { refreshToken: string },
+): AsyncResult<OIDCTokenResponse, 'SYSTEM_ERROR'> => {
+	const oauth2RefreshUrl = urlJoin(authConfig.AUTH_PROVIDER_HOST, `/oauth2/token`);
+	const params = {
+		refresh_token: refreshToken,
+		client_id: authConfig.AUTH_CLIENT_ID,
+		client_secret: authConfig.AUTH_CLIENT_SECRET,
+		grant_type: 'refresh_token',
+		scope: OIDC_SCOPE,
+	};
+
+	try {
+		const tokenResponse = await axios.get(oauth2RefreshUrl, { params });
+		const parsedTokenResponse = oidcTokenResponseSchema.safeParse(tokenResponse.data);
+
+		if (!parsedTokenResponse.success) {
+			logger.error(
+				`OIDC Provider returned tokens for refresh request with unexpected format: ${parsedTokenResponse.error.message}`,
+			);
+			return failure('SYSTEM_ERROR', 'Token response from refresh request has unexpected format.');
+		}
+		return success(parsedTokenResponse.data);
+	} catch (error: unknown) {
+		logger.error(`Unexpected error using refresh_token to retrieve user tokens.`, error);
+		return failure('SYSTEM_ERROR', 'Unable to refresh user session from OIDC provider.');
 	}
 };

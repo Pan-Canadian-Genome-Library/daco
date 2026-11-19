@@ -131,8 +131,7 @@
 						"exemplar1": "Utilisez un langage comme si vous décriviez le projet à quelqu'un en dehors de votre domaine.",
 						"exemplar2": "Définissez tous les termes techniques utilisés.",
 						"exemplar3": "Nous vous recommandons vivement d'utiliser un outil de lisibilité en ligne pour évaluer le niveau scolaire de votre texte ; le niveau de langage visé est un niveau courant ou standard (équivalent du grade 8 or 9 en anglais).",
-						"exemplar4": "Expliquez en langage clair pourquoi vous posez cette question de recherche, ce que vous espérez découvrir et comment vous comptez utiliser les résultats.",
-						"exemplar5": "Considérez ces 3 éléments clés : structure et contenu, lisibilité, et guide linguistique."
+						"exemplar4": "Expliquez en langage clair pourquoi vous posez cette question de recherche, ce que vous espérez découvrir et comment vous comptez utiliser les résultats."
 					}
 				}
 			}
@@ -154,7 +153,7 @@
 		"ethicsLetterDescription": "Votre pays ou région exige que votre projet de recherche soit soumis à un examen éthique ; par conséquent, ce projet de recherche a été approuvé par un CER/CEI officiellement désigné pour approuver et/ou surveiller la recherche impliquant des êtres humains. Conformément à l'Accord d'accès aux données (voir Section G), l'approbation éthique actuelle et applicable relève de la responsabilité du chercheur principal/de la chercheuse principale. Une lettre d'approbation éthique a été téléchargée.",
 		"exemptionDescription": "Vous déclarez et garantissez que votre pays ou région n'exige pas que votre projet de recherche soit soumis à un examen éthique. Une lettre d'exemption d'examen éthique a été téléchargée.",
 		"attach": "Veuillez joindre une version PDF de la lettre d'{{letter}} éthique à cette demande :",
-		"allowedFileTypes": "Types de fichiers autorisés : pdf | Taille maximale : 5 Mo",
+		"allowedFileTypes": "Types de fichiers autorisés : PDF | Taille maximale : 5 Mo",
 		"deleteModalTitle": "Êtes-vous sûr/e de vouloir supprimer {{filename}} ?"
 	},
 	"requested-study": {

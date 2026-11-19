@@ -73,6 +73,13 @@ export const convertToSessionAccount = (data: OIDCTokenResponse): Result<Session
 	return result;
 };
 
+/**
+ * Converts the dac_authorizations of an AuthZ user info response into the session user format.
+ */
+export const convertToSessionDacAuthorizations = (
+	pcglData: PCGLAuthZUserInfoResponse,
+): SessionUser['dacAuthorizations'] => objectToCamel(pcglData).dacAuthorizations;
+
 export const convertToSessionUser = async (
 	oidcData: OIDCUserInfoResponse,
 	pcglData: PCGLAuthZUserInfoResponse,

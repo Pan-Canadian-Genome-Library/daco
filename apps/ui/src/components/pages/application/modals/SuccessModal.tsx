@@ -17,9 +17,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Button, Flex, Modal, Typography } from 'antd';
-
-const { Title } = Typography;
+import Title from '@/components/Title';
+import { Button, Flex, Modal } from 'antd';
 
 interface SuccessModalProps {
 	isOpen: boolean;
