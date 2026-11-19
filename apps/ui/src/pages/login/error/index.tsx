@@ -23,6 +23,7 @@ import ApplyForAccessModal from '@/components/modals/ApplyForAccessModal';
 import { errorStyles, errorStylesCondensed } from '@/components/pages/global/ErrorPage';
 import Title from '@/components/Title';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
+import i18n from '@/i18n/translations';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 
@@ -67,12 +68,14 @@ const LoginError = () => {
 					</Text>
 
 					<Text>
-						<Trans
-							i18nKey={`global.loginError.descriptions.${code}.description2`}
-							components={{
-								link1: <Link href={'mailto:' + import.meta.env.VITE_HELP_DESK_EMAIL} underline />,
-							}}
-						/>
+						{i18n.exists(`global.loginError.descriptions.${code}.description2`) && (
+							<Trans
+								i18nKey={`global.loginError.descriptions.${code}.description2`}
+								components={{
+									link1: <Link href={'mailto:' + import.meta.env.VITE_HELP_DESK_EMAIL} underline />,
+								}}
+							/>
+						)}
 					</Text>
 				</Flex>
 				<Flex style={{ ...buttonContainerStyles }}>
