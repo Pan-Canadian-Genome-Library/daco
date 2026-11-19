@@ -125,7 +125,7 @@ const Appendices = () => {
 											isPdf
 										/>
 									),
-									label: translate('appendices.haveReadAppendix', { value: 'Data Governance Framework' }),
+									label: translate('appendices.haveReadAppendix', { value: translate('appendices.appendix1') }),
 									value: appendicesEnum[0],
 								},
 							]}

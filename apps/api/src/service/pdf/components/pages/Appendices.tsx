@@ -57,22 +57,6 @@ const Appendices = ({ acceptedAppendices, lang = SupportedLangs.ENGLISH }: Appen
 						</Link>
 					</Text>
 				</Checkbox>
-				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[1])}>
-					<Text style={styles.text}>
-						{lang === SupportedLangs.ENGLISH ? APPENDICES.APPENDIX_II : FR_APPENDICES.APPENDIX_II} &mdash;{' '}
-						<Link src="#" style={styles.link}>
-							Data Access and Data Use Policies and Guidelines
-						</Link>
-					</Text>
-				</Checkbox>
-				<Checkbox unchecked={!acceptedAppendices?.find((appendix) => appendix === appendicesEnum[2])}>
-					<Text style={styles.text}>
-						{lang === SupportedLangs.ENGLISH ? APPENDICES.APPENDIX_III : FR_APPENDICES.APPENDIX_III} &mdash;{' '}
-						<Link src="#" style={styles.link}>
-							Intellectual Property Policy
-						</Link>
-					</Text>
-				</Checkbox>
 			</FormDisplay>
 		</StandardPage>
 	);

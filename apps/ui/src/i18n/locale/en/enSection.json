@@ -200,7 +200,7 @@
 		"section1": "PCGL Policies",
 		"readAppendix": "READ THE APPENDIX",
 		"haveReadAppendix": "You have read the {{value}}",
-		"appendix1": "The Data Governance Framework"
+		"appendix1": "Data Governance Framework"
 	},
 	"sign-and-submit-section": {
 		"title": "Sign & Submit",
