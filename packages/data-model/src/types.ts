@@ -399,7 +399,7 @@ export const agreementEnum = [
 	'dac_agreement_read_and_agreed',
 ] as const;
 
-export const appendicesEnum = ['appendix_1'] as const;
+export const appendicesEnum = ['appendix_1', 'appendix_2', 'appendix_3'] as const;
 
 export interface RevisionsDTO {
 	applicationActionId: number;
