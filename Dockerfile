@@ -46,7 +46,7 @@ RUN pnpm build:all
 # UI Server
 #######################################################
 
-FROM nginx:1.27-alpine-slim as daco-ui
+FROM nginx:1.30-alpine-slim as daco-ui
 
 ARG APP_USER
 ARG WORKDIR
