@@ -22,9 +22,10 @@ import { Col, Flex, Row, Typography, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import StatusBarWrapper from '@/components/layouts/StatusBarWrapper';
+import Title from '@/components/Title';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 // TODO: properly type and verify incoming data once API service is completed

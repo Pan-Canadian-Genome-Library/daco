@@ -63,6 +63,11 @@ services:
       SERVER_UPLOAD_LIMIT: 4000
       PLURALIZE_SCHEMAS_ENABLED:
       VALIDATOR_CONFIG: '[]'
+      UI_HOST: http://submission-ui:3031
+      VALKEY_HOST: daco-valkey
+      VALKEY_PORT: 6379
+      VALKEY_USER: default
+      VALKEY_PASSWORD: valkeypass
     volumes:
       - 'clinical-submission:/clinical-submission/data'
   clinical-postgres:

@@ -21,11 +21,12 @@ import React from 'react';
 
 import { contentWrapperStyles } from '@/components/layouts/ContentWrapper';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import Title from '@/components/Title';
 import { useMinWidth } from '@/global/hooks/useMinWidth';
 import { ServerError } from '@/global/types';
 
 const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 type ErrorProps = {

@@ -23,7 +23,7 @@ import { ITransition, StateMachine, t as transition } from 'typescript-fsm';
 import { getDbInstance } from '@/db/index.js';
 import { applicationActionSvc } from '@/service/applicationActionService.js';
 import { applicationSvc } from '@/service/applicationService.js';
-import { type AddActionMethods, type ApplicationRecord } from '@/service/types.js';
+import { type AddActionMethods, type ApplicationRecord, type ApplicationUpdates } from '@/service/types.js';
 import { type AsyncResult, failure, type Result, success } from '@/utils/results.js';
 import BaseLogger from '../logger.js';
 import { validateContent } from './validation.js';
@@ -107,10 +107,11 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 		action: ApplicationStateEvents,
 		actionMethod: AddActionMethods,
 		userName: string,
+		additionalUpdates: ApplicationUpdates = {},
 	): AsyncResult<ApplicationRecord & { actionId: number }, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		try {
 			await this.dispatch(action);
-			const updateResult = await this._updateRecords(actionMethod, userName);
+			const updateResult = await this._updateRecords(actionMethod, userName, additionalUpdates);
 			return updateResult;
 		} catch (error) {
 			const message = `Unexpected error performing action "${actionMethod}" on application with id "${this._application.id}"`;
@@ -122,6 +123,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	async _updateRecords(
 		method: AddActionMethods,
 		userName: string,
+		additionalUpdates: ApplicationUpdates = {},
 	): AsyncResult<ApplicationRecord & { actionId: number }, 'SYSTEM_ERROR' | 'NOT_FOUND'> {
 		const db = getDbInstance();
 		const applicationRepo = applicationSvc(db);
@@ -136,7 +138,7 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 
 				const { state_after: state } = actionResult.data;
 				const { id } = this._application;
-				const update = { state };
+				const update = { ...additionalUpdates, state };
 				const applicationResult = await applicationRepo.findOneAndUpdate({
 					id,
 					update,
@@ -296,7 +298,9 @@ export class ApplicationStateManager extends StateMachine<ApplicationStateValues
 	async approveDacReview(userName: string) {
 		const transitionResult = this._canPerformAction(dac_approve_review);
 		if (transitionResult.success) {
-			return await this._dispatchAndUpdateAction(dac_approve_review, 'dacApproved', userName);
+			return await this._dispatchAndUpdateAction(dac_approve_review, 'dacApproved', userName, {
+				approved_at: new Date(),
+			});
 		} else {
 			return transitionResult;
 		}

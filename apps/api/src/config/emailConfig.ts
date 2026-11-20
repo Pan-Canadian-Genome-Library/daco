@@ -24,6 +24,7 @@ export const emailConfigSchema = z.object({
 	IS_PROD: z.string().optional().default('false'),
 	PORT: z.coerce.number().optional().default(3000),
 	UI_HOST: z.string().url(),
+	RESEARCH_PORTAL_URL: z.string().url(),
 	EMAIL_HOST: z.string(),
 	EMAIL_PORT: z.coerce.number().default(1025),
 	EMAIL_FROM_ADDRESS: z.string().email(),
@@ -49,6 +50,7 @@ export const getEmailConfig = {
 	express: {
 		port: parseResult.data.PORT,
 		ui: parseResult.data.UI_HOST,
+		researchPortalUrl: parseResult.data.RESEARCH_PORTAL_URL,
 	},
 	email: {
 		name: parseResult.data.EMAIL_SERVER_HOSTNAME,

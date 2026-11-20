@@ -18,10 +18,10 @@
  */
 
 import useCreateApplication from '@/api/mutations/useCreateApplication';
-import { Card, Flex, theme, Typography } from 'antd';
+import Title from '@/components/Title';
+import { Card, Flex, theme } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-const { Title } = Typography;
 const { useToken } = theme;
 
 const NewApplicationCard = () => {
