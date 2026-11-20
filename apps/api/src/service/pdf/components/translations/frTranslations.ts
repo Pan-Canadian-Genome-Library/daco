@@ -61,12 +61,10 @@ export const FR_INTRODUCTION: IntroductionTranslation = {
 
 // Appendices Page
 export const FR_APPENDICES: AppendicesTranslation = {
-	TITLE: 'Appendices',
-	DESCRIPTION: 'Please review and agree to the following Appendices.',
-	PCGL_POLICIES_TITLE: 'PCGL Policies',
-	APPENDIX_I: 'You have read APPENDIX I — PCGL Goals and Policies',
-	APPENDIX_II: 'You have read APPENDIX II — Data Access and Data Use Policies and Guidelines',
-	APPENDIX_III: 'You have read APPENDIX III — Intellectual Property Policy',
+	TITLE: 'Annexes',
+	DESCRIPTION: 'Veuillez lire et accepter les annexes suivantes.',
+	PCGL_POLICIES_TITLE: 'Politiques du PCGL',
+	APPENDIX_I: "Vous avez lu l'ANNEXE I — Cadre de gouvernance des données",
 };
 
 // ApplicantInformation Page
