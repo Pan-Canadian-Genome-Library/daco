@@ -178,6 +178,34 @@ table collaborators {
   }
 }
 
+table subcontractors {
+  id bigint [pk, not null]
+  application_id bigint [not null]
+  legal_name varchar(255) [not null]
+  country varchar(255) [not null]
+  address varchar(255) [not null]
+  building varchar(255)
+  state varchar(255) [not null]
+  postal varchar(255) [not null]
+  description_services text [not null]
+
+  indexes {
+    (application_id) [pk]
+  }
+}
+
+table subcontractors_storage_locations {
+  id bigint [pk, not null]
+  subcontractor_id bigint [not null]
+  site_type varchar(255) [not null]
+  country varchar(255) [not null]
+  state varchar(255)
+  indexes {
+    (subcontractor_id) [pk]
+  }
+}
+
+
 table dac {
   dac_id text [pk, not null]
   dac_name varchar(255) [not null]
@@ -275,6 +303,10 @@ ref: application_contents.signed_pdf - files.id
 ref: applications.dac_id - dac.dac_id
 
 ref: collaborators.application_id > application_contents.application_id
+
+ref: subcontractors.application_id > application_contents.application_id
+
+ref: subcontractors_storage_locations.subcontractor_id > subcontractors.id
 
 ref: comments.application_id - applications.id
 
