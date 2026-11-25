@@ -24,7 +24,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext } from 'react-router';
 
-import GovernancePDF from '@/assets/PCGL_GovernanceFramework_v2.pdf';
+import GovernancePDF from '@/assets/PCGL_GovernanceFramework.pdf';
 import SectionWrapper from '@/components/layouts/SectionWrapper';
 import DacComments from '@/components/pages/application/collapse/DacComments';
 import CheckboxGroup from '@/components/pages/application/form-components/CheckboxGroup';
