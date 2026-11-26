@@ -141,7 +141,7 @@ export type AgreementsSchemaType = z.infer<typeof agreementsSchema>;
 
 export const appendicesSchema = z.object({
 	acceptedAppendices: z.array(z.string()).superRefine((policies, context) => {
-		if (policies.length !== 3) {
+		if (policies.length !== 1) {
 			context.addIssue({
 				code: z.ZodIssueCode.custom,
 				params: { violation: 'checkboxesNotFilledOut' },

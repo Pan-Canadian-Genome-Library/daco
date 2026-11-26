@@ -24,13 +24,15 @@ const { Text, Link } = Typography;
 interface LabelWithLinkProps {
 	label: string;
 	link: { label: string; href: string };
+	isPdf?: boolean;
 }
 
-export const LabelWithLink = ({ label, link }: LabelWithLinkProps) => {
+export const LabelWithLink = ({ label, link, isPdf = false }: LabelWithLinkProps) => {
+	const additionalParams = isPdf ? { target: '_blank', rel: 'noopener noreferrer' } : null;
 	return (
 		<Flex align="start" justify="center" gap={'middle'}>
 			<Text>{label}</Text>
-			<Link href={link.href}>{`${link.label} ›`}</Link>
+			<Link href={link.href} {...additionalParams}>{`${link.label} ›`}</Link>
 		</Flex>
 	);
 };

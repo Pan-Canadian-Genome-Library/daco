@@ -107,8 +107,6 @@ export type AppendicesTranslation = {
 	DESCRIPTION: string;
 	PCGL_POLICIES_TITLE: string;
 	APPENDIX_I: string;
-	APPENDIX_II: string;
-	APPENDIX_III: string;
 };
 
 export type ApplicantInformationTranslation = {

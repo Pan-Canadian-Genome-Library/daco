@@ -292,6 +292,7 @@ const RequestedStudy = () => {
 												title: 'Disease Specific Modifier',
 												dataIndex: 'diseaseSpecificModifier',
 												key: 'diseaseSpecificModifier',
+												render: (_, record) => <>{record?.diseaseSpecificModifier.join(', ')}</>,
 											},
 											{
 												title: '',
